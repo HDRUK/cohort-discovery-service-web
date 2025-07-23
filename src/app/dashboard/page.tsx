@@ -1,19 +1,35 @@
-import { Box, Typography, Paper } from "@mui/material";
+import { Box, Paper } from "@mui/material";
 import QueryBuilder from "../components/QueryBuilder";
-import sendQuery from "../methods/sendQuery";
-import getMyQueryAction from "../actions/getMyQueryAction";
+import SubmitQueryButton from "../components/SubmitQueryButton";
+import CohortQueryInput from "../components/CohortQueryInput";
 
 const DashboardPage = () => {
-  sendQuery("dasdas");
-  getMyQueryAction("dasaihaaao");
-
   return (
-    <Box sx={{ width: "50%" }}>
-      <Paper>
+    <Box
+      sx={{
+        width: "100%",
+        height: "100vh", // overflows y direction
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "column",
+        gap: 2,
+      }}
+    >
+      <CohortQueryInput />
+      <Paper
+        sx={{
+          width: "50%",
+          p: 2,
+          borderStyle: "solid",
+          borderColor: "primary.main",
+          borderRadius: 2,
+          boxShadow: 3,
+        }}
+      >
         <QueryBuilder />
+        <SubmitQueryButton />
       </Paper>
-
-      {/*<Typography>{formatQuery(query, "json")}</Typography>*/}
     </Box>
   );
 };

@@ -8,6 +8,18 @@ import { useDaphneStore } from "../store/useDaphneStore";
 
 export default function ThemeRegistry({ children }: { children: ReactNode }) {
   const theme = createTheme({
+    palette: {
+      primary: {
+        main: "#3c7ea7",
+        contrastText: "#ffffff",
+      },
+      secondary: {
+        main: "#b58d5b",
+      },
+      background: {
+        default: "#ffffff",
+      },
+    },
     zIndex: {
       drawer: 2,
     },
@@ -22,7 +34,6 @@ export default function ThemeRegistry({ children }: { children: ReactNode }) {
       },
       body1: {
         fontSize: 20,
-        color: "red",
       },
     },
     components: {
@@ -60,6 +71,13 @@ export default function ThemeRegistry({ children }: { children: ReactNode }) {
         styleOverrides: {
           root: {
             textTransform: "none",
+          },
+        },
+      },
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: {
+            borderRadius: 20,
           },
         },
       },

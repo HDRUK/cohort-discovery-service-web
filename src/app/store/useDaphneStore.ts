@@ -3,7 +3,7 @@ import getMyQueryAction from "../actions/getMyQueryAction";
 
 export interface DaphneStoreState {
   query: any;
-  getQuery: (query: any) => void;
+  getQuery: () => void;
   setQuery: (query: any) => void;
   clearStates: () => void;
 }
@@ -11,8 +11,8 @@ export interface DaphneStoreState {
 const DEFAULT_QUERY = {
   combinator: "and",
   rules: [
-    { field: "firstName", operator: "=", value: "Steve" },
-    { field: "lastName", operator: "ends", value: "Vai" },
+    { field: "sex", operator: "=", value: "Male" },
+    { field: "age", operator: "between", value: [0, 100] },
   ],
 };
 
@@ -28,9 +28,11 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       loadingStatus: 'Signing you out...'
     });
     */
-    const { query } = get();
+    //    const { query } = get();
     //setLoading(true)
-    getMyQueryAction(query).then(() => {});
+    getMyQueryAction().then((res) => {
+      get().setQuery(res);
+    });
     //setLoading(false);
   },
   clearStates: () => {
