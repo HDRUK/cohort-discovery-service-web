@@ -28,7 +28,7 @@ const DashboardPage = () => {
         }}
       >
         <QueryBuilder />
-        <SubmitQueryButton />
+        {/*<SubmitQueryButton />*/}
       </Paper>
     </Box>
   );

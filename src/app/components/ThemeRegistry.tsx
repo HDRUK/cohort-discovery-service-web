@@ -87,7 +87,6 @@ export default function ThemeRegistry({ children }: { children: ReactNode }) {
   const { clearStates } = useDaphneStore();
 
   useEffect(() => {
-    console.log("yo i cleared states");
     clearStates();
   }, [clearStates]);
 

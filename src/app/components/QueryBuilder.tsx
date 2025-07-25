@@ -21,8 +21,14 @@ const fields: Field[] = [
   {
     name: "age",
     label: "Age",
-    inputType: "number", // supports numeric input
-    operators: ["=", ">", "<", ">=", "<=", "between"], // optional: restrict allowed operators
+    inputType: "number",
+    operators: ["=", ">", "<", ">=", "<=", "between"],
+  },
+  {
+    name: "condition",
+    label: "Condition",
+    inputType: "string",
+    operators: ["=", "!="],
   },
 ];
 
@@ -33,14 +39,14 @@ const QueryBuilderSkeleton = () => (
 );
 
 const QueryBuilder = () => {
-  const { query, setQuery } = useDaphneStore();
+  const { query, setQuery, isLoading } = useDaphneStore();
   const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
     setHasMounted(true);
   }, []);
 
-  if (!hasMounted) {
+  if (!hasMounted || isLoading) {
     return <QueryBuilderSkeleton />;
   }
 
