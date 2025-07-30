@@ -2,13 +2,14 @@ import { Box, Paper } from "@mui/material";
 import QueryBuilder from "../components/QueryBuilder";
 import SubmitQueryButton from "../components/SubmitQueryButton";
 import CohortQueryInput from "../components/CohortQueryInput";
+import QueryList from "../components/QueryList";
 
 const DashboardPage = () => {
   return (
     <Box
       sx={{
         width: "100%",
-        height: "100vh", // overflows y direction
+        //height: "100vh", // overflows y direction
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -28,8 +29,15 @@ const DashboardPage = () => {
         }}
       >
         <QueryBuilder />
-        {/*<SubmitQueryButton />*/}
+        <Box
+          sx={{ display: "flex", justifyContent: "end", width: "100%", my: 2 }}
+        >
+          <SubmitQueryButton />
+        </Box>
       </Paper>
+      <Box sx={{ height: 400, width: "70%" }}>
+        <QueryList />
+      </Box>
     </Box>
   );
 };

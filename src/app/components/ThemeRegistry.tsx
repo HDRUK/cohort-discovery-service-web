@@ -10,11 +10,12 @@ export default function ThemeRegistry({ children }: { children: ReactNode }) {
   const theme = createTheme({
     palette: {
       primary: {
-        main: "#3c7ea7",
+        main: "#29235c",
         contrastText: "#ffffff",
       },
       secondary: {
-        main: "#b58d5b",
+        main: "#3db28c",
+        contrastText: "#ffffff",
       },
       background: {
         default: "#ffffff",
@@ -84,7 +85,11 @@ export default function ThemeRegistry({ children }: { children: ReactNode }) {
     },
   });
 
-  const { clearStates } = useDaphneStore();
+  const { clearStates, getOmopDefaults } = useDaphneStore();
+
+  useEffect(() => {
+    getOmopDefaults();
+  }, [getOmopDefaults]);
 
   useEffect(() => {
     clearStates();
