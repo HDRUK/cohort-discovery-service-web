@@ -19,6 +19,7 @@
     "@mui/x-data-grid": "^8.9.1",
     "@tanstack/react-table": "^8.21.3",
     "axios": "^1.11.0",
+    "dayjs": "^1.11.13",
     "material-react-table": "^3.2.1",
     "next": "15.4.2",
     "react": "19.1.0",

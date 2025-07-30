@@ -5,7 +5,7 @@ import {
   useMaterialReactTable,
   type MRT_ColumnDef,
 } from "material-react-table";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Task } from "../types/api";
 import {
   Box,
@@ -15,12 +15,15 @@ import {
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
+import { useDaphneStore } from "../store/useDaphneStore";
 
 type TaskResultsProps = {
   tasks: Task[];
 };
 
 const TaskResults = ({ tasks }: TaskResultsProps) => {
+  const { collections } = useDaphneStore();
+
   const columns = useMemo<MRT_ColumnDef<Task>[]>(
     () => [
       {
@@ -61,10 +64,17 @@ const TaskResults = ({ tasks }: TaskResultsProps) => {
         id: "coverage",
         header: "Coverage [%]",
         accessorFn: (row) => {
-          const total = row.collection?.total ?? 1000;
+          const sexCount =
+            row.collection?.demographics?.result.metadata.parsed_files[0]?.parsed_data.find(
+              (d) => d.CODE === "SEX"
+            )?.COUNT;
+
+          const total = sexCount ? parseInt(sexCount) : 0;
           const count = row.result?.count;
+
           if (count === undefined || count === null) return null;
           if (!total || total === 0) return 0;
+
           return Math.round((count / total) * 100);
         },
         Cell: ({ cell }) => {
@@ -127,7 +137,12 @@ const TaskResults = ({ tasks }: TaskResultsProps) => {
     },
   });
 
-  return <MaterialReactTable table={table} />;
+  return (
+    <MaterialReactTable
+      key={collections.map((c) => c.id).join(",")}
+      table={table}
+    />
+  );
 };
 
 export default TaskResults;

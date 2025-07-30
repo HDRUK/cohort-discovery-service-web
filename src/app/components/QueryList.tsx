@@ -9,10 +9,11 @@ import {
   type MRT_ColumnDef,
 } from "material-react-table";
 import CodeIcon from "@mui/icons-material/Code";
+import { Box } from "@mui/material";
+import dayjs from "dayjs";
 import CodeBlock from "./CodeBlock";
 import ShowOnClick from "./ShowOnClick";
 import TaskResults from "./TaskResults";
-import { Box } from "@mui/material";
 
 const QueryList = () => {
   const { queries, getUserQueries, getUserQuery } = useDaphneStore();
@@ -45,6 +46,14 @@ const QueryList = () => {
   }, [queries]);
 
   const columns: MRT_ColumnDef<Query>[] = [
+    {
+      accessorKey: "created_at",
+      header: "Created",
+      minSize: 80,
+      maxSize: 150,
+      Cell: ({ cell }) =>
+        dayjs(cell.getValue<string>()).format("MMM D, YYYY h:mm A"),
+    },
     {
       accessorKey: "pid",
       header: "Identifier",

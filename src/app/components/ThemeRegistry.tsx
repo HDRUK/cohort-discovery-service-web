@@ -85,11 +85,15 @@ export default function ThemeRegistry({ children }: { children: ReactNode }) {
     },
   });
 
-  const { clearStates, getOmopDefaults } = useDaphneStore();
+  const { clearStates, getOmopDefaults, getAllCollections } = useDaphneStore();
 
   useEffect(() => {
     getOmopDefaults();
   }, [getOmopDefaults]);
+
+  useEffect(() => {
+    getAllCollections();
+  }, [getAllCollections]);
 
   useEffect(() => {
     clearStates();

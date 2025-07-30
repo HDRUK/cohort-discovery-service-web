@@ -6,7 +6,10 @@ import submitQuery from "../actions/submitQuery";
 import getTasks from "../actions/getTasks";
 import getQueries from "../actions/getQueries";
 import getQuery from "../actions/getQuery";
-import { Query } from "../types/api";
+import { Collection, Query } from "../types/api";
+import getCollections from "../actions/getCollections";
+import { baseFields } from "../config/queryFields";
+import { Field } from "react-querybuilder";
 
 type Option = {
   name: string;
@@ -14,13 +17,14 @@ type Option = {
 };
 
 export interface DaphneStoreState {
-  query: RuleGroupType;
-  conditions: Option[];
+  fields: Field[];
+  queryBuilderJson: RuleGroupType;
   getQuery: (input: string) => void;
-  setQuery: (query: RuleGroupType) => void;
+  setQueryBuilderJson: (query: RuleGroupType) => void;
   clearStates: () => void;
   isLoading: boolean;
   setIsLoading: (state: boolean) => void;
+  conditions: Option[];
   setConditions: (options: Option[]) => void;
   getConditions: () => Promise<Option[]>;
   getOmopDefaults: () => void;
@@ -31,6 +35,8 @@ export interface DaphneStoreState {
   getUserQueries: () => void;
   getUserQuery: (pid: string) => void;
   hasIncomplete: boolean;
+  collections: Collection[];
+  getAllCollections: () => void;
 }
 
 const DEFAULT_QUERY = {
@@ -42,17 +48,19 @@ const DEFAULT_QUERY = {
 };
 
 export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
+  fields: baseFields,
   tasks: [],
   queries: [],
   conditions: [],
+  collections: [],
   isLoading: false,
   hasIncomplete: false,
   setIsLoading: (isLoading) => {
     set({ isLoading });
   },
-  query: DEFAULT_QUERY,
-  setQuery: (query) => {
-    set({ query });
+  queryBuilderJson: DEFAULT_QUERY,
+  setQueryBuilderJson: (queryBuilderJson) => {
+    set({ queryBuilderJson });
   },
   getQuery: (input) => {
     set({
@@ -63,7 +71,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     //    const { query } = get();
     //setLoading(true)
     getQueryFromInput(input).then((res) => {
-      get().setQuery(res);
+      get().setQueryBuilderJson(res);
       set({
         isLoading: false,
       });
@@ -76,7 +84,21 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
   getConditions: async () => {
     const res = await getOmopConditions();
     get().setConditions(res);
-    return get().conditions;
+    const conditions = get().conditions;
+
+    const hydratedFields = get().fields.map((field) => {
+      if (field.name === "condition") {
+        return {
+          ...field,
+          values: conditions,
+        };
+      }
+      return field;
+    });
+
+    set({ fields: hydratedFields });
+
+    return conditions;
   },
   getOmopDefaults: async () => {
     get().getConditions();
@@ -114,6 +136,9 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
 
       set({ queries: updatedQueries });
     });
+  },
+  getAllCollections: async () => {
+    getCollections().then((res) => set({ collections: res.data }));
   },
   clearStates: () => {
     set({

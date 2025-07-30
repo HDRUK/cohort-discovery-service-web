@@ -32,70 +32,6 @@ import {
   FormControlLabel,
 } from "@mui/material";
 
-const fields: Field[] = [
-  {
-    name: "sex",
-    label: "Sex",
-    valueEditorType: "select",
-    operators: ["=", "!="],
-    values: [
-      { name: "8507", label: "Male" },
-      { name: "8532", label: "Female" },
-      { name: "8551", label: "Other" },
-    ],
-  },
-  {
-    name: "age",
-    label: "Age",
-    inputType: "number",
-    operators: ["=", ">", "<", ">=", "<=", "between"],
-  },
-  {
-    name: "condition",
-    label: "Condition",
-    valueEditorType: "select",
-    operators: ["=", "!="],
-    values: [],
-  },
-  {
-    name: "measurement",
-    label: "Measurement",
-    inputType: "string",
-    //valueEditorType: "select",
-    operators: ["=", "!=", ">", "<", ">=", "<=", "between"],
-    values: [
-      { name: "bmi", label: "BMI" },
-      { name: "systolic_bp", label: "Systolic Blood Pressure" },
-      { name: "a1c", label: "HbA1c (%)" },
-      { name: "cholesterol", label: "Total Cholesterol (mg/dL)" },
-    ],
-  },
-  {
-    name: "drug_exposure",
-    label: "Drug Exposure",
-    inputType: "string",
-    //valueEditorType: "select",
-    operators: ["=", "!="],
-    values: [
-      { name: "metformin", label: "Metformin" },
-      { name: "insulin", label: "Insulin" },
-      { name: "atorvastatin", label: "Atorvastatin" },
-    ],
-  },
-  {
-    name: "observation",
-    label: "Observation",
-    inputType: "string",
-    //valueEditorType: "select",
-    operators: ["=", "!="],
-    values: [
-      { name: "former_smoker", label: "Former Smoker" },
-      { name: "family_history_diabetes", label: "Family History of Diabetes" },
-      { name: "wheelchair", label: "Uses Wheelchair" },
-    ],
-  },
-];
-
 const QueryBuilderSkeleton = () => (
   <Box sx={{ p: 2 }}>
     <Skeleton variant="rectangular" height={100} width="100%" sx={{ mb: 2 }} />
@@ -289,24 +225,14 @@ const customControlElements = {
 };
 
 const QueryBuilder = () => {
-  const { query, setQuery, isLoading, conditions } = useDaphneStore();
+  const { queryBuilderJson, setQueryBuilderJson, isLoading, fields } =
+    useDaphneStore();
+
   const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
     setHasMounted(true);
   }, []);
-
-  const hydratedFields = useMemo(() => {
-    return fields.map((field) => {
-      if (field.name === "condition") {
-        return {
-          ...field,
-          values: conditions,
-        };
-      }
-      return field;
-    });
-  }, [conditions]);
 
   if (!hasMounted || isLoading) {
     return <QueryBuilderSkeleton />;
@@ -314,9 +240,9 @@ const QueryBuilder = () => {
 
   return (
     <ReactQueryBuilder
-      fields={hydratedFields}
-      query={query}
-      onQueryChange={setQuery}
+      fields={fields}
+      query={queryBuilderJson}
+      onQueryChange={setQueryBuilderJson}
       addRuleToNewGroups
       debugMode
       listsAsArrays
