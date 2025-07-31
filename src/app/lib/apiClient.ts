@@ -14,7 +14,7 @@ async function request<TResponse, TBody = undefined>(
   method: HttpMethod,
   url: string,
   options: RequestOptions<TBody> = {}
-): Promise<TResponse> {
+): Promise<TResponse | never> {
   const fullUrl = `${baseURL}${url}`;
   const { headers = {}, body, signal } = options;
 
@@ -29,7 +29,6 @@ async function request<TResponse, TBody = undefined>(
       },
       body: body !== undefined ? JSON.stringify(body) : undefined,
       signal,
-      next: { revalidate: 0 }, // optional cache control
     });
 
     if (!response.ok) {
@@ -39,7 +38,7 @@ async function request<TResponse, TBody = undefined>(
 
     return (await response.json()) as TResponse;
   } catch (error) {
-    handleApiError(error);
+    throw await handleApiError(error);
   }
 }
 
@@ -55,31 +54,39 @@ async function extractErrorMessage(response: Response): Promise<string> {
   return response.statusText || "API Error";
 }
 
-export function handleApiError(error: unknown): never {
+async function handleApiError(error: unknown): Promise<never> {
   if (error instanceof Error) {
     throw new Error(error.message);
   }
   throw new Error("An unknown error occurred");
 }
 
-export const apiClient = {
-  get: <TResponse>(url: string, options?: RequestOptions<undefined>) =>
-    request<TResponse>("GET", url, options),
+export async function apiGet<TResponse>(
+  url: string,
+  options?: RequestOptions<undefined>
+) {
+  return request<TResponse>("GET", url, options);
+}
 
-  post: <TResponse, TBody>(
-    url: string,
-    body: TBody,
-    options?: RequestOptions<TBody>
-  ) => request<TResponse, TBody>("POST", url, { ...options, body }),
+export async function apiPost<TResponse, TBody>(
+  url: string,
+  body: TBody,
+  options?: RequestOptions<TBody>
+) {
+  return request<TResponse, TBody>("POST", url, { ...options, body });
+}
 
-  put: <TResponse, TBody>(
-    url: string,
-    body: TBody,
-    options?: RequestOptions<TBody>
-  ) => request<TResponse, TBody>("PUT", url, { ...options, body }),
+export async function apiPut<TResponse, TBody>(
+  url: string,
+  body: TBody,
+  options?: RequestOptions<TBody>
+) {
+  return request<TResponse, TBody>("PUT", url, { ...options, body });
+}
 
-  delete: <TResponse>(url: string, options?: RequestOptions<undefined>) =>
-    request<TResponse>("DELETE", url, options),
-};
-
-export default apiClient;
+export async function apiDelete<TResponse>(
+  url: string,
+  options?: RequestOptions<undefined>
+) {
+  return request<TResponse>("DELETE", url, options);
+}

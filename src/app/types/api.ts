@@ -1,6 +1,14 @@
+import { RuleGroupType } from "react-querybuilder";
+
 export interface ApiResponse<T> {
   message: string;
   data: T;
+}
+
+export interface CreateQueryPost {
+  name: string;
+  definition: RuleGroupType;
+  task_type: string;
 }
 
 export interface CreateQuery {
