@@ -35,7 +35,7 @@ const CohortQueryInput = () => {
       component="form"
       onSubmit={handleSubmit(onSubmit)}
       sx={{
-        width: "70%",
+        width: "100%",
         my: 10,
       }}
     >
