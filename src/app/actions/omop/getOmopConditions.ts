@@ -1,6 +1,8 @@
 "use server";
 
 const getOmopConditions = async () => {
+  //placeholder
+  // - will be an API call once implemented
   const conditions = [
     { name: 4323688, label: "Cough" },
     { name: 35626061, label: "No Cough Strength" },
@@ -18,7 +20,6 @@ const getOmopConditions = async () => {
     { name: 4078393, label: "Miscarriage in first trimester" },
     { name: 372328, label: "Otitis media" },
   ];
-  console.log("called get conditions");
   return conditions;
 };
 
