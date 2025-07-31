@@ -17,7 +17,14 @@ Respond ONLY with JSON, no explanations.\
 Available fields are: \
 - 'sex': values are 'Male', 'Female', or 'Other' \
 - 'age': supports '=', '>', '<', '>=', '<=', 'between' \
-- 'condition': supports '=' operator and expects a string value \
+- 'condition': supports '=' and '!=' operators and expects a string value \
+   - these are things like lung cancer or diabetes \
+- 'measurements': supports '=' and '!=' operators and expects a string value \
+   - these are things like measurements of antibodies, of blood pressure etc \
+- 'drug_exposure': supports '=' and '!=' operators and expects a string value \
+   - these are exposures to drugs or vaccines etc. \
+- 'observation': supports '=' and '!=' operators and expects a string value \
+   - these are things like smoking station or history of diabetes \
 \
 For example, for a query of 'females between the age of 50 and 60' you would return:\
 {\

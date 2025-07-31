@@ -4,13 +4,17 @@ import { Button } from "@mui/material";
 import { useDaphneStore } from "../store/useDaphneStore";
 
 const SubmitQueryButton = () => {
-  const { getQuery } = useDaphneStore();
+  const { getResults } = useDaphneStore();
 
   const handleClick = () => {
-    getQuery();
+    getResults();
   };
 
-  return <Button onClick={handleClick}> Click me!</Button>;
+  return (
+    <Button variant="contained" color="secondary" onClick={handleClick}>
+      Run query
+    </Button>
+  );
 };
 
 export default SubmitQueryButton;
