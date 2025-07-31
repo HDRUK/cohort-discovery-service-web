@@ -12,7 +12,6 @@ const SubmitQueryButton = () => {
 
   return (
     <Button variant="contained" color="secondary" onClick={handleClick}>
-      {" "}
       Run query
     </Button>
   );

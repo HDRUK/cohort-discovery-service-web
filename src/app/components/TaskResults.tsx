@@ -27,6 +27,20 @@ const TaskResults = ({ tasks }: TaskResultsProps) => {
   const columns = useMemo<MRT_ColumnDef<Task>[]>(
     () => [
       {
+        id: "status",
+        header: "",
+        accessorFn: (row) => row.completed_at !== null,
+        Cell: ({ cell }) => {
+          const completed = cell.getValue<boolean>();
+          return completed ? (
+            <CheckCircleIcon color="success" fontSize="small" />
+          ) : (
+            <CancelIcon color="error" fontSize="small" />
+          );
+        },
+        size: 20,
+      },
+      {
         accessorFn: (row) => row.collection?.name ?? "—",
         id: "collection",
         header: "Collection",
@@ -46,20 +60,7 @@ const TaskResults = ({ tasks }: TaskResultsProps) => {
         },
         size: 100,
       },
-      {
-        id: "status",
-        header: "Completed",
-        accessorFn: (row) => row.completed_at !== null,
-        Cell: ({ cell }) => {
-          const completed = cell.getValue<boolean>();
-          return completed ? (
-            <CheckCircleIcon color="success" fontSize="small" />
-          ) : (
-            <CancelIcon color="error" fontSize="small" />
-          );
-        },
-        size: 100,
-      },
+
       {
         id: "coverage",
         header: "Coverage [%]",

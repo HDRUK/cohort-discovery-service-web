@@ -196,14 +196,54 @@ const customControlElements = {
     </Select>
   ),
 
-  valueEditor: ({ value, type, handleOnChange }: ValueEditorProps) => {
-    //console.log(type);
-    return (
-      <TextField
-        value={value}
-        onChange={(e) => handleOnChange(e.target.value)}
-      />
-    );
+  valueEditor: ({ value, type, handleOnChange, values }: ValueEditorProps) => {
+    switch (type) {
+      case "select":
+        return (
+          <Select
+            value={value}
+            onChange={(e) => handleOnChange(e.target.value)}
+            size="small"
+          >
+            {(values ?? []).map((opt) => (
+              <MenuItem key={opt.name} value={opt.name}>
+                {opt.label}
+              </MenuItem>
+            ))}
+          </Select>
+        );
+      case "checkbox":
+        return (
+          <FormControlLabel
+            control={
+              <Switch
+                checked={!!value}
+                onChange={(e) => handleOnChange(e.target.checked)}
+                color="primary"
+              />
+            }
+            label="Value"
+          />
+        );
+      case "textarea":
+        return (
+          <TextField
+            multiline
+            minRows={3}
+            value={value}
+            onChange={(e) => handleOnChange(e.target.value)}
+            size="small"
+          />
+        );
+      default:
+        return (
+          <TextField
+            value={value}
+            onChange={(e) => handleOnChange(e.target.value)}
+            size="small"
+          />
+        );
+    }
   },
 
   notToggle: ({ checked, handleOnChange }: NotToggleProps) => (
@@ -251,7 +291,7 @@ const QueryBuilder = () => {
       showLockButtons
       showNotToggle
       controlClassnames={{
-        queryBuilder: "queryBuilder-branches queryBuilder-justified",
+        queryBuilder: "queryBuilder-branches ",
       }}
       //controlElements={customControlElements}
     />

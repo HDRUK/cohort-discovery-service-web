@@ -39,12 +39,17 @@ export interface DaphneStoreState {
   getAllCollections: () => void;
 }
 
-const DEFAULT_QUERY = {
+const DEFAULT_QUERY: RuleGroupType = {
   combinator: "and",
   rules: [
     { field: "sex", operator: "=", value: "8507" },
     { field: "age", operator: "between", value: [50, 100] },
   ],
+};
+
+const NO_QUERY: RuleGroupType = {
+  combinator: "and",
+  rules: [],
 };
 
 export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
@@ -107,10 +112,18 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     //get().getDrugExposures();
   },
   getResults: async () => {
-    submitQuery(get().query).then((res) => {
+    set({
+      isLoading: true,
+    });
+
+    submitQuery(get().queryBuilderJson).then((res) => {
       const { data } = res;
       const pid = data.query_pid;
       get().getUserQuery(pid);
+      set({
+        isLoading: false,
+        queryBuilderJson: NO_QUERY,
+      });
     });
   },
   getUserTasks: async () => {
@@ -125,24 +138,31 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     });
   },
   getUserQuery: async (pid: string) => {
-    getQuery(pid).then((res) => {
-      const { data: newQuery } = res;
-      const existingQueries = get().queries;
+    const res = await getQuery(pid);
+    const { data: newQuery } = res;
+    const existingQueries = get().queries;
 
-      const updatedQueries = [
-        newQuery,
-        ...existingQueries.filter((q) => q.id !== newQuery.id),
-      ];
+    const existingIndex = existingQueries.findIndex(
+      (q) => q.id === newQuery.id
+    );
 
-      set({ queries: updatedQueries });
-    });
+    let updatedQueries;
+    if (existingIndex !== -1) {
+      updatedQueries = [...existingQueries];
+      updatedQueries[existingIndex] = newQuery;
+    } else {
+      updatedQueries = [newQuery, ...existingQueries];
+    }
+
+    set({ queries: updatedQueries });
   },
+
   getAllCollections: async () => {
     getCollections().then((res) => set({ collections: res.data }));
   },
   clearStates: () => {
     set({
-      query: DEFAULT_QUERY,
+      queryBuilderJson: DEFAULT_QUERY,
       isLoading: false,
     });
   },

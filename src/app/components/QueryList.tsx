@@ -9,14 +9,15 @@ import {
   type MRT_ColumnDef,
 } from "material-react-table";
 import CodeIcon from "@mui/icons-material/Code";
-import { Box } from "@mui/material";
+import { Grid, Paper } from "@mui/material";
 import dayjs from "dayjs";
 import CodeBlock from "./CodeBlock";
 import ShowOnClick from "./ShowOnClick";
 import TaskResults from "./TaskResults";
+import { getNaturalLanguage } from "../utils/queryBuilder";
 
 const QueryList = () => {
-  const { queries, getUserQueries, getUserQuery } = useDaphneStore();
+  const { queries, fields, getUserQueries, getUserQuery } = useDaphneStore();
   const [rows, setRows] = useState<Query[]>([]);
   const [hasMounted, setHasMounted] = useState(false);
 
@@ -114,9 +115,24 @@ const QueryList = () => {
     enableColumnFilters: false,
     enableExpanding: true,
     renderDetailPanel: ({ row }) => (
-      <Box sx={{ width: "70%" }}>
-        <TaskResults tasks={row.original.tasks} />
-      </Box>
+      <Grid container spacing={2}>
+        <Grid size={5}>
+          <Paper elevation={1} sx={{ p: 2, bgcolor: "grey.100" }}>
+            <pre
+              style={{
+                whiteSpace: "pre-wrap",
+                wordBreak: "break-word",
+                margin: 0,
+              }}
+            >
+              {getNaturalLanguage(row.original.definition, fields)}
+            </pre>
+          </Paper>
+        </Grid>
+        <Grid size={7}>
+          <TaskResults tasks={row.original.tasks} />
+        </Grid>
+      </Grid>
     ),
   });
 
