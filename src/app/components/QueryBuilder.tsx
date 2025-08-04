@@ -197,7 +197,17 @@ const customControlElements = {
     </Select>
   ),
 
-  valueEditor: ({ value, type, handleOnChange, values }: ValueEditorProps) => {
+  valueEditor: ({
+    value,
+    type,
+    handleOnChange,
+    values,
+    operator,
+    inputType,
+    ...rest
+  }: ValueEditorProps) => {
+    console.log(value, type, operator, rest);
+
     switch (type) {
       case "select":
         const filterOptions = createFilterOptions({
@@ -246,30 +256,68 @@ const customControlElements = {
         if (Array.isArray(value)) {
           const isNumericArray = value.every((v) => typeof v === "number");
 
-          return (
-            <>
-              {value.map((val, index) => (
+          if (
+            operator === "between" &&
+            value.every((v) => typeof v === "number")
+          ) {
+            return (
+              <>
                 <TextField
-                  key={index}
-                  type={isNumericArray ? "number" : "text"}
-                  value={val}
+                  type="number"
+                  label="From"
+                  value={value[0]}
                   onChange={(e) => {
                     const newValues = [...value];
-                    newValues[index] = isNumericArray
-                      ? Number(e.target.value)
-                      : e.target.value;
+                    newValues[0] = Number(e.target.value);
+                    handleOnChange(newValues);
+                  }}
+                  size="small"
+                  sx={{ mr: 1 }}
+                />
+                <TextField
+                  type="number"
+                  label="To"
+                  value={value[1] || 0}
+                  onChange={(e) => {
+                    const newValues = [...value];
+                    newValues[1] = Number(e.target.value);
                     handleOnChange(newValues);
                   }}
                   size="small"
                 />
-              ))}
-            </>
-          );
+              </>
+            );
+          }
+
+          const isMultiValueOperator = ["in", "notIn"].includes(operator);
+
+          if (isMultiValueOperator) {
+            return (
+              <>
+                {value.map((val, index) => (
+                  <TextField
+                    key={index}
+                    type={isNumericArray ? "number" : "text"}
+                    value={val}
+                    onChange={(e) => {
+                      const newValues = [...value];
+                      newValues[index] = isNumericArray
+                        ? Number(e.target.value)
+                        : e.target.value;
+                      handleOnChange(newValues);
+                    }}
+                    size="small"
+                  />
+                ))}
+              </>
+            );
+          }
         }
 
         return (
           <TextField
             value={value}
+            type={inputType || "text"}
             onChange={(e) => handleOnChange(e.target.value)}
             size="small"
           />
