@@ -1,8 +1,8 @@
 "use client";
 
-import { useDaphneStore } from "../store/useDaphneStore";
+import { useDaphneStore } from "@/store/useDaphneStore";
 import { useEffect, useState } from "react";
-import { Query } from "../types/api";
+import { Query } from "@/types/api";
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -11,12 +11,12 @@ import {
 import CodeIcon from "@mui/icons-material/Code";
 import { Grid, Paper } from "@mui/material";
 import dayjs from "dayjs";
-import CodeBlock from "./CodeBlock";
-import ShowOnClick from "./ShowOnClick";
-import TaskResults from "./TaskResults";
-import { getNaturalLanguage } from "../utils/queryBuilder";
+import CodeBlock from "@/components/CodeBlock";
+import ShowOnClick from "@/components/ShowOnClick";
+import TaskResults from "@/components/TaskResults";
+import { getNaturalLanguage } from "@/utils/queryBuilder";
 
-const QueryList = () => {
+const QueryListPage = () => {
   const { queries, fields, getUserQueries, getUserQuery, setQueryBuilderJson } =
     useDaphneStore();
   const [rows, setRows] = useState<Query[]>([]);
@@ -158,4 +158,4 @@ const QueryList = () => {
   return <MaterialReactTable table={table} />;
 };
 
-export default QueryList;
+export default QueryListPage;

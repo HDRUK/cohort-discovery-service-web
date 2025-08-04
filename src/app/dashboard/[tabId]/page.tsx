@@ -1,32 +1,28 @@
-import { Box, Paper, Typography, Tab } from "@mui/material";
+import { Box, Typography, Tab } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import QueryBuilder from "../../components/QueryBuilder";
-import SubmitQueryButton from "../../components/SubmitQueryButton";
-import CohortQueryInput from "../../components/CohortQueryInput";
-import QueryList from "../../components/QueryList";
+import QueryListPage from "./components/QueryListPage";
+import NewQueryPage from "./components/NewQueryPage";
 
-const validTabs = {
-  "new-query": "1",
-  history: "2",
-  collections: "3",
-};
-
-interface Props {
-  params: {
-    tabId: string;
-  };
+enum TabId {
+  NewQuery = "new-query",
+  History = "history",
+  Collections = "collections",
 }
 
-const DashboardTabPage = async ({ params }: Props) => {
-  const { tabId } = await params;
-  const tabValue = validTabs[tabId];
+const isValidTabId = (tabId: string): tabId is TabId => {
+  return Object.values(TabId).includes(tabId as TabId);
+};
 
-  if (!tabValue) return notFound();
+type Params = Promise<{ tabId: string }>;
+
+const DashboardTabPage = async (params: Params) => {
+  const { tabId } = await params;
+  if (!isValidTabId(tabId)) return notFound();
 
   return (
-    <TabContext value={tabValue}>
+    <TabContext value={tabId}>
       <Box
         sx={{
           width: "100%",
@@ -37,61 +33,39 @@ const DashboardTabPage = async ({ params }: Props) => {
         }}
       >
         <Box sx={{ borderBottom: 1, borderColor: "divider", width: "100%" }}>
-          <TabList aria-label="dashboard tabs" centered value={tabValue}>
+          <TabList>
             <Tab
               label="New Query"
               component={Link}
-              href="/dashboard/new-query"
-              value="1"
+              href={`/dashboard/${TabId.NewQuery}`}
+              value={TabId.NewQuery}
             />
             <Tab
               label="History"
               component={Link}
-              href="/dashboard/history"
-              value="2"
+              href={`/dashboard/${TabId.History}`}
+              value={TabId.History}
             />
             <Tab
               label="Collections"
               component={Link}
-              href="/dashboard/collections"
-              value="3"
+              href={`/dashboard/${TabId.Collections}`}
+              value={TabId.Collections}
             />
           </TabList>
         </Box>
 
-        <TabPanel value="1">
-          <CohortQueryInput />
-          <Paper
-            sx={{
-              width: "50%",
-              p: 2,
-              borderStyle: "solid",
-              borderColor: "primary.main",
-              borderRadius: 2,
-              boxShadow: 3,
-            }}
-          >
-            <QueryBuilder />
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "end",
-                width: "100%",
-                my: 2,
-              }}
-            >
-              <SubmitQueryButton />
-            </Box>
-          </Paper>
+        <TabPanel value={TabId.NewQuery}>
+          <NewQueryPage />
         </TabPanel>
 
-        <TabPanel value="2">
+        <TabPanel value={TabId.History}>
           <Box sx={{ height: 400 }}>
-            <QueryList />
+            <QueryListPage />
           </Box>
         </TabPanel>
 
-        <TabPanel value="3">
+        <TabPanel value={TabId.Collections}>
           <Typography variant="body1" color="text.secondary">
             Collections feature coming soon!
           </Typography>
