@@ -6,11 +6,7 @@ export const baseFields: Field[] = [
     label: "Sex",
     valueEditorType: "select",
     operators: ["=", "!="],
-    values: [
-      { name: "8507", label: "Male" },
-      { name: "8532", label: "Female" },
-      { name: "8551", label: "Other" },
-    ],
+    values: [],
   },
   {
     name: "age",
@@ -28,35 +24,30 @@ export const baseFields: Field[] = [
   {
     name: "measurement",
     label: "Measurement",
-    inputType: "string",
-    operators: ["=", "!=", ">", "<", ">=", "<=", "between"],
-    values: [
-      { name: "bmi", label: "BMI" },
-      { name: "systolic_bp", label: "Systolic Blood Pressure" },
-      { name: "a1c", label: "HbA1c (%)" },
-      { name: "cholesterol", label: "Total Cholesterol (mg/dL)" },
-    ],
+    valueEditorType: "select",
+    operators: ["=", "!="],
+    values: [], // filled dynamically
   },
   {
-    name: "drug_exposure",
+    name: "drug",
     label: "Drug Exposure",
-    inputType: "string",
+    valueEditorType: "select",
     operators: ["=", "!="],
-    values: [
-      { name: "metformin", label: "Metformin" },
-      { name: "insulin", label: "Insulin" },
-      { name: "atorvastatin", label: "Atorvastatin" },
-    ],
+    values: [], // filled dynamically
   },
   {
     name: "observation",
     label: "Observation",
     inputType: "string",
+    valueEditorType: "select",
     operators: ["=", "!="],
-    values: [
-      { name: "former_smoker", label: "Former Smoker" },
-      { name: "family_history_diabetes", label: "Family History of Diabetes" },
-      { name: "wheelchair", label: "Uses Wheelchair" },
-    ],
+    values: [], // filled dynamically
+  },
+  {
+    name: "procedure",
+    label: "Procedure",
+    valueEditorType: "select",
+    operators: ["=", "!="],
+    values: [], // filled dynamically
   },
 ];

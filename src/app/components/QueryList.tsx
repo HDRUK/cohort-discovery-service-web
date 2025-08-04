@@ -17,7 +17,8 @@ import TaskResults from "./TaskResults";
 import { getNaturalLanguage } from "../utils/queryBuilder";
 
 const QueryList = () => {
-  const { queries, fields, getUserQueries, getUserQuery } = useDaphneStore();
+  const { queries, fields, getUserQueries, getUserQuery, setQueryBuilderJson } =
+    useDaphneStore();
   const [rows, setRows] = useState<Query[]>([]);
   const [hasMounted, setHasMounted] = useState(false);
 
@@ -117,7 +118,23 @@ const QueryList = () => {
     renderDetailPanel: ({ row }) => (
       <Grid container spacing={2}>
         <Grid size={5}>
-          <Paper elevation={1} sx={{ p: 2, bgcolor: "grey.100" }}>
+          <Paper
+            elevation={1}
+            sx={{
+              p: 2,
+              bgcolor: "grey.100",
+              cursor: "pointer",
+              transition: "all 0.2s ease-in-out",
+              "&:hover": {
+                bgcolor: "grey.200",
+                boxShadow: 3,
+              },
+            }}
+            onClick={() =>
+              row.original.definition &&
+              setQueryBuilderJson(row.original.definition)
+            }
+          >
             <pre
               style={{
                 whiteSpace: "pre-wrap",

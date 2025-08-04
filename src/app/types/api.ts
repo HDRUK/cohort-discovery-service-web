@@ -55,10 +55,9 @@ export interface Result {
   updated_at: string;
 }
 
-export interface ResultDemographics extends Result {
-  metadata: {
-    parsed_files: DemographicParsedFile[];
-  };
+export interface Code {
+  name: string;
+  description: string;
 }
 
 export interface Task {
@@ -77,7 +76,7 @@ export interface Query {
   id: number;
   pid: string;
   name: string;
-  definition: unknown;
+  definition: RuleGroupType;
   created_at: string;
   tasks: Task[];
 }

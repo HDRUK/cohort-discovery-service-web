@@ -1,7 +1,7 @@
 import { create } from "zustand";
-import type { RuleGroupType } from "react-querybuilder";
+import type { RuleGroupType, RuleType } from "react-querybuilder";
 import getQueryFromInput from "../actions/getQueryFromInput";
-import getOmopConditions from "../actions/omop/getOmopConditions";
+
 import submitQuery from "../actions/submitQuery";
 import getTasks from "../actions/getTasks";
 import getQueries from "../actions/getQueries";
@@ -10,6 +10,11 @@ import { Collection, Query } from "../types/api";
 import getCollections from "../actions/getCollections";
 import { baseFields } from "../config/queryFields";
 import { Field } from "react-querybuilder";
+import getOmopConditions from "../actions/omop/getOmopConditions";
+import getOmopMeasurements from "../actions/omop/getOmopMeasurements";
+import getOmopObservations from "../actions/omop/getOmopObservations";
+import getOmopDrugs from "../actions/omop/getOmopDrugs";
+import getOmopProcedures from "../actions/omop/getOmopProcedures";
 
 type Option = {
   name: string;
@@ -24,9 +29,22 @@ export interface DaphneStoreState {
   clearStates: () => void;
   isLoading: boolean;
   setIsLoading: (state: boolean) => void;
+  getAndSetOmopData: (
+    fieldName: string,
+    fetchFn: () => Promise<Option[]>
+  ) => Promise<Option[]>;
+  sexs: Option[];
+  getSexes: () => Promise<Option[]>;
   conditions: Option[];
-  setConditions: (options: Option[]) => void;
   getConditions: () => Promise<Option[]>;
+  measurements: Option[];
+  getMeasurements: () => Promise<Option[]>;
+  drugs: Option[];
+  getDrugs: () => Promise<Option[]>;
+  observations: Option[];
+  getObservations: () => Promise<Option[]>;
+  procedures: Option[];
+  getProcedures: () => Promise<Option[]>;
   getOmopDefaults: () => void;
   getResults: () => void;
   getUserTasks: () => void;
@@ -42,8 +60,8 @@ export interface DaphneStoreState {
 const DEFAULT_QUERY: RuleGroupType = {
   combinator: "and",
   rules: [
-    { field: "sex", operator: "=", value: "8507" },
-    { field: "age", operator: "between", value: [50, 100] },
+    { field: "age", operator: ">", value: [60] },
+    { field: "condition", operator: "=", value: "201826" },
   ],
 };
 
@@ -52,12 +70,73 @@ const NO_QUERY: RuleGroupType = {
   rules: [],
 };
 
+function findBestMatch(value: string, options: Option[]): Option | undefined {
+  if (typeof value === "number") return undefined;
+  const lowerValue = value?.toLowerCase();
+  if (!lowerValue) return;
+
+  let bestScore = -Infinity;
+  let bestOption: Option | undefined;
+  if (!options) return;
+  for (const opt of options) {
+    const label = opt.label.toLowerCase();
+
+    let score = 0;
+    if (label === lowerValue) {
+      score = 100; // perfect match
+    } else if (label.includes(lowerValue)) {
+      score = 80 - (label.indexOf(lowerValue) ?? 0);
+    } else {
+      const commonChars = [...lowerValue].filter((char) =>
+        label.includes(char)
+      ).length;
+      score = commonChars;
+    }
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestOption = opt;
+    }
+  }
+
+  return bestOption;
+}
+
+function normaliseQueryValues(
+  query: RuleGroupType | RuleType,
+  dataSources: Record<string, Option[]>
+): RuleGroupType | RuleType {
+  if ("rules" in query) {
+    return {
+      ...query,
+      rules: query.rules.map((rule) => normaliseQueryValues(rule, dataSources)),
+    };
+  } else {
+    const options = dataSources[`${query.field}s`];
+
+    const match = query?.value
+      ? findBestMatch(query.value, options)
+      : undefined;
+
+    return match ? { ...query, value: match.name } : query;
+  }
+}
+
 export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
   fields: baseFields,
   tasks: [],
   queries: [],
+  sexs: [
+    { name: "8507", label: "Male (8507)" },
+    { name: "8532", label: "Female (8532)" },
+    { name: "8551", label: "Other (8551)" },
+  ],
   conditions: [],
+  measurements: [],
   collections: [],
+  observations: [],
+  drugs: [],
+  procedures: [],
   isLoading: false,
   hasIncomplete: false,
   setIsLoading: (isLoading) => {
@@ -76,40 +155,65 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     //    const { query } = get();
     //setLoading(true)
     getQueryFromInput(input).then((res) => {
-      get().setQueryBuilderJson(res);
+      const normRes = normaliseQueryValues(res, {
+        sexs: get().sexs,
+        conditions: get().conditions,
+        measurements: get().measurements,
+        observations: get().observations,
+        drugs: get().drugs,
+        procedures: get().procedures,
+      });
+
+      get().setQueryBuilderJson(normRes ? normRes : res);
       set({
         isLoading: false,
       });
     });
     //setLoading(false);
   },
-  setConditions: (options: Option[]) => {
-    set({ conditions: options });
+  getAndSetOmopData: async (
+    fieldName: string,
+    fetchFn: () => Promise<Option[]>
+  ) => {
+    const res = await fetchFn();
+    set({ [`${fieldName}s`]: res });
+
+    const updatedFields = get().fields.map((field) =>
+      field.name === fieldName ? { ...field, values: res } : field
+    );
+
+    set({ fields: updatedFields });
+    return updatedFields;
+  },
+  getSexes: async () => {
+    const updatedFields = get().fields.map((field) =>
+      field.name === "sex" ? { ...field, values: get().sexs } : field
+    );
+    set({ fields: updatedFields });
+    return get().sexs;
   },
   getConditions: async () => {
-    const res = await getOmopConditions();
-    get().setConditions(res);
-    const conditions = get().conditions;
-
-    const hydratedFields = get().fields.map((field) => {
-      if (field.name === "condition") {
-        return {
-          ...field,
-          values: conditions,
-        };
-      }
-      return field;
-    });
-
-    set({ fields: hydratedFields });
-
-    return conditions;
+    return get().getAndSetOmopData("condition", getOmopConditions);
+  },
+  getMeasurements: async () => {
+    return get().getAndSetOmopData("measurement", getOmopMeasurements);
+  },
+  getObservations: async () => {
+    return get().getAndSetOmopData("observation", getOmopObservations);
+  },
+  getDrugs: async () => {
+    return get().getAndSetOmopData("drug", getOmopDrugs);
+  },
+  getProcedures: async () => {
+    return get().getAndSetOmopData("procedure", getOmopProcedures);
   },
   getOmopDefaults: async () => {
+    get().getSexes();
     get().getConditions();
-    //get().getObservations();
-    //get().getMeasurements();
-    //get().getDrugExposures();
+    get().getObservations();
+    get().getMeasurements();
+    get().getDrugs();
+    get().getProcedures();
   },
   getResults: async () => {
     set({

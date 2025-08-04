@@ -65,7 +65,7 @@ const TaskResults = ({ tasks }: TaskResultsProps) => {
         id: "coverage",
         header: "Coverage [%]",
         accessorFn: (row) => {
-          const sexCount = row.collection?.size.count;
+          const sexCount = row?.collection?.size?.count;
 
           const total = sexCount ? parseInt(sexCount) : 0;
           const count = row.result?.count;

@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  Field,
   QueryBuilder as ReactQueryBuilder,
   defaultControlElements,
   ValueSelectorProps,
@@ -30,6 +29,8 @@ import {
   Tooltip,
   TextField,
   FormControlLabel,
+  Autocomplete,
+  createFilterOptions,
 } from "@mui/material";
 
 const QueryBuilderSkeleton = () => (
@@ -199,18 +200,24 @@ const customControlElements = {
   valueEditor: ({ value, type, handleOnChange, values }: ValueEditorProps) => {
     switch (type) {
       case "select":
+        const filterOptions = createFilterOptions({
+          stringify: (option) => `${option.name} ${option.label}`,
+        });
+
         return (
-          <Select
-            value={value}
-            onChange={(e) => handleOnChange(e.target.value)}
+          <Autocomplete
+            options={values ?? []}
+            getOptionLabel={(option) => option.label}
+            value={(values ?? []).find((v) => v.name === value) || null}
+            onChange={(_, newValue) => handleOnChange(newValue?.name ?? "")}
+            renderInput={(params) => (
+              <TextField {...params} label="Select option" size="small" />
+            )}
             size="small"
-          >
-            {(values ?? []).map((opt) => (
-              <MenuItem key={opt.name} value={opt.name}>
-                {opt.label}
-              </MenuItem>
-            ))}
-          </Select>
+            isOptionEqualToValue={(option, val) => option.name === val.name}
+            filterOptions={filterOptions}
+            sx={{ minWidth: 400, maxWidth: 500 }}
+          />
         );
       case "checkbox":
         return (
@@ -236,6 +243,30 @@ const customControlElements = {
           />
         );
       default:
+        if (Array.isArray(value)) {
+          const isNumericArray = value.every((v) => typeof v === "number");
+
+          return (
+            <>
+              {value.map((val, index) => (
+                <TextField
+                  key={index}
+                  type={isNumericArray ? "number" : "text"}
+                  value={val}
+                  onChange={(e) => {
+                    const newValues = [...value];
+                    newValues[index] = isNumericArray
+                      ? Number(e.target.value)
+                      : e.target.value;
+                    handleOnChange(newValues);
+                  }}
+                  size="small"
+                />
+              ))}
+            </>
+          );
+        }
+
         return (
           <TextField
             value={value}
@@ -293,7 +324,7 @@ const QueryBuilder = () => {
       controlClassnames={{
         queryBuilder: "queryBuilder-branches ",
       }}
-      //controlElements={customControlElements}
+      controlElements={customControlElements}
     />
   );
 };
