@@ -32,6 +32,7 @@ import {
   Autocomplete,
   createFilterOptions,
 } from "@mui/material";
+import ValueEditor from "./ValueEditor";
 
 const QueryBuilderSkeleton = () => (
   <Box sx={{ p: 2 }}>
@@ -197,133 +198,7 @@ const customControlElements = {
     </Select>
   ),
 
-  valueEditor: ({
-    value,
-    type,
-    handleOnChange,
-    values,
-    operator,
-    inputType,
-    ...rest
-  }: ValueEditorProps) => {
-    console.log(value, type, operator, rest);
-
-    switch (type) {
-      case "select":
-        const filterOptions = createFilterOptions({
-          stringify: (option) => `${option.name} ${option.label}`,
-        });
-
-        return (
-          <Autocomplete
-            options={values ?? []}
-            getOptionLabel={(option) => option.label}
-            value={(values ?? []).find((v) => v.name === value) || null}
-            onChange={(_, newValue) => handleOnChange(newValue?.name ?? "")}
-            renderInput={(params) => (
-              <TextField {...params} label="Select option" size="small" />
-            )}
-            size="small"
-            isOptionEqualToValue={(option, val) => option.name === val.name}
-            filterOptions={filterOptions}
-            sx={{ minWidth: 400, maxWidth: 500 }}
-          />
-        );
-      case "checkbox":
-        return (
-          <FormControlLabel
-            control={
-              <Switch
-                checked={!!value}
-                onChange={(e) => handleOnChange(e.target.checked)}
-                color="primary"
-              />
-            }
-            label="Value"
-          />
-        );
-      case "textarea":
-        return (
-          <TextField
-            multiline
-            minRows={3}
-            value={value}
-            onChange={(e) => handleOnChange(e.target.value)}
-            size="small"
-          />
-        );
-      default:
-        if (Array.isArray(value)) {
-          const isNumericArray = value.every((v) => typeof v === "number");
-
-          if (
-            operator === "between" &&
-            value.every((v) => typeof v === "number")
-          ) {
-            return (
-              <>
-                <TextField
-                  type="number"
-                  label="From"
-                  value={value[0]}
-                  onChange={(e) => {
-                    const newValues = [...value];
-                    newValues[0] = Number(e.target.value);
-                    handleOnChange(newValues);
-                  }}
-                  size="small"
-                  sx={{ mr: 1 }}
-                />
-                <TextField
-                  type="number"
-                  label="To"
-                  value={value[1] || 0}
-                  onChange={(e) => {
-                    const newValues = [...value];
-                    newValues[1] = Number(e.target.value);
-                    handleOnChange(newValues);
-                  }}
-                  size="small"
-                />
-              </>
-            );
-          }
-
-          const isMultiValueOperator = ["in", "notIn"].includes(operator);
-
-          if (isMultiValueOperator) {
-            return (
-              <>
-                {value.map((val, index) => (
-                  <TextField
-                    key={index}
-                    type={isNumericArray ? "number" : "text"}
-                    value={val}
-                    onChange={(e) => {
-                      const newValues = [...value];
-                      newValues[index] = isNumericArray
-                        ? Number(e.target.value)
-                        : e.target.value;
-                      handleOnChange(newValues);
-                    }}
-                    size="small"
-                  />
-                ))}
-              </>
-            );
-          }
-        }
-
-        return (
-          <TextField
-            value={value}
-            type={inputType || "text"}
-            onChange={(e) => handleOnChange(e.target.value)}
-            size="small"
-          />
-        );
-    }
-  },
+  valueEditor: ValueEditor,
 
   notToggle: ({ checked, handleOnChange }: NotToggleProps) => (
     <FormControlLabel

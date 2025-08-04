@@ -60,8 +60,9 @@ export interface DaphneStoreState {
 const DEFAULT_QUERY: RuleGroupType = {
   combinator: "and",
   rules: [
+    //{ field: "age", operator: "between", value: [60, 80] },
     { field: "age", operator: ">", value: 60 },
-    { field: "condition", operator: "=", value: "201826" },
+    //{ field: "condition", operator: "=", value: "201826" },
   ],
 };
 
