@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  Field,
   QueryBuilder as ReactQueryBuilder,
   defaultControlElements,
   ValueSelectorProps,
@@ -30,7 +29,10 @@ import {
   Tooltip,
   TextField,
   FormControlLabel,
+  Autocomplete,
+  createFilterOptions,
 } from "@mui/material";
+import ValueEditor from "./ValueEditor";
 
 const QueryBuilderSkeleton = () => (
   <Box sx={{ p: 2 }}>
@@ -196,55 +198,7 @@ const customControlElements = {
     </Select>
   ),
 
-  valueEditor: ({ value, type, handleOnChange, values }: ValueEditorProps) => {
-    switch (type) {
-      case "select":
-        return (
-          <Select
-            value={value}
-            onChange={(e) => handleOnChange(e.target.value)}
-            size="small"
-          >
-            {(values ?? []).map((opt) => (
-              <MenuItem key={opt.name} value={opt.name}>
-                {opt.label}
-              </MenuItem>
-            ))}
-          </Select>
-        );
-      case "checkbox":
-        return (
-          <FormControlLabel
-            control={
-              <Switch
-                checked={!!value}
-                onChange={(e) => handleOnChange(e.target.checked)}
-                color="primary"
-              />
-            }
-            label="Value"
-          />
-        );
-      case "textarea":
-        return (
-          <TextField
-            multiline
-            minRows={3}
-            value={value}
-            onChange={(e) => handleOnChange(e.target.value)}
-            size="small"
-          />
-        );
-      default:
-        return (
-          <TextField
-            value={value}
-            onChange={(e) => handleOnChange(e.target.value)}
-            size="small"
-          />
-        );
-    }
-  },
+  valueEditor: ValueEditor,
 
   notToggle: ({ checked, handleOnChange }: NotToggleProps) => (
     <FormControlLabel
@@ -293,7 +247,7 @@ const QueryBuilder = () => {
       controlClassnames={{
         queryBuilder: "queryBuilder-branches ",
       }}
-      //controlElements={customControlElements}
+      controlElements={customControlElements}
     />
   );
 };

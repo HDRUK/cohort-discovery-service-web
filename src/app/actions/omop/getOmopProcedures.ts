@@ -3,9 +3,9 @@
 import getCodes from "./getCodes";
 import { codesToOption } from "@/app/utils/omop";
 
-const getOmopConditions = async () => {
-  const codes = await getCodes("condition");
+const getOmopProcedures = async () => {
+  const codes = await getCodes("procedure");
   return codesToOption(codes.data);
 };
 
-export default getOmopConditions;
+export default getOmopProcedures;
