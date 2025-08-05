@@ -15,15 +15,12 @@ import {
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PendingIcon from "@mui/icons-material/Pending";
-import { useDaphneStore } from "../store/useDaphneStore";
 
 type TaskResultsProps = {
   tasks: Task[];
 };
 
 const TaskResults = ({ tasks }: TaskResultsProps) => {
-  const { collections } = useDaphneStore();
-
   const columns = useMemo<MRT_ColumnDef<Task>[]>(
     () => [
       {
@@ -135,12 +132,7 @@ const TaskResults = ({ tasks }: TaskResultsProps) => {
     },
   });
 
-  return (
-    <MaterialReactTable
-      key={collections.map((c) => c.id).join(",")}
-      table={table}
-    />
-  );
+  return <MaterialReactTable table={table} />;
 };
 
 export default TaskResults;

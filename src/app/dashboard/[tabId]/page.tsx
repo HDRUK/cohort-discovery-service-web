@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import QueryListPage from "./components/QueryListPage";
 import NewQueryPage from "./components/NewQueryPage";
+import CollectionsPage from "./components/CollectionsPage";
 
 enum TabId {
   NewQuery = "new-query",
@@ -17,8 +18,9 @@ const isValidTabId = (tabId: string): tabId is TabId => {
 
 type Params = Promise<{ tabId: string }>;
 
-const DashboardTabPage = async (params: Params) => {
+const DashboardTabPage = async ({ params }: { params: Params }) => {
   const { tabId } = await params;
+
   if (!isValidTabId(tabId)) return notFound();
 
   return (
@@ -60,15 +62,11 @@ const DashboardTabPage = async (params: Params) => {
         </TabPanel>
 
         <TabPanel value={TabId.History}>
-          <Box sx={{ height: 400 }}>
-            <QueryListPage />
-          </Box>
+          <QueryListPage />
         </TabPanel>
 
         <TabPanel value={TabId.Collections}>
-          <Typography variant="body1" color="text.secondary">
-            Collections feature coming soon!
-          </Typography>
+          <CollectionsPage />
         </TabPanel>
       </Box>
     </TabContext>

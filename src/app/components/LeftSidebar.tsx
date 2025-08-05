@@ -1,15 +1,22 @@
 "use client";
 
+import Link from "next/link";
 import {
   Box,
   Toolbar,
   Typography,
   List,
-  ListItem,
+  ListItemButton,
   ListItemText,
 } from "@mui/material";
 
 const drawerWidth = 240;
+
+const menuItems = [
+  { label: "Home", path: "/dashboard" },
+  { label: "Settings", path: "/settings" },
+  { label: "Help", path: "/help" },
+];
 
 export default function LeftSidebar() {
   return (
@@ -31,10 +38,15 @@ export default function LeftSidebar() {
           Menu
         </Typography>
         <List>
-          {["Home", "Settings", "Help"].map((text) => (
-            <ListItem key={text}>
-              <ListItemText primary={text} />
-            </ListItem>
+          {menuItems.map(({ label, path }) => (
+            <ListItemButton
+              key={label}
+              component={Link}
+              href={path}
+              sx={{ color: "inherit" }}
+            >
+              <ListItemText primary={label} />
+            </ListItemButton>
           ))}
         </List>
       </Box>

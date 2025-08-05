@@ -2,9 +2,9 @@
 
 import { Box, Paper } from "@mui/material";
 
-import QueryBuilder from "../../../components/QueryBuilder";
-import SubmitQueryButton from "../../../components/SubmitQueryButton";
-import CohortQueryInput from "../../../components/CohortQueryInput";
+import QueryBuilder from "@/components/QueryBuilder";
+import SubmitQueryButton from "@/components/SubmitQueryButton";
+import CohortQueryInput from "@/components/CohortQueryInput";
 
 const NewQueryPage = async () => {
   return (

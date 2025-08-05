@@ -3,18 +3,15 @@
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { useEffect, useState } from "react";
 import { Query } from "@/types/api";
-import {
-  MaterialReactTable,
-  useMaterialReactTable,
-  type MRT_ColumnDef,
-} from "material-react-table";
+import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
 import CodeIcon from "@mui/icons-material/Code";
-import { Grid, Paper } from "@mui/material";
+import { Box, Grid, Paper } from "@mui/material";
 import dayjs from "dayjs";
 import CodeBlock from "@/components/CodeBlock";
 import ShowOnClick from "@/components/ShowOnClick";
 import TaskResults from "@/components/TaskResults";
 import { getNaturalLanguage } from "@/utils/queryBuilder";
+import { useTable } from "@/hooks/useTable";
 
 const QueryListPage = () => {
   const { queries, fields, getUserQueries, getUserQuery, setQueryBuilderJson } =
@@ -98,23 +95,9 @@ const QueryListPage = () => {
     },
   ];
 
-  const table = useMaterialReactTable({
+  const table = useTable<Query>({
     columns,
     data: rows,
-    enableRowSelection: false,
-    enablePagination: false,
-    enableSorting: false,
-    enableFilters: false,
-    enableColumnActions: false,
-    initialState: {
-      columnVisibility: { description: false },
-      density: "compact",
-      expanded: true,
-    },
-    enableDensityToggle: false,
-    enableFullScreenToggle: false,
-    enableColumnFilters: false,
-    enableExpanding: true,
     renderDetailPanel: ({ row }) => (
       <Grid container spacing={2}>
         <Grid size={5}>
@@ -155,7 +138,11 @@ const QueryListPage = () => {
 
   if (!hasMounted) return null;
 
-  return <MaterialReactTable table={table} />;
+  return (
+    <Box>
+      <MaterialReactTable table={table} />
+    </Box>
+  );
 };
 
 export default QueryListPage;
