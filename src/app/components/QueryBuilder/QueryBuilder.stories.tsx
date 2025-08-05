@@ -1,34 +1,8 @@
-import type { Meta, StoryObj } from "@storybook/nextjs";
+import type { Meta, StoryObj, Decorator } from "@storybook/nextjs";
 import QueryBuilder from "./QueryBuilder";
-import { useDaphneStore } from "@/store/useDaphneStore";
 import ThemeRegistry from "../ThemeRegistry";
 
-// Mock data
-const mockFields = [
-  { name: "firstName", label: "First Name" },
-  { name: "age", label: "Age" },
-  { name: "isActive", label: "Is Active" },
-];
-
-const mockQuery = {
-  combinator: "and",
-  rules: [
-    {
-      field: "firstName",
-      operator: "=",
-      value: "John",
-    },
-  ],
-};
-
-const StoreDecorator = (Story: any) => {
-  useDaphneStore.setState({
-    fields: mockFields,
-    queryBuilderJson: mockQuery,
-    setQueryBuilderJson: () => {},
-    isLoading: false,
-  });
-
+const StoreDecorator: Decorator = (Story) => {
   return (
     <ThemeRegistry>
       <Story />

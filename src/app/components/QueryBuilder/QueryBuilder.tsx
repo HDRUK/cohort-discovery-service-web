@@ -4,208 +4,47 @@ import { useEffect, useState } from "react";
 import {
   QueryBuilder as ReactQueryBuilder,
   defaultControlElements,
-  ValueSelectorProps,
-  NotToggleProps,
-  ActionWithRulesProps,
-  RuleGroupHeaderComponents,
-  RuleGroupBodyComponents,
-  Rule,
 } from "react-querybuilder";
-
-import type { RuleProps, UseRuleGroup } from "react-querybuilder";
 import "react-querybuilder/dist/query-builder.css";
-import { Add, Delete, Lock, LockOpen, ContentCopy } from "@mui/icons-material";
-
 import { useDaphneStore } from "@/store/useDaphneStore";
-import {
-  Box,
-  Button,
-  IconButton,
-  MenuItem,
-  Select,
-  Switch,
-  Tooltip,
-  FormControlLabel,
-} from "@mui/material";
-import ValueEditor from "../ValueEditor";
 import { QueryBuilderSkeleton } from "./QueryBuilderSkeleton";
-
-const CustomRuleGroupHeader = (rg: UseRuleGroup) => {
-  return (
-    <Box sx={{ display: "flex", gap: 2, my: 2 }}>
-      <RuleGroupHeaderComponents {...rg} />
-    </Box>
-  );
-};
-
-const CustomRule = (props: RuleProps) => {
-  return (
-    <Box
-      sx={{
-        '& [data-testid="rule"]': {
-          display: "flex",
-          gap: 2,
-        },
-      }}
-    >
-      <Rule {...props} />
-    </Box>
-  );
-};
-
-const CustomRuleGroupBody = (rg: UseRuleGroup) => {
-  return (
-    <Box sx={{ display: "flex", gap: 2, my: 2, flexDirection: "column" }}>
-      <RuleGroupBodyComponents {...rg} />
-    </Box>
-  );
-};
+import RuleGroupHeader from "./controls/RuleGroupHeader";
+import RuleGroupBody from "./controls/RuleGroupBody";
+import Rule from "./controls/Rule";
+import ValueEditor from "./controls/ValueEditor";
+import AddGroupAction from "./controls/AddGroupAction";
+import AddRuleAction from "./controls/AddRuleAction";
+import RemoveGroupAction from "./controls/RemoveGroupAction";
+import RemoveRuleAction from "./controls/RemoveRuleAction";
+import CloneRuleAction from "./controls/CloneRuleAction";
+import CloneGroupAction from "./controls/CloneGroupAction";
+import LockRuleAction from "./controls/LockRuleAction";
+import LockGroupAction from "./controls/LockGroupAction";
+import FieldSelector from "./controls/FieldSelector";
+import OperatorSelector from "./controls/OperatorSelector";
+import CombinatorSelector from "./controls/CombinatorSelector";
+import ValueSourceSelector from "./controls/ValueSourceSelector";
+import NotToggle from "./controls/NotToggle";
 
 const customControlElements = {
   ...defaultControlElements,
-  addGroupAction: ({ handleOnClick }: ActionWithRulesProps) => (
-    <Button
-      variant="contained"
-      color="secondary"
-      onClick={handleOnClick}
-      startIcon={<Add />}
-    >
-      Add Group
-    </Button>
-  ),
-  addRuleAction: ({ handleOnClick }: ActionWithRulesProps) => (
-    <Button
-      variant="contained"
-      color="secondary"
-      onClick={handleOnClick}
-      startIcon={<Add />}
-    >
-      Add Rule
-    </Button>
-  ),
-  removeGroupAction: ({ handleOnClick }: ActionWithRulesProps) => (
-    <IconButton onClick={handleOnClick} color="error">
-      <Delete />
-    </IconButton>
-  ),
-  removeRuleAction: ({ handleOnClick }: ActionWithRulesProps) => (
-    <IconButton onClick={handleOnClick} color="error">
-      <Delete />
-    </IconButton>
-  ),
-  cloneRuleAction: ({ handleOnClick }: ActionWithRulesProps) => (
-    <Tooltip title="Clone Rule">
-      <IconButton onClick={handleOnClick}>
-        <ContentCopy />
-      </IconButton>
-    </Tooltip>
-  ),
-  cloneGroupAction: ({ handleOnClick }: ActionWithRulesProps) => (
-    <Tooltip title="Clone Group">
-      <IconButton onClick={handleOnClick}>
-        <ContentCopy />
-      </IconButton>
-    </Tooltip>
-  ),
-  lockRuleAction: ({ handleOnClick, disabled }: ActionWithRulesProps) => (
-    <Tooltip title={disabled ? "Unlock Rule" : "Lock Rule"}>
-      <IconButton onClick={handleOnClick}>
-        {disabled ? <LockOpen /> : <Lock />}
-      </IconButton>
-    </Tooltip>
-  ),
-  lockGroupAction: ({ handleOnClick, disabled }: ActionWithRulesProps) => (
-    <Tooltip title={disabled ? "Unlock Group" : "Lock Group"}>
-      <IconButton onClick={handleOnClick}>
-        {disabled ? <LockOpen /> : <Lock />}
-      </IconButton>
-    </Tooltip>
-  ),
-  fieldSelector: ({ options, value, handleOnChange }: ValueSelectorProps) => (
-    <Select
-      value={value}
-      onChange={(e) => handleOnChange(e.target.value)}
-      size="small"
-    >
-      {options.map((opt) => (
-        <MenuItem key={opt.name} value={opt.name}>
-          {opt.label}
-        </MenuItem>
-      ))}
-    </Select>
-  ),
-  operatorSelector: ({
-    options,
-    value,
-    handleOnChange,
-  }: ValueSelectorProps) => (
-    <Select
-      value={value}
-      onChange={(e) => handleOnChange(e.target.value)}
-      size="small"
-    >
-      {options.map((opt) => (
-        <MenuItem key={opt.name} value={opt.name}>
-          {opt.label}
-        </MenuItem>
-      ))}
-    </Select>
-  ),
-  combinatorSelector: ({
-    options,
-    value,
-    className,
-    handleOnChange,
-  }: ValueSelectorProps) => (
-    <Select
-      value={value}
-      onChange={(e) => handleOnChange(e.target.value)}
-      className={className}
-      size="small"
-    >
-      {options.map((opt) => (
-        <MenuItem key={opt.name} value={opt.name}>
-          {opt.label}
-        </MenuItem>
-      ))}
-    </Select>
-  ),
-  valueSourceSelector: ({
-    options,
-    value,
-    handleOnChange,
-  }: ValueSelectorProps) => (
-    <Select
-      value={value}
-      onChange={(e) => handleOnChange(e.target.value)}
-      size="small"
-    >
-      {options.map((opt) => (
-        <MenuItem key={opt.name} value={opt.name}>
-          {opt.label}
-        </MenuItem>
-      ))}
-    </Select>
-  ),
-
+  addGroupAction: AddGroupAction,
+  addRuleAction: AddRuleAction,
+  removeGroupAction: RemoveGroupAction,
+  removeRuleAction: RemoveRuleAction,
+  cloneRuleAction: CloneRuleAction,
+  cloneGroupAction: CloneGroupAction,
+  lockRuleAction: LockRuleAction,
+  lockGroupAction: LockGroupAction,
+  fieldSelector: FieldSelector,
+  operatorSelector: OperatorSelector,
+  combinatorSelector: CombinatorSelector,
+  valueSourceSelector: ValueSourceSelector,
   valueEditor: ValueEditor,
-
-  notToggle: ({ checked, handleOnChange }: NotToggleProps) => (
-    <FormControlLabel
-      control={
-        <Switch
-          checked={checked}
-          onChange={(e) => handleOnChange(e.target.checked)}
-          color="primary"
-        />
-      }
-      label="NOT"
-      labelPlacement="end"
-    />
-  ),
-  ruleGroupHeaderElements: CustomRuleGroupHeader,
-  ruleGroupBodyElements: CustomRuleGroupBody,
-  rule: CustomRule,
+  notToggle: NotToggle,
+  ruleGroupHeaderElements: RuleGroupHeader,
+  ruleGroupBodyElements: RuleGroupBody,
+  rule: Rule,
 };
 
 const QueryBuilder = () => {
