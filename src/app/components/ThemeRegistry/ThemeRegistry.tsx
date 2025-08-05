@@ -4,7 +4,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import GlobalStyles from "@mui/material/GlobalStyles";
 import { CssBaseline } from "@mui/material";
-import { useDaphneStore } from "../store/useDaphneStore";
+import { useDaphneStore } from "@/store/useDaphneStore";
 
 export default function ThemeRegistry({ children }: { children: ReactNode }) {
   const theme = createTheme({

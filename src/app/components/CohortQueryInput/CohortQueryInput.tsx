@@ -3,8 +3,8 @@
 import { useForm, Controller } from "react-hook-form";
 import { TextField, Box, InputAdornment } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import { useDaphneStore } from "../store/useDaphneStore";
-import { getNaturalLanguage } from "../utils/queryBuilder";
+import { useDaphneStore } from "@/store/useDaphneStore";
+import { getNaturalLanguage } from "@/utils/queryBuilder";
 import { useEffect } from "react";
 
 type FormValues = {

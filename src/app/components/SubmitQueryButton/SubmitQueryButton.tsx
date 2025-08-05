@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@mui/material";
-import { useDaphneStore } from "../store/useDaphneStore";
+import { useDaphneStore } from "@/store/useDaphneStore";
 
 const SubmitQueryButton = () => {
   const { getResults } = useDaphneStore();
