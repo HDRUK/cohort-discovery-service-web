@@ -1,5 +1,5 @@
 import { PrismAsyncLight as SyntaxHighlighter } from "react-syntax-highlighter";
-import { materialLight } from "react-syntax-highlighter/dist/styles/prism";
+import { materialLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 const CodeBlock = ({ code }: { code: unknown }) => {
   const codeString = JSON.stringify(code, null, 2);
