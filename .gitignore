@@ -9,7 +9,6 @@ logs
 .next
 yarn-error.log
 npm-debug.log
-package-lock.json
 .env
 *storybook.log
 storybook-static
