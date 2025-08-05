@@ -26,6 +26,13 @@ export const useTable = <TData extends MRT_RowData>({
       density: "compact",
       expanded: true,
     },
+    muiTableHeadCellProps: {
+      sx: {
+        backgroundColor: "secondary.main",
+        color: "#fff",
+        fontWeight: "bold",
+      },
+    },
     ...rest,
   });
 };

@@ -34,9 +34,6 @@ export default function LeftSidebar() {
     >
       <Toolbar />
       <Box sx={{ overflow: "auto", p: 2 }}>
-        <Typography variant="h6" gutterBottom>
-          Menu
-        </Typography>
         <List>
           {menuItems.map(({ label, path }) => (
             <ListItemButton

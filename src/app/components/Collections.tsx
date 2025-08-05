@@ -1,12 +1,8 @@
 "use client";
+import { useTable } from "@/hooks/useTable";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { Collection } from "@/types/api";
-
-import {
-  MaterialReactTable,
-  useMaterialReactTable,
-  type MRT_ColumnDef,
-} from "material-react-table";
+import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
 import { useMemo } from "react";
 
 const Collections = () => {
@@ -56,29 +52,9 @@ const Collections = () => {
     []
   );
 
-  const table = useMaterialReactTable({
+  const table = useTable({
     columns,
     data: collections,
-    enablePagination: false,
-    enableSorting: false,
-    enableBottomToolbar: false,
-    enableTopToolbar: false,
-    enableColumnActions: false,
-    enableColumnFilters: false,
-    enableDensityToggle: false,
-    enableFullScreenToggle: false,
-    enableHiding: false,
-    enableRowSelection: false,
-    initialState: {
-      density: "compact",
-    },
-    muiTableHeadCellProps: {
-      sx: {
-        backgroundColor: "secondary.main",
-        color: "#fff",
-        fontWeight: "bold",
-      },
-    },
   });
 
   return <MaterialReactTable table={table} />;

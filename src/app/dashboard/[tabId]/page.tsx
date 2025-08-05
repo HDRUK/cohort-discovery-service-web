@@ -1,4 +1,4 @@
-import { Box, Typography, Tab } from "@mui/material";
+import { Box, Tab } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import Link from "next/link";
 import { notFound } from "next/navigation";
