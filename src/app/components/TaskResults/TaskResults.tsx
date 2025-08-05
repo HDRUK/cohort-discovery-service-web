@@ -2,7 +2,7 @@
 
 import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
 import { useMemo } from "react";
-import { Task } from "../types/api";
+import { Task } from "@/types/api";
 import {
   Box,
   LinearProgress,

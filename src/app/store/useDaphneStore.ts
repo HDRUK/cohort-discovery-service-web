@@ -57,14 +57,19 @@ export interface DaphneStoreState {
   getAllCollections: () => void;
 }
 
-const DEFAULT_QUERY: RuleGroupType = {
+export const DEFAULT_QUERY: RuleGroupType = {
   combinator: "and",
   rules: [
-    //{ field: "age", operator: "between", value: [60, 80] },
     { field: "age", operator: ">", value: 60 },
-    //{ field: "condition", operator: "=", value: "201826" },
+    { field: "condition", operator: "=", value: "201826" },
   ],
 };
+
+export const DEFAULT_SEXES: Option[] = [
+  { name: "8507", label: "Male (8507)" },
+  { name: "8532", label: "Female (8532)" },
+  { name: "8551", label: "Other (8551)" },
+];
 
 const NO_QUERY: RuleGroupType = {
   combinator: "and",
@@ -127,11 +132,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
   fields: baseFields,
   tasks: [],
   queries: [],
-  sexs: [
-    { name: "8507", label: "Male (8507)" },
-    { name: "8532", label: "Female (8532)" },
-    { name: "8551", label: "Other (8551)" },
-  ],
+  sexs: DEFAULT_SEXES,
   conditions: [],
   measurements: [],
   collections: [],

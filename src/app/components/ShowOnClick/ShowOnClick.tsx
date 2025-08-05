@@ -3,7 +3,7 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import Box from "@mui/material/Box";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import Modal from "./Modal";
+import Modal from "@/components/Modal";
 
 interface ShowOnClickProps {
   children: ReactNode;

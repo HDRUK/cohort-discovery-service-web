@@ -20,7 +20,7 @@ export const useTable = <TData extends MRT_RowData>({
     enableDensityToggle: false,
     enableFullScreenToggle: false,
     enableColumnFilters: false,
-    enableExpanding: true,
+    enableExpanding: false,
     initialState: {
       columnVisibility: { description: false },
       density: "compact",
