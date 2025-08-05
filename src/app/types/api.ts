@@ -44,6 +44,7 @@ export interface Collection {
   created_at: string;
   updated_at: string;
   size?: Distribution;
+  demographics?: Distribution[];
 }
 
 export interface Result {

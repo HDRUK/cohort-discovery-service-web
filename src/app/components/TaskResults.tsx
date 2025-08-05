@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  MaterialReactTable,
-  useMaterialReactTable,
-  type MRT_ColumnDef,
-} from "material-react-table";
+import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
 import { useMemo } from "react";
 import { Task } from "../types/api";
 import {
@@ -15,15 +11,13 @@ import {
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PendingIcon from "@mui/icons-material/Pending";
-import { useDaphneStore } from "../store/useDaphneStore";
+import { useTable } from "@/hooks/useTable";
 
 type TaskResultsProps = {
   tasks: Task[];
 };
 
 const TaskResults = ({ tasks }: TaskResultsProps) => {
-  const { collections } = useDaphneStore();
-
   const columns = useMemo<MRT_ColumnDef<Task>[]>(
     () => [
       {
@@ -65,9 +59,8 @@ const TaskResults = ({ tasks }: TaskResultsProps) => {
         id: "coverage",
         header: "Coverage [%]",
         accessorFn: (row) => {
-          const sexCount = row?.collection?.size?.count;
+          const total = row?.collection?.size?.count || 0;
 
-          const total = sexCount ? parseInt(sexCount) : 0;
           const count = row.result?.count;
 
           if (count === undefined || count === null) return null;
@@ -110,37 +103,12 @@ const TaskResults = ({ tasks }: TaskResultsProps) => {
     []
   );
 
-  const table = useMaterialReactTable({
+  const table = useTable({
     columns,
     data: tasks,
-    enablePagination: false,
-    enableSorting: false,
-    enableBottomToolbar: false,
-    enableTopToolbar: false,
-    enableColumnActions: false,
-    enableColumnFilters: false,
-    enableDensityToggle: false,
-    enableFullScreenToggle: false,
-    enableHiding: false,
-    enableRowSelection: false,
-    initialState: {
-      density: "compact",
-    },
-    muiTableHeadCellProps: {
-      sx: {
-        backgroundColor: "secondary.main",
-        color: "#fff",
-        fontWeight: "bold",
-      },
-    },
   });
 
-  return (
-    <MaterialReactTable
-      key={collections.map((c) => c.id).join(",")}
-      table={table}
-    />
-  );
+  return <MaterialReactTable table={table} />;
 };
 
 export default TaskResults;

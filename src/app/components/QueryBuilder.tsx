@@ -5,7 +5,6 @@ import {
   QueryBuilder as ReactQueryBuilder,
   defaultControlElements,
   ValueSelectorProps,
-  ValueEditorProps,
   NotToggleProps,
   ActionWithRulesProps,
   RuleGroupHeaderComponents,
