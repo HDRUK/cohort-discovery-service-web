@@ -16,9 +16,8 @@ import type { RuleProps, UseRuleGroup } from "react-querybuilder";
 import "react-querybuilder/dist/query-builder.css";
 import { Add, Delete, Lock, LockOpen, ContentCopy } from "@mui/icons-material";
 
-import { useDaphneStore } from "../store/useDaphneStore";
+import { useDaphneStore } from "@/store/useDaphneStore";
 import {
-  Skeleton,
   Box,
   Button,
   IconButton,
@@ -26,18 +25,10 @@ import {
   Select,
   Switch,
   Tooltip,
-  TextField,
   FormControlLabel,
-  Autocomplete,
-  createFilterOptions,
 } from "@mui/material";
-import ValueEditor from "./ValueEditor";
-
-const QueryBuilderSkeleton = () => (
-  <Box sx={{ p: 2 }}>
-    <Skeleton variant="rectangular" height={100} width="100%" sx={{ mb: 2 }} />
-  </Box>
-);
+import ValueEditor from "../ValueEditor";
+import { QueryBuilderSkeleton } from "./QueryBuilderSkeleton";
 
 const CustomRuleGroupHeader = (rg: UseRuleGroup) => {
   return (
