@@ -23,7 +23,6 @@ const getCodes = async (domain: string): Promise<ApiResponse<Code[]>> => {
       { name: "2000002", description: "Colonoscopy" },
     ],
   };
-  console.log("here i am");
 
   return {
     data: codesByDomain[domain] || [],

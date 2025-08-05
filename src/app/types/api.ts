@@ -67,7 +67,7 @@ export interface Task {
   query_id: number;
   collection_id: number;
   created_at: string;
-  completed_at: string;
+  completed_at: string | null;
   task_type: string;
   collection: Collection;
   result: Result;
