@@ -1,21 +1,17 @@
-import type { Preview } from "@storybook/nextjs-vite";
+import { Preview } from "@storybook/nextjs";
+import { sb } from "storybook/test";
+import { withThemeFromJSXProvider } from "@storybook/addon-themes";
+import ThemeRegistry from "../src/app/components/ThemeRegistry";
+
+sb.mock(import("../src/app/actions/getCollections"));
+sb.mock(import("../src/app/actions/omop/getCodes"));
 
 const preview: Preview = {
-  parameters: {
-    controls: {
-      matchers: {
-        color: /(background|color)$/i,
-        date: /Date$/i,
-      },
-    },
-
-    a11y: {
-      // 'todo' - show a11y violations in the test UI only
-      // 'error' - fail CI on a11y violations
-      // 'off' - skip a11y checks entirely
-      test: "todo",
-    },
-  },
+  decorators: [
+    withThemeFromJSXProvider({
+      Provider: ThemeRegistry,
+    }),
+  ],
 };
 
 export default preview;
