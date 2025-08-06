@@ -8,6 +8,8 @@ interface RequestOptions<B = unknown> {
   headers?: Record<string, string>;
   body?: B;
   signal?: AbortSignal;
+  cache?: RequestCache;
+  next?: NextFetchRequestConfig;
 }
 
 async function request<TResponse, TBody = undefined>(
@@ -16,9 +18,7 @@ async function request<TResponse, TBody = undefined>(
   options: RequestOptions<TBody> = {}
 ): Promise<TResponse | never> {
   const fullUrl = `${baseURL}${url}`;
-  const { headers = {}, body, signal } = options;
-
-  console.log(`[API REQUEST] ${method} ${fullUrl}`);
+  const { headers = {}, body, signal, cache, next } = options;
 
   try {
     const response = await fetch(fullUrl, {
@@ -29,6 +29,8 @@ async function request<TResponse, TBody = undefined>(
       },
       body: body !== undefined ? JSON.stringify(body) : undefined,
       signal,
+      cache,
+      next,
     });
 
     if (!response.ok) {

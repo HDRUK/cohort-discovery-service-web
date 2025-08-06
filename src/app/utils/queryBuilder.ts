@@ -28,7 +28,6 @@ const getNaturalLanguage = (query: RuleGroupType, fields: Field[]) => {
     fields,
     valueProcessor: customValueProcessor,
   });
-
   return text == "1 is 1" ? "" : text;
 };
 

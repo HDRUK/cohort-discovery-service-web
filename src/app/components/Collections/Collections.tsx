@@ -1,12 +1,14 @@
 "use client";
+
 import { useTable } from "@/hooks/useTable";
-import { useDaphneStore } from "@/store/useDaphneStore";
+//import { useDaphneStore } from "@/store/useDaphneStore";
 import { Collection } from "@/types/api";
 import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
 import { useMemo } from "react";
 
-const Collections = () => {
-  const { collections } = useDaphneStore();
+const Collections = ({ collections }: { collections: Collection[] }) => {
+  //const { collections } = useDaphneStore();
+
   const columns = useMemo<MRT_ColumnDef<Collection>[]>(
     () => [
       {

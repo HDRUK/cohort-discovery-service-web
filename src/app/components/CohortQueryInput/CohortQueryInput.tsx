@@ -6,12 +6,13 @@ import SearchIcon from "@mui/icons-material/Search";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { getNaturalLanguage } from "@/utils/queryBuilder";
 import { useEffect } from "react";
+import { Field } from "react-querybuilder";
 
 type FormValues = {
   cohortQueryInput: string;
 };
 
-const CohortQueryInput = () => {
+const CohortQueryInput = ({ fields }: { fields: Field[] }) => {
   const {
     handleSubmit,
     control,
@@ -19,10 +20,12 @@ const CohortQueryInput = () => {
     formState: { errors },
   } = useForm<FormValues>();
 
-  const { queryBuilderJson, getQuery, fields } = useDaphneStore();
+  const {
+    queryBuilder: { queryBuilderJson, getQueryFromText },
+  } = useDaphneStore();
 
   const onSubmit = (data: FormValues) => {
-    getQuery(data.cohortQueryInput);
+    getQueryFromText(data.cohortQueryInput);
   };
 
   useEffect(() => {
@@ -36,7 +39,9 @@ const CohortQueryInput = () => {
       onSubmit={handleSubmit(onSubmit)}
       sx={{
         width: "100%",
-        my: 10,
+        minWidth: 1000,
+        mt: 10,
+        mb: 2,
       }}
     >
       <Controller

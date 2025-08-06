@@ -1,16 +1,25 @@
-import { useDaphneStore } from "@/store/useDaphneStore";
-import { Autocomplete, TextField, Chip, Box } from "@mui/material";
+"use client";
 
-type SelectDatasetsProps = {
-  selectedDatasets: string[];
-  setSelectedDatasets: (datasets: string[]) => void;
-};
+import { useDaphneStore } from "@/store/useDaphneStore";
+import { Collection } from "@/types/api";
+import { Autocomplete, TextField, Chip, Box } from "@mui/material";
+import { useEffect } from "react";
 
 const SelectDatasets = ({
-  selectedDatasets,
-  setSelectedDatasets,
-}: SelectDatasetsProps) => {
-  const { collections } = useDaphneStore();
+  initialSelection,
+  collections,
+}: {
+  initialSelection: string[];
+  collections: Collection[];
+}) => {
+  const {
+    queryBuilder: { selectedDatasets, setSelectedDatasets },
+  } = useDaphneStore();
+
+  useEffect(() => {
+    setSelectedDatasets(initialSelection);
+  }, [initialSelection, setSelectedDatasets]);
+
   const options = collections.map((c) => ({ value: c.pid, label: c.name }));
 
   return (
@@ -28,10 +37,15 @@ const SelectDatasets = ({
         onChange={(_, newValue) =>
           setSelectedDatasets(newValue.map((v) => v.value))
         }
-        renderValue={(selected) => (
+        renderValue={(selected, getTagProps) => (
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-            {selected.map((option) => (
-              <Chip key={option.value} label={option.label} color="secondary" />
+            {selected.map((option, index) => (
+              <Chip
+                {...getTagProps({ index })}
+                key={option.value}
+                label={option.label}
+                color="secondary"
+              />
             ))}
           </Box>
         )}

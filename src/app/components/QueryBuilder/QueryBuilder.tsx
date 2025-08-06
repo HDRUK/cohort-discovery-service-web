@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import {
+  Field,
   QueryBuilder as ReactQueryBuilder,
   defaultControlElements,
 } from "react-querybuilder";
@@ -47,9 +48,11 @@ const customControlElements = {
   rule: Rule,
 };
 
-const QueryBuilder = () => {
-  const { queryBuilderJson, setQueryBuilderJson, isLoading, fields } =
-    useDaphneStore();
+const QueryBuilder = ({ fields }: { fields: Field[] }) => {
+  const {
+    queryBuilder: { queryBuilderJson, setQueryBuilderJson },
+    stateManagement: { isLoading },
+  } = useDaphneStore();
 
   const [hasMounted, setHasMounted] = useState(false);
 
