@@ -1,7 +1,7 @@
 "use client";
 
 import { Select, MenuItem } from "@mui/material";
-import { Option, ValueSelectorProps } from "react-querybuilder";
+import { ValueSelectorProps } from "react-querybuilder";
 
 const ValueSourceSelector = ({
   options,
