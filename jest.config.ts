@@ -97,6 +97,8 @@ const config: Config = {
     "^@/consts/(.*)$": "<rootDir>/src/app/consts/$1",
     "^@/config/(.*)$": "<rootDir>/src/app/config/$1",
     "^@/actions/(.*)$": "<rootDir>/src/app/actions/$1",
+    "^@/store/(.*)$": "<rootDir>/src/app/store/$1",
+    "^@/types/(.*)$": "<rootDir>/src/app/types/$1",
     "^@/components/(.*)$": "<rootDir>/src/app/components/$1",
     "^@/utils/(.*)$": "<rootDir>/src/app/utils/$1",
     "\\.(css|less|scss|sass)$": "identity-obj-proxy",
@@ -192,6 +194,7 @@ const config: Config = {
       },
     ],
   },
+  transformIgnorePatterns: ["/node_modules/(?!react-syntax-highlighter)"],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx"],
 
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them

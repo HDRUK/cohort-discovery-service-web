@@ -20,6 +20,19 @@ export const mockResults: Result[] = [
   },
 ];
 
+export const getMockTask = (rest?: Partial<Task>) => ({
+  id: 1,
+  pid: "task1",
+  query_id: 100,
+  collection_id: mockCollections[0].id,
+  task_type: "condition",
+  created_at: "2025-01-01T00:00:00Z",
+  completed_at: "2025-01-01T12:00:00Z",
+  collection: mockCollections[0],
+  result: mockResults[0],
+  ...rest,
+});
+
 export const mockTasks: Task[] = [
   {
     id: 1,

@@ -86,6 +86,9 @@ const QueriesTable = ({
         const percent = Math.round((completedCount / tasks.length) * 100);
         return `${percent}%`;
       },
+      Cell: ({ cell }) => (
+        <span data-testid="percent-complete">{cell.getValue<string>()}</span>
+      ),
     },
   ];
 
