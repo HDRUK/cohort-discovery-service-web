@@ -1,6 +1,6 @@
-import { Code } from "../types/api";
+import { Code, Option } from "../types/api";
 
-const codesToOption = (codes: Code[]) =>
+const codesToOption = (codes: Code[]): Option[] =>
   codes
     .filter((code) => code.name !== "0")
     .sort((a, b) => a.description.localeCompare(b.description))

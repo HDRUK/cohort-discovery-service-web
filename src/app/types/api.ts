@@ -5,6 +5,8 @@ export interface ApiResponse<T> {
   data: T;
 }
 
+export type WithIncomplete<T> = T & { hasIncomplete: boolean };
+
 export interface CreateQueryPost {
   name: string;
   definition: RuleGroupType;
@@ -59,6 +61,11 @@ export interface Result {
 export interface Code {
   name: string;
   description: string;
+}
+
+export interface Option {
+  name: string;
+  label: string;
 }
 
 export interface Task {

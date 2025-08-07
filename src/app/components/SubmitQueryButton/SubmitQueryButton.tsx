@@ -2,16 +2,29 @@
 
 import { Button } from "@mui/material";
 import { useDaphneStore } from "@/store/useDaphneStore";
+import { revalidateAction } from "@/actions/revalidate";
+import { useRouter } from "next/navigation";
 
 const SubmitQueryButton = () => {
-  const { getResults } = useDaphneStore();
+  const router = useRouter();
+  const {
+    userData: { fetchResults },
+    queryBuilder: { selectedDatasets },
+  } = useDaphneStore();
 
   const handleClick = () => {
-    getResults();
+    fetchResults();
+    revalidateAction("queries");
+    router.push("history");
   };
 
   return (
-    <Button variant="contained" color="secondary" onClick={handleClick}>
+    <Button
+      disabled={selectedDatasets.length === 0}
+      variant="contained"
+      color="secondary"
+      onClick={handleClick}
+    >
       Run query
     </Button>
   );

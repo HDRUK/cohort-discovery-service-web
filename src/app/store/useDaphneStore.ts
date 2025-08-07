@@ -1,20 +1,11 @@
 import { create } from "zustand";
 import type { RuleGroupType, RuleType } from "react-querybuilder";
 import getQueryFromInput from "../actions/getQueryFromInput";
-
 import submitQuery from "../actions/submitQuery";
-import getTasks from "../actions/getTasks";
-import getQueries from "../actions/getQueries";
-import getQuery from "../actions/getQuery";
 import { Collection, Query } from "../types/api";
-import getCollections from "../actions/getCollections";
+import { DEFAULT_SEXES } from "@/types/omop";
 import { baseFields } from "../config/queryFields";
-import { Field } from "react-querybuilder";
-import getOmopConditions from "../actions/omop/getOmopConditions";
-import getOmopMeasurements from "../actions/omop/getOmopMeasurements";
-import getOmopObservations from "../actions/omop/getOmopObservations";
-import getOmopDrugs from "../actions/omop/getOmopDrugs";
-import getOmopProcedures from "../actions/omop/getOmopProcedures";
+import { Field, isRuleGroup } from "react-querybuilder";
 
 type Option = {
   name: string;
@@ -22,39 +13,41 @@ type Option = {
 };
 
 export interface DaphneStoreState {
-  fields: Field[];
-  queryBuilderJson: RuleGroupType;
-  getQuery: (input: string) => void;
-  setQueryBuilderJson: (query: RuleGroupType) => void;
-  clearStates: () => void;
-  isLoading: boolean;
-  setIsLoading: (state: boolean) => void;
-  getAndSetOmopData: (
-    fieldName: string,
-    fetchFn: () => Promise<Option[]>
-  ) => Promise<Option[]>;
-  sexs: Option[];
-  getSexes: () => Promise<Option[]>;
-  conditions: Option[];
-  getConditions: () => Promise<Option[]>;
-  measurements: Option[];
-  getMeasurements: () => Promise<Option[]>;
-  drugs: Option[];
-  getDrugs: () => Promise<Option[]>;
-  observations: Option[];
-  getObservations: () => Promise<Option[]>;
-  procedures: Option[];
-  getProcedures: () => Promise<Option[]>;
-  getOmopDefaults: () => void;
-  getResults: () => void;
-  getUserTasks: () => void;
-  tasks: string[];
-  queries: Query[];
-  getUserQueries: () => void;
-  getUserQuery: (pid: string) => void;
-  hasIncomplete: boolean;
-  collections: Collection[];
-  getAllCollections: () => void;
+  stateManagement: {
+    clearStates: () => void;
+    isLoading: boolean;
+    setIsLoading: (state: boolean) => void;
+  };
+  queryBuilder: {
+    fields: Field[];
+    setFields: (fields: Field[]) => void;
+    queryBuilderJson: RuleGroupType;
+    setQueryBuilderJson: (query: RuleGroupType) => void;
+    getQueryFromText: (input: string) => void;
+    selectedDatasets: string[];
+    setSelectedDatasets: (pids: string[]) => void;
+  };
+  omop: {
+    sexes: Option[];
+    setSexes: (sexes: Option[]) => void;
+    conditions: Option[];
+    setConditions: (conditions: Option[]) => void;
+    measurements: Option[];
+    setMeasurements: (measurements: Option[]) => void;
+    drugs: Option[];
+    setDrugs: (drugs: Option[]) => void;
+    observations: Option[];
+    setObservations: (observations: Option[]) => void;
+    procedures: Option[];
+    setProcedures: (procedures: Option[]) => void;
+  };
+  userData: {
+    queries: Query[];
+    setQueries: (queries: Query[]) => void;
+    fetchResults: () => void;
+    collections: Collection[];
+    setCollections: (collections: Collection[]) => void;
+  };
 }
 
 export const DEFAULT_QUERY: RuleGroupType = {
@@ -64,12 +57,6 @@ export const DEFAULT_QUERY: RuleGroupType = {
     { field: "condition", operator: "=", value: "201826" },
   ],
 };
-
-export const DEFAULT_SEXES: Option[] = [
-  { name: "8507", label: "Male (8507)" },
-  { name: "8532", label: "Female (8532)" },
-  { name: "8551", label: "Other (8551)" },
-];
 
 const NO_QUERY: RuleGroupType = {
   combinator: "and",
@@ -129,147 +116,140 @@ function normaliseQueryValues(
 }
 
 export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
-  fields: baseFields,
-  tasks: [],
-  queries: [],
-  sexs: DEFAULT_SEXES,
-  conditions: [],
-  measurements: [],
-  collections: [],
-  observations: [],
-  drugs: [],
-  procedures: [],
-  isLoading: false,
-  hasIncomplete: false,
-  setIsLoading: (isLoading) => {
-    set({ isLoading });
+  stateManagement: {
+    isLoading: false,
+    setIsLoading: (isLoading) =>
+      set((state) => ({
+        ...state,
+        stateManagement: { ...state.stateManagement, isLoading },
+      })),
+    clearStates: () =>
+      set((state) => ({
+        ...state,
+        stateManagement: { ...state.stateManagement, isLoading: false },
+        queryBuilder: {
+          ...state.queryBuilder,
+          queryBuilderJson: DEFAULT_QUERY,
+        },
+      })),
   },
-  queryBuilderJson: DEFAULT_QUERY,
-  setQueryBuilderJson: (queryBuilderJson) => {
-    set({ queryBuilderJson });
-  },
-  getQuery: (input) => {
-    set({
-      isLoading: true,
-      //loadingStatus: 'Signing you out...'
-    });
 
-    //    const { query } = get();
-    //setLoading(true)
-    getQueryFromInput(input).then((res) => {
-      const normRes = normaliseQueryValues(res, {
-        sexs: get().sexs,
-        conditions: get().conditions,
-        measurements: get().measurements,
-        observations: get().observations,
-        drugs: get().drugs,
-        procedures: get().procedures,
+  queryBuilder: {
+    fields: baseFields,
+    setFields: (fields) =>
+      set((state) => ({
+        ...state,
+        queryBuilder: { ...state.queryBuilder, fields },
+      })),
+    queryBuilderJson: DEFAULT_QUERY,
+    setQueryBuilderJson: (query) =>
+      set((state) => ({
+        ...state,
+        queryBuilder: { ...state.queryBuilder, queryBuilderJson: query },
+      })),
+    selectedDatasets: [],
+    setSelectedDatasets: (pids) =>
+      set((state) => ({
+        ...state,
+        queryBuilder: { ...state.queryBuilder, selectedDatasets: pids },
+      })),
+    getQueryFromText: async (input: string) => {
+      set((state) => ({
+        ...state,
+        stateManagement: { ...state.stateManagement, isLoading: true },
+      }));
+
+      const rawQuery = await getQueryFromInput(input);
+      const normalised = normaliseQueryValues(rawQuery, {
+        sexes: get().omop.sexes,
+        conditions: get().omop.conditions,
+        measurements: get().omop.measurements,
+        observations: get().omop.observations,
+        drugs: get().omop.drugs,
+        procedures: get().omop.procedures,
       });
 
-      get().setQueryBuilderJson(normRes ? normRes : res);
-      set({
-        isLoading: false,
-      });
-    });
-    //setLoading(false);
-  },
-  getAndSetOmopData: async (
-    fieldName: string,
-    fetchFn: () => Promise<Option[]>
-  ) => {
-    const res = await fetchFn();
-    set({ [`${fieldName}s`]: res });
+      const finalQueryBuilderJson = isRuleGroup(normalised)
+        ? normalised
+        : {
+            combinator: "and",
+            rules: [normalised],
+          };
 
-    const updatedFields = get().fields.map((field) =>
-      field.name === fieldName ? { ...field, values: res } : field
-    );
-
-    set({ fields: updatedFields });
-    return updatedFields;
-  },
-  getSexes: async () => {
-    const updatedFields = get().fields.map((field) =>
-      field.name === "sex" ? { ...field, values: get().sexs } : field
-    );
-    set({ fields: updatedFields });
-    return get().sexs;
-  },
-  getConditions: async () => {
-    return get().getAndSetOmopData("condition", getOmopConditions);
-  },
-  getMeasurements: async () => {
-    return get().getAndSetOmopData("measurement", getOmopMeasurements);
-  },
-  getObservations: async () => {
-    return get().getAndSetOmopData("observation", getOmopObservations);
-  },
-  getDrugs: async () => {
-    return get().getAndSetOmopData("drug", getOmopDrugs);
-  },
-  getProcedures: async () => {
-    return get().getAndSetOmopData("procedure", getOmopProcedures);
-  },
-  getOmopDefaults: async () => {
-    get().getSexes();
-    get().getConditions();
-    get().getObservations();
-    get().getMeasurements();
-    get().getDrugs();
-    get().getProcedures();
-  },
-  getResults: async () => {
-    set({
-      isLoading: true,
-    });
-
-    submitQuery(get().queryBuilderJson).then((res) => {
-      const { data } = res;
-      const pid = data.query_pid;
-      get().getUserQuery(pid);
-      set({
-        isLoading: false,
-        queryBuilderJson: NO_QUERY,
-      });
-    });
-  },
-  getUserTasks: async () => {
-    getTasks().then((res) => {
-      set({ tasks: res.data });
-    });
-  },
-  getUserQueries: async () => {
-    getQueries().then((res) => {
-      // hasIncomplete: res.hasIncomplete
-      set({ queries: res.data });
-    });
-  },
-  getUserQuery: async (pid: string) => {
-    const res = await getQuery(pid);
-    const { data: newQuery } = res;
-    const existingQueries = get().queries;
-
-    const existingIndex = existingQueries.findIndex(
-      (q) => q.id === newQuery.id
-    );
-
-    let updatedQueries;
-    if (existingIndex !== -1) {
-      updatedQueries = [...existingQueries];
-      updatedQueries[existingIndex] = newQuery;
-    } else {
-      updatedQueries = [newQuery, ...existingQueries];
-    }
-
-    set({ queries: updatedQueries });
+      get().queryBuilder.setQueryBuilderJson(finalQueryBuilderJson);
+      set((state) => ({
+        ...state,
+        stateManagement: { ...state.stateManagement, isLoading: false },
+      }));
+    },
   },
 
-  getAllCollections: async () => {
-    getCollections().then((res) => set({ collections: res.data }));
+  omop: {
+    sexes: DEFAULT_SEXES,
+    setSexes: (sexes) =>
+      set((state) => ({
+        ...state,
+        omop: { ...state.omop, sexes },
+      })),
+    conditions: [],
+    setConditions: (conditions) =>
+      set((state) => ({
+        ...state,
+        omop: { ...state.omop, conditions },
+      })),
+    measurements: [],
+    setMeasurements: (measurements) =>
+      set((state) => ({
+        ...state,
+        omop: { ...state.omop, measurements },
+      })),
+    drugs: [],
+    setDrugs: (drugs) =>
+      set((state) => ({
+        ...state,
+        omop: { ...state.omop, drugs },
+      })),
+    observations: [],
+    setObservations: (observations) =>
+      set((state) => ({
+        ...state,
+        omop: { ...state.omop, observations },
+      })),
+    procedures: [],
+    setProcedures: (procedures) =>
+      set((state) => ({
+        ...state,
+        omop: { ...state.omop, procedures },
+      })),
   },
-  clearStates: () => {
-    set({
-      queryBuilderJson: DEFAULT_QUERY,
-      isLoading: false,
-    });
+
+  userData: {
+    queries: [],
+    setQueries: (queries) =>
+      set((state) => ({
+        ...state,
+        userData: { ...state.userData, queries },
+      })),
+    fetchResults: async () => {
+      set((state) => ({
+        ...state,
+        stateManagement: { ...state.stateManagement, isLoading: true },
+      }));
+
+      const { queryBuilderJson, selectedDatasets } = get().queryBuilder;
+      await submitQuery(queryBuilderJson, selectedDatasets);
+
+      set((state) => ({
+        ...state,
+        queryBuilder: { ...state.queryBuilder, queryBuilderJson: NO_QUERY },
+        stateManagement: { ...state.stateManagement, isLoading: false },
+      }));
+    },
+    collections: [],
+    setCollections: (collections) =>
+      set((state) => ({
+        ...state,
+        userData: { ...state.userData, collections },
+      })),
   },
 }));
