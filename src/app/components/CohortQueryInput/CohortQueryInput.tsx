@@ -5,8 +5,10 @@ import { TextField, Box, InputAdornment } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { getNaturalLanguage } from "@/utils/queryBuilder";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Field } from "react-querybuilder";
+import { OmopTableName } from "@/types/omop";
+import { Option } from "@/types/api";
 
 type FormValues = {
   cohortQueryInput: string;
@@ -22,7 +24,19 @@ const CohortQueryInput = ({ fields }: { fields: Field[] }) => {
 
   const {
     queryBuilder: { queryBuilderJson, getQueryFromText },
+    omop: { setOmop },
   } = useDaphneStore();
+
+  const omop = useMemo(() => {
+    return fields.reduce((acc, item) => {
+      acc[item.name] = item.values;
+      return acc;
+    }, {} as Record<OmopTableName, Option[]>);
+  }, [fields]);
+
+  useEffect(() => {
+    setOmop(omop);
+  }, [setOmop, omop]);
 
   const onSubmit = (data: FormValues) => {
     getQueryFromText(data.cohortQueryInput);

@@ -7,6 +7,7 @@ export const DEFAULT_SEXES: Option[] = [
 ];
 
 export enum OmopTableName {
+  Sex = "sex",
   Condition = "condition",
   Drug = "drug",
   Measurement = "measurement",

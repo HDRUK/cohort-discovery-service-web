@@ -3,7 +3,7 @@ import type { RuleGroupType, RuleType } from "react-querybuilder";
 import getQueryFromInput from "../actions/getQueryFromInput";
 import submitQuery from "../actions/submitQuery";
 import { Collection, Query } from "../types/api";
-import { DEFAULT_SEXES } from "@/types/omop";
+import { DEFAULT_SEXES, OmopTableName } from "@/types/omop";
 import { baseFields } from "../config/queryFields";
 import { Field, isRuleGroup } from "react-querybuilder";
 
@@ -40,6 +40,7 @@ export interface DaphneStoreState {
     setObservations: (observations: Option[]) => void;
     procedures: Option[];
     setProcedures: (procedures: Option[]) => void;
+    setOmop: (data: Record<OmopTableName, Option[]>) => void;
   };
   userData: {
     queries: Query[];
@@ -105,7 +106,10 @@ function normaliseQueryValues(
       rules: query.rules.map((rule) => normaliseQueryValues(rule, dataSources)),
     };
   } else {
-    const options = dataSources[`${query.field}s`];
+    const options =
+      dataSources[
+        query.field === "sex" ? `${query.field}es` : `${query.field}s`
+      ];
 
     const match = query?.value
       ? findBestMatch(query.value, options)
@@ -160,6 +164,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       }));
 
       const rawQuery = await getQueryFromInput(input);
+
       const normalised = normaliseQueryValues(rawQuery, {
         sexes: get().omop.sexes,
         conditions: get().omop.conditions,
@@ -221,6 +226,26 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         ...state,
         omop: { ...state.omop, procedures },
       })),
+    setOmop: (options) => {
+      if (options?.sex) {
+        get().omop.setSexes(options.sex);
+      }
+      if (options?.condition) {
+        get().omop.setConditions(options.condition);
+      }
+      if (options?.observation) {
+        get().omop.setObservations(options.observation);
+      }
+      if (options?.drug) {
+        get().omop.setDrugs(options.drug);
+      }
+      if (options?.measurement) {
+        get().omop.setMeasurements(options.measurement);
+      }
+      if (options?.procedure) {
+        get().omop.setProcedures(options.procedure);
+      }
+    },
   },
 
   userData: {
