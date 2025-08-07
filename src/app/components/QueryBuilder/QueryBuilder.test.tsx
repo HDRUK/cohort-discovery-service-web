@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import QueryBuilder from "./QueryBuilder";
 import { Field } from "react-querybuilder";
@@ -13,18 +13,23 @@ jest.mock("@/store/useDaphneStore", () => ({
 
 describe("QueryBuilder", () => {
   it("renders query in the builder", async () => {
-    const mockQueryJson = getQueryJson();
-    const setQueryBuilderJson = jest.fn();
+    let currentQueryJson = getQueryJson();
 
-    (useDaphneStore as unknown as jest.Mock).mockReturnValue({
+    const setQueryBuilderJson = jest.fn((newQuery) => {
+      currentQueryJson = newQuery;
+    });
+
+    (useDaphneStore as unknown as jest.Mock).mockImplementation(() => ({
       queryBuilder: {
-        queryBuilderJson: mockQueryJson,
+        get queryBuilderJson() {
+          return currentQueryJson;
+        },
         setQueryBuilderJson,
       },
       stateManagement: {
         isLoading: false,
       },
-    });
+    }));
 
     const fields: Field[] = baseFields.map((field) => {
       if (field.name === "condition") {
@@ -49,25 +54,28 @@ describe("QueryBuilder", () => {
     expect(rule1.getByDisplayValue(">")).toBeInTheDocument();
     expect(rule1.getByDisplayValue("60")).toBeInTheDocument();
 
-    const operatorInput = rule1.getByDisplayValue(">");
-    await userEvent.click(operatorInput);
+    const select = rule1.getAllByRole("combobox")[1];
 
-    const betweenOption = await screen.findByRole("option", {
-      name: "between",
-    });
-    await userEvent.click(betweenOption);
+    await userEvent.click(select);
 
-    const inputs = rule1.getAllByRole("textbox");
-    expect(inputs).toHaveLength(2);
+    await screen.findByRole("listbox");
 
-    await userEvent.clear(inputs[0]);
-    await userEvent.type(inputs[0], "40");
+    const options = await screen.findAllByRole("option");
+    const betweenOption = options.find((opt) => opt.textContent === "between");
+    expect(betweenOption).toBeDefined();
+    await userEvent.click(betweenOption!);
 
-    await userEvent.clear(inputs[1]);
-    await userEvent.type(inputs[1], "80");
-
-    console.log(JSON.stringify(setQueryBuilderJson.mock.calls));
-    return;
+    expect(setQueryBuilderJson).toHaveBeenCalledWith(
+      expect.objectContaining({
+        rules: expect.arrayContaining([
+          expect.objectContaining({
+            field: "age",
+            operator: "between",
+            value: 60,
+          }),
+        ]),
+      })
+    );
 
     const rule2 = within(rules[1]);
     expect(rule2.getByDisplayValue("condition")).toBeInTheDocument();
