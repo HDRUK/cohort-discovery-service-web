@@ -4,7 +4,7 @@ import Collections from "./Collections";
 import getCollections from "@/actions/getCollections";
 jest.mock("@/actions/getCollections");
 
-describe("Page", () => {
+describe("Collections", () => {
   it('displays "No records to display" when collections is empty', () => {
     render(<Collections collections={[]} />);
 
