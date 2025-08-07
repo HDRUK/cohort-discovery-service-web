@@ -1,7 +1,7 @@
 "use client";
 
 import { useDaphneStore } from "@/store/useDaphneStore";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Query, Paginated } from "@/types/api";
 import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
 import CodeIcon from "@mui/icons-material/Code";
