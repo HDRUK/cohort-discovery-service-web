@@ -1,9 +1,9 @@
 import "@testing-library/jest-dom";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import QueriesTable from "./QueriesTable";
-import getQueries from "@/actions/getQueries";
 import { getMockQuery } from "@/actions/__mocks__/getQueries";
 import { getMockTask } from "@/actions/__mocks__/getTasks";
+import { Field } from "react-querybuilder";
 jest.mock("@/actions/getQueries");
 
 jest.mock("next/navigation", () => ({
@@ -36,26 +36,114 @@ describe("QueriesTable", () => {
     expect(percentCompleteCells[2]).toHaveTextContent("50%");
   });
 
-  {
-    /*it("expands detail panel and shows natural language + TaskResults", async () => {
+  it("expands detail panel and shows natural language + TaskResults", async () => {
+    const mockQueries = [
+      getMockQuery({
+        pid: "abcde",
+        definition: {
+          id: "def-1",
+          combinator: "and",
+          rules: [
+            {
+              id: "rule-1",
+              field: "condition",
+              operator: "=",
+              value: "1234",
+            },
+          ],
+        },
+      }),
+    ];
     render(
-      <QueriesTable queries={mockQueries} hasIncomplete={false} fields={mockFields} />
+      <QueriesTable queries={mockQueries} hasIncomplete={false} fields={[]} />
     );
 
-    // Expand the row by clicking on it
-    const row = screen.getByText("query-123").closest("tr");
+    const row = screen.getByText("abcde").closest("tr");
     if (row) {
       fireEvent.click(row);
     }
 
-    // Natural language block should appear
-    expect(
-      await screen.findByText("Natural language version of query")
-    ).toBeInTheDocument();
+    expect(screen.getByText("condition is 1234")).toBeInTheDocument();
+    expect(screen.getByText("Test Dataset #1")).toBeInTheDocument();
+  });
 
-    // TaskResults (should show collection names)
-    expect(screen.getByText("Synthea 1k")).toBeInTheDocument();
-    expect(screen.getByText("Test Omop Collection - Small")).toBeInTheDocument();
-  });*/
-  }
+  it("expands detail panel and shows natural language complex + TaskResults", async () => {
+    const mockQueries = [
+      getMockQuery({
+        pid: "abcde",
+        definition: {
+          id: "def-1",
+          combinator: "and",
+          rules: [
+            {
+              id: "rule-1",
+              field: "condition",
+              operator: "!=",
+              value: "1234",
+            },
+            {
+              id: "rule-1",
+              field: "condition",
+              operator: "=",
+              value: "4321",
+            },
+          ],
+        },
+      }),
+    ];
+    render(
+      <QueriesTable queries={mockQueries} hasIncomplete={false} fields={[]} />
+    );
+
+    const row = screen.getByText("abcde").closest("tr");
+    if (row) {
+      fireEvent.click(row);
+    }
+
+    expect(
+      screen.getByText("condition is not 1234, and condition is 4321")
+    ).toBeInTheDocument();
+  });
+
+  it("expands detail panel and shows natural language + TaskResults", async () => {
+    const mockQueries = [
+      getMockQuery({
+        pid: "abcde",
+        definition: {
+          id: "def-1",
+          combinator: "and",
+          rules: [
+            {
+              id: "rule-1",
+              field: "condition",
+              operator: "=",
+              value: "1234",
+            },
+          ],
+        },
+      }),
+    ];
+
+    const fields: Field[] = [
+      {
+        name: "condition",
+        label: "Condition",
+        values: [{ name: "1234", label: "My Condition" }],
+      },
+    ];
+
+    render(
+      <QueriesTable
+        queries={mockQueries}
+        hasIncomplete={false}
+        fields={fields}
+      />
+    );
+
+    const row = screen.getByText("abcde").closest("tr");
+    if (row) {
+      fireEvent.click(row);
+    }
+    expect(screen.getByText("Condition is My Condition")).toBeInTheDocument();
+  });
 });

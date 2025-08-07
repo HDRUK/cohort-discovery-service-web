@@ -92,6 +92,8 @@ const QueriesTable = ({
     },
   ];
 
+  console.log(fields);
+
   const table = useTable<Query>({
     columns,
     data: queries,
