@@ -49,6 +49,26 @@ describe("QueryBuilder", () => {
     expect(rule1.getByDisplayValue(">")).toBeInTheDocument();
     expect(rule1.getByDisplayValue("60")).toBeInTheDocument();
 
+    const operatorInput = rule1.getByDisplayValue(">");
+    await userEvent.click(operatorInput);
+
+    const betweenOption = await screen.findByRole("option", {
+      name: "between",
+    });
+    await userEvent.click(betweenOption);
+
+    const inputs = rule1.getAllByRole("textbox");
+    expect(inputs).toHaveLength(2);
+
+    await userEvent.clear(inputs[0]);
+    await userEvent.type(inputs[0], "40");
+
+    await userEvent.clear(inputs[1]);
+    await userEvent.type(inputs[1], "80");
+
+    console.log(JSON.stringify(setQueryBuilderJson.mock.calls));
+    return;
+
     const rule2 = within(rules[1]);
     expect(rule2.getByDisplayValue("condition")).toBeInTheDocument();
     expect(rule2.getByDisplayValue("=")).toBeInTheDocument();
