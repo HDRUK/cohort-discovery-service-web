@@ -1,0 +1,1 @@
+export const DEFAULT_QUERIES_PER_PAGE = 5;
