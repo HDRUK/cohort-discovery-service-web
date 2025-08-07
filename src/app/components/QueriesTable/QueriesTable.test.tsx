@@ -7,12 +7,6 @@ import { Field } from "react-querybuilder";
 import { paginateData } from "@/utils/mock";
 jest.mock("@/actions/getQueries");
 
-jest.mock("next/navigation", () => ({
-  useRouter: () => ({
-    push: jest.fn(),
-  }),
-}));
-
 describe("QueriesTable", () => {
   it("renders a query row with task stats", async () => {
     const data = [
@@ -62,7 +56,11 @@ describe("QueriesTable", () => {
       }),
     ];
     render(
-      <QueriesTable queries={mockQueries} hasIncomplete={false} fields={[]} />
+      <QueriesTable
+        queries={paginateData({ data: mockQueries })}
+        hasIncomplete={false}
+        fields={[]}
+      />
     );
 
     const row = screen.getByText("abcde").closest("tr");
@@ -99,7 +97,11 @@ describe("QueriesTable", () => {
       }),
     ];
     render(
-      <QueriesTable queries={mockQueries} hasIncomplete={false} fields={[]} />
+      <QueriesTable
+        queries={paginateData({ data: mockQueries })}
+        hasIncomplete={false}
+        fields={[]}
+      />
     );
 
     const row = screen.getByText("abcde").closest("tr");
@@ -141,7 +143,7 @@ describe("QueriesTable", () => {
 
     render(
       <QueriesTable
-        queries={mockQueries}
+        queries={paginateData({ data: mockQueries })}
         hasIncomplete={false}
         fields={fields}
       />

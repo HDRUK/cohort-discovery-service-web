@@ -11,10 +11,8 @@ import CodeBlock from "@/components/CodeBlock";
 import ShowOnClick from "@/components/ShowOnClick";
 import TaskResults from "@/components/TaskResults";
 import { getNaturalLanguage } from "@/utils/queryBuilder";
-import { useTable } from "@/hooks/useTable";
 import { Field } from "react-querybuilder";
 import { revalidateAction } from "@/actions/revalidate";
-import { useRouter, useSearchParams } from "next/navigation";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 
 const QueriesTable = ({
@@ -29,29 +27,6 @@ const QueriesTable = ({
   const {
     queryBuilder: { setQueryBuilderJson },
   } = useDaphneStore();
-
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const page = parseInt(searchParams.get("page") || "1");
-  const perPage = parseInt(
-    searchParams.get("per_page") || queries.per_page.toString()
-  );
-
-  const [pagination, setPagination] = useState({
-    pageIndex: page - 1,
-    pageSize: perPage,
-  });
-
-  useEffect(() => {
-    const page = pagination.pageIndex + 1;
-    const per_page = pagination.pageSize;
-
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("page", page.toString());
-    params.set("per_page", per_page.toString());
-
-    router.replace(`?${params.toString()}`);
-  }, [pagination.pageIndex, pagination.pageSize, router, searchParams]);
 
   useEffect(() => {
     if (!hasIncomplete) return;
