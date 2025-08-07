@@ -1,5 +1,6 @@
-import { Query, ApiResponse, WithIncomplete } from "@/types/api";
+import { Query, ApiResponse, WithIncomplete, Paginated } from "@/types/api";
 import { mockTasks } from "./getTasks";
+import { paginateData } from "@/utils/mock";
 
 export const getMockQuery = (rest?: Partial<Query>): Query => ({
   id: 100,
@@ -45,14 +46,16 @@ export const mockQueries: Query[] = [
   }),
 ];
 
-const getQueries = async (): Promise<WithIncomplete<ApiResponse<Query[]>>> => {
+const getQueries = async (): Promise<
+  WithIncomplete<ApiResponse<Paginated<Query[]>>>
+> => {
   const incompleteQueries = mockQueries.filter((q) =>
     q.tasks.some((t) => !t.completed_at)
   );
 
   return {
     message: "success",
-    data: mockQueries,
+    data: paginateData({ data: mockQueries }),
     hasIncomplete: incompleteQueries.length > 0,
   };
 };

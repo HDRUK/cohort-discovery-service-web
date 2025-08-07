@@ -5,6 +5,23 @@ export interface ApiResponse<T> {
   data: T;
 }
 
+export interface Paginated<T> {
+  data: T;
+  current_page: number;
+  per_page: number;
+  total: number;
+
+  from: number;
+  to: number;
+  last_page: number;
+
+  path?: string;
+  first_page_url?: string;
+  last_page_url?: string;
+  next_page_url?: string | null;
+  prev_page_url?: string | null;
+}
+
 export type WithIncomplete<T> = T & { hasIncomplete: boolean };
 
 export interface CreateQueryPost {

@@ -7,8 +7,19 @@ import QueriesTable from "@/components/QueriesTable";
 import { QueriesTableSkeleton } from "@/components/QueriesTable";
 import { getAllFields } from "@/actions/omop/getAllCodes";
 
-const QueryListPageContent = async () => {
-  const queries = await getQueries();
+interface PageProps {
+  searchParams: Promise<{
+    page?: string;
+    per_page?: string;
+  }>;
+}
+
+const QueryListPageContent = async ({ searchParams }: PageProps) => {
+  const params = await searchParams;
+  const page = params?.page ? parseInt(params.page) : undefined;
+  const perPage = params?.per_page ? parseInt(params.per_page) : undefined;
+
+  const queries = await getQueries(page, perPage);
   const fields = await getAllFields();
 
   return (
@@ -20,12 +31,12 @@ const QueryListPageContent = async () => {
   );
 };
 
-const QueryListPage = async () => {
+const QueryListPage = async ({ searchParams }: PageProps) => {
   return (
     <>
       <RevalidateButton tag="queries" />
       <Suspense fallback={<QueriesTableSkeleton />}>
-        <QueryListPageContent />
+        <QueryListPageContent searchParams={searchParams} />
       </Suspense>
     </>
   );

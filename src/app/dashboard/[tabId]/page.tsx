@@ -17,8 +17,13 @@ const isValidTabId = (tabId: string): tabId is TabId => {
 };
 
 type Params = Promise<{ tabId: string }>;
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
-const DashboardTabPage = async ({ params }: { params: Params }) => {
+const DashboardTabPage = async (props: {
+  params: Params;
+  searchParams: SearchParams;
+}) => {
+  const { params } = props;
   const { tabId } = await params;
 
   if (!isValidTabId(tabId)) return notFound();
@@ -62,7 +67,7 @@ const DashboardTabPage = async ({ params }: { params: Params }) => {
         </TabPanel>
 
         <TabPanel value={TabId.History}>
-          <QueryListPage />
+          <QueryListPage {...props} />
         </TabPanel>
 
         <TabPanel value={TabId.Collections}>

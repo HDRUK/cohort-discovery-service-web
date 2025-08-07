@@ -4,6 +4,7 @@ import QueriesTable from "./QueriesTable";
 import { getMockQuery } from "@/actions/__mocks__/getQueries";
 import { getMockTask } from "@/actions/__mocks__/getTasks";
 import { Field } from "react-querybuilder";
+import { paginateData } from "@/utils/mock";
 jest.mock("@/actions/getQueries");
 
 jest.mock("next/navigation", () => ({
@@ -23,7 +24,13 @@ describe("QueriesTable", () => {
         tasks: [getMockTask(), getMockTask({ completed_at: null })],
       }),
     ];
-    render(<QueriesTable queries={data} hasIncomplete={false} fields={[]} />);
+    render(
+      <QueriesTable
+        queries={paginateData({ data })}
+        hasIncomplete={false}
+        fields={[]}
+      />
+    );
 
     expect(screen.getByText("abcde")).toBeInTheDocument();
     expect(screen.getByText("fghij")).toBeInTheDocument();

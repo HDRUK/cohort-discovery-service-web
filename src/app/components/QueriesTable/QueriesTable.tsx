@@ -1,8 +1,8 @@
 "use client";
 
 import { useDaphneStore } from "@/store/useDaphneStore";
-import { useEffect } from "react";
-import { Query } from "@/types/api";
+import { useEffect, useState } from "react";
+import { Query, Paginated } from "@/types/api";
 import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
 import CodeIcon from "@mui/icons-material/Code";
 import { Box, Grid, Paper } from "@mui/material";
@@ -14,21 +14,44 @@ import { getNaturalLanguage } from "@/utils/queryBuilder";
 import { useTable } from "@/hooks/useTable";
 import { Field } from "react-querybuilder";
 import { revalidateAction } from "@/actions/revalidate";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 
 const QueriesTable = ({
   queries,
   hasIncomplete,
   fields,
 }: {
-  queries: Query[];
+  queries: Paginated<Query[]>;
   hasIncomplete: boolean;
   fields: Field[];
 }) => {
   const {
     queryBuilder: { setQueryBuilderJson },
   } = useDaphneStore();
+
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const page = parseInt(searchParams.get("page") || "1");
+  const perPage = parseInt(
+    searchParams.get("per_page") || queries.per_page.toString()
+  );
+
+  const [pagination, setPagination] = useState({
+    pageIndex: page - 1,
+    pageSize: perPage,
+  });
+
+  useEffect(() => {
+    const page = pagination.pageIndex + 1;
+    const per_page = pagination.pageSize;
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", page.toString());
+    params.set("per_page", per_page.toString());
+
+    router.replace(`?${params.toString()}`);
+  }, [pagination.pageIndex, pagination.pageSize, router, searchParams]);
 
   useEffect(() => {
     if (!hasIncomplete) return;
@@ -92,9 +115,12 @@ const QueriesTable = ({
     },
   ];
 
-  const table = useTable<Query>({
+  const table = usePaginatedTable<Query>({
     columns,
-    data: queries,
+    data: queries.data,
+    rowCount: queries.total,
+    perPageDefault: queries.per_page,
+    expandFirstRow: true,
     renderDetailPanel: ({ row }) => (
       <Grid container spacing={2}>
         <Grid size={5}>
