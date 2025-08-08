@@ -71,7 +71,7 @@ const DashboardTabPage = async (props: {
         </Box>
 
         <TabPanel value={TabId.NewQuery}>
-          <NewQueryPage />
+          <NewQueryPage {...props} />
         </TabPanel>
 
         <TabPanel value={TabId.History}>

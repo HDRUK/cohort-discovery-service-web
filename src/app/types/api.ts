@@ -94,7 +94,7 @@ export interface Task {
   completed_at: string | null;
   task_type: string;
   collection: Collection;
-  result: Result;
+  result?: Result;
 }
 
 export interface Query {
