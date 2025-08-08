@@ -21,6 +21,13 @@ export const useTable = <TData extends MRT_RowData>({
     enableFullScreenToggle: false,
     enableColumnFilters: false,
     enableExpanding: false,
+    enableGrouping: false,
+    enableHiding: false,
+    displayColumnDefOptions: {
+      "mrt-row-actions": {
+        visibleInShowHideMenu: false,
+      },
+    },
     initialState: {
       columnVisibility: { description: false },
       density: "compact",
@@ -30,6 +37,18 @@ export const useTable = <TData extends MRT_RowData>({
         backgroundColor: "secondary.main",
         color: "#fff",
         fontWeight: "bold",
+      },
+    },
+    muiTopToolbarProps: {
+      sx: {
+        display: "none",
+      },
+    },
+    muiTablePaperProps: {
+      elevation: 0,
+      sx: {
+        boxShadow: "none",
+        backgroundColor: "transparent",
       },
     },
     ...rest,
