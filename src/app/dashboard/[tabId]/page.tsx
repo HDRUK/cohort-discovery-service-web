@@ -36,11 +36,19 @@ const DashboardTabPage = async (props: {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          gap: 2,
         }}
       >
-        <Box sx={{ borderBottom: 1, borderColor: "divider", width: "100%" }}>
-          <TabList>
+        <Box sx={{ borderBottom: 0, borderColor: "divider", width: "100%" }}>
+          <TabList
+            indicatorColor="secondary"
+            slotProps={{
+              indicator: {
+                sx: {
+                  top: 0,
+                },
+              },
+            }}
+          >
             <Tab
               label="New Query"
               component={Link}

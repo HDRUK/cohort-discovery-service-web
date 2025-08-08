@@ -1,13 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import {
-  Box,
-  Toolbar,
-  List,
-  ListItemButton,
-  ListItemText,
-} from "@mui/material";
+import { Box, List, ListItemButton, ListItemText } from "@mui/material";
+import { usePathname } from "next/navigation";
 
 const drawerWidth = 240;
 
@@ -18,34 +13,35 @@ const menuItems = [
 ];
 
 export default function LeftSidebar() {
+  const pathname = usePathname();
+  const firstSegment = pathname?.split("/")[1] || "";
+
   return (
     <Box
       sx={(theme) => ({
         width: drawerWidth,
         flexShrink: 0,
-        backgroundColor: theme.palette.primary.main,
-        color: theme.palette.primary.contrastText,
-        borderRight: "1px solid #e0e0e0",
-        height: "100vh",
-        p: 2,
-        boxSizing: "border-box",
+        backgroundColor: theme.palette.background.default,
+        color: theme.palette.background.paper,
       })}
     >
-      <Toolbar />
-      <Box sx={{ overflow: "auto", p: 2 }}>
-        <List>
-          {menuItems.map(({ label, path }) => (
+      <List sx={{ py: 0 }}>
+        {menuItems.map(({ label, path }) => {
+          const menuSegment = path.split("/")[1];
+          const isActive = firstSegment === menuSegment;
+
+          return (
             <ListItemButton
               key={label}
               component={Link}
               href={path}
-              sx={{ color: "inherit" }}
+              selected={isActive}
             >
               <ListItemText primary={label} />
             </ListItemButton>
-          ))}
-        </List>
-      </Box>
+          );
+        })}
+      </List>
     </Box>
   );
 }

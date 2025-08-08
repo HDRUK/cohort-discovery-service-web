@@ -7,12 +7,14 @@ const ValueSourceSelector = ({
   options,
   value,
   handleOnChange,
+  disabled,
 }: ValueSelectorProps) => {
   return (
     <Select
       value={value}
       onChange={(e) => handleOnChange(e.target.value)}
       size="small"
+      disabled={disabled}
     >
       {options.map((opt) => (
         <MenuItem key={opt.name} value={opt.name}>

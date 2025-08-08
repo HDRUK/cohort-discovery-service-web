@@ -6,7 +6,6 @@ import {
   QueryBuilder as ReactQueryBuilder,
   defaultControlElements,
 } from "react-querybuilder";
-import "react-querybuilder/dist/query-builder.css";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { QueryBuilderSkeleton } from "./QueryBuilderSkeleton";
 import RuleGroupHeader from "./controls/RuleGroupHeader";
@@ -26,6 +25,16 @@ import OperatorSelector from "./controls/OperatorSelector";
 import CombinatorSelector from "./controls/CombinatorSelector";
 import ValueSourceSelector from "./controls/ValueSourceSelector";
 import NotToggle from "./controls/NotToggle";
+
+import styles from "./QueryBuilder.module.css";
+import "react-querybuilder/dist/query-builder-layout.css";
+
+const customClassnames = {
+  queryBuilder: `${styles.customQueryBuilder} queryBuilder-branches`,
+  ruleGroup: styles.customRuleGroup,
+  rule: styles.rule,
+  fields: styles.fields,
+};
 
 const customControlElements = {
   ...defaultControlElements,
@@ -76,10 +85,8 @@ const QueryBuilder = ({ fields }: { fields: Field[] }) => {
       showCloneButtons
       showLockButtons
       showNotToggle
-      controlClassnames={{
-        queryBuilder: "queryBuilder-branches ",
-      }}
       controlElements={customControlElements}
+      controlClassnames={customClassnames}
     />
   );
 };

@@ -14,6 +14,7 @@ import { getNaturalLanguage } from "@/utils/queryBuilder";
 import { Field } from "react-querybuilder";
 import { revalidateAction } from "@/actions/revalidate";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
+import { useRouter } from "next/navigation";
 
 const QueriesTable = ({
   queries,
@@ -24,6 +25,7 @@ const QueriesTable = ({
   hasIncomplete: boolean;
   fields: Field[];
 }) => {
+  const router = useRouter();
   const {
     queryBuilder: { setQueryBuilderJson },
   } = useDaphneStore();

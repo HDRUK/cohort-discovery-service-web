@@ -4,6 +4,7 @@ import "./globals.css";
 import { Box } from "@mui/material";
 import ThemeRegistry from "./components/ThemeRegistry";
 import LeftSidebar from "./components/LeftSidebar";
+import HeaderBar from "./components/HeaderBar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,18 +30,31 @@ export default function RootLayout({
     <ThemeRegistry>
       <html lang="en">
         <body className={`${geistSans.variable} ${geistMono.variable}`}>
-          <Box sx={{ display: "flex" }}>
-            <LeftSidebar />
-            <Box
-              component="main"
-              sx={{
-                flexGrow: 1,
-                bgcolor: "#fff",
-                p: 3,
-                overflow: "auto",
-              }}
-            >
-              {children}
+          <Box
+            sx={{ display: "flex", flexDirection: "column", height: "100vh" }}
+          >
+            <HeaderBar />
+
+            <Box sx={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
+              <LeftSidebar />
+              <Box
+                component="main"
+                sx={{
+                  flexGrow: 1,
+                  bgcolor: "primary.main",
+                  p: 3,
+                  overflow: "auto",
+                }}
+              >
+                <Box
+                  sx={{
+                    flexGrow: 1,
+                    bgcolor: "#fff",
+                  }}
+                >
+                  {children}
+                </Box>
+              </Box>
             </Box>
           </Box>
         </body>

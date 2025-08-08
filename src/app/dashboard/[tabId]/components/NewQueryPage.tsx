@@ -28,10 +28,6 @@ const NewQueryPageContent = async () => {
       <Paper
         sx={{
           p: 2,
-          borderStyle: "solid",
-          borderColor: "primary.main",
-          borderRadius: 2,
-          boxShadow: 3,
           my: 2,
         }}
       >
