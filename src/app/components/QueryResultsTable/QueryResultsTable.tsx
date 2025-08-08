@@ -2,7 +2,7 @@
 
 import { Query, Task, Result } from "@/types/api";
 import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
-import { Box, Chip, Paper } from "@mui/material";
+import { Box, Chip, CircularProgress, Paper } from "@mui/material";
 import { revalidateAction } from "@/actions/revalidate";
 import { useEffect } from "react";
 import { useTable } from "@/hooks/useTable";
@@ -37,6 +37,14 @@ const QueryResultsTable = ({ query }: { query: Query }) => {
       accessorKey: "total",
       accessorFn: (row) => row.result?.count,
       header: "Total",
+      Cell: ({ cell }) => {
+        const count = cell.getValue<number | undefined>();
+        return count === undefined || count === null ? (
+          <CircularProgress size={20} />
+        ) : (
+          count
+        );
+      },
     },
     {
       accessorKey: "status",
@@ -51,14 +59,6 @@ const QueryResultsTable = ({ query }: { query: Query }) => {
         }
       },
     },
-    /*{
-      accessorFn: (row) => row.tasks?.length ?? 0,
-      id: "tasks",
-      header: "Dataset Count",
-      minSize: 50,
-      maxSize: 80,
-      Cell: ({ cell }) => cell.getValue<number>().toString(),
-    },*/
   ];
 
   const table = useTable<Task>({

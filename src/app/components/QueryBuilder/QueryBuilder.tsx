@@ -29,9 +29,18 @@ import NotToggle from "./controls/NotToggle";
 import styles from "./QueryBuilder.module.css";
 import "react-querybuilder/dist/query-builder-layout.css";
 
+/*
 const customClassnames = {
   queryBuilder: `${styles.customQueryBuilder} queryBuilder-branches`,
   ruleGroup: styles.customRuleGroup,
+  rule: styles.rule,
+  fields: styles.fields,
+};
+*/
+
+const customClassnames = {
+  queryBuilder: `${styles.queryBuilder} queryBuilder-branches`,
+  ruleGroup: styles.ruleGroup,
   rule: styles.rule,
   fields: styles.fields,
 };

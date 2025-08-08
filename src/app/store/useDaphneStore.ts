@@ -45,7 +45,7 @@ export interface DaphneStoreState {
   userData: {
     queries: Query[];
     setQueries: (queries: Query[]) => void;
-    fetchResults: (reset: boolean) => Promise<ApiResponse<CreateQuery>>;
+    fetchResults: (reset?: boolean) => Promise<ApiResponse<CreateQuery>>;
     collections: Collection[];
     setCollections: (collections: Collection[]) => void;
   };
