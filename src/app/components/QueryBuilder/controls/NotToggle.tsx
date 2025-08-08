@@ -8,7 +8,7 @@ const NotToggle = ({ checked, handleOnChange }: NotToggleProps) => {
     <FormControlLabel
       control={
         <Switch
-          checked={checked}
+          checked={!!checked}
           onChange={(e) => handleOnChange(e.target.checked)}
           color="primary"
         />
