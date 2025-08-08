@@ -1,0 +1,20 @@
+.customQueryBuilder {
+    background-color: #f9f9f9;
+    padding: 16px;
+    border-radius: 8px;
+  }
+  
+  .rule {
+    margin-bottom: 12px;
+  }
+
+  .customRuleGroup, .rule-hasSubQuery {
+    background-color: #8FA99C20;
+  }
+ 
+  .fields {
+    padding: 6px;
+    border-radius: 4px;
+    background-color: #fff;
+  }
+  
