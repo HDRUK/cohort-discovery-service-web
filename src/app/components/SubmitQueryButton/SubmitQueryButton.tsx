@@ -22,7 +22,7 @@ const SubmitQueryButton = () => {
     <Button
       disabled={selectedDatasets.length === 0}
       variant="contained"
-      color="secondary"
+      color="primary"
       onClick={handleClick}
     >
       Run query

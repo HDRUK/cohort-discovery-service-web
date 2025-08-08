@@ -8,7 +8,7 @@ const AddGroupAction = ({ handleOnClick }: ActionWithRulesProps) => {
   return (
     <Button
       variant="contained"
-      color="secondary"
+      color="primary"
       onClick={handleOnClick}
       startIcon={<Add />}
     >

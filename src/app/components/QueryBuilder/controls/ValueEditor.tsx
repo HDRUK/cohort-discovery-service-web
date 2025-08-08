@@ -19,6 +19,7 @@ const ValueEditor = ({
   values,
   operator,
   inputType,
+  disabled,
 }: ValueEditorProps) => {
   const [internalValue, setInternalValue] = useState<States>(propValue);
 
@@ -52,6 +53,7 @@ const ValueEditor = ({
 
       return (
         <Autocomplete
+          disabled={disabled}
           options={values ?? []}
           getOptionLabel={(option) => option.label}
           value={(values ?? []).find((v) => v.name === internalValue) || null}
@@ -71,6 +73,7 @@ const ValueEditor = ({
         <FormControlLabel
           control={
             <Switch
+              disabled={disabled}
               checked={!!internalValue}
               onChange={(e) => handleValueChange(e.target.checked)}
               color="primary"
@@ -83,6 +86,7 @@ const ValueEditor = ({
     case "textarea":
       return (
         <TextField
+          disabled={disabled}
           multiline
           minRows={3}
           value={internalValue}
@@ -100,6 +104,7 @@ const ValueEditor = ({
         return (
           <>
             <TextField
+              disabled={disabled}
               type="number"
               label="From"
               value={internalValue[0]}
@@ -112,6 +117,7 @@ const ValueEditor = ({
               sx={{ mr: 1 }}
             />
             <TextField
+              disabled={disabled}
               type="number"
               label="To"
               value={internalValue[1]}
@@ -128,6 +134,7 @@ const ValueEditor = ({
 
       return (
         <TextField
+          disabled={disabled}
           value={
             inputType === "number"
               ? Number(

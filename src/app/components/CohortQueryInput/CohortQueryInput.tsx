@@ -54,8 +54,7 @@ const CohortQueryInput = ({ fields }: { fields: Field[] }) => {
       sx={{
         width: "100%",
         minWidth: 1000,
-        mt: 10,
-        mb: 2,
+        my: 2,
       }}
     >
       <Controller

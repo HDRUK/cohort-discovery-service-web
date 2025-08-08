@@ -1,17 +1,21 @@
 import { createTheme } from "@mui/material/styles";
 
-const theme = createTheme({
+let theme = createTheme({
   palette: {
     primary: {
-      main: "#29235c",
+      main: "#8FA99C",
       contrastText: "#ffffff",
     },
     secondary: {
-      main: "#3db28c",
+      main: "#CCD7D5",
       contrastText: "#ffffff",
     },
+    text: {
+      //default: "#4D5B59",
+    },
     background: {
-      default: "#ffffff",
+      default: "#fff",
+      paper: "#fff",
     },
   },
   zIndex: {
@@ -29,7 +33,48 @@ const theme = createTheme({
       fontSize: 20,
     },
   },
+});
+
+theme = createTheme(theme, {
   components: {
+    MuiListItemButton: {
+      styleOverrides: {
+        root: {
+          color: "#4D5B59",
+          "&.Mui-selected": {
+            backgroundColor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
+            "&:hover": {
+              backgroundColor: "#4D5B59",
+              color: theme.palette.primary.contrastText,
+            },
+          },
+          "&:hover": {
+            color: "#4D5B59",
+          },
+        },
+      },
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          "&.Mui-selected": {
+            backgroundColor: "#f9f9f9",
+            color: "#000",
+          },
+        },
+      },
+    },
+    MuiTabPanel: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "#f9f9f9",
+          width: "100%",
+          p: 2,
+          m: 0,
+        },
+      },
+    },
     MuiFormLabel: {
       styleOverrides: {
         root: {
@@ -49,6 +94,7 @@ const theme = createTheme({
     MuiInputBase: {
       styleOverrides: {
         root: {
+          backgroundColor: "#ffffff",
           "&.Mui-readOnly": {
             color: "gray",
             backgroundColor: "#f0f0f0",
