@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { useTable } from "@/hooks/useTable";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { QueryResultsTableSkeleton } from "./QueryResultsTableSkeleton";
+import { formatNumber } from "@/utils/numbers";
 
 const QueryResultsTable = ({ query }: { query: Query }) => {
   const {
@@ -21,7 +22,6 @@ const QueryResultsTable = ({ query }: { query: Query }) => {
   useEffect(() => {
     if (!isPending) return;
     const interval = setInterval(() => {
-      console.log("getting again");
       revalidateAction(query.pid);
     }, 1000);
     return () => clearInterval(interval);
@@ -42,7 +42,7 @@ const QueryResultsTable = ({ query }: { query: Query }) => {
         return count === undefined || count === null ? (
           <CircularProgress size={20} />
         ) : (
-          count
+          formatNumber(count)
         );
       },
     },
@@ -66,9 +66,9 @@ const QueryResultsTable = ({ query }: { query: Query }) => {
     data: tasks,
   });
 
-  if (isLoading) {
+  /*if (isLoading) {
     return <QueryResultsTableSkeleton />;
-  }
+  }*/
 
   return (
     <Paper sx={{ p: 2 }}>

@@ -9,6 +9,7 @@ import { useEffect, useMemo } from "react";
 import { Field } from "react-querybuilder";
 import { OmopTableName } from "@/types/omop";
 import { Option } from "@/types/api";
+import SearchBox from "../SearchBox";
 
 type FormValues = {
   cohortQueryInput: string;
@@ -16,11 +17,10 @@ type FormValues = {
 
 const CohortQueryInput = ({ fields }: { fields: Field[] }) => {
   const {
-    handleSubmit,
-    control,
-    setValue,
-    formState: { errors },
-  } = useForm<FormValues>();
+    stateManagement: { isLoading },
+  } = useDaphneStore();
+
+  const { handleSubmit, control, setValue } = useForm<FormValues>();
 
   const {
     queryBuilder: { queryBuilderJson, getQueryFromText },
@@ -52,8 +52,7 @@ const CohortQueryInput = ({ fields }: { fields: Field[] }) => {
       component="form"
       onSubmit={handleSubmit(onSubmit)}
       sx={{
-        width: "100%",
-        minWidth: 1000,
+        width: "95%",
         my: 2,
       }}
     >
@@ -62,31 +61,19 @@ const CohortQueryInput = ({ fields }: { fields: Field[] }) => {
         control={control}
         defaultValue=""
         rules={{ required: "Query is required" }}
-        render={({ field }) => (
-          <TextField
+        render={({ field, fieldState: { error } }) => (
+          <SearchBox
             {...field}
-            label="Cohort Query"
+            error={!!error}
+            helperText={error?.message}
+            type="search"
             placeholder="Search for a cohort e.g. females above 50 with diabetes type-ii"
             fullWidth
             variant="outlined"
             margin="normal"
-            error={!!errors.cohortQueryInput}
-            helperText={errors.cohortQueryInput?.message}
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              },
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                handleSubmit(onSubmit)();
-              }
-            }}
+            onSubmit={handleSubmit(onSubmit)}
+            loading={isLoading}
+            disabled={isLoading}
           />
         )}
       />

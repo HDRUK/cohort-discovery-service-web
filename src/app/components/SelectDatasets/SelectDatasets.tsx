@@ -23,9 +23,7 @@ const SelectDatasets = ({
   const options = collections.map((c) => ({ value: c.pid, label: c.name }));
 
   return (
-    <Box
-      sx={{ display: "flex", flexDirection: "column", gap: 2, maxWidth: 500 }}
-    >
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       <Autocomplete
         multiple
         options={options}
@@ -44,7 +42,7 @@ const SelectDatasets = ({
                 {...getTagProps({ index })}
                 key={option.value}
                 label={option.label}
-                color="primary"
+                color="tertiary"
               />
             ))}
           </Box>

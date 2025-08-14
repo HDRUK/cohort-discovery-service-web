@@ -10,6 +10,10 @@ let theme = createTheme({
       main: "#CCD7D5",
       contrastText: "#ffffff",
     },
+    tertiary: {
+      main: "#4D5B59",
+      contrastText: "#ffffff",
+    },
     text: {
       //default: "#4D5B59",
     },

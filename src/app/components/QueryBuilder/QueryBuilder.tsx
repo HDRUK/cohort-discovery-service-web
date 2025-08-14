@@ -69,7 +69,7 @@ const customControlElements = {
 const QueryBuilder = ({ fields }: { fields: Field[] }) => {
   const {
     queryBuilder: { queryBuilderJson, setQueryBuilderJson },
-    stateManagement: { isLoading },
+    //stateManagement: { isLoading },
   } = useDaphneStore();
 
   const [hasMounted, setHasMounted] = useState(false);
@@ -78,7 +78,7 @@ const QueryBuilder = ({ fields }: { fields: Field[] }) => {
     setHasMounted(true);
   }, []);
 
-  if (!hasMounted || isLoading) {
+  if (!hasMounted) {
     return <QueryBuilderSkeleton />;
   }
 

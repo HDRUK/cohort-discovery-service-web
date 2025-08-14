@@ -11,6 +11,7 @@ import { Suspense } from "react";
 import getCollections from "@/actions/getCollections";
 import { getAllFields } from "@/actions/omop/getAllCodes";
 import QueryResults from "@/components/QueryResults";
+import Anchor from "@/components/Anchor";
 
 interface PageProps {
   searchParams: Promise<{
@@ -26,7 +27,7 @@ const NewQueryPageContent = async () => {
   return (
     <>
       <CohortQueryInput fields={fields} />
-      <Box sx={{ maxWidth: 500 }}>
+      <Box sx={{ maxWidth: 1000 }}>
         <SelectDatasets
           initialSelection={initialSelection}
           collections={collections.data}
@@ -64,9 +65,12 @@ const NewQueryPage = async ({ searchParams }: PageProps) => {
         <NewQueryPageContent />
       </Suspense>
       {queryId && (
-        <Suspense fallback={<Skeleton height={200} />}>
-          <QueryResults queryId={queryId} />
-        </Suspense>
+        <>
+          <Anchor name={"query"} />
+          <Suspense key={queryId} fallback={<Skeleton height={200} />}>
+            <QueryResults key={queryId} queryId={queryId} />
+          </Suspense>
+        </>
       )}
     </Box>
   );
