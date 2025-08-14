@@ -15,6 +15,7 @@ import { Field } from "react-querybuilder";
 import { revalidateAction } from "@/actions/revalidate";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import { useRouter } from "next/navigation";
+import { formatNumber } from "@/utils/numbers";
 
 const QueriesTable = ({
   queries,
@@ -71,6 +72,21 @@ const QueriesTable = ({
       minSize: 50,
       maxSize: 80,
       Cell: ({ cell }) => cell.getValue<number>().toString(),
+    },
+    {
+      id: "total",
+      header: "Total Count",
+      minSize: 50,
+      maxSize: 80,
+      Cell: ({ cell }) => formatNumber(cell.getValue<number>()),
+      accessorFn: (row) => {
+        const tasks = row.tasks || [];
+        const count = tasks
+          .filter((t) => t.completed_at !== null)
+          .filter((t) => !!t.result)
+          .reduce((sum, t) => sum + (t.result.count || 0), 0);
+        return count;
+      },
     },
     {
       id: "percentComplete",

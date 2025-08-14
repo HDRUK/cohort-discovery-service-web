@@ -2,7 +2,7 @@ import { create } from "zustand";
 import type { RuleGroupType, RuleType } from "react-querybuilder";
 import getQueryFromInput from "../actions/getQueryFromInput";
 import submitQuery from "../actions/submitQuery";
-import { Collection, Query } from "../types/api";
+import { ApiResponse, Collection, CreateQuery, Query } from "../types/api";
 import { DEFAULT_SEXES, OmopTableName } from "@/types/omop";
 import { baseFields } from "../config/queryFields";
 import { Field, isRuleGroup } from "react-querybuilder";
@@ -45,7 +45,7 @@ export interface DaphneStoreState {
   userData: {
     queries: Query[];
     setQueries: (queries: Query[]) => void;
-    fetchResults: () => void;
+    fetchResults: (reset?: boolean) => Promise<ApiResponse<CreateQuery>>;
     collections: Collection[];
     setCollections: (collections: Collection[]) => void;
   };
@@ -255,20 +255,25 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         ...state,
         userData: { ...state.userData, queries },
       })),
-    fetchResults: async () => {
+    fetchResults: async (reset = false) => {
       set((state) => ({
         ...state,
         stateManagement: { ...state.stateManagement, isLoading: true },
       }));
 
       const { queryBuilderJson, selectedDatasets } = get().queryBuilder;
-      await submitQuery(queryBuilderJson, selectedDatasets);
+      const res = await submitQuery(queryBuilderJson, selectedDatasets);
 
       set((state) => ({
         ...state,
-        queryBuilder: { ...state.queryBuilder, queryBuilderJson: NO_QUERY },
+        queryBuilder: {
+          ...state.queryBuilder,
+          ...(reset ? { queryBuilderJson: NO_QUERY } : {}),
+        },
         stateManagement: { ...state.stateManagement, isLoading: false },
       }));
+
+      return res;
     },
     collections: [],
     setCollections: (collections) =>

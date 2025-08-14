@@ -10,6 +10,14 @@ import { Skeleton } from "@mui/material";
 import { Suspense } from "react";
 import getCollections from "@/actions/getCollections";
 import { getAllFields } from "@/actions/omop/getAllCodes";
+import QueryResults from "@/components/QueryResults";
+import Anchor from "@/components/Anchor";
+
+interface PageProps {
+  searchParams: Promise<{
+    query?: string;
+  }>;
+}
 
 const NewQueryPageContent = async () => {
   const fields = await getAllFields();
@@ -17,9 +25,9 @@ const NewQueryPageContent = async () => {
   const initialSelection = collections.data.map((c) => c.pid);
 
   return (
-    <Box>
+    <>
       <CohortQueryInput fields={fields} />
-      <Box sx={{ maxWidth: 500 }}>
+      <Box sx={{ maxWidth: 1000 }}>
         <SelectDatasets
           initialSelection={initialSelection}
           collections={collections.data}
@@ -43,17 +51,28 @@ const NewQueryPageContent = async () => {
           <SubmitQueryButton />
         </Box>
       </Paper>
-    </Box>
+    </>
   );
 };
 
-const NewQueryPage = async () => {
+const NewQueryPage = async ({ searchParams }: PageProps) => {
+  const params = await searchParams;
+  const queryId = params.query;
+
   return (
-    <>
+    <Box>
       <Suspense fallback={<Skeleton />}>
         <NewQueryPageContent />
       </Suspense>
-    </>
+      {queryId && (
+        <>
+          <Anchor name={"query"} />
+          <Suspense key={queryId} fallback={<Skeleton height={200} />}>
+            <QueryResults key={queryId} queryId={queryId} />
+          </Suspense>
+        </>
+      )}
+    </Box>
   );
 };
 

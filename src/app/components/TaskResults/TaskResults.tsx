@@ -12,6 +12,7 @@ import {
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PendingIcon from "@mui/icons-material/Pending";
 import { useTable } from "@/hooks/useTable";
+import { formatNumber } from "@/utils/numbers";
 
 type TaskResultsProps = {
   tasks: Task[];
@@ -49,7 +50,7 @@ const TaskResults = ({ tasks }: TaskResultsProps) => {
           return count === undefined || count === null ? (
             <CircularProgress size={20} />
           ) : (
-            count
+            formatNumber(count)
           );
         },
         size: 100,

@@ -1,0 +1,70 @@
+
+.queryBuilder .ruleGroup .ruleGroup-header {
+    /* Move group header below body. */
+    /* You could also accomplish the same effect with */
+    /* a custom RuleGroup or Rule component without */
+    /* rearranging the header and body. Also note that */
+    /* this method can cause problems with drag-and-drop. */
+    order: 2;
+  }
+  .queryBuilder > .ruleGroup > .ruleGroup-header > .ruleGroup-remove {
+    /* Hide "remove group" button */
+    display: none;
+  }
+  .queryBuilder > .ruleGroup {
+    flex-direction: row;
+  }
+  .queryBuilder > .ruleGroup > .ruleGroup-header {
+    flex-shrink: 1 !important;
+  }
+  .queryBuilder > .ruleGroup > .ruleGroup-header > .ruleGroup-addRule {
+    /* Hide "add rule" button from root group */
+    display: none;
+  }
+  .queryBuilder .betweenRules {
+    font-family: sans-serif;
+  }
+  .queryBuilder > .ruleGroup > .ruleGroup-body {
+    width: 100%;
+    flex-direction: row;
+    align-items: stretch;
+  }
+  .queryBuilder > .ruleGroup > .ruleGroup-body > .ruleGroup {
+    /* Extra spacing above the "add rule" buttons */
+    gap: 1rem;
+  }
+  .queryBuilder > .ruleGroup > .ruleGroup-body .ruleGroup-addGroup {
+    /* Hide "add group" button from "and" groups */
+    display: none;
+  }
+  .queryBuilder > .ruleGroup > .ruleGroup-body > .betweenRules {
+    /* Fix height of inline combinators */
+    height: fit-content;
+    /* Center vertically */
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+  .queryBuilder > .ruleGroup > .ruleGroup-body > .ruleGroup {
+    /* Span the full width of the "or" group body */
+    width: 100%;
+  }
+  .queryBuilder > .ruleGroup > .ruleGroup-body > .ruleGroup .betweenRules {
+    /* A little space between each combinator and the rule above it */
+    margin-top: 1rem;
+  }
+  .queryBuilder > .ruleGroup .rule {
+    /* Stack field/operator/value vertically */
+    flex-direction: column;
+    /* Left-align */
+    align-items: flex-start;
+  }
+  .queryBuilder > .ruleGroup .rule > .rule-remove {
+    /* Move "remove rule" button to top of rule */
+    order: -1;
+    /* Right-align "remove rule" button */
+    margin-left: auto;
+  }
+  .queryBuilder .rule > .rule-value {
+    max-width: 8rem;
+  }
+  
