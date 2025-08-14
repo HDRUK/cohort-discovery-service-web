@@ -2,9 +2,9 @@
 
 import React from "react";
 import { AppBar, Toolbar, IconButton, Box } from "@mui/material";
-import NotificationsIcon from "@mui/icons-material/Notifications";
 import Image from "next/image";
 import logo from "@/assets/logo.svg";
+import userIcon from "@/assets/user_logo.svg";
 
 const HeaderBar = () => {
   return (
@@ -13,7 +13,7 @@ const HeaderBar = () => {
       color="default"
       elevation={1}
       sx={(theme) => ({
-        backgroundColor: theme.palette.background.default,
+        backgroundColor: "#fff",
         color: theme.palette.background.paper,
       })}
     >
@@ -26,7 +26,7 @@ const HeaderBar = () => {
 
         <Box>
           <IconButton color="inherit">
-            <NotificationsIcon />
+            <Image priority src={userIcon} alt={"user icon"} />
           </IconButton>
         </Box>
       </Toolbar>

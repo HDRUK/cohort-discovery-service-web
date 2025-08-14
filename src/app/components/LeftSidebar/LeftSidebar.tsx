@@ -21,7 +21,7 @@ export default function LeftSidebar() {
       sx={(theme) => ({
         width: drawerWidth,
         flexShrink: 0,
-        backgroundColor: theme.palette.background.default,
+        backgroundColor: "#fff",
         color: theme.palette.background.paper,
       })}
     >

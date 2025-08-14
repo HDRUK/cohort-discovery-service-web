@@ -42,7 +42,7 @@ const SelectDatasets = ({
                 {...getTagProps({ index })}
                 key={option.value}
                 label={option.label}
-                color="tertiary"
+                color="secondary"
               />
             ))}
           </Box>

@@ -2,19 +2,13 @@
 
 import { Query, Task, Result } from "@/types/api";
 import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
-import { Box, Chip, CircularProgress, Paper } from "@mui/material";
+import { CircularProgress, Link, Paper } from "@mui/material";
 import { revalidateAction } from "@/actions/revalidate";
 import { useEffect } from "react";
 import { useTable } from "@/hooks/useTable";
-import { useDaphneStore } from "@/store/useDaphneStore";
-import { QueryResultsTableSkeleton } from "./QueryResultsTableSkeleton";
 import { formatNumber } from "@/utils/numbers";
 
 const QueryResultsTable = ({ query }: { query: Query }) => {
-  const {
-    stateManagement: { isLoading },
-  } = useDaphneStore();
-
   const { tasks } = query;
 
   const isPending = tasks.some((t) => !t.result);
@@ -30,13 +24,19 @@ const QueryResultsTable = ({ query }: { query: Query }) => {
   const columns: MRT_ColumnDef<Task>[] = [
     {
       accessorKey: "collection_name",
-      accessorFn: (row) => row.collection.name,
-      header: "Collection Name",
+      Cell: ({ row }) => (
+        <Link component="a" href={row.original.collection.url || "#"}>
+          {row.original.collection.name}
+        </Link>
+      ),
+      header: "Dataset",
+      minSize: 400,
     },
     {
       accessorKey: "total",
       accessorFn: (row) => row.result?.count,
       header: "Total",
+      maxSize: 50,
       Cell: ({ cell }) => {
         const count = cell.getValue<number | undefined>();
         return count === undefined || count === null ? (
@@ -50,12 +50,13 @@ const QueryResultsTable = ({ query }: { query: Query }) => {
       accessorKey: "status",
       accessorFn: (row) => row.result,
       header: "Status",
+      maxSize: 50,
       Cell: ({ cell }) => {
         const result = cell.getValue<Result>();
         if (result) {
-          return <Chip label={"Success"} color="success" />;
+          return "Successful";
         } else {
-          return <Chip label={"Pending"} color="warning" />;
+          return "Pending";
         }
       },
     },
@@ -65,10 +66,6 @@ const QueryResultsTable = ({ query }: { query: Query }) => {
     columns,
     data: tasks,
   });
-
-  /*if (isLoading) {
-    return <QueryResultsTableSkeleton />;
-  }*/
 
   return (
     <Paper sx={{ p: 2 }}>

@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Source_Sans_3, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Box } from "@mui/material";
 import ThemeRegistry from "./components/ThemeRegistry";
 import LeftSidebar from "./components/LeftSidebar";
 import HeaderBar from "./components/HeaderBar";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const sourceSans = Source_Sans_3({
+  variable: "--font-source-sans-3",
   subsets: ["latin"],
+  style: ["normal", "italic"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
@@ -23,18 +25,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <ThemeRegistry>
       <html lang="en">
-        <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <body className={`${sourceSans.variable} ${geistMono.variable}`}>
           <Box
             sx={{ display: "flex", flexDirection: "column", height: "100vh" }}
           >
             <HeaderBar />
-
             <Box sx={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
               <LeftSidebar />
               <Box
@@ -46,14 +45,7 @@ export default function RootLayout({
                   overflow: "auto",
                 }}
               >
-                <Box
-                  sx={{
-                    flexGrow: 1,
-                    bgcolor: "#fff",
-                  }}
-                >
-                  {children}
-                </Box>
+                <Box sx={{ flexGrow: 1, bgcolor: "#fff" }}>{children}</Box>
               </Box>
             </Box>
           </Box>

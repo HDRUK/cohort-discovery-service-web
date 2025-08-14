@@ -1,25 +1,28 @@
-import { createTheme } from "@mui/material/styles";
+import { createTheme, alpha } from "@mui/material/styles";
 
 let theme = createTheme({
   palette: {
     primary: {
+      dark: "#4D5B59",
       main: "#8FA99C",
+      light: "#CCD7D5",
       contrastText: "#ffffff",
     },
     secondary: {
-      main: "#CCD7D5",
-      contrastText: "#ffffff",
+      main: "#E0DBD7",
+      contrastText: "#3C3C3B",
     },
     tertiary: {
-      main: "#4D5B59",
+      //main: "#4D5B59",
+      main: "#E0DBD7",
       contrastText: "#ffffff",
     },
     text: {
       //default: "#4D5B59",
     },
     background: {
-      default: "#fff",
-      paper: "#fff",
+      default: "#F2F2F2",
+      paper: "#F7F7F7",
     },
   },
   zIndex: {
@@ -40,6 +43,13 @@ let theme = createTheme({
 });
 
 theme = createTheme(theme, {
+  palette: {
+    ...theme.palette,
+    link: theme.palette.augmentColor({
+      color: { main: "#475DA7" },
+      name: "link",
+    }),
+  },
   components: {
     MuiListItemButton: {
       styleOverrides: {
@@ -61,22 +71,22 @@ theme = createTheme(theme, {
     },
     MuiTab: {
       styleOverrides: {
-        root: {
+        root: ({ theme }) => ({
           "&.Mui-selected": {
-            backgroundColor: "#f9f9f9",
+            backgroundColor: theme.palette.background.default,
             color: "#000",
           },
-        },
+        }),
       },
     },
     MuiTabPanel: {
       styleOverrides: {
-        root: {
-          backgroundColor: "#f9f9f9",
+        root: ({ theme }) => ({
+          backgroundColor: theme.palette.background.default,
           width: "100%",
           p: 2,
           m: 0,
-        },
+        }),
       },
     },
     MuiFormLabel: {
@@ -122,6 +132,27 @@ theme = createTheme(theme, {
         root: {
           borderRadius: 20,
         },
+      },
+    },
+    MuiLink: {
+      defaultProps: {
+        underline: "always",
+      },
+      styleOverrides: {
+        root: ({ theme }) => ({
+          textDecorationColor: theme.palette.link.main,
+          color: theme.palette.link.main,
+          "&:hover": { color: theme.palette.link.dark },
+          "&:visited": { color: theme.palette.link.light },
+        }),
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: () => ({
+          boxShadow: "none",
+          border: 1,
+        }),
       },
     },
   },

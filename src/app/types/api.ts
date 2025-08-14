@@ -59,6 +59,7 @@ export interface Collection {
   id: number;
   name: string;
   pid: string;
+  url: string | null;
   type: string;
   created_at: string;
   updated_at: string;
