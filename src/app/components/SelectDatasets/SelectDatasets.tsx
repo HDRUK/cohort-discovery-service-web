@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -28,10 +28,12 @@ const SelectDatasets = ({
     queryBuilder: { selectedDatasets, setSelectedDatasets },
   } = useDaphneStore();
 
+  const mountedRef = useRef(false);
   useEffect(() => {
-    if (selectedDatasets.length > 0) return;
-    setSelectedDatasets(initialSelection);
-  }, [selectedDatasets, initialSelection, setSelectedDatasets]);
+    if (mountedRef.current) return;
+    mountedRef.current = true;
+    setSelectedDatasets(initialSelection ?? []);
+  }, [initialSelection, setSelectedDatasets]);
 
   const options = collections.map((c) => ({ value: c.pid, label: c.name }));
 
