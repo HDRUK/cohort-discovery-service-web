@@ -7,12 +7,13 @@ import { CreateQuery, CreateQueryPost, ApiResponse } from "../types/api";
 
 const submitQuery = async (
   query: RuleGroupType,
+  queryName: string,
   collection_filter?: string[]
 ): Promise<ApiResponse<CreateQuery>> => {
   return await apiPost<ApiResponse<CreateQuery>, CreateQueryPost>(
-    API_ROUTES.task,
+    API_ROUTES.queries,
     {
-      name: "test-task",
+      name: queryName,
       definition: query,
       task_type: "a",
       ...(collection_filter && { collection_filter }),

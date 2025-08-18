@@ -20,7 +20,7 @@ const customValueProcessor: ValueProcessorByRule = (rule, options) => {
   return defaultValueProcessorByRule(rule, options);
 };
 
-const getNaturalLanguage = (query: RuleGroupType, fields: Field[]) => {
+const getNaturalLanguage = (query: RuleGroupType, fields?: Field[]) => {
   const text = formatQuery(query, {
     format: "natural_language",
     parseNumbers: true,

@@ -1,6 +1,7 @@
 "use client";
 
 import { useDaphneStore } from "@/store/useDaphneStore";
+
 import { useEffect } from "react";
 import { Query, Paginated } from "@/types/api";
 import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
@@ -16,7 +17,6 @@ import { formatNumber } from "@/utils/numbers";
 import Link from "next/link";
 import { Link as MuiLink } from "@mui/material";
 import { routes } from "@/config/routes";
-import TableTitle from "../TableTitle/TableTitle";
 
 const QueriesTable = ({
   queries,
@@ -65,6 +65,13 @@ const QueriesTable = ({
           </MuiLink>
         );
       },
+    },
+    {
+      accessorKey: "name",
+      header: "Query Name",
+      minSize: 80,
+      maxSize: 80,
+      Cell: ({ cell }) => cell.getValue<string>(),
     },
     {
       accessorKey: "created_at",
@@ -138,7 +145,7 @@ const QueriesTable = ({
         <Grid size={12}>
           <TaskResults tasks={row.original.tasks} />
         </Grid>
-        <Grid size={7}>
+        <Grid size={6}>
           <Paper
             elevation={1}
             sx={{
@@ -176,12 +183,7 @@ const QueriesTable = ({
     ),
   });
 
-  return (
-    <Paper sx={{ p: 2, gap: 2, display: "flex", flexDirection: "column" }}>
-      <TableTitle name={"History"} count={queries.total} />
-      <MaterialReactTable table={table} />
-    </Paper>
-  );
+  return <MaterialReactTable table={table} />;
 };
 
 export default QueriesTable;

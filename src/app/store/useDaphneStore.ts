@@ -6,6 +6,7 @@ import { ApiResponse, Collection, CreateQuery, Query } from "../types/api";
 import { DEFAULT_SEXES, OmopTableName } from "@/types/omop";
 import { baseFields } from "../config/queryFields";
 import { Field, isRuleGroup } from "react-querybuilder";
+import { getNaturalLanguage } from "@/utils/queryBuilder";
 
 type Option = {
   name: string;
@@ -26,6 +27,8 @@ export interface DaphneStoreState {
     getQueryFromText: (input: string) => void;
     selectedDatasets: string[];
     setSelectedDatasets: (pids: string[]) => void;
+    queryName: string;
+    setQueryName: (name: string) => void;
   };
   omop: {
     sexes: Option[];
@@ -45,7 +48,10 @@ export interface DaphneStoreState {
   userData: {
     queries: Query[];
     setQueries: (queries: Query[]) => void;
-    fetchResults: (reset?: boolean) => Promise<ApiResponse<CreateQuery>>;
+    fetchResults: (
+      queryName?: string,
+      reset?: boolean
+    ) => Promise<ApiResponse<CreateQuery>>;
     collections: Collection[];
     setCollections: (collections: Collection[]) => void;
   };
@@ -133,6 +139,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         stateManagement: { ...state.stateManagement, isLoading: false },
         queryBuilder: {
           ...state.queryBuilder,
+          queryName: "",
           queryBuilderJson: DEFAULT_QUERY,
         },
       })),
@@ -150,6 +157,12 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       set((state) => ({
         ...state,
         queryBuilder: { ...state.queryBuilder, queryBuilderJson: query },
+      })),
+    queryName: "",
+    setQueryName: (name) =>
+      set((state) => ({
+        ...state,
+        queryBuilder: { ...state.queryBuilder, queryName: name },
       })),
     selectedDatasets: [],
     setSelectedDatasets: (pids) =>
@@ -255,14 +268,29 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         ...state,
         userData: { ...state.userData, queries },
       })),
-    fetchResults: async (reset = false) => {
+    fetchResults: async (name, reset = false) => {
       set((state) => ({
         ...state,
         stateManagement: { ...state.stateManagement, isLoading: true },
       }));
 
-      const { queryBuilderJson, selectedDatasets } = get().queryBuilder;
-      const res = await submitQuery(queryBuilderJson, selectedDatasets);
+      const { queryBuilderJson, selectedDatasets, fields } = get().queryBuilder;
+      const queryName = name
+        ? name
+        : getNaturalLanguage(queryBuilderJson, fields);
+
+      console.log("fetchResults", name);
+      console.log("fetchResults", queryName);
+
+      if (get().queryBuilder.queryName !== queryName) {
+        get().queryBuilder.setQueryName(queryName);
+      }
+
+      const res = await submitQuery(
+        queryBuilderJson,
+        queryName,
+        selectedDatasets
+      );
 
       set((state) => ({
         ...state,

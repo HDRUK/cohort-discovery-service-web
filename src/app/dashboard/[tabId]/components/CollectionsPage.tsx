@@ -2,13 +2,21 @@
 
 import Collections from "@/components/Collections";
 import getCollections from "@/actions/getCollections";
-import { Skeleton } from "@mui/material";
+import { Paper, Skeleton } from "@mui/material";
 import { Suspense } from "react";
-import { RevalidateButton } from "./RevalidateButton";
+import RevalidateButton from "@/components/RevalidateButton";
+import Title from "@/components/Title";
 
 const CollectionsPageContent = async () => {
   const collections = await getCollections();
-  return <Collections collections={collections.data} />;
+  return (
+    <Paper sx={{ p: 2, gap: 2, display: "flex", flexDirection: "column" }}>
+      <Title title={"Collections"} subTitle={collections.data.length}>
+        <RevalidateButton tag="collections" />
+      </Title>
+      <Collections collections={collections.data} />
+    </Paper>
+  );
 };
 
 const CollectionsPage = async () => {
@@ -17,7 +25,6 @@ const CollectionsPage = async () => {
       <Suspense fallback={<Skeleton />}>
         <CollectionsPageContent />
       </Suspense>
-      <RevalidateButton tag={"collections"} />
     </>
   );
 };

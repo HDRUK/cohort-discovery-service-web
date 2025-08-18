@@ -1,8 +1,7 @@
 "use client";
 
 import { useForm, Controller } from "react-hook-form";
-import { TextField, Box, InputAdornment } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
+import { Box, TextField } from "@mui/material";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { getNaturalLanguage } from "@/utils/queryBuilder";
 import { useEffect, useMemo } from "react";
@@ -10,22 +9,30 @@ import { Field } from "react-querybuilder";
 import { OmopTableName } from "@/types/omop";
 import { Option } from "@/types/api";
 import SearchBox from "../SearchBox";
+import Title from "@/components/Title";
 
 type FormValues = {
   cohortQueryInput: string;
+  queryName: string;
 };
 
 const CohortQueryInput = ({ fields }: { fields: Field[] }) => {
   const {
+    queryBuilder: { setFields, queryBuilderJson, getQueryFromText },
+    omop: { setOmop },
     stateManagement: { isLoading },
   } = useDaphneStore();
 
-  const { handleSubmit, control, setValue } = useForm<FormValues>();
+  useEffect(() => {
+    setFields(fields);
+  }, [fields, setFields]);
 
-  const {
-    queryBuilder: { queryBuilderJson, getQueryFromText },
-    omop: { setOmop },
-  } = useDaphneStore();
+  const { handleSubmit, control, setValue } = useForm<FormValues>({
+    defaultValues: {
+      cohortQueryInput: "",
+      queryName: "",
+    },
+  });
 
   const omop = useMemo(() => {
     return fields.reduce((acc, item) => {

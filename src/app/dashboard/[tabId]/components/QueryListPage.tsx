@@ -1,11 +1,13 @@
 "use server";
 
 import { Suspense } from "react";
-import { RevalidateButton } from "./RevalidateButton";
 import getQueries from "@/actions/getQueries";
 import QueriesTable from "@/components/QueriesTable";
 import { QueriesTableSkeleton } from "@/components/QueriesTable";
 import { getAllFields } from "@/actions/omop/getAllCodes";
+import { Paper } from "@mui/material";
+import Title from "@/components/Title";
+import RevalidateButton from "@/components/RevalidateButton";
 
 interface PageProps {
   searchParams: Promise<{
@@ -23,18 +25,22 @@ const QueryListPageContent = async ({ searchParams }: PageProps) => {
   const fields = await getAllFields();
 
   return (
-    <QueriesTable
-      queries={queries.data}
-      hasIncomplete={queries.hasIncomplete}
-      fields={fields}
-    />
+    <Paper sx={{ p: 2, gap: 2, display: "flex", flexDirection: "column" }}>
+      <Title title={"History"} subTitle={queries.data.total}>
+        <RevalidateButton tag="queries" />
+      </Title>
+      <QueriesTable
+        queries={queries.data}
+        hasIncomplete={queries.hasIncomplete}
+        fields={fields}
+      />
+    </Paper>
   );
 };
 
 const QueryListPage = async ({ searchParams }: PageProps) => {
   return (
     <>
-      <RevalidateButton tag="queries" />
       <Suspense fallback={<QueriesTableSkeleton />}>
         <QueryListPageContent searchParams={searchParams} />
       </Suspense>

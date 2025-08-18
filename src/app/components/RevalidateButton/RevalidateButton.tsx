@@ -14,7 +14,7 @@ export const RevalidateButton = ({ tag, text }: RevalidateButtonProps) => {
     <Box display="flex" alignItems="center" gap={1}>
       <Tooltip title="Refresh">
         <IconButton onClick={() => revalidateAction(tag)}>
-          <RefreshIcon />
+          <RefreshIcon fontSize={"small"} />
         </IconButton>
       </Tooltip>
       {text && <Typography variant="body2">{text}</Typography>}

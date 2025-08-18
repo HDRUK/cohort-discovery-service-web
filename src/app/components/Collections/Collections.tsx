@@ -17,7 +17,7 @@ const Collections = ({ collections }: { collections: Collection[] }) => {
     () => [
       {
         id: "pid",
-        header: "Id",
+        header: "Collection ID",
         accessorFn: (row) => row.pid,
         size: 20,
       },

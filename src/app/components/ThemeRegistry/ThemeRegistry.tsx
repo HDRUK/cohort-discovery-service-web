@@ -6,6 +6,7 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import GlobalStyles from "@mui/material/GlobalStyles";
 import { CssBaseline } from "@mui/material";
 import theme from "@/config/theme";
+import { NotifyProvider } from "@/providers/NotifyProvider";
 
 export default function ThemeRegistry({ children }: { children: ReactNode }) {
   return (
@@ -24,7 +25,7 @@ export default function ThemeRegistry({ children }: { children: ReactNode }) {
           }}
         />
         <CssBaseline />
-        {children}
+        <NotifyProvider>{children}</NotifyProvider>
       </ThemeProvider>
     </AppRouterCacheProvider>
   );

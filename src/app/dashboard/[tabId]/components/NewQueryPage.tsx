@@ -13,6 +13,7 @@ import QueryResults from "@/components/QueryResults";
 import Anchor from "@/components/Anchor";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorMessage from "@/components/ErrorMessage";
+import CohortQueryTitle from "@/components/CohortQueryTitle";
 
 interface PageProps {
   searchParams: Promise<{
@@ -32,6 +33,7 @@ const NewQueryPageContent = async () => {
 
   return (
     <>
+      <CohortQueryTitle />
       <CohortQueryInput fields={fields} />
       <Box sx={{ maxWidth: 1000 }}>
         <SelectDatasets
@@ -67,7 +69,7 @@ const NewQueryPage = async ({ searchParams }: PageProps) => {
 
   return (
     <Box>
-      <Suspense fallback={<Skeleton />}>
+      <Suspense fallback={<Skeleton height={600} />}>
         <NewQueryPageContent />
       </Suspense>
       {queryId && (

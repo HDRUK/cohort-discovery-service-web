@@ -13,9 +13,8 @@ let theme = createTheme({
       contrastText: "#3C3C3B",
     },
     tertiary: {
-      //main: "#4D5B59",
-      main: "#E0DBD7",
-      contrastText: "#ffffff",
+      main: "#FAFAFA",
+      contrastText: "#3C3C3B",
     },
     text: {
       //default: "#4D5B59",
@@ -137,6 +136,29 @@ theme = createTheme(theme, {
           textTransform: "none",
         },
       },
+      variants: [
+        {
+          props: { variant: "contained", "data-shape": "curvedRight" },
+          style: {
+            borderTopLeftRadius: 0,
+            borderBottomLeftRadius: 0,
+            borderTopRightRadius: "1rem",
+            borderBottomRightRadius: "1rem",
+            my: "auto",
+          },
+        },
+        {
+          props: { variant: "contained", "data-shape": "curvedLeft" },
+          style: {
+            borderTopLeftRadius: "1rem",
+            borderBottomLeftRadius: "1rem",
+            borderTopRightRadius: 0,
+            borderBottomRightRadius: 0,
+            my: "auto",
+          },
+        },
+        // You can add contained/text versions the same way if needed
+      ],
     },
     MuiOutlinedInput: {
       styleOverrides: {

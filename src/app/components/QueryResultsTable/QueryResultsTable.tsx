@@ -2,15 +2,22 @@
 
 import { Query, Task, Result } from "@/types/api";
 import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
-import { Box, CircularProgress, Link, Paper, Typography } from "@mui/material";
+import { CircularProgress, Link, Paper } from "@mui/material";
 import { revalidateAction } from "@/actions/revalidate";
 import { useEffect } from "react";
 import { useTable } from "@/hooks/useTable";
 import { formatNumber } from "@/utils/numbers";
-import TableTitle from "../TableTitle/TableTitle";
+import Title from "../Title";
+import { useDaphneStore } from "@/store/useDaphneStore";
 
 const QueryResultsTable = ({ query }: { query: Query }) => {
-  const { tasks } = query;
+  const {
+    queryBuilder: { setQueryName },
+  } = useDaphneStore();
+  const { tasks, name } = query;
+  useEffect(() => {
+    setQueryName(name);
+  }, [name, setQueryName]);
 
   const isPending = tasks.some((t) => !t.result);
 
@@ -76,7 +83,7 @@ const QueryResultsTable = ({ query }: { query: Query }) => {
 
   return (
     <Paper sx={{ p: 2, gap: 2, display: "flex", flexDirection: "column" }}>
-      <TableTitle name={"Results"} count={tasks.length} />
+      <Title title={"Results"} subTitle={tasks.length} />
       <MaterialReactTable table={table} />
     </Paper>
   );
