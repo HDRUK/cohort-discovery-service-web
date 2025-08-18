@@ -74,6 +74,18 @@ export function usePaginatedTable<TData extends { pid: string }>({
     muiPaginationProps: {
       rowsPerPageOptions: [5, 10, 20],
     },
+    muiBottomToolbarProps: {
+      sx: {
+        display: "flex",
+        "&& .MuiInputBase-input, && .MuiSelect-select": {
+          backgroundColor: "transparent !important",
+        },
+
+        "&& .MuiInputBase-root, && .MuiInput-root": {
+          backgroundColor: "transparent !important",
+        },
+      },
+    },
     ...rest,
   });
 
