@@ -5,7 +5,7 @@ import getCollections from "@/actions/getCollections";
 jest.mock("@/actions/getCollections");
 
 describe("Collections", () => {
-  /*it('displays "No records to display" when collections is empty', () => {
+  it('displays "No records to display" when collections is empty', () => {
     render(<Collections collections={[]} />);
 
     const noRecordsText = screen.getByText(/no records to display/i);
@@ -21,7 +21,7 @@ describe("Collections", () => {
         screen.getByRole("columnheader", { name: column })
       ).toBeInTheDocument();
     }
-  });*/
+  });
 
   it("displays data when collections exist", async () => {
     const collections = await getCollections();
