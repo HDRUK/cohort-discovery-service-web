@@ -15,6 +15,7 @@ import PendingIcon from "@mui/icons-material/Pending";
 import { useTable } from "@/hooks/useTable";
 import { formatNumber } from "@/utils/numbers";
 import { RemoveCircle } from "@mui/icons-material";
+import dayjs from "dayjs";
 
 type TaskResultsProps = {
   tasks: Task[];
@@ -50,6 +51,18 @@ const TaskResults = ({ tasks }: TaskResultsProps) => {
         size: 200,
       },
       {
+        accessorKey: "attempted_at",
+        header: "Executed At",
+        minSize: 80,
+        maxSize: 150,
+        Cell: ({ cell }) => {
+          const value = cell.getValue<string>();
+          return value
+            ? dayjs(cell.getValue<string>()).format("MMM D, YYYY h:mm A")
+            : "-";
+        },
+      },
+      {
         accessorFn: (row) => row.result?.count ?? null,
         id: "count",
         header: "Count",
@@ -65,7 +78,6 @@ const TaskResults = ({ tasks }: TaskResultsProps) => {
         },
         size: 100,
       },
-
       {
         id: "coverage",
         header: "Coverage [%]",

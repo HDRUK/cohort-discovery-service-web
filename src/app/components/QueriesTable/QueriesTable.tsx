@@ -74,18 +74,6 @@ const QueriesTable = ({
       Cell: ({ cell }) =>
         dayjs(cell.getValue<string>()).format("MMM D, YYYY h:mm A"),
     },
-
-    /*{
-      id: "query",
-      header: "Raw Query",
-      accessorFn: (row) => {
-        return (
-          <ShowOnClick icon={<CodeIcon />}>
-            <CodeBlock code={row.definition} />
-          </ShowOnClick>
-        );
-      },
-    },*/
     {
       accessorFn: (row) => row.tasks?.length ?? 0,
       id: "tasks",
@@ -136,8 +124,21 @@ const QueriesTable = ({
     perPageDefault: queries.per_page,
     expandFirstRow: true,
     renderDetailPanel: ({ row }) => (
-      <Grid container spacing={2}>
-        <Grid size={5}>
+      <Grid
+        container
+        spacing={2}
+        sx={{
+          p: 4,
+          borderRadius: 4,
+          border: 1,
+          borderColor: "grey.300",
+          backgroundColor: "#fff",
+        }}
+      >
+        <Grid size={12}>
+          <TaskResults tasks={row.original.tasks} />
+        </Grid>
+        <Grid size={7}>
           <Paper
             elevation={1}
             sx={{
@@ -170,9 +171,6 @@ const QueriesTable = ({
               {getNaturalLanguage(row.original.definition, fields)}
             </pre>
           </Paper>
-        </Grid>
-        <Grid size={7}>
-          <TaskResults tasks={row.original.tasks} />
         </Grid>
       </Grid>
     ),
