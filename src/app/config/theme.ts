@@ -33,11 +33,22 @@ let theme = createTheme({
     fontWeightLight: 100,
     fontWeightRegular: 400,
     fontWeightMedium: 700,
+    h4: {
+      fontSize: "24px",
+      fontWeight: 500,
+    },
     h5: {
-      fontSize: 32,
+      fontSize: "24px",
+      fontWeight: 200,
+      color: "rgba(0, 0, 0, 0.4)",
     },
     body1: {
-      fontSize: 20,
+      fontSize: "18px",
+      fontWeight: 400,
+    },
+    body2: {
+      fontSize: "14px",
+      fontWeight: 400,
     },
   },
 });

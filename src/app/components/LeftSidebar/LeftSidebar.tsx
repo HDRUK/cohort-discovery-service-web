@@ -3,14 +3,11 @@
 import Link from "next/link";
 import { Box, List, ListItemButton, ListItemText } from "@mui/material";
 import { usePathname } from "next/navigation";
+import { routes } from "@/config/routes";
 
 const drawerWidth = 240;
 
-const menuItems = [
-  { label: "Home", path: "/dashboard" },
-  { label: "Settings", path: "/settings" },
-  { label: "Help", path: "/help" },
-];
+const menuItems = [{ label: "Home", path: routes.dashboard }];
 
 export default function LeftSidebar() {
   const pathname = usePathname();

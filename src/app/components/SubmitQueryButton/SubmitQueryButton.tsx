@@ -4,6 +4,7 @@ import { Button } from "@mui/material";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
+import { revalidateAction } from "@/actions/revalidate";
 
 const SubmitQueryButton = () => {
   const router = useRouter();
@@ -22,7 +23,7 @@ const SubmitQueryButton = () => {
 
       params.set("query", newPid);
       router.replace(`?${params.toString()}`, { scroll: false });
-
+      revalidateAction("queries");
       setIsLoading(false);
     });
   };
