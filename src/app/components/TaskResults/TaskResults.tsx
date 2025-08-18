@@ -8,11 +8,14 @@ import {
   LinearProgress,
   Typography,
   CircularProgress,
+  Tooltip,
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PendingIcon from "@mui/icons-material/Pending";
 import { useTable } from "@/hooks/useTable";
 import { formatNumber } from "@/utils/numbers";
+import { RemoveCircle } from "@mui/icons-material";
+import dayjs from "dayjs";
 
 type TaskResultsProps = {
   tasks: Task[];
@@ -24,10 +27,16 @@ const TaskResults = ({ tasks }: TaskResultsProps) => {
       {
         id: "status",
         header: "",
-        accessorFn: (row) => row.completed_at !== null,
-        Cell: ({ cell }) => {
-          const completed = cell.getValue<boolean>();
-          return completed ? (
+        Cell: ({ row }) => {
+          const { completed_at, failed_at, attempts } = row.original;
+          if (failed_at) {
+            return (
+              <Tooltip title={`Marked as failed after ${attempts} were made.`}>
+                <RemoveCircle color="error" fontSize="small" />
+              </Tooltip>
+            );
+          }
+          return completed_at ? (
             <CheckCircleIcon color="success" fontSize="small" />
           ) : (
             <PendingIcon color="warning" fontSize="small" />
@@ -42,11 +51,25 @@ const TaskResults = ({ tasks }: TaskResultsProps) => {
         size: 200,
       },
       {
+        accessorKey: "attempted_at",
+        header: "Executed At",
+        minSize: 80,
+        maxSize: 150,
+        Cell: ({ cell }) => {
+          const value = cell.getValue<string>();
+          return value
+            ? dayjs(cell.getValue<string>()).format("MMM D, YYYY h:mm A")
+            : "-";
+        },
+      },
+      {
         accessorFn: (row) => row.result?.count ?? null,
         id: "count",
         header: "Count",
         Cell: ({ row }) => {
           const count = row.original.result?.count;
+          const { failed_at } = row.original;
+          if (failed_at) return "-";
           return count === undefined || count === null ? (
             <CircularProgress size={20} />
           ) : (
@@ -55,7 +78,6 @@ const TaskResults = ({ tasks }: TaskResultsProps) => {
         },
         size: 100,
       },
-
       {
         id: "coverage",
         header: "Coverage [%]",
@@ -69,7 +91,9 @@ const TaskResults = ({ tasks }: TaskResultsProps) => {
 
           return Math.round((count / total) * 100);
         },
-        Cell: ({ cell }) => {
+        Cell: ({ cell, row }) => {
+          const { failed_at } = row.original;
+          if (failed_at) return "-";
           const percent = cell.getValue<number | null>();
 
           return (

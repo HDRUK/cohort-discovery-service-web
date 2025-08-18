@@ -34,8 +34,8 @@ export const useTable = <TData extends MRT_RowData>({
     },
     muiTableHeadCellProps: {
       sx: {
-        backgroundColor: "tertiary.main",
-        color: "#fff",
+        backgroundColor: "secondary.main",
+        color: "secondary.main.contrastText",
         fontWeight: "bold",
       },
     },
@@ -44,8 +44,15 @@ export const useTable = <TData extends MRT_RowData>({
         display: "none",
       },
     },
+    muiBottomToolbarProps: {
+      sx: {
+        display: "none",
+      },
+    },
+    muiTableBodyRowProps: {
+      sx: { backgroundColor: "transparent !important" },
+    },
     muiTablePaperProps: {
-      elevation: 0,
       sx: {
         boxShadow: "none",
         backgroundColor: "transparent",

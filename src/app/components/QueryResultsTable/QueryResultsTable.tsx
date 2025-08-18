@@ -2,19 +2,14 @@
 
 import { Query, Task, Result } from "@/types/api";
 import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
-import { Box, Chip, CircularProgress, Paper } from "@mui/material";
+import { Box, CircularProgress, Link, Paper, Typography } from "@mui/material";
 import { revalidateAction } from "@/actions/revalidate";
 import { useEffect } from "react";
 import { useTable } from "@/hooks/useTable";
-import { useDaphneStore } from "@/store/useDaphneStore";
-import { QueryResultsTableSkeleton } from "./QueryResultsTableSkeleton";
 import { formatNumber } from "@/utils/numbers";
+import TableTitle from "../TableTitle/TableTitle";
 
 const QueryResultsTable = ({ query }: { query: Query }) => {
-  const {
-    stateManagement: { isLoading },
-  } = useDaphneStore();
-
   const { tasks } = query;
 
   const isPending = tasks.some((t) => !t.result);
@@ -30,8 +25,15 @@ const QueryResultsTable = ({ query }: { query: Query }) => {
   const columns: MRT_ColumnDef<Task>[] = [
     {
       accessorKey: "collection_name",
-      accessorFn: (row) => row.collection.name,
-      header: "Collection Name",
+      Cell: ({ row }) => (
+        <Link component="a" href={row.original.collection.url || "#"}>
+          {row.original.collection.name}
+        </Link>
+      ),
+      header: "Dataset",
+      size: 400,
+      minSize: 400,
+      maxSize: 400,
     },
     {
       accessorKey: "total",
@@ -40,11 +42,14 @@ const QueryResultsTable = ({ query }: { query: Query }) => {
       Cell: ({ cell }) => {
         const count = cell.getValue<number | undefined>();
         return count === undefined || count === null ? (
-          <CircularProgress size={20} />
+          <CircularProgress size={12} />
         ) : (
           formatNumber(count)
         );
       },
+      size: 100,
+      minSize: 100,
+      maxSize: 100,
     },
     {
       accessorKey: "status",
@@ -53,11 +58,14 @@ const QueryResultsTable = ({ query }: { query: Query }) => {
       Cell: ({ cell }) => {
         const result = cell.getValue<Result>();
         if (result) {
-          return <Chip label={"Success"} color="success" />;
+          return "Successful";
         } else {
-          return <Chip label={"Pending"} color="warning" />;
+          return "Pending";
         }
       },
+      size: 100,
+      minSize: 100,
+      maxSize: 100,
     },
   ];
 
@@ -66,12 +74,9 @@ const QueryResultsTable = ({ query }: { query: Query }) => {
     data: tasks,
   });
 
-  /*if (isLoading) {
-    return <QueryResultsTableSkeleton />;
-  }*/
-
   return (
-    <Paper sx={{ p: 2 }}>
+    <Paper sx={{ p: 2, gap: 2, display: "flex", flexDirection: "column" }}>
+      <TableTitle name={"Results"} count={tasks.length} />
       <MaterialReactTable table={table} />
     </Paper>
   );

@@ -1,5 +1,6 @@
-import { Typography } from "@mui/material";
+import { routes } from "@/config/routes";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return <Typography variant="h1"> Daphne Home Page </Typography>;
+  redirect(routes.dashboardNewQuery);
 }

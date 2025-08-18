@@ -4,11 +4,8 @@ import { useDaphneStore } from "@/store/useDaphneStore";
 import { useEffect } from "react";
 import { Query, Paginated } from "@/types/api";
 import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
-import CodeIcon from "@mui/icons-material/Code";
-import { Box, Grid, Paper } from "@mui/material";
+import { Grid, Paper } from "@mui/material";
 import dayjs from "dayjs";
-import CodeBlock from "@/components/CodeBlock";
-import ShowOnClick from "@/components/ShowOnClick";
 import TaskResults from "@/components/TaskResults";
 import { getNaturalLanguage } from "@/utils/queryBuilder";
 import { Field } from "react-querybuilder";
@@ -16,6 +13,10 @@ import { revalidateAction } from "@/actions/revalidate";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import { useRouter } from "next/navigation";
 import { formatNumber } from "@/utils/numbers";
+import Link from "next/link";
+import { Link as MuiLink } from "@mui/material";
+import { routes } from "@/config/routes";
+import TableTitle from "../TableTitle/TableTitle";
 
 const QueriesTable = ({
   queries,
@@ -28,7 +29,7 @@ const QueriesTable = ({
 }) => {
   const router = useRouter();
   const {
-    queryBuilder: { setQueryBuilderJson },
+    queryBuilder: { setQueryBuilderJson, setSelectedDatasets },
   } = useDaphneStore();
 
   useEffect(() => {
@@ -41,29 +42,37 @@ const QueriesTable = ({
 
   const columns: MRT_ColumnDef<Query>[] = [
     {
+      accessorKey: "pid",
+      header: "Query ID",
+      minSize: 80,
+      maxSize: 150,
+      Cell: ({ cell, row }) => {
+        const pid = cell.getValue<string>();
+        return (
+          <MuiLink
+            component={Link}
+            href={{
+              pathname: routes.dashboardNewQuery,
+              query: { query: pid },
+            }}
+            onClick={() => {
+              setSelectedDatasets(
+                row.original.tasks.map((t) => t.collection.pid)
+              );
+            }}
+          >
+            {pid}
+          </MuiLink>
+        );
+      },
+    },
+    {
       accessorKey: "created_at",
       header: "Created",
       minSize: 80,
       maxSize: 150,
       Cell: ({ cell }) =>
         dayjs(cell.getValue<string>()).format("MMM D, YYYY h:mm A"),
-    },
-    {
-      accessorKey: "pid",
-      header: "Identifier",
-      minSize: 80,
-      maxSize: 150,
-    },
-    {
-      id: "query",
-      header: "Raw Query",
-      accessorFn: (row) => {
-        return (
-          <ShowOnClick icon={<CodeIcon />}>
-            <CodeBlock code={row.definition} />
-          </ShowOnClick>
-        );
-      },
     },
     {
       accessorFn: (row) => row.tasks?.length ?? 0,
@@ -84,7 +93,7 @@ const QueriesTable = ({
         const count = tasks
           .filter((t) => t.completed_at !== null)
           .filter((t) => !!t.result)
-          .reduce((sum, t) => sum + (t.result.count || 0), 0);
+          .reduce((sum, t) => sum + (t.result?.count || 0), 0);
         return count;
       },
     },
@@ -115,23 +124,39 @@ const QueriesTable = ({
     perPageDefault: queries.per_page,
     expandFirstRow: true,
     renderDetailPanel: ({ row }) => (
-      <Grid container spacing={2}>
-        <Grid size={5}>
+      <Grid
+        container
+        spacing={2}
+        sx={{
+          p: 4,
+          borderRadius: 4,
+          border: 1,
+          borderColor: "grey.300",
+          backgroundColor: "#fff",
+        }}
+      >
+        <Grid size={12}>
+          <TaskResults tasks={row.original.tasks} />
+        </Grid>
+        <Grid size={7}>
           <Paper
             elevation={1}
             sx={{
               p: 2,
-              bgcolor: "grey.100",
+              bgcolor: "grey.200",
               cursor: "pointer",
               transition: "all 0.2s ease-in-out",
               "&:hover": {
-                bgcolor: "grey.200",
+                bgcolor: "grey.300",
                 boxShadow: 3,
               },
             }}
             onClick={() => {
               if (row.original.definition) {
                 setQueryBuilderJson(row.original.definition);
+                setSelectedDatasets(
+                  row.original.tasks.map((t) => t.collection.pid)
+                );
                 router.push("new-query");
               }
             }}
@@ -147,17 +172,15 @@ const QueriesTable = ({
             </pre>
           </Paper>
         </Grid>
-        <Grid size={7}>
-          <TaskResults tasks={row.original.tasks} />
-        </Grid>
       </Grid>
     ),
   });
 
   return (
-    <Box>
+    <Paper sx={{ p: 2, gap: 2, display: "flex", flexDirection: "column" }}>
+      <TableTitle name={"History"} count={queries.total} />
       <MaterialReactTable table={table} />
-    </Box>
+    </Paper>
   );
 };
 

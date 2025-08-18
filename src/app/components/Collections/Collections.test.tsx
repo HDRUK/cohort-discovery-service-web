@@ -25,6 +25,7 @@ describe("Collections", () => {
 
   it("displays data when collections exist", async () => {
     const collections = await getCollections();
+
     render(<Collections collections={collections.data} />);
 
     expect(screen.getByText("Test Dataset #1")).toBeInTheDocument();
@@ -32,7 +33,7 @@ describe("Collections", () => {
 
     expect(screen.getAllByText("bunny")).toHaveLength(2);
 
-    expect(screen.getByText("1213")).toBeInTheDocument();
+    expect(screen.getByText("1,213")).toBeInTheDocument();
     expect(screen.getByText("100")).toBeInTheDocument();
 
     expect(screen.getByText("607")).toBeInTheDocument();

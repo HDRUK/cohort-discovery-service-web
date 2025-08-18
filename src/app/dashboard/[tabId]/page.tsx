@@ -5,16 +5,22 @@ import { notFound } from "next/navigation";
 import QueryListPage from "./components/QueryListPage";
 import NewQueryPage from "./components/NewQueryPage";
 import CollectionsPage from "./components/CollectionsPage";
+import { routes } from "@/config/routes";
 
-enum TabId {
-  NewQuery = "new-query",
-  History = "history",
-  Collections = "collections",
-}
+const TABS = [
+  { id: "new-query", label: "New Query", href: routes.dashboardNewQuery },
+  { id: "history", label: "History", href: routes.dashboardHistory },
+  {
+    id: "collections",
+    label: "Collections",
+    href: routes.dashboardCollections,
+  },
+] as const;
 
-const isValidTabId = (tabId: string): tabId is TabId => {
-  return Object.values(TabId).includes(tabId as TabId);
-};
+type TabId = (typeof TABS)[number]["id"];
+
+const isValidTabId = (tabId: string): tabId is TabId =>
+  TABS.some((t) => t.id === tabId);
 
 type Params = Promise<{ tabId: string }>;
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
@@ -42,43 +48,30 @@ const DashboardTabPage = async (props: {
           <TabList
             indicatorColor="secondary"
             slotProps={{
-              indicator: {
-                sx: {
-                  top: 0,
-                },
-              },
+              indicator: { sx: { top: 0 } },
             }}
           >
-            <Tab
-              label="New Query"
-              component={Link}
-              href={`/dashboard/${TabId.NewQuery}`}
-              value={TabId.NewQuery}
-            />
-            <Tab
-              label="History"
-              component={Link}
-              href={`/dashboard/${TabId.History}`}
-              value={TabId.History}
-            />
-            <Tab
-              label="Collections"
-              component={Link}
-              href={`/dashboard/${TabId.Collections}`}
-              value={TabId.Collections}
-            />
+            {TABS.map((t) => (
+              <Tab
+                key={t.id}
+                label={t.label}
+                component={Link}
+                href={t.href}
+                value={t.id}
+              />
+            ))}
           </TabList>
         </Box>
 
-        <TabPanel value={TabId.NewQuery}>
+        <TabPanel value="new-query">
           <NewQueryPage {...props} />
         </TabPanel>
 
-        <TabPanel value={TabId.History}>
+        <TabPanel value="history">
           <QueryListPage {...props} />
         </TabPanel>
 
-        <TabPanel value={TabId.Collections}>
+        <TabPanel value="collections">
           <CollectionsPage />
         </TabPanel>
       </Box>
