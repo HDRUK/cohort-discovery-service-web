@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm, Controller } from "react-hook-form";
-import { Box, TextField } from "@mui/material";
+import { Box } from "@mui/material";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { getNaturalLanguage } from "@/utils/queryBuilder";
 import { useEffect, useMemo } from "react";
@@ -9,7 +9,6 @@ import { Field } from "react-querybuilder";
 import { OmopTableName } from "@/types/omop";
 import { Option } from "@/types/api";
 import SearchBox from "../SearchBox";
-import Title from "@/components/Title";
 
 type FormValues = {
   cohortQueryInput: string;
