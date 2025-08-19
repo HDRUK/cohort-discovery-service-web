@@ -6,6 +6,7 @@ import QueryListPage from "./components/QueryListPage";
 import NewQueryPage from "./components/NewQueryPage";
 import CollectionsPage from "./components/CollectionsPage";
 import { routes } from "@/config/routes";
+import CodesPage from "./components/CodesPage";
 
 const TABS = [
   { id: "new-query", label: "New Query", href: routes.dashboardNewQuery },
@@ -14,6 +15,11 @@ const TABS = [
     id: "collections",
     label: "Collections",
     href: routes.dashboardCollections,
+  },
+  {
+    id: "codes",
+    label: "Codes",
+    href: routes.dashboardCodes,
   },
 ] as const;
 
@@ -73,6 +79,10 @@ const DashboardTabPage = async (props: {
 
         <TabPanel value="collections">
           <CollectionsPage />
+        </TabPanel>
+
+        <TabPanel value="codes">
+          <CodesPage {...props} />
         </TabPanel>
       </Box>
     </TabContext>

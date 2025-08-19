@@ -81,6 +81,13 @@ export interface Code {
   description: string;
 }
 
+export interface CodeStat extends Code {
+  pid: string;
+  category: string;
+  collections_count: number;
+  collections_pct: number;
+}
+
 export interface Option {
   name: string;
   label: string;

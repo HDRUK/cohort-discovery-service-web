@@ -12,7 +12,7 @@ export const useTable = <TData extends MRT_RowData>({
   return useMaterialReactTable<TData>({
     columns,
     data,
-    enableRowSelection: false,
+    enableRowSelection: true,
     enablePagination: false,
     enableSorting: false,
     enableFilters: false,

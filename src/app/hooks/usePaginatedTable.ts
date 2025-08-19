@@ -15,7 +15,7 @@ interface UsePaginatedTableOptions<TData extends MRT_RowData>
   data: TData[];
   rowCount: number;
   perPageDefault: number;
-  expandFirstRow: boolean;
+  expandFirstRow?: boolean;
   getRowId?: (row: TData) => string;
 }
 
@@ -41,6 +41,19 @@ export function usePaginatedTable<TData extends { pid: string }>({
     pageSize: perPage,
   });
 
+  const [sorting, setSorting] = useState([]);
+
+  useEffect(() => {
+    const collapsed = sorting
+      .map(({ id, desc }) => `${id}:${desc ? "desc" : "asc"}`)
+      .join(",");
+
+    //note: temporary right now, until implemented in the BE
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("sort", collapsed);
+    router.replace(`?${params.toString()}`);
+  }, [sorting, router, searchParams]);
+
   useEffect(() => {
     const currentPage = pagination.pageIndex + 1;
     const currentPerPage = pagination.pageSize;
@@ -64,12 +77,15 @@ export function usePaginatedTable<TData extends { pid: string }>({
     getRowId,
     enablePagination: true,
     manualPagination: true,
+    enableSorting: true,
     onPaginationChange: setPagination,
+    onSortingChange: setSorting,
     initialState: {
       expanded,
     },
     state: {
       pagination,
+      sorting,
     },
     muiPaginationProps: {
       rowsPerPageOptions: [5, 10, 20],

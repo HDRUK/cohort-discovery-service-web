@@ -61,9 +61,12 @@ const CohortQueryTitle = () => {
             name="queryName"
             control={control}
             defaultValue=""
-            render={({ field }) => (
+            rules={{ required: "A name for your query is required" }}
+            render={({ field, fieldState: { error } }) => (
               <TextField
                 {...field}
+                error={!!error}
+                placeholder={error ? error.message : "Enter query name"}
                 size="small"
                 sx={{
                   "& .MuiOutlinedInput-root": {
