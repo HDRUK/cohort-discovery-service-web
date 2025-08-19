@@ -15,7 +15,14 @@ describe("Collections", () => {
   it("renders the correct column headers", () => {
     render(<Collections collections={[]} />);
 
-    const columns = ["Id", "Name", "Type", "Size", "Males", "Females"];
+    const columns = [
+      "Collection ID",
+      "Name",
+      "Type",
+      "Size",
+      "Males",
+      "Females",
+    ];
     for (const column of columns) {
       expect(
         screen.getByRole("columnheader", { name: column })
