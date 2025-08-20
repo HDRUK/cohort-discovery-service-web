@@ -93,14 +93,14 @@ const config: Config = {
 
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
   moduleNameMapper: {
-    "^@/hooks/(.*)$": "<rootDir>/src/app/hooks/$1",
-    "^@/consts/(.*)$": "<rootDir>/src/app/consts/$1",
-    "^@/config/(.*)$": "<rootDir>/src/app/config/$1",
-    "^@/actions/(.*)$": "<rootDir>/src/app/actions/$1",
-    "^@/store/(.*)$": "<rootDir>/src/app/store/$1",
-    "^@/types/(.*)$": "<rootDir>/src/app/types/$1",
-    "^@/components/(.*)$": "<rootDir>/src/app/components/$1",
-    "^@/utils/(.*)$": "<rootDir>/src/app/utils/$1",
+    "^@/hooks/(.*)$": "<rootDir>/src/hooks/$1",
+    "^@/consts/(.*)$": "<rootDir>/src/consts/$1",
+    "^@/config/(.*)$": "<rootDir>/src/config/$1",
+    "^@/actions/(.*)$": "<rootDir>/src/actions/$1",
+    "^@/store/(.*)$": "<rootDir>/src/store/$1",
+    "^@/types/(.*)$": "<rootDir>/src/types/$1",
+    "^@/components/(.*)$": "<rootDir>/src/components/$1",
+    "^@/utils/(.*)$": "<rootDir>/src/utils/$1",
     "\\.(css|less|scss|sass)$": "identity-obj-proxy",
   },
 
