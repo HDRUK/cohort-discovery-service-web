@@ -1,5 +1,6 @@
 "use server";
 
+import { GATEWAY_TOKEN_NAME } from "@/config/internals";
 import { cookies } from "next/headers";
 
 const baseURL = process.env.API_BASE_URL ?? "http://localhost:8100";
@@ -19,11 +20,11 @@ async function request<TResponse, TBody = undefined>(
   url: string,
   options: RequestOptions<TBody> = {}
 ): Promise<TResponse | never> {
-  const fullUrl = `${baseURL}${url}`;
+  const fullUrl = url.startsWith("http") ? url : `${baseURL}${url}`;
   const { headers = {}, body, signal, cache, next } = options;
 
   const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
+  const token = cookieStore.get(GATEWAY_TOKEN_NAME)?.value;
 
   try {
     const response = await fetch(fullUrl, {
@@ -43,7 +44,6 @@ async function request<TResponse, TBody = undefined>(
       const errorText = await extractErrorMessage(response);
       throw new Error(errorText);
     }
-
     return (await response.json()) as TResponse;
   } catch (error) {
     throw await handleApiError(error);

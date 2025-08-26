@@ -1,12 +1,17 @@
 "use client";
 
 import React from "react";
-import { AppBar, Toolbar, IconButton, Box } from "@mui/material";
+import { AppBar, Toolbar, IconButton, Box, Typography } from "@mui/material";
 import Image from "next/image";
 import logo from "@/assets/logo.svg";
 import userIcon from "@/assets/user_logo.svg";
+import { useDaphneStore } from "@/store/useDaphneStore";
 
 const HeaderBar = () => {
+  const {
+    userData: { user },
+  } = useDaphneStore();
+
   return (
     <AppBar
       position="static"
@@ -23,12 +28,14 @@ const HeaderBar = () => {
             <Image priority src={logo} alt={"cohort discovery logo"} />
           </Box>
         </Box>
-
-        <Box>
-          <IconButton color="inherit">
-            <Image priority src={userIcon} alt={"user icon"} />
-          </IconButton>
-        </Box>
+        {user && (
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <IconButton color="inherit">
+              <Image priority src={userIcon} alt={"user icon"} />
+            </IconButton>
+            <Typography color="primary.dark">{user.name}</Typography>
+          </Box>
+        )}
       </Toolbar>
     </AppBar>
   );

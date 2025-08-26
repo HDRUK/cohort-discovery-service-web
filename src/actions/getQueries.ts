@@ -9,10 +9,20 @@ const getQueries = async (
   page = 1,
   per_page = DEFAULT_QUERIES_PER_PAGE
 ): Promise<WithIncomplete<ApiResponse<Paginated<Query[]>>>> => {
+  // user sessions
+  const userId = 1;
   const { data, message } = await apiGet<ApiResponse<Paginated<Query[]>>>(
     `${API_ROUTES.queries}?page=${page}&per_page=${per_page}`,
     {
-      next: { revalidate: 60, tags: ["queries"] },
+      next: {
+        revalidate: 60,
+        tags: [
+          "all",
+          "queries",
+          `${userId}-queries`,
+          `${userId}-queries-${page}-${per_page}`,
+        ],
+      },
       cache: "force-cache",
     }
   );

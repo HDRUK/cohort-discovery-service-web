@@ -45,7 +45,7 @@ export default function RootLayout({
                   overflow: "auto",
                 }}
               >
-                <Box sx={{ flexGrow: 1, bgcolor: "#fff" }}>{children}</Box>
+                {children}
               </Box>
             </Box>
           </Box>

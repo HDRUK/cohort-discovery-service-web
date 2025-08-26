@@ -31,4 +31,11 @@ const getNaturalLanguage = (query: RuleGroupType, fields?: Field[]) => {
   return text == "1 is 1" ? "" : text;
 };
 
-export { getNaturalLanguage };
+const getSql = (query: RuleGroupType, fields?: Field[]) => {
+  const text = formatQuery(query, {
+    format: "sql",
+  });
+  return text;
+};
+
+export { getNaturalLanguage, getSql };

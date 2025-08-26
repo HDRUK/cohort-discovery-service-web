@@ -22,6 +22,7 @@
     "@mui/material": "^7.2.0",
     "@mui/material-nextjs": "^7.2.0",
     "dayjs": "^1.11.13",
+    "jsonwebtoken": "^9.0.2",
     "material-react-table": "^3.2.1",
     "next": "15.4.2",
     "react": "19.1.0",

@@ -9,9 +9,6 @@ const getCodeStats = async (
   page = 1,
   per_page = DEFAULT_CODES_PER_PAGE
 ): Promise<ApiResponse<Paginated<CodeStat[]>>> => {
-  console.log(
-    `${API_ROUTES.getCodes("stats")}?page=${page}&per_page=${per_page}`
-  );
   return await apiGet<ApiResponse<Paginated<CodeStat[]>>>(
     `${API_ROUTES.getCodes("stats")}?page=${page}&per_page=${per_page}`,
     {

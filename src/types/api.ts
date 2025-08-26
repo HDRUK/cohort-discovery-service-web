@@ -116,3 +116,30 @@ export interface Query {
   created_at: string;
   tasks: Task[];
 }
+
+export interface Token {
+  federated_token: string;
+  type: string;
+  federated_user_id: number;
+  local_user_id: number;
+}
+
+interface Workgroups {
+  id: number;
+  active: number;
+  name: string;
+}
+
+export enum Rquestroles {
+  GENERAL_ACCESS = "GENERAL_ACCESS",
+}
+
+export interface TokenUser {
+  id: number;
+  email: string;
+  name: string;
+  firstname: string;
+  lastname: string;
+  workgroups: Workgroups[];
+  rquestroles: Rquestroles[];
+}

@@ -50,7 +50,14 @@ const DashboardTabPage = async (props: {
           alignItems: "center",
         }}
       >
-        <Box sx={{ borderBottom: 0, borderColor: "divider", width: "100%" }}>
+        <Box
+          sx={{
+            borderBottom: 0,
+            borderColor: "divider",
+            width: "100%",
+            bgcolor: "#fff",
+          }}
+        >
           <TabList
             indicatorColor="secondary"
             slotProps={{

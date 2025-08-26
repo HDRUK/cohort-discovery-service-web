@@ -5,23 +5,11 @@ import QueryBuilder from "@/components/QueryBuilder";
 import SubmitQueryButton from "@/components/SubmitQueryButton";
 import CohortQueryInput from "@/components/CohortQueryInput";
 import SelectDatasets from "@/components/SelectDatasets";
-import { Skeleton } from "@mui/material";
-import { Suspense } from "react";
 import getCollections from "@/actions/getCollections";
 import { getAllFields } from "@/actions/omop/getAllCodes";
-import QueryResults from "@/components/QueryResults";
-import Anchor from "@/components/Anchor";
-import { ErrorBoundary } from "react-error-boundary";
-import ErrorMessage from "@/components/ErrorMessage";
 import CohortQueryTitle from "@/components/CohortQueryTitle";
 
-interface PageProps {
-  searchParams: Promise<{
-    query?: string;
-  }>;
-}
-
-const NewQueryPageContent = async () => {
+const GuiCohortBuilder = async () => {
   const fields = await getAllFields();
   const collections = await getCollections();
 
@@ -63,29 +51,4 @@ const NewQueryPageContent = async () => {
   );
 };
 
-const NewQueryPage = async ({ searchParams }: PageProps) => {
-  const params = await searchParams;
-  const queryId = params.query;
-
-  return (
-    <Box>
-      <Suspense fallback={<Skeleton height={600} />}>
-        <NewQueryPageContent />
-      </Suspense>
-      {queryId && (
-        <>
-          <Anchor name={"query"} />
-          <Suspense key={queryId} fallback={<Skeleton height={200} />}>
-            <ErrorBoundary
-              fallback={<ErrorMessage title={"Cannot find query " + queryId} />}
-            >
-              <QueryResults key={queryId} queryId={queryId} />
-            </ErrorBoundary>
-          </Suspense>
-        </>
-      )}
-    </Box>
-  );
-};
-
-export default NewQueryPage;
+export default GuiCohortBuilder;

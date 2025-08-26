@@ -1,12 +1,19 @@
 import { create } from "zustand";
 import type { RuleGroupType, RuleType } from "react-querybuilder";
-import getQueryFromInput from "../actions/getQueryFromInput";
-import submitQuery from "../actions/submitQuery";
-import { ApiResponse, Collection, CreateQuery, Query } from "../types/api";
-import { DEFAULT_SEXES, OmopTableName } from "../types/omop";
+import getQueryFromInput from "@/actions/getQueryFromInput";
+import submitQuery from "@/actions/submitQuery";
+import {
+  ApiResponse,
+  Collection,
+  CreateQuery,
+  Query,
+  TokenUser,
+} from "@/types/api";
+import { DEFAULT_SEXES, OmopTableName } from "@/types/omop";
 import { baseFields } from "@/config/queryFields";
 import { Field, isRuleGroup } from "react-querybuilder";
 import { getNaturalLanguage } from "@/utils/queryBuilder";
+import getToken from "@/actions/gateway/getToken";
 
 type Option = {
   name: string;
@@ -46,6 +53,9 @@ export interface DaphneStoreState {
     setOmop: (data: Record<OmopTableName, Option[]>) => void;
   };
   userData: {
+    user: TokenUser | undefined | null;
+    setUser: (user: TokenUser) => void;
+    signIn: () => Promise<void>;
     queries: Query[];
     setQueries: (queries: Query[]) => void;
     fetchResults: (
@@ -279,9 +289,6 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         ? name
         : getNaturalLanguage(queryBuilderJson, fields);
 
-      console.log("fetchResults", name);
-      console.log("fetchResults", queryName);
-
       if (get().queryBuilder.queryName !== queryName) {
         get().queryBuilder.setQueryName(queryName);
       }
@@ -309,5 +316,12 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         ...state,
         userData: { ...state.userData, collections },
       })),
+    signIn: async () => {
+      getToken().then((res) => get().userData.setUser(res));
+    },
+    user: null,
+    setUser: (user: TokenUser) => {
+      set((state) => ({ ...state, userData: { ...state.userData, user } }));
+    },
   },
 }));
