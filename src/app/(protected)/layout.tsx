@@ -28,6 +28,7 @@ export default async function ProtectedLayout({
   }
 
   const me = await getMe(token);
+  console.log(me);
 
   return <ProtectedPage user={user}>{children}</ProtectedPage>;
 }

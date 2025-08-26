@@ -34,6 +34,7 @@ const getNaturalLanguage = (query: RuleGroupType, fields?: Field[]) => {
 const getSql = (query: RuleGroupType, fields?: Field[]) => {
   const text = formatQuery(query, {
     format: "sql",
+    fields,
   });
   return text;
 };
