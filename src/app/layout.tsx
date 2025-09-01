@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { Source_Sans_3, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Box } from "@mui/material";
-import ThemeRegistry from "./components/ThemeRegistry";
-import LeftSidebar from "./components/LeftSidebar";
-import HeaderBar from "./components/HeaderBar";
+import ThemeRegistry from "@/components/ThemeRegistry";
+import LeftSidebar from "@/components/LeftSidebar";
+import HeaderBar from "@/components/HeaderBar";
 
 const sourceSans = Source_Sans_3({
   variable: "--font-source-sans-3",
@@ -45,7 +45,7 @@ export default function RootLayout({
                   overflow: "auto",
                 }}
               >
-                <Box sx={{ flexGrow: 1, bgcolor: "#fff" }}>{children}</Box>
+                {children}
               </Box>
             </Box>
           </Box>

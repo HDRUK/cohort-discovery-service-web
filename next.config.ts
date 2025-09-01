@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
       fullUrl: true,
     },
   },
+  experimental: {
+    authInterrupts: true,
+  },
 };
 
 export default nextConfig;
