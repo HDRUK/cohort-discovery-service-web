@@ -134,6 +134,15 @@ export enum Rquestroles {
   GENERAL_ACCESS = "GENERAL_ACCESS",
 }
 
+export interface User {
+  id: number;
+  email: string;
+  name: string;
+  email_verified_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface TokenUser {
   id: number;
   email: string;
@@ -142,4 +151,8 @@ export interface TokenUser {
   lastname: string;
   workgroups: Workgroups[];
   rquestroles: Rquestroles[];
+}
+
+export interface CombinedUser extends User {
+  gateway_user: TokenUser | null;
 }

@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 
 const TEMP_TOKEN = process.env.TEMP_TOKEN;
 
-const getToken = async (): Promise<User> => {
+const getToken = async (): Promise<TokenUser> => {
   const cookieStore = await cookies();
   if (!TEMP_TOKEN) {
     throw new Error("TEMP_TOKEN is not set");
