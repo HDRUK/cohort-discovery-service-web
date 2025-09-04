@@ -1,11 +1,11 @@
 "use client";
 import { useDaphneStore } from "@/store/useDaphneStore";
-import { User } from "@/types/api";
+import { CombinedUser } from "@/types/api";
 import { forbidden } from "next/navigation";
 import { ReactNode, useEffect } from "react";
 
 interface ProtectedPageProps {
-  user: User;
+  user: CombinedUser;
   children: ReactNode;
 }
 

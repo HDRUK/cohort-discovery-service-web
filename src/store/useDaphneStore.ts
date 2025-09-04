@@ -5,6 +5,7 @@ import submitQuery from "@/actions/submitQuery";
 import {
   ApiResponse,
   Collection,
+  CombinedUser,
   CreateQuery,
   Query,
   TokenUser,
@@ -53,8 +54,8 @@ export interface DaphneStoreState {
     setOmop: (data: Record<OmopTableName, Option[]>) => void;
   };
   userData: {
-    user: TokenUser | undefined | null;
-    setUser: (user: TokenUser) => void;
+    user: CombinedUser | undefined | null;
+    setUser: (user: CombinedUser) => void;
     signIn: () => Promise<void>;
     queries: Query[];
     setQueries: (queries: Query[]) => void;
@@ -317,10 +318,10 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         userData: { ...state.userData, collections },
       })),
     signIn: async () => {
-      getToken().then((res) => get().userData.setUser(res));
+      //getToken().then((res) => get().userData.setUser({ gateway_user: res }));
     },
     user: null,
-    setUser: (user: TokenUser) => {
+    setUser: (user: CombinedUser) => {
       set((state) => ({ ...state, userData: { ...state.userData, user } }));
     },
   },

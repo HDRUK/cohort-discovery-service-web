@@ -11,12 +11,19 @@ export default async function ProtectedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const token = (await cookies()).get(GATEWAY_TOKEN_NAME)?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get(GATEWAY_TOKEN_NAME)?.value;
   if (!token) {
     redirect("/login");
   }
 
   const decoded = jwt.decode(token);
+
+  const now = Math.floor(Date.now() / 1000);
+  if (decoded.exp && now >= decoded.exp) {
+    redirect("/api/auth/logout");
+  }
+
   const user = decoded.user as TokenUser;
 
   const hasGeneralAccess = user.rquestroles.includes(
@@ -27,8 +34,14 @@ export default async function ProtectedLayout({
     forbidden();
   }
 
-  const me = await getMe(token);
-  console.log(me);
+  let me;
+  try {
+    me = await getMe(token);
+  } catch {
+    forbidden();
+  }
 
-  return <ProtectedPage user={user}>{children}</ProtectedPage>;
+  const combinedUser = { ...me, gateway_user: user };
+
+  return <ProtectedPage user={combinedUser}>{children}</ProtectedPage>;
 }
