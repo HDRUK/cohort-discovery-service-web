@@ -2,6 +2,8 @@
 
 import { GATEWAY_TOKEN_NAME } from "@/config/internals";
 import { cookies } from "next/headers";
+import { ApiError } from "./https";
+import { notFound, forbidden } from "next/navigation";
 
 const baseURL = process.env.API_BASE_URL ?? "http://localhost:8100";
 
@@ -42,10 +44,15 @@ async function request<TResponse, TBody = undefined>(
 
     if (!response.ok) {
       const errorText = await extractErrorMessage(response);
-      throw new Error(errorText);
+      throw new ApiError(response.status, errorText);
     }
     return (await response.json()) as TResponse;
   } catch (error) {
+    if (error instanceof ApiError) {
+      if (error.status === 404) notFound();
+      if (error.status === 403) forbidden();
+      throw error;
+    }
     throw await handleApiError(error);
   }
 }
@@ -64,9 +71,9 @@ async function extractErrorMessage(response: Response): Promise<string> {
 
 async function handleApiError(error: unknown): Promise<never> {
   if (error instanceof Error) {
-    throw new Error(error.message);
+    throw new ApiError(500, error.message);
   }
-  throw new Error("An unknown error occurred");
+  throw new ApiError(500, "An unknown error occurred");
 }
 
 export async function apiGet<TResponse>(

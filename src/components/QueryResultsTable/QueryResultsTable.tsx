@@ -2,13 +2,17 @@
 
 import { Query, Task, Result } from "../../types/api";
 import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
-import { CircularProgress, Link, Paper } from "@mui/material";
+import { Chip, CircularProgress, Link, Paper, Tooltip } from "@mui/material";
+import ErrorIcon from "@mui/icons-material/Error";
 import { revalidateAction } from "@/actions/revalidate";
 import { useEffect } from "react";
 import { useTable } from "../../hooks/useTable";
 import { formatNumber } from "@/utils/numbers";
 import Title from "../Title";
 import { useDaphneStore } from "@/store/useDaphneStore";
+import { capitaliseFirstLetter } from "@/utils/string";
+import CodeBlock from "../CodeBlock";
+import ShowOnClick from "../ShowOnClick";
 
 const QueryResultsTable = ({ query }: { query: Query }) => {
   const {
@@ -44,10 +48,15 @@ const QueryResultsTable = ({ query }: { query: Query }) => {
     },
     {
       accessorKey: "total",
-      accessorFn: (row) => row.result?.count,
+      accessorFn: (row) => row.result,
       header: "Total",
       Cell: ({ cell }) => {
-        const count = cell.getValue<number | undefined>();
+        const result = cell.getValue<Result>();
+        const { count, status } = result || {};
+        if (status === "error") {
+          return <ErrorIcon color="error" />;
+        }
+
         return count === undefined || count === null ? (
           <CircularProgress size={12} />
         ) : (
@@ -64,11 +73,29 @@ const QueryResultsTable = ({ query }: { query: Query }) => {
       header: "Status",
       Cell: ({ cell }) => {
         const result = cell.getValue<Result>();
-        if (result) {
-          return "Successful";
-        } else {
-          return "Pending";
-        }
+        return (
+          <ShowOnClick
+            dialogTitle={"Error details"}
+            icon={
+              <Chip
+                color={
+                  result?.status
+                    ? result.status === "error"
+                      ? "error"
+                      : "success"
+                    : "warning"
+                }
+                label={
+                  result?.status
+                    ? capitaliseFirstLetter(result.status)
+                    : "Pending"
+                }
+              />
+            }
+          >
+            <CodeBlock code={result.message} />
+          </ShowOnClick>
+        );
       },
       size: 100,
       minSize: 100,

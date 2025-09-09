@@ -5,8 +5,6 @@ import { Skeleton } from "@mui/material";
 import { Suspense } from "react";
 import QueryResults from "@/components/QueryResults";
 import Anchor from "@/components/Anchor";
-import { ErrorBoundary } from "react-error-boundary";
-import ErrorMessage from "@/components/ErrorMessage";
 import TabsShell from "@/components/TabsShell";
 import GuiCohortBuilder from "./GuiCohortBuilder";
 import SqlCohortBuilder from "./SqlCohortBuilder";
@@ -47,11 +45,7 @@ const NewQueryPage = async ({ searchParams }: PageProps) => {
         <>
           <Anchor name={"query"} />
           <Suspense key={queryId} fallback={<Skeleton height={200} />}>
-            <ErrorBoundary
-              fallback={<ErrorMessage title={"Cannot find query " + queryId} />}
-            >
-              <QueryResults key={queryId} queryId={queryId} />
-            </ErrorBoundary>
+            <QueryResults key={queryId} queryId={queryId} />
           </Suspense>
         </>
       )}
