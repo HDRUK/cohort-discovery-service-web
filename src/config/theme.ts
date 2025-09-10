@@ -3,14 +3,14 @@ import { createTheme } from "@mui/material/styles";
 let theme = createTheme({
   palette: {
     primary: {
-      dark: "#4D5B59",
-      main: "#8FA99C",
+      dark: "#3c3c3b",
+      main: "#475da7",
       light: "#CCD7D5",
       contrastText: "#ffffff",
     },
     secondary: {
-      main: "#E0DBD7",
-      contrastText: "#3C3C3B",
+      main: "#3db28c",
+      contrastText: "#ffffff",
     },
     tertiary: {
       main: "#FAFAFA",
@@ -56,7 +56,7 @@ theme = createTheme(theme, {
   palette: {
     ...theme.palette,
     link: theme.palette.augmentColor({
-      color: { main: "#475DA7" },
+      color: { main: "#475da7" },
       name: "link",
     }),
   },
@@ -64,7 +64,7 @@ theme = createTheme(theme, {
     MuiListItemButton: {
       styleOverrides: {
         root: {
-          color: "#4D5B59",
+          color: "#475da7",
           "&.Mui-selected": {
             backgroundColor: theme.palette.primary.main,
             color: theme.palette.primary.contrastText,
