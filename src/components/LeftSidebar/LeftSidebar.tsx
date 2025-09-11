@@ -4,17 +4,28 @@ import Link from "next/link";
 import { Box, List, ListItemButton, ListItemText } from "@mui/material";
 import { usePathname } from "next/navigation";
 import { routes } from "../../config/routes";
+import { useDaphneStore } from "@/store/useDaphneStore";
 
 const drawerWidth = 240;
 
-const menuItems = [
+const userMenuItems = [
   { label: "Home", path: routes.dashboard },
   { label: "Profile", path: routes.profile },
 ];
 
+const adminMenuItems = [{ label: "Admin", path: routes.admin }];
+
 export default function LeftSidebar() {
   const pathname = usePathname();
   const firstSegment = pathname?.split("/")[1] || "";
+  const {
+    userData: { user },
+  } = useDaphneStore();
+
+  const menuItems = [
+    ...userMenuItems,
+    ...(user?.gateway_user?.is_admin ? adminMenuItems : []),
+  ];
 
   return (
     <Box

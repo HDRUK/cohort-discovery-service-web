@@ -145,6 +145,11 @@ export interface User {
   updated_at: string;
 }
 
+export interface GatewayTeam {
+  id: number;
+  name: string;
+}
+
 export interface TokenUser {
   id: number;
   email: string;
@@ -158,6 +163,7 @@ export interface TokenUser {
   provider: string;
   workgroups: Workgroups[];
   rquestroles: Rquestroles[];
+  teams: GatewayTeam[];
 }
 
 export interface CombinedUser extends User {
