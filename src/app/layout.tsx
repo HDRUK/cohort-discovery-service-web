@@ -40,7 +40,7 @@ export default function RootLayout({
                 component="main"
                 sx={{
                   flexGrow: 1,
-                  bgcolor: "primary.main",
+                  bgcolor: "secondary.main",
                   p: 3,
                   overflow: "auto",
                 }}

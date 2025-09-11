@@ -11,4 +11,5 @@ export const routes = {
   dashboardHistory: dashboardPath("history"),
   dashboardCollections: dashboardPath("collections"),
   dashboardCodes: dashboardPath("codes"),
+  profile: "/profile",
 };

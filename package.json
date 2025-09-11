@@ -17,6 +17,7 @@
     "@emotion/styled": "^11.14.1",
     "@fontsource/roboto": "^5.2.6",
     "@google/generative-ai": "^0.24.1",
+    "@hdruk/ui": "file:tmp/hdruk-ui-0.1.0.tgz",
     "@mui/icons-material": "^7.2.0",
     "@mui/lab": "^7.0.0-beta.14",
     "@mui/material": "^7.2.0",

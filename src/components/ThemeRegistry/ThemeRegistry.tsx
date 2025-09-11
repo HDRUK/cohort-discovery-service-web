@@ -1,17 +1,16 @@
 "use client";
 
 import { ReactNode } from "react";
-import { ThemeProvider } from "@mui/material/styles";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import GlobalStyles from "@mui/material/GlobalStyles";
-import { CssBaseline } from "@mui/material";
-import theme from "../../config/theme";
+import { themeOptions } from "../../config/theme";
 import { NotifyProvider } from "../../providers/NotifyProvider";
+import { HdrukUiProvider } from "@hdruk/ui";
 
 export default function ThemeRegistry({ children }: { children: ReactNode }) {
   return (
     <AppRouterCacheProvider>
-      <ThemeProvider theme={theme}>
+      <HdrukUiProvider themeOptions={themeOptions}>
         <GlobalStyles
           styles={{
             body: {
@@ -24,9 +23,8 @@ export default function ThemeRegistry({ children }: { children: ReactNode }) {
             },
           }}
         />
-        <CssBaseline />
         <NotifyProvider>{children}</NotifyProvider>
-      </ThemeProvider>
+      </HdrukUiProvider>
     </AppRouterCacheProvider>
   );
 }
