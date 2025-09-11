@@ -17,7 +17,6 @@ type KVRow = {
 };
 
 const UserDetailsTable = ({ user }: { user: CombinedUser }) => {
-  console.log(user);
   const data: KVRow[] = [
     { label: "ID", value: user.id },
     { label: "Gateway ID", value: user?.gateway_user?.id },
