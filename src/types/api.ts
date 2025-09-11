@@ -148,9 +148,14 @@ export interface User {
 export interface TokenUser {
   id: number;
   email: string;
+  orcid: string;
   name: string;
   firstname: string;
   lastname: string;
+  is_admin: boolean;
+  is_nhse_sde_approval: boolean;
+  organisation: string;
+  provider: string;
   workgroups: Workgroups[];
   rquestroles: Rquestroles[];
 }

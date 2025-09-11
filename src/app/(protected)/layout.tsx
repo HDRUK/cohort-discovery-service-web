@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { forbidden, redirect } from "next/navigation";
 import jwt from "jsonwebtoken";
 import { GATEWAY_TOKEN_NAME } from "@/config/internals";
-import { TokenUser, Rquestroles } from "@/types/api";
+import { TokenUser, Rquestroles, CombinedUser } from "@/types/api";
 import ProtectedPage from "./components/ProtectedPage";
 import getMe from "@/actions/getMe";
 
@@ -36,12 +36,13 @@ export default async function ProtectedLayout({
 
   let me;
   try {
-    me = await getMe(token);
+    const { data } = await getMe(token);
+    me = data;
   } catch {
     forbidden();
   }
 
-  const combinedUser = { ...me, gateway_user: user };
+  const combinedUser = { ...me, gateway_user: user } as unknown as CombinedUser;
 
   return <ProtectedPage user={combinedUser}>{children}</ProtectedPage>;
 }

@@ -7,7 +7,10 @@ import { routes } from "../../config/routes";
 
 const drawerWidth = 240;
 
-const menuItems = [{ label: "Home", path: routes.dashboard }];
+const menuItems = [
+  { label: "Home", path: routes.dashboard },
+  { label: "Profile", path: routes.profile },
+];
 
 export default function LeftSidebar() {
   const pathname = usePathname();

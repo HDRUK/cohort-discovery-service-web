@@ -1,21 +1,7 @@
 import { createTheme } from "@mui/material/styles";
 
-let theme = createTheme({
+export const themeOptions = {
   palette: {
-    primary: {
-      dark: "#3c3c3b",
-      main: "#475da7",
-      light: "#CCD7D5",
-      contrastText: "#ffffff",
-    },
-    secondary: {
-      main: "#3db28c",
-      contrastText: "#ffffff",
-    },
-    tertiary: {
-      main: "#FAFAFA",
-      contrastText: "#3C3C3B",
-    },
     text: {
       //default: "#4D5B59",
     },
@@ -50,27 +36,17 @@ let theme = createTheme({
       fontWeight: 400,
     },
   },
-});
-
-theme = createTheme(theme, {
-  palette: {
-    ...theme.palette,
-    link: theme.palette.augmentColor({
-      color: { main: "#475da7" },
-      name: "link",
-    }),
-  },
   components: {
     MuiListItemButton: {
       styleOverrides: {
         root: {
           color: "#475da7",
           "&.Mui-selected": {
-            backgroundColor: theme.palette.primary.main,
-            color: theme.palette.primary.contrastText,
+            backgroundColor: "primary.main",
+            color: "primary.contrastText",
             "&:hover": {
               backgroundColor: "#4D5B59",
-              color: theme.palette.primary.contrastText,
+              color: "primary.contrastText",
             },
           },
           "&:hover": {
@@ -188,6 +164,18 @@ theme = createTheme(theme, {
         }),
       },
     },
+  },
+};
+
+let theme = createTheme(themeOptions);
+
+theme = createTheme(theme, {
+  palette: {
+    ...theme.palette,
+    link: theme.palette.augmentColor({
+      color: { main: "#475da7" },
+      name: "link",
+    }),
   },
 });
 
