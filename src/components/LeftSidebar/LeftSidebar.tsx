@@ -1,32 +1,68 @@
 "use client";
 
-import Link from "next/link";
-import { Box, List, ListItemButton, ListItemText } from "@mui/material";
-import { usePathname } from "next/navigation";
+import { useMemo } from "react";
+import { Box, List } from "@mui/material";
+
 import { routes } from "../../config/routes";
 import { useDaphneStore } from "@/store/useDaphneStore";
+import LeftSidebarMenuItem from "./LeftSidebarMenuItem";
 
 const drawerWidth = 240;
 
-const userMenuItems = [
-  { label: "Home", path: routes.dashboard },
-  { label: "Profile", path: routes.profile },
-];
-
-const adminMenuItems = [{ label: "Admin", path: routes.admin }];
+type MenuItem = {
+  label: string;
+  path?: string;
+  key?: string;
+  children?: MenuItem[];
+};
 
 export default function LeftSidebar() {
-  const pathname = usePathname();
-  const firstSegment = pathname?.split("/")[1] || "";
   const {
     userData: { user },
+    custodianData: { custodians },
   } = useDaphneStore();
 
-  const menuItems = [
-    ...userMenuItems,
-    ...(user?.gateway_user?.is_admin ? adminMenuItems : []),
-  ];
+  const teamIds = useMemo(
+    () => user?.gateway_user?.teams.map((t) => t.id) ?? [],
+    [user]
+  );
+  const userCustodians = useMemo(
+    () => (custodians ?? []).filter((c) => teamIds.includes(c.gateway_team_id)),
+    [custodians, teamIds]
+  );
 
+  const custodianChildren: MenuItem[] = userCustodians.map((uc) => ({
+    label: uc.name,
+    path: routes.team(uc.pid),
+    key: `custodian-${uc.pid}`,
+  }));
+
+  const isAdmin = useMemo(() => user?.gateway_user?.is_admin, [user]);
+
+  const menu: MenuItem[] = useMemo(
+    () => [
+      { label: "Home", path: routes.dashboard },
+      { label: "Profile", path: routes.profile },
+      ...(custodianChildren.length > 0
+        ? [
+            {
+              label: "Custodians",
+              key: "custodians-root",
+              children: custodianChildren,
+            },
+          ]
+        : []),
+      ...(isAdmin
+        ? [
+            {
+              label: "Admin",
+              path: routes.admin,
+            },
+          ]
+        : []),
+    ],
+    [custodianChildren, isAdmin]
+  );
   return (
     <Box
       sx={(theme) => ({
@@ -37,21 +73,12 @@ export default function LeftSidebar() {
       })}
     >
       <List sx={{ py: 0 }}>
-        {menuItems.map(({ label, path }) => {
-          const menuSegment = path.split("/")[1];
-          const isActive = firstSegment === menuSegment;
-
-          return (
-            <ListItemButton
-              key={label}
-              component={Link}
-              href={path}
-              selected={isActive}
-            >
-              <ListItemText primary={label} />
-            </ListItemButton>
-          );
-        })}
+        {menu.map((item) => (
+          <LeftSidebarMenuItem
+            key={item.key ?? item.path ?? item.label}
+            item={item}
+          />
+        ))}
       </List>
     </Box>
   );

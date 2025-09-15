@@ -93,7 +93,7 @@ const QueryResultsTable = ({ query }: { query: Query }) => {
               />
             }
           >
-            <CodeBlock code={result.message} />
+            <CodeBlock code={result?.message} />
           </ShowOnClick>
         );
       },

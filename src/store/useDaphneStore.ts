@@ -8,13 +8,12 @@ import {
   CombinedUser,
   CreateQuery,
   Query,
-  TokenUser,
+  Custodian,
 } from "@/types/api";
 import { DEFAULT_SEXES, OmopTableName } from "@/types/omop";
 import { baseFields } from "@/config/queryFields";
 import { Field, isRuleGroup } from "react-querybuilder";
 import { getNaturalLanguage } from "@/utils/queryBuilder";
-import getToken from "@/actions/gateway/getToken";
 
 type Option = {
   name: string;
@@ -65,6 +64,10 @@ export interface DaphneStoreState {
     ) => Promise<ApiResponse<CreateQuery>>;
     collections: Collection[];
     setCollections: (collections: Collection[]) => void;
+  };
+  custodianData: {
+    custodians: Custodian[];
+    setCustodians: (custodains: Custodian[]) => void;
   };
 }
 
@@ -324,5 +327,14 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     setUser: (user: CombinedUser) => {
       set((state) => ({ ...state, userData: { ...state.userData, user } }));
     },
+  },
+
+  custodianData: {
+    custodians: [],
+    setCustodians: (custodians) =>
+      set((state) => ({
+        ...state,
+        custodianData: { ...state.custodianData, custodians },
+      })),
   },
 }));

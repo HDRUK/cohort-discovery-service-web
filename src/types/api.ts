@@ -86,6 +86,7 @@ export interface Code {
 export interface CodeStat extends Code {
   pid: string;
   category: string;
+  total_count: number;
   collections_count: number;
   collections_pct: number;
 }
@@ -164,6 +165,14 @@ export interface TokenUser {
   workgroups: Workgroups[];
   rquestroles: Rquestroles[];
   teams: GatewayTeam[];
+}
+
+export interface Custodian {
+  id: number;
+  pid: string;
+  name: string;
+  gateway_team_id: number;
+  gateway_team_name: string;
 }
 
 export interface CombinedUser extends User {

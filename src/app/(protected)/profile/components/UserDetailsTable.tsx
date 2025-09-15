@@ -17,7 +17,6 @@ type KVRow = {
 };
 
 const UserDetailsTable = ({ user }: { user: CombinedUser }) => {
-  console.log(user);
   const data: KVRow[] = [
     { label: "ID", value: user.id },
     { label: "Gateway ID", value: user?.gateway_user?.id },
@@ -88,6 +87,18 @@ const UserDetailsTable = ({ user }: { user: CombinedUser }) => {
         <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
           {user.gateway_user.rquestroles.map((r) => (
             <Chip key={r} size="small" label={r} />
+          ))}
+        </Stack>
+      ) : (
+        "—"
+      ),
+    },
+    {
+      label: "Workgroups",
+      value: user.gateway_user?.workgroups?.length ? (
+        <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+          {user.gateway_user.workgroups.map((wg) => (
+            <Chip color="secondary" key={wg.id} size="small" label={wg.name} />
           ))}
         </Stack>
       ) : (

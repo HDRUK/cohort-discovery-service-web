@@ -5,6 +5,7 @@ export const API_ROUTES = {
   tasks: `${API_URL}/tasks`,
   queries: `${API_URL}/queries`,
   collections: `${API_URL}/collections`,
+  custodians: `${API_URL}/custodians`,
   getMe: `${API_URL}/user`,
   getQuery: (pid: string) => `${API_URL}/query/${pid}`,
   getCodes: (domain: string) => `${API_URL}/codes/${domain}`,
