@@ -2,6 +2,8 @@ import { create } from "zustand";
 import type { RuleGroupType, RuleType } from "react-querybuilder";
 import getQueryFromInput from "@/actions/getQueryFromInput";
 import submitQuery from "@/actions/submitQuery";
+import createCollectionHost from "@/actions/createCollectionHost";
+import { revalidateAction } from "@/actions/revalidate";
 import {
   ApiResponse,
   Collection,
@@ -9,11 +11,13 @@ import {
   CreateQuery,
   Query,
   Custodian,
+  CreateCollectionPost,
 } from "@/types/api";
 import { DEFAULT_SEXES, OmopTableName } from "@/types/omop";
 import { baseFields } from "@/config/queryFields";
 import { Field, isRuleGroup } from "react-querybuilder";
 import { getNaturalLanguage } from "@/utils/queryBuilder";
+import createCollection from "@/actions/createCollection";
 
 type Option = {
   name: string;
@@ -68,6 +72,14 @@ export interface DaphneStoreState {
   custodianData: {
     custodians: Custodian[];
     setCustodians: (custodains: Custodian[]) => void;
+    createCollectionHost: (
+      custodianId: number,
+      payload: { name: string; context: string }
+    ) => Promise<void>;
+    createCollection: (
+      custodianPid: string,
+      payload: CreateCollectionPost
+    ) => Promise<void>;
   };
 }
 
@@ -336,5 +348,13 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         ...state,
         custodianData: { ...state.custodianData, custodians },
       })),
+    createCollectionHost: async (custodianId, { name, context }) => {
+      await createCollectionHost(custodianId, name, context);
+      await revalidateAction("collection_hosts");
+    },
+    createCollection: async (custodianPid, payload) => {
+      await createCollection(custodianPid, payload);
+      await revalidateAction(`collections-${custodianPid}`);
+    },
   },
 }));

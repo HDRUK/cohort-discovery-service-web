@@ -22,9 +22,9 @@ const UserDetailsTable = ({ user }: { user: CombinedUser }) => {
     { label: "Gateway ID", value: user?.gateway_user?.id },
     {
       label: "Gateway Teams",
-      value: user.gateway_user?.teams?.length ? (
+      value: user.gateway_user?.admin_teams?.length ? (
         <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-          {user.gateway_user.teams.map((t) => (
+          {user.gateway_user.admin_teams.map((t) => (
             <Chip key={t.id} size="small" label={t.name} />
           ))}
         </Stack>

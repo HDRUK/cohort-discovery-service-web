@@ -12,6 +12,11 @@ export const API_ROUTES = {
   getTaskStatus: (taskId: string) => `${API_URL}/task/${taskId}/status`,
   cancelTask: (taskId: string) => `${API_URL}/task/${taskId}/cancel`,
   queryResults: (queryPid: string) => `${API_URL}/query/${queryPid}/results`,
+  collectionHosts: `${API_URL}/collection_hosts`,
+  custodianCollectionHosts: (pid: string) =>
+    `${API_URL}/custodians/${pid}/collection_hosts`,
+  custodianCollections: (pid: string) =>
+    `${API_URL}/custodians/${pid}/collections`,
   authCallback: "http://localhost:8100/auth/callback",
 };
 
