@@ -348,11 +348,15 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         ...state,
         custodianData: { ...state.custodianData, custodians },
       })),
-    createCollectionHost: async (custodianId, { name, context }) => {
-      await createCollectionHost(custodianId, name, context);
-      await revalidateAction("collection_hosts");
+    createCollectionHost: async (custodianId, payload) => {
+      await createCollectionHost(custodianId, payload);
+      await revalidateAction(`collection-hosts-${custodianId}`);
     },
     createCollection: async (custodianPid, payload) => {
+      // note: inconsistancy between using custodian Id and custodian Pid
+      // - this is because the BE uses different endpoints:
+      // - Route::post('/v1/collection_hosts'... (custodianId in the payload)
+      // - Route::post('/v1/custodians/{custodianPid}/collections'...
       await createCollection(custodianPid, payload);
       await revalidateAction(`collections-${custodianPid}`);
     },

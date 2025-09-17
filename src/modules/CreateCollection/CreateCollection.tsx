@@ -13,7 +13,10 @@ import { useForm, Controller } from "react-hook-form";
 import { useState } from "react";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { CollectionHost, Custodian } from "@/types/api";
+import { QueryContext } from "@/types/context";
 import CollectionHostChip from "@/components/CollectionHostChip";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 interface CollectionFormProps {
   custodianPid: string;
@@ -21,14 +24,26 @@ interface CollectionFormProps {
   onCancel?: () => void;
 }
 
-interface CollectionFormValues {
-  name: string;
-  description: string;
-  type: string;
-  host_id: number;
-}
+const schema = yup.object({
+  name: yup.string().required("Name is required"),
+  description: yup.string().required("Description is required"),
+  type: yup
+    .mixed<QueryContext>()
+    .oneOf(
+      Object.values(QueryContext) as QueryContext[],
+      "Query context type is required"
+    )
+    .required("Query context type is required"),
+  host_id: yup
+    .number()
+    .transform((value, original) => (original === "" ? undefined : value))
+    .typeError("A collection host is required")
+    .integer()
+    .positive()
+    .required("A collection host is required"),
+});
 
-const QUERY_CONTEXT_OPTIONS = ["bunny", "beacon"];
+type CollectionFormValues = yup.InferType<typeof schema>;
 
 const CollectionForm = ({
   custodianPid,
@@ -42,11 +57,12 @@ const CollectionForm = ({
   const [submitting, setSubmitting] = useState(false);
 
   const { handleSubmit, control, reset } = useForm<CollectionFormValues>({
+    resolver: yupResolver(schema),
     defaultValues: {
       name: "",
       description: "",
-      type: QUERY_CONTEXT_OPTIONS[0],
-      host_id: 0,
+      type: QueryContext.BUNNY,
+      host_id: "" as unknown as number,
     },
   });
 
@@ -116,7 +132,7 @@ const CollectionForm = ({
                   },
                 }}
               >
-                {QUERY_CONTEXT_OPTIONS.map((opt) => (
+                {Object.values(QueryContext).map((opt) => (
                   <MenuItem key={opt} value={opt}>
                     <Chip label={opt} size="small" color="secondary" />
                   </MenuItem>

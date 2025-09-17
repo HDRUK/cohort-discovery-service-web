@@ -18,10 +18,12 @@
     "@fontsource/roboto": "^5.2.6",
     "@google/generative-ai": "^0.24.1",
     "@hdruk/ui": "^1.0.1",
+    "@hookform/resolvers": "^5.2.2",
     "@mui/icons-material": "^7.2.0",
     "@mui/lab": "^7.0.0-beta.14",
     "@mui/material": "^7.2.0",
     "@mui/material-nextjs": "^7.2.0",
+    "@ngneat/falso": "^8.0.2",
     "dayjs": "^1.11.13",
     "jsonwebtoken": "^9.0.2",
     "material-react-table": "^3.2.1",
@@ -32,6 +34,7 @@
     "react-hook-form": "^7.62.0",
     "react-querybuilder": "^8.8.1",
     "react-syntax-highlighter": "^15.6.1",
+    "yup": "^1.7.0",
     "zustand": "^5.0.6"
   },
   "devDependencies": {

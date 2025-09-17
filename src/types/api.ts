@@ -189,6 +189,11 @@ export interface CreateCollectionHostPost {
   custodian_id: number;
 }
 
+export interface CollectionHostFormValues {
+  name: string;
+  context: string;
+}
+
 export interface CollectionHost {
   id: number;
   name: string;
@@ -205,5 +210,3 @@ export interface CreateCollectionPost {
   host_id: number;
   url?: string;
 }
-
-export type CreateCollectionHost = CollectionHost;

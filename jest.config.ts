@@ -100,6 +100,8 @@ const config: Config = {
     "^@/store/(.*)$": "<rootDir>/src/store/$1",
     "^@/types/(.*)$": "<rootDir>/src/types/$1",
     "^@/components/(.*)$": "<rootDir>/src/components/$1",
+    "^@/modules/(.*)$": "<rootDir>/src/modules/$1",
+    "^@/providers/(.*)$": "<rootDir>/src/providers/$1",
     "^@/utils/(.*)$": "<rootDir>/src/utils/$1",
     "\\.(css|less|scss|sass)$": "identity-obj-proxy",
   },

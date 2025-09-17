@@ -12,19 +12,13 @@ import AddIcon from "@mui/icons-material/Add";
 import { useForm, Controller } from "react-hook-form";
 import { useState } from "react";
 import { useDaphneStore } from "@/store/useDaphneStore";
-import { Custodian } from "@/types/api";
+import { Custodian, CollectionHostFormValues } from "@/types/api";
+import { QueryContext } from "@/types/context";
 
 interface CollectionHostFormProps {
   custodianId: number;
   onCancel?: () => void;
 }
-
-interface CollectionHostFormValues {
-  name: string;
-  context: string;
-}
-
-const QUERY_CONTEXT_OPTIONS = ["BUNNY", "BEACON", "OTHER"];
 
 const CollectionHostForm = ({
   custodianId,
@@ -37,7 +31,7 @@ const CollectionHostForm = ({
   const [submitting, setSubmitting] = useState(false);
 
   const { handleSubmit, control, reset } = useForm<CollectionHostFormValues>({
-    defaultValues: { name: "", context: QUERY_CONTEXT_OPTIONS[0] },
+    defaultValues: { name: "", context: QueryContext.BUNNY },
   });
 
   const onSubmit = async (data: CollectionHostFormValues) => {
@@ -91,7 +85,7 @@ const CollectionHostForm = ({
                   },
                 }}
               >
-                {QUERY_CONTEXT_OPTIONS.map((opt) => (
+                {Object.values(QueryContext).map((opt) => (
                   <MenuItem key={opt} value={opt}>
                     <Chip label={opt} size="small" color="secondary" />
                   </MenuItem>

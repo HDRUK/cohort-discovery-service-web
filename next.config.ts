@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
   experimental: {
     authInterrupts: true,
   },
+  transpilePackages: ["@faker-js/faker"],
 };
 
 export default nextConfig;

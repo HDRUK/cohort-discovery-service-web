@@ -1,3 +1,4 @@
+import { QueryContext } from "@/types/context";
 import { ApiResponse, Collection, Distribution } from "../../types/api";
 
 const getMockDistribution = (rest?: Partial<Distribution>): Distribution => ({
@@ -42,7 +43,8 @@ export const mockCollections: Collection[] = [
     id: 1,
     pid: "db6d9b451b818ccc9a449383f2f0c450",
     name: "Test Dataset #1",
-    type: "bunny",
+    url: null,
+    type: QueryContext.BUNNY,
     created_at: "2025-01-01 00:00:00",
     updated_at: "2025-01-01 00:00:00",
     demographics: getMockDemographics({ collection_id: 1, n: 1213 }),
@@ -52,7 +54,8 @@ export const mockCollections: Collection[] = [
     id: 2,
     pid: "db6d9b451b818ccc9a449383f2f0c451",
     name: "Test Dataset #2",
-    type: "bunny",
+    url: null,
+    type: QueryContext.BUNNY,
     created_at: "2025-01-01 00:00:00",
     updated_at: "2025-01-01 00:00:00",
     demographics: getMockDemographics({ collection_id: 2 }),
