@@ -10,6 +10,7 @@ interface ShowOnClickProps {
   icon?: ReactElement;
   tooltip?: string;
   modal?: boolean;
+  disabled?: boolean;
   dialogTitle?: string;
 }
 
@@ -17,6 +18,7 @@ const ShowOnClick = ({
   children,
   icon,
   tooltip,
+  disabled = false,
   modal = true,
   dialogTitle = "Details",
 }: ShowOnClickProps) => {
@@ -25,21 +27,28 @@ const ShowOnClick = ({
   const handleToggle = () => setOpen((prev) => !prev);
   const handleClose = () => setOpen(false);
 
+  const button = (
+    <IconButton onClick={handleToggle} size="small" disabled={disabled}>
+      {icon ?? <ExpandMoreIcon fontSize="small" />}
+    </IconButton>
+  );
+
   return (
     <Box>
-      <Tooltip title={tooltip ?? (open ? "Hide" : "Show")}>
-        <IconButton onClick={handleToggle} size="small">
-          {icon ?? <ExpandMoreIcon fontSize="small" />}
-        </IconButton>
-      </Tooltip>
-
-      {modal ? (
-        <Modal open={open} onClose={handleClose} title={dialogTitle}>
-          {children}
-        </Modal>
+      {disabled ? (
+        button
       ) : (
-        open && children
+        <Tooltip title={tooltip ?? (open ? "Hide" : "Show")}>{button}</Tooltip>
       )}
+
+      {!disabled &&
+        (modal ? (
+          <Modal open={open} onClose={handleClose} title={dialogTitle}>
+            {children}
+          </Modal>
+        ) : (
+          open && children
+        ))}
     </Box>
   );
 };

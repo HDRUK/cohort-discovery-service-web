@@ -2,12 +2,12 @@
 
 import { apiGet } from "../lib/apiClient";
 import { API_ROUTES } from "../lib/apiRoutes";
-import { ApiResponse, CollectionWithHosts } from "../types/api";
+import { ApiResponse, Paginated, CollectionWithHosts } from "../types/api";
 
 const getCustodianCollections = async (
   custodianPid: string
-): Promise<ApiResponse<CollectionWithHosts[]>> => {
-  return await apiGet<ApiResponse<CollectionWithHosts[]>>(
+): Promise<ApiResponse<Paginated<CollectionWithHosts[]>>> => {
+  return await apiGet<ApiResponse<Paginated<CollectionWithHosts[]>>>(
     API_ROUTES.custodianCollections(custodianPid),
     {
       next: { revalidate: 3600, tags: [`collections-${custodianPid}`] },

@@ -16,8 +16,6 @@ const CustodianAdminPageContent = async ({ params }: { params: Params }) => {
     custodianPid
   );
 
-  console.log(custodianCollections);
-
   return (
     <Paper
       sx={{

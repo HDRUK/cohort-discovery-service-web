@@ -146,6 +146,7 @@ const CollectionForm = ({
                             ch={collectionHosts.find(
                               (ch) => ch.id === selected
                             )}
+                            disabled={true}
                           />
                         </Stack>
                       ),
@@ -154,7 +155,7 @@ const CollectionForm = ({
               >
                 {collectionHosts.map((ch) => (
                   <MenuItem key={ch.id} value={ch.id}>
-                    <CollectionHostChip ch={ch} />
+                    <CollectionHostChip ch={ch} disabled={true} />
                   </MenuItem>
                 ))}
               </TextField>

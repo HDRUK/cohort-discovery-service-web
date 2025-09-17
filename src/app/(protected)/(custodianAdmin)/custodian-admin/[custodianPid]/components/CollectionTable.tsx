@@ -1,14 +1,14 @@
-import { CollectionHost, CollectionWithHosts } from "@/types/api";
-import { useTable } from "@/hooks/useTable";
+import { CollectionHost, CollectionWithHosts, Paginated } from "@/types/api";
 import { MaterialReactTable, MRT_ColumnDef } from "material-react-table";
 import { Box } from "@mui/material";
 import CollectionHostChip from "@/components/CollectionHostChip";
 import CodeBlock from "@/components/CodeBlock";
+import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 
 const CollectionTable = ({
   collections,
 }: {
-  collections: CollectionWithHosts[];
+  collections: Paginated<CollectionWithHosts[]>;
 }) => {
   const columns: MRT_ColumnDef<CollectionWithHosts>[] = [
     {
@@ -37,9 +37,11 @@ const CollectionTable = ({
     },
   ];
 
-  const table = useTable<CollectionWithHosts>({
+  const table = usePaginatedTable<CollectionWithHosts>({
     columns,
-    data: collections,
+    data: collections.data,
+    rowCount: collections.total,
+    perPageDefault: collections.per_page,
   });
 
   return (

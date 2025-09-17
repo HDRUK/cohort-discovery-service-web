@@ -1,7 +1,7 @@
 "use client";
 import CreateCollection from "@/modules/CreateCollection";
 import { useDaphneStore } from "@/store/useDaphneStore";
-import { CollectionWithHosts, CollectionHost } from "@/types/api";
+import { CollectionWithHosts, CollectionHost, Paginated } from "@/types/api";
 import { Box, Skeleton } from "@mui/material";
 import CollectionTable from "./CollectionTable";
 
@@ -11,7 +11,7 @@ const CollectionAdmin = ({
   collectionHosts,
 }: {
   pid: string;
-  collections: CollectionWithHosts[];
+  collections: Paginated<CollectionWithHosts[]>;
   collectionHosts: CollectionHost[];
 }) => {
   const {
