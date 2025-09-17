@@ -12,4 +12,6 @@ export const routes = {
   dashboardCollections: dashboardPath("collections"),
   dashboardCodes: dashboardPath("codes"),
   profile: "/profile",
+  admin: "/admin",
+  team: (pid: string) => `/custodian-admin/${pid}`,
 };

@@ -5,6 +5,7 @@ import { GATEWAY_TOKEN_NAME } from "@/config/internals";
 import { TokenUser, Rquestroles, CombinedUser } from "@/types/api";
 import ProtectedPage from "./components/ProtectedPage";
 import getMe from "@/actions/getMe";
+import getCustodians from "@/actions/getCustodians";
 
 export default async function ProtectedLayout({
   children,
@@ -42,7 +43,13 @@ export default async function ProtectedLayout({
     forbidden();
   }
 
+  const { data: custodians } = await getCustodians();
+
   const combinedUser = { ...me, gateway_user: user } as unknown as CombinedUser;
 
-  return <ProtectedPage user={combinedUser}>{children}</ProtectedPage>;
+  return (
+    <ProtectedPage user={combinedUser} custodians={custodians}>
+      {children}
+    </ProtectedPage>
+  );
 }

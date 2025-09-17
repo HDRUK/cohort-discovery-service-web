@@ -5,12 +5,18 @@ export const API_ROUTES = {
   tasks: `${API_URL}/tasks`,
   queries: `${API_URL}/queries`,
   collections: `${API_URL}/collections`,
+  custodians: `${API_URL}/custodians`,
   getMe: `${API_URL}/user`,
   getQuery: (pid: string) => `${API_URL}/query/${pid}`,
   getCodes: (domain: string) => `${API_URL}/codes/${domain}`,
   getTaskStatus: (taskId: string) => `${API_URL}/task/${taskId}/status`,
   cancelTask: (taskId: string) => `${API_URL}/task/${taskId}/cancel`,
   queryResults: (queryPid: string) => `${API_URL}/query/${queryPid}/results`,
+  collectionHosts: `${API_URL}/collection_hosts`,
+  custodianCollectionHosts: (pid: string) =>
+    `${API_URL}/custodians/${pid}/collection_hosts`,
+  custodianCollections: (pid: string) =>
+    `${API_URL}/custodians/${pid}/collections`,
   authCallback: "http://localhost:8100/auth/callback",
 };
 

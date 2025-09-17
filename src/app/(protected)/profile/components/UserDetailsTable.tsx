@@ -20,6 +20,18 @@ const UserDetailsTable = ({ user }: { user: CombinedUser }) => {
   const data: KVRow[] = [
     { label: "ID", value: user.id },
     { label: "Gateway ID", value: user?.gateway_user?.id },
+    {
+      label: "Gateway Teams",
+      value: user.gateway_user?.admin_teams?.length ? (
+        <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+          {user.gateway_user.admin_teams.map((t) => (
+            <Chip key={t.id} size="small" label={t.name} />
+          ))}
+        </Stack>
+      ) : (
+        "—"
+      ),
+    },
     { label: "Name", value: user.name },
     { label: "Email", value: user.email },
     { label: "Orcid", value: user.gateway_user?.orcid || "—" },
@@ -81,7 +93,18 @@ const UserDetailsTable = ({ user }: { user: CombinedUser }) => {
         "—"
       ),
     },
-    { label: "Organisation", value: user.gateway_user?.organisation || "—" },
+    {
+      label: "Workgroups",
+      value: user.gateway_user?.workgroups?.length ? (
+        <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+          {user.gateway_user.workgroups.map((wg) => (
+            <Chip color="secondary" key={wg.id} size="small" label={wg.name} />
+          ))}
+        </Stack>
+      ) : (
+        "—"
+      ),
+    },
   ];
 
   const columns = useMemo<MRT_ColumnDef<KVRow>[]>(

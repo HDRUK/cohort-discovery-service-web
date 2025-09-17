@@ -67,6 +67,10 @@ export interface Collection {
   demographics?: Distribution[];
 }
 
+export interface CollectionWithHosts extends Collection {
+  host: CollectionHost;
+}
+
 export interface Result {
   id: number;
   pid: string;
@@ -86,6 +90,7 @@ export interface Code {
 export interface CodeStat extends Code {
   pid: string;
   category: string;
+  total_count: number;
   collections_count: number;
   collections_pct: number;
 }
@@ -145,6 +150,11 @@ export interface User {
   updated_at: string;
 }
 
+export interface GatewayTeam {
+  id: number;
+  name: string;
+}
+
 export interface TokenUser {
   id: number;
   email: string;
@@ -158,8 +168,45 @@ export interface TokenUser {
   provider: string;
   workgroups: Workgroups[];
   rquestroles: Rquestroles[];
+  admin_teams: GatewayTeam[];
+}
+
+export interface Custodian {
+  id: number;
+  pid: string;
+  name: string;
+  gateway_team_id: number;
+  gateway_team_name: string;
 }
 
 export interface CombinedUser extends User {
   gateway_user: TokenUser | null;
+}
+
+export interface CreateCollectionHostPost {
+  name: string;
+  query_context_type: string;
+  custodian_id: number;
+}
+
+export interface CollectionHostFormValues {
+  name: string;
+  context: string;
+}
+
+export interface CollectionHost {
+  id: number;
+  name: string;
+  query_context_type: string;
+  client_id: string;
+  client_secret: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateCollectionPost {
+  name: string;
+  type: string;
+  host_id: number;
+  url?: string;
 }

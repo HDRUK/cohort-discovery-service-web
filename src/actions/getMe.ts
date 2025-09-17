@@ -3,14 +3,10 @@
 import { apiGet } from "../lib/apiClient";
 import { API_ROUTES } from "../lib/apiRoutes";
 import { User, ApiResponse } from "../types/api";
-import crypto from "crypto";
-
-function tokenKey(token: string) {
-  return crypto.createHash("sha256").update(token).digest("hex");
-}
+import { getTokenKey } from "@/utils/string";
 
 const getMe = async (token: string): Promise<ApiResponse<User>> => {
-  const key = tokenKey(token);
+  const key = getTokenKey(token);
   return await apiGet<ApiResponse<User>>(API_ROUTES.getMe, {
     next: {
       revalidate: 60,

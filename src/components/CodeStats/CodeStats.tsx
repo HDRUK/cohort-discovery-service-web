@@ -1,5 +1,6 @@
 "use client";
 
+import { formatNumber } from "@/utils/numbers";
 import { usePaginatedTable } from "../../hooks/usePaginatedTable";
 import { CodeStat, Paginated } from "../../types/api";
 import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
@@ -32,6 +33,13 @@ const CodeStats = ({ codes }: { codes: Paginated<CodeStat[]> }) => {
         id: "category",
         header: "Category",
         accessorFn: (row) => row.category,
+        minSize: 30,
+      },
+      {
+        id: "count",
+        header: "Total Count",
+        accessorFn: (row) => row.total_count,
+        Cell: ({ cell }) => formatNumber(cell.getValue<number>()),
         minSize: 30,
       },
       {

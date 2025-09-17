@@ -2,19 +2,22 @@ import { create } from "zustand";
 import type { RuleGroupType, RuleType } from "react-querybuilder";
 import getQueryFromInput from "@/actions/getQueryFromInput";
 import submitQuery from "@/actions/submitQuery";
+import createCollectionHost from "@/actions/createCollectionHost";
+import { revalidateAction } from "@/actions/revalidate";
 import {
   ApiResponse,
   Collection,
   CombinedUser,
   CreateQuery,
   Query,
-  TokenUser,
+  Custodian,
+  CreateCollectionPost,
 } from "@/types/api";
 import { DEFAULT_SEXES, OmopTableName } from "@/types/omop";
 import { baseFields } from "@/config/queryFields";
 import { Field, isRuleGroup } from "react-querybuilder";
 import { getNaturalLanguage } from "@/utils/queryBuilder";
-import getToken from "@/actions/gateway/getToken";
+import createCollection from "@/actions/createCollection";
 
 type Option = {
   name: string;
@@ -65,6 +68,18 @@ export interface DaphneStoreState {
     ) => Promise<ApiResponse<CreateQuery>>;
     collections: Collection[];
     setCollections: (collections: Collection[]) => void;
+  };
+  custodianData: {
+    custodians: Custodian[];
+    setCustodians: (custodains: Custodian[]) => void;
+    createCollectionHost: (
+      custodianId: number,
+      payload: { name: string; context: string }
+    ) => Promise<void>;
+    createCollection: (
+      custodianPid: string,
+      payload: CreateCollectionPost
+    ) => Promise<void>;
   };
 }
 
@@ -323,6 +338,27 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     user: null,
     setUser: (user: CombinedUser) => {
       set((state) => ({ ...state, userData: { ...state.userData, user } }));
+    },
+  },
+
+  custodianData: {
+    custodians: [],
+    setCustodians: (custodians) =>
+      set((state) => ({
+        ...state,
+        custodianData: { ...state.custodianData, custodians },
+      })),
+    createCollectionHost: async (custodianId, payload) => {
+      await createCollectionHost(custodianId, payload);
+      await revalidateAction(`collection-hosts-${custodianId}`);
+    },
+    createCollection: async (custodianPid, payload) => {
+      // note: inconsistancy between using custodian Id and custodian Pid
+      // - this is because the BE uses different endpoints:
+      // - Route::post('/v1/collection_hosts'... (custodianId in the payload)
+      // - Route::post('/v1/custodians/{custodianPid}/collections'...
+      await createCollection(custodianPid, payload);
+      await revalidateAction(`collections-${custodianPid}`);
     },
   },
 }));
