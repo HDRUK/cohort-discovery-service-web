@@ -16,16 +16,20 @@ jest.mock("@/store/useDaphneStore", () => ({
   }),
 }));
 
-describe("CreateCollectionHost", () => {
-  let custodian: Custodian;
+let custodian: Custodian;
 
+const renderCreateColllectionHost = (
+  overrides: Partial<React.ComponentProps<typeof CreateCollectionHost>> = {}
+) => render(<CreateCollectionHost custodian={custodian} {...overrides} />);
+
+describe("CreateCollectionHost", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     custodian = getCustodian();
   });
 
   it("renders the add button and shows the form when clicked", async () => {
-    render(<CreateCollectionHost custodian={custodian} />);
+    renderCreateColllectionHost();
 
     const addBtn = screen.getByRole("button", { name: /collection host/i });
     expect(addBtn).toBeEnabled();
@@ -41,7 +45,7 @@ describe("CreateCollectionHost", () => {
   });
 
   it("shows a validation error if name is empty on submit", async () => {
-    render(<CreateCollectionHost custodian={custodian} />);
+    renderCreateColllectionHost();
 
     await userEvent.click(
       screen.getByRole("button", { name: /collection host/i })
@@ -54,7 +58,7 @@ describe("CreateCollectionHost", () => {
   });
 
   it("lets the user change the Query Context Type", async () => {
-    render(<CreateCollectionHost custodian={custodian} />);
+    renderCreateColllectionHost();
 
     await userEvent.click(
       screen.getByRole("button", { name: /collection host/i })
@@ -107,7 +111,7 @@ describe("CreateCollectionHost", () => {
   });
 
   it("cancels and hides the form (and re-enables the add button)", async () => {
-    render(<CreateCollectionHost custodian={custodian} />);
+    renderCreateColllectionHost();
 
     const addBtn = screen.getByRole("button", { name: /collection host/i });
     await userEvent.click(addBtn);

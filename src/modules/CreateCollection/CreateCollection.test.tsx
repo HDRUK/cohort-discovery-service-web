@@ -17,10 +17,22 @@ jest.mock("@/store/useDaphneStore", () => ({
   }),
 }));
 
-describe("CreateCollection", () => {
-  let custodian: Custodian;
-  let collectionHosts: CollectionHost[];
+let custodian: Custodian;
+let collectionHosts: CollectionHost[];
 
+const renderCreateCollection = (
+  overrides: Partial<Parameters<typeof CreateCollection>[0]> = {}
+) => {
+  return render(
+    <CreateCollection
+      custodian={custodian}
+      collectionHosts={collectionHosts}
+      {...overrides}
+    />
+  );
+};
+
+describe("CreateCollection", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     custodian = getCustodian();
@@ -31,12 +43,7 @@ describe("CreateCollection", () => {
   });
 
   it("renders the add button and shows the form when clicked", async () => {
-    render(
-      <CreateCollection
-        custodian={custodian}
-        collectionHosts={collectionHosts}
-      />
-    );
+    renderCreateCollection();
 
     const addBtn = screen.getByRole("button", { name: /collection/i });
     expect(addBtn).toBeEnabled();
@@ -79,12 +86,7 @@ describe("CreateCollection", () => {
   });
 
   it("lets the user change the Query Context Type", async () => {
-    render(
-      <CreateCollection
-        custodian={custodian}
-        collectionHosts={collectionHosts}
-      />
-    );
+    renderCreateCollection();
 
     await userEvent.click(screen.getByRole("button", { name: /collection/i }));
 
@@ -118,12 +120,7 @@ describe("CreateCollection", () => {
   });
 
   it("submits valid data and closes the form", async () => {
-    render(
-      <CreateCollection
-        custodian={custodian}
-        collectionHosts={collectionHosts}
-      />
-    );
+    renderCreateCollection();
 
     await userEvent.click(screen.getByRole("button", { name: /collection/i }));
 
@@ -168,12 +165,7 @@ describe("CreateCollection", () => {
   });
 
   it("cancels and hides the form (and re-enables the add button)", async () => {
-    render(
-      <CreateCollection
-        custodian={custodian}
-        collectionHosts={collectionHosts}
-      />
-    );
+    renderCreateCollection();
 
     const addBtn = screen.getByRole("button", { name: /collection/i });
     await userEvent.click(addBtn);
