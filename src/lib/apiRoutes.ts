@@ -17,6 +17,15 @@ export const API_ROUTES = {
     `${API_URL}/custodians/${pid}/collection_hosts`,
   custodianCollections: (pid: string) =>
     `${API_URL}/custodians/${pid}/collections`,
+  conceptSets: `${API_URL}/concept_sets`,
+  getConceptSet: (id: number) => `${API_URL}/concept_sets/${id}`,
+  clearConceptSet: (conceptSetId: number) =>
+    `${API_URL}/concept_sets/${conceptSetId}/clear`,
+  attachConcept: (conceptSetId: number, conceptId: number) =>
+    `${API_URL}/concept_sets/${conceptSetId}/attach/${conceptId}`,
+  detachConcept: (conceptSetId: number, conceptId: number) =>
+    `${API_URL}/concept_sets/${conceptSetId}/detach/${conceptId}`,
+  searchConcepts: `${API_URL}/omop/concepts/search`,
   authCallback: "http://localhost:8100/auth/callback",
 };
 

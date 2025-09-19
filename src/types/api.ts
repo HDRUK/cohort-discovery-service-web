@@ -5,6 +5,11 @@ export interface ApiResponse<T> {
   data: T;
 }
 
+export interface WithTimestamps {
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Paginated<T> {
   data: T;
   current_page: number;
@@ -37,7 +42,7 @@ export interface CreateQuery {
 }
 export type Tasks = string[];
 
-export interface Distribution {
+export interface Distribution extends WithTimestamps {
   id: number;
   collection_id: number;
   task_id: number;
@@ -51,18 +56,14 @@ export interface Distribution {
   max: number;
   mean: number;
   median: number;
-  created_at: string;
-  updated_at: string;
 }
 
-export interface Collection {
+export interface Collection extends WithTimestamps {
   id: number;
   name: string;
   pid: string;
   url: string | null;
   type: string;
-  created_at: string;
-  updated_at: string;
   size?: Distribution;
   demographics?: Distribution[];
 }
@@ -71,15 +72,13 @@ export interface CollectionWithHosts extends Collection {
   host: CollectionHost;
 }
 
-export interface Result {
+export interface Result extends WithTimestamps {
   id: number;
   pid: string;
   count: number;
   metadata: unknown;
   status: string;
   message: string;
-  created_at: string;
-  updated_at: string;
 }
 
 export interface Code {
@@ -141,13 +140,11 @@ export enum Rquestroles {
   GENERAL_ACCESS = "GENERAL_ACCESS",
 }
 
-export interface User {
+export interface User extends WithTimestamps {
   id: number;
   email: string;
   name: string;
   email_verified_at: string | null;
-  created_at: string;
-  updated_at: string;
 }
 
 export interface GatewayTeam {
@@ -200,8 +197,6 @@ export interface CollectionHost {
   query_context_type: string;
   client_id: string;
   client_secret: string;
-  created_at: string;
-  updated_at: string;
 }
 
 export interface CreateCollectionPost {
@@ -209,4 +204,25 @@ export interface CreateCollectionPost {
   type: string;
   host_id: number;
   url?: string;
+}
+
+export interface Concept {
+  concept_id: number;
+  name: string;
+  description: string;
+  category: string;
+}
+
+export interface ConceptSet extends WithTimestamps {
+  id: number;
+  domain: string;
+  name: string;
+  description: string;
+  concepts: Concept[];
+}
+
+export interface CreateConceptSetPost {
+  name: string;
+  description: string;
+  domain: string;
 }

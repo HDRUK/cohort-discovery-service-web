@@ -8,6 +8,7 @@ import SelectDatasets from "@/components/SelectDatasets";
 import getCollections from "@/actions/getCollections";
 import { getAllFields } from "@/actions/omop/getAllCodes";
 import CohortQueryTitle from "@/components/CohortQueryTitle";
+import getConceptSets from "@/actions/getConceptSets";
 
 const GuiCohortBuilder = async () => {
   const fields = await getAllFields();

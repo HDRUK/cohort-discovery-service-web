@@ -18,6 +18,8 @@ interface ModalProps extends Omit<DialogProps, "children"> {
   showCloseButton?: boolean;
   showActions?: boolean;
   actionLabel?: string;
+  secondaryActionLabel?: string;
+  onSecondaryAction?: () => void;
 }
 
 const Modal = ({
@@ -28,6 +30,8 @@ const Modal = ({
   showCloseButton = true,
   showActions = true,
   actionLabel = "Close",
+  secondaryActionLabel,
+  onSecondaryAction,
   ...dialogProps
 }: ModalProps) => {
   return (
@@ -54,7 +58,18 @@ const Modal = ({
       </DialogTitle>
       <DialogContent dividers>{children}</DialogContent>
       {showActions && (
-        <DialogActions>
+        <DialogActions
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          {secondaryActionLabel && onSecondaryAction && (
+            <Button onClick={onSecondaryAction} variant="contained">
+              {secondaryActionLabel}
+            </Button>
+          )}
           <Button onClick={onClose}>{actionLabel}</Button>
         </DialogActions>
       )}

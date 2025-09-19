@@ -16,7 +16,7 @@ const getCollectionHosts = async (
     {
       next: {
         revalidate: 3600,
-        tags: [`collection-hosts-${custodianPid}`, key],
+        tags: ["collection-hosts", `collection-hosts-${custodianPid}`, key],
       },
       cache: "force-cache",
     }
