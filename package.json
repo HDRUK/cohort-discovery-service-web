@@ -27,7 +27,7 @@
     "dayjs": "^1.11.13",
     "jsonwebtoken": "^9.0.2",
     "material-react-table": "^3.2.1",
-    "next": "15.4.2",
+    "next": "15.5.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-error-boundary": "^6.0.0",
