@@ -5,7 +5,6 @@ import getCodes from "./getCodes";
 import { codesToOption } from "@/utils/omop";
 import { Code, Option } from "../../types/api";
 import { Field } from "react-querybuilder";
-
 import { OmopTableName, DEFAULT_SEXES } from "../../types/omop";
 
 export const getAllCodes = async (): Promise<Record<OmopTableName, Code[]>> => {

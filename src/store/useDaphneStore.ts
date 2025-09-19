@@ -12,12 +12,21 @@ import {
   Query,
   Custodian,
   CreateCollectionPost,
+  Concept,
+  Paginated,
+  CreateConceptSetPost,
+  ConceptSet,
 } from "@/types/api";
 import { DEFAULT_SEXES, OmopTableName } from "@/types/omop";
 import { baseFields } from "@/config/queryFields";
 import { Field, isRuleGroup } from "react-querybuilder";
 import { getNaturalLanguage } from "@/utils/queryBuilder";
 import createCollection from "@/actions/createCollection";
+import createConceptSet from "@/actions/createConceptSet";
+import getConcepts from "@/actions/getConcepts";
+import attachConcepts from "@/actions/attachConcepts";
+import detachConcepts from "@/actions/detachConcepts";
+import deleteConceptSet from "@/actions/deleteConceptSet";
 
 type Option = {
   name: string;
@@ -68,6 +77,22 @@ export interface DaphneStoreState {
     ) => Promise<ApiResponse<CreateQuery>>;
     collections: Collection[];
     setCollections: (collections: Collection[]) => void;
+    conceptSets: ConceptSet[];
+    setConceptSets: (conceptSets: ConceptSet[]) => void;
+    createConceptSet: (payload: CreateConceptSetPost) => Promise<void>;
+    searchForConcepts: (
+      domain: string,
+      searchTerm: string
+    ) => Promise<Paginated<Partial<Concept>[]>>;
+    addConceptsToSet: (
+      conceptSetId: number,
+      conceptIds: number[]
+    ) => Promise<void>;
+    removeConceptsFromSet: (
+      conceptSetId: number,
+      conceptIds: number[]
+    ) => Promise<void>;
+    removeConceptSet: (conceptSetId: number) => Promise<void>;
   };
   custodianData: {
     custodians: Custodian[];
@@ -339,6 +364,40 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     setUser: (user: CombinedUser) => {
       set((state) => ({ ...state, userData: { ...state.userData, user } }));
     },
+    conceptSets: [],
+    setConceptSets: (conceptSets: ConceptSet[]) => {
+      set((state) => ({
+        ...state,
+        userData: { ...state.userData, conceptSets },
+      }));
+    },
+    createConceptSet: async (payload: CreateConceptSetPost) => {
+      await createConceptSet(payload);
+      // revalidate based on pid in the future... need to make a switch to pid
+      await revalidateAction(`concept-sets`);
+    },
+    searchForConcepts: async (domain: string, searchTerm: string) => {
+      const { data } = await getConcepts(domain, searchTerm);
+      return data;
+    },
+    addConceptsToSet: async (conceptSetId: number, conceptIds: number[]) => {
+      await attachConcepts(conceptSetId, conceptIds);
+      // do this based on the user key too, otherwise will get all?
+      revalidateAction("concept-sets");
+    },
+    removeConceptsFromSet: async (
+      conceptSetId: number,
+      conceptIds: number[]
+    ) => {
+      await detachConcepts(conceptSetId, conceptIds);
+      // do this based on the user key too, otherwise will get all?
+      revalidateAction("concept-sets");
+    },
+    removeConceptSet: async (conceptSetId: number) => {
+      await deleteConceptSet(conceptSetId);
+      // do this based on the user key too, otherwise will get all?
+      revalidateAction("concept-sets");
+    },
   },
 
   custodianData: {
@@ -350,7 +409,8 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       })),
     createCollectionHost: async (custodianId, payload) => {
       await createCollectionHost(custodianId, payload);
-      await revalidateAction(`collection-hosts-${custodianId}`);
+      // revalidate based on pid in the future... need to make a switch to pid
+      await revalidateAction(`collection-hosts`);
     },
     createCollection: async (custodianPid, payload) => {
       // note: inconsistancy between using custodian Id and custodian Pid

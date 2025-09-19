@@ -85,7 +85,7 @@ export async function apiGet<TResponse>(
 
 export async function apiPost<TResponse, TBody>(
   url: string,
-  body: TBody,
+  body?: TBody,
   options?: RequestOptions<TBody>
 ) {
   return request<TResponse, TBody>("POST", url, { ...options, body });

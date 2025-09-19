@@ -12,12 +12,14 @@ interface ShowOnClickProps {
   modal?: boolean;
   disabled?: boolean;
   dialogTitle?: string;
+  onSave?: () => Promise<void>;
 }
 
 const ShowOnClick = ({
   children,
   icon,
   tooltip,
+  onSave,
   disabled = false,
   modal = true,
   dialogTitle = "Details",
@@ -26,6 +28,11 @@ const ShowOnClick = ({
 
   const handleToggle = () => setOpen((prev) => !prev);
   const handleClose = () => setOpen(false);
+
+  const handleOnSave = async () => {
+    await onSave?.();
+    handleClose();
+  };
 
   const button = (
     <IconButton onClick={handleToggle} size="small" disabled={disabled}>
@@ -43,7 +50,15 @@ const ShowOnClick = ({
 
       {!disabled &&
         (modal ? (
-          <Modal open={open} onClose={handleClose} title={dialogTitle}>
+          <Modal
+            open={open}
+            onClose={handleClose}
+            title={dialogTitle}
+            {...(onSave && {
+              secondaryActionLabel: "Save",
+              onSecondaryAction: handleOnSave,
+            })}
+          >
             {children}
           </Modal>
         ) : (
