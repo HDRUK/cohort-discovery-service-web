@@ -154,6 +154,7 @@ describe("CreateCollection", () => {
         description: "A test collection",
         type: QueryContext.OTHER,
         host_id: 20,
+        url: null,
       });
     });
 

@@ -17,14 +17,18 @@ describe("SelectDatasets", () => {
       />
     );
     collections.data.forEach((collection) => {
-      expect(screen.getByText(collection.name)).toBeInTheDocument();
+      expect(
+        screen.getByText(`${collection.name} [${collection.type}]`)
+      ).toBeInTheDocument();
     });
 
     const dropdownButton = screen.getByRole("button", { name: /open/i });
     await userEvent.click(dropdownButton);
 
     collections.data.forEach((collection) => {
-      expect(screen.getAllByText(collection.name).length).toBeGreaterThan(0);
+      expect(
+        screen.getAllByText(`${collection.name} [${collection.type}]`).length
+      ).toBeGreaterThan(0);
     });
   });
 
@@ -36,14 +40,18 @@ describe("SelectDatasets", () => {
     );
 
     collections.data.forEach((collection) => {
-      expect(screen.queryByText(collection.name)).not.toBeInTheDocument();
+      expect(
+        screen.queryByText(`${collection.name} [${collection.type}]`)
+      ).not.toBeInTheDocument();
     });
 
     const dropdownButton = screen.getByRole("button", { name: /open/i });
     await userEvent.click(dropdownButton);
 
     collections.data.forEach((collection) => {
-      expect(screen.getByText(collection.name)).toBeInTheDocument();
+      expect(
+        screen.getByText(`${collection.name} [${collection.type}]`)
+      ).toBeInTheDocument();
     });
   });
 });
