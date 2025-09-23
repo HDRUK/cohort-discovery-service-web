@@ -10,9 +10,9 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { useForm, Controller } from "react-hook-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDaphneStore } from "@/store/useDaphneStore";
-import { CollectionHost, Custodian } from "@/types/api";
+import { CollectionHost, CreateCollectionPost, Custodian } from "@/types/api";
 import { QueryContext } from "@/types/context";
 import CollectionHostChip from "@/components/CollectionHostChip";
 import * as yup from "yup";
@@ -41,6 +41,26 @@ const schema = yup.object({
     .integer()
     .positive()
     .required("A collection host is required"),
+
+  url: yup
+    .string()
+    .nullable()
+    .transform((val) => (val === "" ? null : val))
+    .when("type", {
+      is: (val: QueryContext) => val === QueryContext.BEACON,
+      then: (s) =>
+        s
+          .required("URL is required for Beacon")
+          .matches(
+            /^(https?:\/\/)([\w.-]+)(:\d+)?(\/.*)?$/,
+            "Must be a valid URL"
+          ),
+      otherwise: (s) =>
+        s
+          .nullable()
+          .notRequired()
+          .transform(() => null),
+    }),
 });
 
 type CollectionFormValues = yup.InferType<typeof schema>;
@@ -56,19 +76,29 @@ const CollectionForm = ({
 
   const [submitting, setSubmitting] = useState(false);
 
-  const { handleSubmit, control, reset } = useForm<CollectionFormValues>({
-    resolver: yupResolver(schema),
-    defaultValues: {
-      name: "",
-      description: "",
-      type: QueryContext.BUNNY,
-      host_id: "" as unknown as number,
-    },
-  });
+  const { handleSubmit, control, reset, watch, setValue } =
+    useForm<CollectionFormValues>({
+      resolver: yupResolver(schema),
+      defaultValues: {
+        name: "",
+        description: "",
+        type: QueryContext.BUNNY,
+        host_id: "" as unknown as number,
+        url: "",
+      },
+    });
+
+  const type = watch("type");
+
+  useEffect(() => {
+    if (type !== QueryContext.BEACON) {
+      setValue("url", "", { shouldValidate: true, shouldDirty: true });
+    }
+  }, [type, setValue]);
 
   const onSubmit = async (data: CollectionFormValues) => {
     setSubmitting(true);
-    await createCollection(custodianPid, data);
+    await createCollection(custodianPid, data as CreateCollectionPost);
     onCancel?.();
   };
 
@@ -83,7 +113,6 @@ const CollectionForm = ({
           <Controller
             name="name"
             control={control}
-            rules={{ required: "Name is required" }}
             render={({ field, fieldState }) => (
               <TextField
                 {...field}
@@ -98,7 +127,6 @@ const CollectionForm = ({
           <Controller
             name="description"
             control={control}
-            rules={{ required: "Description is required" }}
             render={({ field, fieldState }) => (
               <TextField
                 {...field}
@@ -113,7 +141,6 @@ const CollectionForm = ({
           <Controller
             name="type"
             control={control}
-            rules={{ required: "Query context type is required" }}
             render={({ field, fieldState }) => (
               <TextField
                 {...field}
@@ -141,10 +168,26 @@ const CollectionForm = ({
             )}
           />
 
+          {type === QueryContext.BEACON && (
+            <Controller
+              name="url"
+              control={control}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  label="URL"
+                  placeholder="https://example.com/endpoint"
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                  fullWidth
+                />
+              )}
+            />
+          )}
+
           <Controller
             name="host_id"
             control={control}
-            rules={{ required: "A collection host is required" }}
             render={({ field, fieldState }) => (
               <TextField
                 {...field}
@@ -171,7 +214,7 @@ const CollectionForm = ({
               >
                 {collectionHosts.map((ch) => (
                   <MenuItem key={ch.id} value={ch.id}>
-                    <CollectionHostChip ch={ch} disabled={true} />
+                    <CollectionHostChip ch={ch} disabled />
                   </MenuItem>
                 ))}
               </TextField>
