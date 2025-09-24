@@ -35,7 +35,10 @@ const SelectDatasets = ({
     setSelectedDatasets(initialSelection ?? []);
   }, [initialSelection, setSelectedDatasets]);
 
-  const options = collections.map((c) => ({ value: c.pid, label: c.name }));
+  const options = collections.map((c) => ({
+    value: c.pid,
+    label: `${c.name} [${c.type}]`,
+  }));
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>

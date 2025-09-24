@@ -203,7 +203,7 @@ export interface CreateCollectionPost {
   name: string;
   type: string;
   host_id: number;
-  url?: string;
+  url: string | null;
 }
 
 export interface Concept {
