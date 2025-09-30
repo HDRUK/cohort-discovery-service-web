@@ -83,20 +83,22 @@ const QueryBuilder = ({ fields }: { fields: Field[] }) => {
   }
 
   return (
-    <ReactQueryBuilder
-      fields={fields}
-      query={queryBuilderJson}
-      onQueryChange={setQueryBuilderJson}
-      addRuleToNewGroups
-      debugMode
-      listsAsArrays
-      parseNumbers="strict-limited"
-      showCloneButtons
-      showLockButtons
-      showNotToggle
-      controlElements={customControlElements}
-      controlClassnames={customClassnames}
-    />
+    <div data-query-builder-root="true">
+      <ReactQueryBuilder
+        fields={fields}
+        query={queryBuilderJson}
+        onQueryChange={setQueryBuilderJson}
+        addRuleToNewGroups
+        debugMode
+        listsAsArrays
+        parseNumbers="strict-limited"
+        showCloneButtons
+        showLockButtons
+        showNotToggle
+        controlElements={customControlElements}
+        controlClassnames={customClassnames}
+      />
+    </div>
   );
 };
 

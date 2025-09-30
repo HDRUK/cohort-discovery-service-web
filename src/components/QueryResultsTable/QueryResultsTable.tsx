@@ -5,7 +5,7 @@ import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
 import { Chip, CircularProgress, Link, Paper, Tooltip } from "@mui/material";
 import ErrorIcon from "@mui/icons-material/Error";
 import { revalidateAction } from "@/actions/revalidate";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useTable } from "../../hooks/useTable";
 import { formatNumber } from "@/utils/numbers";
 import Title from "../Title";
@@ -22,8 +22,7 @@ const QueryResultsTable = ({ query }: { query: Query }) => {
   useEffect(() => {
     setQueryName(name);
   }, [name, setQueryName]);
-
-  const isPending = tasks.some((t) => !t.result);
+  const isPending = useMemo(() => tasks.some((t) => !t.result), [tasks]);
 
   useEffect(() => {
     if (!isPending) return;
@@ -73,17 +72,15 @@ const QueryResultsTable = ({ query }: { query: Query }) => {
       header: "Status",
       Cell: ({ cell }) => {
         const result = cell.getValue<Result>();
+        const isError = result?.status === "error";
         return (
           <ShowOnClick
+            disabled={!isError}
             dialogTitle={"Error details"}
             icon={
               <Chip
                 color={
-                  result?.status
-                    ? result.status === "error"
-                      ? "error"
-                      : "success"
-                    : "warning"
+                  result?.status ? (isError ? "error" : "success") : "warning"
                 }
                 label={
                   result?.status

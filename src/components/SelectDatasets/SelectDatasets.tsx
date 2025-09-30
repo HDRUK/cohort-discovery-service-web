@@ -41,7 +41,14 @@ const SelectDatasets = ({
   }));
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
+        maxWidth: "100%",
+      }}
+    >
       <Autocomplete
         multiple
         disableCloseOnSelect
@@ -94,7 +101,7 @@ const SelectDatasets = ({
         renderInput={(params) => (
           <TextField {...params} label="Select datasets" size="small" />
         )}
-        sx={{ minWidth: 400 }}
+        sx={{ minWidth: 100 }}
       />
     </Box>
   );

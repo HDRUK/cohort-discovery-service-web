@@ -6,6 +6,8 @@ import ThemeRegistry from "@/components/ThemeRegistry";
 import LeftSidebar from "@/components/LeftSidebar";
 import HeaderBar from "@/components/HeaderBar";
 
+const NO_NAV = process.env.HIDE_NAV;
+
 const sourceSans = Source_Sans_3({
   variable: "--font-source-sans-3",
   subsets: ["latin"],
@@ -33,9 +35,9 @@ export default function RootLayout({
           <Box
             sx={{ display: "flex", flexDirection: "column", height: "100vh" }}
           >
-            <HeaderBar />
+            {!NO_NAV && <HeaderBar />}
             <Box sx={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
-              <LeftSidebar />
+              {!NO_NAV && <LeftSidebar />}
               <Box
                 component="main"
                 sx={{
