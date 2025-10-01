@@ -81,8 +81,8 @@ export interface DaphneStoreState {
     setConceptSets: (conceptSets: ConceptSet[]) => void;
     createConceptSet: (payload: CreateConceptSetPost) => Promise<void>;
     searchForConcepts: (
-      domain: string,
-      searchTerm: string
+      searchTerm: string,
+      domain?: string
     ) => Promise<Paginated<Partial<Concept>[]>>;
     addConceptsToSet: (
       conceptSetId: number,
@@ -376,8 +376,8 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       // revalidate based on pid in the future... need to make a switch to pid
       await revalidateAction(`concept-sets`);
     },
-    searchForConcepts: async (domain: string, searchTerm: string) => {
-      const { data } = await getConcepts(domain, searchTerm);
+    searchForConcepts: async (searchTerm: string, domain?: string) => {
+      const { data } = await getConcepts(searchTerm, domain);
       return data;
     },
     addConceptsToSet: async (conceptSetId: number, conceptIds: number[]) => {

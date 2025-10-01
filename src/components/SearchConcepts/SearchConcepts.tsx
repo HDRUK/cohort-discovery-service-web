@@ -12,17 +12,28 @@ import {
   Divider,
 } from "@mui/material";
 import { useCallback, useRef } from "react";
+import { ConceptItem, ConceptItemProps } from "./ConceptItem";
+
+interface SlotProps {
+  conceptItem: ConceptItemProps;
+}
 
 interface SearchConceptsProps {
-  domain: string;
-  selected: Record<number, boolean>;
-  setSelected: Dispatch<SetStateAction<Record<number, boolean>>>;
+  domain?: string;
+  selected?: Record<number, boolean>;
+  setSelected?: Dispatch<SetStateAction<Record<number, boolean>>>;
+  multiple?: boolean;
+  onClick?: (concept: Concept) => void;
+  slotProps?: SlotProps;
 }
 
 const SearchConcepts = ({
   domain,
   selected,
   setSelected,
+  onClick,
+  slotProps,
+  multiple = false,
 }: SearchConceptsProps) => {
   const {
     userData: { searchForConcepts },
@@ -34,7 +45,8 @@ const SearchConcepts = ({
   const [options, setOptions] = useState<Concept[]>([]);
 
   const allSelected = useMemo(() => {
-    if (options.length === 0) return false;
+    if (options?.length === 0) return false;
+    if (selected === undefined) return false;
     return options.every((o) => {
       const id = o?.concept_id;
       if (!id) return false;
@@ -43,7 +55,7 @@ const SearchConcepts = ({
   }, [selected, options]);
 
   const toggleSelectAll = useCallback(() => {
-    setSelected((prev) => {
+    setSelected?.((prev) => {
       const next = { ...prev };
       options.forEach((o) => {
         next[o.concept_id] = !allSelected;
@@ -58,8 +70,8 @@ const SearchConcepts = ({
       if (!value) return;
       if (value === lastQueryRef.current) return;
       lastQueryRef.current = value;
-      setSelected({ ...initialSelectedRef.current });
-      const { data } = await searchForConcepts(domain, value);
+      setSelected?.({ ...initialSelectedRef.current });
+      const { data } = await searchForConcepts(value, domain);
       if (data) {
         setOptions(data as Concept[]);
         return;
@@ -70,7 +82,7 @@ const SearchConcepts = ({
 
   const handleToggle = useCallback(
     (id: number) => {
-      setSelected((prev) => ({
+      setSelected?.((prev) => ({
         ...prev,
         [id]: !prev[id],
       }));
@@ -82,27 +94,32 @@ const SearchConcepts = ({
     <Box>
       <SearchBar onSearch={onSearch} />
       <FormGroup sx={{ mt: 2 }}>
-        <FormControlLabel
-          key={"selectAll"}
-          control={
-            <Checkbox
-              checked={allSelected}
-              onChange={() => toggleSelectAll()}
+        {multiple && options?.length > 0 && (
+          <>
+            <FormControlLabel
+              key={"selectAll"}
+              control={
+                <Checkbox
+                  checked={allSelected}
+                  onChange={() => toggleSelectAll()}
+                />
+              }
+              label={"Select All"}
             />
-          }
-          label={"Select All"}
-        />
-        <Divider />
-        {options?.map((o) => (
-          <FormControlLabel
-            key={o.concept_id}
-            control={
-              <Checkbox
-                checked={!!selected[o.concept_id]}
-                onChange={() => handleToggle(o.concept_id!)}
-              />
-            }
-            label={`${o.description} [${o.concept_id}]`}
+            <Divider />
+          </>
+        )}
+        {options?.map((c) => (
+          <ConceptItem
+            {...(slotProps?.conceptItem ?? {})}
+            multiple={multiple}
+            key={c.concept_id}
+            concept={c}
+            isSelected={!!selected?.[c.concept_id]}
+            handleClick={(e) => {
+              handleToggle(e);
+              onClick?.(c);
+            }}
           />
         ))}
       </FormGroup>

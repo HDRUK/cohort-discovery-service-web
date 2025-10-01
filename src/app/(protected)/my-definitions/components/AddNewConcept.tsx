@@ -3,7 +3,7 @@
 import { Tooltip } from "@mui/material";
 import ShowOnClick from "@/components/ShowOnClick";
 import AddIcon from "@mui/icons-material/Add";
-import SearchConcepts from "./SearchConcepts";
+import SearchConcepts from "@/components/SearchConcepts";
 import { ConceptSet } from "@/types/api";
 import { useMemo, useState } from "react";
 import { useDaphneStore } from "@/store/useDaphneStore";

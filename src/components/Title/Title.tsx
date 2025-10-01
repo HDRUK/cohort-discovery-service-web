@@ -4,9 +4,16 @@ interface TableTitleProps {
   title: string;
   subTitle?: number | string;
   children?: React.ReactNode;
+  small?: boolean;
 }
 
-const Title = ({ title, subTitle, children, ...rest }: TableTitleProps) => {
+const Title = ({
+  title,
+  subTitle,
+  children,
+  small = false,
+  ...rest
+}: TableTitleProps) => {
   return (
     <Box
       sx={{
@@ -18,8 +25,10 @@ const Title = ({ title, subTitle, children, ...rest }: TableTitleProps) => {
         ...rest,
       }}
     >
-      <Typography variant="h4"> {title} </Typography>
-      {subTitle && <Typography variant="h5">{subTitle} </Typography>}
+      <Typography variant={small ? "body1" : "h4"}> {title} </Typography>
+      {subTitle && (
+        <Typography variant={small ? "h6" : "h5"}>{subTitle} </Typography>
+      )}
       {children}
     </Box>
   );

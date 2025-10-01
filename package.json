@@ -34,6 +34,7 @@
     "react-hook-form": "^7.62.0",
     "react-querybuilder": "^8.8.1",
     "react-syntax-highlighter": "^15.6.1",
+    "uuid": "^13.0.0",
     "yup": "^1.7.0",
     "zustand": "^5.0.6"
   },

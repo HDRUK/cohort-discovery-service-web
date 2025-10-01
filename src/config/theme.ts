@@ -27,6 +27,11 @@ export const themeOptions = {
       fontWeight: 200,
       color: "rgba(0, 0, 0, 0.4)",
     },
+    h6: {
+      fontSize: "14px",
+      fontWeight: 200,
+      color: "rgba(0, 0, 0, 0.4)",
+    },
     body1: {
       fontSize: "18px",
       fontWeight: 400,
