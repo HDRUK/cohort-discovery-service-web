@@ -7,8 +7,8 @@ import { DEFAULT_CODES_PER_PAGE } from "../config/defaults";
 import { getTokenKey } from "@/utils/string";
 
 const getConcepts = async (
-  domain = "Drug",
-  searchTerm = "",
+  searchTerm: string,
+  domain?: string,
   page = 1,
   per_page = DEFAULT_CODES_PER_PAGE
 ): Promise<ApiResponse<Paginated<Partial<Concept>[]>>> => {
@@ -17,9 +17,9 @@ const getConcepts = async (
   const params = new URLSearchParams({
     page: String(page),
     per_page: String(per_page),
-    domain: domain,
     "description[]": searchTerm,
     "concept_id[]": searchTerm,
+    ...(domain ? { domain } : {}),
   });
 
   const url = `${baseUrl}?${params.toString()}`;
