@@ -12,7 +12,7 @@ import {
 import SearchConcepts from "@/components/SearchConcepts";
 import { Concept } from "@/types/api";
 import { useState } from "react";
-import { ConceptChip } from "./ConceptChip";
+import ConceptChip from "@/components/ConceptChip";
 import { RuleLeafType } from "@/types/rules";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";

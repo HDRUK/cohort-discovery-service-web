@@ -2,8 +2,6 @@ import { Concept } from "@/types/api";
 import { Box, Chip, IconButton, Typography } from "@mui/material";
 import { DragIndicator } from "@mui/icons-material";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { v4 as uuidv4 } from "uuid";
-import { useSortable } from "@dnd-kit/sortable";
 
 const ParentWrapper = ({
   active,
