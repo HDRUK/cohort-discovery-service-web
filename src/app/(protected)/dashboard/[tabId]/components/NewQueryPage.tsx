@@ -5,7 +5,7 @@ import { Skeleton } from "@mui/material";
 import { Suspense } from "react";
 import QueryResults from "@/components/QueryResults";
 import Anchor from "@/components/Anchor";
-import GuiCohortBuilder from "./GuiCohortBuilder";
+import CohortBuilder from "./CohortBuilder";
 
 interface PageProps {
   searchParams: Promise<{
@@ -16,7 +16,7 @@ interface PageProps {
 const NewQueryPageContent = async () => {
   return (
     <Suspense fallback={<Skeleton height={400} />}>
-      <GuiCohortBuilder />
+      <CohortBuilder />
     </Suspense>
   );
 };
