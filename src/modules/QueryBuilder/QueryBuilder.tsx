@@ -178,7 +178,7 @@ const QueryBuilder = () => {
       container
       spacing={2}
       sx={{
-        minHeight: "70vh",
+        minHeight: "20vh",
         my: 2,
       }}
     >

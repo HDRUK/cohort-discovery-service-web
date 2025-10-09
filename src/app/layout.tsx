@@ -40,7 +40,7 @@ export default function RootLayout({
               sx={{
                 display: "flex",
                 flexGrow: 1,
-                //overflow: "hidden"
+                overflow: "hidden",
               }}
             >
               {!hideNav && <LeftSidebar />}
@@ -50,7 +50,7 @@ export default function RootLayout({
                   flexGrow: 1,
                   bgcolor: "secondary.main",
                   p: 3,
-                  //overflow: "auto",
+                  overflow: "auto",
                 }}
               >
                 {children}
