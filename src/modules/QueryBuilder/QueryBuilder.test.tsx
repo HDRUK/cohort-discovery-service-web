@@ -2,10 +2,8 @@ import "@testing-library/jest-dom";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import QueryBuilder from "./QueryBuilder";
-import { Field } from "react-querybuilder";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { getQueryJson } from "./__mocks__/getQueryJson";
-import { baseFields } from "../../config/queryFields";
 
 jest.mock("@/store/useDaphneStore", () => ({
   useDaphneStore: jest.fn(),
@@ -31,20 +29,7 @@ describe("QueryBuilder", () => {
       },
     }));
 
-    const fields: Field[] = baseFields.map((field) => {
-      if (field.name === "condition") {
-        return {
-          ...field,
-          values: [
-            { name: "201826", label: "Diabetes" },
-            { name: "12345", label: "MyCondition" },
-          ],
-        };
-      }
-      return field;
-    });
-
-    render(<QueryBuilder fields={fields} />);
+    render(<QueryBuilder />);
 
     const rules = screen.getAllByTestId("rule");
     expect(rules).toHaveLength(2);

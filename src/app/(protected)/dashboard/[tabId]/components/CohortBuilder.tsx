@@ -1,13 +1,13 @@
 "use server";
 
-import { Box, Grid } from "@mui/material";
+import { Box } from "@mui/material";
 import QueryBuilder from "@/modules/QueryBuilder";
 import SubmitQueryButton from "@/components/SubmitQueryButton";
 import CohortQueryInput from "@/components/CohortQueryInput";
 import SelectDatasets from "@/components/SelectDatasets";
 import getCollections from "@/actions/getCollections";
 
-const GuiCohortBuilder = async () => {
+const CohortBuilder = async () => {
   const collections = await getCollections();
 
   const activeCollections = collections.data.filter(
@@ -17,8 +17,8 @@ const GuiCohortBuilder = async () => {
   const initialSelection = activeCollections.map((c) => c.pid);
 
   return (
-    <Box>
-      {/*<CohortQueryTitle />*/}
+    <>
+      {/*<CohortQueryTitle /> note: to be reimplemented*/}
       <CohortQueryInput />
       <Box sx={{ maxWidth: 1000 }}>
         <SelectDatasets
@@ -39,8 +39,8 @@ const GuiCohortBuilder = async () => {
       >
         <SubmitQueryButton />
       </Box>
-    </Box>
+    </>
   );
 };
 
-export default GuiCohortBuilder;
+export default CohortBuilder;
