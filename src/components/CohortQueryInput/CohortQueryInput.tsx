@@ -3,11 +3,7 @@
 import { useForm, Controller } from "react-hook-form";
 import { Box } from "@mui/material";
 import { useDaphneStore } from "@/store/useDaphneStore";
-import { getNaturalLanguage } from "@/utils/queryBuilder";
-import { useEffect, useMemo } from "react";
-import { Field } from "react-querybuilder";
-import { OmopTableName } from "../../types/omop";
-import { Option } from "../../types/api";
+import { useEffect } from "react";
 import SearchBox from "../SearchBox";
 
 type FormValues = {
@@ -15,43 +11,26 @@ type FormValues = {
   queryName: string;
 };
 
-const CohortQueryInput = ({ fields }: { fields: Field[] }) => {
+const CohortQueryInput = () => {
   const {
-    queryBuilder: { setFields, queryBuilderJson, getQueryFromText },
-    omop: { setOmop },
+    queryBuilder: { queryAsText, getQueryFromText },
     stateManagement: { isLoading },
   } = useDaphneStore();
 
-  useEffect(() => {
-    setFields(fields);
-  }, [fields, setFields]);
-
   const { handleSubmit, control, setValue } = useForm<FormValues>({
     defaultValues: {
-      cohortQueryInput: "",
+      cohortQueryInput: queryAsText,
       queryName: "",
     },
   });
-
-  const omop = useMemo(() => {
-    return fields.reduce((acc, item) => {
-      acc[item.name] = item.values;
-      return acc;
-    }, {} as Record<OmopTableName, Option[]>);
-  }, [fields]);
-
-  useEffect(() => {
-    setOmop(omop);
-  }, [setOmop, omop]);
 
   const onSubmit = (data: FormValues) => {
     getQueryFromText(data.cohortQueryInput);
   };
 
   useEffect(() => {
-    const naturalQuery = getNaturalLanguage(queryBuilderJson, fields);
-    setValue("cohortQueryInput", naturalQuery);
-  }, [queryBuilderJson, setValue, fields]);
+    setValue("cohortQueryInput", queryAsText);
+  }, [queryAsText, setValue]);
 
   return (
     <Box

@@ -8,7 +8,6 @@ import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
 import { Grid, Paper } from "@mui/material";
 import dayjs from "dayjs";
 import TaskResults from "@/components/TaskResults";
-import { getNaturalLanguage } from "@/utils/queryBuilder";
 import { Field } from "react-querybuilder";
 import { revalidateAction } from "@/actions/revalidate";
 import { usePaginatedTable } from "../../hooks/usePaginatedTable";

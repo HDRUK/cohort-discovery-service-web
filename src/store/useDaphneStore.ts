@@ -1,6 +1,4 @@
 import { create } from "zustand";
-import type { RuleGroupType, RuleType } from "react-querybuilder";
-import getQueryFromInput from "@/actions/getQueryFromInput";
 import submitQuery from "@/actions/submitQuery";
 import createCollectionHost from "@/actions/createCollectionHost";
 import { revalidateAction } from "@/actions/revalidate";
@@ -17,21 +15,37 @@ import {
   CreateConceptSetPost,
   ConceptSet,
 } from "@/types/api";
-import { DEFAULT_SEXES, OmopTableName } from "@/types/omop";
-import { baseFields } from "@/config/queryFields";
-import { Field, isRuleGroup } from "react-querybuilder";
-import { getNaturalLanguage } from "@/utils/queryBuilder";
 import createCollection from "@/actions/createCollection";
 import createConceptSet from "@/actions/createConceptSet";
 import getConcepts from "@/actions/getConcepts";
 import attachConcepts from "@/actions/attachConcepts";
 import detachConcepts from "@/actions/detachConcepts";
 import deleteConceptSet from "@/actions/deleteConceptSet";
+import { queryToText } from "@/utils/queryBuilder";
 
-type Option = {
-  name: string;
-  label: string;
-};
+import { SizeCache, BoardIndex, RuleGroupType } from "@/types/rules";
+import {
+  buildIndexFromModel,
+  createOperator,
+  createRule,
+  createRuleGroup,
+  updateById,
+  validateRuleTree,
+} from "@/utils/rules";
+import { UniqueIdentifier } from "@dnd-kit/core";
+import { trueKeys } from "@/utils/numbers";
+import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
+
+export const Creators = {
+  RULE: createRule,
+  GROUP: createRuleGroup,
+  OPERATOR: createOperator,
+} as const;
+
+export type CreatorKey = keyof typeof Creators;
+
+const DEFAULT_QUERY: RuleGroupType =
+  process.env.NEXT_PUBLIC_USE_EXAMPLE_QUERY === "true" ? EXAMPLE_1 : NO_QUERY;
 
 export interface DaphneStoreState {
   stateManagement: {
@@ -40,35 +54,31 @@ export interface DaphneStoreState {
     setIsLoading: (state: boolean) => void;
   };
   queryBuilder: {
-    fields: Field[];
-    setFields: (fields: Field[]) => void;
+    queryName: string;
+    setQueryName: (name: string) => void;
     queryBuilderJson: RuleGroupType;
     setQueryBuilderJson: (query: RuleGroupType) => void;
+    boardIndex: BoardIndex;
+    sizeCache: SizeCache;
+    setSizeCache: (
+      id: UniqueIdentifier,
+      width: number | string,
+      height: number | string
+    ) => void;
+    selected: Record<UniqueIdentifier, boolean>;
+    toggleSelected: (id: UniqueIdentifier) => void;
+    createNewNode: (kind: CreatorKey) => void;
+    createNewRule: () => void;
+    createNewGroup: () => void;
+    createNewOperator: () => void;
+    queryAsText: string;
     getQueryFromText: (input: string) => void;
     selectedDatasets: string[];
     setSelectedDatasets: (pids: string[]) => void;
-    queryName: string;
-    setQueryName: (name: string) => void;
-  };
-  omop: {
-    sexes: Option[];
-    setSexes: (sexes: Option[]) => void;
-    conditions: Option[];
-    setConditions: (conditions: Option[]) => void;
-    measurements: Option[];
-    setMeasurements: (measurements: Option[]) => void;
-    drugs: Option[];
-    setDrugs: (drugs: Option[]) => void;
-    observations: Option[];
-    setObservations: (observations: Option[]) => void;
-    procedures: Option[];
-    setProcedures: (procedures: Option[]) => void;
-    setOmop: (data: Record<OmopTableName, Option[]>) => void;
   };
   userData: {
     user: CombinedUser | undefined | null;
     setUser: (user: CombinedUser) => void;
-    signIn: () => Promise<void>;
     queries: Query[];
     setQueries: (queries: Query[]) => void;
     fetchResults: (
@@ -108,74 +118,6 @@ export interface DaphneStoreState {
   };
 }
 
-export const DEFAULT_QUERY: RuleGroupType = {
-  combinator: "and",
-  rules: [
-    { field: "age", operator: ">", value: 60 },
-    { field: "condition", operator: "=", value: "201826" },
-  ],
-};
-
-const NO_QUERY: RuleGroupType = {
-  combinator: "and",
-  rules: [],
-};
-
-function findBestMatch(value: string, options: Option[]): Option | undefined {
-  if (typeof value === "number") return undefined;
-  const lowerValue = value?.toLowerCase();
-  if (!lowerValue) return;
-
-  let bestScore = -Infinity;
-  let bestOption: Option | undefined;
-  if (!options) return;
-  for (const opt of options) {
-    const label = opt.label.toLowerCase();
-
-    let score = 0;
-    if (label === lowerValue) {
-      score = 100; // perfect match
-    } else if (label.includes(lowerValue)) {
-      score = 80 - (label.indexOf(lowerValue) ?? 0);
-    } else {
-      const commonChars = [...lowerValue].filter((char) =>
-        label.includes(char)
-      ).length;
-      score = commonChars;
-    }
-
-    if (score > bestScore) {
-      bestScore = score;
-      bestOption = opt;
-    }
-  }
-
-  return bestOption;
-}
-
-function normaliseQueryValues(
-  query: RuleGroupType | RuleType,
-  dataSources: Record<string, Option[]>
-): RuleGroupType | RuleType {
-  if ("rules" in query) {
-    return {
-      ...query,
-      rules: query.rules.map((rule) => normaliseQueryValues(rule, dataSources)),
-    };
-  } else {
-    const options =
-      dataSources[
-        query.field === "sex" ? `${query.field}es` : `${query.field}s`
-      ];
-
-    const match = query?.value
-      ? findBestMatch(query.value, options)
-      : undefined;
-
-    return match ? { ...query, value: match.name } : query;
-  }
-}
-
 export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
   stateManagement: {
     isLoading: false,
@@ -197,18 +139,77 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
   },
 
   queryBuilder: {
-    fields: baseFields,
-    setFields: (fields) =>
+    queryBuilderJson: validateRuleTree(DEFAULT_QUERY),
+    boardIndex: buildIndexFromModel(DEFAULT_QUERY),
+    sizeCache: {},
+    setSizeCache: (id, width, height) =>
       set((state) => ({
         ...state,
-        queryBuilder: { ...state.queryBuilder, fields },
+        queryBuilder: {
+          ...state.queryBuilder,
+          sizeCache: {
+            ...state.queryBuilder.sizeCache,
+            [id]: { width, height },
+          },
+        },
       })),
-    queryBuilderJson: DEFAULT_QUERY,
-    setQueryBuilderJson: (query) =>
+    selected: {},
+    toggleSelected: (id: UniqueIdentifier) => {
       set((state) => ({
         ...state,
-        queryBuilder: { ...state.queryBuilder, queryBuilderJson: query },
-      })),
+        queryBuilder: {
+          ...state.queryBuilder,
+          selected: {
+            ...state.queryBuilder.selected,
+            [id]: !(state.queryBuilder.selected?.[id] ?? false),
+          },
+        },
+      }));
+    },
+    createNewNode: (kind: CreatorKey) => {
+      const fn = Creators[kind];
+      const { selected, queryBuilderJson, setQueryBuilderJson } =
+        get().queryBuilder;
+
+      const addAfter = trueKeys(selected);
+
+      if (addAfter.length > 0) {
+        let updatedQueryBuilderJson = queryBuilderJson;
+        for (const id of addAfter) {
+          updatedQueryBuilderJson = updateById(
+            updatedQueryBuilderJson,
+            id as string,
+            (node) => node,
+            {
+              node: fn(),
+              position: "after",
+            }
+          );
+        }
+        setQueryBuilderJson(updatedQueryBuilderJson);
+      } else {
+        const updatedQuery = {
+          ...queryBuilderJson,
+          rules: [...queryBuilderJson.rules, fn()],
+        };
+        setQueryBuilderJson(updatedQuery);
+      }
+    },
+    createNewRule: () => get().queryBuilder.createNewNode("RULE"),
+    createNewGroup: () => get().queryBuilder.createNewNode("GROUP"),
+    createNewOperator: () => get().queryBuilder.createNewNode("OPERATOR"),
+    queryAsText: queryToText(DEFAULT_QUERY),
+    setQueryBuilderJson: (query) => {
+      set((state) => ({
+        ...state,
+        queryBuilder: {
+          ...state.queryBuilder,
+          queryBuilderJson: validateRuleTree(query),
+          boardIndex: buildIndexFromModel(query),
+          queryAsText: queryToText(query),
+        },
+      }));
+    },
     queryName: "",
     setQueryName: (name) =>
       set((state) => ({
@@ -227,91 +228,16 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         stateManagement: { ...state.stateManagement, isLoading: true },
       }));
 
-      const rawQuery = await getQueryFromInput(input);
+      // to be reimplemented in a future task..
 
-      const normalised = normaliseQueryValues(rawQuery, {
-        sexes: get().omop.sexes,
-        conditions: get().omop.conditions,
-        measurements: get().omop.measurements,
-        observations: get().omop.observations,
-        drugs: get().omop.drugs,
-        procedures: get().omop.procedures,
-      });
+      console.log(input);
 
-      const finalQueryBuilderJson = isRuleGroup(normalised)
-        ? normalised
-        : {
-            combinator: "and",
-            rules: [normalised],
-          };
-
-      get().queryBuilder.setQueryBuilderJson(finalQueryBuilderJson);
       set((state) => ({
         ...state,
         stateManagement: { ...state.stateManagement, isLoading: false },
       }));
     },
   },
-
-  omop: {
-    sexes: DEFAULT_SEXES,
-    setSexes: (sexes) =>
-      set((state) => ({
-        ...state,
-        omop: { ...state.omop, sexes },
-      })),
-    conditions: [],
-    setConditions: (conditions) =>
-      set((state) => ({
-        ...state,
-        omop: { ...state.omop, conditions },
-      })),
-    measurements: [],
-    setMeasurements: (measurements) =>
-      set((state) => ({
-        ...state,
-        omop: { ...state.omop, measurements },
-      })),
-    drugs: [],
-    setDrugs: (drugs) =>
-      set((state) => ({
-        ...state,
-        omop: { ...state.omop, drugs },
-      })),
-    observations: [],
-    setObservations: (observations) =>
-      set((state) => ({
-        ...state,
-        omop: { ...state.omop, observations },
-      })),
-    procedures: [],
-    setProcedures: (procedures) =>
-      set((state) => ({
-        ...state,
-        omop: { ...state.omop, procedures },
-      })),
-    setOmop: (options) => {
-      if (options?.sex) {
-        get().omop.setSexes(options.sex);
-      }
-      if (options?.condition) {
-        get().omop.setConditions(options.condition);
-      }
-      if (options?.observation) {
-        get().omop.setObservations(options.observation);
-      }
-      if (options?.drug) {
-        get().omop.setDrugs(options.drug);
-      }
-      if (options?.measurement) {
-        get().omop.setMeasurements(options.measurement);
-      }
-      if (options?.procedure) {
-        get().omop.setProcedures(options.procedure);
-      }
-    },
-  },
-
   userData: {
     queries: [],
     setQueries: (queries) =>
@@ -325,10 +251,9 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         stateManagement: { ...state.stateManagement, isLoading: true },
       }));
 
-      const { queryBuilderJson, selectedDatasets, fields } = get().queryBuilder;
-      const queryName = name
-        ? name
-        : getNaturalLanguage(queryBuilderJson, fields);
+      const { queryBuilderJson, queryAsText, selectedDatasets } =
+        get().queryBuilder;
+      const queryName = name ? name : queryAsText;
 
       if (get().queryBuilder.queryName !== queryName) {
         get().queryBuilder.setQueryName(queryName);
@@ -344,7 +269,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         ...state,
         queryBuilder: {
           ...state.queryBuilder,
-          ...(reset ? { queryBuilderJson: NO_QUERY } : {}),
+          ...(reset ? { queryBuilderJson: DEFAULT_QUERY } : {}),
         },
         stateManagement: { ...state.stateManagement, isLoading: false },
       }));
@@ -357,9 +282,6 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         ...state,
         userData: { ...state.userData, collections },
       })),
-    signIn: async () => {
-      //getToken().then((res) => get().userData.setUser({ gateway_user: res }));
-    },
     user: null,
     setUser: (user: CombinedUser) => {
       set((state) => ({ ...state, userData: { ...state.userData, user } }));

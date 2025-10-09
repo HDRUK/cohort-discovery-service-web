@@ -1,6 +1,6 @@
 "use server";
 
-import { RuleGroupType } from "react-querybuilder";
+import { RuleGroupType } from "@/types/rules";
 import { apiPost } from "../lib/apiClient";
 import { API_ROUTES } from "../lib/apiRoutes";
 import { CreateQuery, CreateQueryPost, ApiResponse } from "../types/api";

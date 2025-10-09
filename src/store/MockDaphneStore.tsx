@@ -11,7 +11,7 @@ import type {
   CreateCollectionPost,
   ConceptSet,
 } from "@/types/api";
-import type { RuleGroupType } from "react-querybuilder";
+import { RuleGroupType } from "@/types/rules";
 import { DEFAULT_SEXES } from "@/types/omop";
 import { baseFields } from "@/config/queryFields";
 import getConcepts from "@/actions/__mocks__/getConcepts";
@@ -31,8 +31,6 @@ function makeDefaultStore(): DaphneStoreState {
       clearStates: NOOP,
     },
     queryBuilder: {
-      fields: baseFields,
-      setFields: NOOP,
       queryBuilderJson: { combinator: "and", rules: [] } as RuleGroupType,
       setQueryBuilderJson: NOOP,
       getQueryFromText: NOOP,

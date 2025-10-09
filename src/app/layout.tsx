@@ -23,6 +23,8 @@ export const metadata: Metadata = {
   description: "New cohort discovery tool",
 };
 
+const hideNav = process.env.HIDE_NAV === "true";
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -33,16 +35,22 @@ export default function RootLayout({
           <Box
             sx={{ display: "flex", flexDirection: "column", height: "100vh" }}
           >
-            <HeaderBar />
-            <Box sx={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
-              <LeftSidebar />
+            {!hideNav && <HeaderBar />}
+            <Box
+              sx={{
+                display: "flex",
+                flexGrow: 1,
+                //overflow: "hidden"
+              }}
+            >
+              {!hideNav && <LeftSidebar />}
               <Box
                 component="main"
                 sx={{
                   flexGrow: 1,
                   bgcolor: "secondary.main",
                   p: 3,
-                  overflow: "auto",
+                  //overflow: "auto",
                 }}
               >
                 {children}

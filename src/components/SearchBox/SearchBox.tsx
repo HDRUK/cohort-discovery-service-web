@@ -148,6 +148,7 @@ const SearchBox = ({
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             e.preventDefault();
+            e.stopPropagation();
             if (collapsible) {
               if (expanded) void onSubmit();
               else toggle();
