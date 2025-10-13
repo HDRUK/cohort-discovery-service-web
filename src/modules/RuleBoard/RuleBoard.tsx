@@ -7,13 +7,11 @@ import Rule from "@/modules/Rule";
 import { isOperator, isRuleGroup, isRuleLeaf } from "@/utils/rules";
 import { Box } from "@mui/material";
 import { RuleGroupType, RuleNodeType } from "@/types/rules";
-
 import RuleGroup from "@/modules/RuleGroup";
-
-import RuleOperator from "../RuleOperator";
+import RuleOperator from "@/modules/RuleOperator";
 import { useDroppable } from "@dnd-kit/core";
 import React from "react";
-import DropSpacer from "./DropSpacer";
+import DropSpacer from "@/components/DropSpacer";
 import {
   SortableContext,
   verticalListSortingStrategy,
