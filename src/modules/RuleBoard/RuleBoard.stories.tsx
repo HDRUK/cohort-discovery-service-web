@@ -7,6 +7,7 @@ import {
   RuleGroupType,
   RuleLeafType,
 } from "@/types/rules";
+import { Concept } from "@/types/api";
 
 const mockConcept1: Concept = {
   concept_id: 1234,

@@ -17,7 +17,7 @@ import {
 
 import RuleWrapper from "../RuleWrapper";
 
-interface RuleProps {
+export interface RuleProps {
   rule: RuleLeafType;
   groupId: string;
   sortable?: boolean;
