@@ -34,7 +34,7 @@ import {
 } from "@/utils/rules";
 import { UniqueIdentifier } from "@dnd-kit/core";
 import { trueKeys } from "@/utils/numbers";
-import { EXAMPLE_1, EXAMPLE_2, NO_QUERY } from "@/config/queryExamples";
+import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
 import getQueryFromInput from "@/actions/getQueryFromInput";
 
 export const Creators = {

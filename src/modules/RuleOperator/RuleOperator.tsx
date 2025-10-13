@@ -4,7 +4,6 @@ import { Box, Chip, Divider } from "@mui/material";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import { OperatorType } from "@/types/rules";
 import RuleWrapper from "../RuleWrapper";
-import { useState } from "react";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { removeById } from "@/utils/rules";
 
@@ -24,35 +23,11 @@ const RuleOperator = ({
     queryBuilder: { queryBuilderJson, setQueryBuilderJson },
   } = useDaphneStore();
 
-  const [menuPos, setMenuPos] = useState<{
-    mouseX: number;
-    mouseY: number;
-  } | null>(null);
-
-  const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setMenuPos(
-      menuPos === null
-        ? {
-            mouseX: event.clientX + 2,
-            mouseY: event.clientY - 6,
-          }
-        : null
-    );
-  };
-
-  const handleClose = () => {
-    setMenuPos(null);
-  };
-
   const handleDeleteRule = () => {
     setQueryBuilderJson(removeById(queryBuilderJson, id));
-    handleClose();
   };
 
   const actions = [{ action: handleDeleteRule, label: "Delete" }];
-
   return (
     <RuleWrapper
       hideHeader
@@ -80,8 +55,6 @@ const RuleOperator = ({
             alignItems: "center",
             justifyContent: "center",
           }}
-          onContextMenu={handleContextMenu}
-          onClick={(e) => e.stopPropagation()}
         >
           <Divider
             orientation="vertical"
@@ -109,7 +82,7 @@ const RuleOperator = ({
               boxShadow: theme.shadows[2],
               zIndex: 1, // keep above the divider
             })}
-            label={combinator?.toUpperCase()}
+            label={combinator?.toUpperCase().replace("_", " ")}
           />
 
           {valid ? (
