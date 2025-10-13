@@ -136,6 +136,7 @@ const RuleWrapper = ({
           />
         ) : (
           <Card
+            data-testid="clickable-card"
             ref={anchorRef}
             key={id}
             sx={{

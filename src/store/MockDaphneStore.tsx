@@ -18,6 +18,7 @@ import { EXAMPLE_1 } from "@/config/queryExamples";
 import type { BoardIndex, SizeCache } from "@/types/rules";
 import type { UniqueIdentifier } from "@dnd-kit/core";
 import getConcepts from "@/actions/__mocks__/getConcepts";
+import { validateRuleTree } from "@/utils/rules";
 
 type SliceOverrides = {
   [K in keyof DaphneStoreState]?: Partial<DaphneStoreState[K]>;
@@ -35,8 +36,7 @@ function makeDefaultStore(): DaphneStoreState {
     },
 
     queryBuilder: {
-      // minimal-but-valid defaults
-      queryBuilderJson: EXAMPLE_1,
+      queryBuilderJson: validateRuleTree(EXAMPLE_1),
       boardIndex: {} as BoardIndex,
       sizeCache: {} as SizeCache,
       setSizeCache: (

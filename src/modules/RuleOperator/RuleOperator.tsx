@@ -7,7 +7,7 @@ import RuleWrapper from "../RuleWrapper";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { removeById } from "@/utils/rules";
 
-interface RuleOperatorProps {
+export interface RuleOperatorProps {
   operator: OperatorType;
   groupId: string;
   hidden?: boolean;
