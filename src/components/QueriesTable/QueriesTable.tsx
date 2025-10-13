@@ -8,7 +8,6 @@ import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
 import { Grid, Paper } from "@mui/material";
 import dayjs from "dayjs";
 import TaskResults from "@/components/TaskResults";
-import { Field } from "react-querybuilder";
 import { revalidateAction } from "@/actions/revalidate";
 import { usePaginatedTable } from "../../hooks/usePaginatedTable";
 import { useRouter } from "next/navigation";
@@ -24,7 +23,6 @@ const QueriesTable = ({
 }: {
   queries: Paginated<Query[]>;
   hasIncomplete: boolean;
-  fields: Field[];
 }) => {
   const router = useRouter();
   const {
@@ -174,7 +172,7 @@ const QueriesTable = ({
                 margin: 0,
               }}
             >
-              {getNaturalLanguage(row.original.definition, fields)}
+              {/* to be implemetned */}
             </pre>
           </Paper>
         </Grid>

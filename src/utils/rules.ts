@@ -217,7 +217,7 @@ export const insertIntoGroup = <T extends RuleNodeType>(
   });
 };
 
-export function moveItemInModel(
+export function moveItemIntoGroup(
   root: RuleGroupType,
   itemId: string,
   to: string,
@@ -282,15 +282,15 @@ export const removeById = <T extends RuleNodeType>(root: T, id: string): T =>
   removeByIdWithNode(root, id).root;
 
 export const buildIndexFromModel = (root: RuleGroupType): BoardIndex => {
-  const itemsByContainer: Record<string, string[]> = { [root.id]: [] };
+  const itemsByGroup: Record<string, string[]> = { [root.id]: [] };
   const containers: string[] = [root.id];
 
   const visit = (container: string, group: RuleNodeType) => {
     if (!isRuleGroup(group)) return;
-    itemsByContainer[container] ??= [];
+    itemsByGroup[container] ??= [];
     for (const entry of group.rules) {
       const id = entry.id;
-      itemsByContainer[container].push(id);
+      itemsByGroup[container].push(id);
       if (isRuleGroup(entry)) {
         const gid = entry.id;
         containers.push(gid);
@@ -300,7 +300,7 @@ export const buildIndexFromModel = (root: RuleGroupType): BoardIndex => {
   };
 
   visit(root.id, root);
-  return { containers, itemsByContainer };
+  return { containers, itemsByGroup };
 };
 
 export function validateRuleTree(root: RuleGroupType): RuleGroupType {
@@ -324,10 +324,13 @@ export function validateRuleTree(root: RuleGroupType): RuleGroupType {
       ? n.valid
       : (n as OperatorType).valid) !== false;
 
-  const validateGroup = (group: RuleGroupType): RuleGroupType => {
+  const validateGroup = (
+    group: RuleGroupType,
+    minChildren = 1
+  ): RuleGroupType => {
     const children = group.rules.map((child) => {
       if (isRuleGroup(child)) {
-        return validateGroup(child);
+        return validateGroup(child, 2);
       }
       if (isRuleLeaf(child)) {
         const empty = isEmptyRule(child);
@@ -376,9 +379,8 @@ export function validateRuleTree(root: RuleGroupType): RuleGroupType {
         }
       }
     }
-
-    // Group is valid only if all immediate children are valid
-    const groupIsValid = children.every((c) => getValid(c));
+    const groupIsValid =
+      children.length >= minChildren && children.every((c) => getValid(c));
 
     return { ...withValidTrue(group), rules: children, valid: groupIsValid };
   };

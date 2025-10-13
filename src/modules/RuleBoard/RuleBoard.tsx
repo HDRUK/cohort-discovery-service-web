@@ -5,41 +5,40 @@ import { RuleBoardSkeleton } from "./RuleBoardSkeleton";
 
 import Rule from "@/modules/Rule";
 import { isOperator, isRuleGroup, isRuleLeaf } from "@/utils/rules";
-import { Alert, Box } from "@mui/material";
+import { Box } from "@mui/material";
 import { RuleGroupType, RuleNodeType } from "@/types/rules";
 
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
 import RuleGroup from "@/modules/RuleGroup";
-import { useDaphneStore } from "@/store/useDaphneStore";
+
 import RuleOperator from "../RuleOperator";
 import { useDroppable } from "@dnd-kit/core";
 import React from "react";
 import DropSpacer from "./DropSpacer";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 
 interface RuleBoardProps {
   ruleGroup: RuleGroupType;
 }
 
-function renderRule(item: RuleNodeType) {
+function renderRule(item: RuleNodeType, ruleGroupId: string) {
   if (isRuleLeaf(item)) {
-    return <Rule sortable key={item.id} rule={item} />;
+    return <Rule key={item.id} rule={item} groupId={ruleGroupId} />;
   } else if (isRuleGroup(item)) {
-    return <RuleGroup sortable key={item.id} group={item} />;
+    return <RuleGroup key={item.id} group={item} parentGroupId={ruleGroupId} />;
   } else if (isOperator(item)) {
-    return <RuleOperator key={item.id} operator={item} />;
+    return <RuleOperator key={item.id} operator={item} groupId={ruleGroupId} />;
   }
 }
 
 const RuleBoard = ({ ruleGroup }: RuleBoardProps) => {
   const { rules } = useMemo(() => ruleGroup, [ruleGroup]);
-  const { setNodeRef } = useDroppable({ id: ruleGroup.id });
-
-  const {
-    queryBuilder: { boardIndex },
-  } = useDaphneStore();
+  const { setNodeRef } = useDroppable({
+    id: ruleGroup.id,
+    data: { type: "container", containerId: ruleGroup.id },
+  });
 
   const [hasMounted, setHasMounted] = useState(false);
 
@@ -47,30 +46,36 @@ const RuleBoard = ({ ruleGroup }: RuleBoardProps) => {
     setHasMounted(true);
   }, []);
 
-  const ids = useMemo(() => {
-    const list = boardIndex.itemsByContainer[ruleGroup.id] ?? [];
-    return list.includes(ruleGroup.id) ? list : [...list, ruleGroup.id];
-  }, [boardIndex, ruleGroup.id]);
-
   if (!hasMounted) {
     return <RuleBoardSkeleton />;
   }
 
-  if (!ids || ids.length === 0) {
-    return <Alert color="error"> Something wrong </Alert>;
-  }
-
   return (
     <div ref={setNodeRef}>
-      <SortableContext items={ids} strategy={verticalListSortingStrategy}>
-        <Box display="flex" flexDirection="column" gap={0}>
-          <DropSpacer id={`${ruleGroup.id}::top`} />
+      <Box display="flex" flexDirection="column" gap={0}>
+        <DropSpacer
+          id={`${ruleGroup.id}::top`}
+          position="top"
+          groupId={ruleGroup.id}
+        />
+        <SortableContext
+          items={rules.map((r) => r.id)}
+          strategy={verticalListSortingStrategy}
+        >
           {rules.map((rule) => {
-            return <Fragment key={rule.id}>{renderRule(rule)}</Fragment>;
+            return (
+              <Fragment key={rule.id}>
+                {renderRule(rule, ruleGroup.id)}
+              </Fragment>
+            );
           })}
-          <DropSpacer id={`${ruleGroup.id}::bottom`} />
-        </Box>
-      </SortableContext>
+        </SortableContext>
+        <DropSpacer
+          id={`${ruleGroup.id}::bottom`}
+          position="bottom"
+          groupId={ruleGroup.id}
+        />
+      </Box>
     </div>
   );
 };

@@ -1,14 +1,23 @@
 import { ConceptOperator, RuleGroupType, RuleNodeType } from "@/types/rules";
-import { isRuleGroup, isRuleLeaf, isSingleConcept } from "@/utils/rules";
+import {
+  isOperator,
+  isRuleGroup,
+  isRuleLeaf,
+  isSingleConcept,
+} from "@/utils/rules";
+
+type Piece = { verb?: string | null; text: string };
 
 const queryToText = (node: RuleGroupType) => {
   const subject = "People who";
+
   const getVerb = (category: string): string => {
     switch (category) {
       case "Drug":
         return "received";
       case "Observation":
         return "observed with";
+      case "Measurement":
       case "Measured":
         return "measured with";
       case "Condition":
@@ -19,17 +28,31 @@ const queryToText = (node: RuleGroupType) => {
   };
 
   const cleanDescription = (s: string) => {
-    // to be implemented
-    // - some of the concepts have very long names
-    //   which could be reduced here
-    return s;
+    if (!s) return s;
+
+    let out = s.trim();
+
+    // Normalize COVID phrasing
+    out = out.replace(/SARS[-–—]CoV[-–—]?2\s*\(COVID[-–—]?19\)/gi, "COVID-19");
+    //out = out.replace(/SARS[-–—]CoV[-–—]?2/gi, "COVID-19");
+
+    // Shorten common vaccine suffixes
+    out = out.replace(/\s*-\s*COVID-19\s*vaccine\b/gi, " COVID-19 vaccine");
+    out = out.replace(/\s*vaccine(?:\s+AZD\d+)?\b/gi, " vaccine");
+
+    // Tidy punctuation/spacing
+    out = out.replace(/\bperson\/patient\b/gi, "person");
+    out = out.replace(/\s*\(\s*\)/g, "");
+
+    return out.trim();
   };
 
-  const leafText = (rule: ConceptOperator) => {
+  const leafText = (
+    rule: ConceptOperator
+  ): { verb: string | null; text: string | null } => {
     const c = rule.concept;
-    if (!c) {
-      return { verb: null, text: null };
-    }
+    if (!c) return { verb: null, text: null };
+
     if (isSingleConcept(c)) {
       const verb = getVerb(c.category);
       const desc = cleanDescription(c.description);
@@ -44,73 +67,98 @@ const queryToText = (node: RuleGroupType) => {
       const verb = getVerb(c[0].category);
       return { verb, text: texts };
     }
+
     return { verb: null, text: null };
   };
 
-  const render = (
-    n: RuleNodeType,
-    parentComb: string | null = null
-  ): { verb?: string; text: string; comb: string }[] => {
+  const render = (n: RuleNodeType, isTopLevel = false): Piece[] => {
+    if (isOperator(n)) {
+      const text = (n.combinator || "").toLowerCase() === "or" ? "or" : "and";
+      return [{ text }];
+    }
+
     if (isRuleLeaf(n)) {
       const { verb, text } = leafText(n.rule);
       if (!text) return [];
       let phrase = verb ? `${verb} ${text}` : text;
       if (n.exclude) phrase = `not (${phrase})`;
-      return [{ verb, text: phrase, comb: n.combinator }];
+      return [{ verb: verb ?? null, text: phrase }];
     }
 
     if (isRuleGroup(n)) {
-      const comb = n.combinator;
-      const parts = n.rules
-        .flatMap((child) => render(child, child.combinator))
-        .filter((x) => !!x);
+      const rawParts: Piece[] = (n.rules || [])
+        .flatMap((child) => render(child))
+        .filter((x): x is Piece => Boolean(x && x.text));
 
-      const grouped = [];
-      let currentVerb = null;
-      let currentTexts: string[] = [];
+      if (rawParts.length === 0) return [];
 
-      for (const p of parts) {
-        const sameVerb = (p.verb || "") === (currentVerb || "");
+      const stripLeadingVerb = (verb: string, phrase: string) => {
+        const re = new RegExp(`^${verb}\\s+`, "i");
+        return phrase.replace(re, "");
+      };
 
-        const stripped = p.verb
-          ? p.text.replace(new RegExp(`^${p.verb}\\s+`, "i"), "")
-          : p.text;
+      const merged: string[] = [];
+      let i = 0;
+      let hasAnd = false;
+      let hasOr = false;
 
-        if (sameVerb && currentTexts.length) {
-          currentTexts.push(stripped);
-        } else {
-          if (currentTexts.length) {
-            grouped.push({
-              verb: currentVerb || undefined,
-              text: currentTexts.join(` ${p.comb} `),
-            });
-          }
-          currentVerb = p.verb || undefined;
-          currentTexts = [stripped];
+      while (i < rawParts.length) {
+        const curr = rawParts[i];
+
+        if (curr.text === "and" || curr.text === "or") {
+          merged.push(curr.text);
+          if (curr.text === "and") hasAnd = true;
+          else hasOr = true;
+          i += 1;
+          continue;
         }
+
+        if (curr.verb) {
+          const verb = curr.verb;
+          const items: string[] = [stripLeadingVerb(verb, curr.text)];
+          let joiner: "and" | "or" | null = null;
+          let j = i + 1;
+
+          while (
+            j + 1 < rawParts.length &&
+            (rawParts[j].text === "and" || rawParts[j].text === "or") &&
+            rawParts[j + 1].verb === verb
+          ) {
+            const op = rawParts[j].text as "and" | "or";
+            if (joiner && joiner !== op) break;
+            joiner = op;
+            items.push(stripLeadingVerb(verb, rawParts[j + 1].text));
+            j += 2;
+          }
+
+          const connector = joiner || "and";
+          if (items.length === 1) {
+            merged.push(`${verb} ${items[0]}`);
+          } else {
+            merged.push(`${verb} ${items.join(` ${connector} `)}`);
+            if (connector === "and") hasAnd = true;
+            else hasOr = true;
+          }
+
+          i = j;
+          continue;
+        }
+
+        merged.push(curr.text);
+        i += 1;
       }
 
-      if (currentTexts.length) {
-        grouped.push({
-          verb: currentVerb || undefined,
-          text: currentTexts.join(` ${comb} `),
-        });
-      }
+      let combined = merged.join(" ").replace(/\s+/g, " ").trim();
+      const needsParens = hasAnd && hasOr;
+      if (needsParens && !isTopLevel) combined = `(${combined})`;
 
-      let combined = grouped
-        .map((g) => (g.verb ? `${g.verb} ${g.text}` : g.text))
-        .join(` ${comb} `);
-
-      if (n.exclude) combined = `not (${combined})`;
-      if (parentComb && parentComb !== comb) combined = `(${combined})`;
-
-      return [{ text: combined, comb }];
+      return [{ text: combined }];
     }
 
     return [];
   };
 
-  const body = render(node)
+  const body = render(node, true)
     .map((p) => p.text)
     .join(" ")
     .replace(/\s+/g, " ")

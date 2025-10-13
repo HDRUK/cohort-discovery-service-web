@@ -4,15 +4,28 @@ import { Box } from "@mui/material";
 
 import { useDroppable } from "@dnd-kit/core";
 import React from "react";
+import { v4 as uuidv4 } from "uuid";
 
 const DropSpacer = ({
   id,
+  groupId,
+  position,
   isVisible = false,
 }: {
   id: string;
+  groupId: string;
+  position: "top" | "bottom";
   isVisible?: boolean;
 }) => {
-  const { setNodeRef, isOver } = useDroppable({ id });
+  const { setNodeRef, isOver } = useDroppable({
+    id,
+    data: {
+      id,
+      type: "Spacer",
+      position,
+      groupId,
+    },
+  });
   return (
     <Box
       ref={setNodeRef}

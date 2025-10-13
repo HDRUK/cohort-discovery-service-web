@@ -1,7 +1,10 @@
 import * as React from "react";
 import { CSS } from "@dnd-kit/utilities";
 import { type UniqueIdentifier } from "@dnd-kit/core";
-import { useSortable as useDndSortable } from "@dnd-kit/sortable";
+import {
+  useSortable as useDndSortable,
+  UseSortableArguments,
+} from "@dnd-kit/sortable";
 import { useState, useEffect } from "react";
 import { useElementSize } from "./useElementSize";
 
@@ -13,8 +16,8 @@ export interface UseSortablePlusReturn
   anchorSize: { width: number | string; height: number | string };
 }
 
-const useSortable = (id: UniqueIdentifier): UseSortablePlusReturn => {
-  const params = useDndSortable({ id });
+const useSortable = (args: UseSortableArguments): UseSortablePlusReturn => {
+  const params = useDndSortable(args);
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(params.transform),
@@ -34,7 +37,7 @@ const useSortable = (id: UniqueIdentifier): UseSortablePlusReturn => {
     return () => clearTimeout(timeout);
   }, [params.newIndex, params.items]);
 
-  const [anchorRef, anchorSize] = useElementSize<HTMLDivElement>(id);
+  const [anchorRef, anchorSize] = useElementSize<HTMLDivElement>(args.id);
 
   return {
     ...params,

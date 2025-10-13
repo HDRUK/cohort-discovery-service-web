@@ -34,7 +34,8 @@ import {
 } from "@/utils/rules";
 import { UniqueIdentifier } from "@dnd-kit/core";
 import { trueKeys } from "@/utils/numbers";
-import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
+import { EXAMPLE_1, EXAMPLE_2, NO_QUERY } from "@/config/queryExamples";
+import getQueryFromInput from "@/actions/getQueryFromInput";
 
 export const Creators = {
   RULE: createRule,
@@ -231,6 +232,8 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       // to be reimplemented in a future task..
 
       console.log(input);
+      const newQuery = await getQueryFromInput(input);
+      console.log(newQuery);
 
       set((state) => ({
         ...state,
@@ -251,9 +254,8 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         stateManagement: { ...state.stateManagement, isLoading: true },
       }));
 
-      const { queryBuilderJson, queryAsText, selectedDatasets } =
-        get().queryBuilder;
-      const queryName = name ? name : queryAsText;
+      const { queryBuilderJson, selectedDatasets } = get().queryBuilder;
+      const queryName = name ? name : queryBuilderJson.id;
 
       if (get().queryBuilder.queryName !== queryName) {
         get().queryBuilder.setQueryName(queryName);

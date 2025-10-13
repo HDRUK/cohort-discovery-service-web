@@ -1,7 +1,7 @@
 "use client";
 import { useDaphneStore } from "@/store/useDaphneStore";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useMemo, useEffect } from "react";
 import { Grid } from "@mui/material";
 import SwimLane from "@/components/SwimLane";
 import ActionMenu from "../ActionMenu";
@@ -17,6 +17,8 @@ import {
   DragOverEvent,
   DragStartEvent,
   closestCorners,
+  Active,
+  MeasuringStrategy,
 } from "@dnd-kit/core";
 
 import {
@@ -28,26 +30,7 @@ import RuleBoard from "@/modules/RuleBoard";
 import DragOverlay from "@/components/DragOverlay";
 
 import { RuleNodeType } from "@/types/rules";
-import { findById, moveItemInModel } from "@/utils/rules";
-
-const TOP_SUFFIX = "::top" as const;
-const BOTTOM_SUFFIX = "::bottom" as const;
-
-type EdgeZone = "top" | "bottom" | null;
-
-const parseOverId = (
-  id: unknown
-): { baseId: string | null; zone: EdgeZone } => {
-  if (typeof id !== "string") return { baseId: null, zone: null };
-
-  if (id.endsWith(TOP_SUFFIX)) {
-    return { baseId: id.slice(0, -TOP_SUFFIX.length), zone: "top" };
-  }
-  if (id.endsWith(BOTTOM_SUFFIX)) {
-    return { baseId: id.slice(0, -BOTTOM_SUFFIX.length), zone: "bottom" };
-  }
-  return { baseId: id, zone: null };
-};
+import { findById, moveItemIntoGroup } from "@/utils/rules";
 
 const QueryBuilder = () => {
   const {
@@ -59,37 +42,12 @@ const QueryBuilder = () => {
     useSensor(KeyboardSensor)
   );
 
-  const findContainer = useCallback(
-    (id: string | string | null): string | null => {
-      if (!id) return null;
-      if (boardIndex.containers.includes(id as string)) return id as string;
-      return (
-        (Object.keys(boardIndex.itemsByContainer) as string[]).find((c) =>
-          boardIndex.itemsByContainer[c].includes(id as string)
-        ) ?? null
-      );
-    },
-    [boardIndex]
-  );
-
-  const hoverTimerRef = useRef<number | null>(null);
-  const hoverTargetRef = useRef<string | null>(null);
-  const [activeId, setActiveId] = useState<string | null>(null);
-
+  const [active, setActive] = useState<Active | null>(null);
   const [activeNode, setActiveNode] = useState<RuleNodeType | null>(null);
 
-  const clearHoverTimer = () => {
-    if (hoverTimerRef.current) {
-      window.clearTimeout(hoverTimerRef.current);
-      hoverTimerRef.current = null;
-    }
-    hoverTargetRef.current = null;
-  };
-
-  const lastOverContainerRef = useRef<string | null>(null);
-
   const onDragStart = (e: DragStartEvent) => {
-    setActiveId(e.active.id as string);
+    setActive(e.active);
+
     const node = findById(queryBuilderJson, e.active.id as string);
     if (node) {
       setActiveNode(node);
@@ -101,76 +59,74 @@ const QueryBuilder = () => {
       const { over } = e;
 
       if (!over) {
-        clearHoverTimer();
         return;
       }
 
-      const { baseId: overId, zone } = parseOverId(over.id as string);
-      const activeContainer = findContainer(activeId);
-      const overContainer = findContainer(overId);
+      if (!active) return;
 
-      if (!activeContainer || !overContainer) return;
-      if (overContainer === activeContainer && !zone) return;
+      const activeData = active.data.current;
+      const overData = over.data.current;
 
-      if (lastOverContainerRef.current === overContainer) return;
-      lastOverContainerRef.current = overContainer;
+      const activeGroupId = activeData?.groupId;
+      const overGroupId = overData?.groupId;
 
-      const containerItems = boardIndex.itemsByContainer[overContainer] ?? [];
-      let targetIndex = containerItems.length;
+      if (!overGroupId || !activeGroupId) return;
 
-      if (zone) {
-        targetIndex = zone === "top" ? 0 : containerItems.length;
+      if (activeData.id === overData.id) return;
+
+      const groupItems = boardIndex.itemsByGroup[overGroupId] ?? [];
+      let targetIndex = groupItems.length;
+      if (overData.type === "Spacer" && overData.position === "top") {
+        targetIndex = 0;
       }
 
       setQueryBuilderJson(
-        moveItemInModel(
+        moveItemIntoGroup(
           queryBuilderJson,
-          activeId as string,
-          overContainer,
+          activeData.id,
+          overGroupId,
           targetIndex
         )
       );
     },
-    [activeId, queryBuilderJson, boardIndex, setQueryBuilderJson, findContainer]
+    [active, queryBuilderJson, boardIndex, setQueryBuilderJson]
   );
 
   const onDragEnd = useCallback(
     (e: DragEndEvent) => {
-      setActiveNode(null);
-      clearHoverTimer();
       const { over } = e;
-      if (!over) {
-        setActiveId(null);
+
+      if (!over || !active) {
+        setActiveNode(null);
+        setActive(null);
         return;
       }
 
-      const activeContainer = findContainer(activeId as string);
-      const overContainer = findContainer(over.id as string);
-      if (!activeContainer || !overContainer) {
-        setActiveId(null);
-        return;
-      }
+      const activeData = active.data.current;
+      const overData = over.data.current;
 
-      const overItems = boardIndex.itemsByContainer[overContainer];
-      const overIndex = overItems.indexOf(over.id as string);
+      const activeGroupId = activeData?.groupId;
+      const overGroupId = overData?.groupId;
+
+      if (!overGroupId || !activeGroupId) return;
+
+      const groupItems = boardIndex.itemsByGroup[overGroupId] ?? [];
+      const overIndex = groupItems.indexOf(overData.id);
       const targetIndex = overIndex >= 0 ? overIndex : "end";
 
-      if (!activeContainer || !overContainer) {
-        return;
-      }
-
       setQueryBuilderJson(
-        moveItemInModel(
+        moveItemIntoGroup(
           queryBuilderJson,
-          activeId as string,
-          overContainer,
+          activeData.id,
+          overGroupId,
           targetIndex
         )
       );
 
-      setActiveId(null);
+      setActiveNode(null);
+      setActive(null);
     },
-    [activeId, queryBuilderJson, boardIndex, setQueryBuilderJson, findContainer]
+    [active, queryBuilderJson, boardIndex, setQueryBuilderJson]
   );
 
   return (
@@ -209,6 +165,7 @@ const QueryBuilder = () => {
             onDragEnd={onDragEnd}
             modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
             collisionDetection={closestCorners}
+            measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
           >
             <RuleBoard ruleGroup={queryBuilderJson} />
             <DragOverlay node={activeNode} />

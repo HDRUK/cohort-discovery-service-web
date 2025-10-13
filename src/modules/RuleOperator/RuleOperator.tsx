@@ -4,81 +4,122 @@ import { Box, Chip, Divider } from "@mui/material";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import { OperatorType } from "@/types/rules";
 import RuleWrapper from "../RuleWrapper";
+import { useState } from "react";
+import { useDaphneStore } from "@/store/useDaphneStore";
+import { removeById } from "@/utils/rules";
 
 interface RuleOperatorProps {
   operator: OperatorType;
-  sortable?: boolean;
+  groupId: string;
   hidden?: boolean;
 }
 
 const RuleOperator = ({
   operator,
-  sortable = true,
+  groupId,
   hidden = false,
 }: RuleOperatorProps) => {
   const { id, combinator, valid = true } = operator;
+  const {
+    queryBuilder: { queryBuilderJson, setQueryBuilderJson },
+  } = useDaphneStore();
+
+  const [menuPos, setMenuPos] = useState<{
+    mouseX: number;
+    mouseY: number;
+  } | null>(null);
+
+  const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setMenuPos(
+      menuPos === null
+        ? {
+            mouseX: event.clientX + 2,
+            mouseY: event.clientY - 6,
+          }
+        : null
+    );
+  };
+
+  const handleClose = () => {
+    setMenuPos(null);
+  };
+
+  const handleDeleteRule = () => {
+    setQueryBuilderJson(removeById(queryBuilderJson, id));
+    handleClose();
+  };
+
+  const actions = [{ action: handleDeleteRule, label: "Delete" }];
 
   return (
     <RuleWrapper
+      hideHeader
+      cardProps={{
+        sx: {
+          border: 0,
+          mx: "auto",
+          width: "fit-content",
+          pt: 1,
+          minWidth: 80,
+          bgcolor: "transparent",
+        },
+      }}
       id={id}
-      sortable={sortable}
-      render={(ref) => (
+      type={"Operator"}
+      groupId={groupId}
+      sortable={true}
+      render={() => (
         <Box
-          ref={ref}
           sx={{
-            mx: "auto",
-            width: "fit-content",
-            pt: 1,
-            minWidth: 80,
+            minHeight: 80,
+            position: "relative",
+            display: hidden ? "none" : "grid",
+            gridTemplateColumns: "1fr 2fr 1fr",
+            alignItems: "center",
+            justifyContent: "center",
           }}
+          onContextMenu={handleContextMenu}
+          onClick={(e) => e.stopPropagation()}
         >
-          <Box
-            sx={{
-              minHeight: 80,
+          <Divider
+            orientation="vertical"
+            flexItem
+            sx={(theme) => ({
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              left: "50%",
+              transform: "translateX(-50%)",
+              borderLeftWidth: 2,
+              zIndex: 0,
+              borderColor: valid
+                ? theme.palette.divider
+                : theme.palette.warning.main,
+            })}
+          />
+
+          <Box />
+
+          <Chip
+            sx={(theme) => ({
               position: "relative",
-              display: hidden ? "none" : "grid",
-              gridTemplateColumns: "1fr 2fr 1fr",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Divider
-              orientation="vertical"
-              flexItem
-              sx={(theme) => ({
-                position: "absolute",
-                top: 0,
-                bottom: 0,
-                left: "50%",
-                transform: "translateX(-50%)",
-                borderLeftWidth: 2,
-                zIndex: 0,
-                borderColor: valid
-                  ? theme.palette.divider
-                  : theme.palette.warning.main,
-              })}
-            />
+              bgcolor: "white",
+              boxShadow: theme.shadows[2],
+              zIndex: 1, // keep above the divider
+            })}
+            label={combinator?.toUpperCase()}
+          />
 
+          {valid ? (
             <Box />
-
-            <Chip
-              sx={(theme) => ({
-                position: "relative",
-                bgcolor: "white",
-                boxShadow: theme.shadows[2],
-                zIndex: 1, // keep above the divider
-              })}
-              label={combinator?.toUpperCase()}
-            />
-
-            {valid ? (
-              <Box />
-            ) : (
-              <WarningAmberIcon fontSize="small" color="warning" />
-            )}
-          </Box>
+          ) : (
+            <WarningAmberIcon fontSize="small" color="warning" />
+          )}
         </Box>
       )}
+      actions={actions}
     />
   );
 };

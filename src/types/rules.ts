@@ -39,7 +39,7 @@ export type RuleNodeType = RuleGroupType | RuleLeafType | OperatorType;
 
 export interface BoardIndex {
   containers: string[];
-  itemsByContainer: Record<string, string[]>;
+  itemsByGroup: Record<string, string[]>;
 }
 
 export type SizeCache = Record<
