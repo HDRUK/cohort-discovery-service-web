@@ -11,13 +11,13 @@ import {
 import RuleBoard from "../RuleBoard";
 import RuleWrapper from "../RuleWrapper";
 
-interface RuleProps {
+export interface RuleGroupProps {
   group: RuleGroupType;
   parentGroupId: string;
   showConnector?: boolean;
 }
 
-const RuleGroup = ({ group, parentGroupId }: RuleProps) => {
+const RuleGroup = ({ group, parentGroupId }: RuleGroupProps) => {
   const { id, rules, exclude, valid = true } = group;
   const {
     queryBuilder: { queryBuilderJson, setQueryBuilderJson },
