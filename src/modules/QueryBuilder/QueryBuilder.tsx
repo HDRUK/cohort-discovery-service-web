@@ -61,7 +61,7 @@ const QueryBuilder = () => {
       if (!over) {
         return;
       }
-      return;
+
       if (!active) return;
 
       const activeData = active.data.current;

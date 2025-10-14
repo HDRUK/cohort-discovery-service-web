@@ -2,14 +2,14 @@ const formatNumber = (num: number) => {
   return new Intl.NumberFormat("en-UK").format(num);
 };
 
-const trueKeys = <K extends string | number>(obj: Record<K, boolean>): K[] => {
-  return (Object.entries(obj) as [K, boolean][])
+const trueKeys = <T extends string | number>(obj: Record<T, boolean>): T[] => {
+  return (Object.entries(obj) as [T, boolean][])
     .filter(([, value]) => value)
     .map(([key]) => key);
 };
 
-const falseKeys = <K extends string | number>(obj: Record<K, boolean>): K[] => {
-  return (Object.entries(obj) as [K, boolean][])
+const falseKeys = <T extends string | number>(obj: Record<T, boolean>): T[] => {
+  return (Object.entries(obj) as [T, boolean][])
     .filter(([, value]) => !value)
     .map(([key]) => key);
 };

@@ -6,6 +6,7 @@ import {
 } from "@dnd-kit/sortable";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useElementSize } from "./useElementSize";
+import { quantise } from "@/utils/numbers";
 
 export interface UseSortablePlusReturn
   extends ReturnType<typeof useDndSortable> {
