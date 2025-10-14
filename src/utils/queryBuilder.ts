@@ -34,7 +34,6 @@ const queryToText = (node: RuleGroupType) => {
 
     // Normalize COVID phrasing
     out = out.replace(/SARS[-–—]CoV[-–—]?2\s*\(COVID[-–—]?19\)/gi, "COVID-19");
-    //out = out.replace(/SARS[-–—]CoV[-–—]?2/gi, "COVID-19");
 
     // Shorten common vaccine suffixes
     out = out.replace(/\s*-\s*COVID-19\s*vaccine\b/gi, " COVID-19 vaccine");
