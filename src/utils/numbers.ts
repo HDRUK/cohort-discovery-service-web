@@ -13,4 +13,8 @@ const falseKeys = <K extends string | number>(obj: Record<K, boolean>): K[] => {
     .filter(([, value]) => !value)
     .map(([key]) => key);
 };
-export { formatNumber, trueKeys, falseKeys };
+
+const quantise = (n: number, step = 0.1) => {
+  return Math.round(n / step) * step;
+};
+export { quantise, formatNumber, trueKeys, falseKeys };

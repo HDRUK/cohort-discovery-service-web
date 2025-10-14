@@ -8,6 +8,10 @@ import {
   RuleLeafType,
 } from "@/types/rules";
 import { Concept } from "@/types/api";
+import {
+  restrictToWindowEdges,
+  restrictToVerticalAxis,
+} from "@dnd-kit/modifiers";
 
 const mockConcept1: Concept = {
   concept_id: 1234,
@@ -59,7 +63,7 @@ const meta: Meta<typeof RuleBoard> = {
   decorators: [
     (Story) => (
       <div style={{ maxWidth: 600, margin: "0 auto", padding: "1rem" }}>
-        <DndContext>
+        <DndContext modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}>
           <Story />
         </DndContext>
       </div>

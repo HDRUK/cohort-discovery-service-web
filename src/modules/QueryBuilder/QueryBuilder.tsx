@@ -38,7 +38,7 @@ const QueryBuilder = () => {
   } = useDaphneStore();
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 3 } }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 1 } }),
     useSensor(KeyboardSensor)
   );
 
@@ -61,7 +61,7 @@ const QueryBuilder = () => {
       if (!over) {
         return;
       }
-
+      return;
       if (!active) return;
 
       const activeData = active.data.current;

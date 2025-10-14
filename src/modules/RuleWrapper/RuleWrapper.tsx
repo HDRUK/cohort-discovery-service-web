@@ -92,7 +92,15 @@ const RuleWrapper = ({
     setMenuPos(null);
   };
 
-  const { setNodeRef, style, anchorRef, anchorSize } = params;
+  const {
+    setNodeRef,
+    style,
+    anchorRef,
+    anchorSize,
+    isDragging,
+    attributes,
+    listeners,
+  } = params;
 
   return (
     <Box
@@ -115,17 +123,17 @@ const RuleWrapper = ({
           <IconButton
             aria-label="Drag"
             size="small"
-            {...(sortable ? params.attributes : {})}
-            {...(sortable ? params.listeners : {})}
+            {...(sortable ? attributes : {})}
+            {...(sortable ? listeners : {})}
             sx={{ cursor: "grab", mt: 0.25 }}
           >
             <DragIndicator
               fontSize="small"
-              sx={{ opacity: params.isDragging ? 0 : 1 }}
+              sx={{ opacity: isDragging ? 0 : 1 }}
             />
           </IconButton>
         </Box>
-        {params.isDragging ? (
+        {isDragging ? (
           <Skeleton
             variant="rectangular"
             animation="wave"
@@ -139,7 +147,6 @@ const RuleWrapper = ({
           <Card
             data-testid="clickable-card"
             ref={anchorRef}
-            key={id}
             sx={{
               p: 2,
               border: 1,

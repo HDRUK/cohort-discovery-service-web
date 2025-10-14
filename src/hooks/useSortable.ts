@@ -1,11 +1,10 @@
 import * as React from "react";
 import { CSS } from "@dnd-kit/utilities";
-import { type UniqueIdentifier } from "@dnd-kit/core";
 import {
   useSortable as useDndSortable,
   UseSortableArguments,
 } from "@dnd-kit/sortable";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useElementSize } from "./useElementSize";
 
 export interface UseSortablePlusReturn
@@ -19,12 +18,33 @@ export interface UseSortablePlusReturn
 const useSortable = (args: UseSortableArguments): UseSortablePlusReturn => {
   const params = useDndSortable(args);
 
-  const style: React.CSSProperties = {
-    transform: CSS.Transform.toString(params.transform),
-    transition: params.transition,
-    opacity: params.isDragging ? 0.6 : 1,
-    willChange: "transform",
-  };
+  const lastTransformStr = useRef<string | undefined>(undefined);
+
+  const transform = useMemo(() => {
+    if (!params.transform) return undefined;
+    const q = {
+      ...params.transform,
+      x: quantise(params.transform.x ?? 0),
+      y: quantise(params.transform.y ?? 0),
+      scaleX: params.transform.scaleX ?? 1,
+      scaleY: params.transform.scaleY ?? 1,
+    };
+
+    const next = CSS.Transform.toString(q);
+    if (next === lastTransformStr.current) return lastTransformStr.current;
+    lastTransformStr.current = next;
+    return next;
+  }, [params.transform]);
+
+  const style = useMemo<React.CSSProperties>(
+    () => ({
+      transform,
+      transition: "transform 200ms ease",
+      opacity: params.isDragging ? 0.6 : 1,
+      willChange: "transform",
+    }),
+    [params.isDragging, transform]
+  );
 
   const [stableIsLast, setStableIsLast] = useState(false);
 
@@ -33,7 +53,7 @@ const useSortable = (args: UseSortableArguments): UseSortablePlusReturn => {
       // note: this is -2 because need to remove all the bounding group
       //       that is included in the items
       setStableIsLast(params.newIndex === params.items.length - 2);
-    }, 100);
+    }, 500);
     return () => clearTimeout(timeout);
   }, [params.newIndex, params.items]);
 
