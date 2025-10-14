@@ -96,6 +96,7 @@ const RuleWrapper = ({
 
   return (
     <Box
+      data-testid="sortable-rule"
       onClick={() => {
         toggleSelected(id);
       }}

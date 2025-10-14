@@ -1,102 +1,116 @@
 import "@testing-library/jest-dom";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import RuleBoard from "./RuleBoard";
+
 import MockDaphneStore from "@/store/MockDaphneStore";
-import {
-  CombinatorType,
-  OperatorType,
-  RuleGroupType,
-  RuleNodeType,
-} from "@/types/rules";
-
+import { CombinatorType, RuleGroupType, RuleNodeType } from "@/types/rules";
 import { validateRuleTree } from "@/utils/rules";
+const setQueryBuilderJson = jest.fn();
 
-describe("RuleBoard", () => {
+describe("QueryBuilder", () => {
   const renderComponent = (
-    opArgs?: Partial<OperatorType>,
-    before: RuleNodeType = {
-      id: "rule-before",
-      rule: {
-        concept: {
-          concept_id: 1234,
-          description: "Observation 1234",
-          category: "Observation",
+    rules: RuleNodeType[] = [
+      {
+        id: "rule-1",
+        rule: {
+          concept: {
+            concept_id: 1234,
+            description: "Rule 1234",
+            category: "cat-1",
+          },
         },
       },
-    },
-    after: RuleNodeType = {
-      id: "rule-after",
-      rule: {
-        concept: {
-          concept_id: 4321,
-          description: "Observation 4321",
-          category: "Observation",
+      {
+        id: "op-1",
+        combinator: CombinatorType.AND,
+      },
+      {
+        id: "rule-2",
+        rule: {
+          concept: {
+            concept_id: 4321,
+            description: "Rule 4321",
+            category: "cat-1",
+          },
         },
       },
-    }
+    ]
   ) => {
-    const operator = {
-      id: "op-1",
-      combinator: CombinatorType.AND,
-      ...opArgs,
-    };
-
-    const query = {
+    const group = validateRuleTree({
       id: "group-1",
-      rules: [before, operator, after],
-    } as RuleGroupType;
-
-    return render(
+      rules,
+    }) as RuleGroupType;
+    const rendered = render(
       <MockDaphneStore
         overrides={{
-          queryBuilder: { queryBuilderJson: validateRuleTree(query) },
+          queryBuilder: {
+            queryBuilderJson: group,
+            setQueryBuilderJson,
+          },
         }}
       >
-        <RuleOperator operator={operator} groupId="group-1" />
+        <RuleBoard ruleGroup={group} />
       </MockDaphneStore>
     );
+    return rendered;
   };
 
-  it("renders the combinator chip correctly for AND", () => {
+  it("renders the board correctly", async () => {
     renderComponent();
-    expect(screen.getByText("AND")).toBeInTheDocument();
-    expect(screen.queryByTestId("WarningAmberIcon")).not.toBeInTheDocument();
+
+    const ruleHeadings = screen.getAllByRole("heading", { name: /rule/i });
+    expect(ruleHeadings).toHaveLength(2);
+
+    const expectedTexts = ["Rule 1234", "Rule 4321"];
+
+    ruleHeadings.map((heading, i) => {
+      const ruleCard = heading.closest('[data-testid="clickable-card"]');
+      const scope = within(ruleCard as HTMLElement);
+      expect(scope.getByText(expectedTexts[i])).toBeInTheDocument();
+    });
+
+    const chip = screen.getByText("AND").closest(".MuiChip-root");
+    expect(chip).toBeInTheDocument();
   });
 
-  it("renders the combinator chip correctly for OR", () => {
-    renderComponent({ combinator: CombinatorType.OR });
-    expect(screen.getByText("OR")).toBeInTheDocument();
-    expect(screen.queryByTestId("WarningAmberIcon")).not.toBeInTheDocument();
+  it("renders the warnings when the order is wrong", async () => {
+    renderComponent([
+      {
+        id: "rule-1",
+        rule: {
+          concept: {
+            concept_id: 1234,
+            description: "Rule 1234",
+            category: "cat-1",
+          },
+        },
+      },
+      {
+        id: "rule-2",
+        rule: {
+          concept: {
+            concept_id: 4321,
+            description: "Rule 4321",
+            category: "cat-1",
+          },
+        },
+      },
+      {
+        id: "op-1",
+        combinator: CombinatorType.AND,
+      },
+    ]);
+
+    const ruleHeadings = screen.getAllByRole("heading", { name: /rule/i });
+    expect(ruleHeadings).toHaveLength(2);
+
+    const expectedTexts = ["Rule 1234", "Rule 4321"];
+
+    ruleHeadings.map((heading, i) => {
+      const ruleCard = heading.closest('[data-testid="clickable-card"]');
+      const scope = within(ruleCard as HTMLElement);
+      expect(scope.getByText(expectedTexts[i])).toBeInTheDocument();
+      expect(scope.queryByTestId("WarningAmberIcon")).toBeInTheDocument();
+    });
   });
-
-  it("shows warning icon when rule is invalid", () => {
-    renderComponent({ valid: false });
-    expect(screen.queryByTestId("WarningAmberIcon")).toBeInTheDocument();
-  });
-  /*
-
-  it("hides itself when hidden prop is true", () => {
-    setupStore();
-
-    render(
-      <RuleOperator operator={baseOperator} groupId="grp-1" hidden={true} />
-    );
-
-    // The chip still exists but should not be visible
-    expect(screen.getByText("AND OR")).not.toBeVisible();
-  });
-
-  it("calls setQueryBuilderJson with updated state when Delete action is triggered", () => {
-    const { setQueryBuilderJson, queryBuilderJson } = setupStore();
-    (removeById as jest.Mock).mockReturnValue({ updated: true });
-
-    render(<RuleOperator operator={baseOperator} groupId="grp-1" />);
-
-    // RuleWrapper likely renders some button with "Delete" label
-    const deleteButton = screen.getByRole("button", { name: /delete/i });
-    fireEvent.click(deleteButton);
-
-    expect(removeById).toHaveBeenCalledWith(queryBuilderJson, "op-123");
-    expect(setQueryBuilderJson).toHaveBeenCalledWith({ updated: true });
-  });*/
 });
