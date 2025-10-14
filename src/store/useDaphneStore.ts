@@ -23,7 +23,12 @@ import detachConcepts from "@/actions/detachConcepts";
 import deleteConceptSet from "@/actions/deleteConceptSet";
 import { queryToText } from "@/utils/queryBuilder";
 
-import { SizeCache, BoardIndex, RuleGroupType } from "@/types/rules";
+import {
+  SizeCache,
+  BoardIndex,
+  RuleGroupType,
+  RuleNodeType,
+} from "@/types/rules";
 import {
   buildIndexFromModel,
   createOperator,
@@ -37,13 +42,18 @@ import { trueKeys } from "@/utils/numbers";
 import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
 import getQueryFromInput from "@/actions/getQueryFromInput";
 
-export const Creators = {
-  RULE: createRule,
-  GROUP: createRuleGroup,
-  OPERATOR: createOperator,
-} as const;
+export enum NodeKind {
+  RULE = "RULE",
+  GROUP = "GROUP",
+  OPERATOR = "OPERATOR",
+}
 
-export type CreatorKey = keyof typeof Creators;
+type NodeFactory = () => RuleNodeType;
+export const Creators: Record<string, NodeFactory> = {
+  [NodeKind.RULE]: createRule,
+  [NodeKind.GROUP]: createRuleGroup,
+  [NodeKind.OPERATOR]: createOperator,
+};
 
 const DEFAULT_QUERY: RuleGroupType =
   process.env.NEXT_PUBLIC_USE_EXAMPLE_QUERY === "true" ? EXAMPLE_1 : NO_QUERY;
@@ -167,7 +177,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         },
       }));
     },
-    createNewNode: (kind: CreatorKey) => {
+    createNewNode: (kind: NodeKind) => {
       const fn = Creators[kind];
       const { selected, queryBuilderJson, setQueryBuilderJson } =
         get().queryBuilder;
@@ -196,9 +206,10 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         setQueryBuilderJson(updatedQuery);
       }
     },
-    createNewRule: () => get().queryBuilder.createNewNode("RULE"),
-    createNewGroup: () => get().queryBuilder.createNewNode("GROUP"),
-    createNewOperator: () => get().queryBuilder.createNewNode("OPERATOR"),
+    createNewRule: () => get().queryBuilder.createNewNode(NodeKind.RULE),
+    createNewGroup: () => get().queryBuilder.createNewNode(NodeKind.GROUP),
+    createNewOperator: () =>
+      get().queryBuilder.createNewNode(NodeKind.OPERATOR),
     queryAsText: queryToText(DEFAULT_QUERY),
     setQueryBuilderJson: (query) => {
       set((state) => ({

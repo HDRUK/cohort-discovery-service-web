@@ -12,7 +12,6 @@ import { v4 as uuidv4 } from "uuid";
 
 export const createRule = (
   rule: ConceptOperator = { concept: null },
-  combinator: CombinatorType = CombinatorType.AND,
   exclude = false
 ): RuleLeafType => ({
   id: uuidv4(),
