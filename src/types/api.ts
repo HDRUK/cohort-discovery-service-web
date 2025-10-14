@@ -100,8 +100,8 @@ export interface Task {
   query_id: number;
   collection_id: number;
   created_at: string;
-  attempted_at: string | null;
-  failed_at: string | null;
+  attempted_at?: string | null;
+  failed_at?: string | null;
   completed_at: string | null;
   attempts: number;
   task_type: string;

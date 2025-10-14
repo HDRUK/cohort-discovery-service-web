@@ -19,7 +19,6 @@ import { routes } from "../../config/routes";
 const QueriesTable = ({
   queries,
   hasIncomplete,
-  fields,
 }: {
   queries: Paginated<Query[]>;
   hasIncomplete: boolean;
