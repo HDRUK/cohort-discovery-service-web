@@ -11,9 +11,11 @@ const SubmitQueryButton = () => {
   const searchParams = useSearchParams();
   const {
     userData: { fetchResults },
-    queryBuilder: { selectedDatasets, queryName },
+    queryBuilder: { selectedDatasets, queryName, queryBuilderJson },
     stateManagement: { isLoading, setIsLoading },
   } = useDaphneStore();
+
+  const { valid } = queryBuilderJson;
 
   const handleClick = async () => {
     setIsLoading(true);
@@ -21,6 +23,7 @@ const SubmitQueryButton = () => {
       const params = new URLSearchParams(searchParams.toString());
       const newPid = res.data.query_pid;
 
+      //needs to be used queries
       revalidateAction("queries");
       setIsLoading(false);
 
@@ -31,7 +34,7 @@ const SubmitQueryButton = () => {
 
   return (
     <Button
-      disabled={selectedDatasets.length === 0 || isLoading}
+      disabled={selectedDatasets.length === 0 || !valid || isLoading}
       variant="contained"
       color="primary"
       onClick={handleClick}

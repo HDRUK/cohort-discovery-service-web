@@ -1,4 +1,4 @@
-import { RuleGroupType } from "react-querybuilder";
+import { RuleGroupType } from "./rules";
 
 export interface ApiResponse<T> {
   message: string;
@@ -94,19 +94,14 @@ export interface CodeStat extends Code {
   collections_pct: number;
 }
 
-export interface Option {
-  name: string;
-  label: string;
-}
-
 export interface Task {
   id: number;
   pid: string;
   query_id: number;
   collection_id: number;
   created_at: string;
-  attempted_at: string | null;
-  failed_at: string | null;
+  attempted_at?: string | null;
+  failed_at?: string | null;
   completed_at: string | null;
   attempts: number;
   task_type: string;
@@ -208,9 +203,10 @@ export interface CreateCollectionPost {
 
 export interface Concept {
   concept_id: number;
-  name: string;
+  name?: string;
   description: string;
   category: string;
+  children?: Concept[];
 }
 
 export interface ConceptSet extends WithTimestamps {

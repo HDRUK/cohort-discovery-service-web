@@ -12,3 +12,8 @@ jest.mock("next/navigation", () => ({
     replace: jest.fn(),
   }),
 }));
+
+let counter = 0;
+jest.mock("uuid", () => ({
+  v4: jest.fn(() => `mocked-uuid-${++counter}`),
+}));

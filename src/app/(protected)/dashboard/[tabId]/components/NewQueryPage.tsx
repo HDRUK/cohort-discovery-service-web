@@ -5,10 +5,7 @@ import { Skeleton } from "@mui/material";
 import { Suspense } from "react";
 import QueryResults from "@/components/QueryResults";
 import Anchor from "@/components/Anchor";
-import TabsShell from "@/components/TabsShell";
-import GuiCohortBuilder from "./GuiCohortBuilder";
-import SqlCohortBuilder from "./SqlCohortBuilder";
-import JsonCohortBuilder from "./JsonCohortBuilder";
+import CohortBuilder from "./CohortBuilder";
 
 interface PageProps {
   searchParams: Promise<{
@@ -18,17 +15,9 @@ interface PageProps {
 
 const NewQueryPageContent = async () => {
   return (
-    <TabsShell labels={["GUI Builder", "SQL Builder", "JSON Builder"]}>
-      <Suspense fallback={<Skeleton height={400} />}>
-        <GuiCohortBuilder />
-      </Suspense>
-      <Suspense fallback={<Skeleton height={400} />}>
-        <SqlCohortBuilder />
-      </Suspense>
-      <Suspense fallback={<Skeleton height={400} />}>
-        <JsonCohortBuilder />
-      </Suspense>
-    </TabsShell>
+    <Suspense fallback={<Skeleton height={400} />}>
+      <CohortBuilder />
+    </Suspense>
   );
 };
 

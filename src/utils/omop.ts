@@ -1,4 +1,5 @@
-import { Code, Option } from "../../types/api";
+import { Code } from "@/types/api";
+import { Option } from "@/types/common";
 
 const codesToOption = (codes: Code[]): Option[] =>
   codes

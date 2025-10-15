@@ -1,0 +1,175 @@
+import { Typography, Chip, Alert } from "@mui/material";
+import SearchConcepts from "@/components/SearchConcepts";
+import { Concept } from "@/types/api";
+import { useState } from "react";
+import ConceptChip from "@/components/ConceptChip";
+import { RuleLeafType } from "@/types/rules";
+import { useDaphneStore } from "@/store/useDaphneStore";
+import {
+  isEmptyRule,
+  updateById,
+  removeById,
+  isSingleConcept,
+  isRuleLeaf,
+  ruleToGroup,
+  isMultipleConcept,
+} from "@/utils/rules";
+
+import RuleWrapper from "../RuleWrapper";
+
+export interface RuleProps {
+  rule: RuleLeafType;
+  groupId: string;
+  sortable?: boolean;
+}
+
+const Rule = ({ rule, groupId }: RuleProps) => {
+  const {
+    id,
+    exclude,
+    valid = true,
+    rule: { concept },
+  } = rule;
+
+  const domain =
+    concept && Array.isArray(concept)
+      ? concept?.[0].category
+      : concept?.category;
+
+  const {
+    queryBuilder: { queryBuilderJson, setQueryBuilderJson },
+  } = useDaphneStore();
+
+  const setConcept = (c: Concept) => {
+    setQueryBuilderJson(
+      updateById(queryBuilderJson, id, (node) => {
+        if (isRuleLeaf(node)) {
+          return {
+            ...node,
+            rule: { ...node.rule, concept: c },
+          };
+        }
+        return node;
+      })
+    );
+  };
+
+  const clearConcept = () => {
+    setQueryBuilderJson(
+      updateById(queryBuilderJson, id, (node) => {
+        if (isRuleLeaf(node)) {
+          return {
+            ...node,
+            rule: { ...node.rule, concept: null },
+          };
+        }
+        return node;
+      })
+    );
+  };
+
+  const [showChildren, setShowChildren] = useState<boolean>(false);
+  const onClick = (c: Concept) => {
+    setConcept(c);
+  };
+
+  const removeChild = (parent: Concept, child: Concept) => {
+    const children = parent.children?.filter(
+      (c) => c.concept_id !== child.concept_id
+    );
+    const newConcept = {
+      ...parent,
+      children,
+    };
+    return newConcept;
+  };
+
+  const handleDeleteRule = () => {
+    const newQuery = removeById(queryBuilderJson, id);
+    setQueryBuilderJson(newQuery);
+  };
+
+  const handleConvertToGroup = () => {
+    setQueryBuilderJson(
+      updateById(queryBuilderJson, id, (node) => {
+        if (!isRuleLeaf(node)) return node;
+        const newGroup = ruleToGroup(node);
+        return newGroup;
+      })
+    );
+  };
+
+  const actions = [
+    { action: handleConvertToGroup, label: "Convert to Group" },
+    { action: handleDeleteRule, label: "Delete" },
+  ];
+
+  return (
+    <RuleWrapper
+      id={id}
+      type="Rule"
+      groupId={groupId}
+      sortable={true}
+      exclude={exclude}
+      valid={valid}
+      headerExtra={
+        <>
+          {!isEmptyRule(rule) && domain && (
+            <>
+              <Typography variant="h5">/</Typography>
+              <Chip
+                sx={{
+                  bgcolor: "white",
+                  borderColor: "white",
+                }}
+                variant="outlined"
+                label={domain}
+              />
+            </>
+          )}
+        </>
+      }
+      render={() => (
+        <>
+          {isEmptyRule(rule) ? (
+            <SearchConcepts onClick={onClick} />
+          ) : (
+            <>
+              {isSingleConcept(concept) && (
+                <>
+                  <ConceptChip
+                    indicateIfParent={showChildren}
+                    concept={concept}
+                    onDelete={() => clearConcept()}
+                    onClick={
+                      concept?.children && concept.children.length > 0
+                        ? () => setShowChildren(!showChildren)
+                        : undefined
+                    }
+                  />
+                  {showChildren &&
+                    concept?.children?.map((childConcept) => (
+                      <ConceptChip
+                        draggable={false}
+                        key={childConcept.concept_id}
+                        concept={childConcept}
+                        onDelete={() => {
+                          setConcept(removeChild(concept, childConcept));
+                        }}
+                      />
+                    ))}
+                </>
+              )}
+              {isMultipleConcept(concept) && (
+                <Alert color="error"> Not yet implemented </Alert>
+              )}
+            </>
+          )}
+        </>
+      )}
+      actions={actions}
+    />
+  );
+};
+
+export default Rule;

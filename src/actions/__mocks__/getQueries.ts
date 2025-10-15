@@ -1,3 +1,4 @@
+import { EXAMPLE_1, EXAMPLE_2 } from "@/config/queryExamples";
 import { Query, ApiResponse, WithIncomplete, Paginated } from "../../types/api";
 import { mockTasks } from "./getTasks";
 import { paginateData } from "@/utils/mock";
@@ -6,18 +7,7 @@ export const getMockQuery = (rest?: Partial<Query>): Query => ({
   id: 100,
   pid: "query-123",
   name: "Test Query",
-  definition: {
-    id: "def-1",
-    combinator: "and",
-    rules: [
-      {
-        id: "rule-1",
-        field: "condition",
-        operator: "=",
-        value: "1234",
-      },
-    ],
-  },
+  definition: EXAMPLE_1,
   created_at: "2025-08-06T13:31:58.000000Z",
   tasks: mockTasks,
   ...rest,
@@ -27,22 +17,9 @@ export const mockQueries: Query[] = [
   getMockQuery(),
   getMockQuery({
     id: 101,
-    pid: "query-456",
-    name: "Second Query",
-    definition: {
-      id: "def-2",
-      combinator: "and",
-      rules: [
-        {
-          id: "rule-2",
-          field: "condition",
-          operator: "=",
-          value: "5678",
-        },
-      ],
-    },
-    created_at: "2025-08-07T10:00:00.000000Z",
-    tasks: [],
+    pid: "query-321",
+    name: "Test Query 2",
+    definition: EXAMPLE_2,
   }),
 ];
 

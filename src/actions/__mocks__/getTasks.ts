@@ -1,35 +1,33 @@
 import { ApiResponse, Task, Result } from "../../types/api";
-import { mockCollections } from "./getCollections";
+import { getMockCollections } from "./getCollections";
 
-export const mockResults: Result[] = [
-  {
-    id: 1,
-    pid: "res1",
-    count: 723,
-    metadata: {},
-    created_at: "2025-01-01T00:00:00Z",
-    updated_at: "2025-01-01T00:00:00Z",
-  },
-  {
-    id: 2,
-    pid: "res2",
-    count: 421,
-    metadata: {},
-    created_at: "2025-01-01T00:00:00Z",
-    updated_at: "2025-01-01T00:00:00Z",
-  },
-];
+const [mockCollection1, mockCollection2] = getMockCollections(2);
+
+export const getMockResult = (rest?: Partial<Result>) => ({
+  id: 1,
+  pid: "res1",
+  count: 723,
+  metadata: {},
+  created_at: "2025-01-01T00:00:00Z",
+  updated_at: "2025-01-01T00:00:00Z",
+  status: "ok",
+  message: "ok",
+  ...rest,
+});
 
 export const getMockTask = (rest?: Partial<Task>) => ({
   id: 1,
   pid: "task1",
   query_id: 100,
-  collection_id: mockCollections[0].id,
+  collection_id: mockCollection1.id,
   task_type: "condition",
   created_at: "2025-01-01T00:00:00Z",
   completed_at: "2025-01-01T12:00:00Z",
-  collection: mockCollections[0],
-  result: mockResults[0],
+  attemted_at: "2025-01-01T12:00:00Z",
+  failed_at: null,
+  attempts: 1,
+  collection: mockCollection1,
+  result: getMockResult(),
   ...rest,
 });
 
@@ -38,23 +36,33 @@ export const mockTasks: Task[] = [
     id: 1,
     pid: "task1",
     query_id: 100,
-    collection_id: mockCollections[0].id,
+    collection_id: mockCollection1.id,
     task_type: "condition",
     created_at: "2025-01-01T00:00:00Z",
     completed_at: "2025-01-01T12:00:00Z",
-    collection: mockCollections[0],
-    result: mockResults[0],
+    attempted_at: "2025-01-01T12:00:00Z",
+    attempts: 1,
+    failed_at: null,
+    collection: mockCollection1,
+    result: getMockResult(),
   },
   {
     id: 2,
     pid: "task2",
     query_id: 100,
-    collection_id: mockCollections[1].id,
+    collection_id: mockCollection2.id,
     task_type: "condition",
     created_at: "2025-01-01T00:00:00Z",
+    attempted_at: "2025-01-01T12:00:00Z",
+    attempts: 1,
+    failed_at: null,
     completed_at: null,
-    collection: mockCollections[1],
-    result: mockResults[1],
+    collection: mockCollection2,
+    result: getMockResult({
+      id: 2,
+      pid: "res2",
+      count: 421,
+    }),
   },
 ];
 
