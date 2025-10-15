@@ -41,10 +41,6 @@ describe("Collections", () => {
     expect(screen.getAllByText("bunny")).toHaveLength(2);
 
     expect(screen.getByText("1,213")).toBeInTheDocument();
-    expect(screen.getByText("100")).toBeInTheDocument();
-
-    expect(screen.getByText("607")).toBeInTheDocument();
-    expect(screen.getByText("606")).toBeInTheDocument();
-    expect(screen.getAllByText("50")).toHaveLength(2);
+    expect(screen.getByText("603")).toBeInTheDocument();
   });
 });

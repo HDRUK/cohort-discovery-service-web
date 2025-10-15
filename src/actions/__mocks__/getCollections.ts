@@ -1,5 +1,6 @@
 import { QueryContext } from "@/types/context";
-import { ApiResponse, Collection, Distribution } from "../../types/api";
+import { ApiResponse, Collection, Distribution } from "@/types/api";
+import { v4 as uuidv4 } from "uuid";
 
 const getMockDistribution = (rest?: Partial<Distribution>): Distribution => ({
   id: 1,
@@ -38,16 +39,19 @@ const getMockDemographics = ({
   ];
 };
 
-export const getMockCollection = (rest?: Partial<Collection>): Collection => ({
+export const getMockCollection = (
+  rest?: Partial<Collection>,
+  count: number = 1213
+): Collection => ({
   id: 1,
-  pid: "db6d9b451b818ccc9a449383f2f0c450",
+  pid: uuidv4(),
   name: "Test Dataset #1",
   url: null,
   type: QueryContext.BUNNY,
   created_at: "2025-01-01 00:00:00",
   updated_at: "2025-01-01 00:00:00",
-  demographics: getMockDemographics({ collection_id: 1, n: 1213 }),
-  size: getMockDistribution({ collection_id: 1, count: 1213 }),
+  demographics: getMockDemographics({ collection_id: 1, n: count }),
+  size: getMockDistribution({ collection_id: 1, count }),
   ...rest,
 });
 
@@ -55,9 +59,15 @@ export const getMockCollections = (n: number = 2): Collection[] =>
   Array.from({ length: Math.max(0, n) }, (_, id) =>
     getMockCollection({
       id,
-      name: `Test Dataset #${id}`,
-      demographics: getMockDemographics({ collection_id: id }),
-      size: getMockDistribution({ collection_id: id, count: 1213 }),
+      name: `Test Dataset #${id + 1}`,
+      demographics: getMockDemographics({
+        collection_id: id,
+        n: id < 1 ? 1213 : 603,
+      }),
+      size: getMockDistribution({
+        collection_id: id,
+        count: id < 1 ? 1213 : 603,
+      }),
     })
   );
 
