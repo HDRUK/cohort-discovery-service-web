@@ -109,7 +109,6 @@ export const findByIdWithNeighbors = (
   const flat: RuleNodeType[] = [];
 
   const dfs = (node: RuleNodeType) => {
-    console.log(node.id);
     flat.push(node);
     if (isRuleGroup(node)) {
       for (const child of node.rules) {
