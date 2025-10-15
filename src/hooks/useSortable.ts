@@ -40,7 +40,7 @@ const useSortable = (args: UseSortableArguments): UseSortablePlusReturn => {
   const style = useMemo<React.CSSProperties>(
     () => ({
       transform,
-      transition: "transform 200ms ease",
+      transition: DEFAULT_TRANSFORM,
       opacity: params.isDragging ? 0.6 : 1,
       willChange: "transform",
     }),
