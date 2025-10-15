@@ -19,6 +19,20 @@ import { DragIndicator } from "@mui/icons-material";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 
+import {
+  containerSx,
+  headerRowSx,
+  leftControlsSx,
+  dragButtonSx,
+  dragIconSx,
+  skeletonSx,
+  cardSx,
+  cardHeaderSx,
+  chipSx,
+  headerActionSx,
+  selectedCaptionSx,
+} from "./RuleWrapper.styles";
+
 interface Action {
   action: () => void;
   label: string;
@@ -88,9 +102,7 @@ const RuleWrapper = ({
     );
   };
 
-  const handleClose = () => {
-    setMenuPos(null);
-  };
+  const handleClose = () => setMenuPos(null);
 
   const {
     setNodeRef,
@@ -108,71 +120,47 @@ const RuleWrapper = ({
       onClick={() => {
         toggleSelected(id);
       }}
-      sx={{
-        border: 1,
-        borderColor: isSelected ? "blue" : "transparent",
-        p: 1,
-        position: "relative",
-      }}
+      sx={containerSx(isSelected)}
       ref={setNodeRef}
       style={sortable ? style : {}}
       {...rest}
     >
-      <Box sx={{ display: "flex", flexDirection: "row", width: "100%" }}>
-        <Box display="flex" alignItems="center" gap={1}>
+      <Box sx={headerRowSx}>
+        <Box sx={leftControlsSx}>
           <IconButton
             aria-label="Drag"
             size="small"
             {...(sortable ? attributes : {})}
             {...(sortable ? listeners : {})}
-            sx={{ cursor: "grab", mt: 0.25 }}
+            sx={dragButtonSx}
           >
-            <DragIndicator
-              fontSize="small"
-              sx={{ opacity: isDragging ? 0 : 1 }}
-            />
+            <DragIndicator fontSize="small" sx={dragIconSx(isDragging)} />
           </IconButton>
         </Box>
+
         {isDragging ? (
           <Skeleton
             variant="rectangular"
             animation="wave"
-            sx={{
-              mx: "auto",
-              width: anchorSize.width,
-              height: anchorSize.height,
-            }}
+            sx={skeletonSx(anchorSize.width, anchorSize.height)}
           />
         ) : (
           <Card
             data-testid="clickable-card"
             ref={anchorRef}
-            sx={{
-              p: 2,
-              border: 1,
-              borderColor: valid ? "black" : "warning.main",
-              width: "100%",
-            }}
+            sx={cardSx(valid)}
             onContextMenu={handleContextMenu}
             onClick={(e) => e.stopPropagation()}
             {...cardProps}
           >
             {!hideHeader && (
               <CardHeader
-                sx={{
-                  borderBottom: 1,
-                  borderColor: "divider",
-                  p: 0,
-                  m: 0,
-                  pb: 1,
-                }}
+                sx={cardHeaderSx}
                 avatar={
                   <>
                     <Chip
                       color={exclude ? "error" : "primary"}
-                      sx={{
-                        bgcolor: "white",
-                      }}
+                      sx={chipSx}
                       variant="outlined"
                       label={exclude ? "Exclude" : "Include"}
                     />
@@ -180,13 +168,14 @@ const RuleWrapper = ({
                   </>
                 }
                 action={
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <Box sx={headerActionSx}>
                     <Typography variant="h5">{type}</Typography>
                     {headerExtra}
                   </Box>
                 }
               />
             )}
+
             <CardContent>{render(anchorRef, params)}</CardContent>
 
             {actions && (
@@ -218,22 +207,7 @@ const RuleWrapper = ({
       </Box>
 
       {isSelected && (
-        <Typography
-          variant="caption"
-          component="span"
-          sx={{
-            zIndex: 1,
-            position: "absolute",
-            left: "50%",
-            bottom: 0,
-            transform: "translateX(-50%)",
-            px: 0.75,
-            py: 0.25,
-            lineHeight: 1,
-            bgcolor: "blue",
-            color: "white",
-          }}
-        >
+        <Typography variant="caption" component="span" sx={selectedCaptionSx}>
           {id}
         </Typography>
       )}
