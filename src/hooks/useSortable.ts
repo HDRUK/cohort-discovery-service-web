@@ -47,22 +47,16 @@ const useSortable = (args: UseSortableArguments): UseSortablePlusReturn => {
     [params.isDragging, transform]
   );
 
-  const [stableIsLast, setStableIsLast] = useState(false);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      // note: this is -2 because need to remove all the bounding group
-      //       that is included in the items
-      setStableIsLast(params.newIndex === params.items.length - 2);
-    }, 500);
-    return () => clearTimeout(timeout);
-  }, [params.newIndex, params.items]);
+  const isLast = useMemo(
+    () => params.newIndex === params.items.length - 2,
+    [params.newIndex, params.items]
+  );
 
   const [anchorRef, anchorSize] = useElementSize<HTMLDivElement>(args.id);
 
   return {
     ...params,
-    isLast: stableIsLast,
+    isLast,
     style,
     anchorRef,
     anchorSize,
