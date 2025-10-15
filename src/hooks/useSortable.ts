@@ -4,9 +4,10 @@ import {
   useSortable as useDndSortable,
   UseSortableArguments,
 } from "@dnd-kit/sortable";
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useRef, useMemo } from "react";
 import { useElementSize } from "./useElementSize";
 import { quantise } from "@/utils/numbers";
+import { DEFAULT_TRANSFORM } from "@/config/defaults";
 
 export interface UseSortablePlusReturn
   extends ReturnType<typeof useDndSortable> {
