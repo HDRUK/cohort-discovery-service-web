@@ -7,6 +7,8 @@ import RuleWrapper from "../RuleWrapper";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { removeById } from "@/utils/rules";
 
+import { cardSx, rootSx, dividerSx, chipSx } from "./RuleOperator.styles";
+
 export interface RuleOperatorProps {
   operator: OperatorType;
   groupId: string;
@@ -31,57 +33,19 @@ const RuleOperator = ({
   return (
     <RuleWrapper
       hideHeader
-      cardProps={{
-        sx: {
-          border: 0,
-          mx: "auto",
-          width: "fit-content",
-          pt: 1,
-          minWidth: 80,
-          bgcolor: "transparent",
-        },
-      }}
+      cardProps={{ sx: cardSx }}
       id={id}
       type={"Operator"}
       groupId={groupId}
       sortable={true}
       render={() => (
-        <Box
-          sx={{
-            minHeight: 80,
-            position: "relative",
-            display: hidden ? "none" : "grid",
-            gridTemplateColumns: "1fr 2fr 1fr",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Divider
-            orientation="vertical"
-            flexItem
-            sx={(theme) => ({
-              position: "absolute",
-              top: 0,
-              bottom: 0,
-              left: "50%",
-              transform: "translateX(-50%)",
-              borderLeftWidth: 2,
-              zIndex: 0,
-              borderColor: valid
-                ? theme.palette.divider
-                : theme.palette.warning.main,
-            })}
-          />
+        <Box sx={rootSx(hidden)}>
+          <Divider orientation="vertical" flexItem sx={dividerSx(valid)} />
 
           <Box />
 
           <Chip
-            sx={(theme) => ({
-              position: "relative",
-              bgcolor: "white",
-              boxShadow: theme.shadows[2],
-              zIndex: 1, // keep above the divider
-            })}
+            sx={chipSx}
             label={combinator?.toUpperCase().replace("_", " ")}
           />
 
