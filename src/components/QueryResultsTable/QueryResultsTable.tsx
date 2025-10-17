@@ -2,7 +2,7 @@
 
 import { Query, Task, Result } from "../../types/api";
 import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
-import { Chip, CircularProgress, Link, Paper, Tooltip } from "@mui/material";
+import { Chip, CircularProgress, Link, Paper } from "@mui/material";
 import ErrorIcon from "@mui/icons-material/Error";
 import { revalidateAction } from "@/actions/revalidate";
 import { useEffect } from "react";
@@ -16,9 +16,14 @@ import ShowOnClick from "../ShowOnClick";
 
 const QueryResultsTable = ({ query }: { query: Query }) => {
   const {
-    queryBuilder: { setQueryName },
+    queryBuilder: { setQueryName, setQueryBuilderJson },
   } = useDaphneStore();
-  const { tasks, name } = query;
+  const { tasks, name, definition } = query;
+
+  useEffect(() => {
+    setQueryBuilderJson(definition);
+  }, [definition, setQueryBuilderJson]);
+
   useEffect(() => {
     setQueryName(name);
   }, [name, setQueryName]);

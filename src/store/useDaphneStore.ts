@@ -239,7 +239,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     createNewGroup: () => get().queryBuilder.createNewNode(NodeKind.GROUP),
     createNewOperator: () =>
       get().queryBuilder.createNewNode(NodeKind.OPERATOR),
-    queryAsText: "", //queryToText(DEFAULT_QUERY),
+    queryAsText: queryToText(DEFAULT_QUERY),
     setQueryBuilderJson: (query: RuleGroupType) => {
       const updatedQuery = validateRuleTree(query);
 
@@ -249,7 +249,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
           ...state.queryBuilder,
           queryBuilderJson: updatedQuery,
           boardIndex: buildIndexFromModel(query),
-          queryAsText: "", //queryToText(query),
+          queryAsText: queryToText(query),
         },
       }));
     },
@@ -278,8 +278,9 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         ...state,
         queryBuilder: {
           ...state.queryBuilder,
-          queryBuilderJson: newQuery,
+          queryBuilderJson: validateRuleTree(newQuery),
           boardIndex: buildIndexFromModel(newQuery),
+          queryAsText: queryToText(newQuery),
         },
         stateManagement: { ...state.stateManagement, isLoading: false },
       }));
@@ -298,8 +299,9 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         stateManagement: { ...state.stateManagement, isLoading: true },
       }));
 
-      const { queryBuilderJson, selectedDatasets } = get().queryBuilder;
-      const queryName = name ? name : queryBuilderJson.id;
+      const { queryBuilderJson, queryAsText, selectedDatasets } =
+        get().queryBuilder;
+      const queryName = name ? name : queryAsText;
 
       if (get().queryBuilder.queryName !== queryName) {
         get().queryBuilder.setQueryName(queryName);
