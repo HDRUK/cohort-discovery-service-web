@@ -31,7 +31,6 @@ import DragOverlay from "@/components/DragOverlay";
 
 import { RuleNodeType } from "@/types/rules";
 import { findById, moveItemIntoGroup } from "@/utils/rules";
-import { useDebouncedCallback } from "@/hooks/useDebounceCallback";
 
 const QueryBuilder = () => {
   const {
@@ -89,7 +88,6 @@ const QueryBuilder = () => {
           targetIndex = overData.position;
         }
       }
-      //console.log(overData.id, overData.type, targetIndex);
 
       setQueryBuilderJson(
         moveItemIntoGroup(

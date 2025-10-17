@@ -29,7 +29,7 @@ const DropSpacer = ({
     <Box
       ref={setNodeRef}
       sx={{
-        height: isVisible ? 50 : 0,
+        height: isVisible ? 20 : 0,
         transition: "height 120ms",
         my: 1,
         mx: 1,
