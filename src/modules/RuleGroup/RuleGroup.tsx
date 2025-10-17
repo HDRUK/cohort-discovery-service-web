@@ -11,13 +11,13 @@ import {
 import RuleBoard from "../RuleBoard";
 import RuleWrapper from "../RuleWrapper";
 
-interface RuleProps {
+export interface RuleGroupProps {
   group: RuleGroupType;
   parentGroupId?: string;
   showConnector?: boolean;
 }
 
-const RuleGroup = ({ group, parentGroupId, ...rest }: RuleProps) => {
+const RuleGroup = ({ group, parentGroupId, ...rest }: RuleGroupProps) => {
   const { id, rules, exclude, valid = true } = group;
 
   const {
