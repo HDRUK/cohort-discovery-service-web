@@ -1,23 +1,24 @@
 import { Theme } from "@mui/material/styles";
 import { SxProps } from "@mui/system";
 
-export const containerSx = (isSelected: boolean): SxProps<Theme> => ({
+export const containerSx = (
+  isSelected: boolean,
+  rest?: SxProps<Theme>
+): SxProps<Theme> => ({
   border: 1,
   borderColor: isSelected ? "blue" : "transparent",
   p: 1,
   position: "relative",
+  ...rest,
 });
 
 export const headerRowSx: SxProps<Theme> = {
+  position: "relative",
   display: "flex",
   flexDirection: "row",
-  width: "100%",
-};
-
-export const leftControlsSx: SxProps<Theme> = {
-  display: "flex",
   alignItems: "center",
-  gap: 1,
+  width: "100%",
+  minHeight: 40,
 };
 
 export const dragButtonSx: SxProps<Theme> = {

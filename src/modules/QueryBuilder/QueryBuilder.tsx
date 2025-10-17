@@ -31,6 +31,7 @@ import DragOverlay from "@/components/DragOverlay";
 
 import { RuleNodeType } from "@/types/rules";
 import { findById, moveItemIntoGroup } from "@/utils/rules";
+import { useDebouncedCallback } from "@/hooks/useDebounceCallback";
 
 const QueryBuilder = () => {
   const {
@@ -75,15 +76,25 @@ const QueryBuilder = () => {
       if (activeData.id === overData.id) return;
 
       const groupItems = boardIndex.itemsByGroup[overGroupId] ?? [];
-      let targetIndex = groupItems.length;
-      if (overData.type === "Spacer" && overData.position === "top") {
-        targetIndex = 0;
+      let targetIndex = groupItems?.indexOf(overData.id);
+
+      targetIndex = targetIndex < 0 ? 0 : targetIndex;
+
+      if (overData.type === "Spacer") {
+        if (overData.position === "top") {
+          targetIndex = 0;
+        } else if (overData.position === "bottom") {
+          targetIndex = groupItems.length;
+        } else {
+          targetIndex = overData.position;
+        }
       }
+      //console.log(overData.id, overData.type, targetIndex);
 
       setQueryBuilderJson(
         moveItemIntoGroup(
           queryBuilderJson,
-          activeData.id,
+          activeData?.id as string,
           overGroupId,
           targetIndex
         )
@@ -111,8 +122,17 @@ const QueryBuilder = () => {
       if (!overGroupId || !activeGroupId) return;
 
       const groupItems = boardIndex.itemsByGroup[overGroupId] ?? [];
-      const overIndex = groupItems.indexOf(overData.id);
-      const targetIndex = overIndex >= 0 ? overIndex : "end";
+      let targetIndex = groupItems?.indexOf(overData.id);
+
+      targetIndex = targetIndex < 0 ? 0 : targetIndex;
+
+      if (overData.type === "Spacer") {
+        if (overData.position === "top") {
+          targetIndex = 0;
+        } else {
+          targetIndex = groupItems.length;
+        }
+      }
 
       setQueryBuilderJson(
         moveItemIntoGroup(

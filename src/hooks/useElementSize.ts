@@ -1,6 +1,7 @@
 import { useLayoutEffect, useMemo, useRef } from "react";
 import type { UniqueIdentifier } from "@dnd-kit/core";
 import { useDaphneStore } from "@/store/useDaphneStore";
+import { useDebouncedCallback } from "./useDebounceCallback";
 
 interface ElementSizeProps {
   minHeight?: number | string;
@@ -18,6 +19,8 @@ export function useElementSize<T extends HTMLElement>(
     queryBuilder: { sizeCache, setSizeCache },
   } = useDaphneStore();
 
+  const setSizeCacheDebounced = useDebouncedCallback(setSizeCache);
+
   const size = useMemo(
     () => sizeCache[id] ?? { height: minHeight, width: minWidth },
     [id, sizeCache, minHeight, minWidth]
@@ -34,7 +37,7 @@ export function useElementSize<T extends HTMLElement>(
       const r = el.getBoundingClientRect();
       if (r.height > 0) {
         if (size.height !== r.height || size.width !== r.width) {
-          setSizeCache(id, r.width, r.height);
+          setSizeCacheDebounced(id, r.width, r.height);
         }
       }
     };
@@ -57,7 +60,7 @@ export function useElementSize<T extends HTMLElement>(
       if (observerRef.current) observerRef.current.disconnect();
       observerRef.current = null;
     };
-  }, [id, size, setSizeCache]);
+  }, [id, size, setSizeCacheDebounced]);
 
   return [ref, size];
 }

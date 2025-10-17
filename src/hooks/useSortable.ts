@@ -7,7 +7,6 @@ import {
 import { useRef, useMemo } from "react";
 import { useElementSize } from "./useElementSize";
 import { quantise } from "@/utils/numbers";
-import { DEFAULT_TRANSFORM } from "@/config/defaults";
 
 export interface UseSortablePlusReturn
   extends ReturnType<typeof useDndSortable> {
@@ -41,11 +40,11 @@ const useSortable = (args: UseSortableArguments): UseSortablePlusReturn => {
   const style = useMemo<React.CSSProperties>(
     () => ({
       transform,
-      transition: DEFAULT_TRANSFORM,
+      transition: params.transition,
       opacity: params.isDragging ? 0.6 : 1,
       willChange: "transform",
     }),
-    [params.isDragging, transform]
+    [params.isDragging, params.transition, transform]
   );
 
   const isLast = useMemo(

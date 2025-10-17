@@ -19,11 +19,10 @@ import RuleWrapper from "../RuleWrapper";
 
 export interface RuleProps {
   rule: RuleLeafType;
-  groupId: string;
-  sortable?: boolean;
+  groupId?: string;
 }
 
-const Rule = ({ rule, groupId }: RuleProps) => {
+const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
   const {
     id,
     exclude,
@@ -168,6 +167,7 @@ const Rule = ({ rule, groupId }: RuleProps) => {
         </>
       )}
       actions={actions}
+      {...rest}
     />
   );
 };

@@ -4,6 +4,7 @@ export const API_ROUTES = {
   task: `${API_URL}/task`,
   tasks: `${API_URL}/tasks`,
   queries: `${API_URL}/queries`,
+  parseQuery: `${API_URL}/parse-query`,
   collections: `${API_URL}/collections`,
   custodians: `${API_URL}/custodians`,
   getMe: `${API_URL}/user`,

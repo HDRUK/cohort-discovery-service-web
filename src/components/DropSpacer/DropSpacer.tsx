@@ -13,7 +13,7 @@ const DropSpacer = ({
 }: {
   id: string;
   groupId: string;
-  position: "top" | "bottom";
+  position: "top" | "bottom" | number;
   isVisible?: boolean;
 }) => {
   const { setNodeRef, isOver } = useDroppable({
@@ -29,7 +29,7 @@ const DropSpacer = ({
     <Box
       ref={setNodeRef}
       sx={{
-        height: isVisible ? 10 : 0,
+        height: isVisible ? 50 : 0,
         transition: "height 120ms",
         my: 1,
         mx: 1,

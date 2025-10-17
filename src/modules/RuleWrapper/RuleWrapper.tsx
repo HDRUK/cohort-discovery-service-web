@@ -11,8 +11,9 @@ import {
   Menu,
   MenuItem,
   CardProps,
+  Collapse,
 } from "@mui/material";
-import { ReactNode, RefObject, useMemo, useState } from "react";
+import { ReactNode, RefObject, useCallback, useMemo, useState } from "react";
 import useSortable from "@/hooks/useSortable";
 import { UseSortablePlusReturn } from "@/hooks/useSortable";
 import { DragIndicator } from "@mui/icons-material";
@@ -21,8 +22,6 @@ import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 
 import {
   containerSx,
-  headerRowSx,
-  leftControlsSx,
   dragButtonSx,
   dragIconSx,
   skeletonSx,
@@ -31,7 +30,9 @@ import {
   chipSx,
   headerActionSx,
   selectedCaptionSx,
+  headerRowSx,
 } from "./RuleWrapper.styles";
+import { TRIGGER_GUTTER_PX } from "@/config/defaults";
 
 interface Action {
   action: () => void;
@@ -43,16 +44,20 @@ export interface RuleWrapperProps extends BoxProps {
   type: "Rule" | "Group" | "Operator";
   headerExtra?: ReactNode;
   hideHeader?: boolean;
-  groupId: string;
+  groupId?: string;
   sortable?: boolean;
   valid?: boolean;
   exclude?: boolean;
   cardProps?: CardProps;
+  containerProps?: BoxProps;
   render: (
     ref: RefObject<HTMLDivElement | null>,
-    props: UseSortablePlusReturn
+    props: UseSortablePlusReturn,
+    handleShown?: boolean
   ) => ReactNode;
   actions?: Action[];
+  forceShowHandle?: boolean;
+  useLeftDragPlaceHolder?: boolean;
 }
 
 const RuleWrapper = ({
@@ -65,9 +70,11 @@ const RuleWrapper = ({
   valid = true,
   exclude = false,
   cardProps = {},
+  containerProps = {},
   render,
   actions,
-  ...rest
+  forceShowHandle = false,
+  useLeftDragPlaceHolder = false,
 }: RuleWrapperProps) => {
   const {
     queryBuilder: { selected, toggleSelected },
@@ -83,6 +90,37 @@ const RuleWrapper = ({
       groupId,
     },
   });
+
+  const {
+    setNodeRef,
+    style,
+    anchorRef,
+    anchorSize,
+    isDragging,
+    attributes,
+    listeners,
+  } = params;
+
+  const [showHandle, setShowHandle] = useState(false);
+
+  const onMouseMove = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      e.stopPropagation();
+
+      const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+      const xFromLeft = e.clientX - rect.left;
+
+      const shouldShow = xFromLeft <= TRIGGER_GUTTER_PX;
+      if (shouldShow !== showHandle) setShowHandle(shouldShow);
+    },
+    [showHandle]
+  );
+
+  const onMouseLeave = () => {
+    if (showHandle && !isDragging) {
+      setShowHandle(false);
+    }
+  };
 
   const [menuPos, setMenuPos] = useState<{
     mouseX: number;
@@ -104,29 +142,27 @@ const RuleWrapper = ({
 
   const handleClose = () => setMenuPos(null);
 
-  const {
-    setNodeRef,
-    style,
-    anchorRef,
-    anchorSize,
-    isDragging,
-    attributes,
-    listeners,
-  } = params;
-
   return (
     <Box
       data-testid="sortable-rule"
       onClick={() => {
         toggleSelected(id);
       }}
-      sx={containerSx(isSelected)}
       ref={setNodeRef}
       style={sortable ? style : {}}
-      {...rest}
+      {...containerProps}
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
+      sx={containerSx(isSelected, containerProps?.sx)}
     >
       <Box sx={headerRowSx}>
-        <Box sx={leftControlsSx}>
+        <Collapse
+          in={showHandle || forceShowHandle || isDragging}
+          orientation="horizontal"
+          collapsedSize={0}
+          unmountOnExit
+          sx={{ display: "flex", alignItems: "center" }}
+        >
           <IconButton
             aria-label="Drag"
             size="small"
@@ -136,8 +172,7 @@ const RuleWrapper = ({
           >
             <DragIndicator fontSize="small" sx={dragIconSx(isDragging)} />
           </IconButton>
-        </Box>
-
+        </Collapse>
         {isDragging ? (
           <Skeleton
             variant="rectangular"
@@ -146,11 +181,14 @@ const RuleWrapper = ({
           />
         ) : (
           <Card
-            data-testid="clickable-card"
             ref={anchorRef}
+            data-testid="clickable-card"
             sx={cardSx(valid)}
             onContextMenu={handleContextMenu}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              toggleSelected(id);
+              e.stopPropagation();
+            }}
             {...cardProps}
           >
             {!hideHeader && (
@@ -176,7 +214,7 @@ const RuleWrapper = ({
               />
             )}
 
-            <CardContent>{render(anchorRef, params)}</CardContent>
+            <CardContent>{render(anchorRef, params, showHandle)}</CardContent>
 
             {actions && (
               <Menu
@@ -203,6 +241,20 @@ const RuleWrapper = ({
               </Menu>
             )}
           </Card>
+        )}
+
+        {useLeftDragPlaceHolder && (
+          <Collapse
+            in={showHandle || forceShowHandle || isDragging}
+            orientation="horizontal"
+            collapsedSize={0}
+            unmountOnExit
+            sx={{ display: "flex", alignItems: "center" }}
+          >
+            <IconButton aria-label="Drag" size="small" sx={{ opacity: 0 }}>
+              <DragIndicator fontSize="small" sx={dragIconSx(isDragging)} />
+            </IconButton>
+          </Collapse>
         )}
       </Box>
 

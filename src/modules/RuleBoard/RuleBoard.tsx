@@ -21,11 +21,20 @@ interface RuleBoardProps {
   ruleGroup: RuleGroupType;
 }
 
-function renderRule(item: RuleNodeType, ruleGroupId: string) {
+function renderRule(item: RuleNodeType, ruleGroupId: string, idx: number) {
   if (isRuleLeaf(item)) {
     return <Rule key={item.id} rule={item} groupId={ruleGroupId} />;
   } else if (isRuleGroup(item)) {
-    return <RuleGroup key={item.id} group={item} parentGroupId={ruleGroupId} />;
+    return (
+      <>
+        <RuleGroup key={item.id} group={item} parentGroupId={ruleGroupId} />
+        {/*<DropSpacer
+          id={`${item.id}::outerBottom`}
+          position={idx + 1}
+          groupId={ruleGroupId}
+        />*/}
+      </>
+    );
   } else if (isOperator(item)) {
     return <RuleOperator key={item.id} operator={item} groupId={ruleGroupId} />;
   }
@@ -47,6 +56,7 @@ const RuleBoard = ({ ruleGroup }: RuleBoardProps) => {
   if (!hasMounted) {
     return <RuleBoardSkeleton />;
   }
+  //
   return (
     <div ref={setNodeRef}>
       <Box display="flex" flexDirection="column" gap={0}>
@@ -59,10 +69,10 @@ const RuleBoard = ({ ruleGroup }: RuleBoardProps) => {
           items={rules.map((r) => r.id)}
           strategy={verticalListSortingStrategy}
         >
-          {rules.map((rule) => {
+          {rules.map((rule, idx) => {
             return (
               <Fragment key={rule.id}>
-                {renderRule(rule, ruleGroup.id)}
+                {renderRule(rule, ruleGroup.id, idx)}
               </Fragment>
             );
           })}
