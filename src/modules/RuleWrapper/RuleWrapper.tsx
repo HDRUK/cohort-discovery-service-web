@@ -106,10 +106,8 @@ const RuleWrapper = ({
   const onMouseMove = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
-
       const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
       const xFromLeft = e.clientX - rect.left;
-
       const shouldShow = xFromLeft <= TRIGGER_GUTTER_PX;
       if (shouldShow !== showHandle) setShowHandle(shouldShow);
     },
