@@ -243,13 +243,15 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     setQueryBuilderJson: (query: RuleGroupType) => {
       const updatedQuery = validateRuleTree(query);
 
+      const text = updatedQuery.valid ? queryToText(query) : "__invalid__";
+
       set((state) => ({
         ...state,
         queryBuilder: {
           ...state.queryBuilder,
           queryBuilderJson: updatedQuery,
           boardIndex: buildIndexFromModel(query),
-          queryAsText: queryToText(query),
+          queryAsText: text,
         },
       }));
     },

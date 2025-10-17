@@ -5,6 +5,7 @@ import { Box } from "@mui/material";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { useEffect } from "react";
 import SearchBox from "../SearchBox";
+import { WarningAmberOutlined } from "@mui/icons-material";
 
 type FormValues = {
   cohortQueryInput: string;
@@ -17,20 +18,27 @@ const CohortQueryInput = () => {
     stateManagement: { isLoading },
   } = useDaphneStore();
 
-  const { handleSubmit, control, setValue } = useForm<FormValues>({
-    defaultValues: {
-      cohortQueryInput: queryAsText,
-      queryName: "",
-    },
-  });
+  const { handleSubmit, control, setValue, setError, clearErrors } =
+    useForm<FormValues>({
+      defaultValues: {
+        cohortQueryInput: queryAsText,
+        queryName: "",
+      },
+    });
 
   const onSubmit = (data: FormValues) => {
     getQueryFromText(data.cohortQueryInput);
   };
 
   useEffect(() => {
+    clearErrors();
+    if (queryAsText === "__invalid__") {
+      setValue("cohortQueryInput", "");
+      setError("cohortQueryInput", { message: "query builder is invalid" });
+      return;
+    }
     setValue("cohortQueryInput", queryAsText);
-  }, [queryAsText, setValue]);
+  }, [queryAsText, setValue, setError, clearErrors]);
 
   return (
     <Box
