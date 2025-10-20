@@ -13,12 +13,13 @@ import RuleWrapper from "../RuleWrapper";
 
 export interface RuleGroupProps {
   group: RuleGroupType;
-  parentGroupId: string;
+  parentGroupId?: string;
   showConnector?: boolean;
 }
 
-const RuleGroup = ({ group, parentGroupId }: RuleGroupProps) => {
+const RuleGroup = ({ group, parentGroupId, ...rest }: RuleGroupProps) => {
   const { id, rules, exclude, valid = true } = group;
+
   const {
     queryBuilder: { queryBuilderJson, setQueryBuilderJson },
   } = useDaphneStore();
@@ -26,18 +27,7 @@ const RuleGroup = ({ group, parentGroupId }: RuleGroupProps) => {
   const handleCollapseGroup = () => {};
 
   const handleCreateNewRule = () => {
-    const newRules = [...rules, createRule()];
-
-    setQueryBuilderJson(
-      updateById(queryBuilderJson, id, (node) => ({
-        ...node,
-        rules: newRules,
-      }))
-    );
-  };
-
-  const handleCreateNewOperator = () => {
-    const newRules = [...rules, createOperator()];
+    const newRules = [...rules, createRule(), createOperator()];
 
     setQueryBuilderJson(
       updateById(queryBuilderJson, id, (node) => ({
@@ -53,7 +43,6 @@ const RuleGroup = ({ group, parentGroupId }: RuleGroupProps) => {
 
   const actions = [
     { action: handleCreateNewRule, label: "Add Rule" },
-    { action: handleCreateNewOperator, label: "Add Operator" },
     { action: handleCollapseGroup, label: "Collapse Group" },
     { action: handleDeleteRule, label: "Delete" },
   ];
@@ -68,6 +57,7 @@ const RuleGroup = ({ group, parentGroupId }: RuleGroupProps) => {
       valid={valid}
       render={() => <RuleBoard ruleGroup={group} />}
       actions={actions}
+      {...rest}
     />
   );
 };

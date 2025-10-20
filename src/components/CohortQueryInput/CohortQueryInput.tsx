@@ -13,24 +13,31 @@ type FormValues = {
 
 const CohortQueryInput = () => {
   const {
-    queryBuilder: { queryAsText, getQueryFromText },
+    queryBuilder: { queryAsText, queryBuilderJson, getQueryFromText },
     stateManagement: { isLoading },
   } = useDaphneStore();
 
-  const { handleSubmit, control, setValue } = useForm<FormValues>({
-    defaultValues: {
-      cohortQueryInput: queryAsText,
-      queryName: "",
-    },
-  });
+  const { handleSubmit, control, setValue, setError, clearErrors } =
+    useForm<FormValues>({
+      defaultValues: {
+        cohortQueryInput: queryAsText,
+        queryName: "",
+      },
+    });
 
   const onSubmit = (data: FormValues) => {
     getQueryFromText(data.cohortQueryInput);
   };
 
   useEffect(() => {
+    clearErrors();
+    if (!queryBuilderJson.valid) {
+      setValue("cohortQueryInput", "");
+      setError("cohortQueryInput", { message: "query builder is invalid" });
+      return;
+    }
     setValue("cohortQueryInput", queryAsText);
-  }, [queryAsText, setValue]);
+  }, [queryAsText, queryBuilderJson.valid, setValue, setError, clearErrors]);
 
   return (
     <Box

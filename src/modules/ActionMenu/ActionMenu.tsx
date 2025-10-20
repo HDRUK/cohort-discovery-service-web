@@ -14,7 +14,7 @@ import AccordionExpandIcon from "@/components/AccordionExpandIcon";
 
 const ActionMenu: React.FC = () => {
   const {
-    queryBuilder: { createNewGroup, createNewOperator, createNewRule },
+    queryBuilder: { createNewGroup, createNewRule },
   } = useDaphneStore();
 
   return (
@@ -59,15 +59,6 @@ const ActionMenu: React.FC = () => {
           sx={{ justifyContent: "flex-start", color: "text.primary" }}
         >
           Add rule
-        </Button>
-
-        <Button
-          variant="text"
-          startIcon={<AddIcon />}
-          onClick={createNewOperator}
-          sx={{ justifyContent: "flex-start", color: "text.primary" }}
-        >
-          Add operator
         </Button>
 
         <Button

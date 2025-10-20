@@ -19,7 +19,7 @@ const CohortBuilder = async () => {
   return (
     <>
       {/*<CohortQueryTitle /> note: to be reimplemented*/}
-      {/*<CohortQueryInput />*/}
+      <CohortQueryInput />
       <Box sx={{ maxWidth: 1000 }}>
         <SelectDatasets
           initialSelection={initialSelection}

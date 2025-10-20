@@ -6,12 +6,11 @@ import { OperatorType } from "@/types/rules";
 import RuleWrapper from "../RuleWrapper";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { removeById } from "@/utils/rules";
-
 import { cardSx, rootSx, dividerSx, chipSx } from "./RuleOperator.styles";
 
 export interface RuleOperatorProps {
   operator: OperatorType;
-  groupId: string;
+  groupId?: string;
   hidden?: boolean;
 }
 
@@ -19,6 +18,7 @@ const RuleOperator = ({
   operator,
   groupId,
   hidden = false,
+  ...rest
 }: RuleOperatorProps) => {
   const { id, combinator, valid = true } = operator;
   const {
@@ -30,8 +30,10 @@ const RuleOperator = ({
   };
 
   const actions = [{ action: handleDeleteRule, label: "Delete" }];
+
   return (
     <RuleWrapper
+      useLeftDragPlaceHolder
       hideHeader
       cardProps={{ sx: cardSx }}
       id={id}
@@ -57,6 +59,7 @@ const RuleOperator = ({
         </Box>
       )}
       actions={actions}
+      {...rest}
     />
   );
 };

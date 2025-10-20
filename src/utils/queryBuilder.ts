@@ -162,7 +162,7 @@ const queryToText = (node: RuleGroupType) => {
     .join(" ")
     .replace(/\s+/g, " ")
     .trim();
-
+  if (body.length === 0) return "";
   return `${subject} ${body}`;
 };
 

@@ -47,6 +47,7 @@ const RuleBoard = ({ ruleGroup }: RuleBoardProps) => {
   if (!hasMounted) {
     return <RuleBoardSkeleton />;
   }
+
   return (
     <div ref={setNodeRef}>
       <Box display="flex" flexDirection="column" gap={0}>

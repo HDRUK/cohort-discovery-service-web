@@ -133,38 +133,46 @@ export const updateById = <T extends RuleNodeType>(
   root: T,
   id: string,
   updater: (node: RuleNodeType) => RuleNodeType,
-  insert?: { node: RuleNodeType; position?: "before" | "after" }
+  insert?: {
+    node: RuleNodeType | RuleNodeType[];
+    position?: "before" | "after";
+  }
 ): T => {
+  // If the target IS the root, we can only update it—no before/after insertion without parent context.
   if (root.id === id) {
     const updated = updater(root) as T;
-    if (!insert) return updated;
-
     return updated;
   }
 
   if (isRuleGroup(root)) {
     let changed = false;
-
     const nextRules: RuleNodeType[] = [];
+
+    // Normalise insert payload once
+    const toArray = (n: RuleNodeType | RuleNodeType[]) =>
+      Array.isArray(n) ? n : [n];
+    const pos = insert?.position ?? "after";
 
     for (const child of root.rules) {
       if (child.id === id) {
         const updatedChild = updater(child);
-        changed = true;
+        if (updatedChild !== child) changed = true;
 
-        if (insert?.position === "before") {
-          nextRules.push(insert.node);
+        if (insert && pos === "before") {
+          nextRules.push(...toArray(insert.node));
+          changed = true;
         }
 
         nextRules.push(updatedChild);
 
-        if (insert?.position === "after") {
-          nextRules.push(insert.node);
+        if (insert && pos === "after") {
+          nextRules.push(...toArray(insert.node));
+          changed = true;
         }
       } else {
-        const updatedChild = updateById(child, id, updater, insert);
-        if (updatedChild !== child) changed = true;
-        nextRules.push(updatedChild);
+        const updatedDesc = updateById(child, id, updater, insert);
+        if (updatedDesc !== child) changed = true;
+        nextRules.push(updatedDesc);
       }
     }
 

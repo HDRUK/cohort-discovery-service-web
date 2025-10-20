@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import QueryBuilder from "./QueryBuilder";
 
@@ -113,17 +113,25 @@ describe("QueryBuilder", () => {
     expect(initialIndex).not.toBe(lastIndexBefore);
 
     const startCard = allRules()[initialIndex];
-    const endCard = allRules()[lastIndexBefore];
+
+    jest.spyOn(startCard, "getBoundingClientRect").mockReturnValue({
+      left: 100,
+      top: 0,
+      right: 300,
+      bottom: 50,
+      width: 200,
+      height: 50,
+      x: 100,
+      y: 0,
+      toJSON: () => {},
+    } as DOMRect);
+    fireEvent.mouseMove(startCard, { clientX: 100, clientY: 10 });
 
     const dragHandleStart = startCard.querySelector(
       '[aria-label="Drag"]'
     ) as HTMLElement;
-    const dragHandleEnd = endCard.querySelector(
-      '[aria-label="Drag"]'
-    ) as HTMLElement;
 
     expect(dragHandleStart).toBeTruthy();
-    expect(dragHandleEnd).toBeTruthy();
 
     await userEvent.pointer([
       { target: dragHandleStart, keys: "[MouseLeft>]" },
