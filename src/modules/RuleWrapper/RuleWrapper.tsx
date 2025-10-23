@@ -150,9 +150,6 @@ const RuleWrapper = ({
   return (
     <Box
       data-testid="sortable-rule"
-      onClick={() => {
-        toggleSelected(id);
-      }}
       ref={setNodeRef}
       style={sortable ? style : {}}
       {...containerProps}

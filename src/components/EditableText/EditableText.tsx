@@ -23,7 +23,7 @@ const EditableText = ({
   onCommit,
   typographyProps,
   textFieldProps,
-  commitOnBlur = false,
+  commitOnBlur = true,
   autoSelect = false,
   trim = true,
   placeholder,
