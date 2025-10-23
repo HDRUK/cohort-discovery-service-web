@@ -265,6 +265,9 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     },
     getNodeName: (node: RuleNodeType) => {
       if (node.name) return node.name;
+
+      console.log(node);
+
       let name = node.exclude ? "Excluded " : "";
       if (isRuleGroup(node)) name += "Group";
       else if (isRuleLeaf(node)) {
