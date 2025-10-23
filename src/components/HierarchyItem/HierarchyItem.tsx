@@ -122,7 +122,11 @@ export const HierarchyItem = ({
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <ActionMenuSection id={`rule-${node.id}`} summary={content}>
+      <ActionMenuSection
+        id={`rule-${node.id}`}
+        summary={content}
+        sx={{ pl: depth }}
+      >
         {({ expanded }) => (
           <List disablePadding>
             <SortableContext
