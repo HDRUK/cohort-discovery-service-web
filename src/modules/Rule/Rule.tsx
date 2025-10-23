@@ -105,7 +105,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
 
   return (
     <RuleWrapper
-      id={id}
+      node={rule}
       type="Rule"
       groupId={groupId}
       sortable={true}

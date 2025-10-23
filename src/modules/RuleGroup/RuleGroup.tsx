@@ -27,7 +27,7 @@ const RuleGroup = ({ group, parentGroupId, ...rest }: RuleGroupProps) => {
   const handleCollapseGroup = () => {};
 
   const handleCreateNewRule = () => {
-    const newRules = [...rules, createRule(), createOperator()];
+    const newRules = [createRule(), createOperator(), ...rules];
 
     setQueryBuilderJson(
       updateById(queryBuilderJson, id, (node) => ({
@@ -49,7 +49,7 @@ const RuleGroup = ({ group, parentGroupId, ...rest }: RuleGroupProps) => {
 
   return (
     <RuleWrapper
-      id={id}
+      node={group}
       type="Group"
       groupId={parentGroupId}
       sortable={true}

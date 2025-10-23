@@ -73,7 +73,6 @@ const SearchBox = ({
         type="search"
         sx={{
           "& .MuiOutlinedInput-root": {
-            //overflow: "visible",
             borderRadius: 100,
             boxShadow: "0px 2px 0px rgba(0, 0, 0, 0.23)",
             backgroundColor: "#fff",
@@ -92,6 +91,26 @@ const SearchBox = ({
           "& .MuiInputAdornment-root": { position: "relative", zIndex: 2 },
           "& .MuiFormLabel-root": {
             zIndex: 1,
+          },
+          "& .MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline":
+            {
+              display: "inherit",
+              opacity: 1,
+              borderColor: (t) => t.palette.error.main,
+            },
+
+          "& .MuiOutlinedInput-root.Mui-error.Mui-disabled .MuiOutlinedInput-notchedOutline":
+            {
+              borderColor: (t) => t.palette.error.main,
+            },
+          "& .MuiInputLabel-root": {
+            color: "text.secondary",
+          },
+          "& .MuiInputLabel-root.Mui-focused": {
+            color: "text.secondary",
+          },
+          "& .MuiInputLabel-root.Mui-error": {
+            color: (t) => t.palette.error.main,
           },
         }}
         slotProps={{

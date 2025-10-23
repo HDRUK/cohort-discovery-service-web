@@ -33,6 +33,8 @@ import {
   headerRowSx,
 } from "./RuleWrapper.styles";
 import { TRIGGER_GUTTER_PX } from "@/config/defaults";
+import { RuleNodeType } from "@/types/rules";
+import EditableText from "@/components/EditableText";
 
 interface Action {
   action: () => void;
@@ -40,7 +42,7 @@ interface Action {
 }
 
 export interface RuleWrapperProps extends BoxProps {
-  id: string;
+  node: RuleNodeType;
   type: "Rule" | "Group" | "Operator";
   headerExtra?: ReactNode;
   hideHeader?: boolean;
@@ -51,7 +53,8 @@ export interface RuleWrapperProps extends BoxProps {
   cardProps?: CardProps;
   containerProps?: BoxProps;
   render: (
-    ref: RefObject<HTMLDivElement | null>,
+    rule: RuleNodeType,
+    ref: RefObject<HTMLDivElement | HTMLLIElement | null>,
     props: UseSortablePlusReturn,
     handleShown?: boolean
   ) => ReactNode;
@@ -61,7 +64,7 @@ export interface RuleWrapperProps extends BoxProps {
 }
 
 const RuleWrapper = ({
-  id,
+  node,
   type,
   groupId,
   headerExtra,
@@ -76,8 +79,10 @@ const RuleWrapper = ({
   forceShowHandle = false,
   useLeftDragPlaceHolder = false,
 }: RuleWrapperProps) => {
+  const { id } = node;
+
   const {
-    queryBuilder: { selected, toggleSelected },
+    queryBuilder: { selected, toggleSelected, getNodeName, setNodeName },
   } = useDaphneStore();
 
   const isSelected = useMemo(() => selected?.[id] ?? false, [selected, id]);
@@ -140,6 +145,8 @@ const RuleWrapper = ({
 
   const handleClose = () => setMenuPos(null);
 
+  const nodeName = useMemo(() => getNodeName(node), [node, getNodeName]);
+
   return (
     <Box
       data-testid="sortable-rule"
@@ -179,11 +186,12 @@ const RuleWrapper = ({
           />
         ) : (
           <Card
+            component="div"
             ref={anchorRef}
             data-testid="clickable-card"
             sx={cardSx(valid)}
             onContextMenu={handleContextMenu}
-            onClick={(e) => {
+            onClick={(e: React.MouseEvent) => {
               toggleSelected(id);
               e.stopPropagation();
             }}
@@ -212,7 +220,9 @@ const RuleWrapper = ({
               />
             )}
 
-            <CardContent>{render(anchorRef, params, showHandle)}</CardContent>
+            <CardContent>
+              {render(node, anchorRef, params, showHandle)}
+            </CardContent>
 
             {actions && (
               <Menu
@@ -257,9 +267,35 @@ const RuleWrapper = ({
       </Box>
 
       {isSelected && (
-        <Typography variant="caption" component="span" sx={selectedCaptionSx}>
-          {id}
-        </Typography>
+        <EditableText
+          value={nodeName}
+          onCommit={(name) => setNodeName(node, name)}
+          typographyProps={{
+            component: "span",
+            variant: "caption",
+            sx: selectedCaptionSx,
+          }}
+          textFieldProps={{
+            variant: "standard",
+            size: "small",
+            margin: "dense",
+            InputProps: { disableUnderline: true },
+            sx: {
+              p: 0,
+              m: 0,
+              "& .MuiInputBase-root": {
+                fontSize: "inherit",
+                lineHeight: "inherit",
+              },
+              "& .MuiInputBase-input": {
+                fontSize: "inherit",
+                lineHeight: "inherit",
+                paddingTop: 0,
+                paddingBottom: 0,
+              },
+            },
+          }}
+        />
       )}
     </Box>
   );

@@ -33,7 +33,7 @@ const CohortQueryInput = () => {
     clearErrors();
     if (!queryBuilderJson.valid) {
       setValue("cohortQueryInput", "");
-      setError("cohortQueryInput", { message: "query builder is invalid" });
+      setError("cohortQueryInput", { message: "This query is invalid..." });
       return;
     }
     setValue("cohortQueryInput", queryAsText);
@@ -53,11 +53,11 @@ const CohortQueryInput = () => {
         control={control}
         defaultValue=""
         rules={{ required: "Query is required" }}
-        render={({ field, fieldState: { error } }) => (
+        render={({ field, fieldState: { error, isDirty } }) => (
           <SearchBox
             {...field}
             error={!!error}
-            helperText={error?.message}
+            label={!isDirty && error?.message}
             type="search"
             placeholder="Search for a cohort e.g. females above 50 with diabetes type-ii"
             fullWidth

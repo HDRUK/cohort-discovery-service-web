@@ -2,10 +2,10 @@
 
 import { Box, Chip, Divider } from "@mui/material";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
-import { OperatorType } from "@/types/rules";
+import { CombinatorType, OperatorType } from "@/types/rules";
 import RuleWrapper from "../RuleWrapper";
 import { useDaphneStore } from "@/store/useDaphneStore";
-import { removeById } from "@/utils/rules";
+import { isOperator, removeById, updateById } from "@/utils/rules";
 import { cardSx, rootSx, dividerSx, chipSx } from "./RuleOperator.styles";
 
 export interface RuleOperatorProps {
@@ -29,14 +29,34 @@ const RuleOperator = ({
     setQueryBuilderJson(removeById(queryBuilderJson, id));
   };
 
-  const actions = [{ action: handleDeleteRule, label: "Delete" }];
+  const handleChange = () => {
+    setQueryBuilderJson(
+      updateById(queryBuilderJson, id, (node) => {
+        if (isOperator(node)) {
+          return {
+            ...node,
+            combinator:
+              node.combinator === CombinatorType.AND
+                ? CombinatorType.OR
+                : CombinatorType.AND,
+          };
+        }
+        return node;
+      })
+    );
+  };
+
+  const actions = [
+    { action: handleDeleteRule, label: "Delete" },
+    { action: handleChange, label: "Change" },
+  ];
 
   return (
     <RuleWrapper
       useLeftDragPlaceHolder
       hideHeader
       cardProps={{ sx: cardSx }}
-      id={id}
+      node={operator}
       type={"Operator"}
       groupId={groupId}
       sortable={true}

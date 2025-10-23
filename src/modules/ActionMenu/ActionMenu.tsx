@@ -2,60 +2,23 @@
 
 import * as React from "react";
 import { useDaphneStore } from "@/store/useDaphneStore";
-import {
-  Button,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Typography,
-} from "@mui/material";
+import { Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import AccordionExpandIcon from "@/components/AccordionExpandIcon";
+import ActionMenuSection from "@/components/ActionMenuSection";
+import Hierarchy from "../Hierarchy";
 
 const ActionMenu: React.FC = () => {
   const {
-    queryBuilder: { createNewGroup, createNewRule },
+    queryBuilder: { queryBuilderJson, createNewGroup, createNewRule },
   } = useDaphneStore();
 
   return (
-    <Accordion
-      defaultExpanded
-      disableGutters
-      elevation={0}
-      square
-      sx={{
-        bgcolor: "transparent",
-        "&:before": { display: "none" },
-      }}
-    >
-      <AccordionSummary
-        expandIcon={<AccordionExpandIcon />}
-        aria-controls="insert-section-content"
-        id="insert-section-header"
-        sx={{
-          minHeight: 40,
-          bgcolor: "transparent",
-          "& .MuiAccordionSummary-content": { my: 0 },
-        }}
-      >
-        <Typography variant="overline" color="text.secondary">
-          Insert
-        </Typography>
-      </AccordionSummary>
-
-      <AccordionDetails
-        id="insert-section-content"
-        sx={{
-          p: 0,
-          display: "flex",
-          flexDirection: "column",
-          gap: 0.5,
-        }}
-      >
+    <>
+      <ActionMenuSection title={"Insert"} defaultExpanded underline>
         <Button
           variant="text"
           startIcon={<AddIcon />}
-          onClick={createNewRule}
+          onClick={() => createNewRule()}
           sx={{ justifyContent: "flex-start", color: "text.primary" }}
         >
           Add rule
@@ -64,13 +27,21 @@ const ActionMenu: React.FC = () => {
         <Button
           variant="text"
           startIcon={<AddIcon />}
-          onClick={createNewGroup}
+          onClick={() => createNewGroup()}
           sx={{ justifyContent: "flex-start", color: "text.primary" }}
         >
           Add group
         </Button>
-      </AccordionDetails>
-    </Accordion>
+      </ActionMenuSection>
+      <ActionMenuSection
+        title={"Hierarchy"}
+        defaultExpanded={queryBuilderJson.rules.length > 0}
+        disabled={queryBuilderJson.rules.length === 0}
+        underline
+      >
+        <Hierarchy />
+      </ActionMenuSection>
+    </>
   );
 };
 

@@ -391,5 +391,10 @@ export function validateRuleTree(root: RuleGroupType): RuleGroupType {
     return { ...withValidTrue(group), rules: children, valid: groupIsValid };
   };
 
+  if (root.rules.length === 0) {
+    //is an empty query
+    return { ...root, valid: true };
+  }
+
   return validateGroup(withValidTrue(root));
 }
