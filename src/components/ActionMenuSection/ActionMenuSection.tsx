@@ -19,6 +19,7 @@ interface ActionMenuSectionProps extends Omit<AccordionProps, "children"> {
   underline?: boolean;
   attributes?: DraggableAttributes;
   listeners?: SyntheticListenerMap;
+  disabled?: boolean;
   children?:
     | React.ReactNode
     | ((args: { expanded: boolean }) => React.ReactNode);
@@ -33,6 +34,7 @@ const ActionMenuSection = ({
   defaultExpanded = false,
   attributes,
   listeners,
+  disabled,
   ...rest
 }: ActionMenuSectionProps) => {
   const titleLowercase = (title ?? "").toLowerCase();
@@ -69,6 +71,7 @@ const ActionMenuSection = ({
       <AccordionSummary
         {...attributes}
         {...listeners}
+        disabled={disabled}
         expandIcon={
           <Box
             component="div"

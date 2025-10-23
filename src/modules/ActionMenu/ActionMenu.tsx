@@ -9,7 +9,7 @@ import Hierarchy from "../Hierarchy";
 
 const ActionMenu: React.FC = () => {
   const {
-    queryBuilder: { createNewGroup, createNewRule },
+    queryBuilder: { queryBuilderJson, createNewGroup, createNewRule },
   } = useDaphneStore();
 
   return (
@@ -33,7 +33,12 @@ const ActionMenu: React.FC = () => {
           Add group
         </Button>
       </ActionMenuSection>
-      <ActionMenuSection title={"Hierarchy"} defaultExpanded underline>
+      <ActionMenuSection
+        title={"Hierarchy"}
+        defaultExpanded={queryBuilderJson.rules.length > 0}
+        disabled={queryBuilderJson.rules.length === 0}
+        underline
+      >
         <Hierarchy />
       </ActionMenuSection>
     </>
