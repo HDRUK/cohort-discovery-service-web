@@ -27,7 +27,7 @@ const RuleGroup = ({ group, parentGroupId, ...rest }: RuleGroupProps) => {
   const handleCollapseGroup = () => {};
 
   const handleCreateNewRule = () => {
-    const newRules = [...rules, createRule(), createOperator()];
+    const newRules = [createRule(), createOperator(), ...rules];
 
     setQueryBuilderJson(
       updateById(queryBuilderJson, id, (node) => ({
