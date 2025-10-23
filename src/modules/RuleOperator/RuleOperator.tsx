@@ -36,7 +36,7 @@ const RuleOperator = ({
       useLeftDragPlaceHolder
       hideHeader
       cardProps={{ sx: cardSx }}
-      id={id}
+      node={operator}
       type={"Operator"}
       groupId={groupId}
       sortable={true}

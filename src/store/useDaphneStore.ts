@@ -36,6 +36,8 @@ import {
   createRuleGroup,
   findById,
   isOperator,
+  isRuleGroup,
+  isRuleLeaf,
   updateById,
   validateRuleTree,
 } from "@/utils/rules";
@@ -71,6 +73,8 @@ export interface DaphneStoreState {
     setQueryName: (name: string) => void;
     queryBuilderJson: RuleGroupType;
     setQueryBuilderJson: (query: RuleGroupType) => void;
+    getNodeName: (node: RuleNodeType) => string;
+    setNodeName: (node: RuleNodeType, name: string) => void;
     boardIndex: BoardIndex;
     sizeCache: SizeCache;
     setSizeCache: (
@@ -80,10 +84,10 @@ export interface DaphneStoreState {
     ) => void;
     selected: Record<UniqueIdentifier, boolean>;
     toggleSelected: (id: UniqueIdentifier) => void;
-    createNewNode: (kind: NodeKind) => void;
-    createNewRule: () => void;
-    createNewGroup: () => void;
-    createNewOperator: () => void;
+    createNewNode: (kind: NodeKind, above: boolean) => void;
+    createNewRule: (above: boolean) => void;
+    createNewGroup: (above: boolean) => void;
+    createNewOperator: (above: boolean) => void;
     queryAsText: string;
     getQueryFromText: (input: string) => void;
     selectedDatasets: string[];
@@ -179,28 +183,28 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         },
       }));
     },
-    createNewNode: (kind: NodeKind) => {
+    createNewNode: (kind: NodeKind, above: boolean = true) => {
       const fn = Creators[kind];
 
       const {
         queryBuilder: { selected, queryBuilderJson, setQueryBuilderJson },
       } = get();
 
-      const addAfter = trueKeys(selected);
+      const idsToAddTo = trueKeys(selected);
 
       const normaliseAdditions = (
-        leftNeighbor?: RuleNodeType
+        belowNeighbor?: RuleNodeType
       ): RuleNodeType[] => {
         const produced = fn();
         const additions = Array.isArray(produced) ? produced : [produced];
 
-        const leftIsOperator = !!leftNeighbor && isOperator(leftNeighbor);
+        const belowIsOperator = !!belowNeighbor && isOperator(belowNeighbor);
         const firstIsOperator = isOperator(additions[0]);
 
         const needLeadingOperator =
-          !!leftNeighbor && !leftIsOperator && !firstIsOperator;
+          !!belowNeighbor && !belowIsOperator && !firstIsOperator;
 
-        const skipFirstOperator = leftIsOperator && firstIsOperator;
+        const skipFirstOperator = belowIsOperator && firstIsOperator;
 
         return [
           ...(needLeadingOperator ? [createOperator()] : []),
@@ -208,16 +212,16 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         ];
       };
 
-      if (addAfter.length > 0) {
+      if (idsToAddTo.length > 0) {
         let updated = queryBuilderJson;
 
-        for (const id of addAfter) {
+        for (const id of idsToAddTo) {
           const leftNeighbor = findById(updated, id as string);
           const toInsert = normaliseAdditions(leftNeighbor);
 
           updated = updateById(updated, id as string, (node) => node, {
-            node: toInsert,
-            position: "after",
+            node: above ? toInsert.reverse() : toInsert,
+            position: above ? "before" : "after",
           });
         }
 
@@ -229,16 +233,20 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         queryBuilderJson.rules[queryBuilderJson.rules.length - 1];
       const toAppend = normaliseAdditions(lastNode);
 
-      const rules = [...queryBuilderJson.rules, ...toAppend];
+      const rules = above
+        ? [...toAppend.reverse(), ...queryBuilderJson.rules]
+        : [...queryBuilderJson.rules, ...toAppend];
       const updatedQuery = { ...queryBuilderJson, rules };
 
       setQueryBuilderJson(updatedQuery);
     },
 
-    createNewRule: () => get().queryBuilder.createNewNode(NodeKind.RULE),
-    createNewGroup: () => get().queryBuilder.createNewNode(NodeKind.GROUP),
-    createNewOperator: () =>
-      get().queryBuilder.createNewNode(NodeKind.OPERATOR),
+    createNewRule: (above: boolean = true) =>
+      get().queryBuilder.createNewNode(NodeKind.RULE, above),
+    createNewGroup: (above: boolean = true) =>
+      get().queryBuilder.createNewNode(NodeKind.GROUP, above),
+    createNewOperator: (above: boolean = true) =>
+      get().queryBuilder.createNewNode(NodeKind.OPERATOR, above),
     queryAsText: queryToText(DEFAULT_QUERY),
     setQueryBuilderJson: (query: RuleGroupType) => {
       const updatedQuery = validateRuleTree(query);
@@ -254,6 +262,27 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
           queryAsText: text,
         },
       }));
+    },
+    getNodeName: (node: RuleNodeType) => {
+      if (node.name) return node.name;
+      let name = node.exclude ? "Excluded " : "";
+      if (isRuleGroup(node)) name += "Group";
+      else if (isRuleLeaf(node)) {
+        const c = node.rule?.concept;
+        const category = Array.isArray(c) ? c[0]?.category : c?.category;
+        name += `${category ?? "Blank"} rule`.trim();
+      } else if (isOperator(node))
+        name += `${node.combinator.toUpperCase()} operator`;
+      else name += "Unknown";
+      return name;
+    },
+    setNodeName: (node: RuleNodeType, name: string) => {
+      get().queryBuilder.setQueryBuilderJson(
+        updateById(get().queryBuilder.queryBuilderJson, node.id, (target) => ({
+          ...target,
+          name,
+        }))
+      );
     },
     queryName: "",
     setQueryName: (name) =>

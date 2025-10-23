@@ -7,17 +7,43 @@ import {
 import { useRef, useMemo } from "react";
 import { useElementSize } from "./useElementSize";
 import { quantise } from "@/utils/numbers";
+import { useDndContext } from "@dnd-kit/core";
+import { useDaphneStore } from "@/store/useDaphneStore";
 
 export interface UseSortablePlusReturn
   extends ReturnType<typeof useDndSortable> {
   isLast: boolean;
   style: React.CSSProperties;
-  anchorRef: React.RefObject<HTMLDivElement | null>;
+  anchorRef: React.RefObject<HTMLDivElement | HTMLLIElement | null>;
   anchorSize: { width: number | string; height: number | string };
+  isOver: boolean;
+  isAbove: boolean;
 }
 
 const useSortable = (args: UseSortableArguments): UseSortablePlusReturn => {
+  const {
+    queryBuilder: { boardIndex },
+  } = useDaphneStore();
   const params = useDndSortable(args);
+  const { over, active } = useDndContext();
+
+  const isOver = useMemo(
+    () => over?.id !== active?.id && over?.id === args.id,
+    [over, active, args.id]
+  );
+
+  const isAbove = useMemo(() => {
+    if (!over?.id) return false;
+    const overId = over?.data?.current?.id;
+    const activeId = active?.data?.current?.id;
+    const overGroupId = over?.data?.current?.groupId;
+
+    const board = boardIndex.itemsByGroup[overGroupId];
+    const currentIndex = board.indexOf(activeId as string);
+    const targetIndex = board.indexOf(overId as string);
+
+    return currentIndex >= targetIndex;
+  }, [active, over, boardIndex]);
 
   const lastTransformStr = useRef<string | undefined>(undefined);
 
@@ -52,7 +78,9 @@ const useSortable = (args: UseSortableArguments): UseSortablePlusReturn => {
     [params.newIndex, params.items]
   );
 
-  const [anchorRef, anchorSize] = useElementSize<HTMLDivElement>(args.id);
+  const [anchorRef, anchorSize] = useElementSize<
+    HTMLDivElement | HTMLLIElement
+  >(args.id);
 
   return {
     ...params,
@@ -60,6 +88,8 @@ const useSortable = (args: UseSortableArguments): UseSortablePlusReturn => {
     style,
     anchorRef,
     anchorSize,
+    isOver,
+    isAbove,
   };
 };
 

@@ -15,25 +15,24 @@ export type ConceptOperator = {
   concept: Concept | Array<Concept> | null;
 };
 
-export type OperatorType = {
+type Node = {
   id: string;
+  exclude?: boolean;
+  valid?: boolean;
+  name?: string;
+};
+
+export interface OperatorType extends Node {
   combinator: CombinatorType;
-  valid?: boolean;
-};
+}
 
-export type RuleGroupType = {
-  id: string;
+export interface RuleGroupType extends Node {
   rules: Array<RuleNodeType>;
-  exclude?: boolean;
-  valid?: boolean;
-};
+}
 
-export type RuleLeafType = {
-  id: string;
+export interface RuleLeafType extends Node {
   rule: ConceptOperator;
-  exclude?: boolean;
-  valid?: boolean;
-};
+}
 
 export type RuleNodeType = RuleGroupType | RuleLeafType | OperatorType;
 

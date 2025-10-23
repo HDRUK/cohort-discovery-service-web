@@ -49,7 +49,7 @@ const RuleGroup = ({ group, parentGroupId, ...rest }: RuleGroupProps) => {
 
   return (
     <RuleWrapper
-      id={id}
+      node={group}
       type="Group"
       groupId={parentGroupId}
       sortable={true}
