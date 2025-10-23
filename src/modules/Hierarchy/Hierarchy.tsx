@@ -49,9 +49,13 @@ export const Hierarchy = () => {
 
       const activeId = active?.data?.current?.id;
       const overId = over?.data?.current?.id;
-      const targetIndex = boardIndex.itemsByGroup[overGroupId].indexOf(
-        overId as string
-      );
+      const board = boardIndex.itemsByGroup[overGroupId];
+
+      const currentIndex = board.indexOf(activeId as string);
+
+      //if dragging from a different group, put it after
+      const targetIndex =
+        board.indexOf(overId as string) + (currentIndex < 0 ? 1 : 0);
 
       setQueryBuilderJson(
         moveItemIntoGroup(queryBuilderJson, activeId, overGroupId, targetIndex)
