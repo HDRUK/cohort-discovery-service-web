@@ -18,7 +18,7 @@ const ActionMenu: React.FC = () => {
         <Button
           variant="text"
           startIcon={<AddIcon />}
-          onClick={createNewRule}
+          onClick={() => createNewRule()}
           sx={{ justifyContent: "flex-start", color: "text.primary" }}
         >
           Add rule
@@ -27,7 +27,7 @@ const ActionMenu: React.FC = () => {
         <Button
           variant="text"
           startIcon={<AddIcon />}
-          onClick={createNewGroup}
+          onClick={() => createNewGroup()}
           sx={{ justifyContent: "flex-start", color: "text.primary" }}
         >
           Add group

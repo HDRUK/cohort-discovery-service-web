@@ -84,10 +84,10 @@ export interface DaphneStoreState {
     ) => void;
     selected: Record<UniqueIdentifier, boolean>;
     toggleSelected: (id: UniqueIdentifier) => void;
-    createNewNode: (kind: NodeKind, above: boolean) => void;
-    createNewRule: (above: boolean) => void;
-    createNewGroup: (above: boolean) => void;
-    createNewOperator: (above: boolean) => void;
+    createNewNode: (kind: NodeKind, above?: boolean) => void;
+    createNewRule: (above?: boolean) => void;
+    createNewGroup: (above?: boolean) => void;
+    createNewOperator: (above?: boolean) => void;
     queryAsText: string;
     getQueryFromText: (input: string) => void;
     selectedDatasets: string[];

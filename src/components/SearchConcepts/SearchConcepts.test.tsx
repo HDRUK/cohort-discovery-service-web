@@ -53,7 +53,6 @@ describe("SearchConcepts", () => {
     const selectAll = screen.getByRole("checkbox", { name: /select all/i });
     expect(selectAll).not.toBeChecked();
 
-    screen.debug(undefined, Infinity);
     await userEvent.click(selectAll);
     expect(selectAll).toBeChecked();
 

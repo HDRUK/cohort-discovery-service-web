@@ -1,6 +1,6 @@
 import { PropsWithChildren } from "react";
 import { useDaphneStore } from "@/store/useDaphneStore";
-import type { DaphneStoreState, CreatorKey } from "@/store/useDaphneStore";
+import type { DaphneStoreState, NodeKind } from "@/store/useDaphneStore";
 import type {
   ApiResponse,
   Collection,
@@ -14,11 +14,17 @@ import type {
   Paginated,
   CreateConceptSetPost,
 } from "@/types/api";
-import { EXAMPLE_1 } from "@/config/queryExamples";
-import type { BoardIndex, SizeCache } from "@/types/rules";
+import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
+import type {
+  BoardIndex,
+  SizeCache,
+  RuleNodeType,
+  RuleGroupType,
+} from "@/types/rules";
 import type { UniqueIdentifier } from "@dnd-kit/core";
 import getConcepts from "@/actions/__mocks__/getConcepts";
 import { validateRuleTree } from "@/utils/rules";
+import { queryToText } from "@/utils/queryBuilder";
 
 type SliceOverrides = {
   [K in keyof DaphneStoreState]?: Partial<DaphneStoreState[K]>;
@@ -26,6 +32,9 @@ type SliceOverrides = {
 
 const NOOP = () => {};
 const RESOLVE = <T,>(v: T) => Promise.resolve(v);
+
+const DEFAULT_QUERY: RuleGroupType =
+  process.env.NEXT_PUBLIC_USE_EXAMPLE_QUERY === "true" ? EXAMPLE_1 : NO_QUERY;
 
 function makeDefaultStore(): DaphneStoreState {
   return {
@@ -36,7 +45,12 @@ function makeDefaultStore(): DaphneStoreState {
     },
 
     queryBuilder: {
-      queryBuilderJson: validateRuleTree(EXAMPLE_1),
+      queryBuilderJson: validateRuleTree(DEFAULT_QUERY),
+      queryAsText: queryToText(DEFAULT_QUERY),
+
+      getNodeName: (node: RuleNodeType) => node?.name ?? "Unknown",
+      setNodeName: (_node: RuleNodeType, _name: string) => {},
+
       boardIndex: {} as BoardIndex,
       sizeCache: {} as SizeCache,
       setSizeCache: (
@@ -46,13 +60,15 @@ function makeDefaultStore(): DaphneStoreState {
       ) => {},
       selected: {},
       toggleSelected: (_id: UniqueIdentifier) => {},
-      createNewNode: (_kind: CreatorKey) => {},
-      createNewRule: NOOP,
-      createNewGroup: NOOP,
-      createNewOperator: NOOP,
-      queryAsText: "",
+
+      createNewNode: (_kind: NodeKind, _above: boolean = true) => {},
+      createNewRule: (_above: boolean = true) => {},
+      createNewGroup: (_above: boolean = true) => {},
+      createNewOperator: (_above: boolean = true) => {},
+
       setQueryBuilderJson: NOOP,
-      getQueryFromText: NOOP,
+      getQueryFromText: (_input: string) => {},
+
       selectedDatasets: [],
       setSelectedDatasets: NOOP,
       queryName: "",
@@ -138,7 +154,6 @@ const MockDaphneStore = ({
   };
 
   useDaphneStore.setState(mock, true);
-
   return <>{children}</>;
 };
 

@@ -38,7 +38,8 @@ const useSortable = (args: UseSortableArguments): UseSortablePlusReturn => {
     const activeId = active?.data?.current?.id;
     const overGroupId = over?.data?.current?.groupId;
 
-    const board = boardIndex.itemsByGroup[overGroupId];
+    const board = boardIndex?.itemsByGroup?.[overGroupId];
+    if (!board) return false;
     const currentIndex = board.indexOf(activeId as string);
     const targetIndex = board.indexOf(overId as string);
 
