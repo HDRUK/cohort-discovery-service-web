@@ -21,6 +21,8 @@ const standaloneSignIn = async (
 
     const token = response.data?.access_token;
 
+    console.log(token);
+
     if (!token) {
         return false;
     }

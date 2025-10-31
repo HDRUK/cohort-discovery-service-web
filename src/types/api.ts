@@ -137,6 +137,7 @@ export enum Rquestroles {
 
 export enum Roles {
   GENERAL_ACCESS = "GENERAL_ACCESS",
+  SYSTEM_ADMIN = "SYSTEM_ADMIN",
   ADMIN = "admin",
 }
 
@@ -164,7 +165,7 @@ export interface TokenUser {
   organisation: string;
   provider: string;
   workgroups: Workgroups[];
-  roles: Roles[];
+  cohort_discovery_roles: Roles[];
   admin_teams: GatewayTeam[];
 }
 

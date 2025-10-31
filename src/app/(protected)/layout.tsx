@@ -29,15 +29,18 @@ export default async function ProtectedLayout({
   const decoded = jwt.decode(token);
   const user = decoded.user as TokenUser;
 
-  const hasGeneralAccess = user?.roles?.includes(Roles.GENERAL_ACCESS);
-  const hasAdminAccess = user?.roles?.includes(Roles.ADMIN);
+  const hasGeneralAccess = user?.cohort_discovery_roles?.includes(Roles.GENERAL_ACCESS);
+  const hasAdminAccess = (user?.cohort_discovery_roles?.includes(Roles.ADMIN) || 
+    user?.cohort_discovery_roles.includes(Roles.SYSTEM_ADMIN));
 
   const now = Math.floor(Date.now() / 1000);
   if (decoded.exp && now >= decoded.exp) {
     redirect("/api/auth/logout");
   }
 
-  if (!hasGeneralAccess && !hasAdminAccess) {
+  console.log(hasAdminAccess, hasGeneralAccess);
+
+  if (!hasGeneralAccess || !hasAdminAccess) {
     forbidden();
   }
 
