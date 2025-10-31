@@ -38,8 +38,6 @@ export default async function ProtectedLayout({
     redirect("/api/auth/logout");
   }
 
-  console.log(hasAdminAccess, hasGeneralAccess);
-
   if (!hasGeneralAccess || !hasAdminAccess) {
     forbidden();
   }
