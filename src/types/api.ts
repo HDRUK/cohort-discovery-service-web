@@ -135,6 +135,12 @@ export enum Rquestroles {
   GENERAL_ACCESS = "GENERAL_ACCESS",
 }
 
+export enum Roles {
+  GENERAL_ACCESS = "GENERAL_ACCESS",
+  SYSTEM_ADMIN = "SYSTEM_ADMIN",
+  ADMIN = "admin",
+}
+
 export interface User extends WithTimestamps {
   id: number;
   email: string;
@@ -159,7 +165,7 @@ export interface TokenUser {
   organisation: string;
   provider: string;
   workgroups: Workgroups[];
-  rquestroles: Rquestroles[];
+  cohort_discovery_roles: Roles[];
   admin_teams: GatewayTeam[];
 }
 
@@ -221,4 +227,9 @@ export interface CreateConceptSetPost {
   name: string;
   description: string;
   domain: string;
+}
+
+export interface SignInPost {
+  email: string;
+  password: string;
 }

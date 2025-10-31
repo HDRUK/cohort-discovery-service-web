@@ -44,6 +44,7 @@ async function request<TResponse, TBody = undefined>(
 
     if (!response.ok) {
       const errorText = await extractErrorMessage(response);
+      console.error(errorText + " url: " + fullUrl);
       throw new ApiError(response.status, errorText);
     }
     return (await response.json()) as TResponse;
@@ -60,6 +61,8 @@ async function request<TResponse, TBody = undefined>(
 async function extractErrorMessage(response: Response): Promise<string> {
   try {
     const data = await response.json();
+    console.log(data);
+    
     if (typeof data?.message === "string") {
       return data.message;
     }

@@ -7,6 +7,7 @@ import NewQueryPage from "./components/NewQueryPage";
 import CollectionsPage from "./components/CollectionsPage";
 import { routes } from "@/config/routes";
 import CodesPage from "./components/CodesPage";
+import { cookies } from "next/headers";
 
 const TABS = [
   { id: "new-query", label: "New Query", href: routes.dashboardNewQuery },
@@ -39,6 +40,9 @@ const DashboardTabPage = async (props: {
   const { tabId } = await params;
 
   if (!isValidTabId(tabId)) return notFound();
+
+  const cookieStore = await cookies();
+  const token = cookieStore.get('token');
 
   return (
     <TabContext value={tabId}>
@@ -75,21 +79,34 @@ const DashboardTabPage = async (props: {
             ))}
           </TabList>
         </Box>
-
+ 
+        {/* These need better handling. These were being called repeatedly
+          causing all kinds of slowness, as they were failing without a
+          token and not being handled properly. Have wrapped for the time
+          being, but they really need consolidating better
+         */}
         <TabPanel value="new-query">
-          <NewQueryPage {...props} />
+          {token &&
+            <NewQueryPage {...props} />
+          }
         </TabPanel>
 
         <TabPanel value="history">
-          <QueryListPage {...props} />
+          {token &&
+            <QueryListPage {...props} />
+          }
         </TabPanel>
 
         <TabPanel value="collections">
-          <CollectionsPage />
+          {token &&
+            <CollectionsPage />
+          }
         </TabPanel>
 
         <TabPanel value="codes">
-          <CodesPage {...props} />
+          {token &&
+            <CodesPage {...props} />
+          }
         </TabPanel>
       </Box>
     </TabContext>

@@ -1,4 +1,5 @@
 const API_URL = "/api/v1";
+const API_AUTH_URL = "/api/auth";
 
 export const API_ROUTES = {
   task: `${API_URL}/task`,
@@ -8,6 +9,7 @@ export const API_ROUTES = {
   collections: `${API_URL}/collections`,
   custodians: `${API_URL}/custodians`,
   getMe: `${API_URL}/user`,
+  signIn: `${API_AUTH_URL}/login`,
   getQuery: (pid: string) => `${API_URL}/query/${pid}`,
   getCodes: (domain: string) => `${API_URL}/codes/${domain}`,
   getTaskStatus: (taskId: string) => `${API_URL}/task/${taskId}/status`,
