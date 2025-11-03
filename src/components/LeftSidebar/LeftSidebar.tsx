@@ -7,9 +7,12 @@ import { routes } from "../../config/routes";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import LeftSidebarMenuItem from "./LeftSidebarMenuItem";
 
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+
 const drawerWidth = 240;
 
 type MenuItem = {
+  icon?: React.ElementType;
   label: string;
   path?: string;
   key?: string;
@@ -44,6 +47,7 @@ export default function LeftSidebar() {
       { label: "Home", path: routes.dashboard },
       { label: "Profile", path: routes.profile },
       { label: "My Definitions", path: routes.definitions },
+      { label: "Administration", path: routes.admin },
       ...(custodianChildren.length > 0
         ? [
             {
