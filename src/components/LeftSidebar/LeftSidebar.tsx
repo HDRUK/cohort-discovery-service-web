@@ -7,8 +7,6 @@ import { routes } from "../../config/routes";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import LeftSidebarMenuItem from "./LeftSidebarMenuItem";
 
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-
 const drawerWidth = 240;
 
 type MenuItem = {

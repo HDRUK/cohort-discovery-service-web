@@ -19,7 +19,6 @@ import type { ApiResponse, UserList } from "@/types/api";
 import getUsersList from "@/actions/admin/getUsersList";
 import SearchBox from "../SearchBox";
 import { Controller, useForm } from "react-hook-form";
-import { useDaphneStore } from "@/store/useDaphneStore";
 import getSearchUsers from "@/actions/admin/getSearchUsers";
 
 interface TabPanelProps {
