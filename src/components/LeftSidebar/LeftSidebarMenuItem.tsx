@@ -6,6 +6,7 @@ import React, { Fragment, useMemo, useState } from "react";
 import {
   List,
   ListItemButton,
+  ListItemIcon,
   ListItemText,
   Collapse,
   IconButton,
@@ -14,6 +15,7 @@ import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { usePathname } from "next/navigation";
 
 export type MenuItem = {
+  icon?: React.ElementType;
   label: string;
   path?: string;
   key?: string;
@@ -30,6 +32,7 @@ const LeftSidebarMenuItem = ({ item, depth = 0 }: Props) => {
   const hasChildren = !!item.children?.length;
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const IconComp = item.icon as React.ElementType | undefined;
 
   const selected = useMemo(
     () =>
