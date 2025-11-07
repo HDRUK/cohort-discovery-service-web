@@ -19,5 +19,5 @@ COPY . /usr/src
 
 RUN npm run build
 
-EXPOSE 8100
+EXPOSE 3000
 CMD npm run start
