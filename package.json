@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "dev-debug": "NODE_OPTIONS='--inspect' next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -27,6 +28,7 @@
     "@mui/material": "^7.2.0",
     "@mui/material-nextjs": "^7.2.0",
     "@ngneat/falso": "^8.0.2",
+    "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "jsonwebtoken": "^9.0.2",
     "material-react-table": "^3.2.1",

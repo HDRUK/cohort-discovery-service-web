@@ -118,6 +118,16 @@ export interface Query {
   tasks: Task[];
 }
 
+export interface UserList {
+  id: number;
+  name: string;
+  email: string;
+  email_verified_at: string | null;
+  created_at: string;
+  updated_at: string;
+  new_user_status: number;
+}
+
 export interface Token {
   federated_token: string;
   type: string;
@@ -133,6 +143,12 @@ interface Workgroups {
 
 export enum Rquestroles {
   GENERAL_ACCESS = "GENERAL_ACCESS",
+}
+
+export enum Roles {
+  GENERAL_ACCESS = "GENERAL_ACCESS",
+  SYSTEM_ADMIN = "SYSTEM_ADMIN",
+  ADMIN = "admin",
 }
 
 export interface User extends WithTimestamps {
@@ -159,7 +175,7 @@ export interface TokenUser {
   organisation: string;
   provider: string;
   workgroups: Workgroups[];
-  rquestroles: Rquestroles[];
+  cohort_discovery_roles: Roles[];
   admin_teams: GatewayTeam[];
 }
 
@@ -221,4 +237,9 @@ export interface CreateConceptSetPost {
   name: string;
   description: string;
   domain: string;
+}
+
+export interface SignInPost {
+  email: string;
+  password: string;
 }
