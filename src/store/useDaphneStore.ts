@@ -83,7 +83,9 @@ export interface DaphneStoreState {
       height: number | string
     ) => void;
     selected: Record<UniqueIdentifier, boolean>;
-    setSelected: (id: UniqueIdentifier) => void;
+    setSelected: (id: UniqueIdentifier, next?: boolean) => void;
+    select: (id: UniqueIdentifier) => void;
+    deselect: (id: UniqueIdentifier) => void;
     toggleSelected: (id: UniqueIdentifier) => void;
     createNewNode: (kind: NodeKind, above?: boolean) => void;
     createNewRule: (above?: boolean) => void;
@@ -172,12 +174,15 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         },
       })),
     selected: {},
-    setSelected: (id: UniqueIdentifier) => {
-      const isSelected = get().queryBuilder.selected[id];
-      if (!isSelected) {
+    setSelected: (id: UniqueIdentifier, next: boolean = true) => {
+      const isSelected = !!get().queryBuilder.selected[id];
+      if (isSelected !== next) {
         get().queryBuilder.toggleSelected(id);
       }
     },
+    select: (id: UniqueIdentifier) => get().queryBuilder.setSelected(id, true),
+    deselect: (id: UniqueIdentifier) =>
+      get().queryBuilder.setSelected(id, false),
     toggleSelected: (id: UniqueIdentifier) => {
       set((state) => ({
         ...state,

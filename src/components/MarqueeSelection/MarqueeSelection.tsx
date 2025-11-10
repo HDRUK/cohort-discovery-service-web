@@ -2,32 +2,22 @@
 
 import React, {
   useEffect,
-  useMemo,
   useRef,
   useState,
   RefObject,
-  PointerEvent as ReactPointerEvent,
+  useCallback,
 } from "react";
 import { createPortal } from "react-dom";
 
 type MarqueeSelectionProps = {
-  /** The scrollable/positioned container that holds all selectable items */
   containerRef: RefObject<HTMLElement | null>;
-  /** CSS selector to find selectable elements inside container */
-  selectable?: string; // e.g. '.rule-card' or '[data-selectable="true"]'
-  /** Attribute on items to read their id from */
-  idAttr?: string; // default: 'data-id'
-  /** Called whenever the selection set changes while dragging */
-  onChange?: (ids: string[]) => void;
-  /** Called once after the user releases the mouse */
+  selectable?: string;
+  idAttr?: string;
+  onChange?: (ids: string[], deselectedIds: string[]) => void;
   onEnd?: (ids: string[]) => void;
-  /** If true, disables marquee entirely */
   disabled?: boolean;
-  /** Hold this key to force marquee even when starting over an item */
   requireModifierKey?: "Shift" | "Alt" | "Meta" | "Control" | null;
-  /** Optional: prevent starting marquee when pointerdown is inside this selector */
-  ignoreWhenInside?: string; // e.g. '[data-draggable="true"]'
-  /** Z-index for the rectangle overlay */
+  ignoreWhenInside?: string;
   zIndex?: number;
 };
 
@@ -63,11 +53,10 @@ export default function MarqueeSelection({
   const rectRef = useRef<Rect>({ x: 0, y: 0, w: 0, h: 0 });
   const [rectState, setRectState] = useState<Rect | null>(null);
   const latestSelected = useRef<string[]>([]);
+  const insideRef = useRef<string>(null);
 
-  // We render the rectangle inside the same container so coords match.
   const portalTarget = containerRef.current;
 
-  // Prevent text selection & scrolling while dragging
   useEffect(() => {
     if (!dragging) return;
     const prevUserSelect = document.body.style.userSelect;
@@ -83,34 +72,39 @@ export default function MarqueeSelection({
     };
   }, [dragging]);
 
-  // Helper: get pointer pos relative to container content (accounts for scroll)
-  const getLocalPoint = (clientX: number, clientY: number) => {
-    const el = containerRef.current!;
-    const r = el.getBoundingClientRect();
-    const x = clientX - r.left + el.scrollLeft;
-    const y = clientY - r.top + el.scrollTop;
-    return { x, y };
-  };
+  const getLocalPoint = useCallback(
+    (clientX: number, clientY: number) => {
+      const el = containerRef.current!;
+      const r = el.getBoundingClientRect();
+      const x = clientX - r.left + el.scrollLeft;
+      const y = clientY - r.top + el.scrollTop;
+      return { x, y };
+    },
+    [containerRef]
+  );
 
-  const computeSelection = (rectN: Rect) => {
-    const el = containerRef.current!;
-    const items = Array.from(el.querySelectorAll<HTMLElement>(selectable));
-    const containerRect = el.getBoundingClientRect();
-    const selection: string[] = [];
-    for (const it of items) {
-      const id = it.getAttribute(idAttr);
-      if (!id) continue;
-      const ir = it.getBoundingClientRect();
-      const local: Rect = {
-        x: ir.left - containerRect.left + el.scrollLeft,
-        y: ir.top - containerRect.top + el.scrollTop,
-        w: ir.width,
-        h: ir.height,
-      };
-      if (intersects(rectN, local)) selection.push(id);
-    }
-    return selection;
-  };
+  const computeSelection = useCallback(
+    (rectN: Rect) => {
+      const el = containerRef.current!;
+      const items = Array.from(el.querySelectorAll<HTMLElement>(selectable));
+      const containerRect = el.getBoundingClientRect();
+      const selection: string[] = [];
+      for (const it of items) {
+        const id = it.getAttribute(idAttr);
+        if (!id) continue;
+        const ir = it.getBoundingClientRect();
+        const local: Rect = {
+          x: ir.left - containerRect.left + el.scrollLeft,
+          y: ir.top - containerRect.top + el.scrollTop,
+          w: ir.width,
+          h: ir.height,
+        };
+        if (intersects(rectN, local)) selection.push(id);
+      }
+      return selection;
+    },
+    [containerRef, idAttr, selectable]
+  );
 
   useEffect(() => {
     if (disabled) return;
@@ -119,9 +113,8 @@ export default function MarqueeSelection({
 
     const onPointerDown = (e: PointerEvent) => {
       if (disabled) return;
-      if (e.button !== 0) return; // left click only
+      if (e.button !== 0) return;
 
-      // If a modifier is required, enforce it
       if (
         requireModifierKey &&
         !(
@@ -134,15 +127,13 @@ export default function MarqueeSelection({
         return;
       }
 
-      // Avoid starting on interactive/draggable elements unless forced w/ modifier
-      if (
-        ignoreWhenInside &&
-        (e.target as HTMLElement)?.closest(ignoreWhenInside)
-      ) {
-        if (!requireModifierKey) return; // only allow if modifier is held and we configured one
+      insideRef.current = null;
+      if (ignoreWhenInside) {
+        const el = (e.target as HTMLElement)?.closest(ignoreWhenInside);
+        const dataId = el?.getAttribute("data-id");
+        insideRef.current = dataId || null;
       }
 
-      // Only start if click occurs within the container bounds
       const { left, top, right, bottom } = container.getBoundingClientRect();
       if (
         e.clientX < left ||
@@ -160,7 +151,6 @@ export default function MarqueeSelection({
       latestSelected.current = [];
       setDragging(true);
 
-      // Stop dnd-kit from also activating
       e.preventDefault();
       e.stopPropagation();
     };
@@ -178,15 +168,21 @@ export default function MarqueeSelection({
       const rectN = normalizeRect(rectRef.current);
       setRectState(rectN);
 
-      const selected = computeSelection(rectN);
-      // Avoid thrashing onChange
+      const selected = computeSelection(rectN).filter(
+        (id) => id !== insideRef.current
+      );
       const prev = latestSelected.current;
-      if (
+
+      const selectedSet = new Set(selected);
+      const deselectedIds = prev.filter((id) => !selectedSet.has(id));
+
+      const changed =
         selected.length !== prev.length ||
-        selected.some((id, i) => id !== prev[i])
-      ) {
+        selected.some((id, i) => id !== prev[i]);
+
+      if (changed) {
+        onChange?.(selected, deselectedIds);
         latestSelected.current = selected;
-        onChange?.(selected);
       }
 
       e.preventDefault();
@@ -226,11 +222,12 @@ export default function MarqueeSelection({
     dragging,
     ignoreWhenInside,
     requireModifierKey,
+    computeSelection,
+    getLocalPoint,
   ]);
 
   if (!portalTarget || !rectState) return null;
 
-  // The overlay rectangle
   const style: React.CSSProperties = {
     position: "absolute",
     left: rectState.x,

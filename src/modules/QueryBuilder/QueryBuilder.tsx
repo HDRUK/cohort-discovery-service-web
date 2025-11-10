@@ -39,7 +39,8 @@ const QueryBuilder = () => {
       queryBuilderJson,
       setQueryBuilderJson,
       boardIndex,
-      setSelected,
+      select,
+      deselect,
     },
   } = useDaphneStore();
 
@@ -209,9 +210,12 @@ const QueryBuilder = () => {
               selectable='[data-selectable="true"]'
               idAttr="data-id"
               ignoreWhenInside='[data-draggable="true"]'
-              // requireModifierKey="Shift" // uncomment if you want Shift+Drag to always start selection, even on items
-              onChange={(ids) => ids.map((id) => setSelected(id))}
-              onEnd={(ids) => console.log(ids)}
+              requireModifierKey="Shift"
+              onChange={(ids, deselectedIds) => {
+                deselectedIds.map((id) => deselect(id));
+                ids.map((id) => select(id));
+              }}
+              onEnd={(ids) => ids.map((id) => select(id))}
             />
           </SwimLane>
         </div>
