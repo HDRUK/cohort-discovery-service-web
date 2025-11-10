@@ -183,6 +183,9 @@ const RuleWrapper = ({
           />
         ) : (
           <Card
+            data-id={id}
+            data-selectable="true"
+            data-draggable="false"
             component="div"
             ref={anchorRef}
             data-testid="clickable-card"

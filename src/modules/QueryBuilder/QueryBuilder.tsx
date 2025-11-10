@@ -1,7 +1,7 @@
 "use client";
 import { useDaphneStore } from "@/store/useDaphneStore";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { Grid } from "@mui/material";
 import SwimLane from "@/components/SwimLane";
 import ActionMenu from "../ActionMenu";
@@ -31,14 +31,20 @@ import DragOverlay from "@/components/DragOverlay";
 
 import { RuleNodeType } from "@/types/rules";
 import { findById, moveItemIntoGroup } from "@/utils/rules";
+import MarqueeSelection from "@/components/MarqueeSelection";
 
 const QueryBuilder = () => {
   const {
-    queryBuilder: { queryBuilderJson, setQueryBuilderJson, boardIndex },
+    queryBuilder: {
+      queryBuilderJson,
+      setQueryBuilderJson,
+      boardIndex,
+      setSelected,
+    },
   } = useDaphneStore();
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 1 } }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
     useSensor(KeyboardSensor)
   );
 
@@ -146,6 +152,7 @@ const QueryBuilder = () => {
     },
     [active, queryBuilderJson, boardIndex, setQueryBuilderJson]
   );
+  const boardRef = useRef<HTMLDivElement>(null);
 
   return (
     <Grid
@@ -168,27 +175,46 @@ const QueryBuilder = () => {
       </Grid>
 
       <Grid size={6}>
-        <SwimLane
-          sx={{
-            p: 2,
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
+        <div
+          ref={boardRef}
+          style={{
+            position: "relative",
+            minHeight: 400,
+            overflow: "auto",
           }}
         >
-          <DndContext
-            sensors={sensors}
-            onDragStart={onDragStart}
-            onDragOver={onDragOver}
-            onDragEnd={onDragEnd}
-            modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
-            collisionDetection={closestCorners}
-            measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
+          <SwimLane
+            sx={{
+              p: 2,
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+            }}
           >
-            <RuleBoard ruleGroup={queryBuilderJson} />
-            <DragOverlay node={activeNode} />
-          </DndContext>
-        </SwimLane>
+            <DndContext
+              sensors={sensors}
+              onDragStart={onDragStart}
+              onDragOver={onDragOver}
+              onDragEnd={onDragEnd}
+              modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
+              collisionDetection={closestCorners}
+              measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
+            >
+              <RuleBoard ruleGroup={queryBuilderJson} />
+              <DragOverlay node={activeNode} />
+            </DndContext>
+
+            <MarqueeSelection
+              containerRef={boardRef}
+              selectable='[data-selectable="true"]'
+              idAttr="data-id"
+              ignoreWhenInside='[data-draggable="true"]'
+              // requireModifierKey="Shift" // uncomment if you want Shift+Drag to always start selection, even on items
+              onChange={(ids) => ids.map((id) => setSelected(id))}
+              onEnd={(ids) => console.log(ids)}
+            />
+          </SwimLane>
+        </div>
       </Grid>
 
       <Grid size={3}>

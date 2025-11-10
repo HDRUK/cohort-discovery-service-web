@@ -17,6 +17,7 @@ export default async function ProtectedLayout({
 
   const cookieStore = await cookies();
   const token = cookieStore.get(GATEWAY_TOKEN_NAME)?.value;
+
   if (!token) {
     if (applicationMode === "standalone") {
       // No token — render the client SignIn component so users can sign in.
@@ -29,16 +30,19 @@ export default async function ProtectedLayout({
   const decoded = jwt.decode(token);
   const user = decoded.user as TokenUser;
 
-  const hasGeneralAccess = user?.cohort_discovery_roles?.includes(Roles.GENERAL_ACCESS);
-  const hasAdminAccess = (user?.cohort_discovery_roles?.includes(Roles.ADMIN) || 
-    user?.cohort_discovery_roles.includes(Roles.SYSTEM_ADMIN));
+  const hasGeneralAccess = user?.cohort_discovery_roles?.includes(
+    Roles.GENERAL_ACCESS
+  );
+  const hasAdminAccess =
+    user?.cohort_discovery_roles?.includes(Roles.ADMIN) ||
+    user?.cohort_discovery_roles.includes(Roles.SYSTEM_ADMIN);
 
   const now = Math.floor(Date.now() / 1000);
   if (decoded.exp && now >= decoded.exp) {
     redirect("/api/auth/logout");
   }
 
-  if (!hasGeneralAccess || !hasAdminAccess) {
+  if (!(hasGeneralAccess || hasAdminAccess)) {
     forbidden();
   }
 
