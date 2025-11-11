@@ -4,7 +4,7 @@ import { Box, Chip, Divider } from "@mui/material";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import { CombinatorType, OperatorType } from "@/types/rules";
 import RuleWrapper from "../RuleWrapper";
-import { useDaphneStore } from "@/store/useDaphneStore";
+import useQueryBuilder from "@/store/useQueryBuilder";
 import { isOperator, removeById, updateById } from "@/utils/rules";
 import { cardSx, rootSx, dividerSx, chipSx } from "./RuleOperator.styles";
 import { useCallback } from "react";
@@ -23,12 +23,10 @@ const RuleOperator = ({
 }: RuleOperatorProps) => {
   const { id, combinator, valid = true } = operator;
 
-  const queryBuilderJson = useDaphneStore(
-    (s) => s.queryBuilder.queryBuilderJson
-  );
-  const setQueryBuilderJson = useDaphneStore(
-    (s) => s.queryBuilder.setQueryBuilderJson
-  );
+  const { queryBuilderJson, setQueryBuilderJson } = useQueryBuilder((qb) => ({
+    queryBuilderJson: qb.queryBuilderJson,
+    setQueryBuilderJson: qb.setQueryBuilderJson,
+  }));
 
   const handleDeleteRule = useCallback(() => {
     setQueryBuilderJson(removeById(queryBuilderJson, id));

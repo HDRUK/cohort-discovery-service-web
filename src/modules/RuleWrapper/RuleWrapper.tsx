@@ -16,7 +16,7 @@ import {
 import { ReactNode, RefObject, useCallback, useMemo, useState } from "react";
 import useSortable from "@/hooks/useSortable";
 import { DragIndicator } from "@mui/icons-material";
-import { useDaphneStore } from "@/store/useDaphneStore";
+import useQueryBuilder from "@/store/useQueryBuilder";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 
 import {
@@ -79,10 +79,13 @@ const RuleWrapper = ({
 }: RuleWrapperProps) => {
   const { id } = node;
 
-  const isSelected = useDaphneStore((s) => !!s.queryBuilder.selected[id]);
-  const toggleSelected = useDaphneStore((s) => s.queryBuilder.toggleSelected);
-  const getNodeName = useDaphneStore((s) => s.queryBuilder.getNodeName);
-  const setNodeName = useDaphneStore((s) => s.queryBuilder.setNodeName);
+  const { isSelected, toggleSelected, getNodeName, setNodeName } =
+    useQueryBuilder((qb) => ({
+      isSelected: !!qb.selected[id],
+      toggleSelected: qb.toggleSelected,
+      getNodeName: qb.getNodeName,
+      setNodeName: qb.setNodeName,
+    }));
 
   const {
     setNodeRef,

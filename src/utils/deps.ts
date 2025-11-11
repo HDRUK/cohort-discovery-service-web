@@ -1,6 +1,7 @@
 import { useRef, useEffect, type RefObject } from "react";
 
-const isProd = process?.env?.NODE_ENV === "production";
+const isProd = process.env.NODE_ENV === "production";
+const useDebug = process.env.NEXT_PUBLIC_USE_DEBUG_LOGS === "true";
 
 type Deps = Readonly<Record<string, unknown>>;
 
@@ -36,7 +37,7 @@ function useLogDependencyChanges(
   depsObj: Deps,
   options?: Options
 ): void {
-  const { enabled = !isProd, pretty = true } = options ?? {};
+  const { enabled = !isProd && useDebug, pretty = true } = options ?? {};
   const prev = useRef<Deps>(depsObj);
 
   useEffect(() => {

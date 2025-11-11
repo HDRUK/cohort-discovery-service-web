@@ -1,5 +1,5 @@
 import { RuleGroupType } from "@/types/rules";
-import { useDaphneStore } from "@/store/useDaphneStore";
+import useQueryBuilder from "@/store/useQueryBuilder";
 
 import {
   updateById,
@@ -21,12 +21,10 @@ export interface RuleGroupProps {
 const RuleGroup = ({ group, parentGroupId, ...rest }: RuleGroupProps) => {
   const { id, rules, exclude, valid = true } = group;
 
-  const queryBuilderJson = useDaphneStore(
-    (s) => s.queryBuilder.queryBuilderJson
-  );
-  const setQueryBuilderJson = useDaphneStore(
-    (s) => s.queryBuilder.setQueryBuilderJson
-  );
+  const { queryBuilderJson, setQueryBuilderJson } = useQueryBuilder((qb) => ({
+    queryBuilderJson: qb.queryBuilderJson,
+    setQueryBuilderJson: qb.setQueryBuilderJson,
+  }));
 
   const handleCollapseGroup = () => {};
 

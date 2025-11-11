@@ -5,6 +5,7 @@ import { Box } from "@mui/material";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { useEffect } from "react";
 import SearchBox from "../SearchBox";
+import useQueryBuilder from "@/store/useQueryBuilder";
 
 type FormValues = {
   cohortQueryInput: string;
@@ -12,12 +13,12 @@ type FormValues = {
 };
 
 const CohortQueryInput = () => {
-  const queryAsText = useDaphneStore((s) => s.queryBuilder.queryAsText);
-  const queryBuilderJson = useDaphneStore(
-    (s) => s.queryBuilder.queryBuilderJson
-  );
-  const getQueryFromText = useDaphneStore(
-    (s) => s.queryBuilder.getQueryFromText
+  const { queryAsText, queryBuilderJson, getQueryFromText } = useQueryBuilder(
+    (qb) => ({
+      queryAsText: qb.queryAsText,
+      queryBuilderJson: qb.queryBuilderJson,
+      getQueryFromText: qb.getQueryFromText,
+    })
   );
   const isLoading = useDaphneStore((s) => s.stateManagement.isLoading);
 

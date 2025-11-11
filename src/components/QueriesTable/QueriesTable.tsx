@@ -1,6 +1,6 @@
 "use client";
 
-import { useDaphneStore } from "@/store/useDaphneStore";
+import useQueryBuilder from "@/store/useQueryBuilder";
 
 import { useEffect } from "react";
 import { Query, Paginated } from "../../types/api";
@@ -24,11 +24,11 @@ const QueriesTable = ({
   hasIncomplete: boolean;
 }) => {
   const router = useRouter();
-  const setQueryBuilderJson = useDaphneStore(
-    (s) => s.queryBuilder.setQueryBuilderJson
-  );
-  const setSelectedDatasets = useDaphneStore(
-    (s) => s.queryBuilder.setSelectedDatasets
+  const { setQueryBuilderJson, setSelectedDatasets } = useQueryBuilder(
+    (qb) => ({
+      setQueryBuilderJson: qb.setQueryBuilderJson,
+      setSelectedDatasets: qb.setSelectedDatasets,
+    })
   );
 
   useEffect(() => {

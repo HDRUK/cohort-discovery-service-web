@@ -2,6 +2,7 @@
 
 import { Button } from "@mui/material";
 import { useDaphneStore } from "@/store/useDaphneStore";
+import useQueryBuilder from "@/store/useQueryBuilder";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { revalidateAction } from "@/actions/revalidate";
@@ -10,17 +11,15 @@ const SubmitQueryButton = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const fetchResults = useDaphneStore((s) => s.userData.fetchResults);
+  const { isLoading, setIsLoading } = useDaphneStore((s) => s.stateManagement);
 
-  const selectedDatasets = useDaphneStore(
-    (s) => s.queryBuilder.selectedDatasets
+  const { selectedDatasets, queryName, queryBuilderJson } = useQueryBuilder(
+    (qb) => ({
+      selectedDatasets: qb.selectedDatasets,
+      queryName: qb.queryName,
+      queryBuilderJson: qb.queryBuilderJson,
+    })
   );
-  const queryName = useDaphneStore((s) => s.queryBuilder.queryName);
-  const queryBuilderJson = useDaphneStore(
-    (s) => s.queryBuilder.queryBuilderJson
-  );
-
-  const isLoading = useDaphneStore((s) => s.stateManagement.isLoading);
-  const setIsLoading = useDaphneStore((s) => s.stateManagement.setIsLoading);
 
   const { valid } = queryBuilderJson;
 

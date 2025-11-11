@@ -2,7 +2,7 @@
 
 import { useForm, Controller } from "react-hook-form";
 import { Box, Button, TextField } from "@mui/material";
-import { useDaphneStore } from "@/store/useDaphneStore";
+import useQueryBuilder from "@/store/useQueryBuilder";
 import { useEffect } from "react";
 import Title from "@/components/Title";
 import { useNotify } from "../../providers/NotifyProvider";
@@ -12,9 +12,10 @@ type FormValues = {
 };
 
 const CohortQueryTitle = () => {
-  const queryName = useDaphneStore((s) => s.queryBuilder.queryName);
-  const setQueryName = useDaphneStore((s) => s.queryBuilder.setQueryName);
-
+  const { queryName, setQueryName } = useQueryBuilder((qb) => ({
+    queryName: qb.queryName,
+    setQueryName: qb.setQueryName,
+  }));
   const notify = useNotify();
 
   const { handleSubmit, control, setValue } = useForm<FormValues>({

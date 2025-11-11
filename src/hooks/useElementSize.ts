@@ -1,6 +1,6 @@
 import { useLayoutEffect, useMemo, useRef } from "react";
 import type { UniqueIdentifier } from "@dnd-kit/core";
-import { useDaphneStore } from "@/store/useDaphneStore";
+import useQueryBuilder from "@/store/useQueryBuilder";
 import { useDebouncedCallback } from "./useDebounceCallback";
 
 interface ElementSizeProps {
@@ -15,8 +15,10 @@ export function useElementSize<T extends HTMLElement>(
   React.RefObject<T | null>,
   { width: number | string; height: number | string }
 ] {
-  const sizeCache = useDaphneStore((s) => s.queryBuilder.sizeCache);
-  const setSizeCache = useDaphneStore((s) => s.queryBuilder.setSizeCache);
+  const { sizeCache, setSizeCache } = useQueryBuilder((qb) => ({
+    sizeCache: qb.sizeCache,
+    setSizeCache: qb.setSizeCache,
+  }));
 
   const setSizeCacheDebounced = useDebouncedCallback(setSizeCache);
 

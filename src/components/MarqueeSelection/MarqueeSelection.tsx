@@ -77,8 +77,12 @@ export default function MarqueeSelection({
     (clientX: number, clientY: number) => {
       const el = containerRef.current!;
       const r = el.getBoundingClientRect();
-      const x = clientX - r.left + el.scrollLeft;
-      const y = clientY - r.top + el.scrollTop;
+
+      const clampedX = Math.min(Math.max(clientX, r.left), r.right - 1);
+      const clampedY = Math.min(Math.max(clientY, r.top), r.bottom - 1);
+
+      const x = clampedX - r.left + el.scrollLeft;
+      const y = clampedY - r.top + el.scrollTop;
       return { x, y };
     },
     [containerRef]

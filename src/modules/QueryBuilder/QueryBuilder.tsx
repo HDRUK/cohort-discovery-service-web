@@ -1,5 +1,5 @@
 "use client";
-import { useDaphneStore } from "@/store/useDaphneStore";
+import useQueryBuilder from "@/store/useQueryBuilder";
 
 import { useState, useCallback, useRef } from "react";
 import { Grid } from "@mui/material";
@@ -34,16 +34,19 @@ import { findById, moveItemIntoGroup } from "@/utils/rules";
 import MarqueeSelection from "@/components/MarqueeSelection";
 
 const QueryBuilder = () => {
-  const queryBuilderJson = useDaphneStore(
-    (s) => s.queryBuilder.queryBuilderJson
-  );
-  const setQueryBuilderJson = useDaphneStore(
-    (s) => s.queryBuilder.setQueryBuilderJson
-  );
-  const boardIndex = useDaphneStore((s) => s.queryBuilder.boardIndex);
-
-  const select = useDaphneStore((s) => s.queryBuilder.select);
-  const deselect = useDaphneStore((s) => s.queryBuilder.deselect);
+  const {
+    queryBuilderJson,
+    setQueryBuilderJson,
+    boardIndex,
+    select,
+    deselect,
+  } = useQueryBuilder((qb) => ({
+    queryBuilderJson: qb.queryBuilderJson,
+    setQueryBuilderJson: qb.setQueryBuilderJson,
+    boardIndex: qb.boardIndex,
+    select: qb.select,
+    deselect: qb.deselect,
+  }));
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),

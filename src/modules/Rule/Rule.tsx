@@ -4,7 +4,8 @@ import { Concept } from "@/types/api";
 import { useCallback, useState } from "react";
 import ConceptChip from "@/components/ConceptChip";
 import { RuleLeafType } from "@/types/rules";
-import { useDaphneStore } from "@/store/useDaphneStore";
+
+import useQueryBuilder from "@/store/useQueryBuilder";
 import {
   isEmptyRule,
   updateById,
@@ -35,12 +36,10 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       ? concept?.[0].category
       : concept?.category;
 
-  const queryBuilderJson = useDaphneStore(
-    (s) => s.queryBuilder.queryBuilderJson
-  );
-  const setQueryBuilderJson = useDaphneStore(
-    (s) => s.queryBuilder.setQueryBuilderJson
-  );
+  const { queryBuilderJson, setQueryBuilderJson } = useQueryBuilder((qb) => ({
+    queryBuilderJson: qb.queryBuilderJson,
+    setQueryBuilderJson: qb.setQueryBuilderJson,
+  }));
 
   const setConcept = useCallback(
     (c: Concept) => {
