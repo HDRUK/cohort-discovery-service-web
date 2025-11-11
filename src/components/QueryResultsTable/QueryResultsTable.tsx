@@ -15,9 +15,11 @@ import CodeBlock from "../CodeBlock";
 import ShowOnClick from "../ShowOnClick";
 
 const QueryResultsTable = ({ query }: { query: Query }) => {
-  const {
-    queryBuilder: { setQueryName, setQueryBuilderJson },
-  } = useDaphneStore();
+  const setQueryName = useDaphneStore((s) => s.queryBuilder.setQueryName);
+  const setQueryBuilderJson = useDaphneStore(
+    (s) => s.queryBuilder.setQueryBuilderJson
+  );
+
   const { tasks, name, definition } = query;
 
   useEffect(() => {

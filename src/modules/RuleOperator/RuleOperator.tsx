@@ -7,6 +7,7 @@ import RuleWrapper from "../RuleWrapper";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { isOperator, removeById, updateById } from "@/utils/rules";
 import { cardSx, rootSx, dividerSx, chipSx } from "./RuleOperator.styles";
+import { useCallback } from "react";
 
 export interface RuleOperatorProps {
   operator: OperatorType;
@@ -21,15 +22,19 @@ const RuleOperator = ({
   ...rest
 }: RuleOperatorProps) => {
   const { id, combinator, valid = true } = operator;
-  const {
-    queryBuilder: { queryBuilderJson, setQueryBuilderJson },
-  } = useDaphneStore();
 
-  const handleDeleteRule = () => {
+  const queryBuilderJson = useDaphneStore(
+    (s) => s.queryBuilder.queryBuilderJson
+  );
+  const setQueryBuilderJson = useDaphneStore(
+    (s) => s.queryBuilder.setQueryBuilderJson
+  );
+
+  const handleDeleteRule = useCallback(() => {
     setQueryBuilderJson(removeById(queryBuilderJson, id));
-  };
+  }, [id, queryBuilderJson, setQueryBuilderJson]);
 
-  const handleChange = () => {
+  const handleChange = useCallback(() => {
     setQueryBuilderJson(
       updateById(queryBuilderJson, id, (node) => {
         if (isOperator(node)) {
@@ -44,7 +49,7 @@ const RuleOperator = ({
         return node;
       })
     );
-  };
+  }, [id, queryBuilderJson, setQueryBuilderJson]);
 
   const actions = [
     { action: handleDeleteRule, label: "Delete" },

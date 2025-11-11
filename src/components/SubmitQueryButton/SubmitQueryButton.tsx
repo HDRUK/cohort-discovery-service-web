@@ -9,11 +9,18 @@ import { revalidateAction } from "@/actions/revalidate";
 const SubmitQueryButton = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const {
-    userData: { fetchResults },
-    queryBuilder: { selectedDatasets, queryName, queryBuilderJson },
-    stateManagement: { isLoading, setIsLoading },
-  } = useDaphneStore();
+  const fetchResults = useDaphneStore((s) => s.userData.fetchResults);
+
+  const selectedDatasets = useDaphneStore(
+    (s) => s.queryBuilder.selectedDatasets
+  );
+  const queryName = useDaphneStore((s) => s.queryBuilder.queryName);
+  const queryBuilderJson = useDaphneStore(
+    (s) => s.queryBuilder.queryBuilderJson
+  );
+
+  const isLoading = useDaphneStore((s) => s.stateManagement.isLoading);
+  const setIsLoading = useDaphneStore((s) => s.stateManagement.setIsLoading);
 
   const { valid } = queryBuilderJson;
 

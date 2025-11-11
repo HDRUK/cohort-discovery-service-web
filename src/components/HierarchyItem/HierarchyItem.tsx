@@ -29,9 +29,10 @@ export const HierarchyItem = ({
   groupId,
   depth = 0,
 }: HierarchyItemProps) => {
-  const {
-    queryBuilder: { toggleSelected, selected, getNodeName, setNodeName },
-  } = useDaphneStore();
+  const toggleSelected = useDaphneStore((s) => s.queryBuilder.toggleSelected);
+  const selected = useDaphneStore((s) => s.queryBuilder.selected);
+  const getNodeName = useDaphneStore((s) => s.queryBuilder.getNodeName);
+  const setNodeName = useDaphneStore((s) => s.queryBuilder.setNodeName);
 
   const id = `${ID_REF_SUFFIX}-${node.id}`;
 

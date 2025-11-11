@@ -172,7 +172,24 @@ export const EXAMPLE_2 = {
       exclude: false,
       rules: [
         {
-          id: "rule-1",
+          id: "rule-1-in-group-1",
+          exclude: false,
+          rule: {
+            concept: {
+              concept_id: 3955320,
+              description: "Moderna - SARS-CoV-2 (COVID-19) vaccine",
+              category: "Drug",
+              children: [],
+            },
+          },
+        },
+        {
+          id: "connector-1-in-group-1",
+          combinator: CombinatorType.AND,
+          exclude: false,
+        },
+        {
+          id: "rule-2-in-group-1",
           exclude: false,
           rule: {
             concept: {
@@ -192,6 +209,24 @@ export const EXAMPLE_2 = {
     },
     {
       id: "rule-2",
+      exclude: true,
+      rule: {
+        concept: {
+          concept_id: 3955322,
+          description:
+            "Oxford, AstraZeneca - SARS-CoV-2 (COVID-19) vaccine AZD1222",
+          category: "Drug",
+          children: [],
+        },
+      },
+    },
+    {
+      id: "connector-2",
+      combinator: CombinatorType.AND,
+      exclude: false,
+    },
+    {
+      id: "rule-3",
       exclude: true,
       rule: {
         concept: {

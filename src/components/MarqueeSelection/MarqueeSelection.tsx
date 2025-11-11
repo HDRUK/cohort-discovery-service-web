@@ -1,5 +1,6 @@
 "use client";
 
+import { useLogDependencyChanges } from "@/utils/deps";
 import React, {
   useEffect,
   useRef,
@@ -226,6 +227,20 @@ export default function MarqueeSelection({
     getLocalPoint,
   ]);
 
+  useLogDependencyChanges("selection-effect", {
+    containerRef: containerRef?.current ?? containerRef, // logs the node if available
+    selectable,
+    idAttr,
+    onChange,
+    onEnd,
+    disabled,
+    dragging,
+    ignoreWhenInside,
+    requireModifierKey,
+    computeSelection,
+    getLocalPoint,
+  });
+
   if (!portalTarget || !rectState) return null;
 
   const style: React.CSSProperties = {
@@ -235,7 +250,7 @@ export default function MarqueeSelection({
     width: rectState.w,
     height: rectState.h,
     pointerEvents: "none",
-    border: "1px solid rgba(59,130,246,0.9)", // Tailwind blue-500-ish
+    border: "1px solid rgba(59,130,246,0.9)",
     background: "rgba(59,130,246,0.15)",
     boxShadow: "0 0 0 1px rgba(59,130,246,0.2) inset",
     borderRadius: 4,

@@ -24,9 +24,12 @@ const SelectDatasets = ({
   initialSelection: string[];
   collections: Collection[];
 }) => {
-  const {
-    queryBuilder: { selectedDatasets, setSelectedDatasets },
-  } = useDaphneStore();
+  const selectedDatasets = useDaphneStore(
+    (s) => s.queryBuilder.selectedDatasets
+  );
+  const setSelectedDatasets = useDaphneStore(
+    (s) => s.queryBuilder.setSelectedDatasets
+  );
 
   const mountedRef = useRef(false);
   useEffect(() => {

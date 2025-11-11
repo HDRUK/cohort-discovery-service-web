@@ -34,15 +34,16 @@ import { findById, moveItemIntoGroup } from "@/utils/rules";
 import MarqueeSelection from "@/components/MarqueeSelection";
 
 const QueryBuilder = () => {
-  const {
-    queryBuilder: {
-      queryBuilderJson,
-      setQueryBuilderJson,
-      boardIndex,
-      select,
-      deselect,
-    },
-  } = useDaphneStore();
+  const queryBuilderJson = useDaphneStore(
+    (s) => s.queryBuilder.queryBuilderJson
+  );
+  const setQueryBuilderJson = useDaphneStore(
+    (s) => s.queryBuilder.setQueryBuilderJson
+  );
+  const boardIndex = useDaphneStore((s) => s.queryBuilder.boardIndex);
+
+  const select = useDaphneStore((s) => s.queryBuilder.select);
+  const deselect = useDaphneStore((s) => s.queryBuilder.deselect);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -153,6 +154,15 @@ const QueryBuilder = () => {
     },
     [active, queryBuilderJson, boardIndex, setQueryBuilderJson]
   );
+
+  const onChangeSelection = useCallback(
+    (ids: string[], deselectedIds: string[]) => {
+      select(ids);
+      deselect(deselectedIds);
+    },
+    [deselect, select]
+  );
+
   const boardRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -211,11 +221,7 @@ const QueryBuilder = () => {
               idAttr="data-id"
               ignoreWhenInside='[data-draggable="true"]'
               requireModifierKey="Shift"
-              onChange={(ids, deselectedIds) => {
-                deselectedIds.map((id) => deselect(id));
-                ids.map((id) => select(id));
-              }}
-              onEnd={(ids) => ids.map((id) => select(id))}
+              onChange={onChangeSelection}
             />
           </SwimLane>
         </div>

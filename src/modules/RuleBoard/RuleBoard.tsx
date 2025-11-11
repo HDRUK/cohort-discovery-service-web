@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo, Fragment } from "react";
+import { useEffect, useState, Fragment } from "react";
 import { RuleBoardSkeleton } from "./RuleBoardSkeleton";
 
 import Rule from "@/modules/Rule";
@@ -32,10 +32,10 @@ function renderRule(item: RuleNodeType, ruleGroupId: string) {
 }
 
 const RuleBoard = ({ ruleGroup }: RuleBoardProps) => {
-  const { rules } = useMemo(() => ruleGroup, [ruleGroup]);
+  const { rules, id } = ruleGroup;
   const { setNodeRef } = useDroppable({
-    id: ruleGroup.id,
-    data: { type: "container", containerId: ruleGroup.id },
+    id,
+    data: { type: "container", containerId: id },
   });
 
   const [hasMounted, setHasMounted] = useState(false);
@@ -51,28 +51,16 @@ const RuleBoard = ({ ruleGroup }: RuleBoardProps) => {
   return (
     <div ref={setNodeRef}>
       <Box display="flex" flexDirection="column" gap={0}>
-        <DropSpacer
-          id={`${ruleGroup.id}::top`}
-          position="top"
-          groupId={ruleGroup.id}
-        />
+        <DropSpacer id={`${id}::top`} position="top" groupId={id} />
         <SortableContext
           items={rules.map((r) => r.id)}
           strategy={verticalListSortingStrategy}
         >
           {rules.map((rule) => {
-            return (
-              <Fragment key={rule.id}>
-                {renderRule(rule, ruleGroup.id)}
-              </Fragment>
-            );
+            return <Fragment key={rule.id}>{renderRule(rule, id)}</Fragment>;
           })}
         </SortableContext>
-        <DropSpacer
-          id={`${ruleGroup.id}::bottom`}
-          position="bottom"
-          groupId={ruleGroup.id}
-        />
+        <DropSpacer id={`${id}::bottom`} position="bottom" groupId={id} />
       </Box>
     </div>
   );

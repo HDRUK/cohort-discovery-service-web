@@ -15,9 +15,8 @@ export function useElementSize<T extends HTMLElement>(
   React.RefObject<T | null>,
   { width: number | string; height: number | string }
 ] {
-  const {
-    queryBuilder: { sizeCache, setSizeCache },
-  } = useDaphneStore();
+  const sizeCache = useDaphneStore((s) => s.queryBuilder.sizeCache);
+  const setSizeCache = useDaphneStore((s) => s.queryBuilder.setSizeCache);
 
   const setSizeCacheDebounced = useDebouncedCallback(setSizeCache);
 

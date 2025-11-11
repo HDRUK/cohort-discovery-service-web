@@ -15,7 +15,6 @@ import {
 } from "@mui/material";
 import { ReactNode, RefObject, useCallback, useMemo, useState } from "react";
 import useSortable from "@/hooks/useSortable";
-import { UseSortablePlusReturn } from "@/hooks/useSortable";
 import { DragIndicator } from "@mui/icons-material";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
@@ -35,6 +34,7 @@ import {
 import { TRIGGER_GUTTER_PX } from "@/config/defaults";
 import { RuleNodeType } from "@/types/rules";
 import EditableText from "@/components/EditableText";
+import { useLogDependencyChanges } from "@/utils/deps";
 
 interface Action {
   action: () => void;
@@ -54,9 +54,7 @@ export interface RuleWrapperProps extends BoxProps {
   containerProps?: BoxProps;
   render: (
     rule: RuleNodeType,
-    ref: RefObject<HTMLDivElement | HTMLLIElement | null>,
-    props: UseSortablePlusReturn,
-    handleShown?: boolean
+    ref: RefObject<HTMLDivElement | HTMLLIElement | null>
   ) => ReactNode;
   actions?: Action[];
   forceShowHandle?: boolean;
@@ -72,8 +70,8 @@ const RuleWrapper = ({
   sortable = true,
   valid = true,
   exclude = false,
-  cardProps = {},
-  containerProps = {},
+  cardProps = undefined,
+  containerProps = undefined,
   render,
   actions,
   forceShowHandle = false,
@@ -81,20 +79,10 @@ const RuleWrapper = ({
 }: RuleWrapperProps) => {
   const { id } = node;
 
-  const {
-    queryBuilder: { selected, toggleSelected, getNodeName, setNodeName },
-  } = useDaphneStore();
-
-  const isSelected = useMemo(() => selected?.[id] ?? false, [selected, id]);
-
-  const params = useSortable({
-    id,
-    data: {
-      id,
-      type,
-      groupId,
-    },
-  });
+  const isSelected = useDaphneStore((s) => !!s.queryBuilder.selected[id]);
+  const toggleSelected = useDaphneStore((s) => s.queryBuilder.toggleSelected);
+  const getNodeName = useDaphneStore((s) => s.queryBuilder.getNodeName);
+  const setNodeName = useDaphneStore((s) => s.queryBuilder.setNodeName);
 
   const {
     setNodeRef,
@@ -104,9 +92,24 @@ const RuleWrapper = ({
     isDragging,
     attributes,
     listeners,
-  } = params;
+  } = useSortable({
+    id,
+    data: {
+      id,
+      type,
+      groupId,
+    },
+  });
 
   const [showHandle, setShowHandle] = useState(false);
+
+  const handleOnSelect = useCallback(
+    (e: React.MouseEvent) => {
+      toggleSelected(id);
+      e.stopPropagation();
+    },
+    [id, toggleSelected]
+  );
 
   const onMouseMove = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
@@ -119,33 +122,61 @@ const RuleWrapper = ({
     [showHandle]
   );
 
-  const onMouseLeave = () => {
+  const onMouseLeave = useCallback(() => {
     if (showHandle && !isDragging) {
       setShowHandle(false);
     }
-  };
+  }, [showHandle, isDragging, setShowHandle]);
 
   const [menuPos, setMenuPos] = useState<{
     mouseX: number;
     mouseY: number;
   } | null>(null);
 
-  const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setMenuPos(
-      menuPos === null
-        ? {
-            mouseX: event.clientX + 2,
-            mouseY: event.clientY - 6,
-          }
-        : null
-    );
-  };
+  const handleContextMenu = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      event.preventDefault();
+      event.stopPropagation();
+      setMenuPos(
+        menuPos === null
+          ? {
+              mouseX: event.clientX + 2,
+              mouseY: event.clientY - 6,
+            }
+          : null
+      );
+    },
+    [menuPos]
+  );
 
   const handleClose = () => setMenuPos(null);
 
   const nodeName = useMemo(() => getNodeName(node), [node, getNodeName]);
+
+  useLogDependencyChanges("wrapper " + node.id, {
+    isSelected,
+    node,
+    groupId,
+    exclude,
+    valid,
+    handleContextMenu,
+    menuPos,
+    onMouseLeave,
+    onMouseMove,
+    handleOnSelect,
+    showHandle,
+    setNodeRef,
+    style,
+    anchorRef,
+    anchorSize,
+    isDragging,
+    attributes,
+    listeners,
+    containerProps,
+    cardHeaderSx,
+    cardProps,
+    headerRowSx,
+  });
 
   return (
     <Box
@@ -187,14 +218,10 @@ const RuleWrapper = ({
             data-selectable="true"
             data-draggable="true"
             component="div"
-            ref={anchorRef}
             data-testid="clickable-card"
             sx={cardSx(valid)}
             onContextMenu={handleContextMenu}
-            onClick={(e: React.MouseEvent) => {
-              toggleSelected(id);
-              e.stopPropagation();
-            }}
+            onClick={handleOnSelect}
             {...cardProps}
           >
             {!hideHeader && (
@@ -220,9 +247,7 @@ const RuleWrapper = ({
               />
             )}
 
-            <CardContent>
-              {render(node, anchorRef, params, showHandle)}
-            </CardContent>
+            <CardContent>{render(node, anchorRef)}</CardContent>
 
             {actions && (
               <Menu

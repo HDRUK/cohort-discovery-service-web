@@ -12,10 +12,14 @@ type FormValues = {
 };
 
 const CohortQueryInput = () => {
-  const {
-    queryBuilder: { queryAsText, queryBuilderJson, getQueryFromText },
-    stateManagement: { isLoading },
-  } = useDaphneStore();
+  const queryAsText = useDaphneStore((s) => s.queryBuilder.queryAsText);
+  const queryBuilderJson = useDaphneStore(
+    (s) => s.queryBuilder.queryBuilderJson
+  );
+  const getQueryFromText = useDaphneStore(
+    (s) => s.queryBuilder.getQueryFromText
+  );
+  const isLoading = useDaphneStore((s) => s.stateManagement.isLoading);
 
   const { handleSubmit, control, setValue, setError, clearErrors } =
     useForm<FormValues>({

@@ -24,9 +24,12 @@ const QueriesTable = ({
   hasIncomplete: boolean;
 }) => {
   const router = useRouter();
-  const {
-    queryBuilder: { setQueryBuilderJson, setSelectedDatasets },
-  } = useDaphneStore();
+  const setQueryBuilderJson = useDaphneStore(
+    (s) => s.queryBuilder.setQueryBuilderJson
+  );
+  const setSelectedDatasets = useDaphneStore(
+    (s) => s.queryBuilder.setSelectedDatasets
+  );
 
   useEffect(() => {
     if (!hasIncomplete) return;

@@ -12,9 +12,8 @@ type FormValues = {
 };
 
 const CohortQueryTitle = () => {
-  const {
-    queryBuilder: { queryName, setQueryName },
-  } = useDaphneStore();
+  const queryName = useDaphneStore((s) => s.queryBuilder.queryName);
+  const setQueryName = useDaphneStore((s) => s.queryBuilder.setQueryName);
 
   const notify = useNotify();
 
