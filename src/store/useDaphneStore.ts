@@ -83,6 +83,12 @@ export interface DaphneStoreState {
       height: number | string
     ) => void;
     selected: Record<UniqueIdentifier, boolean>;
+    setSelected: (
+      id: UniqueIdentifier | UniqueIdentifier[],
+      next?: boolean
+    ) => void;
+    select: (id: UniqueIdentifier | UniqueIdentifier[]) => void;
+    deselect: (id: UniqueIdentifier | UniqueIdentifier[]) => void;
     toggleSelected: (id: UniqueIdentifier) => void;
     createNewNode: (kind: NodeKind, above?: boolean) => void;
     createNewRule: (above?: boolean) => void;
@@ -171,6 +177,41 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         },
       })),
     selected: {},
+    setSelected: async (
+      id: UniqueIdentifier | UniqueIdentifier[],
+      nextValue: boolean = true
+    ) => {
+      const ids = Array.isArray(id) ? id : [id];
+      const uniqueIds = Array.from(new Set(ids));
+
+      set((state) => {
+        const curr = state.queryBuilder.selected ?? {};
+        let changed = false;
+
+        const nextSelected = { ...curr };
+
+        for (const key of uniqueIds) {
+          if (curr[key] !== nextValue) {
+            nextSelected[key] = nextValue;
+            changed = true;
+          }
+        }
+
+        if (!changed) return state;
+
+        return {
+          ...state,
+          queryBuilder: {
+            ...state.queryBuilder,
+            selected: nextSelected,
+          },
+        };
+      });
+    },
+    select: async (id: UniqueIdentifier | UniqueIdentifier[]) =>
+      get().queryBuilder.setSelected(id, true),
+    deselect: (id: UniqueIdentifier | UniqueIdentifier[]) =>
+      get().queryBuilder.setSelected(id, false),
     toggleSelected: (id: UniqueIdentifier) => {
       set((state) => ({
         ...state,

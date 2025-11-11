@@ -9,15 +9,17 @@ import { useEffect } from "react";
 import { useTable } from "../../hooks/useTable";
 import { formatNumber } from "@/utils/numbers";
 import Title from "../Title";
-import { useDaphneStore } from "@/store/useDaphneStore";
+import useQueryBuilder from "@/store/useQueryBuilder";
 import { capitaliseFirstLetter } from "@/utils/string";
 import CodeBlock from "../CodeBlock";
 import ShowOnClick from "../ShowOnClick";
 
 const QueryResultsTable = ({ query }: { query: Query }) => {
-  const {
-    queryBuilder: { setQueryName, setQueryBuilderJson },
-  } = useDaphneStore();
+  const { setQueryName, setQueryBuilderJson } = useQueryBuilder((qb) => ({
+    setQueryName: qb.setQueryName,
+    setQueryBuilderJson: qb.setQueryBuilderJson,
+  }));
+
   const { tasks, name, definition } = query;
 
   useEffect(() => {

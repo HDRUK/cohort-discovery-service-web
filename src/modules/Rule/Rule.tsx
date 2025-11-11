@@ -1,10 +1,11 @@
 import { Typography, Chip, Alert } from "@mui/material";
 import SearchConcepts from "@/components/SearchConcepts";
 import { Concept } from "@/types/api";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import ConceptChip from "@/components/ConceptChip";
 import { RuleLeafType } from "@/types/rules";
-import { useDaphneStore } from "@/store/useDaphneStore";
+
+import useQueryBuilder from "@/store/useQueryBuilder";
 import {
   isEmptyRule,
   updateById,
@@ -35,25 +36,29 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       ? concept?.[0].category
       : concept?.category;
 
-  const {
-    queryBuilder: { queryBuilderJson, setQueryBuilderJson },
-  } = useDaphneStore();
+  const { queryBuilderJson, setQueryBuilderJson } = useQueryBuilder((qb) => ({
+    queryBuilderJson: qb.queryBuilderJson,
+    setQueryBuilderJson: qb.setQueryBuilderJson,
+  }));
 
-  const setConcept = (c: Concept) => {
-    setQueryBuilderJson(
-      updateById(queryBuilderJson, id, (node) => {
-        if (isRuleLeaf(node)) {
-          return {
-            ...node,
-            rule: { ...node.rule, concept: c },
-          };
-        }
-        return node;
-      })
-    );
-  };
+  const setConcept = useCallback(
+    (c: Concept) => {
+      setQueryBuilderJson(
+        updateById(queryBuilderJson, id, (node) => {
+          if (isRuleLeaf(node)) {
+            return {
+              ...node,
+              rule: { ...node.rule, concept: c },
+            };
+          }
+          return node;
+        })
+      );
+    },
+    [id, setQueryBuilderJson, queryBuilderJson]
+  );
 
-  const clearConcept = () => {
+  const clearConcept = useCallback(() => {
     setQueryBuilderJson(
       updateById(queryBuilderJson, id, (node) => {
         if (isRuleLeaf(node)) {
@@ -65,14 +70,17 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
         return node;
       })
     );
-  };
+  }, [id, queryBuilderJson, setQueryBuilderJson]);
 
   const [showChildren, setShowChildren] = useState<boolean>(false);
-  const onClick = (c: Concept) => {
-    setConcept(c);
-  };
+  const onClick = useCallback(
+    (c: Concept) => {
+      setConcept(c);
+    },
+    [setConcept]
+  );
 
-  const removeChild = (parent: Concept, child: Concept) => {
+  const removeChild = useCallback((parent: Concept, child: Concept) => {
     const children = parent.children?.filter(
       (c) => c.concept_id !== child.concept_id
     );
@@ -81,14 +89,14 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       children,
     };
     return newConcept;
-  };
+  }, []);
 
-  const handleDeleteRule = () => {
+  const handleDeleteRule = useCallback(() => {
     const newQuery = removeById(queryBuilderJson, id);
     setQueryBuilderJson(newQuery);
-  };
+  }, [id, queryBuilderJson, setQueryBuilderJson]);
 
-  const handleConvertToGroup = () => {
+  const handleConvertToGroup = useCallback(() => {
     setQueryBuilderJson(
       updateById(queryBuilderJson, id, (node) => {
         if (!isRuleLeaf(node)) return node;
@@ -96,7 +104,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
         return newGroup;
       })
     );
-  };
+  }, [id, queryBuilderJson, setQueryBuilderJson]);
 
   const actions = [
     { action: handleConvertToGroup, label: "Convert to Group" },

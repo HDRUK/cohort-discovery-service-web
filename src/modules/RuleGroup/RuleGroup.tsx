@@ -1,5 +1,5 @@
 import { RuleGroupType } from "@/types/rules";
-import { useDaphneStore } from "@/store/useDaphneStore";
+import useQueryBuilder from "@/store/useQueryBuilder";
 
 import {
   updateById,
@@ -10,6 +10,7 @@ import {
 
 import RuleBoard from "../RuleBoard";
 import RuleWrapper from "../RuleWrapper";
+import { useCallback } from "react";
 
 export interface RuleGroupProps {
   group: RuleGroupType;
@@ -20,13 +21,14 @@ export interface RuleGroupProps {
 const RuleGroup = ({ group, parentGroupId, ...rest }: RuleGroupProps) => {
   const { id, rules, exclude, valid = true } = group;
 
-  const {
-    queryBuilder: { queryBuilderJson, setQueryBuilderJson },
-  } = useDaphneStore();
+  const { queryBuilderJson, setQueryBuilderJson } = useQueryBuilder((qb) => ({
+    queryBuilderJson: qb.queryBuilderJson,
+    setQueryBuilderJson: qb.setQueryBuilderJson,
+  }));
 
   const handleCollapseGroup = () => {};
 
-  const handleCreateNewRule = () => {
+  const handleCreateNewRule = useCallback(() => {
     const newRules = [createRule(), createOperator(), ...rules];
 
     setQueryBuilderJson(
@@ -35,11 +37,11 @@ const RuleGroup = ({ group, parentGroupId, ...rest }: RuleGroupProps) => {
         rules: newRules,
       }))
     );
-  };
+  }, [id, rules, queryBuilderJson, setQueryBuilderJson]);
 
-  const handleDeleteRule = () => {
+  const handleDeleteRule = useCallback(() => {
     setQueryBuilderJson(removeById(queryBuilderJson, id));
-  };
+  }, [id, queryBuilderJson, setQueryBuilderJson]);
 
   const actions = [
     { action: handleCreateNewRule, label: "Add Rule" },

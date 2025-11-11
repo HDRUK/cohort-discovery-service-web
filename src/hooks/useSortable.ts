@@ -21,9 +21,8 @@ export interface UseSortablePlusReturn
 }
 
 const useSortable = (args: UseSortableArguments): UseSortablePlusReturn => {
-  const {
-    queryBuilder: { boardIndex },
-  } = useDaphneStore();
+  const boardIndex = useDaphneStore((s) => s.queryBuilder.boardIndex);
+
   const params = useDndSortable(args);
   const { over, active } = useDndContext();
 

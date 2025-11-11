@@ -2,7 +2,7 @@
 import ActionMenuSection from "@/components/ActionMenuSection";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import useSortable from "@/hooks/useSortable";
-import { useDaphneStore } from "@/store/useDaphneStore";
+import useQueryBuilder from "@/store/useQueryBuilder";
 import { RuleNodeType } from "@/types/rules";
 import { isRuleGroup } from "@/utils/rules";
 
@@ -29,10 +29,13 @@ export const HierarchyItem = ({
   groupId,
   depth = 0,
 }: HierarchyItemProps) => {
-  const {
-    queryBuilder: { toggleSelected, selected, getNodeName, setNodeName },
-  } = useDaphneStore();
-
+  const { toggleSelected, selected, getNodeName, setNodeName } =
+    useQueryBuilder((qb) => ({
+      toggleSelected: qb.toggleSelected,
+      selected: qb.selected,
+      getNodeName: qb.getNodeName,
+      setNodeName: qb.setNodeName,
+    }));
   const id = `${ID_REF_SUFFIX}-${node.id}`;
 
   const {

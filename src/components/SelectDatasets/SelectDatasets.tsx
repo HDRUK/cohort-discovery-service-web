@@ -1,6 +1,6 @@
 "use client";
 
-import { useDaphneStore } from "@/store/useDaphneStore";
+import useQueryBuilder from "@/store/useQueryBuilder";
 import { Collection } from "../../types/api";
 import {
   Autocomplete,
@@ -24,9 +24,10 @@ const SelectDatasets = ({
   initialSelection: string[];
   collections: Collection[];
 }) => {
-  const {
-    queryBuilder: { selectedDatasets, setSelectedDatasets },
-  } = useDaphneStore();
+  const { selectedDatasets, setSelectedDatasets } = useQueryBuilder((qb) => ({
+    selectedDatasets: qb.selectedDatasets,
+    setSelectedDatasets: qb.setSelectedDatasets,
+  }));
 
   const mountedRef = useRef(false);
   useEffect(() => {
