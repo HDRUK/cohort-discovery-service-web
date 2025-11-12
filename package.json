@@ -35,9 +35,9 @@
     "dayjs": "^1.11.13",
     "jsonwebtoken": "^9.0.2",
     "material-react-table": "^3.2.1",
-    "next": "^16.0.1",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "next": "16.0.1",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
     "react-error-boundary": "^6.0.0",
     "react-hook-form": "^7.62.0",
     "react-syntax-highlighter": "^15.6.1",
@@ -48,7 +48,7 @@
   "devDependencies": {
     "@chromatic-com/storybook": "^4.1.0",
     "@eslint/eslintrc": "^3",
-    "@next/mdx": "^16.0.1",
+    "@next/mdx": "16.0.1",
     "@storybook/addon-a11y": "^9.1.1",
     "@storybook/addon-docs": "^9.1.1",
     "@storybook/addon-onboarding": "^9.1.1",
@@ -61,12 +61,12 @@
     "@testing-library/react": "^16.3.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "19.2.3",
+    "@types/react-dom": "19.2.3",
     "@vitest/browser": "^3.2.4",
     "@vitest/coverage-v8": "^3.2.4",
     "eslint": "^9.32.0",
-    "eslint-config-next": "15.4.2",
+    "eslint-config-next": "16.0.1",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-storybook": "^9.1.1",
     "identity-obj-proxy": "^3.0.0",
@@ -78,5 +78,9 @@
     "ts-node": "^10.9.2",
     "typescript": "^5",
     "vitest": "^3.2.4"
+  },
+  "overrides": {
+    "@types/react": "19.2.3",
+    "@types/react-dom": "19.2.3"
   }
 }

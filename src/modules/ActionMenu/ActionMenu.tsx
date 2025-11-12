@@ -14,7 +14,7 @@ const ActionMenu: React.FC = () => {
 
   return (
     <>
-      <ActionMenuSection title={"Insert"} defaultExpanded>
+      <ActionMenuSection title={"Insert"} defaultExpanded underline>
         <Button
           variant="text"
           startIcon={<AddIcon />}
