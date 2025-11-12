@@ -54,58 +54,6 @@ const DashboardTabPage = async (props: {
       <NewQueryPage {...props} />
     </TabsShell>
   );
-
-  return (
-    <TabContext value={tabId}>
-      <Box
-        sx={{
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <Box
-          sx={{
-            borderBottom: 0,
-            borderColor: "divider",
-            width: "100%",
-            bgcolor: "#fff",
-          }}
-        >
-          <TabList
-            indicatorColor="secondary"
-            slotProps={{
-              indicator: { sx: { top: 0 } },
-            }}
-          >
-            {TABS.map((t) => (
-              <Link key={t.id} href={t.href}>
-                <Tab label={t.label} value={t.id} />
-              </Link>
-            ))}
-          </TabList>
-        </Box>
-
-        {/* These need better handling. These were being called repeatedly
-          causing all kinds of slowness, as they were failing without a
-          token and not being handled properly. Have wrapped for the time
-          being, but they really need consolidating better
-         */}
-        <TabPanel value="new-query">
-          {token && <NewQueryPage {...props} />}
-        </TabPanel>
-
-        <TabPanel value="history">
-          {token && <QueryListPage {...props} />}
-        </TabPanel>
-
-        <TabPanel value="collections">{token && <CollectionsPage />}</TabPanel>
-
-        <TabPanel value="codes">{token && <CodesPage {...props} />}</TabPanel>
-      </Box>
-    </TabContext>
-  );
 };
 
 export default DashboardTabPage;
