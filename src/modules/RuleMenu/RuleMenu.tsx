@@ -1,18 +1,39 @@
 "use client";
 
-import ShowOnClick from "@/components/ShowOnClick";
-import CodeBlock from "@/components/CodeBlock";
-import CodeIcon from "@mui/icons-material/Code";
-import { useDaphneStore } from "@/store/useDaphneStore";
+import ToolGuidance from "@/content/guidance/tool.mdx";
+import { Box, Typography } from "@mui/material";
+import { ReactNode } from "react";
+import useQueryBuilder from "@/store/useQueryBuilder";
+import ActionMenuSection from "@/components/ActionMenuSection";
+
+function CustomH1({ children }: { children: ReactNode }) {
+  return (
+    <Typography variant="guidance1" sx={{ borderBottom: 2, my: 1 }}>
+      {children}
+    </Typography>
+  );
+}
+
+function CustomH2({ children }: { children: ReactNode }) {
+  return <Typography variant="guidance2">{children}</Typography>;
+}
+
+const overrideGuidanceComponents = {
+  h1: CustomH1,
+  h2: CustomH2,
+};
 
 const RuleMenu = () => {
-  const {
-    queryBuilder: { queryBuilderJson },
-  } = useDaphneStore();
+  const queryBuilderJson = useQueryBuilder((qb) => qb.queryBuilderJson);
+
   return (
-    <ShowOnClick icon={<CodeIcon />}>
-      <CodeBlock code={queryBuilderJson} />{" "}
-    </ShowOnClick>
+    <Box sx={{ px: 1 }}>
+      {queryBuilderJson.rules.length === 0 && (
+        <ActionMenuSection title={"Tool Guidance"} defaultExpanded>
+          <ToolGuidance components={overrideGuidanceComponents} />
+        </ActionMenuSection>
+      )}
+    </Box>
   );
 };
 

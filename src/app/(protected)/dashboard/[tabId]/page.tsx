@@ -8,6 +8,7 @@ import CollectionsPage from "./components/CollectionsPage";
 import { routes } from "@/config/routes";
 import CodesPage from "./components/CodesPage";
 import { cookies } from "next/headers";
+import TabsShell from "@/components/TabsShell";
 
 const TABS = [
   { id: "new-query", label: "New Query", href: routes.dashboardNewQuery },
@@ -42,7 +43,17 @@ const DashboardTabPage = async (props: {
   if (!isValidTabId(tabId)) return notFound();
 
   const cookieStore = await cookies();
-  const token = cookieStore.get('token');
+  const token = cookieStore.get("token");
+
+  return (
+    <TabsShell
+      tabs={[
+        { id: "new-query", label: "New Query", href: routes.dashboardNewQuery },
+      ]}
+    >
+      <NewQueryPage {...props} />
+    </TabsShell>
+  );
 
   return (
     <TabContext value={tabId}>
@@ -69,45 +80,29 @@ const DashboardTabPage = async (props: {
             }}
           >
             {TABS.map((t) => (
-              <Tab
-                key={t.id}
-                label={t.label}
-                component={Link}
-                href={t.href}
-                value={t.id}
-              />
+              <Link key={t.id} href={t.href}>
+                <Tab label={t.label} value={t.id} />
+              </Link>
             ))}
           </TabList>
         </Box>
- 
+
         {/* These need better handling. These were being called repeatedly
           causing all kinds of slowness, as they were failing without a
           token and not being handled properly. Have wrapped for the time
           being, but they really need consolidating better
          */}
         <TabPanel value="new-query">
-          {token &&
-            <NewQueryPage {...props} />
-          }
+          {token && <NewQueryPage {...props} />}
         </TabPanel>
 
         <TabPanel value="history">
-          {token &&
-            <QueryListPage {...props} />
-          }
+          {token && <QueryListPage {...props} />}
         </TabPanel>
 
-        <TabPanel value="collections">
-          {token &&
-            <CollectionsPage />
-          }
-        </TabPanel>
+        <TabPanel value="collections">{token && <CollectionsPage />}</TabPanel>
 
-        <TabPanel value="codes">
-          {token &&
-            <CodesPage {...props} />
-          }
-        </TabPanel>
+        <TabPanel value="codes">{token && <CodesPage {...props} />}</TabPanel>
       </Box>
     </TabContext>
   );

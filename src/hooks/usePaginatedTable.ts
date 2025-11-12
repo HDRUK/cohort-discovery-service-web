@@ -43,6 +43,50 @@ export function usePaginatedTable<TData extends { pid: string }>({
 
   const [sorting, setSorting] = useState([]);
 
+  const table = useTable<TData>({
+    columns,
+    data,
+    rowCount,
+    getRowId,
+    enablePagination: true,
+    manualPagination: true,
+    enableSorting: true,
+    muiPaginationProps: {
+      rowsPerPageOptions: [5, 10, 20],
+    },
+    muiBottomToolbarProps: {
+      sx: {
+        display: "flex",
+        "&& .MuiInputBase-input, && .MuiSelect-select": {
+          backgroundColor: "transparent !important",
+        },
+
+        "&& .MuiInputBase-root, && .MuiInput-root": {
+          backgroundColor: "transparent !important",
+        },
+      },
+    },
+    ...rest,
+  });
+
+  return table;
+
+  /*
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const page = parseInt(searchParams.get("page") || "1");
+  const perPage = parseInt(
+    searchParams.get("per_page") || perPageDefault.toString()
+  );
+
+  const [pagination, setPagination] = useState({
+    pageIndex: page - 1,
+    pageSize: perPage,
+  });
+
+  const [sorting, setSorting] = useState([]);
+
   useEffect(() => {
     const collapsed = sorting
       .map(({ id, desc }) => `${id}:${desc ? "desc" : "asc"}`)
@@ -105,5 +149,5 @@ export function usePaginatedTable<TData extends { pid: string }>({
     ...rest,
   });
 
-  return table;
+  return table;*/
 }
