@@ -32,7 +32,7 @@ export default function SquareRadio(props: React.ComponentProps<typeof Radio>) {
   return (
     <Radio
       icon={<SquareRadioIcon />}
-      checkedIcon={<SquareRadioIcon filled={true} />}
+      checkedIcon={<SquareRadioIcon filled />}
       disableRipple
       sx={{
         "&.Mui-checked": { color: "primary.main" },
