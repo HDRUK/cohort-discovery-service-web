@@ -1,57 +1,70 @@
 import "@testing-library/jest-dom";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import getCollections from "@/actions/getCollections";
 import SelectDatasets from "./SelectDatasets";
+import MockDaphneStore from "@/store/MockDaphneStore";
 jest.mock("@/actions/getCollections");
 
+const setSelectedDatasets = jest.fn();
+
 describe("SelectDatasets", () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it("displays datasets", async () => {
     const collections = await getCollections();
     const initialSelection = collections.data.map((c) => c.pid);
 
     render(
-      <SelectDatasets
-        collections={collections.data}
-        initialSelection={initialSelection}
-      />
+      <MockDaphneStore
+        overrides={{
+          queryBuilder: {
+            openSelectDatasetsPanel: true,
+          },
+        }}
+      >
+        <SelectDatasets
+          collections={collections.data}
+          initialSelection={initialSelection}
+        />
+      </MockDaphneStore>
     );
-    collections.data.forEach((collection) => {
-      expect(
-        screen.getByText(`${collection.name} [${collection.type}]`)
-      ).toBeInTheDocument();
-    });
-
-    const dropdownButton = screen.getByRole("button", { name: /open/i });
-    await userEvent.click(dropdownButton);
 
     collections.data.forEach((collection) => {
-      expect(
-        screen.getAllByText(`${collection.name} [${collection.type}]`).length
-      ).toBeGreaterThan(0);
+      expect(screen.getByText(collection.name)).toBeInTheDocument();
     });
   });
 
-  it("shows no selected datasets when initialSelection is empty", async () => {
+  it("can select datasets on click", async () => {
     const collections = await getCollections();
-
+    const initialSelection = collections.data.map((c) => c.pid);
+    const user = userEvent.setup();
     render(
-      <SelectDatasets collections={collections.data} initialSelection={[]} />
+      <MockDaphneStore
+        overrides={{
+          queryBuilder: {
+            openSelectDatasetsPanel: true,
+            setSelectedDatasets,
+          },
+        }}
+      >
+        <SelectDatasets
+          collections={collections.data}
+          initialSelection={initialSelection}
+        />
+      </MockDaphneStore>
     );
+    expect(setSelectedDatasets).toHaveBeenLastCalledWith(initialSelection);
 
-    collections.data.forEach((collection) => {
-      expect(
-        screen.queryByText(`${collection.name} [${collection.type}]`)
-      ).not.toBeInTheDocument();
-    });
+    const { pid, name } = collections.data[0];
+    const row = screen.getByText(name).closest("div")!;
+    const checkbox = within(row).getByRole("checkbox");
 
-    const dropdownButton = screen.getByRole("button", { name: /open/i });
-    await userEvent.click(dropdownButton);
+    expect(checkbox).not.toBeChecked();
 
-    collections.data.forEach((collection) => {
-      expect(
-        screen.getByText(`${collection.name} [${collection.type}]`)
-      ).toBeInTheDocument();
-    });
+    await user.click(checkbox);
+    expect(setSelectedDatasets).toHaveBeenLastCalledWith([pid]);
   });
 });

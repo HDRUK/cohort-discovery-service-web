@@ -18,6 +18,7 @@ type SearchBoxProps = Omit<TextFieldProps, "onSubmit"> & {
   defaultExpanded?: boolean;
   collapsedWidth?: number | string;
   expandedWidth?: number | string;
+  inputBgColor?: string;
 };
 
 const SearchBox = ({
@@ -27,6 +28,7 @@ const SearchBox = ({
   defaultExpanded = true,
   collapsedWidth = 0,
   expandedWidth = "100%",
+  inputBgColor = "#fff",
   ...rest
 }: SearchBoxProps) => {
   const [expanded, setExpanded] = useState(
@@ -75,7 +77,7 @@ const SearchBox = ({
           "& .MuiOutlinedInput-root": {
             borderRadius: 100,
             boxShadow: "0px 2px 0px rgba(0, 0, 0, 0.23)",
-            backgroundColor: "#fff",
+            backgroundColor: inputBgColor,
             p: 0,
           },
           "& .MuiOutlinedInput-notchedOutline": {
@@ -126,7 +128,7 @@ const SearchBox = ({
                 position="end"
                 sx={{
                   position: "relative",
-                  mr: -5,
+                  mr: 1,
                   zIndex: 3,
                 }}
               >
@@ -144,8 +146,8 @@ const SearchBox = ({
                     boxShadow: "-4px 0px 6px -2px rgba(0, 0, 0, 0.4)",
                     color: "common.white",
                     borderRadius: "999px",
-                    height: 60,
-                    width: 60,
+                    height: 40,
+                    width: 40,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",

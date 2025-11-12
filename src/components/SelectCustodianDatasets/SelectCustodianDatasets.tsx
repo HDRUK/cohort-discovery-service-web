@@ -1,0 +1,126 @@
+"use client";
+
+import useQueryBuilder from "@/store/useQueryBuilder";
+import { GroupedCollection } from "../../types/api";
+import {
+  Chip,
+  Box,
+  Checkbox,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  FormControlLabel,
+} from "@mui/material";
+
+import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
+import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import Title from "../Title";
+
+const SelectCustodianDatasets = ({
+  custodianCollections,
+}: {
+  custodianCollections: GroupedCollection;
+}) => {
+  const { selectedDatasets, setSelectedDatasets } = useQueryBuilder((qb) => ({
+    selectedDatasets: qb.selectedDatasets,
+    setSelectedDatasets: qb.setSelectedDatasets,
+  }));
+
+  const nTotal = custodianCollections.items.length;
+  const nSelected = selectedDatasets.filter((pid) =>
+    custodianCollections.items.map((i) => i.pid).includes(pid)
+  ).length;
+
+  const handleSelectDataset = (pid: string) => {
+    const next = selectedDatasets.includes(pid)
+      ? selectedDatasets.filter((x) => x !== pid)
+      : [...selectedDatasets, pid];
+    setSelectedDatasets(next);
+  };
+
+  const handleSelectAll = () => {
+    console.log("handle Select All");
+    if (nSelected > 0) {
+      const ids = custodianCollections.items.map((i) => i.pid);
+      const next = selectedDatasets.filter((pid) => !ids.includes(pid));
+      setSelectedDatasets(next);
+      return;
+    }
+    const ids = custodianCollections.items.map((i) => i.pid);
+    const next = Array.from(new Set([...selectedDatasets, ...ids]));
+    setSelectedDatasets(next);
+  };
+
+  return (
+    <Accordion
+      defaultExpanded={true}
+      disableGutters
+      elevation={1}
+      square
+      sx={{
+        bgcolor: "white",
+      }}
+    >
+      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+        <Title
+          small
+          startIcon={
+            <Checkbox
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleSelectAll();
+              }}
+              checked={nSelected > 0}
+              icon={<RadioButtonUncheckedIcon />}
+              checkedIcon={<RadioButtonCheckedIcon />}
+            />
+          }
+          title={custodianCollections.custodian.name}
+          subTitle={`${nSelected}/${nTotal} Collections Selected`}
+          useSeparator={false}
+        />
+      </AccordionSummary>
+
+      <AccordionDetails
+        sx={{
+          p: 0,
+          mx: 2,
+          mb: 2,
+          display: "flex",
+          flexDirection: "column",
+          border: 1,
+          borderRadius: 1,
+          borderColor: "lightgrey",
+        }}
+      >
+        <Box sx={{ display: "flex", gap: 2, p: 2 }}>
+          {custodianCollections.items.map((c) => (
+            <Chip
+              size="small"
+              variant="outlined"
+              sx={{ borderRadius: 10, py: 2 }}
+              key={c.id}
+              label={
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onClick={() => handleSelectDataset(c.pid)}
+                      checked={selectedDatasets.includes(c.pid)}
+                      icon={<RadioButtonUncheckedIcon />}
+                      checkedIcon={<RadioButtonCheckedIcon />}
+                    />
+                  }
+                  label={c.name}
+                />
+              }
+            />
+          ))}
+        </Box>
+      </AccordionDetails>
+    </Accordion>
+  );
+};
+
+export default SelectCustodianDatasets;

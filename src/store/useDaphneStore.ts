@@ -98,6 +98,8 @@ export interface DaphneStoreState {
     getQueryFromText: (input: string) => void;
     selectedDatasets: string[];
     setSelectedDatasets: (pids: string[]) => void;
+    openSelectDatasetsPanel: boolean;
+    setOpenSelectDatasetsPanel: (value: boolean) => void;
   };
   userData: {
     user: CombinedUser | undefined | null;
@@ -336,6 +338,12 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       set((state) => ({
         ...state,
         queryBuilder: { ...state.queryBuilder, selectedDatasets: pids },
+      })),
+    openSelectDatasetsPanel: false,
+    setOpenSelectDatasetsPanel: (value) =>
+      set((state) => ({
+        ...state,
+        queryBuilder: { ...state.queryBuilder, openSelectDatasetsPanel: value },
       })),
     getQueryFromText: async (input: string) => {
       set((state) => ({

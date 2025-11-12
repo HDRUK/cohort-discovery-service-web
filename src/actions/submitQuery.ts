@@ -4,16 +4,18 @@ import { RuleGroupType } from "@/types/rules";
 import { apiPost } from "../lib/apiClient";
 import { API_ROUTES } from "../lib/apiRoutes";
 import { CreateQuery, CreateQueryPost, ApiResponse } from "../types/api";
+import { capVarChar } from "@/utils/string";
 
 const submitQuery = async (
   query: RuleGroupType,
   queryName: string,
   collection_filter?: string[]
 ): Promise<ApiResponse<CreateQuery>> => {
+  const safeName = capVarChar(queryName);
   return await apiPost<ApiResponse<CreateQuery>, CreateQueryPost>(
     API_ROUTES.queries,
     {
-      name: queryName,
+      name: safeName,
       definition: query,
       task_type: "a",
       ...(collection_filter && { collection_filter }),
