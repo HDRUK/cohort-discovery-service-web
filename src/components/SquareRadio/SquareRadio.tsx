@@ -7,7 +7,7 @@ interface SquareRadioIconProps extends SvgIconProps {
   filled?: boolean;
 }
 
-function SquareRadioIcon({ filled, ...props }: SquareRadioIconProps) {
+const SquareRadioIcon = ({ filled, ...props }: SquareRadioIconProps) => {
   const theme = useTheme();
   return (
     <SvgIcon {...props} viewBox="0 0 24 24">
@@ -26,19 +26,19 @@ function SquareRadioIcon({ filled, ...props }: SquareRadioIconProps) {
       )}
     </SvgIcon>
   );
-}
+};
 
-export default function SquareRadio(props: React.ComponentProps<typeof Radio>) {
-  return (
-    <Radio
-      icon={<SquareRadioIcon />}
-      checkedIcon={<SquareRadioIcon filled />}
-      disableRipple
-      sx={{
-        "&.Mui-checked": { color: "primary.main" },
-        [`& .${radioClasses.root}`]: { p: 0.5 },
-      }}
-      {...props}
-    />
-  );
-}
+const SquareRadio = (props: React.ComponentProps<typeof Radio>) => (
+  <Radio
+    icon={<SquareRadioIcon />}
+    checkedIcon={<SquareRadioIcon filled />}
+    disableRipple
+    sx={{
+      "&.Mui-checked": { color: "primary.main" },
+      [`& .${radioClasses.root}`]: { p: 0.5 },
+    }}
+    {...props}
+  />
+);
+
+export default SquareRadio;
