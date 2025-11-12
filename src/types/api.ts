@@ -66,6 +66,7 @@ export interface Collection extends WithTimestamps {
   type: string;
   size?: Distribution;
   demographics?: Distribution[];
+  custodian: Custodian;
 }
 
 export interface CollectionWithHosts extends Collection {
@@ -243,3 +244,5 @@ export interface SignInPost {
   email: string;
   password: string;
 }
+
+export type GroupedCollection = { custodian: Custodian; items: Collection[] };

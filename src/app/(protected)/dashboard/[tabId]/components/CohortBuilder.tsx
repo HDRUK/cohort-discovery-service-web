@@ -1,11 +1,13 @@
 "use server";
 
-import { Box } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import QueryBuilder from "@/modules/QueryBuilder";
 import SubmitQueryButton from "@/components/SubmitQueryButton";
 import CohortQueryInput from "@/components/CohortQueryInput";
 import SelectDatasets from "@/components/SelectDatasets";
 import getCollections from "@/actions/getCollections";
+import CohortQueryTitle from "@/components/CohortQueryTitle";
+import FilterDatasets from "@/components/FilterDatasets/FilterDatasets";
 
 const CohortBuilder = async () => {
   const collections = await getCollections();
@@ -18,14 +20,20 @@ const CohortBuilder = async () => {
 
   return (
     <>
-      {/*<CohortQueryTitle /> note: to be reimplemented*/}
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
+        spacing={2}
+      >
+        <CohortQueryTitle />
+        <FilterDatasets />
+      </Stack>
+      <SelectDatasets
+        initialSelection={initialSelection}
+        collections={activeCollections}
+      />
       <CohortQueryInput />
-      <Box sx={{ maxWidth: 1000 }}>
-        <SelectDatasets
-          initialSelection={initialSelection}
-          collections={activeCollections}
-        />
-      </Box>
 
       <QueryBuilder />
 

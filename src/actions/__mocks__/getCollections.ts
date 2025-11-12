@@ -1,6 +1,7 @@
 import { QueryContext } from "@/types/context";
 import { ApiResponse, Collection, Distribution } from "@/types/api";
 import { v4 as uuidv4 } from "uuid";
+import getCustodian from "./getCustodian";
 
 const getMockDistribution = (rest?: Partial<Distribution>): Distribution => ({
   id: 1,
@@ -51,6 +52,7 @@ export const getMockCollection = (
   created_at: "2025-01-01 00:00:00",
   updated_at: "2025-01-01 00:00:00",
   demographics: getMockDemographics({ collection_id: 1, n: count }),
+  custodian: getCustodian(),
   size: getMockDistribution({ collection_id: 1, count }),
   ...rest,
 });

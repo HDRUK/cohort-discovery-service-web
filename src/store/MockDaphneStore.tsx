@@ -73,6 +73,11 @@ function makeDefaultStore(): DaphneStoreState {
       setSelectedDatasets: NOOP,
       queryName: "",
       setQueryName: NOOP,
+      setSelected: NOOP,
+      select: NOOP,
+      deselect: NOOP,
+      openSelectDatasetsPanel: true,
+      setOpenSelectDatasetsPanel: NOOP,
     },
 
     userData: {
