@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { MAX_VARCHAR_LENGTH } from "@/config/defaults";
 
 function capitaliseFirstLetter(str: string) {
   if (!str) return "";
@@ -9,4 +10,7 @@ function getTokenKey(token: string) {
   return crypto.createHash("sha256").update(token).digest("hex");
 }
 
-export { capitaliseFirstLetter, getTokenKey };
+const capVarChar = (s: string, max = MAX_VARCHAR_LENGTH) =>
+  [...s].slice(0, max).join("");
+
+export { capitaliseFirstLetter, getTokenKey, capVarChar };

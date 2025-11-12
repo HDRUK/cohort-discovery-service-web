@@ -4,18 +4,14 @@ import { RuleGroupType } from "@/types/rules";
 import { apiPost } from "../lib/apiClient";
 import { API_ROUTES } from "../lib/apiRoutes";
 import { CreateQuery, CreateQueryPost, ApiResponse } from "../types/api";
-
-const MAX_NAME_LEN = 255;
-
-const capToChars = (s: string, max = MAX_NAME_LEN) =>
-  [...s].slice(0, max).join("");
+import { capVarChar } from "@/utils/string";
 
 const submitQuery = async (
   query: RuleGroupType,
   queryName: string,
   collection_filter?: string[]
 ): Promise<ApiResponse<CreateQuery>> => {
-  const safeName = capToChars(queryName, MAX_NAME_LEN);
+  const safeName = capVarChar(queryName);
   return await apiPost<ApiResponse<CreateQuery>, CreateQueryPost>(
     API_ROUTES.queries,
     {
