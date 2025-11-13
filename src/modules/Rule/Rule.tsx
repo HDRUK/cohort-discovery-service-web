@@ -1,7 +1,7 @@
 import { Typography, Chip, Alert } from "@mui/material";
 import SearchConcepts from "@/components/SearchConcepts";
 import { Concept } from "@/types/api";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import ConceptChip from "@/components/ConceptChip";
 import { RuleLeafType } from "@/types/rules";
 
@@ -36,10 +36,22 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       ? concept?.[0].category
       : concept?.category;
 
-  const { queryBuilderJson, setQueryBuilderJson } = useQueryBuilder((qb) => ({
+  const {
+    queryBuilderJson,
+    setQueryBuilderJson,
+    showDescendants,
+    setShowDescendants,
+  } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
+    showDescendants: qb.showDescendants[id],
+    setShowDescendants: qb.setShowDescendants,
   }));
+
+  const toggleShowDescendants = useCallback(
+    () => setShowDescendants(id, !showDescendants),
+    [id, showDescendants, setShowDescendants]
+  );
 
   const setConcept = useCallback(
     (c: Concept) => {
@@ -72,7 +84,6 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     );
   }, [id, queryBuilderJson, setQueryBuilderJson]);
 
-  const [showChildren, setShowChildren] = useState<boolean>(false);
   const onClick = useCallback(
     (c: Concept) => {
       setConcept(c);
@@ -145,16 +156,17 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
               {isSingleConcept(concept) && (
                 <>
                   <ConceptChip
-                    indicateIfParent={showChildren}
+                    indicateIfParent={showDescendants}
                     concept={concept}
                     onDelete={() => clearConcept()}
-                    onClick={
-                      concept?.children && concept.children.length > 0
-                        ? () => setShowChildren(!showChildren)
-                        : undefined
-                    }
+                    onClick={(e: React.MouseEvent) => {
+                      if (concept?.children && concept.children.length > 0) {
+                        e.stopPropagation();
+                        toggleShowDescendants();
+                      }
+                    }}
                   />
-                  {showChildren &&
+                  {showDescendants &&
                     concept?.children?.map((childConcept) => (
                       <ConceptChip
                         draggable={false}

@@ -2,6 +2,12 @@ import { createTheme } from "@mui/material/styles";
 
 export const themeOptions = {
   palette: {
+    success: {
+      main: "#3db28c",
+      light: "#6edbb0",
+      dark: "#2b7e61",
+      contrastText: "#ffffff",
+    },
     text: {
       default: "#4D5B59",
     },

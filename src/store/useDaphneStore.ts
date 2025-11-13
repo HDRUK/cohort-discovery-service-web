@@ -100,6 +100,11 @@ export interface DaphneStoreState {
     setSelectedDatasets: (pids: string[]) => void;
     openSelectDatasetsPanel: boolean;
     setOpenSelectDatasetsPanel: (value: boolean) => void;
+    showDescendants: Record<UniqueIdentifier, boolean>;
+    setShowDescendants: (
+      id: UniqueIdentifier | UniqueIdentifier[],
+      next?: boolean
+    ) => void;
   };
   userData: {
     user: CombinedUser | undefined | null;
@@ -345,6 +350,38 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         ...state,
         queryBuilder: { ...state.queryBuilder, openSelectDatasetsPanel: value },
       })),
+    showDescendants: {},
+    setShowDescendants: async (
+      id: UniqueIdentifier | UniqueIdentifier[],
+      nextValue: boolean = true
+    ) => {
+      const ids = Array.isArray(id) ? id : [id];
+      const uniqueIds = Array.from(new Set(ids));
+
+      set((state) => {
+        const curr = state.queryBuilder.showDescendants ?? {};
+        let changed = false;
+
+        const next = { ...curr };
+
+        for (const key of uniqueIds) {
+          if (curr[key] !== nextValue) {
+            next[key] = nextValue;
+            changed = true;
+          }
+        }
+
+        if (!changed) return state;
+
+        return {
+          ...state,
+          queryBuilder: {
+            ...state.queryBuilder,
+            showDescendants: next,
+          },
+        };
+      });
+    },
     getQueryFromText: async (input: string) => {
       set((state) => ({
         ...state,

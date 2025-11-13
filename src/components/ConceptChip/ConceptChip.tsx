@@ -44,7 +44,7 @@ export const ConceptChip = ({
   draggable?: boolean;
   indicateIfParent?: boolean;
   concept: Concept;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent) => void;
   onDelete: () => void;
 }) => {
   const isParent = (concept?.children?.length ?? 0) > 0;
