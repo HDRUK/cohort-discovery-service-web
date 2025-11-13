@@ -45,7 +45,6 @@ export default function LeftSidebar() {
       { label: "Home", path: routes.dashboard },
       { label: "Profile", path: routes.profile },
       { label: "My Definitions", path: routes.definitions },
-      { label: "Administration", path: routes.admin },
       ...(custodianChildren.length > 0
         ? [
             {

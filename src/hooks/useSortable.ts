@@ -4,7 +4,7 @@ import {
   useSortable as useDndSortable,
   UseSortableArguments,
 } from "@dnd-kit/sortable";
-import { useRef, useMemo } from "react";
+import { useMemo } from "react";
 import { useElementSize } from "./useElementSize";
 import { quantise } from "@/utils/numbers";
 import { useDndContext } from "@dnd-kit/core";
@@ -45,8 +45,6 @@ const useSortable = (args: UseSortableArguments): UseSortablePlusReturn => {
     return currentIndex >= targetIndex;
   }, [active, over, boardIndex]);
 
-  const lastTransformStr = useRef<string | undefined>(undefined);
-
   const transform = useMemo(() => {
     if (!params.transform) return undefined;
     const q = {
@@ -56,11 +54,7 @@ const useSortable = (args: UseSortableArguments): UseSortablePlusReturn => {
       scaleX: params.transform.scaleX ?? 1,
       scaleY: params.transform.scaleY ?? 1,
     };
-
-    const next = CSS.Transform.toString(q);
-    if (next === lastTransformStr.current) return lastTransformStr.current;
-    lastTransformStr.current = next;
-    return next;
+    return CSS.Transform.toString(q);
   }, [params.transform]);
 
   const style = useMemo<React.CSSProperties>(

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Fragment } from "react";
+import { Fragment } from "react";
 import { RuleBoardSkeleton } from "./RuleBoardSkeleton";
 
 import Rule from "@/modules/Rule";
@@ -10,12 +10,12 @@ import { RuleGroupType, RuleNodeType } from "@/types/rules";
 import RuleGroup from "@/modules/RuleGroup";
 import RuleOperator from "@/modules/RuleOperator";
 import { useDroppable } from "@dnd-kit/core";
-import React from "react";
 import DropSpacer from "@/components/DropSpacer";
 import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import useHasMounted from "@/hooks/useHasMounted";
 
 interface RuleBoardProps {
   ruleGroup: RuleGroupType;
@@ -38,11 +38,7 @@ const RuleBoard = ({ ruleGroup }: RuleBoardProps) => {
     data: { type: "container", containerId: id },
   });
 
-  const [hasMounted, setHasMounted] = useState(false);
-
-  useEffect(() => {
-    setHasMounted(true);
-  }, []);
+  const hasMounted = useHasMounted();
 
   if (!hasMounted) {
     return <RuleBoardSkeleton />;

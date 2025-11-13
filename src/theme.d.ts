@@ -26,3 +26,10 @@ declare module "@mui/material/Button" {
     tertiary: true;
   }
 }
+
+declare module "@mui/material/Typography" {
+  interface TypographyPropsVariantOverrides {
+    guidance1: true;
+    guidance2: true;
+  }
+}

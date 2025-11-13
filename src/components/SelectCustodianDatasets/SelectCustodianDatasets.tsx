@@ -5,17 +5,14 @@ import { GroupedCollection } from "../../types/api";
 import {
   Chip,
   Box,
-  Checkbox,
   Accordion,
   AccordionSummary,
   AccordionDetails,
   FormControlLabel,
 } from "@mui/material";
-
-import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
-import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Title from "../Title";
+import SquareRadio from "../SquareRadio";
 
 const SelectCustodianDatasets = ({
   custodianCollections,
@@ -66,15 +63,13 @@ const SelectCustodianDatasets = ({
         <Title
           small
           startIcon={
-            <Checkbox
+            <SquareRadio
+              checked={nSelected > 0}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 handleSelectAll();
               }}
-              checked={nSelected > 0}
-              icon={<RadioButtonUncheckedIcon />}
-              checkedIcon={<RadioButtonCheckedIcon />}
             />
           }
           title={custodianCollections.custodian.name}
@@ -105,11 +100,9 @@ const SelectCustodianDatasets = ({
               label={
                 <FormControlLabel
                   control={
-                    <Checkbox
+                    <SquareRadio
                       onClick={() => handleSelectDataset(c.pid)}
                       checked={selectedDatasets.includes(c.pid)}
-                      icon={<RadioButtonUncheckedIcon />}
-                      checkedIcon={<RadioButtonCheckedIcon />}
                     />
                   }
                   label={c.name}

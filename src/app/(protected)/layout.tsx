@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { forbidden, redirect } from "next/navigation";
 import jwt from "jsonwebtoken";
 import { GATEWAY_TOKEN_NAME } from "@/config/internals";
@@ -37,7 +37,9 @@ export default async function ProtectedLayout({
     user?.cohort_discovery_roles?.includes(Roles.ADMIN) ||
     user?.cohort_discovery_roles.includes(Roles.SYSTEM_ADMIN);
 
-  const now = Math.floor(Date.now() / 1000);
+  const h = await headers();
+  const requestNow = h?.get("x-request-now");
+  const now = requestNow !== null ? Number(requestNow) : 0;
   if (decoded.exp && now >= decoded.exp) {
     redirect("/api/auth/logout");
   }

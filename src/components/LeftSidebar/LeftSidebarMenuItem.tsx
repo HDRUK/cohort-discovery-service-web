@@ -1,4 +1,3 @@
-// RecursiveMenuItem.tsx
 "use client";
 
 import Link from "next/link";
@@ -6,7 +5,6 @@ import React, { Fragment, useMemo, useState } from "react";
 import {
   List,
   ListItemButton,
-  ListItemIcon,
   ListItemText,
   Collapse,
   IconButton,
@@ -32,7 +30,6 @@ const LeftSidebarMenuItem = ({ item, depth = 0 }: Props) => {
   const hasChildren = !!item.children?.length;
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const IconComp = item.icon as React.ElementType | undefined;
 
   const selected = useMemo(
     () =>

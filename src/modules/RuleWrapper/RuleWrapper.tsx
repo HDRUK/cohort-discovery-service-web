@@ -293,7 +293,6 @@ const RuleWrapper = ({
           </Collapse>
         )}
       </Box>
-
       {isSelected && (
         <EditableText
           value={nodeName}

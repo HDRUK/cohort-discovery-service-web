@@ -9,7 +9,7 @@ import {
   Paper,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useWatch } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { CollectionHost, CreateCollectionPost, Custodian } from "@/types/api";
@@ -76,7 +76,7 @@ const CollectionForm = ({
 
   const [submitting, setSubmitting] = useState(false);
 
-  const { handleSubmit, control, reset, watch, setValue } =
+  const { handleSubmit, control, reset, setValue } =
     useForm<CollectionFormValues>({
       resolver: yupResolver(schema),
       defaultValues: {
@@ -88,7 +88,7 @@ const CollectionForm = ({
       },
     });
 
-  const type = watch("type");
+  const type = useWatch({ control, name: "type" });
 
   useEffect(() => {
     if (type !== QueryContext.BEACON) {

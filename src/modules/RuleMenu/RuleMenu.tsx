@@ -1,19 +1,16 @@
 "use client";
+import dynamic from "next/dynamic";
 
-import ShowOnClick from "@/components/ShowOnClick";
-import CodeBlock from "@/components/CodeBlock";
-import CodeIcon from "@mui/icons-material/Code";
-import { useDaphneStore } from "@/store/useDaphneStore";
+// hack because https://github.com/vercel/next-plugins/issues/388
+// - hard to transform mdx files to use in tests
+// - pointless testing static data anyway..
+const isTest = process.env.NODE_ENV === "test";
+const Guidance = isTest
+  ? () => null
+  : dynamic(() => import("../Guidance"), { ssr: false });
 
 const RuleMenu = () => {
-  const {
-    queryBuilder: { queryBuilderJson },
-  } = useDaphneStore();
-  return (
-    <ShowOnClick icon={<CodeIcon />}>
-      <CodeBlock code={queryBuilderJson} />{" "}
-    </ShowOnClick>
-  );
+  return <Guidance />;
 };
 
 export default RuleMenu;

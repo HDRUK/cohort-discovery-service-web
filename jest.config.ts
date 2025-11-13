@@ -100,6 +100,7 @@ const config: Config = {
     "^@/store/(.*)$": "<rootDir>/src/store/$1",
     "^@/types/(.*)$": "<rootDir>/src/types/$1",
     "^@/components/(.*)$": "<rootDir>/src/components/$1",
+    "^@/content/(.*)$": "<rootDir>/src/content/$1",
     "^@/modules/(.*)$": "<rootDir>/src/modules/$1",
     "^@/providers/(.*)$": "<rootDir>/src/providers/$1",
     "^@/utils/(.*)$": "<rootDir>/src/utils/$1",
@@ -189,15 +190,17 @@ const config: Config = {
   // testRunner: "jest-circus/runner",
 
   transform: {
-    "^.+\\.(ts|tsx)$": [
+    "^.+\\.(js|jsx|ts|tsx|md|mdx)$": [
       "ts-jest",
       {
         tsconfig: "./tsconfig.jest.json",
       },
     ],
   },
-  transformIgnorePatterns: ["/node_modules/(?!react-syntax-highlighter)"],
-  moduleFileExtensions: ["ts", "tsx", "js", "jsx"],
+  transformIgnorePatterns: [
+    "/node_modules/(?!react-syntax-highlighter|refractor|hastscript|property-information|space-separated-tokens|comma-separated-tokens)/",
+  ],
+  moduleFileExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
 
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
   // unmockedModulePathPatterns: undefined,

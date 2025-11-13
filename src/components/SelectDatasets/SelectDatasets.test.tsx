@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { render, screen, within, waitFor } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import getCollections from "@/actions/getCollections";
 import SelectDatasets from "./SelectDatasets";
@@ -60,11 +60,11 @@ describe("SelectDatasets", () => {
 
     const { pid, name } = collections.data[0];
     const row = screen.getByText(name).closest("div")!;
-    const checkbox = within(row).getByRole("checkbox");
+    const radio = within(row).getByRole("radio");
 
-    expect(checkbox).not.toBeChecked();
+    expect(radio).not.toBeChecked();
 
-    await user.click(checkbox);
+    await user.click(radio);
     expect(setSelectedDatasets).toHaveBeenLastCalledWith([pid]);
   });
 });

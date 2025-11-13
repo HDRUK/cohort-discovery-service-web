@@ -40,6 +40,20 @@ export const themeOptions = {
       fontSize: "14px",
       fontWeight: 400,
     },
+    overline: {
+      fontSize: "18px",
+      fontWeight: 600,
+      letterSpacing: 0,
+      textTransform: "none",
+    },
+    guidance1: {
+      fontSize: "20px",
+      fontWeight: 400,
+    },
+    guidance2: {
+      fontSize: "18px",
+      fontWeight: 600,
+    },
   },
   components: {
     MuiListItemButton: {
@@ -167,6 +181,14 @@ export const themeOptions = {
           boxShadow: "none",
           border: 1,
         }),
+      },
+    },
+    MuiTypography: {
+      defaultProps: {
+        variantMapping: {
+          guidance1: "h1",
+          guidance2: "h2",
+        },
       },
     },
   },

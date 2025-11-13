@@ -33,10 +33,6 @@ const EditableText = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (!editing) setDraft(value);
-  }, [value, editing]);
-
-  useEffect(() => {
     if (editing) {
       inputRef.current?.focus();
       if (autoSelect) inputRef.current?.select();
@@ -65,6 +61,8 @@ const EditableText = ({
     setDraft(value);
   };
 
+  const displayText = value || placeholder || "";
+
   return (
     <Typography
       {...typographyProps}
@@ -82,6 +80,7 @@ const EditableText = ({
     >
       {editing ? (
         <TextField
+          key="editing"
           autoFocus
           inputRef={inputRef}
           value={draft}
@@ -103,7 +102,7 @@ const EditableText = ({
           {...textFieldProps}
         />
       ) : (
-        <>{value || placeholder || ""}</>
+        <>{displayText}</>
       )}
     </Typography>
   );

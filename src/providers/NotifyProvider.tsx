@@ -44,18 +44,32 @@ export function NotifyProvider({ children }: { children: React.ReactNode }) {
     setOpen(true);
   }, []);
 
-  const notify: NotifyFn = useMemo(() => {
-    const fn = ((args: NotifyArgs) => notifyBase(args)) as NotifyFn;
-    fn.success = (msg, dur) =>
-      notifyBase({ message: msg, severity: "success", autoHideDuration: dur });
-    fn.info = (msg, dur) =>
-      notifyBase({ message: msg, severity: "info", autoHideDuration: dur });
-    fn.warning = (msg, dur) =>
-      notifyBase({ message: msg, severity: "warning", autoHideDuration: dur });
-    fn.error = (msg, dur) =>
-      notifyBase({ message: msg, severity: "error", autoHideDuration: dur });
-    return fn;
-  }, [notifyBase]);
+  const notify: NotifyFn = useMemo(
+    () =>
+      Object.assign(((args: NotifyArgs) => notifyBase(args)) as NotifyFn, {
+        success: (msg: string, dur?: number) =>
+          notifyBase({
+            message: msg,
+            severity: "success",
+            autoHideDuration: dur,
+          }),
+        info: (msg: string, dur?: number) =>
+          notifyBase({ message: msg, severity: "info", autoHideDuration: dur }),
+        warning: (msg: string, dur?: number) =>
+          notifyBase({
+            message: msg,
+            severity: "warning",
+            autoHideDuration: dur,
+          }),
+        error: (msg: string, dur?: number) =>
+          notifyBase({
+            message: msg,
+            severity: "error",
+            autoHideDuration: dur,
+          }),
+      }),
+    [notifyBase]
+  );
 
   return (
     <NotifyContext.Provider value={notify}>
