@@ -71,7 +71,7 @@ const Guidance = () => {
             </ActionMenuSection>
           )}
           {isOperator(selectedNode) && (
-            <ActionMenuSection title={"Rule"} defaultExpanded>
+            <ActionMenuSection title={"Operator"} defaultExpanded>
               <OperatorGuidance
                 components={makeOperatorComponents(selectedNode)}
               />
