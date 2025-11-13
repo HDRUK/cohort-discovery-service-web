@@ -15,7 +15,7 @@ export const Switch = (props: SwitchProps) => (
       checkedIcon={
         <CheckIcon
           fontSize="small"
-          sx={{ color: "white", bgcolor: "#3db28c", borderRadius: 10 }}
+          sx={{ color: "white", bgcolor: "success.main", borderRadius: 10 }}
         />
       }
       {...props}
