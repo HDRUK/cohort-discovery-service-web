@@ -2,7 +2,7 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import SquareRadio from "@/components/SquareRadio";
-import { CombinatorType, OperatorType, RuleLeafType } from "@/types/rules";
+import { CombinatorType, OperatorType } from "@/types/rules";
 import { updateById } from "@/utils/rules";
 import useQueryBuilder from "@/store/useQueryBuilder";
 
