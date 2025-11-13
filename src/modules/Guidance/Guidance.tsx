@@ -3,17 +3,27 @@
 import ToolGuidance from "@/content/guidance/tool.mdx";
 import RuleGuidance from "@/content/guidance/rule.mdx";
 import OperatorGuidance from "@/content/guidance/operator.mdx";
+import GroupGuidance from "@/content/guidance/group.mdx";
 import { Box, Typography } from "@mui/material";
-import { ReactNode, useMemo } from "react";
+import { ReactNode, useCallback, useMemo } from "react";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import ActionMenuSection from "@/components/ActionMenuSection";
-import { findById, isOperator } from "@/utils/rules";
+import {
+  createOperator,
+  createRule,
+  findById,
+  isOperator,
+  isRuleGroup,
+  updateById,
+} from "@/utils/rules";
 import { isRuleLeaf } from "@/utils/rules";
 import { trueKeys } from "@/utils/numbers";
-import { OperatorType, RuleLeafType } from "@/types/rules";
+import { OperatorType, RuleGroupType, RuleLeafType } from "@/types/rules";
 import ToggleExclusion from "@/content/guidance/components/ToggleExclusion";
 import ShowDescendants from "@/content/guidance/components/ShowDescendants";
 import ToggleOperator from "@/content/guidance/components/ToggleOperator";
+import AddButton from "@/components/AddButton";
+import { AddButtonProps } from "@/components/AddButton/AddButton";
 
 function CustomH1({ children }: { children: ReactNode }) {
   return (
@@ -32,22 +42,14 @@ const baseComponents = {
   h2: CustomH2,
 };
 
-const makeRuleComponents = (node: RuleLeafType) => ({
-  ...baseComponents,
-  ToggleExclusion: () => <ToggleExclusion node={node} />,
-  ShowDescendants: () => <ShowDescendants node={node} />,
-});
-
-const makeOperatorComponents = (node: OperatorType) => ({
-  ...baseComponents,
-  ToggleOperator: () => <ToggleOperator operator={node} />,
-});
-
 const Guidance = () => {
-  const { queryBuilderJson, selected } = useQueryBuilder((qb) => ({
-    selected: qb.selected,
-    queryBuilderJson: qb.queryBuilderJson,
-  }));
+  const { queryBuilderJson, setQueryBuilderJson, selected } = useQueryBuilder(
+    (qb) => ({
+      selected: qb.selected,
+      queryBuilderJson: qb.queryBuilderJson,
+      setQueryBuilderJson: qb.setQueryBuilderJson,
+    })
+  );
 
   const selectedIds = useMemo(() => trueKeys(selected), [selected]);
   const selectedNode = useMemo(() => {
@@ -55,6 +57,44 @@ const Guidance = () => {
     const node = findById(queryBuilderJson, String(selectedIds[0]));
     return node;
   }, [queryBuilderJson, selectedIds]);
+
+  const handleCreateNewRuleInGroup = useCallback(
+    (id: RuleGroupType["id"], rules: RuleGroupType["rules"]) => {
+      const newRules = [createRule(), createOperator(), ...rules];
+
+      setQueryBuilderJson(
+        updateById(queryBuilderJson, id, (node) => ({
+          ...node,
+          rules: newRules,
+        }))
+      );
+    },
+    [queryBuilderJson, setQueryBuilderJson]
+  );
+
+  const makeRuleComponents = (node: RuleLeafType) => ({
+    ...baseComponents,
+    ToggleExclusion: () => <ToggleExclusion node={node} />,
+    ShowDescendants: () => <ShowDescendants node={node} />,
+  });
+
+  const makeOperatorComponents = (node: OperatorType) => ({
+    ...baseComponents,
+    ToggleOperator: () => <ToggleOperator operator={node} />,
+  });
+
+  const makeGroupComponents = (group: RuleGroupType) => {
+    const { id, rules } = group;
+    return {
+      ...baseComponents,
+      AddNewRuleButton: (props: AddButtonProps) => (
+        <AddButton
+          {...props}
+          action={() => handleCreateNewRuleInGroup(id, rules)}
+        />
+      ),
+    };
+  };
 
   return (
     <Box sx={{ px: 1 }}>
@@ -75,6 +115,11 @@ const Guidance = () => {
               <OperatorGuidance
                 components={makeOperatorComponents(selectedNode)}
               />
+            </ActionMenuSection>
+          )}
+          {isRuleGroup(selectedNode) && (
+            <ActionMenuSection title={"Operator"} defaultExpanded>
+              <GroupGuidance components={makeGroupComponents(selectedNode)} />
             </ActionMenuSection>
           )}
         </>

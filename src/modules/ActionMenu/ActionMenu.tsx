@@ -2,9 +2,8 @@
 
 import * as React from "react";
 import { useDaphneStore } from "@/store/useDaphneStore";
-import { Button } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
 import ActionMenuSection from "@/components/ActionMenuSection";
+import AddButton from "@/components/AddButton";
 import Hierarchy from "../Hierarchy";
 
 const ActionMenu: React.FC = () => {
@@ -15,23 +14,8 @@ const ActionMenu: React.FC = () => {
   return (
     <>
       <ActionMenuSection title={"Insert"} defaultExpanded underline>
-        <Button
-          variant="text"
-          startIcon={<AddIcon />}
-          onClick={() => createNewRule()}
-          sx={{ justifyContent: "flex-start", color: "text.primary" }}
-        >
-          Add rule
-        </Button>
-
-        <Button
-          variant="text"
-          startIcon={<AddIcon />}
-          onClick={() => createNewGroup()}
-          sx={{ justifyContent: "flex-start", color: "text.primary" }}
-        >
-          Add group
-        </Button>
+        <AddButton action={createNewRule} label={"Add rule"} />
+        <AddButton action={createNewGroup} label={"Add group"} />
       </ActionMenuSection>
       <ActionMenuSection
         title={"Hierarchy"}
