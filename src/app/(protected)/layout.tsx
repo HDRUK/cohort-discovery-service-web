@@ -1,5 +1,5 @@
-import { cookies } from "next/headers";
-import { forbidden } from "next/navigation";
+import { cookies, headers } from "next/headers";
+import { forbidden, redirect } from "next/navigation";
 import jwt from "jsonwebtoken";
 import { GATEWAY_TOKEN_NAME } from "@/config/internals";
 import { TokenUser, CombinedUser, Roles } from "@/types/api";
@@ -36,6 +36,13 @@ export default async function ProtectedLayout({
   const hasAdminAccess =
     user?.cohort_discovery_roles?.includes(Roles.ADMIN) ||
     user?.cohort_discovery_roles.includes(Roles.SYSTEM_ADMIN);
+
+  const h = await headers();
+  const requestNow = h?.get("x-request-now");
+  const now = requestNow !== null ? Number(requestNow) : 0;
+  if (decoded.exp && now >= decoded.exp) {
+    redirect("/api/auth/logout");
+  }
 
   if (!(hasGeneralAccess || hasAdminAccess)) {
     forbidden();
