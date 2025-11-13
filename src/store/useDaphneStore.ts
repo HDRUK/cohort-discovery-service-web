@@ -85,7 +85,8 @@ export interface DaphneStoreState {
     selected: Record<UniqueIdentifier, boolean>;
     setSelected: (
       id: UniqueIdentifier | UniqueIdentifier[],
-      next?: boolean
+      next?: boolean,
+      reset?: boolean
     ) => void;
     select: (id: UniqueIdentifier | UniqueIdentifier[]) => void;
     deselect: (id: UniqueIdentifier | UniqueIdentifier[]) => void;
@@ -186,13 +187,14 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     selected: {},
     setSelected: async (
       id: UniqueIdentifier | UniqueIdentifier[],
-      nextValue: boolean = true
+      nextValue: boolean = true,
+      reset: boolean = false
     ) => {
       const ids = Array.isArray(id) ? id : [id];
       const uniqueIds = Array.from(new Set(ids));
 
       set((state) => {
-        const curr = state.queryBuilder.selected ?? {};
+        const curr = reset ? {} : state.queryBuilder.selected ?? {};
         let changed = false;
 
         const nextSelected = { ...curr };
@@ -235,7 +237,12 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       const fn = Creators[kind];
 
       const {
-        queryBuilder: { selected, queryBuilderJson, setQueryBuilderJson },
+        queryBuilder: {
+          selected,
+          queryBuilderJson,
+          setQueryBuilderJson,
+          setSelected,
+        },
       } = get();
 
       const idsToAddTo = trueKeys(selected);
@@ -266,6 +273,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         for (const id of idsToAddTo) {
           const leftNeighbor = findById(updated, id as string);
           const toInsert = normaliseAdditions(leftNeighbor);
+          setSelected(toInsert[above ? toInsert.length - 1 : 0].id, true, true);
 
           updated = updateById(updated, id as string, (node) => node, {
             node: above ? toInsert.reverse() : toInsert,
@@ -285,7 +293,11 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         ? [...toAppend.reverse(), ...queryBuilderJson.rules]
         : [...queryBuilderJson.rules, ...toAppend];
       const updatedQuery = { ...queryBuilderJson, rules };
-
+      setSelected(
+        toAppend.slice(0, 1).map((r) => r.id),
+        true,
+        true
+      );
       setQueryBuilderJson(updatedQuery);
     },
 

@@ -4,6 +4,7 @@ import ToolGuidance from "@/content/guidance/tool.mdx";
 import RuleGuidance from "@/content/guidance/rule.mdx";
 import OperatorGuidance from "@/content/guidance/operator.mdx";
 import GroupGuidance from "@/content/guidance/group.mdx";
+import BuildGuidance from "@/content/guidance/build.mdx";
 import { Box, Typography } from "@mui/material";
 import { ReactNode, useCallback, useMemo } from "react";
 import useQueryBuilder from "@/store/useQueryBuilder";
@@ -40,6 +41,28 @@ function CustomH2({ children }: { children: ReactNode }) {
 const baseComponents = {
   h1: CustomH1,
   h2: CustomH2,
+  ul: (props: any) => (
+    <Box
+      component="ul"
+      sx={{
+        pl: 2,
+        my: 1,
+        listStyleType: "disc",
+        listStylePosition: "outside",
+      }}
+      {...props}
+    />
+  ),
+  li: (props: any) => (
+    <Box
+      component="li"
+      sx={{
+        display: "list-item",
+        my: 0.5,
+      }}
+      {...props}
+    />
+  ),
 };
 
 const Guidance = () => {
@@ -49,6 +72,10 @@ const Guidance = () => {
       queryBuilderJson: qb.queryBuilderJson,
       setQueryBuilderJson: qb.setQueryBuilderJson,
     })
+  );
+  const empty = useMemo(
+    () => queryBuilderJson.rules.length === 0,
+    [queryBuilderJson]
   );
 
   const selectedIds = useMemo(() => trueKeys(selected), [selected]);
@@ -98,7 +125,12 @@ const Guidance = () => {
 
   return (
     <Box sx={{ px: 1 }}>
-      {!selectedNode && (
+      {empty && (
+        <ActionMenuSection title={"Build Guidance"} fixedExpanded>
+          <BuildGuidance components={baseComponents} />
+        </ActionMenuSection>
+      )}
+      {!selectedNode && !empty && (
         <ActionMenuSection title={"Tool Guidance"} fixedExpanded>
           <ToolGuidance components={baseComponents} />
         </ActionMenuSection>

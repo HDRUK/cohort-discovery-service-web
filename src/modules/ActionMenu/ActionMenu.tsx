@@ -5,11 +5,16 @@ import { useDaphneStore } from "@/store/useDaphneStore";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import AddButton from "@/components/AddButton";
 import Hierarchy from "../Hierarchy";
+import useQueryBuilder from "@/store/useQueryBuilder";
 
 const ActionMenu: React.FC = () => {
-  const {
-    queryBuilder: { queryBuilderJson, createNewGroup, createNewRule },
-  } = useDaphneStore();
+  const { queryBuilderJson, createNewGroup, createNewRule } = useQueryBuilder(
+    (qb) => ({
+      queryBuilderJson: qb.queryBuilderJson,
+      createNewGroup: qb.createNewGroup,
+      createNewRule: qb.createNewRule,
+    })
+  );
 
   return (
     <>
