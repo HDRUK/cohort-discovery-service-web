@@ -78,6 +78,8 @@ function makeDefaultStore(): DaphneStoreState {
       deselect: NOOP,
       openSelectDatasetsPanel: true,
       setOpenSelectDatasetsPanel: NOOP,
+      showDescendants: {},
+      setShowDescendants: NOOP,
     },
 
     userData: {
