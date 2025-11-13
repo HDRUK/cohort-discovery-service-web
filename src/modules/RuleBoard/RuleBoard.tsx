@@ -38,7 +38,7 @@ const RuleBoard = ({ ruleGroup }: RuleBoardProps) => {
     data: { type: "container", containerId: id },
   });
 
-  const [hasMounted, setHasMounted] = useState(false);
+  const [hasMounted, setHasMounted] = useState(typeof window !== "undefined");
 
   useEffect(() => {
     const t = setTimeout(() => setHasMounted(true), 0);

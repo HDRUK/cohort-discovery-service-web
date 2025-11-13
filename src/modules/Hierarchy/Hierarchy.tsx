@@ -31,7 +31,8 @@ export const Hierarchy = () => {
   const { rules } = queryBuilderJson;
 
   const [active, setActive] = useState<Active | null>(null);
-  const [hasMounted, setHasMounted] = useState(false);
+  const [hasMounted, setHasMounted] = useState(typeof window !== "undefined");
+
   useEffect(() => {
     const t = setTimeout(() => setHasMounted(true), 0);
     return () => clearTimeout(t);

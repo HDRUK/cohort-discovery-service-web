@@ -84,8 +84,7 @@ const QueryBuilder = () => {
       if (!overGroupId || !activeGroupId) return;
 
       if (activeData.id === overData.id) return;
-
-      const groupItems = boardIndex.itemsByGroup[overGroupId] ?? [];
+      const groupItems = boardIndex?.itemsByGroup?.[overGroupId] ?? [];
       let targetIndex = groupItems?.indexOf(overData.id);
 
       targetIndex = targetIndex < 0 ? 0 : targetIndex;
