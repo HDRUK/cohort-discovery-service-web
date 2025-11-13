@@ -5,7 +5,7 @@ import RuleGuidance from "@/content/guidance/rule.mdx";
 import OperatorGuidance from "@/content/guidance/operator.mdx";
 import GroupGuidance from "@/content/guidance/group.mdx";
 import BuildGuidance from "@/content/guidance/build.mdx";
-import { Box, Typography } from "@mui/material";
+import { Box, BoxProps, Typography } from "@mui/material";
 import { ReactNode, useCallback, useMemo } from "react";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import ActionMenuSection from "@/components/ActionMenuSection";
@@ -41,7 +41,7 @@ function CustomH2({ children }: { children: ReactNode }) {
 const baseComponents = {
   h1: CustomH1,
   h2: CustomH2,
-  ul: (props: any) => (
+  ul: (props: BoxProps) => (
     <Box
       component="ul"
       sx={{
@@ -53,7 +53,7 @@ const baseComponents = {
       {...props}
     />
   ),
-  li: (props: any) => (
+  li: (props: BoxProps) => (
     <Box
       component="li"
       sx={{
