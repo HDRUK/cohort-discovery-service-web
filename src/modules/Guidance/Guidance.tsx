@@ -2,16 +2,18 @@
 
 import ToolGuidance from "@/content/guidance/tool.mdx";
 import RuleGuidance from "@/content/guidance/rule.mdx";
+import OperatorGuidance from "@/content/guidance/operator.mdx";
 import { Box, Typography } from "@mui/material";
 import { ReactNode, useMemo } from "react";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import ActionMenuSection from "@/components/ActionMenuSection";
-import { findById } from "@/utils/rules";
+import { findById, isOperator } from "@/utils/rules";
 import { isRuleLeaf } from "@/utils/rules";
 import { trueKeys } from "@/utils/numbers";
-import { RuleLeafType } from "@/types/rules";
+import { OperatorType, RuleLeafType } from "@/types/rules";
 import ToggleExclusion from "@/content/guidance/components/ToggleExclusion";
 import ShowDescendants from "@/content/guidance/components/ShowDescendants";
+import ToggleOperator from "@/content/guidance/components/ToggleOperator";
 
 function CustomH1({ children }: { children: ReactNode }) {
   return (
@@ -36,6 +38,11 @@ const makeRuleComponents = (node: RuleLeafType) => ({
   ShowDescendants: () => <ShowDescendants node={node} />,
 });
 
+const makeOperatorComponents = (node: OperatorType) => ({
+  ...baseComponents,
+  ToggleOperator: () => <ToggleOperator operator={node} />,
+});
+
 const Guidance = () => {
   const { queryBuilderJson, selected } = useQueryBuilder((qb) => ({
     selected: qb.selected,
@@ -56,13 +63,22 @@ const Guidance = () => {
           <ToolGuidance components={baseComponents} />
         </ActionMenuSection>
       )}
-      {selectedNode
-        ? isRuleLeaf(selectedNode) && (
+      {selectedNode && (
+        <>
+          {isRuleLeaf(selectedNode) && (
             <ActionMenuSection title={"Rule"} defaultExpanded>
               <RuleGuidance components={makeRuleComponents(selectedNode)} />
             </ActionMenuSection>
-          )
-        : null}
+          )}
+          {isOperator(selectedNode) && (
+            <ActionMenuSection title={"Rule"} defaultExpanded>
+              <OperatorGuidance
+                components={makeOperatorComponents(selectedNode)}
+              />
+            </ActionMenuSection>
+          )}
+        </>
+      )}
     </Box>
   );
 };
