@@ -19,9 +19,10 @@ import {
 } from "@dnd-kit/modifiers";
 import { SortableContext } from "@dnd-kit/sortable";
 import { List, Skeleton } from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import HierarchyItem from "@/components/HierarchyItem";
 import { ID_REF_SUFFIX } from "@/config/defaults";
+import useHasMounted from "@/hooks/useHasMounted";
 
 export const Hierarchy = () => {
   const {
@@ -31,12 +32,7 @@ export const Hierarchy = () => {
   const { rules } = queryBuilderJson;
 
   const [active, setActive] = useState<Active | null>(null);
-  const [hasMounted, setHasMounted] = useState(typeof window !== "undefined");
-
-  useEffect(() => {
-    const t = setTimeout(() => setHasMounted(true), 0);
-    return () => clearTimeout(t);
-  }, []);
+  const hasMounted = useHasMounted();
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } })

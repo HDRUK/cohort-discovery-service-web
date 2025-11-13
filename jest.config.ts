@@ -190,14 +190,16 @@ const config: Config = {
   // testRunner: "jest-circus/runner",
 
   transform: {
-    "^.+\\.(ts|tsx|md|mdx)$": [
+    "^.+\\.(js|jsx|ts|tsx|md|mdx)$": [
       "ts-jest",
       {
         tsconfig: "./tsconfig.jest.json",
       },
     ],
   },
-  transformIgnorePatterns: ["/node_modules/(?!react-syntax-highlighter)"],
+  transformIgnorePatterns: [
+    "/node_modules/(?!react-syntax-highlighter|refractor|hastscript|property-information|space-separated-tokens|comma-separated-tokens)/",
+  ],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "md", "mdx"],
 
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
