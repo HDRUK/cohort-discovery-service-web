@@ -1,7 +1,7 @@
 import { Typography, Chip, Alert } from "@mui/material";
 import SearchConcepts from "@/components/SearchConcepts";
 import { Concept } from "@/types/api";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback } from "react";
 import ConceptChip from "@/components/ConceptChip";
 import { RuleLeafType } from "@/types/rules";
 
@@ -50,7 +50,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
 
   const toggleShowDescendants = useCallback(
     () => setShowDescendants(id, !showDescendants),
-    [id, showDescendants]
+    [id, showDescendants, setShowDescendants]
   );
 
   const setConcept = useCallback(
