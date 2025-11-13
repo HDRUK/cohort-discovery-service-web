@@ -54,9 +54,12 @@ export default function MarqueeSelection({
   const rectRef = useRef<Rect>({ x: 0, y: 0, w: 0, h: 0 });
   const [rectState, setRectState] = useState<Rect | null>(null);
   const latestSelected = useRef<string[]>([]);
-  const insideRef = useRef<string>(null);
+  const insideRef = useRef<string | null>(null);
 
-  const portalTarget = containerRef.current;
+  const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    setPortalTarget(containerRef.current);
+  }, [containerRef]);
 
   useEffect(() => {
     if (!dragging) return;
@@ -232,7 +235,7 @@ export default function MarqueeSelection({
   ]);
 
   useLogDependencyChanges("selection-effect", {
-    containerRef: containerRef?.current ?? containerRef, // logs the node if available
+    containerRef,
     selectable,
     idAttr,
     onChange,

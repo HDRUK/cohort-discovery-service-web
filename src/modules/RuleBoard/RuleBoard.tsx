@@ -41,7 +41,8 @@ const RuleBoard = ({ ruleGroup }: RuleBoardProps) => {
   const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
-    setHasMounted(true);
+    const t = setTimeout(() => setHasMounted(true), 0);
+    return () => clearTimeout(t);
   }, []);
 
   if (!hasMounted) {

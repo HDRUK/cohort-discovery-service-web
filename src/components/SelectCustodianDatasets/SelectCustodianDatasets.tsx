@@ -5,15 +5,11 @@ import { GroupedCollection } from "../../types/api";
 import {
   Chip,
   Box,
-  Checkbox,
   Accordion,
   AccordionSummary,
   AccordionDetails,
   FormControlLabel,
 } from "@mui/material";
-
-import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
-import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Title from "../Title";
 import SquareRadio from "../SquareRadio";

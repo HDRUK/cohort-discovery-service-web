@@ -32,7 +32,10 @@ export const Hierarchy = () => {
 
   const [active, setActive] = useState<Active | null>(null);
   const [hasMounted, setHasMounted] = useState(false);
-  useEffect(() => setHasMounted(true), []);
+  useEffect(() => {
+    const t = setTimeout(() => setHasMounted(true), 0);
+    return () => clearTimeout(t);
+  }, []);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } })

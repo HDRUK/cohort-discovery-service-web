@@ -1,7 +1,6 @@
-// MarqueeSelection.test.tsx
 import "@testing-library/jest-dom";
-import React, { useRef } from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { useRef } from "react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import MarqueeSelection from "./MarqueeSelection";
 
