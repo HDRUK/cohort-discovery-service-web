@@ -25,7 +25,7 @@ const CustodianAdminPageContent = async ({ params }: { params: Params }) => {
       }}
     >
       <CollectionHeader pid={custodianPid} />
-      <TabsShell labels={["Hosts", "Collections"]}>
+      <TabsShell tabs={[{ label: "Hosts" }, { label: "Collections" }]}>
         <CollectionHostAdmin
           pid={custodianPid}
           collectionHosts={collectionHosts}

@@ -1,6 +1,6 @@
-import { createTheme } from "@mui/material/styles";
+import { createTheme, Theme, ThemeOptions } from "@mui/material/styles";
 
-export const themeOptions = {
+export const themeOptions: ThemeOptions = {
   palette: {
     success: {
       main: "#3db28c",
@@ -9,11 +9,16 @@ export const themeOptions = {
       contrastText: "#ffffff",
     },
     text: {
-      default: "#4D5B59",
+      primary: "#4D5B59",
     },
     background: {
       default: "#F2F2F2",
       paper: "#F7F7F7",
+    },
+    link: {
+      main: "#1976d2",
+      light: "#90caf9",
+      dark: "#0d47a1",
     },
   },
   zIndex: {
@@ -90,16 +95,6 @@ export const themeOptions = {
         }),
       },
     },
-    MuiTabPanel: {
-      styleOverrides: {
-        root: ({ theme }) => ({
-          backgroundColor: theme.palette.background.default,
-          width: "100%",
-          p: 2,
-          m: 0,
-        }),
-      },
-    },
     MuiFormLabel: {
       styleOverrides: {
         root: {
@@ -139,7 +134,7 @@ export const themeOptions = {
       },
       variants: [
         {
-          props: { variant: "contained", "data-shape": "curvedRight" },
+          props: { variant: "curvedRight" },
           style: {
             borderTopLeftRadius: 0,
             borderBottomLeftRadius: 0,
@@ -149,7 +144,7 @@ export const themeOptions = {
           },
         },
         {
-          props: { variant: "contained", "data-shape": "curvedLeft" },
+          props: { variant: "curvedLeft" },
           style: {
             borderTopLeftRadius: "1rem",
             borderBottomLeftRadius: "1rem",
@@ -158,7 +153,6 @@ export const themeOptions = {
             my: "auto",
           },
         },
-        // You can add contained/text versions the same way if needed
       ],
     },
     MuiOutlinedInput: {

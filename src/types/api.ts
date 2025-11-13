@@ -119,16 +119,6 @@ export interface Query {
   tasks: Task[];
 }
 
-export interface UserList {
-  id: number;
-  name: string;
-  email: string;
-  email_verified_at: string | null;
-  created_at: string;
-  updated_at: string;
-  new_user_status: number;
-}
-
 export interface Token {
   federated_token: string;
   type: string;
@@ -157,6 +147,7 @@ export interface User extends WithTimestamps {
   email: string;
   name: string;
   email_verified_at: string | null;
+  new_user_status?: number;
 }
 
 export interface GatewayTeam {

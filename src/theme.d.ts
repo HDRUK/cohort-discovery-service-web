@@ -1,3 +1,4 @@
+import React from "react";
 import "@mui/material/styles";
 import "@mui/material/Chip";
 import "@mui/material/Button";
@@ -5,9 +6,19 @@ import "@mui/material/Button";
 declare module "@mui/material/styles" {
   interface Palette {
     tertiary: Palette["primary"];
+    link: Palette["primary"];
   }
   interface PaletteOptions {
     tertiary?: PaletteOptions["primary"];
+    link?: PaletteOptions["primary"];
+  }
+  interface TypographyVariants {
+    guidance1: React.CSSProperties;
+    guidance2: React.CSSProperties;
+  }
+  interface TypographyVariantsOptions {
+    guidance1?: React.CSSProperties;
+    guidance2?: React.CSSProperties;
   }
 }
 

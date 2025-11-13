@@ -2,6 +2,20 @@ import { Box } from "@mui/material";
 import { User } from "@/types/api";
 
 const UserInitials = ({ user }: { user: User }) => {
+  const getInitials = (fullName: string) => {
+    if (!fullName) return "";
+
+    const parts = fullName.trim().split(/\s+/);
+
+    if (parts.length === 1) {
+      return parts[0][0].toUpperCase();
+    }
+
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  };
+
+  const initials = getInitials(user.name);
+
   return (
     <Box
       sx={{
@@ -16,7 +30,7 @@ const UserInitials = ({ user }: { user: User }) => {
         fontWeight: "bold",
       }}
     >
-      {`${user.firstname[0]}${user.lastname[0]}`.toUpperCase()}
+      {initials}
     </Box>
   );
 };

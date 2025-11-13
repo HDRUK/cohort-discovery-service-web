@@ -1,3 +1,3 @@
-import SelectDatasets from "./SelectDatasets";
+import FilterDatasets from "./FilterDatasets";
 
-export default SelectDatasets;
+export default FilterDatasets;

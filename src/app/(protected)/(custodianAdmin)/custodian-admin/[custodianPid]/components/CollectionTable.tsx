@@ -18,7 +18,7 @@ const CollectionTable = ({
         header: "PID",
         Cell: ({ cell }) => {
           const pid = cell.getValue<string>();
-          return <CodeBlock code={pid} language="html" />;
+          return <CodeBlock code={pid} />;
         },
       },
       {

@@ -4,7 +4,6 @@ import { Suspense } from "react";
 import getQueries from "@/actions/getQueries";
 import QueriesTable from "@/components/QueriesTable";
 import { QueriesTableSkeleton } from "@/components/QueriesTable";
-import { getAllFields } from "@/actions/omop/getAllCodes";
 import { Paper } from "@mui/material";
 import Title from "@/components/Title";
 import RevalidateButton from "@/components/RevalidateButton";
@@ -22,7 +21,6 @@ const QueryListPageContent = async ({ searchParams }: PageProps) => {
   const perPage = params?.per_page ? parseInt(params.per_page) : undefined;
 
   const queries = await getQueries(page, perPage);
-  const fields = await getAllFields();
 
   return (
     <Paper sx={{ p: 2, gap: 2, display: "flex", flexDirection: "column" }}>
@@ -32,7 +30,6 @@ const QueryListPageContent = async ({ searchParams }: PageProps) => {
       <QueriesTable
         queries={queries.data}
         hasIncomplete={queries.hasIncomplete}
-        fields={fields}
       />
     </Paper>
   );
