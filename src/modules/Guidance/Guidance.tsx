@@ -98,27 +98,27 @@ const Guidance = () => {
 
   return (
     <Box sx={{ px: 1 }}>
-      {queryBuilderJson.rules.length === 0 && (
-        <ActionMenuSection title={"Tool Guidance"} defaultExpanded>
+      {!selectedNode && (
+        <ActionMenuSection title={"Tool Guidance"} fixedExpanded>
           <ToolGuidance components={baseComponents} />
         </ActionMenuSection>
       )}
       {selectedNode && (
         <>
           {isRuleLeaf(selectedNode) && (
-            <ActionMenuSection title={"Rule"} defaultExpanded>
+            <ActionMenuSection title={"Rule"} fixedExpanded>
               <RuleGuidance components={makeRuleComponents(selectedNode)} />
             </ActionMenuSection>
           )}
           {isOperator(selectedNode) && (
-            <ActionMenuSection title={"Operator"} defaultExpanded>
+            <ActionMenuSection title={"Operator"} fixedExpanded>
               <OperatorGuidance
                 components={makeOperatorComponents(selectedNode)}
               />
             </ActionMenuSection>
           )}
           {isRuleGroup(selectedNode) && (
-            <ActionMenuSection title={"Operator"} defaultExpanded>
+            <ActionMenuSection title={"Group"} fixedExpanded>
               <GroupGuidance components={makeGroupComponents(selectedNode)} />
             </ActionMenuSection>
           )}

@@ -65,6 +65,7 @@ const SelectCustodianDatasets = ({
           startIcon={
             <SquareRadio
               checked={nSelected > 0}
+              partial={nSelected !== nTotal}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
