@@ -24,7 +24,7 @@ const useSearchParams = (paramName: string = "searchTerm") => {
       const queryString = params.toString();
       router.replace(queryString ? `?${queryString}` : ".");
     },
-    [router, searchParams]
+    [router, searchParams, paramName]
   );
 
   return { ...searchParams, setSearchParam };
