@@ -7,15 +7,13 @@ import SearchBox from "@/components/SearchBox";
 import { Controller, useForm } from "react-hook-form";
 import AdminUserTable from "./AdminUserTable";
 import TabsShell from "@/components/TabsShell";
-import { useRouter, useSearchParams } from "next/navigation";
-import useSearchSubmit from "@/hooks/useSubmitSearch";
+import useSearchParams from "@/hooks/useSearchParams";
 
 type FormValues = {
   userSearchInput: string;
 };
 
 const AdminUserList = ({ users }: { users: User[] }) => {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { handleSubmit, control } = useForm<FormValues>({
     defaultValues: {
@@ -23,10 +21,8 @@ const AdminUserList = ({ users }: { users: User[] }) => {
     },
   });
 
-  const { submitSearch } = useSearchSubmit();
-
   const onSubmit = (data: FormValues) => {
-    submitSearch(data.userSearchInput);
+    searchParams.setSearchParam(data.userSearchInput);
   };
 
   const newUsers = useMemo(

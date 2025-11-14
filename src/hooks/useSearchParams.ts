@@ -1,13 +1,16 @@
 "use client";
 
 import { useCallback } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import {
+  useRouter,
+  useSearchParams as useNextSearchParams,
+} from "next/navigation";
 
-const useSearchSubmit = (paramName: string = "searchTerm") => {
+const useSearchParams = (paramName: string = "searchTerm") => {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const searchParams = useNextSearchParams();
 
-  const submitSearch = useCallback(
+  const setSearchParam = useCallback(
     (userSearchInput: string) => {
       const params = new URLSearchParams(searchParams.toString());
       const value = userSearchInput.trim();
@@ -24,7 +27,7 @@ const useSearchSubmit = (paramName: string = "searchTerm") => {
     [router, searchParams]
   );
 
-  return { submitSearch };
+  return { ...searchParams, setSearchParam };
 };
 
-export default useSearchSubmit;
+export default useSearchParams;
