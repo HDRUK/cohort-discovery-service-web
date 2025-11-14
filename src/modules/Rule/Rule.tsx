@@ -4,6 +4,7 @@ import { Concept } from "@/types/api";
 import { useCallback } from "react";
 import ConceptChip from "@/components/ConceptChip";
 import { RuleLeafType } from "@/types/rules";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
 import useQueryBuilder from "@/store/useQueryBuilder";
 import {

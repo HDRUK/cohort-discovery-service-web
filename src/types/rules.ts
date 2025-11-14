@@ -8,9 +8,8 @@ export enum CombinatorType {
 }
 
 export type ConceptOperator = {
-  //operator: string;
   //ageConstraint: string;
-  //timeConstraint: string;
+  timeConstraint?: string;
   //valueConstraint: string;
   concept: Concept | Array<Concept> | null;
 };

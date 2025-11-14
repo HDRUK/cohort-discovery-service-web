@@ -25,6 +25,7 @@ import ShowDescendants from "@/content/guidance/components/ShowDescendants";
 import ToggleOperator from "@/content/guidance/components/ToggleOperator";
 import AddButton from "@/components/AddButton";
 import { AddButtonProps } from "@/components/AddButton/AddButton";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
 function CustomH1({ children }: { children: ReactNode }) {
   return (
@@ -103,6 +104,19 @@ const Guidance = () => {
     ...baseComponents,
     ToggleExclusion: () => <ToggleExclusion node={node} />,
     ShowDescendants: () => <ShowDescendants node={node} />,
+    AddTimeFrameButton: (props: AddButtonProps) => (
+      <>
+        <AddButton {...props} action={() => console.log("yo")} />
+        <DatePicker
+          slotProps={
+            {
+              //openPickerButton: { sx: { display: "none" } },
+            }
+          }
+          format={"DD MM YYYY"}
+        />
+      </>
+    ),
   });
 
   const makeOperatorComponents = (node: OperatorType) => ({
