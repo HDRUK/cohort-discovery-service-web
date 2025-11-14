@@ -78,12 +78,7 @@ const CohortQueryTitle = () => {
             )}
           />
 
-          <Button
-            type="submit"
-            variant="contained"
-            color="tertiary"
-            data-shape="curvedRight"
-          >
+          <Button type="submit" variant="curvedRight" color="tertiary">
             Save
           </Button>
         </Box>

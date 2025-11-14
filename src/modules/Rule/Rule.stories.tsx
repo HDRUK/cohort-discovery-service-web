@@ -30,7 +30,6 @@ const meta: Meta<typeof Rule> = {
   args: {
     rule: mockRule,
     groupId: "group-1",
-    sortable: true,
   },
   decorators: [
     (Story) => (

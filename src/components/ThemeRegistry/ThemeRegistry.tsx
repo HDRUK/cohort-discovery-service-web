@@ -6,11 +6,12 @@ import GlobalStyles from "@mui/material/GlobalStyles";
 import { themeOptions } from "../../config/theme";
 import { NotifyProvider } from "../../providers/NotifyProvider";
 import { HdrukUiProvider } from "@hdruk/ui";
+import { ThemeOptions } from "@mui/material";
 
 export default function ThemeRegistry({ children }: { children: ReactNode }) {
   return (
     <AppRouterCacheProvider>
-      <HdrukUiProvider themeOptions={themeOptions}>
+      <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
         <GlobalStyles
           styles={{
             body: {

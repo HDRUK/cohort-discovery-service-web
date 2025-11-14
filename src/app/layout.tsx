@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   description: "New cohort discovery tool",
 };
 
-const hideNav = process.env.HIDE_NAV === "true";
+const hideNav = process.env.APPLICATION_MODE === "integrated";
 
 export default function RootLayout({
   children,

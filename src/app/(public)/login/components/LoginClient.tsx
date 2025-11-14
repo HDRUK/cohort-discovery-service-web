@@ -3,13 +3,13 @@
 import { Button } from "@mui/material";
 import { useRouter } from "next/navigation";
 
-const GATEWAY_URL = process.env.NEXT_PUBLIC_GATEWAY_URL;
+const LOGIN_URL = process.env.NEXT_PUBLIC_LOGIN_URL;
 
 const LoginClient = () => {
   const router = useRouter();
   return (
     <Button
-      onClick={() => router.push(GATEWAY_URL || "/")}
+      onClick={() => router.push(LOGIN_URL || "/")}
       variant="contained"
       color="secondary"
     >

@@ -3,8 +3,15 @@ import { materialLight } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import { IconButton, Box } from "@mui/material";
 import { CopyAllOutlined } from "@mui/icons-material";
 import { useNotify } from "@/providers/NotifyProvider";
+import type { ComponentProps } from "react";
 
-const CodeBlock = ({ code, ...rest }: { code: unknown }) => {
+type SyntaxHighlighterProps = ComponentProps<typeof SyntaxHighlighter>;
+
+interface CodeBlockProps extends Omit<SyntaxHighlighterProps, "children"> {
+  code: unknown;
+}
+
+const CodeBlock = ({ code, ...rest }: CodeBlockProps) => {
   const notify = useNotify();
   const codeString =
     typeof code === "string" ? code : JSON.stringify(code, null, 2);

@@ -11,11 +11,11 @@ import { RuleNodeType } from "@/types/rules";
 
 function renderRule(item: RuleNodeType) {
   if (isRuleLeaf(item)) {
-    return <Rule rule={item} forceShowHandle />;
+    return <Rule rule={item} />;
   } else if (isRuleGroup(item)) {
-    return <RuleGroup group={item} forceShowHandle />;
+    return <RuleGroup group={item} />;
   } else if (isOperator(item)) {
-    return <RuleOperator operator={item} forceShowHandle />;
+    return <RuleOperator operator={item} />;
   }
 }
 

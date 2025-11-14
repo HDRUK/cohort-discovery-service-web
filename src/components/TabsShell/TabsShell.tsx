@@ -8,7 +8,7 @@ import TabPanel from "@mui/lab/TabPanel";
 import Link from "next/link";
 
 type TabType = {
-  id: string;
+  id?: string;
   label: string;
   href?: string;
 };
@@ -60,7 +60,7 @@ export default function TabsShell({
             {tabs.map(({ id, label, href }, i) => (
               <Tab
                 value={String(i)}
-                key={id}
+                key={id || label}
                 label={label}
                 component={Link}
                 href={href ?? "#"}

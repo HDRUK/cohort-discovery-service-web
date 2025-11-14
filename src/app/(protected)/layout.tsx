@@ -1,6 +1,6 @@
 import { cookies, headers } from "next/headers";
 import { forbidden, redirect } from "next/navigation";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { GATEWAY_TOKEN_NAME } from "@/config/internals";
 import { TokenUser, CombinedUser, Roles } from "@/types/api";
 import ProtectedPage from "./components/ProtectedPage";
@@ -17,8 +17,9 @@ export default async function ProtectedLayout({
 
   const cookieStore = await cookies();
   const token = cookieStore.get(GATEWAY_TOKEN_NAME)?.value;
+  const decoded = token ? (jwt.decode(token) as JwtPayload) : undefined;
 
-  if (!token) {
+  if (!token || !decoded) {
     if (applicationMode === "standalone") {
       // No token — render the client SignIn component so users can sign in.
       return <SignIn />;
@@ -27,7 +28,13 @@ export default async function ProtectedLayout({
     }
   }
 
-  const decoded = jwt.decode(token);
+  const h = await headers();
+  const requestNow = h?.get("x-request-now");
+  const now = requestNow !== null ? Number(requestNow) : 0;
+  if (decoded.exp && now >= decoded.exp) {
+    redirect("/api/auth/logout");
+  }
+
   const user = decoded.user as TokenUser;
 
   const hasGeneralAccess = user?.cohort_discovery_roles?.includes(
@@ -36,13 +43,6 @@ export default async function ProtectedLayout({
   const hasAdminAccess =
     user?.cohort_discovery_roles?.includes(Roles.ADMIN) ||
     user?.cohort_discovery_roles.includes(Roles.SYSTEM_ADMIN);
-
-  const h = await headers();
-  const requestNow = h?.get("x-request-now");
-  const now = requestNow !== null ? Number(requestNow) : 0;
-  if (decoded.exp && now >= decoded.exp) {
-    redirect("/api/auth/logout");
-  }
 
   if (!(hasGeneralAccess || hasAdminAccess)) {
     forbidden();

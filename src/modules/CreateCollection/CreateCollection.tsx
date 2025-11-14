@@ -63,7 +63,7 @@ const schema = yup.object({
     }),
 });
 
-type CollectionFormValues = yup.InferType<typeof schema>;
+type CollectionFormValues = yup.Asserts<typeof schema>;
 
 const CollectionForm = ({
   custodianPid,
@@ -76,17 +76,16 @@ const CollectionForm = ({
 
   const [submitting, setSubmitting] = useState(false);
 
-  const { handleSubmit, control, reset, setValue } =
-    useForm<CollectionFormValues>({
-      resolver: yupResolver(schema),
-      defaultValues: {
-        name: "",
-        description: "",
-        type: QueryContext.BUNNY,
-        host_id: "" as unknown as number,
-        url: "",
-      },
-    });
+  const { handleSubmit, control, reset, setValue } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      name: "",
+      description: "",
+      type: QueryContext.BUNNY,
+      host_id: "" as unknown as number,
+      url: "",
+    },
+  });
 
   const type = useWatch({ control, name: "type" });
 

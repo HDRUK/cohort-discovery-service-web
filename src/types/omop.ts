@@ -1,4 +1,4 @@
-import { Option } from "./api";
+import { Option } from "./common";
 
 export const DEFAULT_SEXES: Option[] = [
   { name: "8507", label: "Male (8507)" },

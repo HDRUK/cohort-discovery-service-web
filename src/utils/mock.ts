@@ -1,4 +1,5 @@
-import { Paginated } from "../../types/api";
+import { Paginated } from "@/types/api";
+
 type PaginateOptions<T> = {
   data: T[];
   perPage?: number;

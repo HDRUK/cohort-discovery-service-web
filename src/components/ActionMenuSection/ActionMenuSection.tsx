@@ -20,6 +20,7 @@ interface ActionMenuSectionProps extends Omit<AccordionProps, "children"> {
   attributes?: DraggableAttributes;
   listeners?: SyntheticListenerMap;
   disabled?: boolean;
+  fixedExpanded?: boolean;
   children?:
     | React.ReactNode
     | ((args: { expanded: boolean }) => React.ReactNode);
@@ -32,6 +33,7 @@ const ActionMenuSection = ({
   children,
   underline = false,
   defaultExpanded = false,
+  fixedExpanded = false,
   attributes,
   listeners,
   disabled,
@@ -40,7 +42,9 @@ const ActionMenuSection = ({
   const titleLowercase = (title ?? "").toLowerCase();
   const baseId = id ?? (titleLowercase || "section");
 
-  const [expanded, setExpanded] = React.useState<boolean>(defaultExpanded);
+  const [expanded, setExpanded] = React.useState<boolean>(
+    fixedExpanded ? true : defaultExpanded
+  );
 
   const handleChange = (event: React.SyntheticEvent) => {
     event.preventDefault();
@@ -73,16 +77,18 @@ const ActionMenuSection = ({
         {...listeners}
         disabled={disabled}
         expandIcon={
-          <Box
-            component="div"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleChange(e);
-            }}
-            onPointerDown={(e) => e.stopPropagation()}
-          >
-            <AccordionExpandIcon expanded={expanded} />
-          </Box>
+          fixedExpanded ? undefined : (
+            <Box
+              component="div"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleChange(e);
+              }}
+              onPointerDown={(e) => e.stopPropagation()}
+            >
+              <AccordionExpandIcon expanded={expanded} />
+            </Box>
+          )
         }
         aria-controls={`${baseId}-content`}
         id={`${baseId}-header`}

@@ -83,9 +83,9 @@ const UserDetailsTable = ({ user }: { user: CombinedUser }) => {
     },
     {
       label: "Roles",
-      value: user.gateway_user?.rquestroles?.length ? (
+      value: user.gateway_user?.cohort_discovery_roles?.length ? (
         <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-          {user.gateway_user.rquestroles.map((r) => (
+          {user.gateway_user.cohort_discovery_roles.map((r) => (
             <Chip key={r} size="small" label={r} />
           ))}
         </Stack>

@@ -6,6 +6,7 @@ import {
   MRT_ColumnDef,
   MRT_RowData,
   MRT_TableOptions,
+  MRT_SortingState,
 } from "material-react-table";
 import { useTable } from "./useTable";
 
@@ -41,7 +42,7 @@ export function usePaginatedTable<TData extends { pid: string }>({
     pageSize: perPage,
   });
 
-  const [sorting, setSorting] = useState([]);
+  const [sorting, setSorting] = useState<MRT_SortingState>([]);
 
   useEffect(() => {
     const collapsed = sorting
