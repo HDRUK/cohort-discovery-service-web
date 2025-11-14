@@ -18,7 +18,7 @@ const getUsersList = async (
         tags: [
           "all",
           "admin",
-          `admin-users`,
+          "admin-users",
           `admin-users-${page}-${per_page}`,
         ],
       },
