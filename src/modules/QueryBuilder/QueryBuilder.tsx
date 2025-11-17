@@ -172,9 +172,9 @@ const QueryBuilder = () => {
       container
       spacing={2}
       sx={{
-        height: "100%",
+        flex: 1,
         minHeight: 0,
-        maxHeight: "100%",
+        overflow: "hidden",
       }}
     >
       <SwimLane size={3}>
@@ -205,7 +205,7 @@ const QueryBuilder = () => {
         />
       </SwimLane>
 
-      <SwimLane size={3}>
+      <SwimLane size={3} scrollable={false}>
         <RuleMenu />
       </SwimLane>
     </Grid>

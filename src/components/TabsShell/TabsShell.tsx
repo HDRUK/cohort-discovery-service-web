@@ -43,7 +43,6 @@ export default function TabsShell({
     display: "flex",
     flexDirection: "column",
     px: 2,
-    height: "100%",
     flex: 1,
     minHeight: 0,
   },
@@ -89,7 +88,14 @@ export default function TabsShell({
             <TabPanel
               key={i}
               value={String(i)}
-              sx={{ px: 0, py: 1, height: "100%" }}
+              sx={{
+                px: 0,
+                py: 1,
+                flex: 1,
+                minHeight: 0,
+                display: "flex",
+                flexDirection: "column",
+              }}
             >
               {child}
             </TabPanel>

@@ -7,7 +7,7 @@ export const containerSx = (
 ): SxProps<Theme> => ({
   border: 1,
   borderColor: isSelected ? "blue" : "transparent",
-  p: 1,
+  p: 0,
   position: "relative",
   ...rest,
 });
@@ -47,7 +47,7 @@ export const cardSx = (
   border: 1,
   borderColor: valid ? "black" : "warning.main",
   width: "100%",
-  bgcolor: isSelected ? undefined : "white",
+  bgcolor: isSelected ? "undefined" : "white",
 });
 
 export const cardHeaderSx: SxProps<Theme> = {

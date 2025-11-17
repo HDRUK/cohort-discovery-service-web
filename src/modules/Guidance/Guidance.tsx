@@ -121,14 +121,14 @@ const Guidance = () => {
   };
 
   return (
-    <Box sx={{ px: 1 }}>
+    <>
       {empty && (
         <ActionMenuSection title={"Build Guidance"} fixedExpanded>
           <BuildGuidance components={baseComponents} />
         </ActionMenuSection>
       )}
       {!selectedNode && !empty && (
-        <ActionMenuSection title={"Tool Guidance"} fixedExpanded>
+        <ActionMenuSection title={"Tool Guidance"} fixedExpanded scrollable>
           <ToolGuidance components={baseComponents} />
         </ActionMenuSection>
       )}
@@ -153,7 +153,7 @@ const Guidance = () => {
           )}
         </>
       )}
-    </Box>
+    </>
   );
 };
 

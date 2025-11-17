@@ -1,8 +1,12 @@
 import React from "react";
 import Paper from "@mui/material/Paper";
-import { Grid, GridProps } from "@mui/material";
+import { Box, Grid, GridProps } from "@mui/material";
 
-const SwimLane: React.FC<GridProps> = ({ children, ...rest }) => (
+interface SwimLaneProps extends GridProps {
+  scrollable?: boolean;
+}
+
+const SwimLane = ({ children, scrollable = true, ...rest }: SwimLaneProps) => (
   <Grid
     sx={{
       display: "flex",
@@ -15,15 +19,24 @@ const SwimLane: React.FC<GridProps> = ({ children, ...rest }) => (
     <Paper
       sx={{
         bgcolor: "white",
-        p: 2,
         display: "flex",
         flexDirection: "column",
         flex: 1,
         minHeight: 0,
-        overflowY: "auto",
+        p: 2,
       }}
     >
-      {children}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          flex: 1,
+          minHeight: 0,
+          overflowY: scrollable ? "auto" : undefined,
+        }}
+      >
+        {children}
+      </Box>
     </Paper>
   </Grid>
 );

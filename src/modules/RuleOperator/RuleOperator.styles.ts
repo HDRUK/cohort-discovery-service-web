@@ -5,13 +5,16 @@ export const cardSx = (selected: boolean): SxProps<Theme> => ({
   border: 0,
   mx: "auto",
   width: "fit-content",
-  pt: 1,
   minWidth: "100%",
-  bgcolor: selected ? "highlight.main" : "transparent",
+  bgcolor: selected ? undefined : "transparent",
+  "&:hover": {
+    bgcolor: selected ? "inherit" : "highlight.main",
+    cursor: "pointer",
+  },
 });
 
 export const rootSx = (hidden: boolean): SxProps<Theme> => ({
-  minHeight: 80,
+  minHeight: 60,
   position: "relative",
   display: hidden ? "none" : "grid",
   gridTemplateColumns: "1fr 1fr 1fr",

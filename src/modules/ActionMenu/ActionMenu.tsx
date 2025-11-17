@@ -5,6 +5,7 @@ import ActionMenuSection from "@/components/ActionMenuSection";
 import AddButton from "@/components/AddButton";
 import Hierarchy from "../Hierarchy";
 import useQueryBuilder from "@/store/useQueryBuilder";
+import { Box } from "@mui/material";
 
 const ActionMenu: React.FC = () => {
   const { queryBuilderJson, createNewGroup, createNewRule } = useQueryBuilder(
@@ -16,7 +17,15 @@ const ActionMenu: React.FC = () => {
   );
 
   return (
-    <>
+    <Box
+      sx={{
+        px: 1,
+        display: "flex",
+        flexDirection: "column",
+        flex: 1,
+        minHeight: 0,
+      }}
+    >
       <ActionMenuSection title={"Insert"} defaultExpanded underline>
         <AddButton action={createNewRule} label={"Add rule"} />
         <AddButton action={createNewGroup} label={"Add group"} />
@@ -29,7 +38,7 @@ const ActionMenu: React.FC = () => {
       >
         <Hierarchy />
       </ActionMenuSection>
-    </>
+    </Box>
   );
 };
 
