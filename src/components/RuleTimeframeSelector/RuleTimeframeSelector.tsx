@@ -15,7 +15,7 @@ import { PickerValue } from "@mui/x-date-pickers/internals";
 import { CustomH1 } from "@/components/GuidanceHeaders";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
-interface RuleTimeframeSelectorProps extends DatePickerProps {
+export interface RuleTimeframeSelectorProps extends DatePickerProps {
   rule: RuleNodeType;
   title?: string;
 }
@@ -27,7 +27,6 @@ const RuleTimeframeSelector = ({
   format = "MM YYYY",
   slotProps,
   readOnly,
-  disabled,
   open,
   ...props
 }: RuleTimeframeSelectorProps) => {
@@ -91,8 +90,8 @@ const RuleTimeframeSelector = ({
     format,
     slotProps: mergedSlotProps,
     readOnly,
-    disabled: readOnly ? true : disabled,
     open: readOnly ? false : open,
+    disableOpenPicker: readOnly ? true : false,
   };
 
   return (
