@@ -1,6 +1,6 @@
 "use server";
 
-import { Box, Stack } from "@mui/material";
+import { Stack } from "@mui/material";
 import QueryBuilder from "@/modules/QueryBuilder";
 import CohortQueryInput from "@/components/CohortQueryInput";
 import SelectDatasets from "@/components/SelectDatasets";

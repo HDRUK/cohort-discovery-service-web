@@ -12,7 +12,7 @@ import {
   DatePickerSlotProps,
 } from "@mui/x-date-pickers/DatePicker";
 import { PickerValue } from "@mui/x-date-pickers/internals";
-import { CustomH1 } from "@/modules/Guidance/Guidance";
+import { CustomH1 } from "@/components/GuidanceHeaders";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 interface RuleTimeframeSelectorProps extends DatePickerProps {
@@ -24,10 +24,10 @@ const RuleTimeframeSelector = ({
   rule,
   title,
   views = ["month", "year"],
-  format = "DD MM YYYY",
+  format = "MM YYYY",
   slotProps,
   readOnly,
-  disableOpenPicker,
+  disabled,
   open,
   ...props
 }: RuleTimeframeSelectorProps) => {
@@ -72,23 +72,16 @@ const RuleTimeframeSelector = ({
 
   if (!rule.timeConstraint) return null;
 
-  const mergedSlotProps: DatePickerSlotProps = {
+  const mergedSlotProps: DatePickerSlotProps<false> = {
     ...slotProps,
     textField: {
+      ...slotProps?.textField,
       sx: {
-        backgroundColor: "#ffffff",
+        backgroundColor: "white",
+        width: readOnly ? 120 : 150,
         borderRadius: 1,
         ...(readOnly ? { pointerEvents: "none" as const } : {}),
-        ...(slotProps?.textField?.sx ?? {}),
       },
-      onClick: (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        if (slotProps?.textField?.onClick && !readOnly) {
-          slotProps.textField.onClick(event);
-        }
-      },
-      ...slotProps?.textField,
     },
   };
 
@@ -98,7 +91,7 @@ const RuleTimeframeSelector = ({
     format,
     slotProps: mergedSlotProps,
     readOnly,
-    disableOpenPicker: readOnly ? true : disableOpenPicker,
+    disabled: readOnly ? true : disabled,
     open: readOnly ? false : open,
   };
 

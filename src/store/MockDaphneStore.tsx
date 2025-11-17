@@ -25,6 +25,8 @@ import type { UniqueIdentifier } from "@dnd-kit/core";
 import getConcepts from "@/actions/__mocks__/getConcepts";
 import { validateRuleTree } from "@/utils/rules";
 import { queryToText } from "@/utils/queryBuilder";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 type SliceOverrides = {
   [K in keyof DaphneStoreState]?: Partial<DaphneStoreState[K]>;
@@ -161,7 +163,11 @@ const MockDaphneStore = ({
   };
 
   useDaphneStore.setState(mock, true);
-  return <>{children}</>;
+  return (
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      {children}
+    </LocalizationProvider>
+  );
 };
 
 export default MockDaphneStore;

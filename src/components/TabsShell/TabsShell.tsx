@@ -18,6 +18,7 @@ type TabsShellProps = {
   children: React.ReactNode | React.ReactNode[];
   initial?: number;
   sx?: BoxProps["sx"];
+  tabSx?: BoxProps["sx"];
   tabHeaderSx?: BoxProps["sx"];
   tabContentSx?: BoxProps["sx"];
 };

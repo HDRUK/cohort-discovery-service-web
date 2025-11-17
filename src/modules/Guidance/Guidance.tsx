@@ -5,8 +5,8 @@ import RuleGuidance from "@/content/guidance/rule.mdx";
 import OperatorGuidance from "@/content/guidance/operator.mdx";
 import GroupGuidance from "@/content/guidance/group.mdx";
 import BuildGuidance from "@/content/guidance/build.mdx";
-import { Box, BoxProps, Typography } from "@mui/material";
-import { ReactNode, useCallback, useMemo } from "react";
+import { Box, BoxProps } from "@mui/material";
+import { useCallback, useMemo } from "react";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import {
@@ -27,18 +27,7 @@ import AddButton from "@/components/AddButton";
 import { AddButtonProps } from "@/components/AddButton/AddButton";
 import AddTimeFrameButton from "@/components/AddTimeFrameButton";
 import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
-
-export function CustomH1({ children }: { children: ReactNode }) {
-  return (
-    <Typography variant="guidance1" sx={{ borderBottom: 2, my: 1 }}>
-      {children}
-    </Typography>
-  );
-}
-
-export function CustomH2({ children }: { children: ReactNode }) {
-  return <Typography variant="guidance2">{children}</Typography>;
-}
+import { CustomH1, CustomH2 } from "@/components/GuidanceHeaders";
 
 const baseComponents = {
   h1: CustomH1,

@@ -1,6 +1,5 @@
 import { UniqueIdentifier } from "@dnd-kit/core";
 import { Concept } from "./api";
-import { Dayjs } from "dayjs";
 
 export enum CombinatorType {
   AND = "and",
