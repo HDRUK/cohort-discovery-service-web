@@ -21,6 +21,7 @@ interface ActionMenuSectionProps extends Omit<AccordionProps, "children"> {
   listeners?: SyntheticListenerMap;
   disabled?: boolean;
   fixedExpanded?: boolean;
+  scrollable?: boolean;
   children?:
     | React.ReactNode
     | ((args: { expanded: boolean }) => React.ReactNode);
@@ -37,6 +38,7 @@ const ActionMenuSection = ({
   attributes,
   listeners,
   disabled,
+  scrollable = false,
   ...rest
 }: ActionMenuSectionProps) => {
   const titleLowercase = (title ?? "").toLowerCase();
@@ -49,7 +51,9 @@ const ActionMenuSection = ({
   const handleChange = (event: React.SyntheticEvent) => {
     event.preventDefault();
     event.stopPropagation();
-    setExpanded((prev) => !prev);
+    if (!fixedExpanded) {
+      setExpanded((prev) => !prev);
+    }
   };
 
   const renderChildren =
@@ -69,6 +73,20 @@ const ActionMenuSection = ({
         bgcolor: "transparent",
         "&:before": { display: "none" },
         width: "100%",
+        ...(scrollable && {
+          flex: 1,
+          minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
+
+          "& .MuiAccordion-region, & .MuiCollapse-root, & .MuiCollapse-wrapper, & .MuiCollapse-wrapperInner":
+            {
+              flex: 1,
+              minHeight: 0,
+              display: "flex",
+              flexDirection: "column",
+            },
+        }),
       }}
       {...rest}
     >
@@ -116,6 +134,11 @@ const ActionMenuSection = ({
           gap: 0.5,
           borderTop: underline ? 1 : 0,
           mx: underline ? 1 : 0,
+          ...(scrollable && {
+            flex: 1,
+            minHeight: 0,
+            overflowY: "auto",
+          }),
         }}
       >
         {renderChildren}

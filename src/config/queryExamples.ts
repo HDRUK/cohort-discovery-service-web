@@ -24,6 +24,10 @@ export const EXAMPLE_1: RuleGroupType = {
               children: [],
             },
           },
+          timeConstraint: [
+            "2025-11-10T00:00:00.000Z",
+            "2025-11-15T00:00:00.000Z",
+          ],
         },
         {
           id: uuidv4(),

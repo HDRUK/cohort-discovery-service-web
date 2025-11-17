@@ -1,8 +1,7 @@
 "use server";
 
-import { Box, Stack } from "@mui/material";
+import { Stack } from "@mui/material";
 import QueryBuilder from "@/modules/QueryBuilder";
-import SubmitQueryButton from "@/components/SubmitQueryButton";
 import CohortQueryInput from "@/components/CohortQueryInput";
 import SelectDatasets from "@/components/SelectDatasets";
 import getCollections from "@/actions/getCollections";
@@ -36,17 +35,6 @@ const CohortBuilder = async () => {
       <CohortQueryInput />
 
       <QueryBuilder />
-
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "end",
-          width: "100%",
-          my: 2,
-        }}
-      >
-        <SubmitQueryButton />
-      </Box>
     </>
   );
 };

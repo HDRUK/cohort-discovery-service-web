@@ -12,6 +12,7 @@ import {
   MenuItem,
   CardProps,
   Collapse,
+  CardActions,
 } from "@mui/material";
 import { ReactNode, RefObject, useCallback, useMemo, useState } from "react";
 import useSortable from "@/hooks/useSortable";
@@ -26,6 +27,7 @@ import {
   skeletonSx,
   cardSx,
   cardHeaderSx,
+  cardActionsSx,
   chipSx,
   headerActionSx,
   selectedCaptionSx,
@@ -35,6 +37,7 @@ import { TRIGGER_GUTTER_PX } from "@/config/defaults";
 import { RuleNodeType } from "@/types/rules";
 import EditableText from "@/components/EditableText";
 import { useLogDependencyChanges } from "@/utils/deps";
+import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
 
 interface Action {
   action: () => void;
@@ -217,12 +220,13 @@ const RuleWrapper = ({
           />
         ) : (
           <Card
+            ref={anchorRef}
             data-id={id}
             data-selectable="true"
             data-draggable="true"
             component="div"
             data-testid="clickable-card"
-            sx={cardSx(valid)}
+            sx={cardSx(isSelected, valid)}
             onContextMenu={handleContextMenu}
             onClick={handleOnSelect}
             {...cardProps}
@@ -251,6 +255,12 @@ const RuleWrapper = ({
             )}
 
             <CardContent>{render(node, anchorRef)}</CardContent>
+
+            {node.timeConstraint && (
+              <CardActions sx={cardActionsSx}>
+                <RuleTimeframeSelector rule={node} readOnly />
+              </CardActions>
+            )}
 
             {actions && (
               <Menu

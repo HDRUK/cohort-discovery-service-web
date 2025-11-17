@@ -6,6 +6,7 @@ import { useDaphneStore } from "@/store/useDaphneStore";
 import { useEffect } from "react";
 import SearchBox from "../SearchBox";
 import useQueryBuilder from "@/store/useQueryBuilder";
+import SubmitQueryButton from "../SubmitQueryButton";
 
 type FormValues = {
   cohortQueryInput: string;
@@ -61,6 +62,7 @@ const CohortQueryInput = () => {
         render={({ field, fieldState: { error, isDirty } }) => (
           <SearchBox
             {...field}
+            collapsible={false}
             error={!!error}
             label={!isDirty && error?.message}
             type="search"
@@ -71,6 +73,7 @@ const CohortQueryInput = () => {
             onSubmit={handleSubmit(onSubmit)}
             loading={isLoading}
             disabled={isLoading}
+            actionIcon={<SubmitQueryButton />}
           />
         )}
       />

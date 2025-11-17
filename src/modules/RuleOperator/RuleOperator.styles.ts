@@ -1,20 +1,23 @@
 import { Theme } from "@mui/material/styles";
 import { SxProps } from "@mui/system";
 
-export const cardSx: SxProps<Theme> = {
+export const cardSx = (selected: boolean): SxProps<Theme> => ({
   border: 0,
   mx: "auto",
   width: "fit-content",
-  pt: 1,
-  minWidth: 80,
-  bgcolor: "transparent",
-};
+  minWidth: "100%",
+  bgcolor: selected ? undefined : "transparent",
+  "&:hover": {
+    bgcolor: selected ? undefined : "highlight.main",
+    cursor: "pointer",
+  },
+});
 
 export const rootSx = (hidden: boolean): SxProps<Theme> => ({
-  minHeight: 80,
+  minHeight: 60,
   position: "relative",
   display: hidden ? "none" : "grid",
-  gridTemplateColumns: "1fr 2fr 1fr",
+  gridTemplateColumns: "1fr 1fr 1fr",
   alignItems: "center",
   justifyContent: "center",
 });

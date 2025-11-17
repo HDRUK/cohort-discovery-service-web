@@ -8,9 +8,7 @@ export enum CombinatorType {
 }
 
 export type ConceptOperator = {
-  //operator: string;
   //ageConstraint: string;
-  //timeConstraint: string;
   //valueConstraint: string;
   concept: Concept | Array<Concept> | null;
 };
@@ -20,6 +18,7 @@ type Node = {
   exclude?: boolean;
   valid?: boolean;
   name?: string;
+  timeConstraint?: [string | null, string | null];
 };
 
 export interface OperatorType extends Node {

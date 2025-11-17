@@ -7,6 +7,15 @@ import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
 import Link from "next/link";
 
+import {
+  rootSx as defaultRootSx,
+  tabSx as defaultTabSx,
+  tabHeaderSx as defaultTabHeaderSx,
+  tabContentSx as defaultTabContentSx,
+  tabListSx,
+  tabPanelSx,
+} from "./TabsShell.styles";
+
 type TabType = {
   id?: string;
   label: string;
@@ -18,6 +27,7 @@ type TabsShellProps = {
   children: React.ReactNode | React.ReactNode[];
   initial?: number;
   sx?: BoxProps["sx"];
+  tabSx?: BoxProps["sx"];
   tabHeaderSx?: BoxProps["sx"];
   tabContentSx?: BoxProps["sx"];
 };
@@ -26,15 +36,10 @@ export default function TabsShell({
   tabs,
   children,
   initial = 0,
-  sx = {
-    bgcolor: "background.default",
-  },
-  tabHeaderSx = {
-    bgcolor: "white",
-  },
-  tabContentSx = {
-    px: 2,
-  },
+  sx = defaultRootSx,
+  tabSx = defaultTabSx,
+  tabHeaderSx = defaultTabHeaderSx,
+  tabContentSx = defaultTabContentSx,
 }: TabsShellProps) {
   const [value, setValue] = React.useState(String(initial));
   const handleChange = (_: React.SyntheticEvent, newValue: string) =>
@@ -43,19 +48,13 @@ export default function TabsShell({
   const kids = React.Children.toArray(children);
 
   return (
-    <Box sx={{ width: "100%", ...sx }}>
+    <Box sx={sx}>
       <TabContext value={value}>
-        <Box sx={{ ...tabHeaderSx }}>
+        <Box sx={tabHeaderSx}>
           <TabList
             onChange={handleChange}
-            variant="scrollable"
             allowScrollButtonsMobile
-            sx={{
-              "& .MuiTabs-indicator": {
-                top: 0,
-                bottom: "auto",
-              },
-            }}
+            sx={tabListSx}
           >
             {tabs.map(({ id, label, href }, i) => (
               <Tab
@@ -64,6 +63,7 @@ export default function TabsShell({
                 label={label}
                 component={Link}
                 href={href ?? "#"}
+                sx={tabSx}
                 onClick={(e) => {
                   if (!href) e.preventDefault();
                 }}
@@ -72,9 +72,9 @@ export default function TabsShell({
           </TabList>
         </Box>
 
-        <Box sx={{ ...tabContentSx }}>
+        <Box sx={tabContentSx}>
           {kids.map((child, i) => (
-            <TabPanel key={i} value={String(i)} sx={{ px: 0 }}>
+            <TabPanel key={i} value={String(i)} sx={tabPanelSx}>
               {child}
             </TabPanel>
           ))}

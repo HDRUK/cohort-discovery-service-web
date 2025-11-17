@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import NewQueryPage from "./components/NewQueryPage";
 import { routes } from "@/config/routes";
 import TabsShell from "@/components/TabsShell";
+import { GATEWAY_TOKEN_NAME } from "@/config/internals";
+import { cookies } from "next/headers";
 
 // to be reimplemented in new tickets per new design
 const TABS = [
@@ -34,12 +36,17 @@ const DashboardTabPage = async (props: {
   const { params } = props;
   const { tabId } = await params;
 
+  const cookieStore = await cookies();
+  const token = cookieStore.get(GATEWAY_TOKEN_NAME)?.value;
+
   if (!isValidTabId(tabId)) return notFound();
 
   return (
-    <TabsShell tabs={TABS}>
-      <NewQueryPage {...props} />
-    </TabsShell>
+    token && (
+      <TabsShell tabs={TABS}>
+        <NewQueryPage />
+      </TabsShell>
+    )
   );
 };
 

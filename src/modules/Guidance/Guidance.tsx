@@ -5,8 +5,8 @@ import RuleGuidance from "@/content/guidance/rule.mdx";
 import OperatorGuidance from "@/content/guidance/operator.mdx";
 import GroupGuidance from "@/content/guidance/group.mdx";
 import BuildGuidance from "@/content/guidance/build.mdx";
-import { Box, BoxProps, Typography } from "@mui/material";
-import { ReactNode, useCallback, useMemo } from "react";
+import { Box, BoxProps } from "@mui/material";
+import { useCallback, useMemo } from "react";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import {
@@ -25,18 +25,9 @@ import ShowDescendants from "@/content/guidance/components/ShowDescendants";
 import ToggleOperator from "@/content/guidance/components/ToggleOperator";
 import AddButton from "@/components/AddButton";
 import { AddButtonProps } from "@/components/AddButton/AddButton";
-
-function CustomH1({ children }: { children: ReactNode }) {
-  return (
-    <Typography variant="guidance1" sx={{ borderBottom: 2, my: 1 }}>
-      {children}
-    </Typography>
-  );
-}
-
-function CustomH2({ children }: { children: ReactNode }) {
-  return <Typography variant="guidance2">{children}</Typography>;
-}
+import AddTimeFrameButton from "@/components/AddTimeFrameButton";
+import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
+import { CustomH1, CustomH2 } from "@/components/GuidanceHeaders";
 
 const baseComponents = {
   h1: CustomH1,
@@ -103,6 +94,12 @@ const Guidance = () => {
     ...baseComponents,
     ToggleExclusion: () => <ToggleExclusion node={node} />,
     ShowDescendants: () => <ShowDescendants node={node} />,
+    AddTimeFrameButton: (props: AddButtonProps) => (
+      <AddTimeFrameButton rule={node} {...props} />
+    ),
+    RuleTimeframeSelector: (props: { title: string }) => (
+      <RuleTimeframeSelector rule={node} {...props} />
+    ),
   });
 
   const makeOperatorComponents = (node: OperatorType) => ({
@@ -124,14 +121,14 @@ const Guidance = () => {
   };
 
   return (
-    <Box sx={{ px: 1 }}>
+    <>
       {empty && (
         <ActionMenuSection title={"Build Guidance"} fixedExpanded>
           <BuildGuidance components={baseComponents} />
         </ActionMenuSection>
       )}
       {!selectedNode && !empty && (
-        <ActionMenuSection title={"Tool Guidance"} fixedExpanded>
+        <ActionMenuSection title={"Tool Guidance"} fixedExpanded scrollable>
           <ToolGuidance components={baseComponents} />
         </ActionMenuSection>
       )}
@@ -156,7 +153,7 @@ const Guidance = () => {
           )}
         </>
       )}
-    </Box>
+    </>
   );
 };
 

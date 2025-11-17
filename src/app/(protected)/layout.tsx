@@ -4,7 +4,6 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { GATEWAY_TOKEN_NAME } from "@/config/internals";
 import { TokenUser, CombinedUser, Roles } from "@/types/api";
 import ProtectedPage from "./components/ProtectedPage";
-import SignIn from "@/app/signin";
 import getMe from "@/actions/getMe";
 import getCustodians from "@/actions/getCustodians";
 
@@ -18,11 +17,10 @@ export default async function ProtectedLayout({
   const cookieStore = await cookies();
   const token = cookieStore.get(GATEWAY_TOKEN_NAME)?.value;
   const decoded = token ? (jwt.decode(token) as JwtPayload) : undefined;
-
   if (!token || !decoded) {
     if (applicationMode === "standalone") {
       // No token — render the client SignIn component so users can sign in.
-      return <SignIn />;
+      redirect("/login");
     } else {
       forbidden();
     }

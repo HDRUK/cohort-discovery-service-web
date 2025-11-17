@@ -11,7 +11,11 @@ const AddButton = ({ label, action }: AddButtonProps) => (
     variant="text"
     startIcon={<AddIcon />}
     onClick={() => action()}
-    sx={{ justifyContent: "flex-start", color: "text.primary" }}
+    sx={{
+      justifyContent: "flex-start",
+      textAlign: "left",
+      color: "text.primary",
+    }}
   >
     {label}
   </Button>
