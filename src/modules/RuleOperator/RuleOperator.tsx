@@ -23,10 +23,13 @@ const RuleOperator = ({
 }: RuleOperatorProps) => {
   const { id, combinator, valid = true } = operator;
 
-  const { queryBuilderJson, setQueryBuilderJson } = useQueryBuilder((qb) => ({
-    queryBuilderJson: qb.queryBuilderJson,
-    setQueryBuilderJson: qb.setQueryBuilderJson,
-  }));
+  const { isSelected, queryBuilderJson, setQueryBuilderJson } = useQueryBuilder(
+    (qb) => ({
+      isSelected: !!qb.selected[id],
+      queryBuilderJson: qb.queryBuilderJson,
+      setQueryBuilderJson: qb.setQueryBuilderJson,
+    })
+  );
 
   const handleDeleteRule = useCallback(() => {
     setQueryBuilderJson(removeById(queryBuilderJson, id));
@@ -58,7 +61,9 @@ const RuleOperator = ({
     <RuleWrapper
       useLeftDragPlaceHolder
       hideHeader
-      cardProps={{ sx: cardSx }}
+      cardProps={{
+        sx: cardSx(isSelected),
+      }}
       node={operator}
       type={"Operator"}
       groupId={groupId}
@@ -69,10 +74,12 @@ const RuleOperator = ({
 
           <Box />
 
-          <Chip
-            sx={chipSx}
-            label={combinator?.toUpperCase().replace("_", " ")}
-          />
+          <Box sx={{ maxWidth: 80, mx: "auto" }}>
+            <Chip
+              sx={chipSx}
+              label={combinator?.toUpperCase().replace("_", " ")}
+            />
+          </Box>
 
           {valid ? (
             <Box />

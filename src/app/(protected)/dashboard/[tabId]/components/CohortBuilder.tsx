@@ -2,7 +2,6 @@
 
 import { Box, Stack } from "@mui/material";
 import QueryBuilder from "@/modules/QueryBuilder";
-import SubmitQueryButton from "@/components/SubmitQueryButton";
 import CohortQueryInput from "@/components/CohortQueryInput";
 import SelectDatasets from "@/components/SelectDatasets";
 import getCollections from "@/actions/getCollections";
@@ -10,6 +9,7 @@ import CohortQueryTitle from "@/components/CohortQueryTitle";
 import FilterDatasets from "@/components/FilterDatasets/FilterDatasets";
 
 const CohortBuilder = async () => {
+  console.log("getting collections");
   const collections = await getCollections();
 
   const activeCollections = collections.data.filter(
@@ -19,7 +19,14 @@ const CohortBuilder = async () => {
   const initialSelection = activeCollections.map((c) => c.pid);
 
   return (
-    <>
+    <Box
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+      }}
+    >
       <Stack
         direction="row"
         alignItems="center"
@@ -36,18 +43,7 @@ const CohortBuilder = async () => {
       <CohortQueryInput />
 
       <QueryBuilder />
-
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "end",
-          width: "100%",
-          my: 2,
-        }}
-      >
-        <SubmitQueryButton />
-      </Box>
-    </>
+    </Box>
   );
 };
 

@@ -8,6 +8,9 @@ export const themeOptions: ThemeOptions = {
       dark: "#2b7e61",
       contrastText: "#ffffff",
     },
+    highlight: {
+      main: "#E9ECF4",
+    },
     text: {
       primary: "#4D5B59",
     },

@@ -1,5 +1,6 @@
 import { UniqueIdentifier } from "@dnd-kit/core";
 import { Concept } from "./api";
+import { Dayjs } from "dayjs";
 
 export enum CombinatorType {
   AND = "and",
@@ -9,7 +10,6 @@ export enum CombinatorType {
 
 export type ConceptOperator = {
   //ageConstraint: string;
-  timeConstraint?: string;
   //valueConstraint: string;
   concept: Concept | Array<Concept> | null;
 };
@@ -19,6 +19,7 @@ type Node = {
   exclude?: boolean;
   valid?: boolean;
   name?: string;
+  timeConstraint?: [string | null, string | null];
 };
 
 export interface OperatorType extends Node {

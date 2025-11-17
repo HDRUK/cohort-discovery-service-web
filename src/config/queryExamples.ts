@@ -24,6 +24,10 @@ export const EXAMPLE_1: RuleGroupType = {
               children: [],
             },
           },
+          timeConstraint: [
+            "2025-11-10T00:00:00.000Z",
+            "2025-11-15T00:00:00.000Z",
+          ],
         },
         {
           id: uuidv4(),
@@ -74,6 +78,57 @@ export const EXAMPLE_1: RuleGroupType = {
           description:
             "Close contact with confirmed COVID-19 case person/patient",
           category: "Observation",
+          children: [],
+        },
+      },
+    },
+    {
+      id: uuidv4(),
+      combinator: CombinatorType.AND,
+    },
+    {
+      id: uuidv4(),
+      exclude: false,
+      rule: {
+        concept: {
+          concept_id: 3955313,
+          description:
+            "SARS-CoV-2 antibody to nucleocapsid (N) protein present",
+          category: "Measurement",
+          children: [],
+        },
+      },
+    },
+    {
+      id: uuidv4(),
+      combinator: CombinatorType.AND,
+    },
+    {
+      id: uuidv4(),
+      exclude: false,
+      rule: {
+        concept: {
+          concept_id: 3955313,
+          description:
+            "SARS-CoV-2 antibody to nucleocapsid (N) protein present",
+          category: "Measurement",
+          children: [],
+        },
+      },
+    },
+    {
+      id: uuidv4(),
+      combinator: CombinatorType.AND,
+    },
+    {
+      id: uuidv4(),
+      exclude: false,
+      rule: {
+        concept: {
+          concept_id: 3955313,
+          description:
+            "SARS-CoV-2 antibody to nucleocapsid (N) protein present",
+          category: "Measurement",
           children: [],
         },
       },

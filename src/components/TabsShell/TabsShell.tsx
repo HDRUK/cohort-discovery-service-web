@@ -27,13 +27,24 @@ export default function TabsShell({
   children,
   initial = 0,
   sx = {
+    display: "flex",
+    flexDirection: "column",
     bgcolor: "background.default",
+    height: "100%",
+    minHeight: 0,
+    overflow: "hidden",
   },
+  tabSx = { minWidth: 200 },
   tabHeaderSx = {
     bgcolor: "white",
   },
   tabContentSx = {
+    display: "flex",
+    flexDirection: "column",
     px: 2,
+    height: "100%",
+    flex: 1,
+    minHeight: 0,
   },
 }: TabsShellProps) {
   const [value, setValue] = React.useState(String(initial));
@@ -43,12 +54,11 @@ export default function TabsShell({
   const kids = React.Children.toArray(children);
 
   return (
-    <Box sx={{ width: "100%", ...sx }}>
+    <Box sx={sx}>
       <TabContext value={value}>
         <Box sx={{ ...tabHeaderSx }}>
           <TabList
             onChange={handleChange}
-            variant="scrollable"
             allowScrollButtonsMobile
             sx={{
               "& .MuiTabs-indicator": {
@@ -64,6 +74,7 @@ export default function TabsShell({
                 label={label}
                 component={Link}
                 href={href ?? "#"}
+                sx={tabSx}
                 onClick={(e) => {
                   if (!href) e.preventDefault();
                 }}
@@ -72,9 +83,13 @@ export default function TabsShell({
           </TabList>
         </Box>
 
-        <Box sx={{ ...tabContentSx }}>
+        <Box sx={tabContentSx}>
           {kids.map((child, i) => (
-            <TabPanel key={i} value={String(i)} sx={{ px: 0 }}>
+            <TabPanel
+              key={i}
+              value={String(i)}
+              sx={{ px: 0, py: 1, height: "100%" }}
+            >
               {child}
             </TabPanel>
           ))}

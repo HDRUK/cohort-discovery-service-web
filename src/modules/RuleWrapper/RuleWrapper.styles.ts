@@ -39,11 +39,15 @@ export const skeletonSx = (
   height,
 });
 
-export const cardSx = (valid: boolean): SxProps<Theme> => ({
+export const cardSx = (
+  isSelected: boolean,
+  valid: boolean
+): SxProps<Theme> => ({
   p: 2,
   border: 1,
   borderColor: valid ? "black" : "warning.main",
   width: "100%",
+  bgcolor: isSelected ? undefined : "white",
 });
 
 export const cardHeaderSx: SxProps<Theme> = {
@@ -52,6 +56,14 @@ export const cardHeaderSx: SxProps<Theme> = {
   p: 0,
   m: 0,
   pb: 1,
+};
+
+export const cardActionsSx: SxProps<Theme> = {
+  borderTop: 1,
+  borderColor: "divider",
+  p: 0,
+  m: 0,
+  pt: 1,
 };
 
 export const chipSx: SxProps<Theme> = {

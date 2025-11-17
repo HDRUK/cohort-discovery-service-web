@@ -25,9 +25,10 @@ import ShowDescendants from "@/content/guidance/components/ShowDescendants";
 import ToggleOperator from "@/content/guidance/components/ToggleOperator";
 import AddButton from "@/components/AddButton";
 import { AddButtonProps } from "@/components/AddButton/AddButton";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import AddTimeFrameButton from "@/components/AddTimeFrameButton";
+import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
 
-function CustomH1({ children }: { children: ReactNode }) {
+export function CustomH1({ children }: { children: ReactNode }) {
   return (
     <Typography variant="guidance1" sx={{ borderBottom: 2, my: 1 }}>
       {children}
@@ -35,7 +36,7 @@ function CustomH1({ children }: { children: ReactNode }) {
   );
 }
 
-function CustomH2({ children }: { children: ReactNode }) {
+export function CustomH2({ children }: { children: ReactNode }) {
   return <Typography variant="guidance2">{children}</Typography>;
 }
 
@@ -105,17 +106,10 @@ const Guidance = () => {
     ToggleExclusion: () => <ToggleExclusion node={node} />,
     ShowDescendants: () => <ShowDescendants node={node} />,
     AddTimeFrameButton: (props: AddButtonProps) => (
-      <>
-        <AddButton {...props} action={() => console.log("yo")} />
-        <DatePicker
-          slotProps={
-            {
-              //openPickerButton: { sx: { display: "none" } },
-            }
-          }
-          format={"DD MM YYYY"}
-        />
-      </>
+      <AddTimeFrameButton rule={node} {...props} />
+    ),
+    RuleTimeframeSelector: (props: { title: string }) => (
+      <RuleTimeframeSelector rule={node} {...props} />
     ),
   });
 
