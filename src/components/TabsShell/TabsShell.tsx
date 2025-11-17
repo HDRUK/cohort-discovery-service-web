@@ -7,6 +7,15 @@ import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
 import Link from "next/link";
 
+import {
+  rootSx as defaultRootSx,
+  tabSx as defaultTabSx,
+  tabHeaderSx as defaultTabHeaderSx,
+  tabContentSx as defaultTabContentSx,
+  tabListSx,
+  tabPanelSx,
+} from "./TabsShell.styles";
+
 type TabType = {
   id?: string;
   label: string;
@@ -27,25 +36,10 @@ export default function TabsShell({
   tabs,
   children,
   initial = 0,
-  sx = {
-    display: "flex",
-    flexDirection: "column",
-    bgcolor: "background.default",
-    height: "100%",
-    minHeight: 0,
-    overflow: "hidden",
-  },
-  tabSx = { minWidth: 200 },
-  tabHeaderSx = {
-    bgcolor: "white",
-  },
-  tabContentSx = {
-    display: "flex",
-    flexDirection: "column",
-    px: 2,
-    flex: 1,
-    minHeight: 0,
-  },
+  sx = defaultRootSx,
+  tabSx = defaultTabSx,
+  tabHeaderSx = defaultTabHeaderSx,
+  tabContentSx = defaultTabContentSx,
 }: TabsShellProps) {
   const [value, setValue] = React.useState(String(initial));
   const handleChange = (_: React.SyntheticEvent, newValue: string) =>
@@ -56,16 +50,11 @@ export default function TabsShell({
   return (
     <Box sx={sx}>
       <TabContext value={value}>
-        <Box sx={{ ...tabHeaderSx }}>
+        <Box sx={tabHeaderSx}>
           <TabList
             onChange={handleChange}
             allowScrollButtonsMobile
-            sx={{
-              "& .MuiTabs-indicator": {
-                top: 0,
-                bottom: "auto",
-              },
-            }}
+            sx={tabListSx}
           >
             {tabs.map(({ id, label, href }, i) => (
               <Tab
@@ -85,18 +74,7 @@ export default function TabsShell({
 
         <Box sx={tabContentSx}>
           {kids.map((child, i) => (
-            <TabPanel
-              key={i}
-              value={String(i)}
-              sx={{
-                px: 0,
-                py: 1,
-                flex: 1,
-                minHeight: 0,
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
+            <TabPanel key={i} value={String(i)} sx={tabPanelSx}>
               {child}
             </TabPanel>
           ))}
