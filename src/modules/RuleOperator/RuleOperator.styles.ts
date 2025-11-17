@@ -8,7 +8,7 @@ export const cardSx = (selected: boolean): SxProps<Theme> => ({
   minWidth: "100%",
   bgcolor: selected ? undefined : "transparent",
   "&:hover": {
-    bgcolor: selected ? "inherit" : "highlight.main",
+    bgcolor: selected ? undefined : "highlight.main",
     cursor: "pointer",
   },
 });
