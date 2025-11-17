@@ -123,7 +123,7 @@ const Guidance = () => {
   return (
     <>
       {empty && (
-        <ActionMenuSection title={"Build Guidance"} fixedExpanded>
+        <ActionMenuSection title={"Build Guidance"} fixedExpanded scrollable>
           <BuildGuidance components={baseComponents} />
         </ActionMenuSection>
       )}
@@ -135,19 +135,19 @@ const Guidance = () => {
       {selectedNode && (
         <>
           {isRuleLeaf(selectedNode) && (
-            <ActionMenuSection title={"Rule"} fixedExpanded>
+            <ActionMenuSection title={"Rule"} fixedExpanded scrollable>
               <RuleGuidance components={makeRuleComponents(selectedNode)} />
             </ActionMenuSection>
           )}
           {isOperator(selectedNode) && (
-            <ActionMenuSection title={"Operator"} fixedExpanded>
+            <ActionMenuSection title={"Operator"} fixedExpanded scrollable>
               <OperatorGuidance
                 components={makeOperatorComponents(selectedNode)}
               />
             </ActionMenuSection>
           )}
           {isRuleGroup(selectedNode) && (
-            <ActionMenuSection title={"Group"} fixedExpanded>
+            <ActionMenuSection title={"Group"} fixedExpanded scrollable>
               <GroupGuidance components={makeGroupComponents(selectedNode)} />
             </ActionMenuSection>
           )}
