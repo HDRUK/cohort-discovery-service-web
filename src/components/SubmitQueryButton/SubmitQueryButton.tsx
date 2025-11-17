@@ -41,6 +41,7 @@ const SubmitQueryButton = () => {
 
   return (
     <IconButton
+      component="span"
       disabled={selectedDatasets.length === 0 || !valid || isLoading}
       onClick={(event) => {
         event.stopPropagation();

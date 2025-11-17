@@ -12,6 +12,7 @@ const submitQuery = async (
   collection_filter?: string[]
 ): Promise<ApiResponse<CreateQuery>> => {
   const safeName = capVarChar(queryName);
+  console.log(JSON.stringify(query));
   return await apiPost<ApiResponse<CreateQuery>, CreateQueryPost>(
     API_ROUTES.queries,
     {
