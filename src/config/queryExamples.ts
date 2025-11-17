@@ -108,57 +108,6 @@ export const EXAMPLE_1: RuleGroupType = {
       exclude: false,
       rule: {
         concept: {
-          concept_id: 3955313,
-          description:
-            "SARS-CoV-2 antibody to nucleocapsid (N) protein present",
-          category: "Measurement",
-          children: [],
-        },
-      },
-    },
-    {
-      id: uuidv4(),
-      combinator: CombinatorType.AND,
-    },
-    {
-      id: uuidv4(),
-      exclude: false,
-      rule: {
-        concept: {
-          concept_id: 3955313,
-          description:
-            "SARS-CoV-2 antibody to nucleocapsid (N) protein present",
-          category: "Measurement",
-          children: [],
-        },
-      },
-    },
-    {
-      id: uuidv4(),
-      combinator: CombinatorType.AND,
-    },
-    {
-      id: uuidv4(),
-      exclude: false,
-      rule: {
-        concept: {
-          concept_id: 3955313,
-          description:
-            "SARS-CoV-2 antibody to nucleocapsid (N) protein present",
-          category: "Measurement",
-          children: [],
-        },
-      },
-    },
-    {
-      id: uuidv4(),
-      combinator: CombinatorType.AND,
-    },
-    {
-      id: uuidv4(),
-      exclude: false,
-      rule: {
-        concept: {
           concept_id: 443597,
           description: "Chronic kidney disease stage 3",
           category: "Condition",
