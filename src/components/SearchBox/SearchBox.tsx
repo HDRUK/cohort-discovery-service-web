@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, ReactNode } from "react";
 import {
   TextField,
   InputAdornment,
@@ -19,6 +19,7 @@ type SearchBoxProps = Omit<TextFieldProps, "onSubmit"> & {
   collapsedWidth?: number | string;
   expandedWidth?: number | string;
   inputBgColor?: string;
+  actionIcon?: ReactNode;
 };
 
 const SearchBox = ({
@@ -29,6 +30,7 @@ const SearchBox = ({
   collapsedWidth = 0,
   expandedWidth = "100%",
   inputBgColor = "#fff",
+  actionIcon,
   ...rest
 }: SearchBoxProps) => {
   const [expanded, setExpanded] = useState(
@@ -158,6 +160,8 @@ const SearchBox = ({
                 >
                   {loading ? (
                     <CircularProgress size={24} color="inherit" />
+                  ) : actionIcon ? (
+                    <>{actionIcon}</>
                   ) : (
                     <SearchIcon fontSize="large" />
                   )}

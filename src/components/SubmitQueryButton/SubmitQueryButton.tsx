@@ -1,11 +1,12 @@
 "use client";
 
-import { Button } from "@mui/material";
+import { IconButton } from "@mui/material";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { revalidateAction } from "@/actions/revalidate";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 const SubmitQueryButton = () => {
   const router = useRouter();
@@ -39,14 +40,16 @@ const SubmitQueryButton = () => {
   };
 
   return (
-    <Button
+    <IconButton
       disabled={selectedDatasets.length === 0 || !valid || isLoading}
-      variant="contained"
-      color="primary"
-      onClick={handleClick}
+      onClick={(event) => {
+        event.stopPropagation();
+        event.preventDefault();
+        handleClick();
+      }}
     >
-      Run query
-    </Button>
+      <ArrowForwardIcon sx={{ color: "white" }} />
+    </IconButton>
   );
 };
 
