@@ -137,7 +137,7 @@ const Guidance = () => {
           {isRuleLeaf(selectedNode) && (
             <ActionMenuSection title={"Rule"} fixedExpanded scrollable>
               <RuleGuidance
-                category={selectedNode.rule.concept?.category}
+                category={selectedNode.rule.concept?.category || ""}
                 components={makeRuleComponents(selectedNode)}
               />
             </ActionMenuSection>

@@ -69,13 +69,12 @@ export function ruleToGroup(
 export const isEmptyRule = (rule: RuleLeafType): boolean =>
   rule.rule.concept === null;
 
-export const isSingleConcept = (
-  concept: ConceptOperator["concept"]
-): concept is Concept => concept != null && !isMultipleConcept(concept);
+export const isSingleConcept = (concept: ConceptOperator["concept"]): boolean =>
+  concept != null && !isMultipleConcept(concept);
 
 export const isMultipleConcept = (
   concept: ConceptOperator["concept"]
-): concept is Concept =>
+): boolean =>
   concept != null &&
   Array.isArray(concept?.alternatives) &&
   concept!.alternatives.length > 0;

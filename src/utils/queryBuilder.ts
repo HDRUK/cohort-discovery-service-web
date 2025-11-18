@@ -60,11 +60,12 @@ const queryToText = (node: RuleGroupType) => {
     }
 
     if (isMultipleConcept(c)) {
-      const texts = c.alternatives
-        .filter((x) => !!x)
-        .map((x) => cleanDescription(x.description))
-        .join(" or ");
-      const verb = getVerb(c[0].category);
+      const texts =
+        c.alternatives
+          ?.filter((x) => !!x)
+          .map((x) => cleanDescription(x.description))
+          .join(" or ") || "";
+      const verb = getVerb(c.category);
       return { verb, text: texts };
     }
 
