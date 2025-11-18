@@ -136,7 +136,10 @@ const Guidance = () => {
         <>
           {isRuleLeaf(selectedNode) && (
             <ActionMenuSection title={"Rule"} fixedExpanded scrollable>
-              <RuleGuidance components={makeRuleComponents(selectedNode)} />
+              <RuleGuidance
+                category={selectedNode.rule.concept?.category}
+                components={makeRuleComponents(selectedNode)}
+              />
             </ActionMenuSection>
           )}
           {isOperator(selectedNode) && (

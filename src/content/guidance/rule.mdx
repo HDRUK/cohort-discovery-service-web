@@ -9,18 +9,17 @@ Toggle <b>Including</b> to add items that meet the selected criteria. Use this t
 
 Toggle <b>Excluding</b> to remove items that meet the selected criteria. Use this to exclude them from your results.
 
-
 # Descendants
 
 <ShowDescendants/>
 
 # Rule Parameters
 
-<AddTimeFrameButton label={'Add timeframe when condition was diagnosed'} />
+<AddTimeFrameButton label={`Add timeframe when ${props.category.toLowerCase()} was diagnosed`} />
 
 
 
-<RuleTimeframeSelector title={'Timeframe of Condition Diagnosis'} />
+<RuleTimeframeSelector title={`Timeframe of ${props.category} Diagnosis`} />
 
 
 # Guidance
