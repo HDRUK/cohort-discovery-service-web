@@ -1,3 +1,4 @@
+import { Concept } from "@/types/api";
 import {
   RuleGroupType,
   RuleLeafType,
@@ -7,7 +8,6 @@ import {
   BoardIndex,
   OperatorType,
 } from "@/types/rules";
-import { Concept } from "@/types/api";
 import { v4 as uuidv4 } from "uuid";
 
 export const createRule = (
@@ -69,12 +69,14 @@ export function ruleToGroup(
 export const isEmptyRule = (rule: RuleLeafType): boolean =>
   rule.rule.concept === null;
 
-export const isSingleConcept = (concept: ConceptOperator["concept"]): boolean =>
+export const isSingleConcept = (
+  concept: Concept | null
+): concept is Concept & { alternatives: undefined } =>
   concept != null && !isMultipleConcept(concept);
 
 export const isMultipleConcept = (
-  concept: ConceptOperator["concept"]
-): boolean =>
+  concept: Concept | null
+): concept is Concept & { alternatives: Concept[] } =>
   concept != null &&
   Array.isArray(concept?.alternatives) &&
   concept!.alternatives.length > 0;
