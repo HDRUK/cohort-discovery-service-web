@@ -10,7 +10,7 @@ export enum CombinatorType {
 export type ConceptOperator = {
   //ageConstraint: string;
   //valueConstraint: string;
-  concept: Concept | Array<Concept> | null;
+  concept: Concept | null;
 };
 
 type Node = {

@@ -1,5 +1,6 @@
 import { ConceptOperator, RuleGroupType, RuleNodeType } from "@/types/rules";
 import {
+  isMultipleConcept,
   isOperator,
   isRuleGroup,
   isRuleLeaf,
@@ -58,12 +59,13 @@ const queryToText = (node: RuleGroupType) => {
       return { verb, text: desc };
     }
 
-    if (Array.isArray(c) && c.length > 0) {
-      const texts = c
-        .filter((x) => !!x)
-        .map((x) => cleanDescription(x.description))
-        .join(" or ");
-      const verb = getVerb(c[0].category);
+    if (isMultipleConcept(c)) {
+      const texts =
+        c.alternatives
+          ?.filter((x) => !!x)
+          .map((x) => cleanDescription(x.description))
+          .join(" or ") || "";
+      const verb = getVerb(c.category);
       return { verb, text: texts };
     }
 

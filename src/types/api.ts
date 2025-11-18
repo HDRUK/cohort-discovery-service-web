@@ -215,6 +215,7 @@ export interface Concept {
   description: string;
   category: string;
   children?: Concept[];
+  alternatives?: Concept[];
 }
 
 export interface ConceptSet extends WithTimestamps {
