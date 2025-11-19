@@ -64,7 +64,7 @@ const PositionedMenu = ({
     prevOpen.current = open;
   }, [open]);
 
-  const ButtonComponent = isIcon ? IconButton : Button;
+  const ButtonComponent = (isIcon ? IconButton : Button) as React.ElementType;
   const commonButtonProps = {
     ref: buttonRef,
     onClick: handleToggle,
