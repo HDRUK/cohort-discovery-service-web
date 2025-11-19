@@ -10,7 +10,7 @@ function getTokenKey(token: string) {
   return crypto.createHash("sha256").update(token).digest("hex");
 }
 
-const capVarChar = (s: string, max = MAX_VARCHAR_LENGTH) =>
-  [...s].slice(0, max).join("");
+const capVarChar = (s: string, max = MAX_VARCHAR_LENGTH, addDots = false) =>
+  `${[...s].slice(0, max).join("")} ${addDots ? "..." : ""}`;
 
 export { capitaliseFirstLetter, getTokenKey, capVarChar };

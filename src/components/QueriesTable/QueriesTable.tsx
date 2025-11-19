@@ -51,7 +51,7 @@ const QueriesTable = ({
           <MuiLink
             component={Link}
             href={{
-              pathname: routes.dashboardNewQuery,
+              pathname: routes.dashboardNewQuery(pid),
               query: { query: pid },
             }}
             onClick={() => {

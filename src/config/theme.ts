@@ -11,6 +11,9 @@ export const themeOptions: ThemeOptions = {
     highlight: {
       main: "#E9ECF4",
     },
+    table: {
+      main: "#CCD7D5",
+    },
     text: {
       primary: "#4D5B59",
     },
