@@ -41,4 +41,7 @@ export const tabPanelSx: Sx = {
   minHeight: 0,
   display: "flex",
   flexDirection: "column",
+  "&[hidden]": {
+    display: "none",
+  },
 };

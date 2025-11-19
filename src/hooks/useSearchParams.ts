@@ -27,7 +27,9 @@ const useSearchParams = (paramName: string = "searchTerm") => {
     [router, searchParams, paramName]
   );
 
-  return { ...searchParams, setSearchParam };
+  const getSearchParam = () => searchParams?.get(paramName);
+
+  return { searchParams, getSearchParam, setSearchParam };
 };
 
 export default useSearchParams;

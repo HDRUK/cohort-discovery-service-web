@@ -8,11 +8,13 @@ declare module "@mui/material/styles" {
     tertiary: Palette["primary"];
     link: Palette["primary"];
     highlight: Palette["primary"];
+    table?: Palette["primary"];
   }
   interface PaletteOptions {
     tertiary?: PaletteOptions["primary"];
     link?: PaletteOptions["primary"];
     highlight?: PaletteOptions["primary"];
+    table?: PaletteOptions["primary"];
   }
   interface TypographyVariants {
     guidance1: React.CSSProperties;

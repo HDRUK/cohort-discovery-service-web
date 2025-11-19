@@ -25,7 +25,7 @@ type TabType = {
 type TabsShellProps = {
   tabs: TabType[];
   children: React.ReactNode | React.ReactNode[];
-  initial?: number;
+  initial?: number | string;
   sx?: BoxProps["sx"];
   tabSx?: BoxProps["sx"];
   tabHeaderSx?: BoxProps["sx"];
@@ -35,13 +35,15 @@ type TabsShellProps = {
 export default function TabsShell({
   tabs,
   children,
-  initial = 0,
+  initial,
   sx = defaultRootSx,
   tabSx = defaultTabSx,
   tabHeaderSx = defaultTabHeaderSx,
   tabContentSx = defaultTabContentSx,
 }: TabsShellProps) {
-  const [value, setValue] = React.useState(String(initial));
+  const [value, setValue] = React.useState(
+    initial ? initial : tabs[0]?.id || 0
+  );
   const handleChange = (_: React.SyntheticEvent, newValue: string) =>
     setValue(newValue);
 
@@ -56,10 +58,10 @@ export default function TabsShell({
             allowScrollButtonsMobile
             sx={tabListSx}
           >
-            {tabs.map(({ id, label, href }, i) => (
+            {tabs.map(({ id, label, href }) => (
               <Tab
-                value={String(i)}
-                key={id || label}
+                value={id}
+                key={id}
                 label={label}
                 component={Link}
                 href={href ?? "#"}
@@ -74,7 +76,7 @@ export default function TabsShell({
 
         <Box sx={tabContentSx}>
           {kids.map((child, i) => (
-            <TabPanel key={i} value={String(i)} sx={tabPanelSx}>
+            <TabPanel key={i} value={tabs[i]?.id || i} sx={tabPanelSx}>
               {child}
             </TabPanel>
           ))}

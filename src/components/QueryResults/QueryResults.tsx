@@ -6,8 +6,14 @@ import { Box } from "@mui/material";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorMessage from "@/components/ErrorMessage";
 
-const QueryResults = async ({ queryId }: { queryId: string }) => {
-  const query = await getQuery(queryId);
+const QueryResults = async ({
+  queryId,
+  searchTerm,
+}: {
+  queryId: string;
+  searchTerm?: string;
+}) => {
+  const query = await getQuery(queryId, searchTerm);
   return (
     <Box>
       <ErrorBoundary
@@ -17,7 +23,7 @@ const QueryResults = async ({ queryId }: { queryId: string }) => {
           />
         }
       >
-        <QueryResultsTable query={query.data} />{" "}
+        <QueryResultsTable query={query.data} />
       </ErrorBoundary>
     </Box>
   );

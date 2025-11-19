@@ -3,14 +3,13 @@
 import { IconButton } from "@mui/material";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import useQueryBuilder from "@/store/useQueryBuilder";
-import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { revalidateAction } from "@/actions/revalidate";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import { routes } from "@/config/routes";
 
 const SubmitQueryButton = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const fetchResults = useDaphneStore((s) => s.userData.fetchResults);
   const { isLoading, setIsLoading } = useDaphneStore((s) => s.stateManagement);
 
@@ -27,15 +26,13 @@ const SubmitQueryButton = () => {
   const handleClick = async () => {
     setIsLoading(true);
     fetchResults(queryName).then(async (res) => {
-      const params = new URLSearchParams(searchParams.toString());
       const newPid = res.data.query_pid;
 
       //needs to be used queries
       revalidateAction("queries");
       setIsLoading(false);
 
-      params.set("query", newPid);
-      router.replace(`?${params.toString()}`, { scroll: false });
+      router.replace(routes.dashboardQueryResult(newPid));
     });
   };
 
