@@ -64,38 +64,35 @@ const PositionedMenu = ({
     prevOpen.current = open;
   }, [open]);
 
+  const ButtonComponent = isIcon ? IconButton : Button;
+  const commonButtonProps = {
+    ref: buttonRef,
+    onClick: handleToggle,
+    id: "composition-button",
+    "aria-controls": open ? "composition-menu" : undefined,
+    "aria-expanded": open ? "true" : undefined,
+    "aria-haspopup": "true",
+  };
+
+  const specificButtonProps = isIcon
+    ? {
+        sx: {
+          bgcolor: "white",
+          borderRadius: 10,
+          border: 2,
+          borderColor: active ? "success.main" : "transparent",
+        },
+      }
+    : {
+        variant: "text",
+      };
+
   return (
     <>
-      {isIcon ? (
-        <IconButton
-          ref={buttonRef}
-          onClick={handleToggle}
-          sx={{
-            bgcolor: "white",
-            borderRadius: 10,
-            border: 2,
-            borderColor: active ? "success.main" : "transparent",
-          }}
-          id="composition-button"
-          aria-controls={open ? "composition-menu" : undefined}
-          aria-expanded={open ? "true" : undefined}
-          aria-haspopup="true"
-        >
-          {children}
-        </IconButton>
-      ) : (
-        <Button
-          ref={buttonRef}
-          variant="text"
-          onClick={handleToggle}
-          id="composition-button"
-          aria-controls={open ? "composition-menu" : undefined}
-          aria-expanded={open ? "true" : undefined}
-          aria-haspopup="true"
-        >
-          {children}
-        </Button>
-      )}
+      <ButtonComponent {...commonButtonProps} {...specificButtonProps}>
+        {children}
+      </ButtonComponent>
+
       <Popper
         open={open}
         anchorEl={anchorEl}

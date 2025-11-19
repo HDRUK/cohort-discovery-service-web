@@ -1,5 +1,3 @@
-import * as React from "react";
-
 import SvgIcon, { SvgIconProps } from "@mui/material/SvgIcon";
 
 export const SortDescendingIcon = (props: SvgIconProps) => (

@@ -13,6 +13,14 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
+import {
+  getContainerSx,
+  getTextFieldSx,
+  getHtmlInputSx,
+  inputAdornmentSx,
+  iconButtonSx,
+} from "./SearchBox.styles";
+
 export type SearchBoxProps = Omit<TextFieldProps, "onSubmit"> & {
   loading?: boolean;
   onSubmit?: () => void | Promise<void>;
@@ -40,7 +48,7 @@ const SearchBox = ({
   const [expanded, setExpanded] = useState(
     collapsible ? defaultExpanded : true
   );
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const toggle = () => {
     if (!collapsible) return;
@@ -65,19 +73,7 @@ const SearchBox = ({
 
   return (
     <Box
-      sx={(theme) => ({
-        width: collapsible
-          ? expanded
-            ? expandedWidth
-            : collapsedWidth
-          : expandedWidth,
-        transition: collapsible
-          ? theme.transitions.create("width", {
-              duration: 250,
-              easing: theme.transitions.easing.easeInOut,
-            })
-          : "none",
-      })}
+      sx={getContainerSx(collapsible, expanded, expandedWidth, collapsedWidth)}
       aria-expanded={expanded}
     >
       <Grid
@@ -91,69 +87,14 @@ const SearchBox = ({
           <TextField
             inputRef={inputRef}
             type="search"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                borderRadius: 100,
-                boxShadow: "0px 2px 0px rgba(0, 0, 0, 0.23)",
-                backgroundColor: inputBgColor,
-                p: 0,
-              },
-              "& .MuiOutlinedInput-notchedOutline": {
-                zIndex: 0,
-                borderTop: "none",
-                borderLeftColor: "rgba(0,0,0,0.1)",
-                borderRightColor: "rgba(0,0,0,0.1)",
-                borderBottomColor: "rgba(0,0,0,0.23)",
-                opacity: collapsible ? (expanded ? 1 : 0) : 1,
-                transition: collapsible ? "opacity 150ms" : "none",
-                display: collapsible
-                  ? expanded
-                    ? "none"
-                    : "inherit"
-                  : "inherit",
-              },
-              "& .MuiInputAdornment-root": { position: "relative", zIndex: 2 },
-              "& .MuiFormLabel-root": {
-                zIndex: 1,
-              },
-              "& .MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline":
-                {
-                  display: "inherit",
-                  opacity: 1,
-                  borderColor: (t) => t.palette.error.main,
-                },
-
-              "& .MuiOutlinedInput-root.Mui-error.Mui-disabled .MuiOutlinedInput-notchedOutline":
-                {
-                  borderColor: (t) => t.palette.error.main,
-                },
-              "& .MuiInputLabel-root": {
-                color: "text.secondary",
-              },
-              "& .MuiInputLabel-root.Mui-focused": {
-                color: "text.secondary",
-              },
-              "& .MuiInputLabel-root.Mui-error": {
-                color: (t) => t.palette.error.main,
-              },
-            }}
+            sx={getTextFieldSx(collapsible, expanded, inputBgColor)}
             slotProps={{
               htmlInput: {
-                sx: {
-                  opacity: collapsible ? (expanded ? 1 : 0) : 1,
-                  transition: collapsible ? "opacity 150ms" : "none",
-                },
+                sx: getHtmlInputSx(collapsible, expanded),
               },
               input: {
                 endAdornment: (
-                  <InputAdornment
-                    position="end"
-                    sx={{
-                      position: "relative",
-                      mr: 1,
-                      zIndex: 3,
-                    }}
-                  >
+                  <InputAdornment position="end" sx={inputAdornmentSx}>
                     <IconButton
                       onClick={handleIconClick}
                       aria-label={
@@ -163,20 +104,7 @@ const SearchBox = ({
                             : "Expand search"
                           : "Submit search"
                       }
-                      sx={{
-                        bgcolor: "grey.600",
-                        boxShadow: "-4px 0px 6px -2px rgba(0, 0, 0, 0.4)",
-                        color: "common.white",
-                        borderRadius: "999px",
-                        height: 40,
-                        width: 40,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        cursor: "pointer",
-                        lineHeight: 0,
-                        "&:hover": { bgcolor: "grey.700" },
-                      }}
+                      sx={iconButtonSx}
                     >
                       {loading ? (
                         <CircularProgress size={24} color="inherit" />
