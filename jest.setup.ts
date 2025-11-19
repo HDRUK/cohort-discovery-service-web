@@ -4,9 +4,11 @@ jest.mock("next/cache", () => ({
 }));
 
 const mockSearchParams = new URLSearchParams("page=1&per_page=5");
+const mockPathname = "/dashboard";
 
 jest.mock("next/navigation", () => ({
   useSearchParams: () => mockSearchParams,
+  usePathname: () => mockPathname,
   useRouter: () => ({
     push: jest.fn(),
     replace: jest.fn(),

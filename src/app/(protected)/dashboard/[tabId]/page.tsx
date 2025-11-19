@@ -5,7 +5,9 @@ import { routes } from "@/config/routes";
 import TabsShell from "@/components/TabsShell";
 import { GATEWAY_TOKEN_NAME } from "@/config/internals";
 import { cookies } from "next/headers";
-import { Box } from "@mui/material";
+import getQuery from "@/actions/getQuery";
+import { capVarChar } from "@/utils/string";
+import { Query } from "@/types/api";
 
 type Params = Promise<{ tabId: string }>;
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
@@ -18,6 +20,15 @@ const DashboardTabPage = async (props: {
   const { tabId } = await params;
   const { query } = await searchParams;
 
+  let queryData: Query | undefined;
+  let queryName: string | undefined;
+
+  if (query) {
+    const { data } = await getQuery(query as string);
+    queryData = data;
+    queryName = capVarChar(queryData.name, 30, true);
+  }
+
   // note - work in progress
   // - to be completed and cleaned up in the next few tasks
   const TABS = [
@@ -26,12 +37,13 @@ const DashboardTabPage = async (props: {
       label: "New Query",
       href: routes.dashboardNewQuery(),
     },
-    ...(query
+    ...(query && queryName
       ? [
           {
             id: "query-result",
-            label: "Query Result",
+            label: queryName,
             href: routes.dashboardQueryResult(query as string),
+            onCloseHref: routes.dashboardNewQuery(),
           },
         ]
       : []),

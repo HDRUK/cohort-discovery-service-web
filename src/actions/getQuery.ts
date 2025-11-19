@@ -6,15 +6,16 @@ import { Query, ApiResponse } from "../types/api";
 
 const getQuery = async (
   pid: string,
-  searchTerm?: string
+  searchParams?: URLSearchParams
 ): Promise<ApiResponse<Query>> => {
   const baseUrl = API_ROUTES.getQuery(pid);
-  const url = searchTerm ? `${baseUrl}?name[]=${searchTerm}` : baseUrl;
+  const url = searchParams ? `${baseUrl}?${searchParams.toString()}` : baseUrl;
 
   return await apiGet<ApiResponse<Query>>(url, {
     next: {
-      tags: ["query", pid],
+      tags: ["query", pid, `query-${pid}-${searchParams?.toString()}`],
     },
+    cache: "force-cache",
   });
 };
 

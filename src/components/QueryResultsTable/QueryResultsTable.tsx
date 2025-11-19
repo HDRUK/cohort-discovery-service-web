@@ -6,28 +6,26 @@ import {
   Box,
   CircularProgress,
   Divider,
-  IconButton,
   Link,
   Paper,
   Typography,
 } from "@mui/material";
 import ErrorIcon from "@mui/icons-material/Error";
 import { revalidateAction } from "@/actions/revalidate";
-import { useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useTable } from "../../hooks/useTable";
 import { formatNumber } from "@/utils/numbers";
 import Title from "../Title";
 import useQueryBuilder from "@/store/useQueryBuilder";
-import SortIcon from "@mui/icons-material/Sort";
-import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import DownloadIcon from "@mui/icons-material/Download";
-import ControlledSearchBox from "@/modules/ControlledSearchBox";
 
-const STATUS_LABELS: Record<string, string> = {
-  ok: "Successful",
-  error: "Failed",
-  pending: "Pending",
-};
+import ControlledSearchBox from "@/modules/ControlledSearchBox";
+import DownloadButton from "../DownloadButton";
+import SortButton from "../SortButton";
+import { SortAscendingIcon } from "@/icons/SortAscendingIcon";
+import { SortDescendingIcon } from "@/icons/SortDescendingIcon";
+import useSearchParams from "@/hooks/useSearchParams";
+import { SortDirection } from "@/types/common";
+import { STATUS_LABELS } from "@/config/defaults";
 
 const QueryResultsTable = ({ query }: { query: Query }) => {
   const { setQueryName, setQueryBuilderJson, queryAsText } = useQueryBuilder(
@@ -123,9 +121,36 @@ const QueryResultsTable = ({ query }: { query: Query }) => {
     },
   ];
 
+  const { getSearchParam, setSearchParam } = useSearchParams("sort");
+  const currentSortDirection = getSearchParam()?.split(":")[1];
+
+  const handleSort = useCallback(
+    (direction: SortDirection) => {
+      setSearchParam(
+        direction !== currentSortDirection
+          ? `collection.name:${direction}`
+          : null
+      );
+    },
+    [currentSortDirection, setSearchParam]
+  );
+
+  // ideally this would be done on the BE
+  // - made a note of this for the BE
+  // - we should definitely do this on the BE
+  //   if the results are to be paginated in the future
+  const sortedTasks = useMemo(() => {
+    if (!currentSortDirection) {
+      return [...tasks].sort(
+        (a, b) => (b.result?.count ?? 0) - (a.result?.count ?? 0)
+      );
+    }
+    return tasks;
+  }, [tasks, currentSortDirection]);
+
   const table = useTable<Task>({
     columns,
-    data: tasks,
+    data: sortedTasks,
   });
 
   return (
@@ -133,22 +158,57 @@ const QueryResultsTable = ({ query }: { query: Query }) => {
       <Title title={"Query Results"} subTitle={query.pid} />
       <Typography variant="h6">{queryAsText}</Typography>
       <Divider />
-
       <ControlledSearchBox
         placeholder="Search your query results..."
         actions={[
-          <IconButton key="sort">
-            <SortIcon />
-          </IconButton>,
-          <IconButton key="delete">
-            <DeleteForeverIcon />
-          </IconButton>,
-          <IconButton
+          <SortButton
+            key="sort"
+            active={!!currentSortDirection}
+            items={[
+              {
+                id: SortDirection.ASCENDING,
+                label: (
+                  <Typography
+                    component="span"
+                    sx={{ display: "flex", alignItems: "center" }}
+                    fontWeight={
+                      currentSortDirection == SortDirection.ASCENDING
+                        ? "bold"
+                        : "normal"
+                    }
+                  >
+                    <SortAscendingIcon sx={{ mr: 1 }} /> Sort alphabetically
+                    (A-Z)
+                  </Typography>
+                ),
+                onClick: () => handleSort(SortDirection.ASCENDING),
+              },
+              {
+                id: SortDirection.DESCENDING,
+                label: (
+                  <Typography
+                    component="span"
+                    sx={{ display: "flex", alignItems: "center" }}
+                    fontWeight={
+                      currentSortDirection == SortDirection.DESCENDING
+                        ? "bold"
+                        : "normal"
+                    }
+                  >
+                    <SortDescendingIcon sx={{ mr: 1 }} /> Sort alphabetically
+                    (Z-A)
+                  </Typography>
+                ),
+                onClick: () => handleSort(SortDirection.DESCENDING),
+              },
+            ]}
+          />,
+          <DownloadButton
             key="download"
-            href={`/api/download/${query.pid}?entity=queries&format=json`}
-          >
-            <DownloadIcon />
-          </IconButton>,
+            id={query.pid}
+            entity="queries"
+            format="json"
+          />,
         ]}
       />
 

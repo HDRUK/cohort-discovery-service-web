@@ -1,11 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { Box, BoxProps, Tab } from "@mui/material";
+import { Box, BoxProps, Tab, IconButton, Typography } from "@mui/material";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
 import Link from "next/link";
+import CloseIcon from "@mui/icons-material/Close";
 
 import {
   rootSx as defaultRootSx,
@@ -15,11 +16,13 @@ import {
   tabListSx,
   tabPanelSx,
 } from "./TabsShell.styles";
+import { useRouter } from "next/navigation";
 
 type TabType = {
   id?: string;
   label: string;
   href?: string;
+  onCloseHref?: string;
 };
 
 type TabsShellProps = {
@@ -48,6 +51,7 @@ export default function TabsShell({
     setValue(newValue);
 
   const kids = React.Children.toArray(children);
+  const router = useRouter();
 
   return (
     <Box sx={sx}>
@@ -58,11 +62,31 @@ export default function TabsShell({
             allowScrollButtonsMobile
             sx={tabListSx}
           >
-            {tabs.map(({ id, label, href }, i) => (
+            {tabs.map(({ id, label, href, onCloseHref }, i) => (
               <Tab
                 value={id || i}
                 key={id || label}
-                label={label}
+                label={
+                  <Typography
+                    sx={{ p: 0, m: 0 }}
+                    variant="body1"
+                    component="span"
+                  >
+                    {label}
+                    {onCloseHref && (
+                      <IconButton
+                        size="small"
+                        onClick={async (e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          router.replace(onCloseHref);
+                        }}
+                      >
+                        <CloseIcon />
+                      </IconButton>
+                    )}
+                  </Typography>
+                }
                 component={Link}
                 href={href ?? "#"}
                 sx={tabSx}

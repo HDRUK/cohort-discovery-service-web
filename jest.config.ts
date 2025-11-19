@@ -104,6 +104,7 @@ const config: Config = {
     "^@/modules/(.*)$": "<rootDir>/src/modules/$1",
     "^@/providers/(.*)$": "<rootDir>/src/providers/$1",
     "^@/utils/(.*)$": "<rootDir>/src/utils/$1",
+    "^@/icons/(.*)$": "<rootDir>/src/icons/$1",
     "\\.(css|less|scss|sass)$": "identity-obj-proxy",
   },
 
