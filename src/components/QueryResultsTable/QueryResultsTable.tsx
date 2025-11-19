@@ -27,7 +27,6 @@ const STATUS_LABELS: Record<string, string> = {
   ok: "Successful",
   error: "Failed",
   pending: "Pending",
-  // add more here...
 };
 
 const QueryResultsTable = ({ query }: { query: Query }) => {

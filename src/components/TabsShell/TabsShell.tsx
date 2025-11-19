@@ -61,7 +61,7 @@ export default function TabsShell({
             {tabs.map(({ id, label, href }, i) => (
               <Tab
                 value={id || i}
-                key={id}
+                key={id || label}
                 label={label}
                 component={Link}
                 href={href ?? "#"}
