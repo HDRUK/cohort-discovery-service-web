@@ -58,9 +58,9 @@ export default function TabsShell({
             allowScrollButtonsMobile
             sx={tabListSx}
           >
-            {tabs.map(({ id, label, href }) => (
+            {tabs.map(({ id, label, href }, i) => (
               <Tab
-                value={id}
+                value={id || i}
                 key={id}
                 label={label}
                 component={Link}

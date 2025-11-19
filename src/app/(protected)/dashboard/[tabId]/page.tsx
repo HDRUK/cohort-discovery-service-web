@@ -18,6 +18,8 @@ const DashboardTabPage = async (props: {
   const { tabId } = await params;
   const { query } = await searchParams;
 
+  // note - work in progress
+  // - to be completed and cleaned up in the next few tasks
   const TABS = [
     {
       id: "new-query",
@@ -58,7 +60,6 @@ const DashboardTabPage = async (props: {
       <TabsShell initial={tabId} tabs={TABS}>
         <NewQueryPage />
         <QueryResultsPage {...props} />
-        <Box sx={{ border: 1 }}> hi3 </Box>
       </TabsShell>
     )
   );
