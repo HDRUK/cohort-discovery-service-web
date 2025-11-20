@@ -78,7 +78,10 @@ export function NotifyProvider({ children }: { children: React.ReactNode }) {
         open={open}
         onClose={() => setOpen(false)}
         autoHideDuration={autoHideDuration}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        sx={{
+          m: 0.5,
+        }}
       >
         <Alert
           onClose={() => setOpen(false)}

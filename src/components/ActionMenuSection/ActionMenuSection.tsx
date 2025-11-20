@@ -111,11 +111,13 @@ const ActionMenuSection = ({
         aria-controls={`${baseId}-content`}
         id={`${baseId}-header`}
         sx={{
-          minHeight: 40,
+          minHeight: 30,
           bgcolor: "transparent",
           "& .MuiAccordionSummary-content": { my: 0 },
           m: 0,
           p: 0,
+          borderBottom: underline ? 1 : 0,
+          my: 1,
         }}
       >
         {summary ?? (
@@ -132,8 +134,6 @@ const ActionMenuSection = ({
           display: "flex",
           flexDirection: "column",
           gap: 0.5,
-          borderTop: underline ? 1 : 0,
-          mx: underline ? 1 : 0,
           ...(scrollable && {
             flex: 1,
             minHeight: 0,

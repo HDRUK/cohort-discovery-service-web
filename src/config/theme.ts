@@ -19,7 +19,7 @@ export const themeOptions: ThemeOptions = {
     },
     background: {
       default: "#F2F2F2",
-      paper: "#F7F7F7",
+      paper: "#FAFAFA",
     },
     link: {
       main: "#1976d2",
@@ -62,6 +62,7 @@ export const themeOptions: ThemeOptions = {
       fontWeight: 600,
       letterSpacing: 0,
       textTransform: "none",
+      lineHeight: 1.1,
     },
     guidance1: {
       fontSize: "20px",
@@ -165,6 +166,17 @@ export const themeOptions: ThemeOptions = {
       styleOverrides: {
         root: {
           borderRadius: 20,
+        },
+      },
+    },
+    MuiFilledInput: {
+      styleOverrides: {
+        root: {
+          borderRadius: 0,
+        },
+        input: {
+          paddingTop: 10,
+          paddingBottom: 10,
         },
       },
     },

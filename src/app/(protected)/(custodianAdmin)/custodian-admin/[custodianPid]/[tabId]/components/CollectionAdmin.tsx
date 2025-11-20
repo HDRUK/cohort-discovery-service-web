@@ -1,15 +1,17 @@
 "use client";
-import CreateCollectionHost from "@/modules/CreateCollectionHost";
+import CreateCollection from "@/modules/CreateCollection";
 import { useDaphneStore } from "@/store/useDaphneStore";
-import { CollectionHost } from "@/types/api";
+import { CollectionWithHosts, CollectionHost, Paginated } from "@/types/api";
 import { Box, Skeleton } from "@mui/material";
-import CollectionHostsTable from "./CollectionHostsTable";
+import CollectionTable from "./CollectionTable";
 
-const CollectionHostAdmin = ({
+const CollectionAdmin = ({
   pid,
+  collections,
   collectionHosts,
 }: {
   pid: string;
+  collections: Paginated<CollectionWithHosts[]>;
   collectionHosts: CollectionHost[];
 }) => {
   const {
@@ -19,16 +21,19 @@ const CollectionHostAdmin = ({
   const custodian = custodians.find((c) => c.pid === pid);
   if (!custodian) return <Skeleton height={"100%"} />;
 
+  return <b> hi </b>;
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       <Box>
-        <CreateCollectionHost custodian={custodian} />
+        <CreateCollection
+          custodian={custodian}
+          collectionHosts={collectionHosts}
+        />
       </Box>
-      <Box>
-        <CollectionHostsTable collectionHosts={collectionHosts} />
-      </Box>
+      <CollectionTable collections={collections} />
     </Box>
   );
 };
 
-export default CollectionHostAdmin;
+export default CollectionAdmin;
