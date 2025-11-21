@@ -1,67 +1,21 @@
 "use client";
-import CreateCollectionHost from "@/modules/CreateCollectionHost";
+import { useState, useMemo, useEffect } from "react";
+import { Box, Skeleton } from "@mui/material";
+import Title from "@/components/Title";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { CollectionHost } from "@/types/api";
-import {
-  Box,
-  IconButton,
-  Skeleton,
-  TextField,
-  Typography,
-} from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import CollectionHostsTable from "./CollectionHostsTable";
-import Title from "@/components/Title";
-import SwimLane from "@/components/SwimLane";
-import SwimLaneContainer from "@/components/SwimLaneContainer";
-import ActionMenuSection from "@/components/ActionMenuSection";
-import AddButton from "@/components/AddButton";
-import { useState, useMemo, useEffect } from "react";
-import Guidance from "./Guidance";
 import { MRT_RowSelectionState } from "material-react-table";
 import { trueKeys } from "@/utils/numbers";
-import CopyableVariable from "@/components/CopyableVariable";
-import LockOutlineIcon from "@mui/icons-material/LockOutline";
-import LockOpenIcon from "@mui/icons-material/LockOpen";
-import { Controller, useForm } from "react-hook-form";
 import { useNotify } from "@/providers/NotifyProvider";
+import { useForm } from "react-hook-form";
+import ThreePaneSwimLaneLayout, {
+  ExpandedSide,
+} from "@/modules/ThreePaneSwimLaneLayout";
+import CollectionHostCreatePanel from "./CollectionHostCreatePanel";
+import CollectionHostListPanel from "./CollectionHostListPanel";
+import CollectionHostDetailPanel from "./CollectionHostDetailPanel";
 
-const PANEL_WIDTH = 3;
-enum ExpandedSide {
-  LEFT = "left",
-  RIGHT = "right",
-}
-
-type HostFormValues = { hostName: string };
-
-const getPanelSizes = (
-  expanded: ExpandedSide | null,
-  noHosts: boolean,
-  panelWidth: number = PANEL_WIDTH,
-  totalWidth: number = 12
-) => {
-  if (expanded === ExpandedSide.LEFT) {
-    return {
-      left: totalWidth - panelWidth,
-      middle: 0,
-      right: panelWidth,
-    };
-  }
-
-  if (expanded === ExpandedSide.RIGHT) {
-    return {
-      left: 1,
-      middle: noHosts ? totalWidth - panelWidth : 2 * panelWidth - 0.5,
-      right: noHosts ? 0 : 2 * panelWidth - 0.5,
-    };
-  }
-
-  return {
-    left: panelWidth,
-    middle: noHosts ? totalWidth - panelWidth : totalWidth - 2 * panelWidth,
-    right: noHosts ? 0 : panelWidth,
-  };
-};
+type CollectionHostFormValues = { hostName: string };
 
 const CollectionHostAdmin = ({
   pid,
@@ -78,7 +32,7 @@ const CollectionHostAdmin = ({
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
   const selectedHostIds = useMemo(() => trueKeys(rowSelection), [rowSelection]);
 
-  const selectedHost = useMemo(
+  const selectedCollectionHost = useMemo(
     () =>
       selectedHostIds.length > 0
         ? collectionHosts.find((h) => h.client_id === selectedHostIds[0])
@@ -104,35 +58,30 @@ const CollectionHostAdmin = ({
   const expandedLeft = expandedSide === ExpandedSide.LEFT;
   const expandedRight = expandedSide === ExpandedSide.RIGHT;
 
-  const createNewHost = () => toggleExpandLeft();
-
   const custodian = custodians.find((c) => c.pid === pid);
-  const noHosts = collectionHosts.length === 0;
+  const noCollectionHosts = collectionHosts.length === 0;
 
-  const {
-    left: leftSize,
-    middle: middleSize,
-    right: rightSize,
-  } = getPanelSizes(expandedSide, noHosts, PANEL_WIDTH);
-
-  const { handleSubmit, control, setValue } = useForm<HostFormValues>({
-    defaultValues: {
-      hostName: selectedHost?.name,
-    },
-  });
+  const { handleSubmit, control, setValue } = useForm<CollectionHostFormValues>(
+    {
+      defaultValues: {
+        hostName: selectedCollectionHost?.name,
+      },
+    }
+  );
 
   useEffect(() => {
-    if (selectedHost) setValue("hostName", selectedHost.name);
-  }, [selectedHost, setValue]);
+    if (selectedCollectionHost)
+      setValue("hostName", selectedCollectionHost.name);
+  }, [selectedCollectionHost, setValue]);
 
   const submitHostForm = async (
-    { hostName }: HostFormValues,
+    { hostName }: CollectionHostFormValues,
     closeAfter = false
   ) => {
-    if (!selectedHost?.id) return;
-    const { id } = selectedHost;
+    if (!selectedCollectionHost?.id) return;
+    const { id } = selectedCollectionHost;
 
-    if (hostName !== selectedHost.name) {
+    if (hostName !== selectedCollectionHost.name) {
       await updateCollectionHost(id, { name: hostName });
       notify.success(`Updated host name ${hostName}`);
     }
@@ -150,13 +99,14 @@ const CollectionHostAdmin = ({
   const handleUnlockClick = () => {
     toggleExpandRight();
   };
+
   const handleDeleteHost = async () => {
-    selectedHostIds.map((pid) => {
-      const id = collectionHosts.find((h) => h.client_id === pid)?.id;
+    selectedHostIds.map((clientId) => {
+      const id = collectionHosts.find((h) => h.client_id === clientId)?.id;
       if (id) {
         deleteCollectionHost(id);
       } else {
-        notify.warning(`Did not find host ${pid} to delete`);
+        notify.warning(`Did not find host ${clientId} to delete`);
       }
     });
 
@@ -165,152 +115,46 @@ const CollectionHostAdmin = ({
   };
 
   if (!custodian) return <Skeleton height={"100%"} />;
+
   return (
     <Box
       sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}
     >
       <Title title="Host" subTitle="Create" />
-      <SwimLaneContainer>
-        <SwimLane size={leftSize}>
-          <Box
-            sx={{
-              px: 1,
-              display: "flex",
-              flexDirection: "column",
-              flex: 1,
-              minHeight: 0,
-            }}
-          >
-            <ActionMenuSection
-              title={"Create"}
-              fixedExpanded
-              defaultExpanded
-              underline
-            >
-              <AddButton
-                action={createNewHost}
-                label={"Host"}
-                disabled={expandedLeft}
-              />
-            </ActionMenuSection>
-
-            {expandedLeft && (
-              <ActionMenuSection
-                title={"New Host"}
-                fixedExpanded
-                defaultExpanded
-                underline
-                scrollable
-              >
-                <CreateCollectionHost
-                  custodianId={custodian.id}
-                  onCancel={() => toggleExpandLeft()}
-                />
-              </ActionMenuSection>
-            )}
-          </Box>
-        </SwimLane>
-
-        <SwimLane size={middleSize}>
-          {noHosts ? (
-            <Box sx={{ mx: "auto", my: "auto" }}>
-              <Typography variant="h5">
-                Collection hosts will appear here when they are created
-              </Typography>
-            </Box>
-          ) : (
-            <Box>
-              <Box
-                sx={{
-                  minHeight: 40,
-                  display: "flex",
-                  justifyContent: "space-between",
-                }}
-              >
-                <div></div>
-                {selectedHostIds.length > 0 && (
-                  <IconButton onClick={() => handleDeleteHost()}>
-                    <DeleteIcon />
-                  </IconButton>
-                )}
-              </Box>
-
-              <CollectionHostsTable
-                collectionHosts={collectionHosts}
-                rowSelection={rowSelection}
-                setRowSelection={setRowSelection}
-              />
-            </Box>
-          )}
-        </SwimLane>
-
-        <SwimLane size={rightSize}>
-          {selectedHost ? (
-            <>
-              <Typography component="span" variant="overline">
-                Host
-                <IconButton
-                  size="small"
-                  sx={{ ml: "auto" }}
-                  onClick={() => {
-                    if (expandedRight) {
-                      handleLockClick();
-                    } else {
-                      handleUnlockClick();
-                    }
-                  }}
-                >
-                  {expandedRight ? <LockOpenIcon /> : <LockOutlineIcon />}
-                </IconButton>
-              </Typography>
-
-              <ActionMenuSection
-                title={"Host Name"}
-                fixedExpanded
-                defaultExpanded
-                underline
-              >
-                {expandedRight ? (
-                  <Controller
-                    name="hostName"
-                    control={control}
-                    rules={{ required: "Host name is required" }}
-                    render={({ field, fieldState: { error } }) => (
-                      <TextField
-                        {...field}
-                        slotProps={{ input: { sx: { borderRadius: 0 } } }}
-                        error={!!error}
-                        helperText={error?.message}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            e.preventDefault();
-                            handleEnter();
-                          }
-                        }}
-                      />
-                    )}
-                  />
-                ) : (
-                  selectedHost.name
-                )}
-              </ActionMenuSection>
-              <ActionMenuSection
-                title={"Host Credentials"}
-                fixedExpanded
-                defaultExpanded
-                underline
-              >
-                Client ID
-                <CopyableVariable value={selectedHost.client_id} />
-                Client Secret
-                <CopyableVariable hidden value={selectedHost.client_secret} />
-              </ActionMenuSection>
-            </>
-          ) : (
-            <Guidance creating={expandedLeft} />
-          )}
-        </SwimLane>
-      </SwimLaneContainer>
+      <ThreePaneSwimLaneLayout
+        expandedSide={expandedSide}
+        rightDisabled={noCollectionHosts}
+        panelWidth={3}
+        left={
+          <CollectionHostCreatePanel
+            custodianId={custodian.id}
+            expandedLeft={expandedLeft}
+            onCreateNewHost={toggleExpandLeft}
+            onCancelCreate={toggleExpandLeft}
+          />
+        }
+        middle={
+          <CollectionHostListPanel
+            noCollectionHosts={noCollectionHosts}
+            collectionHosts={collectionHosts}
+            rowSelection={rowSelection}
+            setRowSelection={setRowSelection}
+            onDeleteHost={handleDeleteHost}
+            hasSelection={selectedHostIds.length > 0}
+          />
+        }
+        right={
+          <CollectionHostDetailPanel
+            selectedCollectionHost={selectedCollectionHost || null}
+            expandedRight={expandedRight}
+            expandedLeft={expandedLeft}
+            control={control}
+            handleEnter={handleEnter}
+            handleLockClick={handleLockClick}
+            handleUnlockClick={handleUnlockClick}
+          />
+        }
+      />
     </Box>
   );
 };
