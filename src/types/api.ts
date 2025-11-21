@@ -189,6 +189,11 @@ export interface CreateCollectionHostPost {
   custodian_id: number;
 }
 
+export interface UpdateCollectionHostPayload {
+  name?: string;
+  query_context_type?: string;
+}
+
 export interface CollectionHostFormValues {
   name: string;
   context: string;

@@ -45,20 +45,20 @@ export const themeOptions: ThemeOptions = {
       color: "rgba(0, 0, 0, 0.4)",
     },
     h6: {
-      fontSize: "14px",
+      fontSize: "15px",
       fontWeight: 200,
       color: "rgba(0, 0, 0, 0.4)",
     },
     body1: {
-      fontSize: "18px",
+      fontSize: "15px",
       fontWeight: 400,
     },
     body2: {
-      fontSize: "14px",
+      fontSize: "13px",
       fontWeight: 400,
     },
     overline: {
-      fontSize: "18px",
+      fontSize: "15px",
       fontWeight: 600,
       letterSpacing: 0,
       textTransform: "none",
