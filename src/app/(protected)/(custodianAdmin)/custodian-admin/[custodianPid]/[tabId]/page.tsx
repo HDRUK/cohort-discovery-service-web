@@ -1,21 +1,20 @@
-import CollectionHostAdmin from "./components/CollectionHostAdmin";
-import getCollectionHosts from "@/actions/getCollectionHosts";
+import { Suspense } from "react";
 import TabsShell from "@/components/TabsShell";
-import CollectionAdmin from "./components/CollectionAdmin";
-import getCustodianCollections from "@/actions/getCustodianCollections";
 import { notFound } from "next/navigation";
 import { GATEWAY_TOKEN_NAME } from "@/config/internals";
 import { cookies } from "next/headers";
 import { routes } from "@/config/routes";
+import CollectionHostsTab, {
+  CollectionHostsSkeleton,
+} from "./components/CollectionHostTab";
+import CollectionsTab, {
+  CollectionsSkeleton,
+} from "./components/CollectionsTab";
 
 type Params = Promise<{ custodianPid: string; tabId: string }>;
 
 const CustodianAdminPage = async ({ params }: { params: Params }) => {
   const { custodianPid, tabId } = await params;
-  const { data: collectionHosts } = await getCollectionHosts(custodianPid);
-  const { data: custodianCollections } = await getCustodianCollections(
-    custodianPid
-  );
 
   const tabs = [
     { id: "hosts", label: "Hosts", href: routes.teamHosts(custodianPid) },
@@ -36,15 +35,12 @@ const CustodianAdminPage = async ({ params }: { params: Params }) => {
   return (
     token && (
       <TabsShell initial={tabId} tabs={tabs}>
-        <CollectionHostAdmin
-          pid={custodianPid}
-          collectionHosts={collectionHosts}
-        />
-        <CollectionAdmin
-          pid={custodianPid}
-          collectionHosts={collectionHosts}
-          collections={custodianCollections}
-        />
+        <Suspense fallback={<CollectionHostsSkeleton />}>
+          <CollectionHostsTab custodianPid={custodianPid} />
+        </Suspense>
+        <Suspense fallback={<CollectionsSkeleton />}>
+          <CollectionsTab custodianPid={custodianPid} />
+        </Suspense>
       </TabsShell>
     )
   );
