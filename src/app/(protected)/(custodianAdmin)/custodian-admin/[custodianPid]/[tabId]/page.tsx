@@ -1,0 +1,49 @@
+import { Suspense } from "react";
+import TabsShell from "@/components/TabsShell";
+import { notFound } from "next/navigation";
+import { GATEWAY_TOKEN_NAME } from "@/config/internals";
+import { cookies } from "next/headers";
+import { routes } from "@/config/routes";
+import CollectionHostsTab, {
+  CollectionHostsSkeleton,
+} from "./components/CollectionHostTab";
+import CollectionsTab, {
+  CollectionsSkeleton,
+} from "./components/CollectionsTab";
+
+type Params = Promise<{ custodianPid: string; tabId: string }>;
+
+const CustodianAdminPage = async ({ params }: { params: Params }) => {
+  const { custodianPid, tabId } = await params;
+
+  const tabs = [
+    { id: "hosts", label: "Hosts", href: routes.teamHosts(custodianPid) },
+    {
+      id: "collections",
+      label: "Collections",
+      href: routes.teamCollections(custodianPid),
+    },
+  ];
+
+  const isValidTabId = (tabId: string) => tabs.some((t) => t.id === tabId);
+
+  const cookieStore = await cookies();
+  const token = cookieStore.get(GATEWAY_TOKEN_NAME)?.value;
+
+  if (!isValidTabId(tabId)) return notFound();
+
+  return (
+    token && (
+      <TabsShell initial={tabId} tabs={tabs}>
+        <Suspense fallback={<CollectionHostsSkeleton />}>
+          <CollectionHostsTab custodianPid={custodianPid} />
+        </Suspense>
+        <Suspense fallback={<CollectionsSkeleton />}>
+          <CollectionsTab custodianPid={custodianPid} />
+        </Suspense>
+      </TabsShell>
+    )
+  );
+};
+
+export default CustodianAdminPage;

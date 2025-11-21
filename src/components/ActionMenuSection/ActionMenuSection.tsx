@@ -21,6 +21,7 @@ interface ActionMenuSectionProps extends Omit<AccordionProps, "children"> {
   listeners?: SyntheticListenerMap;
   disabled?: boolean;
   fixedExpanded?: boolean;
+  additionalAction?: React.ReactNode;
   scrollable?: boolean;
   children?:
     | React.ReactNode
@@ -35,6 +36,7 @@ const ActionMenuSection = ({
   underline = false,
   defaultExpanded = false,
   fixedExpanded = false,
+  additionalAction,
   attributes,
   listeners,
   disabled,
@@ -111,17 +113,29 @@ const ActionMenuSection = ({
         aria-controls={`${baseId}-content`}
         id={`${baseId}-header`}
         sx={{
-          minHeight: 40,
+          minHeight: 30,
           bgcolor: "transparent",
           "& .MuiAccordionSummary-content": { my: 0 },
           m: 0,
           p: 0,
+          borderBottom: underline ? 1 : 0,
+          my: 1,
         }}
       >
         {summary ?? (
-          <Typography variant="overline" color="text.secondary">
-            {title}
-          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              alignContent: "space-between",
+              width: "100%",
+            }}
+          >
+            <Typography variant="overline" color="text.secondary">
+              {title}
+            </Typography>
+            {additionalAction}
+          </Box>
         )}
       </AccordionSummary>
 
@@ -132,8 +146,6 @@ const ActionMenuSection = ({
           display: "flex",
           flexDirection: "column",
           gap: 0.5,
-          borderTop: underline ? 1 : 0,
-          mx: underline ? 1 : 0,
           ...(scrollable && {
             flex: 1,
             minHeight: 0,

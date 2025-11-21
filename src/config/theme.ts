@@ -19,7 +19,7 @@ export const themeOptions: ThemeOptions = {
     },
     background: {
       default: "#F2F2F2",
-      paper: "#F7F7F7",
+      paper: "#FAFAFA",
     },
     link: {
       main: "#1976d2",
@@ -45,23 +45,24 @@ export const themeOptions: ThemeOptions = {
       color: "rgba(0, 0, 0, 0.4)",
     },
     h6: {
-      fontSize: "14px",
+      fontSize: "15px",
       fontWeight: 200,
       color: "rgba(0, 0, 0, 0.4)",
     },
     body1: {
-      fontSize: "18px",
+      fontSize: "15px",
       fontWeight: 400,
     },
     body2: {
-      fontSize: "14px",
+      fontSize: "13px",
       fontWeight: 400,
     },
     overline: {
-      fontSize: "18px",
+      fontSize: "15px",
       fontWeight: 600,
       letterSpacing: 0,
       textTransform: "none",
+      lineHeight: 1.1,
     },
     guidance1: {
       fontSize: "20px",
@@ -168,6 +169,17 @@ export const themeOptions: ThemeOptions = {
         },
       },
     },
+    MuiFilledInput: {
+      styleOverrides: {
+        root: {
+          borderRadius: 0,
+        },
+        input: {
+          paddingTop: 10,
+          paddingBottom: 10,
+        },
+      },
+    },
     MuiLink: {
       defaultProps: {
         underline: "always",
@@ -196,6 +208,17 @@ export const themeOptions: ThemeOptions = {
           guidance2: "h2",
         },
       },
+    },
+  },
+  transitions: {
+    duration: {
+      shortest: 150,
+      shorter: 200,
+      short: 250,
+      standard: 300,
+      complex: 375,
+      enteringScreen: 400,
+      leavingScreen: 400,
     },
   },
 };

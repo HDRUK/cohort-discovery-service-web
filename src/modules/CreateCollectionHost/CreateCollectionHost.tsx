@@ -1,68 +1,77 @@
-import {
-  IconButton,
-  TextField,
-  Box,
-  Stack,
-  Button,
-  MenuItem,
-  Chip,
-  Paper,
-} from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
+import { TextField, Box, Stack, Button, MenuItem, Chip } from "@mui/material";
+
 import { useForm, Controller } from "react-hook-form";
-import { useState } from "react";
 import { useDaphneStore } from "@/store/useDaphneStore";
-import { Custodian, CollectionHostFormValues } from "@/types/api";
+import { CollectionHostFormValues } from "@/types/api";
 import { QueryContext } from "@/types/context";
+import FormTextField from "@/components/FormTextField";
 
 interface CollectionHostFormProps {
   custodianId: number;
   onCancel?: () => void;
+  hideContext?: boolean;
 }
 
-const CollectionHostForm = ({
+const CreateCollectionHost = ({
   custodianId,
   onCancel,
+  hideContext = true,
 }: CollectionHostFormProps) => {
   const {
     custodianData: { createCollectionHost },
   } = useDaphneStore();
 
-  const [submitting, setSubmitting] = useState(false);
-
-  const { handleSubmit, control, reset } = useForm<CollectionHostFormValues>({
+  const {
+    handleSubmit,
+    control,
+    reset,
+    formState: { isValid, isSubmitting },
+  } = useForm<CollectionHostFormValues>({
     defaultValues: { name: "", context: QueryContext.BUNNY },
   });
 
   const onSubmit = async (data: CollectionHostFormValues) => {
-    setSubmitting(true);
     await createCollectionHost(custodianId, data);
     onCancel?.();
   };
 
   return (
-    <Paper elevation={3} sx={{ width: "50%", mx: "auto", bgcolor: "white" }}>
-      <Box
-        component="form"
-        onSubmit={handleSubmit(onSubmit)}
-        sx={{ mt: 2, p: 2 }}
-      >
-        <Stack spacing={2}>
-          <Controller
-            name="name"
-            control={control}
-            rules={{ required: "Name is required" }}
-            render={({ field, fieldState }) => (
-              <TextField
-                {...field}
-                label="Name"
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
-                fullWidth
-              />
-            )}
-          />
+    <Box
+      component="form"
+      onSubmit={handleSubmit(onSubmit)}
+      sx={{
+        mt: 2,
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        mb: 5,
+      }}
+    >
+      <Stack spacing={2} width={"70%"} height={"100%"}>
+        <Controller
+          name="name"
+          control={control}
+          rules={{ required: "Name is required" }}
+          render={({ field, fieldState }) => (
+            <FormTextField
+              {...field}
+              label="Name"
+              error={!!fieldState.error}
+              helperText={fieldState.error?.message}
+              fullWidth
+            />
+          )}
+        />
 
+        {hideContext ? (
+          <Controller
+            name="context"
+            control={control}
+            defaultValue={QueryContext.BUNNY}
+            render={({ field }) => <input type="hidden" {...field} />}
+          />
+        ) : (
           <Controller
             name="context"
             control={control}
@@ -93,42 +102,30 @@ const CollectionHostForm = ({
               </TextField>
             )}
           />
-          <Stack direction="row" spacing={1}>
-            <Button type="submit" variant="contained" disabled={submitting}>
-              {submitting ? "Creating..." : "Create"}
-            </Button>
-            <Button
-              type="button"
-              onClick={() => {
-                onCancel?.();
-                reset();
-              }}
-              disabled={submitting}
-            >
-              Cancel
-            </Button>
-          </Stack>
-        </Stack>
-      </Box>
-    </Paper>
-  );
-};
-
-const CreateCollectionHost = ({ custodian }: { custodian: Custodian }) => {
-  const [showForm, setShowForm] = useState(false);
-  return (
-    <>
-      <IconButton disabled={showForm} onClick={() => setShowForm(true)}>
-        <AddIcon />
-        {" collection host"}
-      </IconButton>
-      {showForm && (
-        <CollectionHostForm
-          custodianId={custodian.id}
-          onCancel={() => setShowForm(false)}
-        />
-      )}
-    </>
+        )}
+      </Stack>
+      <Stack direction="row" spacing={1} justifyContent="flex-end">
+        <Button
+          type="button"
+          onClick={() => {
+            onCancel?.();
+            reset();
+          }}
+          disabled={isSubmitting}
+          variant="contained"
+          sx={{ bgcolor: "background.default", color: "text.primary" }}
+        >
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          variant="outlined"
+          disabled={isSubmitting || !isValid}
+        >
+          {isSubmitting ? "Creating..." : "Create"}
+        </Button>
+      </Stack>
+    </Box>
   );
 };
 

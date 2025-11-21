@@ -16,6 +16,7 @@ export const API_ROUTES = {
   cancelTask: (taskId: string) => `${API_URL}/task/${taskId}/cancel`,
   queryResults: (queryPid: string) => `${API_URL}/query/${queryPid}/results`,
   collectionHosts: `${API_URL}/collection_hosts`,
+  collectionHost: (id: number) => `${API_URL}/collection_hosts/${id}`,
   custodianCollectionHosts: (pid: string) =>
     `${API_URL}/custodians/${pid}/collection_hosts`,
   custodianCollections: (pid: string) =>

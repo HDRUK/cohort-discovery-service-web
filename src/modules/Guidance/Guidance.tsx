@@ -29,7 +29,7 @@ import AddTimeFrameButton from "@/components/AddTimeFrameButton";
 import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
 import { CustomH1, CustomH2 } from "@/components/GuidanceHeaders";
 
-const baseComponents = {
+export const baseComponents = {
   h1: CustomH1,
   h2: CustomH2,
   ul: (props: BoxProps) => (

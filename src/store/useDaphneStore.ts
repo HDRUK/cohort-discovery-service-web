@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import submitQuery from "@/actions/submitQuery";
 import createCollectionHost from "@/actions/createCollectionHost";
+import updateCollectionHost from "@/actions/updateCollectionHost";
+import deleteCollectionHost from "@/actions/deleteCollectionHost";
 import { revalidateAction } from "@/actions/revalidate";
 import {
   ApiResponse,
@@ -14,6 +16,7 @@ import {
   Paginated,
   CreateConceptSetPost,
   ConceptSet,
+  UpdateCollectionHostPayload,
 } from "@/types/api";
 import createCollection from "@/actions/createCollection";
 import createConceptSet from "@/actions/createConceptSet";
@@ -142,6 +145,11 @@ export interface DaphneStoreState {
       custodianId: number,
       payload: { name: string; context: string }
     ) => Promise<void>;
+    updateCollectionHost: (
+      id: number,
+      payload: UpdateCollectionHostPayload
+    ) => Promise<void>;
+    deleteCollectionHost: (id: number) => Promise<void>;
     createCollection: (
       custodianPid: string,
       payload: CreateCollectionPost
@@ -509,6 +517,14 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     createCollectionHost: async (custodianId, payload) => {
       await createCollectionHost(custodianId, payload);
       // revalidate based on pid in the future... need to make a switch to pid
+      await revalidateAction(`collection-hosts`);
+    },
+    updateCollectionHost: async (id, payload) => {
+      await updateCollectionHost(id, payload);
+      await revalidateAction(`collection-hosts`);
+    },
+    deleteCollectionHost: async (id) => {
+      await deleteCollectionHost(id);
       await revalidateAction(`collection-hosts`);
     },
     createCollection: async (custodianPid, payload) => {

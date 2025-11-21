@@ -3,6 +3,9 @@ const dashboardPath = (subpath: string = "", queryParams?: string) =>
     queryParams ? `?${queryParams}` : ""
   }` as const;
 
+const teamPath = (pid: string, subpath: string) =>
+  `/custodian-admin/${pid}/${subpath}`;
+
 export const routes = {
   dashboard: dashboardPath(),
   dashboardNewQuery: (queryParams?: string) =>
@@ -15,5 +18,6 @@ export const routes = {
   profile: "/profile",
   definitions: "/my-definitions",
   admin: "/admin",
-  team: (pid: string) => `/custodian-admin/${pid}`,
+  teamHosts: (pid: string) => teamPath(pid, "hosts"),
+  teamCollections: (pid: string) => teamPath(pid, "collections"),
 };

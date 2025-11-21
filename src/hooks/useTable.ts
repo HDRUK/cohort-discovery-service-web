@@ -1,8 +1,11 @@
 import {
+  getMRT_RowSelectionHandler,
   useMaterialReactTable,
   type MRT_RowData,
   type MRT_TableOptions,
 } from "material-react-table";
+
+const SELECT_COL_SIZE = 10;
 
 export const useTable = <TData extends MRT_RowData>({
   columns,
@@ -32,13 +35,18 @@ export const useTable = <TData extends MRT_RowData>({
       columnVisibility: { description: false },
       density: "compact",
     },
-    muiTableHeadCellProps: {
+    muiTableHeadCellProps: ({ column }) => ({
       sx: {
         backgroundColor: "table.main",
         color: "primary.main.contrastText",
         fontWeight: "bold",
+        ...(column.id === "mrt-row-select" && {
+          width: SELECT_COL_SIZE,
+          minWidth: SELECT_COL_SIZE,
+          maxWidth: SELECT_COL_SIZE,
+        }),
       },
-    },
+    }),
     muiTopToolbarProps: {
       sx: {
         display: "none",
@@ -49,9 +57,21 @@ export const useTable = <TData extends MRT_RowData>({
         display: "none",
       },
     },
-    muiTableBodyRowProps: {
-      sx: { backgroundColor: "transparent !important" },
-    },
+    muiTableBodyRowProps: ({ row, staticRowIndex, table }) => ({
+      onClick: (event) =>
+        getMRT_RowSelectionHandler({ row, staticRowIndex, table })(event), //import this helper function from material-react-table
+      sx: { backgroundColor: "transparent !important", cursor: "pointer" },
+    }),
+    muiTableBodyCellProps: ({ column }) => ({
+      sx:
+        column.id === "mrt-row-select"
+          ? {
+              width: SELECT_COL_SIZE,
+              minWidth: SELECT_COL_SIZE,
+              maxWidth: SELECT_COL_SIZE,
+            }
+          : {},
+    }),
     muiTablePaperProps: {
       sx: {
         boxShadow: "none",

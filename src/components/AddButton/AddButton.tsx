@@ -1,12 +1,12 @@
-import { Button } from "@mui/material";
+import { Button, ButtonProps } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
-export interface AddButtonProps {
+export interface AddButtonProps extends ButtonProps {
   label: string;
   action: () => void;
 }
 
-const AddButton = ({ label, action }: AddButtonProps) => (
+const AddButton = ({ label, action, ...rest }: AddButtonProps) => (
   <Button
     variant="text"
     startIcon={<AddIcon />}
@@ -16,6 +16,7 @@ const AddButton = ({ label, action }: AddButtonProps) => (
       textAlign: "left",
       color: "text.primary",
     }}
+    {...rest}
   >
     {label}
   </Button>
