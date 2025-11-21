@@ -34,7 +34,7 @@ export default function LeftSidebar() {
 
   const custodianChildren: MenuItem[] = userCustodians.map((uc) => ({
     label: uc.name,
-    path: routes.team(uc.pid),
+    path: routes.teamCollections(uc.pid),
     key: `custodian-${uc.pid}`,
   }));
 

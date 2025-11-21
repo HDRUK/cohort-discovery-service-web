@@ -13,6 +13,7 @@ import type {
   Concept,
   Paginated,
   CreateConceptSetPost,
+  UpdateCollectionHostPayload,
 } from "@/types/api";
 import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
 import type {
@@ -128,6 +129,11 @@ function makeDefaultStore(): DaphneStoreState {
         _custodianId: number,
         _payload: { name: string; context: string }
       ) => RESOLVE<void>(undefined),
+      updateCollectionHost: (
+        _id: number,
+        _payload: UpdateCollectionHostPayload
+      ) => RESOLVE<void>(undefined),
+      deleteCollectionHost: (_id: number) => RESOLVE<void>(undefined),
 
       createCollection: (
         _custodianPid: string,

@@ -21,8 +21,6 @@ const CollectionAdmin = ({
   const custodian = custodians.find((c) => c.pid === pid);
   if (!custodian) return <Skeleton height={"100%"} />;
 
-  return <b> hi </b>;
-
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       <Box>

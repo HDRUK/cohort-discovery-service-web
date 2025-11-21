@@ -6,7 +6,7 @@ import ActionMenuSection from "@/components/ActionMenuSection";
 import CopyableVariable from "@/components/CopyableVariable";
 import { CollectionHost } from "@/types/api";
 import { Control, Controller } from "react-hook-form";
-import Guidance from "./Guidance";
+import GuidancePanel from "./GuidancePanel";
 
 type CollectionHostFormValues = { hostName: string };
 
@@ -30,7 +30,7 @@ const CollectionHostDetailPanel = ({
   handleUnlockClick,
 }: CollectionHostDetailPanelProps) => {
   if (!selectedCollectionHost) {
-    return <Guidance creating={expandedLeft} />;
+    return <GuidancePanel creating={expandedLeft} />;
   }
 
   return (
