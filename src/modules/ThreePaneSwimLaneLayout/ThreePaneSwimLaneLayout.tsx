@@ -2,6 +2,7 @@
 import { ReactNode } from "react";
 import SwimLane from "@/components/SwimLane";
 import SwimLaneContainer from "@/components/SwimLaneContainer";
+import { SwimLaneProps } from "@/components/SwimLane/SwimLane";
 
 export enum ExpandedSide {
   LEFT = "left",
@@ -14,8 +15,11 @@ type ThreePaneSwimLaneLayoutProps = {
   panelWidth?: number;
   totalWidth?: number;
   left: ReactNode;
+  leftProps?: SwimLaneProps;
   middle: ReactNode;
+  middleProps?: SwimLaneProps;
   right: ReactNode;
+  rightProps?: SwimLaneProps;
 };
 
 const getPanelSizes = (
@@ -57,6 +61,9 @@ const ThreePaneSwimLaneLayout = ({
   left,
   middle,
   right,
+  leftProps,
+  middleProps,
+  rightProps,
 }: ThreePaneSwimLaneLayoutProps) => {
   const {
     left: leftSize,
@@ -66,9 +73,15 @@ const ThreePaneSwimLaneLayout = ({
 
   return (
     <SwimLaneContainer>
-      <SwimLane size={leftSize}>{left}</SwimLane>
-      <SwimLane size={middleSize}>{middle}</SwimLane>
-      <SwimLane size={rightSize}>{right}</SwimLane>
+      <SwimLane size={leftSize} {...leftProps}>
+        {left}
+      </SwimLane>
+      <SwimLane size={middleSize} {...middleProps}>
+        {middle}
+      </SwimLane>
+      <SwimLane size={rightSize} {...rightProps}>
+        {right}
+      </SwimLane>
     </SwimLaneContainer>
   );
 };

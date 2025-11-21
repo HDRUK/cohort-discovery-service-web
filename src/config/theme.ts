@@ -210,6 +210,17 @@ export const themeOptions: ThemeOptions = {
       },
     },
   },
+  transitions: {
+    duration: {
+      shortest: 150,
+      shorter: 200,
+      short: 250,
+      standard: 300,
+      complex: 375,
+      enteringScreen: 400,
+      leavingScreen: 400,
+    },
+  },
 };
 
 let theme = createTheme(themeOptions);

@@ -143,6 +143,7 @@ const CollectionHostAdmin = ({
             hasSelection={selectedHostIds.length > 0}
           />
         }
+        middleProps={{ hideOnTransiton: false }}
         right={
           <CollectionHostDetailPanel
             selectedCollectionHost={selectedCollectionHost || null}
@@ -154,6 +155,7 @@ const CollectionHostAdmin = ({
             handleUnlockClick={handleUnlockClick}
           />
         }
+        rightProps={{ hideOnTransiton: false }}
       />
     </Box>
   );

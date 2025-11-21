@@ -1,27 +1,51 @@
 import Paper from "@mui/material/Paper";
 import { Box, Grid, GridProps } from "@mui/material";
+import { useState, TransitionEvent } from "react";
 
-interface SwimLaneProps extends GridProps {
+export interface SwimLaneProps extends GridProps {
   scrollable?: boolean;
-  expandedSize?: number;
+  hideOnTransiton?: boolean;
 }
 
 const SwimLane = ({
   children,
   scrollable = true,
+  hideOnTransiton = false,
   size,
   ...rest
 }: SwimLaneProps) => {
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  const handleTransitionStart = (e: TransitionEvent<HTMLDivElement>) => {
+    if (
+      e.nativeEvent.propertyName !== "width" &&
+      e.nativeEvent.propertyName !== "flex-basis"
+    )
+      return;
+    setIsTransitioning(true);
+  };
+
+  const handleTransitionEnd = (e: TransitionEvent<HTMLDivElement>) => {
+    if (
+      e.nativeEvent.propertyName !== "width" &&
+      e.nativeEvent.propertyName !== "flex-basis"
+    )
+      return;
+    setIsTransitioning(false);
+  };
+
   return (
     <Grid
+      onTransitionStart={hideOnTransiton ? handleTransitionStart : undefined}
+      onTransitionEnd={hideOnTransiton ? handleTransitionEnd : undefined}
       sx={(theme) => ({
         display: "flex",
         flexDirection: "column",
         minHeight: 0,
         height: "100%",
-        transition: theme.transitions.create("all", {
+        transition: theme.transitions.create(["width", "flex-basis"], {
           easing: theme.transitions.easing.sharp,
-          duration: theme.transitions.duration.leavingScreen,
+          duration: theme.transitions.duration.short,
         }),
       })}
       {...rest}
@@ -46,7 +70,7 @@ const SwimLane = ({
             overflowY: scrollable ? "auto" : undefined,
           }}
         >
-          {children}
+          {!isTransitioning && children}
         </Box>
       </Paper>
     </Grid>
