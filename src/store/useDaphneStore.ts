@@ -17,6 +17,7 @@ import {
   CreateConceptSetPost,
   ConceptSet,
   UpdateCollectionHostPayload,
+  CreateCollectionConfigPost,
 } from "@/types/api";
 import createCollection from "@/actions/createCollection";
 import createConceptSet from "@/actions/createConceptSet";
@@ -48,6 +49,7 @@ import { UniqueIdentifier } from "@dnd-kit/core";
 import { trueKeys } from "@/utils/numbers";
 import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
 import parseQuery from "@/actions/parseQuery";
+import createCollectionConfig from "@/actions/createCollectionConfig";
 
 export enum NodeKind {
   RULE = "RULE",
@@ -153,6 +155,9 @@ export interface DaphneStoreState {
     createCollection: (
       custodianPid: string,
       payload: CreateCollectionPost
+    ) => Promise<Collection>;
+    createCollectionConfig: (
+      payload: CreateCollectionConfigPost
     ) => Promise<void>;
   };
 }
@@ -532,8 +537,12 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       // - this is because the BE uses different endpoints:
       // - Route::post('/v1/collection_hosts'... (custodianId in the payload)
       // - Route::post('/v1/custodians/{custodianPid}/collections'...
-      await createCollection(custodianPid, payload);
+      const { data } = await createCollection(custodianPid, payload);
       await revalidateAction(`collections-${custodianPid}`);
+      return data;
+    },
+    createCollectionConfig: async (payload: CreateCollectionConfigPost) => {
+      await createCollectionConfig(payload);
     },
   },
 }));

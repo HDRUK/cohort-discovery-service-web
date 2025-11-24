@@ -1,158 +1,167 @@
-import {
-  IconButton,
-  TextField,
-  Box,
-  Stack,
-  Button,
-  MenuItem,
-  Chip,
-  Paper,
-} from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import { useForm, Controller, useWatch } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { Box, Stack, Button, MenuItem, Chip } from "@mui/material";
+
+import { useForm, Controller } from "react-hook-form";
 import { useDaphneStore } from "@/store/useDaphneStore";
-import { CollectionHost, CreateCollectionPost, Custodian } from "@/types/api";
+import { CreateCollectionFormValues } from "@/types/forms";
 import { QueryContext } from "@/types/context";
-import CollectionHostChip from "@/components/CollectionHostChip";
-import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
+import FormTextField from "@/components/FormTextField";
+import { capitaliseFirstLetter } from "@/utils/string";
+import {
+  CollectionHost,
+  Custodian,
+  TaskType,
+  FrequencyMode,
+} from "@/types/api";
+import ActionMenuSection from "@/components/ActionMenuSection";
+import { useNotify } from "@/providers/NotifyProvider";
+import CollectionConfig from "@/components/CollectionConfig";
 
 interface CollectionFormProps {
-  custodianPid: string;
+  custodian: Custodian;
   collectionHosts: CollectionHost[];
   onCancel?: () => void;
 }
 
-const schema = yup.object({
-  name: yup.string().required("Name is required"),
-  description: yup.string().required("Description is required"),
-  type: yup
-    .mixed<QueryContext>()
-    .oneOf(
-      Object.values(QueryContext) as QueryContext[],
-      "Query context type is required"
-    )
-    .required("Query context type is required"),
-  host_id: yup
-    .number()
-    .transform((value, original) => (original === "" ? undefined : value))
-    .typeError("A collection host is required")
-    .integer()
-    .positive()
-    .required("A collection host is required"),
-
-  url: yup
-    .string()
-    .nullable()
-    .transform((val) => (val === "" ? null : val))
-    .when("type", {
-      is: (val: QueryContext) => val === QueryContext.BEACON,
-      then: (s) =>
-        s
-          .required("URL is required for Beacon")
-          .matches(
-            /^(https?:\/\/)([\w.-]+)(:\d+)?(\/.*)?$/,
-            "Must be a valid URL"
-          ),
-      otherwise: (s) =>
-        s
-          .nullable()
-          .notRequired()
-          .transform(() => null),
-    }),
-});
-
-type CollectionFormValues = yup.Asserts<typeof schema>;
-
-const CollectionForm = ({
-  custodianPid,
+const CreateCollection = ({
+  custodian,
   collectionHosts,
   onCancel,
 }: CollectionFormProps) => {
   const {
-    custodianData: { createCollection },
+    custodianData: { createCollection, createCollectionConfig },
   } = useDaphneStore();
+  const notify = useNotify();
 
-  const [submitting, setSubmitting] = useState(false);
-
-  const { handleSubmit, control, reset, setValue } = useForm({
-    resolver: yupResolver(schema),
+  const {
+    setValue,
+    handleSubmit,
+    control,
+    reset,
+    formState: { isValid, isSubmitting },
+  } = useForm<CreateCollectionFormValues>({
     defaultValues: {
-      name: "",
-      description: "",
-      type: QueryContext.BUNNY,
-      host_id: "" as unknown as number,
-      url: "",
+      collection: {
+        name: "",
+        description: "",
+        type: QueryContext.BUNNY,
+        host_id: 0,
+      },
+      config: {
+        collection_id: 0,
+        run_time_hour: 0,
+        run_time_minute: 0,
+        frequency_mode: FrequencyMode.WEEKLY,
+        run_time_frequency: 0,
+        enabled: 1,
+        type: TaskType.B,
+      },
     },
   });
 
-  const type = useWatch({ control, name: "type" });
+  const onSubmit = async (data: CreateCollectionFormValues) => {
+    const createdCollection = await createCollection(
+      custodian.pid,
+      data.collection
+    );
+    createCollectionConfig({
+      ...data.config,
+      collection_id: createdCollection.id,
+    });
 
-  useEffect(() => {
-    if (type !== QueryContext.BEACON) {
-      setValue("url", "", { shouldValidate: true, shouldDirty: true });
-    }
-  }, [type, setValue]);
+    notify.success(`Created collection ${createCollection.name} `);
 
-  const onSubmit = async (data: CollectionFormValues) => {
-    setSubmitting(true);
-    await createCollection(custodianPid, data as CreateCollectionPost);
     onCancel?.();
   };
 
   return (
-    <Paper elevation={3} sx={{ width: "50%", mx: "auto", bgcolor: "white" }}>
-      <Box
-        component="form"
-        onSubmit={handleSubmit(onSubmit)}
-        sx={{ mt: 2, p: 2 }}
+    <Box
+      component="form"
+      onSubmit={handleSubmit(onSubmit)}
+      sx={{
+        mt: 2,
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        mb: 5,
+      }}
+    >
+      <ActionMenuSection
+        title={"New Collection"}
+        fixedExpanded
+        defaultExpanded
+        underline
       >
-        <Stack spacing={2}>
+        <Stack spacing={2} width={"70%"} height={"100%"}>
           <Controller
-            name="name"
+            name="collection.name"
             control={control}
+            rules={{ required: "Name is required" }}
             render={({ field, fieldState }) => (
-              <TextField
+              <FormTextField
                 {...field}
                 label="Name"
                 error={!!fieldState.error}
                 helperText={fieldState.error?.message}
                 fullWidth
+                required
               />
             )}
           />
 
           <Controller
-            name="description"
+            name="collection.description"
             control={control}
+            rules={{ required: "A description is required" }}
             render={({ field, fieldState }) => (
-              <TextField
+              <FormTextField
                 {...field}
                 label="Description"
                 error={!!fieldState.error}
                 helperText={fieldState.error?.message}
                 fullWidth
+                required
               />
             )}
           />
 
           <Controller
-            name="type"
+            name="collection.url"
             control={control}
             render={({ field, fieldState }) => (
-              <TextField
+              <FormTextField
                 {...field}
+                label="Link to Associated Datasets"
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                fullWidth
+              />
+            )}
+          />
+
+          <Controller
+            name="collection.type"
+            control={control}
+            rules={{ required: "Query context type is required" }}
+            render={({ field, fieldState }) => (
+              <FormTextField
+                {...field}
+                disabled
                 select
                 label="Query Context Type"
                 error={!!fieldState.error}
                 helperText={fieldState.error?.message}
                 fullWidth
+                required
                 slotProps={{
                   htmlInput: {
                     renderValue: (selected: string) => (
                       <Stack direction="row" spacing={1}>
-                        <Chip label={selected} color="secondary" size="small" />
+                        <Chip
+                          label={capitaliseFirstLetter(selected)}
+                          color="primary"
+                          size="small"
+                        />
                       </Stack>
                     ),
                   },
@@ -163,106 +172,93 @@ const CollectionForm = ({
                     <Chip label={opt} size="small" color="secondary" />
                   </MenuItem>
                 ))}
-              </TextField>
+              </FormTextField>
             )}
           />
 
-          {type === QueryContext.BEACON && (
-            <Controller
-              name="url"
-              control={control}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label="URL"
-                  placeholder="https://example.com/endpoint"
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                  fullWidth
-                />
-              )}
-            />
-          )}
-
           <Controller
-            name="host_id"
+            name="collection.host_id"
             control={control}
+            rules={{
+              required: "A collection host is required",
+              validate: (value) =>
+                Number(value) > 0 || "Please select a valid collection host",
+            }}
             render={({ field, fieldState }) => (
-              <TextField
+              <FormTextField
                 {...field}
                 select
                 label="Collection Host"
                 error={!!fieldState.error}
                 helperText={fieldState.error?.message}
                 fullWidth
+                required
                 slotProps={{
                   htmlInput: {
-                    renderValue: (selected: number) =>
-                      selected > 0 && (
+                    renderValue: (selected: number) => {
+                      const selectedHost = collectionHosts.find(
+                        (ch) => ch.id === selected
+                      );
+                      return (
                         <Stack direction="row" spacing={1}>
-                          <CollectionHostChip
-                            ch={collectionHosts.find(
-                              (ch) => ch.id === selected
-                            )}
-                            disabled={true}
-                          />
+                          {selectedHost && (
+                            <Chip
+                              label={capitaliseFirstLetter(selectedHost.name)}
+                              color="secondary"
+                              size="small"
+                            />
+                          )}
                         </Stack>
-                      ),
+                      );
+                    },
                   },
                 }}
               >
+                <MenuItem value={0} disabled>
+                  Select a collection host
+                </MenuItem>
                 {collectionHosts.map((ch) => (
                   <MenuItem key={ch.id} value={ch.id}>
-                    <CollectionHostChip ch={ch} disabled />
+                    <Chip label={ch.name} size="small" color="secondary" />
                   </MenuItem>
                 ))}
-              </TextField>
+              </FormTextField>
             )}
           />
-
-          <Stack direction="row" spacing={1}>
-            <Button type="submit" variant="contained" disabled={submitting}>
-              {submitting ? "Creating..." : "Create"}
-            </Button>
-            <Button
-              type="button"
-              onClick={() => {
-                onCancel?.();
-                reset();
-              }}
-              disabled={submitting}
-            >
-              Cancel
-            </Button>
-          </Stack>
         </Stack>
-      </Box>
-    </Paper>
-  );
-};
+      </ActionMenuSection>
 
-const CreateCollection = ({
-  custodian,
-  collectionHosts,
-}: {
-  custodian: Custodian;
-  collectionHosts: CollectionHost[];
-}) => {
-  const [showForm, setShowForm] = useState(false);
-  return (
-    <>
-      <IconButton disabled={showForm} onClick={() => setShowForm(true)}>
-        <AddIcon />
-        {" collection"}
-      </IconButton>
-      {showForm && (
-        <CollectionForm
-          custodianPid={custodian.pid}
-          collectionHosts={collectionHosts}
-          onCancel={() => setShowForm(false)}
-        />
-      )}
-    </>
+      <ActionMenuSection
+        title={"Collection Configuration"}
+        fixedExpanded
+        defaultExpanded
+        underline
+      >
+        <CollectionConfig control={control} setValue={setValue} />
+      </ActionMenuSection>
+
+      <Stack direction="row" spacing={1} justifyContent="flex-end">
+        <Button
+          type="button"
+          onClick={() => {
+            onCancel?.();
+            reset();
+          }}
+          disabled={isSubmitting}
+          variant="contained"
+          sx={{ bgcolor: "background.default", color: "text.primary" }}
+        >
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          variant="outlined"
+          disabled={isSubmitting || !isValid}
+        >
+          {isSubmitting ? "Creating..." : "Create"}
+        </Button>
+      </Stack>
+    </Box>
   );
 };
 

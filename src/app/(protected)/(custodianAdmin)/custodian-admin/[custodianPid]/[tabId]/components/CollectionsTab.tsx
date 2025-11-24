@@ -1,4 +1,4 @@
-import CollectionAdmin from "./CollectionAdmin";
+import CollectionsAdmin from "./CollectionsAdmin";
 import getCollectionHosts from "@/actions/getCollectionHosts";
 import getCustodianCollections from "@/actions/getCustodianCollections";
 import { Box, Skeleton } from "@mui/material";
@@ -18,7 +18,7 @@ const CollectionsTab = async ({ custodianPid }: { custodianPid: string }) => {
     ]);
 
   return (
-    <CollectionAdmin
+    <CollectionsAdmin
       pid={custodianPid}
       collectionHosts={collectionHosts}
       collections={custodianCollections}

@@ -104,8 +104,11 @@ export const themeOptions: ThemeOptions = {
     },
     MuiFormLabel: {
       styleOverrides: {
+        asterisk: ({ theme }) => ({
+          color: theme.palette.error.main,
+        }),
         root: {
-          fontSize: 20,
+          fontSize: 15,
           fontWeight: 500,
         },
       },

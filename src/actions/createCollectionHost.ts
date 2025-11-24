@@ -5,9 +5,9 @@ import { API_ROUTES } from "../lib/apiRoutes";
 import {
   CollectionHost,
   CreateCollectionHostPost,
-  CollectionHostFormValues,
   ApiResponse,
 } from "../types/api";
+import { CollectionHostFormValues } from "@/types/forms";
 
 const createCollectionHost = async (
   custodian_id: number,

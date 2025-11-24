@@ -1,3 +1,4 @@
+import { QueryContext } from "./context";
 import { RuleGroupType } from "./rules";
 
 export interface ApiResponse<T> {
@@ -142,6 +143,43 @@ export enum Roles {
   ADMIN = "admin",
 }
 
+export enum FrequencyMode {
+  WEEKLY = "1",
+  MONTHLY = "2",
+  QUARTERLY = "3",
+  BIANNUALLY = "4",
+}
+
+const WEEK_DAYS = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+
+const MONTH_WEEKS = [
+  "First Week",
+  "Second Week",
+  "Third Week",
+  "Fourth Week",
+  "Last Week",
+];
+
+export const frequencyMap: Record<FrequencyMode, string[]> = {
+  [FrequencyMode.WEEKLY]: WEEK_DAYS,
+  [FrequencyMode.MONTHLY]: MONTH_WEEKS,
+  [FrequencyMode.QUARTERLY]: ["Q1", "Q2", "Q3", "Q4"],
+  [FrequencyMode.BIANNUALLY]: ["H1", "H2"],
+};
+
+export enum TaskType {
+  A = "a",
+  B = "b",
+}
+
 export interface User extends WithTimestamps {
   id: number;
   email: string;
@@ -194,11 +232,6 @@ export interface UpdateCollectionHostPayload {
   query_context_type?: string;
 }
 
-export interface CollectionHostFormValues {
-  name: string;
-  context: string;
-}
-
 export interface CollectionHost {
   id: number;
   name: string;
@@ -209,7 +242,26 @@ export interface CollectionHost {
 
 export interface CreateCollectionPost {
   name: string;
+  description: string;
+  type: QueryContext;
+  host_id: number;
+  url: string | null;
+}
+
+export interface CreateCollectionConfigPost {
+  collection_id: number;
+  run_time_hour: number;
+  run_time_minute: number;
+  frequency_mode: FrequencyMode;
+  run_time_frequency: number;
+  enabled: number;
   type: string;
+}
+
+export interface CreateCollectionPost {
+  name: string;
+  description: string;
+  type: QueryContext;
   host_id: number;
   url: string | null;
 }
