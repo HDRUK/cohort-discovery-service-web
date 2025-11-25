@@ -1,28 +1,19 @@
 import "@testing-library/jest-dom";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import CollectionsTable from "./CollectionsTable";
-import getCollections from "@/actions/getCollections";
-jest.mock("@/actions/getCollections");
+import getCustodianCollections from "@/actions/getCustodianCollections";
+jest.mock("@/actions/getCustodianCollections");
 
 describe("CollectionsTable", () => {
-  it('displays "No records to display" when collections is empty', () => {
-    render(<CollectionsTable collections={[]} />);
+  it("renders the correct column headers", async () => {
+    const collections = await getCustodianCollections("abc");
 
-    const noRecordsText = screen.getByText(/no records to display/i);
-    expect(noRecordsText).toBeInTheDocument();
-  });
+    render(
+      <CollectionsTable custodianPid={"abc"} collections={collections.data} />
+    );
 
-  it("renders the correct column headers", () => {
-    render(<CollectionsTable collections={[]} />);
-
-    const columns = [
-      "Collection ID",
-      "Name",
-      "Type",
-      "Size",
-      "Males",
-      "Females",
-    ];
+    const columns = ["Name", "Last Active", "Status"];
     for (const column of columns) {
       expect(
         screen.getByRole("columnheader", { name: column })
@@ -31,16 +22,45 @@ describe("CollectionsTable", () => {
   });
 
   it("displays data when collections exist", async () => {
-    const collections = await getCollections();
+    const collections = await getCustodianCollections("abc");
 
-    render(<CollectionsTable collections={collections.data} />);
+    render(
+      <CollectionsTable custodianPid={"abc"} collections={collections.data} />
+    );
 
     expect(screen.getByText("Test Dataset #1")).toBeInTheDocument();
     expect(screen.getByText("Test Dataset #2")).toBeInTheDocument();
+  });
 
-    expect(screen.getAllByText("bunny")).toHaveLength(2);
+  it("it can change selected rows", async () => {
+    const collections = await getCustodianCollections("abc");
 
-    expect(screen.getByText("1,213")).toBeInTheDocument();
-    expect(screen.getByText("603")).toBeInTheDocument();
+    const setRowSelection = jest.fn();
+    const rowSelection = {};
+
+    render(
+      <CollectionsTable
+        custodianPid={"abc"}
+        collections={collections.data}
+        rowSelection={rowSelection}
+        setRowSelection={setRowSelection}
+      />
+    );
+
+    const row = screen.getByRole("row", { name: /Test Dataset #1/i });
+
+    const checkbox = within(row).getByRole("checkbox", {
+      name: /toggle select row/i,
+    });
+
+    await userEvent.click(checkbox);
+
+    const id = collections.data.data[0].id;
+    expect(setRowSelection).toHaveBeenCalledTimes(1);
+    const updater = (setRowSelection as jest.Mock).mock.calls[0][0];
+    expect(updater).toEqual(expect.any(Function));
+
+    const nextState = updater(rowSelection);
+    expect(nextState).toEqual({ [id]: true });
   });
 });

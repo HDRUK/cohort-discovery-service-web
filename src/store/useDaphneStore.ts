@@ -20,6 +20,7 @@ import {
   CreateCollectionConfigPost,
 } from "@/types/api";
 import createCollection from "@/actions/createCollection";
+import deleteCollection from "@/actions/deleteCollection";
 import createConceptSet from "@/actions/createConceptSet";
 import getConcepts from "@/actions/getConcepts";
 import attachConcepts from "@/actions/attachConcepts";
@@ -156,6 +157,10 @@ export interface DaphneStoreState {
       custodianPid: string,
       payload: CreateCollectionPost
     ) => Promise<Collection>;
+    deleteCollection: (
+      id: number | string,
+      custodianPid: string
+    ) => Promise<void>;
     createCollectionConfig: (
       payload: CreateCollectionConfigPost
     ) => Promise<void>;
@@ -540,6 +545,13 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       const { data } = await createCollection(custodianPid, payload);
       await revalidateAction(`collections-${custodianPid}`);
       return data;
+    },
+    deleteCollection: async (id, custodianPid) => {
+      await deleteCollection(id);
+      //this needs to be re-done, mixing of pid and id makes it diffcult
+      // to revalidate cache
+      // - created a ticket for this
+      await revalidateAction(`collections-${custodianPid}`);
     },
     createCollectionConfig: async (payload: CreateCollectionConfigPost) => {
       await createCollectionConfig(payload);

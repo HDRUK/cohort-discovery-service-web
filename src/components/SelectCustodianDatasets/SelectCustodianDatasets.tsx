@@ -37,7 +37,6 @@ const SelectCustodianDatasets = ({
   };
 
   const handleSelectAll = () => {
-    console.log("handle Select All");
     if (nSelected > 0) {
       const ids = custodianCollections.items.map((i) => i.pid);
       const next = selectedDatasets.filter((pid) => !ids.includes(pid));

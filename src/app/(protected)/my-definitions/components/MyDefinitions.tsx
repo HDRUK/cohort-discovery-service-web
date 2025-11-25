@@ -78,7 +78,7 @@ const MyDefinitions = ({ conceptSets }: { conceptSets: ConceptSet[] }) => {
 
   const table = useTable({
     columns,
-    data: conceptSets,
+    data: conceptSets || [],
     enableExpanding: true,
     initialState: {
       expanded: true,

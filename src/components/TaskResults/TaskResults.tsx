@@ -131,7 +131,7 @@ const TaskResults = ({ tasks }: TaskResultsProps) => {
 
   const table = useTable({
     columns,
-    data: tasks,
+    data: tasks || [],
   });
 
   return <Table table={table} />;

@@ -6,7 +6,7 @@ import ActionMenuSection from "@/components/ActionMenuSection";
 import CopyableVariable from "@/components/CopyableVariable";
 import { CollectionHost } from "@/types/api";
 import { Control, Controller } from "react-hook-form";
-import GuidancePanel from "./GuidancePanel";
+import GuidancePanel from "./CollectionHostGuidancePanel";
 
 type CollectionHostFormValues = { hostName: string };
 
@@ -35,7 +35,15 @@ const CollectionHostDetailPanel = ({
 
   return (
     <>
-      <Typography component="span" variant="overline">
+      <Typography
+        component="div"
+        variant="overline"
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          width: "100%",
+        }}
+      >
         Host
         <IconButton
           size="small"

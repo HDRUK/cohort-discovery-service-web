@@ -8,9 +8,9 @@ import { cookies } from "next/headers";
 import getQuery from "@/actions/getQuery";
 import { capVarChar } from "@/utils/string";
 import { Query } from "@/types/api";
+import { SearchParams } from "@/types/api";
 
 type Params = Promise<{ tabId: string }>;
-type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
 const DashboardTabPage = async (props: {
   params: Params;

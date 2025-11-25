@@ -6,26 +6,44 @@ import {
   CollectionWithHosts,
   Paginated,
 } from "@/types/api";
-import { type MRT_ColumnDef } from "material-react-table";
-import { useMemo } from "react";
-import { Chip } from "@mui/material";
+import {
+  MRT_RowSelectionState,
+  type MRT_ColumnDef,
+} from "material-react-table";
+import { Dispatch, SetStateAction, useMemo } from "react";
+import { Box, Chip } from "@mui/material";
 import { getCollectionStatus } from "@/utils/colours";
 import dayjs from "dayjs";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import Table from "../Table";
+import { useDaphneStore } from "@/store/useDaphneStore";
+
+export interface CollectionsTableProps {
+  custodianPid: string;
+  collections: Paginated<CollectionWithHosts[]>;
+  rowSelection?: MRT_RowSelectionState;
+  setRowSelection?: Dispatch<SetStateAction<MRT_RowSelectionState>>;
+}
 
 const CollectionsTable = ({
+  custodianPid,
   collections,
-}: {
-  collections: Paginated<CollectionWithHosts[]>;
-}) => {
+  rowSelection,
+  setRowSelection,
+}: CollectionsTableProps) => {
+  const {
+    custodianData: { deleteCollection },
+  } = useDaphneStore();
+
   const columns = useMemo<MRT_ColumnDef<Collection>[]>(
     () => [
       {
         id: "name",
         header: "Name",
         accessorFn: (row) => row.name,
-        size: 50,
+        size: 200,
+        minSize: 200,
+        maxSize: 200,
       },
       {
         id: "last_active",
@@ -33,6 +51,8 @@ const CollectionsTable = ({
         accessorFn: (row) =>
           row.last_active ? dayjs(row.last_active).format("DD/MM/YYYY") : "—",
         size: 50,
+        minSize: 50,
+        maxSize: 50,
       },
       {
         id: "status",
@@ -44,6 +64,8 @@ const CollectionsTable = ({
           return <Chip label={label} color={color} />;
         },
         size: 20,
+        minSize: 20,
+        maxSize: 20,
       },
     ],
     []
@@ -55,9 +77,36 @@ const CollectionsTable = ({
     rowCount: collections.total,
     perPageDefault: collections.per_page,
     enableSorting: false,
+    ...(setRowSelection && { onRowSelectionChange: setRowSelection }),
+    ...(rowSelection && { state: { rowSelection } }),
+    getRowId: (row) => String(row.id),
   });
 
-  return <Table table={table} />;
+  const handleDeleteCollections = async (ids: string[]) => {
+    await Promise.all(
+      ids.map((id) => {
+        deleteCollection(id, custodianPid);
+      })
+    );
+  };
+
+  return (
+    <Box
+      sx={{
+        px: 1,
+        display: "flex",
+        flexDirection: "column",
+        flex: 1,
+        minHeight: 0,
+      }}
+    >
+      <Table
+        key="custodian-collection-table"
+        table={table}
+        handleDeleteRows={handleDeleteCollections}
+      />
+    </Box>
+  );
 };
 
 export default CollectionsTable;

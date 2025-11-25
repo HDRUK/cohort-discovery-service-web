@@ -1,5 +1,10 @@
 import { QueryContext } from "@/types/context";
-import { ApiResponse, Collection, Distribution } from "@/types/api";
+import {
+  ApiResponse,
+  Collection,
+  CollectionStatus,
+  Distribution,
+} from "@/types/api";
 import { v4 as uuidv4 } from "uuid";
 import getCustodian from "./getCustodian";
 
@@ -47,7 +52,10 @@ export const getMockCollection = (
   id: 1,
   pid: uuidv4(),
   name: "Test Dataset #1",
-  url: null,
+  description: "test datast #1 description",
+  url: "https://www.test.com",
+  status: CollectionStatus.ACTIVE,
+  last_active: null,
   type: QueryContext.BUNNY,
   created_at: "2025-01-01 00:00:00",
   updated_at: "2025-01-01 00:00:00",

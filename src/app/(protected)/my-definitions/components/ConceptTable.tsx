@@ -42,7 +42,7 @@ const ConceptTable = ({ concepts, onDelete }: ConceptTableProps) => {
 
   const table = useTable({
     columns,
-    data: concepts,
+    data: concepts || [],
   });
 
   return <Table table={table} />;

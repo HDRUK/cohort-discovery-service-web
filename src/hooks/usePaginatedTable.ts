@@ -27,6 +27,7 @@ export function usePaginatedTable<TData extends { pid: string }>({
   perPageDefault,
   expandFirstRow = false,
   getRowId = (row) => row.pid,
+  state,
   ...rest
 }: UsePaginatedTableOptions<TData>) {
   const router = useRouter();
@@ -94,9 +95,10 @@ export function usePaginatedTable<TData extends { pid: string }>({
     state: {
       pagination,
       sorting,
+      ...state,
     },
     muiPaginationProps: {
-      rowsPerPageOptions: [5, 10, 20, perPageDefault],
+      rowsPerPageOptions: Array.from(new Set([5, 10, 20, perPageDefault])),
     },
     muiBottomToolbarProps: {
       sx: {

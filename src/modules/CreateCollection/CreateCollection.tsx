@@ -16,7 +16,7 @@ import ActionMenuSection from "@/components/ActionMenuSection";
 import { useNotify } from "@/providers/NotifyProvider";
 import CollectionConfig from "@/components/CollectionConfig";
 
-interface CollectionFormProps {
+interface CreateCollectionProps {
   custodian: Custodian;
   collectionHosts: CollectionHost[];
   onCancel?: () => void;
@@ -26,7 +26,7 @@ const CreateCollection = ({
   custodian,
   collectionHosts,
   onCancel,
-}: CollectionFormProps) => {
+}: CreateCollectionProps) => {
   const {
     custodianData: { createCollection, createCollectionConfig },
   } = useDaphneStore();
@@ -43,6 +43,7 @@ const CreateCollection = ({
       collection: {
         name: "",
         description: "",
+        url: "",
         type: QueryContext.BUNNY,
         host_id: 0,
       },
@@ -126,6 +127,13 @@ const CreateCollection = ({
           <Controller
             name="collection.url"
             control={control}
+            rules={{
+              pattern: {
+                value:
+                  /^(http?:\/\/)([\w-]+(\.[\w-]+)+)(:[0-9]+)?(\/[^\s]*)?$/i,
+                message: "Enter a valid URL (including http(s)://)",
+              },
+            }}
             render={({ field, fieldState }) => (
               <FormTextField
                 {...field}

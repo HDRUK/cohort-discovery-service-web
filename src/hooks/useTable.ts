@@ -32,7 +32,6 @@ export const useTable = <TData extends MRT_RowData>({
       },
     },
     initialState: {
-      columnVisibility: { description: false },
       density: "compact",
     },
     muiTableHeadCellProps: ({ column }) => ({

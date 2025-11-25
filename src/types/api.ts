@@ -1,6 +1,16 @@
 import { QueryContext } from "./context";
 import { RuleGroupType } from "./rules";
 
+export type SearchParams = Promise<{
+  [key: string]: string | string[] | undefined;
+}>;
+
+export interface ApiSearchParams {
+  per_page?: number;
+  page?: number;
+  sort?: string;
+}
+
 export interface ApiResponse<T> {
   message: string;
   data: T;
@@ -71,7 +81,7 @@ export interface Collection extends WithTimestamps {
   description: string;
   pid: string;
   url: string | null;
-  type: string;
+  type: QueryContext;
   status: CollectionStatus;
   last_active: string | null;
   size?: Distribution;
@@ -249,12 +259,14 @@ export interface CollectionHost {
   client_secret: string;
 }
 
+export type UrlString = `http${"s" | ""}://${string}`;
+
 export interface CreateCollectionPost {
   name: string;
   description: string;
   type: QueryContext;
   host_id: number;
-  url: string | null;
+  url: UrlString | "" | null;
 }
 
 export interface CreateCollectionConfigPost {
@@ -265,14 +277,6 @@ export interface CreateCollectionConfigPost {
   run_time_frequency: number;
   enabled: number;
   type: string;
-}
-
-export interface CreateCollectionPost {
-  name: string;
-  description: string;
-  type: QueryContext;
-  host_id: number;
-  url: string | null;
 }
 
 export interface Concept {
