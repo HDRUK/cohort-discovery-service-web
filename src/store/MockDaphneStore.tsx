@@ -29,6 +29,7 @@ import { queryToText } from "@/utils/queryBuilder";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { NotifyProvider } from "@/providers/NotifyProvider";
+import { getMockCollection } from "@/actions/__mocks__/getCollections";
 
 type SliceOverrides = {
   [K in keyof DaphneStoreState]?: Partial<DaphneStoreState[K]>;
@@ -139,7 +140,10 @@ function makeDefaultStore(): DaphneStoreState {
       createCollection: (
         _custodianPid: string,
         _payload: CreateCollectionPost
-      ) => RESOLVE<void>(undefined),
+      ) => RESOLVE<Collection>(getMockCollection()),
+      deleteCollection: (_id: number | string, _custodianPid: string) =>
+        RESOLVE<void>(undefined),
+      createCollectionConfig: () => RESOLVE<void>(undefined),
     },
   };
 }

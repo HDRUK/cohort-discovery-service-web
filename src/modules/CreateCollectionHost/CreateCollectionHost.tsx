@@ -2,7 +2,7 @@ import { TextField, Box, Stack, Button, MenuItem, Chip } from "@mui/material";
 
 import { useForm, Controller } from "react-hook-form";
 import { useDaphneStore } from "@/store/useDaphneStore";
-import { CollectionHostFormValues } from "@/types/api";
+import { CollectionHostFormValues } from "@/types/forms";
 import { QueryContext } from "@/types/context";
 import FormTextField from "@/components/FormTextField";
 
