@@ -28,6 +28,7 @@ import { validateRuleTree } from "@/utils/rules";
 import { queryToText } from "@/utils/queryBuilder";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { NotifyProvider } from "@/providers/NotifyProvider";
 
 type SliceOverrides = {
   [K in keyof DaphneStoreState]?: Partial<DaphneStoreState[K]>;
@@ -171,7 +172,7 @@ const MockDaphneStore = ({
   useDaphneStore.setState(mock, true);
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      {children}
+      <NotifyProvider>{children}</NotifyProvider>
     </LocalizationProvider>
   );
 };

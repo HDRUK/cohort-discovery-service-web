@@ -1,7 +1,6 @@
 import "@testing-library/jest-dom";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import getCustodianCollections from "@/actions/getCustodianCollections";
 import { useState } from "react";
 import { useTable } from "@/hooks/useTable";
 import Table from "./Table";

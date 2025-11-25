@@ -1,21 +1,21 @@
-// CreateCollection.test.tsx
 import "@testing-library/jest-dom";
-import { render, screen, waitFor } from "@testing-library/react";
+import {
+  render,
+  screen,
+  waitFor,
+  fireEvent,
+  within,
+  act,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import CreateCollection from "./CreateCollection";
 import { Custodian, CollectionHost } from "@/types/api";
 import getCustodian from "@/actions/__mocks__/getCustodian";
 import { QueryContext } from "@/types/context";
+import MockDaphneStore from "@/store/MockDaphneStore";
 
 const createCollection = jest.fn();
-
-jest.mock("@/store/useDaphneStore", () => ({
-  useDaphneStore: () => ({
-    custodianData: {
-      createCollection,
-    },
-  }),
-}));
+const createCollectionConfig = jest.fn();
 
 let custodian: Custodian;
 let collectionHosts: CollectionHost[];
@@ -24,11 +24,20 @@ const renderCreateCollection = (
   overrides: Partial<Parameters<typeof CreateCollection>[0]> = {}
 ) => {
   return render(
-    <CreateCollection
-      custodian={custodian}
-      collectionHosts={collectionHosts}
-      {...overrides}
-    />
+    <MockDaphneStore
+      overrides={{
+        custodianData: {
+          createCollection,
+          createCollectionConfig,
+        },
+      }}
+    >
+      <CreateCollection
+        custodian={custodian}
+        collectionHosts={collectionHosts}
+        {...overrides}
+      />
+    </MockDaphneStore>
   );
 };
 
@@ -42,139 +51,137 @@ describe("CreateCollection", () => {
     ];
   });
 
-  it("renders the add button and shows the form when clicked", async () => {
+  it("renders the main fields and sections", () => {
     renderCreateCollection();
 
-    const addBtn = screen.getByRole("button", { name: /collection/i });
-    expect(addBtn).toBeEnabled();
+    expect(screen.getByText(/new collection/i)).toBeInTheDocument();
+    expect(screen.getByText(/collection configuration/i)).toBeInTheDocument();
 
-    await userEvent.click(addBtn);
-
-    expect(addBtn).toBeDisabled();
-
-    expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/description/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/query context type/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/collection host/i)).toBeInTheDocument();
-
+    expect(screen.getByText(/name/i)).toBeInTheDocument();
+    expect(screen.getByText(/description/i)).toBeInTheDocument();
     expect(
-      screen.getAllByText(new RegExp(QueryContext.BUNNY, "i"))[0]
+      screen.getByText(/link to associated datasets/i)
     ).toBeInTheDocument();
+    expect(screen.getByText(/query context type/i)).toBeInTheDocument();
+    expect(screen.getByText(/collection host/i)).toBeInTheDocument();
+
+    expect(screen.getByRole("button", { name: /create/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /cancel/i })).toBeInTheDocument();
   });
 
-  it("shows validation errors when required fields are missing", async () => {
-    render(
-      <CreateCollection
-        custodian={custodian}
-        collectionHosts={collectionHosts}
-      />
-    );
-
-    await userEvent.click(screen.getByRole("button", { name: /collection/i }));
-
-    await userEvent.click(screen.getByRole("button", { name: /^create$/i }));
-
-    expect(await screen.findByText(/name is required/i)).toBeInTheDocument();
-    expect(
-      await screen.findByText(/description is required/i)
-    ).toBeInTheDocument();
-    expect(
-      await screen.findByText(/a collection host is required/i)
-    ).toBeInTheDocument();
-
-    expect(createCollection).not.toHaveBeenCalled();
-  });
-
-  it("lets the user change the Query Context Type", async () => {
+  it("does not submit when the form is invalid", async () => {
     renderCreateCollection();
 
-    await userEvent.click(screen.getByRole("button", { name: /collection/i }));
+    const createButton = screen.getByRole("button", { name: /create/i });
+    expect(createButton).toBeDisabled();
 
-    const typeField = screen.getByLabelText(/query context type/i);
-    await userEvent.click(typeField);
-
-    const beaconOpt = await screen.findByRole("option", { name: /beacon/i });
-    await userEvent.click(beaconOpt);
-
-    expect(screen.getByText(/beacon/i)).toBeInTheDocument();
-  });
-
-  it("allows selecting a Collection Host", async () => {
-    render(
-      <CreateCollection
-        custodian={custodian}
-        collectionHosts={collectionHosts}
-      />
-    );
-
-    await userEvent.click(screen.getByRole("button", { name: /collection/i }));
-
-    const hostField = screen.getByLabelText(/collection host/i);
-    await userEvent.click(hostField);
-
-    const alphaOption = await screen.findByRole("option", {
-      name: /alpha host/i,
+    await waitFor(() => {
+      expect(createCollection).not.toHaveBeenCalled();
+      expect(createCollectionConfig).not.toHaveBeenCalled();
     });
-    await userEvent.click(alphaOption);
-    expect(screen.getByLabelText(/alpha host/i)).toBeInTheDocument();
   });
 
-  it("submits valid data and closes the form", async () => {
-    renderCreateCollection();
+  it("submits valid data, creates collection and config, and calls onCancel", async () => {
+    const user = userEvent.setup();
+    const onCancel = jest.fn();
 
-    await userEvent.click(screen.getByRole("button", { name: /collection/i }));
+    const createdCollection = {
+      id: 123,
+      name: "My Collection",
+    };
 
-    await userEvent.type(screen.getByLabelText(/name/i), "My Collection");
-    await userEvent.type(
-      screen.getByLabelText(/description/i),
-      "A test collection"
+    createCollection.mockResolvedValue(createdCollection);
+
+    renderCreateCollection({ onCancel });
+
+    await user.type(screen.getByLabelText(/name/i), "My Collection");
+    await user.type(screen.getByLabelText(/description/i), "A test collection");
+    await user.type(
+      screen.getByLabelText(/link to associated datasets/i),
+      "http://example.com"
     );
 
-    const typeField = screen.getByLabelText(/query context type/i);
-    await userEvent.click(typeField);
-    await userEvent.click(
-      await screen.findByRole("option", { name: /other/i })
-    );
+    const label = screen.getByText(/collection host/i);
+    const id = label.getAttribute("for");
+    const hostSelect = document.getElementById(id!) as HTMLElement;
 
-    const hostField = screen.getByLabelText(/collection host/i);
-    await userEvent.click(hostField);
-    await userEvent.click(
-      await screen.findByRole("option", { name: /beta host/i })
-    );
+    await act(async () => {
+      fireEvent.mouseDown(hostSelect);
+    });
 
-    createCollection.mockImplementation(async () => ({ ok: true }));
+    const listbox = await screen.findByRole("listbox");
+    const betaOption = within(listbox).getByText(/beta host/i);
+    // note- having to use fireEvent - couldnt get this to work with user
+    // with have to return to this one day?
+    await act(async () => {
+      fireEvent.click(betaOption);
+    });
 
-    const submitBtn = screen.getByRole("button", { name: /^create$/i });
-    await userEvent.click(submitBtn);
+    const createButton = screen.getByRole("button", { name: /create/i });
+    expect(createButton).not.toBeDisabled();
+    await user.click(createButton);
 
     await waitFor(() => {
       expect(createCollection).toHaveBeenCalledTimes(1);
-      expect(createCollection).toHaveBeenCalledWith(custodian.pid, {
-        name: "My Collection",
-        description: "A test collection",
-        type: QueryContext.OTHER,
-        host_id: 20,
-        url: null,
-      });
     });
 
-    expect(
-      screen.queryByRole("button", { name: /^create$/i })
-    ).not.toBeInTheDocument();
+    expect(createCollection).toHaveBeenCalledWith(custodian.pid, {
+      name: "My Collection",
+      description: "A test collection",
+      url: "http://example.com",
+      type: QueryContext.BUNNY,
+      host_id: 20,
+    });
 
-    expect(screen.getByRole("button", { name: /collection/i })).toBeEnabled();
+    expect(createCollectionConfig).toHaveBeenCalledTimes(1);
+    expect(createCollectionConfig).toHaveBeenCalledWith(
+      expect.objectContaining({
+        collection_id: createdCollection.id,
+      })
+    );
+
+    expect(onCancel).toHaveBeenCalled();
   });
 
-  it("cancels and hides the form (and re-enables the add button)", async () => {
-    renderCreateCollection();
+  it("calls onCancel and resets the form when Cancel is clicked", async () => {
+    const user = userEvent.setup();
+    const onCancel = jest.fn();
 
-    const addBtn = screen.getByRole("button", { name: /collection/i });
-    await userEvent.click(addBtn);
+    renderCreateCollection({ onCancel });
 
-    const cancelBtn = screen.getByRole("button", { name: /cancel/i });
-    await userEvent.click(cancelBtn);
+    const nameInput = screen.getByLabelText(/name/i) as HTMLInputElement;
+    const descInput = screen.getByLabelText(/description/i) as HTMLInputElement;
+    const urlInput = screen.getByLabelText(
+      /link to associated datasets/i
+    ) as HTMLInputElement;
 
-    expect(screen.queryByLabelText(/name/i)).not.toBeInTheDocument();
-    expect(addBtn).toBeEnabled();
+    await user.type(nameInput, "Temp Name");
+    await user.type(descInput, "Temp Description");
+    await user.type(urlInput, "http://temp-url.com");
+
+    const label = screen.getByText(/collection host/i);
+    const id = label.getAttribute("for");
+    const hostSelect = document.getElementById(id!) as HTMLElement;
+
+    await act(async () => {
+      fireEvent.mouseDown(hostSelect);
+    });
+
+    const listbox = await screen.findByRole("listbox");
+    const betaOption = within(listbox).getByText(/alpha host/i);
+
+    await act(async () => {
+      fireEvent.click(betaOption);
+    });
+
+    const cancelButton = screen.getByRole("button", { name: /cancel/i });
+    await user.click(cancelButton);
+
+    expect(onCancel).toHaveBeenCalled();
+
+    // RHF reset should clear values
+    expect(nameInput.value).toBe("");
+    expect(descInput.value).toBe("");
+    expect(urlInput.value).toBe("");
   });
 });
