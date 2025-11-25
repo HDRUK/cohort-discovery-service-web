@@ -59,12 +59,21 @@ export interface Distribution extends WithTimestamps {
   median: number;
 }
 
+export enum CollectionStatus {
+  INACTIVE = 0,
+  ACTIVE = 1,
+  SUSPENDED = 2,
+}
+
 export interface Collection extends WithTimestamps {
   id: number;
   name: string;
+  description: string;
   pid: string;
   url: string | null;
   type: string;
+  status: CollectionStatus;
+  last_active: string | null;
   size?: Distribution;
   demographics?: Distribution[];
   custodian: Custodian;

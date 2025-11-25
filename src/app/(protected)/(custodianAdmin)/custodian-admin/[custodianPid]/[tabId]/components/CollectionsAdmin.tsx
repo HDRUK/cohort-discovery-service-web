@@ -10,6 +10,7 @@ import ThreePaneSwimLaneLayout, {
 } from "@/modules/ThreePaneSwimLaneLayout";
 import { useState } from "react";
 import CollectionsLeftPanel from "./CollectionsLeftPanel";
+import CollectionsMiddlePanel from "./CollectionsMiddlePanel";
 
 const CollectionAdmin = ({
   pid,
@@ -62,7 +63,12 @@ const CollectionAdmin = ({
             onCancelCreate={toggleExpandLeft}
           />
         }
-        middle={<b> hi2</b>}
+        middle={
+          <CollectionsMiddlePanel
+            expandedLeft={expandedLeft}
+            collections={collections}
+          />
+        }
         right={<b> hi3</b>}
       />
     </Box>

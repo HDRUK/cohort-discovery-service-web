@@ -1,19 +1,19 @@
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
-import Collections from "./Collections";
+import CollectionsTable from "./CollectionsTable";
 import getCollections from "@/actions/getCollections";
 jest.mock("@/actions/getCollections");
 
-describe("Collections", () => {
+describe("CollectionsTable", () => {
   it('displays "No records to display" when collections is empty', () => {
-    render(<Collections collections={[]} />);
+    render(<CollectionsTable collections={[]} />);
 
     const noRecordsText = screen.getByText(/no records to display/i);
     expect(noRecordsText).toBeInTheDocument();
   });
 
   it("renders the correct column headers", () => {
-    render(<Collections collections={[]} />);
+    render(<CollectionsTable collections={[]} />);
 
     const columns = [
       "Collection ID",
@@ -33,7 +33,7 @@ describe("Collections", () => {
   it("displays data when collections exist", async () => {
     const collections = await getCollections();
 
-    render(<Collections collections={collections.data} />);
+    render(<CollectionsTable collections={collections.data} />);
 
     expect(screen.getByText("Test Dataset #1")).toBeInTheDocument();
     expect(screen.getByText("Test Dataset #2")).toBeInTheDocument();

@@ -5,7 +5,7 @@ import AddButton from "@/components/AddButton";
 import CreateCollection from "@/modules/CreateCollection";
 import { CollectionHost, Custodian } from "@/types/api";
 
-type CollectionHostCreatePanelProps = {
+type CollectionsLeftPanelProps = {
   custodian: Custodian;
   collectionHosts: CollectionHost[];
   expandedLeft: boolean;
@@ -19,7 +19,7 @@ const CollectionsLeftPanel = ({
   expandedLeft,
   onCreate,
   onCancelCreate,
-}: CollectionHostCreatePanelProps) => {
+}: CollectionsLeftPanelProps) => {
   return (
     <Box
       sx={{

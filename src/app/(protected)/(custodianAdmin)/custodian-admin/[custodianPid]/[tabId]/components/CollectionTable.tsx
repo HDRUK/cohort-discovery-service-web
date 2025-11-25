@@ -1,10 +1,11 @@
 import { CollectionHost, CollectionWithHosts, Paginated } from "@/types/api";
-import { MaterialReactTable, MRT_ColumnDef } from "material-react-table";
+import { MRT_ColumnDef } from "material-react-table";
 import { Box } from "@mui/material";
 import CollectionHostChip from "@/components/CollectionHostChip";
 import CodeBlock from "@/components/CodeBlock";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import { useMemo } from "react";
+import Table from "@/components/Table";
 
 const CollectionTable = ({
   collections,
@@ -50,7 +51,7 @@ const CollectionTable = ({
 
   return (
     <Box>
-      <MaterialReactTable table={table} />
+      <Table table={table} />
     </Box>
   );
 };

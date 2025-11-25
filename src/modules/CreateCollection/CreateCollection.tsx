@@ -67,9 +67,7 @@ const CreateCollection = ({
       ...data.config,
       collection_id: createdCollection.id,
     });
-
-    notify.success(`Created collection ${createCollection.name} `);
-
+    notify.success(`Created collection ${createdCollection.name} `);
     onCancel?.();
   };
 
@@ -234,7 +232,7 @@ const CreateCollection = ({
         defaultExpanded
         underline
       >
-        <CollectionConfig control={control} setValue={setValue} />
+        <CollectionConfig keepExpanded control={control} setValue={setValue} />
       </ActionMenuSection>
 
       <Stack direction="row" spacing={1} justifyContent="flex-end">

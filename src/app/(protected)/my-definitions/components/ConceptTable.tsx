@@ -1,9 +1,10 @@
 "use client";
 import { Concept } from "@/types/api";
 import { useTable } from "@/hooks/useTable";
-import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
+import { type MRT_ColumnDef } from "material-react-table";
 import { useMemo } from "react";
 import ActionDeleteButton from "@/components/ActionDeleteButton";
+import Table from "@/components/Table";
 
 interface ConceptTableProps {
   concepts: Concept[];
@@ -44,7 +45,7 @@ const ConceptTable = ({ concepts, onDelete }: ConceptTableProps) => {
     data: concepts,
   });
 
-  return <MaterialReactTable table={table} />;
+  return <Table table={table} />;
 };
 
 export default ConceptTable;

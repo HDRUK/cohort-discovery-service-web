@@ -1,6 +1,6 @@
 "use server";
 
-import Collections from "@/components/Collections";
+import Collections from "@/components/CollectionsTable";
 import getCollections from "@/actions/getCollections";
 import { Paper, Skeleton } from "@mui/material";
 import { Suspense } from "react";

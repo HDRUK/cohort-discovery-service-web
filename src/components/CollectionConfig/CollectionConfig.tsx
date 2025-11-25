@@ -1,4 +1,4 @@
-import { Box, Stack, MenuItem, Chip } from "@mui/material";
+import { Box, Stack, MenuItem, Chip, Typography } from "@mui/material";
 
 import {
   Controller,
@@ -12,14 +12,24 @@ import { capitaliseFirstLetter, getEnumLabel } from "@/utils/string";
 import { FrequencyMode, frequencyMap } from "@/types/api";
 import FormRadioGroup from "@/components/FormRadioGroup";
 import { useEffect, useMemo, useState } from "react";
+import HourMinuteSelect from "../HourMinuteSelect";
 
 interface CollectionConfigProps {
   control: Control<CreateCollectionFormValues>;
   setValue: UseFormSetValue<CreateCollectionFormValues>;
+  keepExpanded?: boolean;
+  hideSynchronisationTime?: boolean;
 }
 
-const CollectionConfig = ({ control, setValue }: CollectionConfigProps) => {
-  const [frequencyExpanded, setFrequencyExpanded] = useState(false);
+const CollectionConfig = ({
+  control,
+  setValue,
+  keepExpanded = false,
+  hideSynchronisationTime = true,
+}: CollectionConfigProps) => {
+  const [frequencyExpanded, setFrequencyExpanded] = useState(
+    keepExpanded ? true : false
+  );
 
   const {
     field: { value: frequencyField },
@@ -51,9 +61,14 @@ const CollectionConfig = ({ control, setValue }: CollectionConfigProps) => {
 
   return (
     <Stack spacing={2} width={300} height={"100%"}>
+      <Typography> Configuration Frequency</Typography>
       <Box sx={{ display: "flex", gap: 2 }}>
         <Chip
-          onClick={() => setFrequencyExpanded((prev) => !prev)}
+          onClick={
+            keepExpanded
+              ? undefined
+              : () => setFrequencyExpanded((prev) => !prev)
+          }
           color="secondary"
           label={getEnumLabel(FrequencyMode, frequencyField)}
         />
@@ -106,6 +121,16 @@ const CollectionConfig = ({ control, setValue }: CollectionConfigProps) => {
           />
         </>
       )}
+
+      {!hideSynchronisationTime && (
+        <Typography> Synchronisation Time</Typography>
+      )}
+      <HourMinuteSelect<CreateCollectionFormValues>
+        hourValueName={"config.run_time_hour"}
+        minuteValueName="config.run_time_minute"
+        control={control}
+        hidden={hideSynchronisationTime}
+      />
     </Stack>
   );
 };

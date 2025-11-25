@@ -1,7 +1,7 @@
 "use client";
 import { ConceptSet } from "@/types/api";
 import { useTable } from "@/hooks/useTable";
-import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
+import { type MRT_ColumnDef } from "material-react-table";
 import { useCallback, useEffect, useMemo } from "react";
 import { Box, Grid } from "@mui/material";
 import dayjs from "dayjs";
@@ -10,6 +10,7 @@ import AddNewConcept from "./AddNewConcept";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import ActionDeleteButton from "@/components/ActionDeleteButton";
 import CreateConceptSet from "@/modules/CreateConceptSet";
+import Table from "@/components/Table";
 
 const MyDefinitions = ({ conceptSets }: { conceptSets: ConceptSet[] }) => {
   const {
@@ -112,7 +113,7 @@ const MyDefinitions = ({ conceptSets }: { conceptSets: ConceptSet[] }) => {
       <Box>
         <CreateConceptSet />
       </Box>
-      <MaterialReactTable table={table} />
+      <Table table={table} />
     </Box>
   );
 };

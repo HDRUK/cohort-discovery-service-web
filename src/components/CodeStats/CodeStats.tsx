@@ -3,8 +3,9 @@
 import { formatNumber } from "@/utils/numbers";
 import { usePaginatedTable } from "../../hooks/usePaginatedTable";
 import { CodeStat, Paginated } from "../../types/api";
-import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
+import { type MRT_ColumnDef } from "material-react-table";
 import { useMemo } from "react";
+import Table from "../Table";
 
 const DEFAULT_PER_PAGE = 20;
 
@@ -68,7 +69,7 @@ const CodeStats = ({ codes }: { codes: Paginated<CodeStat[]> }) => {
     getRowId: (row) => row.name,
   });
 
-  return <MaterialReactTable table={table} />;
+  return <Table table={table} />;
 };
 
 export default CodeStats;

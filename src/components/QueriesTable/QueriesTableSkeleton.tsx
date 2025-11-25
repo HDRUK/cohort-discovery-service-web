@@ -1,7 +1,8 @@
 "use client";
 
-import { Box, Grid, Paper, Skeleton } from "@mui/material";
-import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
+import { Grid, Paper, Skeleton } from "@mui/material";
+import { type MRT_ColumnDef } from "material-react-table";
+import Table from "../Table";
 
 const skeletonRows = Array.from({ length: 5 });
 
@@ -31,38 +32,36 @@ const QueriesTableSkeleton = () => {
   }));
 
   return (
-    <Box>
-      <MaterialReactTable
-        columns={skeletonColumns}
-        data={data}
-        enablePagination={false}
-        enableSorting={false}
-        enableTopToolbar={false}
-        enableBottomToolbar={false}
-        state={{ isLoading: true }}
-        muiTableBodyRowProps={{
-          sx: { "& td": { verticalAlign: "middle" } },
-        }}
-        renderDetailPanel={() => (
-          <Grid container spacing={2}>
-            <Grid size={5}>
-              <Paper
-                elevation={1}
-                sx={{
-                  p: 2,
-                  bgcolor: "grey.100",
-                }}
-              >
-                <Skeleton height={80} />
-              </Paper>
-            </Grid>
-            <Grid size={7}>
-              <Skeleton variant="rectangular" height={80} />
-            </Grid>
+    <Table
+      columns={skeletonColumns}
+      data={data}
+      enablePagination={false}
+      enableSorting={false}
+      enableTopToolbar={false}
+      enableBottomToolbar={false}
+      state={{ isLoading: true }}
+      muiTableBodyRowProps={{
+        sx: { "& td": { verticalAlign: "middle" } },
+      }}
+      renderDetailPanel={() => (
+        <Grid container spacing={2}>
+          <Grid size={5}>
+            <Paper
+              elevation={1}
+              sx={{
+                p: 2,
+                bgcolor: "grey.100",
+              }}
+            >
+              <Skeleton height={80} />
+            </Paper>
           </Grid>
-        )}
-      />
-    </Box>
+          <Grid size={7}>
+            <Skeleton variant="rectangular" height={80} />
+          </Grid>
+        </Grid>
+      )}
+    />
   );
 };
 

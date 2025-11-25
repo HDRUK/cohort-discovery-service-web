@@ -5,10 +5,6 @@ export interface CollectionHostFormValues {
   context: string;
 }
 
-export enum CollectionConfigFrequency {
-  WEEKLY = "",
-}
-
 export interface CreateCollectionFormValues {
   collection: CreateCollectionPost;
   config: CreateCollectionConfigPost;

@@ -1,12 +1,9 @@
 import { CollectionHost } from "@/types/api";
 import { useTable } from "@/hooks/useTable";
-import {
-  MaterialReactTable,
-  MRT_ColumnDef,
-  MRT_RowSelectionState,
-} from "material-react-table";
+import { MRT_ColumnDef, MRT_RowSelectionState } from "material-react-table";
 import { Box } from "@mui/material";
 import { Dispatch, SetStateAction, useMemo } from "react";
+import Table from "@/components/Table";
 
 interface CollectionHostsTableProps {
   collectionHosts: CollectionHost[];
@@ -39,7 +36,7 @@ const CollectionHostsTable = ({
 
   return (
     <Box>
-      <MaterialReactTable table={table} />
+      <Table table={table} />
     </Box>
   );
 };
