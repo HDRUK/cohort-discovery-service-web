@@ -1,11 +1,10 @@
-import { Box, Stack, Button, MenuItem, Chip } from "@mui/material";
+import { Box, Stack, Button, MenuItem } from "@mui/material";
 
 import { useForm, Controller } from "react-hook-form";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { CreateCollectionFormValues } from "@/types/forms";
 import { QueryContext } from "@/types/context";
 import FormTextField from "@/components/FormTextField";
-import { capitaliseFirstLetter } from "@/utils/string";
 import {
   CollectionHost,
   Custodian,
@@ -15,7 +14,7 @@ import {
 import ActionMenuSection from "@/components/ActionMenuSection";
 import { useNotify } from "@/providers/NotifyProvider";
 import CollectionConfig from "@/components/CollectionConfig";
-import { REGEX_URL } from "@/config/regex";
+import { REGEX_URL_NO_WWW } from "@/config/regex";
 import FormDropdown from "@/components/FormDropdown";
 
 interface CreateCollectionProps {
@@ -130,8 +129,8 @@ const CreateCollection = ({
             rules={{
               required: "A link to this associated dataset(s) is required",
               pattern: {
-                value: REGEX_URL,
-                message: "Enter a valid URL (including http(s):// or www.)",
+                value: REGEX_URL_NO_WWW,
+                message: "Enter a valid URL (including http(s):// )",
               },
             }}
             render={({ field, fieldState: { error } }) => (
@@ -159,7 +158,8 @@ const CreateCollection = ({
                 fullWidth
                 required
                 options={Object.values(QueryContext).map((opt) => ({
-                  label: opt,
+                  value: opt,
+                  label: opt.toUpperCase(),
                 }))}
               />
             )}
@@ -190,22 +190,7 @@ const CreateCollection = ({
                   label: ch.name,
                   value: ch.id,
                 }))}
-                renderValue={(selected) => {
-                  const selectedHost = collectionHosts.find(
-                    (ch) => ch.id === selected
-                  );
-                  return (
-                    <Stack direction="row" spacing={1}>
-                      {selectedHost && (
-                        <Chip
-                          label={capitaliseFirstLetter(selectedHost.name)}
-                          color="secondary"
-                          size="small"
-                        />
-                      )}
-                    </Stack>
-                  );
-                }}
+                chipColor="secondary"
               />
             )}
           />

@@ -55,7 +55,8 @@ const CollectionAdmin = ({
       selectedCollectionIds.length > 0
         ? collections.data.find(
             (h) =>
-              h.pid === selectedCollectionIds[selectedCollectionIds.length - 1]
+              String(h.id) ===
+              selectedCollectionIds[selectedCollectionIds.length - 1]
           )
         : null,
     [collections, selectedCollectionIds]

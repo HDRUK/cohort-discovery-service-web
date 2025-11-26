@@ -61,6 +61,7 @@ async function request<TResponse, TBody = undefined>(
 async function extractErrorMessage(response: Response): Promise<string> {
   try {
     const data = await response.json();
+    console.error(data?.errors);
 
     if (typeof data?.message === "string") {
       return data.message;
