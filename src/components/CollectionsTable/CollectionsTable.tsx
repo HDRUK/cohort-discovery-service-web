@@ -11,7 +11,7 @@ import {
   type MRT_ColumnDef,
 } from "material-react-table";
 import { Dispatch, SetStateAction, useMemo } from "react";
-import { Box, Chip } from "@mui/material";
+import { Box, Chip, Typography } from "@mui/material";
 import { getCollectionStatus } from "@/utils/colours";
 import dayjs from "dayjs";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
@@ -89,6 +89,15 @@ const CollectionsTable = ({
       })
     );
   };
+
+  if (collections.total === 0)
+    return (
+      <Box sx={{ mx: "auto", my: "auto" }}>
+        <Typography variant="h5">
+          Collection will appear here when they are created
+        </Typography>
+      </Box>
+    );
 
   return (
     <Box
