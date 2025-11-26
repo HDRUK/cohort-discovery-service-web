@@ -36,10 +36,9 @@ const Table = <TData extends MRT_RowData>({
         sx={{
           minHeight: 40,
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: "flex-end",
         }}
       >
-        <div></div>
         {selectedRows?.length > 0 && handleDeleteRows && (
           <IconButton onClick={() => handleDeleteRows(selectedRows)}>
             <DeleteIcon data-testid="DeleteIcon" />
