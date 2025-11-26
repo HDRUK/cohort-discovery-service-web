@@ -102,15 +102,8 @@ const CollectionConfig = ({
             name="config.run_time_frequency"
             control={control}
             rules={{ required: "Run time frequency is required" }}
-            render={({ field, fieldState }) => (
-              <FormTextField
-                {...field}
-                select
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
-                fullWidth
-                required
-              >
+            render={({ field, fieldState: { error } }) => (
+              <FormTextField {...field} error={error} select fullWidth required>
                 {options.map((opt) => (
                   <MenuItem key={opt} value={opt}>
                     {frequencyLabels[opt]}

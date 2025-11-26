@@ -10,11 +10,14 @@ import {
 } from "@mui/material";
 import { useNotify } from "@/providers/NotifyProvider";
 import { CopyAllOutlined } from "@mui/icons-material";
+import { FieldError } from "react-hook-form";
 
-interface FormTextFieldProps extends Omit<OutlinedTextFieldProps, "variant"> {
+export interface FormTextFieldProps
+  extends Omit<OutlinedTextFieldProps, "variant" | "error"> {
   label?: string;
   required?: boolean;
   copyable?: boolean;
+  error?: FieldError;
 }
 
 const FormTextField = ({
@@ -23,6 +26,7 @@ const FormTextField = ({
   id,
   required = false,
   copyable = false,
+  error,
   ...props
 }: FormTextFieldProps) => {
   const generatedId = useId();
@@ -35,7 +39,7 @@ const FormTextField = ({
   };
 
   return (
-    <FormControl fullWidth error={!!props.error} required={required}>
+    <FormControl fullWidth error={!!error} required={required}>
       {label && (
         <FormLabel htmlFor={inputId} required={required}>
           {label}
@@ -56,6 +60,8 @@ const FormTextField = ({
             },
             ...sx,
           }}
+          error={!!error}
+          helperText={error?.message}
           {...props}
           variant="outlined"
         />

@@ -116,7 +116,7 @@ export const themeOptions: ThemeOptions = {
     MuiFormHelperText: {
       styleOverrides: {
         root: {
-          fontSize: 20,
+          fontSize: 12,
           fontStyle: "italic",
         },
       },

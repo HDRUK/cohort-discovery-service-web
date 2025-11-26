@@ -15,6 +15,8 @@ import {
 import ActionMenuSection from "@/components/ActionMenuSection";
 import { useNotify } from "@/providers/NotifyProvider";
 import CollectionConfig from "@/components/CollectionConfig";
+import { REGEX_URL } from "@/config/regex";
+import FormDropdown from "@/components/FormDropdown";
 
 interface CreateCollectionProps {
   custodian: Custodian;
@@ -37,7 +39,7 @@ const CreateCollection = ({
     handleSubmit,
     control,
     reset,
-    formState: { isValid, isSubmitting },
+    formState: { isSubmitting },
   } = useForm<CreateCollectionFormValues>({
     defaultValues: {
       collection: {
@@ -96,12 +98,11 @@ const CreateCollection = ({
             name="collection.name"
             control={control}
             rules={{ required: "Name is required" }}
-            render={({ field, fieldState }) => (
+            render={({ field, fieldState: { error } }) => (
               <FormTextField
                 {...field}
                 label="Name"
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
+                error={error}
                 fullWidth
                 required
               />
@@ -112,12 +113,11 @@ const CreateCollection = ({
             name="collection.description"
             control={control}
             rules={{ required: "A description is required" }}
-            render={({ field, fieldState }) => (
+            render={({ field, fieldState: { error } }) => (
               <FormTextField
                 {...field}
                 label="Description"
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
+                error={error}
                 fullWidth
                 required
               />
@@ -128,18 +128,18 @@ const CreateCollection = ({
             name="collection.url"
             control={control}
             rules={{
+              required: "A link to this associated dataset(s) is required",
               pattern: {
-                value:
-                  /^(http?:\/\/)([\w-]+(\.[\w-]+)+)(:[0-9]+)?(\/[^\s]*)?$/i,
-                message: "Enter a valid URL (including http(s)://)",
+                value: REGEX_URL,
+                message: "Enter a valid URL (including http(s):// or www.)",
               },
             }}
-            render={({ field, fieldState }) => (
+            render={({ field, fieldState: { error } }) => (
               <FormTextField
                 {...field}
+                error={error}
+                required
                 label="Link to Associated Datasets"
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
                 fullWidth
               />
             )}
@@ -149,36 +149,19 @@ const CreateCollection = ({
             name="collection.type"
             control={control}
             rules={{ required: "Query context type is required" }}
-            render={({ field, fieldState }) => (
-              <FormTextField
+            render={({ field, fieldState: { error } }) => (
+              <FormDropdown
                 {...field}
                 disabled
                 select
                 label="Query Context Type"
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
+                error={error}
                 fullWidth
                 required
-                slotProps={{
-                  htmlInput: {
-                    renderValue: (selected: string) => (
-                      <Stack direction="row" spacing={1}>
-                        <Chip
-                          label={capitaliseFirstLetter(selected)}
-                          color="primary"
-                          size="small"
-                        />
-                      </Stack>
-                    ),
-                  },
-                }}
-              >
-                {Object.values(QueryContext).map((opt) => (
-                  <MenuItem key={opt} value={opt}>
-                    <Chip label={opt} size="small" color="secondary" />
-                  </MenuItem>
-                ))}
-              </FormTextField>
+                options={Object.values(QueryContext).map((opt) => ({
+                  label: opt,
+                }))}
+              />
             )}
           />
 
@@ -190,45 +173,40 @@ const CreateCollection = ({
               validate: (value) =>
                 Number(value) > 0 || "Please select a valid collection host",
             }}
-            render={({ field, fieldState }) => (
-              <FormTextField
+            render={({ field, fieldState: { error } }) => (
+              <FormDropdown
                 {...field}
                 select
                 label="Collection Host"
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
+                error={error}
                 fullWidth
                 required
-                slotProps={{
-                  htmlInput: {
-                    renderValue: (selected: number) => {
-                      const selectedHost = collectionHosts.find(
-                        (ch) => ch.id === selected
-                      );
-                      return (
-                        <Stack direction="row" spacing={1}>
-                          {selectedHost && (
-                            <Chip
-                              label={capitaliseFirstLetter(selectedHost.name)}
-                              color="secondary"
-                              size="small"
-                            />
-                          )}
-                        </Stack>
-                      );
-                    },
-                  },
-                }}
-              >
-                <MenuItem value={0} disabled>
-                  Select a collection host
-                </MenuItem>
-                {collectionHosts.map((ch) => (
-                  <MenuItem key={ch.id} value={ch.id}>
-                    <Chip label={ch.name} size="small" color="secondary" />
+                placeHolderOption={
+                  <MenuItem value={0} disabled>
+                    Select a collection host
                   </MenuItem>
-                ))}
-              </FormTextField>
+                }
+                options={collectionHosts.map((ch) => ({
+                  label: ch.name,
+                  value: ch.id,
+                }))}
+                renderValue={(selected) => {
+                  const selectedHost = collectionHosts.find(
+                    (ch) => ch.id === selected
+                  );
+                  return (
+                    <Stack direction="row" spacing={1}>
+                      {selectedHost && (
+                        <Chip
+                          label={capitaliseFirstLetter(selectedHost.name)}
+                          color="secondary"
+                          size="small"
+                        />
+                      )}
+                    </Stack>
+                  );
+                }}
+              />
             )}
           />
         </Stack>
@@ -256,11 +234,7 @@ const CreateCollection = ({
         >
           Cancel
         </Button>
-        <Button
-          type="submit"
-          variant="outlined"
-          disabled={isSubmitting || !isValid}
-        >
+        <Button type="submit" variant="outlined" disabled={isSubmitting}>
           {isSubmitting ? "Creating..." : "Create"}
         </Button>
       </Stack>

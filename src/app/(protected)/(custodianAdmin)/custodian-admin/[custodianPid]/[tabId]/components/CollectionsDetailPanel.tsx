@@ -105,12 +105,11 @@ const CollectionsDetailPanel = ({
           name="name"
           control={control}
           rules={{ required: "A name is required" }}
-          render={({ field, fieldState }) => (
+          render={({ field, fieldState: { error } }) => (
             <FormTextField
               {...field}
               label="Name"
-              error={!!fieldState.error}
-              helperText={fieldState.error?.message}
+              error={error}
               fullWidth
               required
             />
@@ -121,12 +120,11 @@ const CollectionsDetailPanel = ({
           name="description"
           control={control}
           rules={{ required: "A description is required" }}
-          render={({ field, fieldState }) => (
+          render={({ field, fieldState: { error } }) => (
             <FormTextField
               {...field}
               label="Description"
-              error={!!fieldState.error}
-              helperText={fieldState.error?.message}
+              error={error}
               fullWidth
               required
             />
@@ -143,8 +141,7 @@ const CollectionsDetailPanel = ({
               copyable
               {...field}
               label="Link to Associated Dataset"
-              error={!!error}
-              helperText={error?.message}
+              error={error}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();

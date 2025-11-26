@@ -70,10 +70,13 @@ describe("CreateCollection", () => {
   });
 
   it("does not submit when the form is invalid", async () => {
+    const user = userEvent.setup();
     renderCreateCollection();
 
     const createButton = screen.getByRole("button", { name: /create/i });
-    expect(createButton).toBeDisabled();
+    user.click(createButton);
+    //to-do - add more testing for rendering form errors
+    // - coming in a future maitenace ticket to clean up form handling
 
     await waitFor(() => {
       expect(createCollection).not.toHaveBeenCalled();
