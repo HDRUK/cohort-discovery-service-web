@@ -17,8 +17,10 @@ import {
   CreateConceptSetPost,
   ConceptSet,
   UpdateCollectionHostPayload,
+  CreateCollectionConfigPost,
 } from "@/types/api";
 import createCollection from "@/actions/createCollection";
+import deleteCollection from "@/actions/deleteCollection";
 import createConceptSet from "@/actions/createConceptSet";
 import getConcepts from "@/actions/getConcepts";
 import attachConcepts from "@/actions/attachConcepts";
@@ -48,6 +50,7 @@ import { UniqueIdentifier } from "@dnd-kit/core";
 import { trueKeys } from "@/utils/numbers";
 import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
 import parseQuery from "@/actions/parseQuery";
+import createCollectionConfig from "@/actions/createCollectionConfig";
 
 export enum NodeKind {
   RULE = "RULE",
@@ -153,6 +156,13 @@ export interface DaphneStoreState {
     createCollection: (
       custodianPid: string,
       payload: CreateCollectionPost
+    ) => Promise<Collection>;
+    deleteCollection: (
+      id: number | string,
+      custodianPid: string
+    ) => Promise<void>;
+    createCollectionConfig: (
+      payload: CreateCollectionConfigPost
     ) => Promise<void>;
   };
 }
@@ -532,8 +542,19 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       // - this is because the BE uses different endpoints:
       // - Route::post('/v1/collection_hosts'... (custodianId in the payload)
       // - Route::post('/v1/custodians/{custodianPid}/collections'...
-      await createCollection(custodianPid, payload);
+      const { data } = await createCollection(custodianPid, payload);
       await revalidateAction(`collections-${custodianPid}`);
+      return data;
+    },
+    deleteCollection: async (id, custodianPid) => {
+      await deleteCollection(id);
+      //this needs to be re-done, mixing of pid and id makes it diffcult
+      // to revalidate cache
+      // - created a ticket for this
+      await revalidateAction(`collections-${custodianPid}`);
+    },
+    createCollectionConfig: async (payload: CreateCollectionConfigPost) => {
+      await createCollectionConfig(payload);
     },
   },
 }));

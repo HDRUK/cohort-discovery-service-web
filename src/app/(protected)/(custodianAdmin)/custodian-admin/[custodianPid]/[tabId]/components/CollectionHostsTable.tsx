@@ -1,23 +1,22 @@
 import { CollectionHost } from "@/types/api";
 import { useTable } from "@/hooks/useTable";
-import {
-  MaterialReactTable,
-  MRT_ColumnDef,
-  MRT_RowSelectionState,
-} from "material-react-table";
+import { MRT_ColumnDef, MRT_RowSelectionState } from "material-react-table";
 import { Box } from "@mui/material";
 import { Dispatch, SetStateAction, useMemo } from "react";
+import Table from "@/components/Table";
 
 interface CollectionHostsTableProps {
   collectionHosts: CollectionHost[];
   rowSelection: MRT_RowSelectionState;
   setRowSelection: Dispatch<SetStateAction<MRT_RowSelectionState>>;
+  onDelete: (ids: string[]) => void;
 }
 
 const CollectionHostsTable = ({
   collectionHosts,
   rowSelection,
   setRowSelection,
+  onDelete,
 }: CollectionHostsTableProps) => {
   const columns = useMemo<MRT_ColumnDef<CollectionHost>[]>(
     () => [
@@ -39,7 +38,7 @@ const CollectionHostsTable = ({
 
   return (
     <Box>
-      <MaterialReactTable table={table} />
+      <Table table={table} handleDeleteRows={onDelete} />
     </Box>
   );
 };

@@ -1,10 +1,10 @@
-import { TextField, Box, Stack, Button, MenuItem, Chip } from "@mui/material";
-
+import { Box, Stack, Button } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { useDaphneStore } from "@/store/useDaphneStore";
-import { CollectionHostFormValues } from "@/types/api";
+import { CollectionHostFormValues } from "@/types/forms";
 import { QueryContext } from "@/types/context";
 import FormTextField from "@/components/FormTextField";
+import FormDropdown from "@/components/FormDropdown";
 
 interface CollectionHostFormProps {
   custodianId: number;
@@ -53,14 +53,8 @@ const CreateCollectionHost = ({
           name="name"
           control={control}
           rules={{ required: "Name is required" }}
-          render={({ field, fieldState }) => (
-            <FormTextField
-              {...field}
-              label="Name"
-              error={!!fieldState.error}
-              helperText={fieldState.error?.message}
-              fullWidth
-            />
+          render={({ field, fieldState: { error } }) => (
+            <FormTextField {...field} label="Name" error={error} fullWidth />
           )}
         />
 
@@ -76,30 +70,17 @@ const CreateCollectionHost = ({
             name="context"
             control={control}
             rules={{ required: "Query context type is required" }}
-            render={({ field, fieldState }) => (
-              <TextField
+            render={({ field, fieldState: { error } }) => (
+              <FormDropdown
                 {...field}
+                options={Object.values(QueryContext).map((opt) => ({
+                  label: opt,
+                }))}
                 select
                 label="Query Context Type"
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
+                error={error}
                 fullWidth
-                slotProps={{
-                  htmlInput: {
-                    renderValue: (selected: string) => (
-                      <Stack direction="row" spacing={1}>
-                        <Chip label={selected} color="primary" size="small" />
-                      </Stack>
-                    ),
-                  },
-                }}
-              >
-                {Object.values(QueryContext).map((opt) => (
-                  <MenuItem key={opt} value={opt}>
-                    <Chip label={opt} size="small" color="secondary" />
-                  </MenuItem>
-                ))}
-              </TextField>
+              />
             )}
           />
         )}

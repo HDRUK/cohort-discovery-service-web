@@ -1,36 +1,78 @@
 import { useId } from "react";
 import {
+  Box,
   FormControl,
   FormLabel,
+  IconButton,
   OutlinedTextFieldProps,
+  Stack,
   TextField,
 } from "@mui/material";
+import { useNotify } from "@/providers/NotifyProvider";
+import { CopyAllOutlined } from "@mui/icons-material";
+import { FieldError } from "react-hook-form";
 
-interface FormTextFieldProps extends Omit<OutlinedTextFieldProps, "variant"> {
-  label: string;
+export interface FormTextFieldProps
+  extends Omit<OutlinedTextFieldProps, "variant" | "error"> {
+  label?: string;
+  required?: boolean;
+  copyable?: boolean;
+  error?: FieldError;
 }
 
-const FormTextField = ({ label, sx, id, ...props }: FormTextFieldProps) => {
+const FormTextField = ({
+  label,
+  sx,
+  id,
+  required = false,
+  copyable = false,
+  error,
+  ...props
+}: FormTextFieldProps) => {
   const generatedId = useId();
   const inputId = id ?? generatedId;
+  const notify = useNotify();
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(String(props.value));
+    notify.success("Copied to clipboard");
+  };
+
   return (
-    <FormControl fullWidth error={!!props.error}>
-      <FormLabel htmlFor={inputId}>{label}</FormLabel>
-      <TextField
-        id={inputId}
-        sx={{
-          borderRadius: 0,
-          "& .MuiOutlinedInput-root": {
+    <FormControl fullWidth error={!!error} required={required}>
+      {label && (
+        <FormLabel htmlFor={inputId} required={required}>
+          {label}
+        </FormLabel>
+      )}
+
+      <Stack direction="row" alignItems="center">
+        <TextField
+          id={inputId}
+          required={required}
+          sx={{
             borderRadius: 0,
-          },
-          "& .MuiOutlinedInput-notchedOutline": {
-            borderRadius: 0,
-          },
-          ...sx,
-        }}
-        {...props}
-        variant={"outlined"}
-      />
+            "& .MuiOutlinedInput-root": {
+              borderRadius: 0,
+            },
+            "& .MuiOutlinedInput-notchedOutline": {
+              borderRadius: 0,
+            },
+            ...sx,
+          }}
+          error={!!error}
+          helperText={error?.message}
+          {...props}
+          variant="outlined"
+        />
+        {copyable && (
+          <Box sx={{ display: "flex", justifyContent: "center" }}>
+            <IconButton onClick={handleCopy}>
+              <CopyAllOutlined />
+            </IconButton>
+          </Box>
+        )}
+      </Stack>
     </FormControl>
   );
 };

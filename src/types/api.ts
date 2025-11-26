@@ -1,4 +1,15 @@
+import { QueryContext } from "./context";
 import { RuleGroupType } from "./rules";
+
+export type SearchParams = Promise<{
+  [key: string]: string | string[] | undefined;
+}>;
+
+export interface ApiSearchParams {
+  per_page?: number;
+  page?: number;
+  sort?: string;
+}
 
 export interface ApiResponse<T> {
   message: string;
@@ -58,12 +69,21 @@ export interface Distribution extends WithTimestamps {
   median: number;
 }
 
+export enum CollectionStatus {
+  INACTIVE = 0,
+  ACTIVE = 1,
+  SUSPENDED = 2,
+}
+
 export interface Collection extends WithTimestamps {
   id: number;
   name: string;
+  description: string;
   pid: string;
   url: string | null;
-  type: string;
+  type: QueryContext;
+  status: CollectionStatus;
+  last_active: string | null;
   size?: Distribution;
   demographics?: Distribution[];
   custodian: Custodian;
@@ -142,6 +162,43 @@ export enum Roles {
   ADMIN = "admin",
 }
 
+export enum FrequencyMode {
+  WEEKLY = "1",
+  MONTHLY = "2",
+  QUARTERLY = "3",
+  BIANNUALLY = "4",
+}
+
+const WEEK_DAYS = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+
+const MONTH_WEEKS = [
+  "First Week",
+  "Second Week",
+  "Third Week",
+  "Fourth Week",
+  "Last Week",
+];
+
+export const frequencyMap: Record<FrequencyMode, string[]> = {
+  [FrequencyMode.WEEKLY]: WEEK_DAYS,
+  [FrequencyMode.MONTHLY]: MONTH_WEEKS,
+  [FrequencyMode.QUARTERLY]: ["Q1", "Q2", "Q3", "Q4"],
+  [FrequencyMode.BIANNUALLY]: ["H1", "H2"],
+};
+
+export enum TaskType {
+  A = "a",
+  B = "b",
+}
+
 export interface User extends WithTimestamps {
   id: number;
   email: string;
@@ -194,11 +251,6 @@ export interface UpdateCollectionHostPayload {
   query_context_type?: string;
 }
 
-export interface CollectionHostFormValues {
-  name: string;
-  context: string;
-}
-
 export interface CollectionHost {
   id: number;
   name: string;
@@ -207,11 +259,24 @@ export interface CollectionHost {
   client_secret: string;
 }
 
+export type UrlString = `http${"s" | ""}://${string}`;
+
 export interface CreateCollectionPost {
   name: string;
-  type: string;
+  description: string;
+  type: QueryContext;
   host_id: number;
-  url: string | null;
+  url: UrlString | "" | null;
+}
+
+export interface CreateCollectionConfigPost {
+  collection_id: number;
+  run_time_hour: number;
+  run_time_minute: number;
+  frequency_mode: FrequencyMode;
+  run_time_frequency: number;
+  enabled: number;
+  type: string;
 }
 
 export interface Concept {

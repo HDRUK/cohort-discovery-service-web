@@ -1,6 +1,6 @@
 "use client";
 
-import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
+import { type MRT_ColumnDef } from "material-react-table";
 import { useMemo } from "react";
 import { Chip, Tooltip, Stack, Box } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -10,6 +10,7 @@ import dayjs from "dayjs";
 import { CombinedUser } from "@/types/api";
 import BlockIcon from "@mui/icons-material/Block";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import Table from "@/components/Table";
 
 type KVRow = {
   label: string;
@@ -142,7 +143,7 @@ const UserDetailsTable = ({ user }: { user: CombinedUser }) => {
         display: "flex",
       }}
     >
-      <MaterialReactTable table={table} />
+      <Table table={table} />
     </Box>
   );
 };

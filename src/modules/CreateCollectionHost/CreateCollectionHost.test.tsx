@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import CreateCollectionHost from "./CreateCollectionHost";
 import { Custodian } from "@/types/api";
 import getCustodian from "@/actions/__mocks__/getCustodian";
+import { NotifyProvider } from "@/providers/NotifyProvider";
 
 // --- Mock Daphne store ---
 const createCollectionHost = jest.fn();
@@ -23,11 +24,13 @@ const renderCreateColllectionHost = (
   overrides: Partial<React.ComponentProps<typeof CreateCollectionHost>> = {}
 ) =>
   render(
-    <CreateCollectionHost
-      custodianId={custodian.id}
-      onCancel={onCancel}
-      {...overrides}
-    />
+    <NotifyProvider>
+      <CreateCollectionHost
+        custodianId={custodian.id}
+        onCancel={onCancel}
+        {...overrides}
+      />
+    </NotifyProvider>
   );
 
 describe("CreateCollectionHost", () => {

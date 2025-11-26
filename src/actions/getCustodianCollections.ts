@@ -7,17 +7,25 @@ import { cookies } from "next/headers";
 import { getTokenKey } from "@/utils/string";
 
 const getCustodianCollections = async (
-  custodianPid: string
+  custodianPid: string,
+  params?: URLSearchParams
 ): Promise<ApiResponse<Paginated<CollectionWithHosts[]>>> => {
   const token = (await cookies()).get("token")?.value || "";
   const key = getTokenKey(token);
-  return await apiGet<ApiResponse<Paginated<CollectionWithHosts[]>>>(
-    API_ROUTES.custodianCollections(custodianPid),
-    {
-      next: { revalidate: 3600, tags: [`collections-${custodianPid}`, key] },
-      cache: "force-cache",
-    }
-  );
+
+  let url = API_ROUTES.custodianCollections(custodianPid);
+  const queryString = params?.toString();
+  if (queryString) {
+    url += `?${queryString}`;
+  }
+
+  return await apiGet<ApiResponse<Paginated<CollectionWithHosts[]>>>(url, {
+    next: {
+      revalidate: 3600,
+      tags: [`collections-${custodianPid}`, `collections-${queryString}`, key],
+    },
+    cache: "force-cache",
+  });
 };
 
 export default getCustodianCollections;

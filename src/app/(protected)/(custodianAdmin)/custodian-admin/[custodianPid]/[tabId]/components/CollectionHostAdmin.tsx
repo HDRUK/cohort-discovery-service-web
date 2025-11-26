@@ -140,7 +140,6 @@ const CollectionHostAdmin = ({
             rowSelection={rowSelection}
             setRowSelection={setRowSelection}
             onDeleteHost={handleDeleteHost}
-            hasSelection={selectedHostIds.length > 0}
           />
         }
         right={

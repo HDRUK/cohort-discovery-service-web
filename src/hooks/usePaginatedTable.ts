@@ -27,6 +27,7 @@ export function usePaginatedTable<TData extends { pid: string }>({
   perPageDefault,
   expandFirstRow = false,
   getRowId = (row) => row.pid,
+  state,
   ...rest
 }: UsePaginatedTableOptions<TData>) {
   const router = useRouter();
@@ -44,7 +45,7 @@ export function usePaginatedTable<TData extends { pid: string }>({
 
   const [sorting, setSorting] = useState<MRT_SortingState>([]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     const collapsed = sorting
       .map(({ id, desc }) => `${id}:${desc ? "desc" : "asc"}`)
       .join(",");
@@ -54,14 +55,21 @@ export function usePaginatedTable<TData extends { pid: string }>({
     params.set("sort", collapsed);
     router.replace(`?${params.toString()}`);
   }, [sorting, router, searchParams]);
+  */
 
   useEffect(() => {
-    const currentPage = pagination.pageIndex + 1;
-    const currentPerPage = pagination.pageSize;
+    const currentPage = (pagination.pageIndex + 1).toString();
+    const currentPerPage = pagination.pageSize.toString();
+
+    if (
+      currentPage === searchParams.get("page") &&
+      currentPerPage === searchParams.get("per_page")
+    )
+      return;
 
     const params = new URLSearchParams(searchParams.toString());
-    params.set("page", currentPage.toString());
-    params.set("per_page", currentPerPage.toString());
+    params.set("page", currentPage);
+    params.set("per_page", currentPerPage);
 
     router.replace(`?${params.toString()}`);
   }, [pagination.pageIndex, pagination.pageSize, router, searchParams]);
@@ -87,9 +95,10 @@ export function usePaginatedTable<TData extends { pid: string }>({
     state: {
       pagination,
       sorting,
+      ...state,
     },
     muiPaginationProps: {
-      rowsPerPageOptions: [5, 10, 20],
+      rowsPerPageOptions: Array.from(new Set([5, 10, 20, perPageDefault])),
     },
     muiBottomToolbarProps: {
       sx: {

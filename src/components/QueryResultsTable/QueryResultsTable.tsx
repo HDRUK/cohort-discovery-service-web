@@ -1,7 +1,7 @@
 "use client";
 
 import { Query, Task, Result } from "../../types/api";
-import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
+import { type MRT_ColumnDef } from "material-react-table";
 import {
   Box,
   CircularProgress,
@@ -26,6 +26,7 @@ import { SortDescendingIcon } from "@/icons/SortDescendingIcon";
 import useSearchParams from "@/hooks/useSearchParams";
 import { SortDirection } from "@/types/common";
 import { STATUS_LABELS } from "@/config/defaults";
+import Table from "../Table";
 
 const QueryResultsTable = ({ query }: { query: Query }) => {
   const { setQueryName, setQueryBuilderJson, queryAsText } = useQueryBuilder(
@@ -213,7 +214,7 @@ const QueryResultsTable = ({ query }: { query: Query }) => {
       />
 
       <Paper sx={{ p: 2, gap: 2, display: "flex", flexDirection: "column" }}>
-        <MaterialReactTable table={table} />
+        <Table table={table} />
       </Paper>
     </Box>
   );

@@ -4,7 +4,7 @@ import useQueryBuilder from "@/store/useQueryBuilder";
 
 import { useEffect } from "react";
 import { Query, Paginated } from "../../types/api";
-import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
+import { type MRT_ColumnDef } from "material-react-table";
 import { Grid, Paper } from "@mui/material";
 import dayjs from "dayjs";
 import TaskResults from "@/components/TaskResults";
@@ -15,6 +15,7 @@ import { formatNumber } from "@/utils/numbers";
 import Link from "next/link";
 import { Link as MuiLink } from "@mui/material";
 import { routes } from "../../config/routes";
+import Table from "../Table";
 
 const QueriesTable = ({
   queries,
@@ -182,7 +183,7 @@ const QueriesTable = ({
     ),
   });
 
-  return <MaterialReactTable table={table} />;
+  return <Table table={table} />;
 };
 
 export default QueriesTable;

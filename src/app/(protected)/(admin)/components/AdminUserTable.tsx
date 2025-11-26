@@ -1,8 +1,9 @@
+import Table from "@/components/Table";
 import { useTable } from "@/hooks/useTable";
 import { User } from "@/types/api";
 import { Box } from "@mui/material";
 import dayjs from "dayjs";
-import { MaterialReactTable, MRT_ColumnDef } from "material-react-table";
+import { MRT_ColumnDef } from "material-react-table";
 import { useMemo } from "react";
 
 const AdminUserTable = ({ users }: { users: User[] }) => {
@@ -35,7 +36,7 @@ const AdminUserTable = ({ users }: { users: User[] }) => {
 
   return (
     <Box>
-      <MaterialReactTable table={table} />
+      <Table table={table} />
     </Box>
   );
 };

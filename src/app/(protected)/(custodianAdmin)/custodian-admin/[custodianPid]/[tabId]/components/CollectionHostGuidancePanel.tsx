@@ -1,6 +1,6 @@
 "use client";
 import dynamic from "next/dynamic";
-import { GuidanceProps } from "./Guidance";
+import { CollectionHostGuidanceProps } from "./CollectionHostGuidance";
 
 // hack because https://github.com/vercel/next-plugins/issues/388
 // - hard to transform mdx files to use in tests
@@ -8,10 +8,10 @@ import { GuidanceProps } from "./Guidance";
 const isTest = process.env.NODE_ENV === "test";
 const Guidance = isTest
   ? () => null
-  : dynamic(() => import("./Guidance"), { ssr: false });
+  : dynamic(() => import("./CollectionHostGuidance"), { ssr: false });
 
-const GuidancePanel = (props: GuidanceProps) => {
+const CollectionHostGuidancePanel = (props: CollectionHostGuidanceProps) => {
   return <Guidance {...props} />;
 };
 
-export default GuidancePanel;
+export default CollectionHostGuidancePanel;

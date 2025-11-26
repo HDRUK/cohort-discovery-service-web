@@ -1,6 +1,6 @@
 "use client";
 
-import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
+import { type MRT_ColumnDef } from "material-react-table";
 import { useMemo } from "react";
 import { Task } from "../../types/api";
 import {
@@ -16,6 +16,7 @@ import { useTable } from "../../hooks/useTable";
 import { formatNumber } from "@/utils/numbers";
 import { RemoveCircle } from "@mui/icons-material";
 import dayjs from "dayjs";
+import Table from "../Table";
 
 type TaskResultsProps = {
   tasks: Task[];
@@ -130,10 +131,10 @@ const TaskResults = ({ tasks }: TaskResultsProps) => {
 
   const table = useTable({
     columns,
-    data: tasks,
+    data: tasks || [],
   });
 
-  return <MaterialReactTable table={table} />;
+  return <Table table={table} />;
 };
 
 export default TaskResults;

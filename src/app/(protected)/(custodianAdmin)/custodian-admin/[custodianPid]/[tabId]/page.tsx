@@ -10,11 +10,19 @@ import CollectionHostsTab, {
 import CollectionsTab, {
   CollectionsSkeleton,
 } from "./components/CollectionsTab";
+import { SearchParams } from "@/types/api";
 
 type Params = Promise<{ custodianPid: string; tabId: string }>;
 
-const CustodianAdminPage = async ({ params }: { params: Params }) => {
+const CustodianAdminPage = async ({
+  params,
+  searchParams,
+}: {
+  params: Params;
+  searchParams: SearchParams;
+}) => {
   const { custodianPid, tabId } = await params;
+  const apiSearchParams = await searchParams;
 
   const tabs = [
     { id: "hosts", label: "Hosts", href: routes.teamHosts(custodianPid) },
@@ -39,7 +47,10 @@ const CustodianAdminPage = async ({ params }: { params: Params }) => {
           <CollectionHostsTab custodianPid={custodianPid} />
         </Suspense>
         <Suspense fallback={<CollectionsSkeleton />}>
-          <CollectionsTab custodianPid={custodianPid} />
+          <CollectionsTab
+            custodianPid={custodianPid}
+            searchParams={apiSearchParams}
+          />
         </Suspense>
       </TabsShell>
     )
