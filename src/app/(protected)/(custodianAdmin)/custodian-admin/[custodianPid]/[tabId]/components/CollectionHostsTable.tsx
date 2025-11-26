@@ -9,12 +9,14 @@ interface CollectionHostsTableProps {
   collectionHosts: CollectionHost[];
   rowSelection: MRT_RowSelectionState;
   setRowSelection: Dispatch<SetStateAction<MRT_RowSelectionState>>;
+  onDelete: (ids: string[]) => void;
 }
 
 const CollectionHostsTable = ({
   collectionHosts,
   rowSelection,
   setRowSelection,
+  onDelete,
 }: CollectionHostsTableProps) => {
   const columns = useMemo<MRT_ColumnDef<CollectionHost>[]>(
     () => [
@@ -36,7 +38,7 @@ const CollectionHostsTable = ({
 
   return (
     <Box>
-      <Table table={table} />
+      <Table table={table} handleDeleteRows={onDelete} />
     </Box>
   );
 };
