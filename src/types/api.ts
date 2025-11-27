@@ -180,7 +180,7 @@ export interface Custodian {
 }
 
 export interface CombinedUser extends User {
-  gateway_user: TokenUser | null;
+  token_user: TokenUser | null;
 }
 
 export interface CreateCollectionHostPost {
