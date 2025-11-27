@@ -9,9 +9,11 @@ const AdminPage = ({ children }: { children: React.ReactNode }) => {
     userData: { user },
   } = useDaphneStore();
 
-  const { gateway_user } = user || {};
-  const is_admin = gateway_user?.cohort_discovery_roles.includes(Roles.ADMIN) ||
-    gateway_user?.cohort_discovery_roles.includes(Roles.SYSTEM_ADMIN) || {};
+  const { token_user } = user || {};
+  const is_admin =
+    token_user?.cohort_discovery_roles.includes(Roles.ADMIN) ||
+    token_user?.cohort_discovery_roles.includes(Roles.SYSTEM_ADMIN) ||
+    {};
 
   if (!is_admin) forbidden();
 

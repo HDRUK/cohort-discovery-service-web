@@ -24,7 +24,7 @@ export default function LeftSidebar() {
   } = useDaphneStore();
 
   const teamIds = useMemo(
-    () => user?.gateway_user?.admin_teams?.map((t) => t.id) ?? [],
+    () => user?.token_user?.cohort_admin_teams?.map((t) => t.id) ?? [],
     [user]
   );
   const userCustodians = useMemo(
@@ -38,7 +38,7 @@ export default function LeftSidebar() {
     key: `custodian-${uc.pid}`,
   }));
 
-  const isAdmin = useMemo(() => user?.gateway_user?.is_admin, [user]);
+  const isAdmin = useMemo(() => user?.token_user?.is_admin, [user]);
 
   const menu: MenuItem[] = useMemo(
     () => [

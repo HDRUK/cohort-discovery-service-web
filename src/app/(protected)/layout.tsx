@@ -56,7 +56,7 @@ export default async function ProtectedLayout({
 
   const { data: custodians } = await getCustodians();
 
-  const combinedUser = { ...me, gateway_user: user } as unknown as CombinedUser;
+  const combinedUser = { ...me, token_user: user } as unknown as CombinedUser;
 
   return (
     <ProtectedPage user={combinedUser} custodians={custodians}>
