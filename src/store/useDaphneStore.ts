@@ -79,6 +79,7 @@ export interface DaphneStoreState {
     setQueryName: (name: string) => void;
     queryBuilderJson: RuleGroupType;
     setQueryBuilderJson: (query: RuleGroupType) => void;
+    resetQueryBuilderJson: () => void;
     getNodeName: (node: RuleNodeType) => string;
     setNodeName: (node: RuleNodeType, name: string) => void;
     boardIndex: BoardIndex;
@@ -189,6 +190,12 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
 
   queryBuilder: {
     queryBuilderJson: validateRuleTree(DEFAULT_QUERY),
+    resetQueryBuilderJson: () => {
+      const {
+        queryBuilder: { setQueryBuilderJson },
+      } = get();
+      setQueryBuilderJson(DEFAULT_QUERY);
+    },
     boardIndex: buildIndexFromModel(DEFAULT_QUERY),
     sizeCache: {},
     setSizeCache: (id, width, height) =>

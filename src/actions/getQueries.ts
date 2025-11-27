@@ -3,16 +3,18 @@
 import { apiGet } from "../lib/apiClient";
 import { API_ROUTES } from "../lib/apiRoutes";
 import { Query, ApiResponse, Paginated, WithIncomplete } from "../types/api";
-import { DEFAULT_QUERIES_PER_PAGE } from "../config/defaults";
+import { getTokenUser } from "@/lib/auth";
 
 const getQueries = async (
-  page = 1,
-  per_page = DEFAULT_QUERIES_PER_PAGE
+  searchParams?: URLSearchParams
 ): Promise<WithIncomplete<ApiResponse<Paginated<Query[]>>>> => {
-  // user sessions
-  const userId = 1;
+  const { user } = await getTokenUser();
+  const userId = user.id;
+
   const { data, message } = await apiGet<ApiResponse<Paginated<Query[]>>>(
-    `${API_ROUTES.queries}?page=${page}&per_page=${per_page}`,
+    searchParams?.toString()
+      ? `${API_ROUTES.queries}?${searchParams.toString()}`
+      : API_ROUTES.queries,
     {
       next: {
         revalidate: 60,
@@ -20,7 +22,7 @@ const getQueries = async (
           "all",
           "queries",
           `${userId}-queries`,
-          `${userId}-queries-${page}-${per_page}`,
+          `${userId}-queries-${searchParams?.toString()}`,
         ],
       },
       cache: "force-cache",

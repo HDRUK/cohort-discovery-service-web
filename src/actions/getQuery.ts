@@ -10,7 +10,9 @@ const getQuery = async (
   useCache: boolean = true
 ): Promise<ApiResponse<Query>> => {
   const baseUrl = API_ROUTES.getQuery(pid);
-  const url = searchParams ? `${baseUrl}?${searchParams.toString()}` : baseUrl;
+  const url = searchParams?.toString()
+    ? `${baseUrl}?${searchParams.toString()}`
+    : baseUrl;
 
   return await apiGet<ApiResponse<Query>>(url, {
     next: {

@@ -44,7 +44,19 @@ const TableWithState = () => {
     getRowId: (row) => String(row.id),
   });
 
-  return <Table table={table} handleDeleteRows={handleDeleteRows} />;
+  return (
+    <Table
+      table={table}
+      rightAction={{
+        deleteProps: { onClick: handleDeleteRows },
+        downloadProps: {
+          id: "download-id",
+          entity: "test-entity",
+          format: "json",
+        },
+      }}
+    />
+  );
 };
 
 describe("Table", () => {
@@ -101,5 +113,25 @@ describe("Table", () => {
     await userEvent.click(deleteButton);
 
     expect(handleDeleteRows).toHaveBeenLastCalledWith(["2"]);
+  });
+
+  it("it can donwload on click", async () => {
+    render(<TableWithState />);
+
+    const row = screen.getByRole("row", { name: /name1/i });
+
+    const checkbox = within(row).getByRole("checkbox", {
+      name: /toggle select row/i,
+    });
+
+    await userEvent.click(checkbox);
+    const downloadButton = screen.getByTestId("download-button");
+
+    expect(downloadButton).toBeInTheDocument();
+
+    expect(downloadButton).toHaveAttribute(
+      "href",
+      "/api/download/download-id?entity=test-entity&format=json"
+    );
   });
 });

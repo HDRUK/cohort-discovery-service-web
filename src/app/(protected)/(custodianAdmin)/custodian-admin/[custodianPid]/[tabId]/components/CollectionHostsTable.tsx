@@ -38,7 +38,10 @@ const CollectionHostsTable = ({
 
   return (
     <Box>
-      <Table table={table} handleDeleteRows={onDelete} />
+      <Table
+        table={table}
+        rightAction={{ deleteProps: { onClick: onDelete } }}
+      />
     </Box>
   );
 };

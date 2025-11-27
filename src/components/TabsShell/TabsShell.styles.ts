@@ -29,6 +29,7 @@ export const tabContentSx: Sx = {
 
 export const tabListSx: Sx = {
   "& .MuiTabs-indicator": {
+    display: "none",
     top: 0,
     bottom: "auto",
   },

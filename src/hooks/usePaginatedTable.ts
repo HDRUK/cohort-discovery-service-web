@@ -28,6 +28,7 @@ export function usePaginatedTable<TData extends { pid: string }>({
   expandFirstRow = false,
   getRowId = (row) => row.pid,
   state,
+  initialState,
   ...rest
 }: UsePaginatedTableOptions<TData>) {
   const router = useRouter();
@@ -74,7 +75,7 @@ export function usePaginatedTable<TData extends { pid: string }>({
     router.replace(`?${params.toString()}`);
   }, [pagination.pageIndex, pagination.pageSize, router, searchParams]);
 
-  const firstRowId = data?.[0]?.pid;
+  const firstRowId = getRowId(data?.[0]);
   const expanded = useMemo(() => {
     return firstRowId && expandFirstRow ? { [firstRowId]: true } : {};
   }, [firstRowId, expandFirstRow]);
@@ -90,6 +91,7 @@ export function usePaginatedTable<TData extends { pid: string }>({
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
     initialState: {
+      ...initialState,
       expanded,
     },
     state: {

@@ -12,7 +12,7 @@ export const routes = {
     dashboardPath("new-query", queryParams),
   dashboardQueryResult: (pid: string) =>
     `${dashboardPath("query-result")}?query=${pid}`,
-  dashboardHistory: dashboardPath("history"),
+  dashboardHistory: dashboardPath("query-history"),
   dashboardCollections: dashboardPath("collections"),
   dashboardCodes: dashboardPath("codes"),
   profile: "/profile",

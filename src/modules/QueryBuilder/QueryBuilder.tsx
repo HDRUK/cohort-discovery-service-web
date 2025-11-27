@@ -1,7 +1,7 @@
 "use client";
 import useQueryBuilder from "@/store/useQueryBuilder";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { Grid } from "@mui/material";
 import SwimLane from "@/components/SwimLane";
 import ActionMenu from "../ActionMenu";
@@ -36,17 +36,23 @@ import MarqueeSelection from "@/components/MarqueeSelection";
 const QueryBuilder = () => {
   const {
     queryBuilderJson,
+    resetQueryBuilderJson,
     setQueryBuilderJson,
     boardIndex,
     select,
     deselect,
   } = useQueryBuilder((qb) => ({
+    resetQueryBuilderJson: qb.resetQueryBuilderJson,
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
     boardIndex: qb.boardIndex,
     select: qb.select,
     deselect: qb.deselect,
   }));
+
+  useEffect(() => {
+    resetQueryBuilderJson();
+  }, [resetQueryBuilderJson]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),

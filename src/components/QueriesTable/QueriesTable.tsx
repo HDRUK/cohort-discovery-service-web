@@ -2,33 +2,46 @@
 
 import useQueryBuilder from "@/store/useQueryBuilder";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Query, Paginated } from "../../types/api";
-import { type MRT_ColumnDef } from "material-react-table";
-import { Grid, Paper } from "@mui/material";
+import {
+  MRT_ExpandedState,
+  MRT_RowSelectionState,
+  type MRT_ColumnDef,
+} from "material-react-table";
+import { Grid, Paper, Typography } from "@mui/material";
 import dayjs from "dayjs";
-import TaskResults from "@/components/TaskResults";
 import { revalidateAction } from "@/actions/revalidate";
 import { usePaginatedTable } from "../../hooks/usePaginatedTable";
-import { useRouter } from "next/navigation";
 import { formatNumber } from "@/utils/numbers";
 import Link from "next/link";
 import { Link as MuiLink } from "@mui/material";
 import { routes } from "../../config/routes";
 import Table from "../Table";
+import { getTasksStatus, getTotalAllTasks } from "@/utils/tasks";
+import QueryResultsTable from "../QueryResultsTable";
+import ControlledSearchBox from "@/modules/ControlledSearchBox";
+import Title from "../Title";
+import { queryToText } from "@/utils/queryBuilder";
+import { useRouter } from "next/navigation";
+
+interface QueriesTableProps {
+  queries: Paginated<Query[]>;
+  hasIncomplete: boolean;
+  columnVisibility?: Record<string, boolean>;
+}
 
 const QueriesTable = ({
   queries,
   hasIncomplete,
-}: {
-  queries: Paginated<Query[]>;
-  hasIncomplete: boolean;
-}) => {
+  columnVisibility = { pid: false, "mrt-row-expand": false },
+}: QueriesTableProps) => {
   const router = useRouter();
+
   const { setQueryBuilderJson, setSelectedDatasets } = useQueryBuilder(
     (qb) => ({
-      setQueryBuilderJson: qb.setQueryBuilderJson,
       setSelectedDatasets: qb.setSelectedDatasets,
+      setQueryBuilderJson: qb.setQueryBuilderJson,
     })
   );
 
@@ -42,6 +55,7 @@ const QueriesTable = ({
 
   const columns: MRT_ColumnDef<Query>[] = [
     {
+      id: "pid",
       accessorKey: "pid",
       header: "Query ID",
       minSize: 80,
@@ -69,121 +83,154 @@ const QueriesTable = ({
     {
       accessorKey: "name",
       header: "Query Name",
-      minSize: 80,
-      maxSize: 80,
+      minSize: 100,
+      maxSize: 300,
       Cell: ({ cell }) => cell.getValue<string>(),
     },
     {
       accessorKey: "created_at",
-      header: "Created",
+      header: "Started(UTC)",
       minSize: 80,
-      maxSize: 150,
+      maxSize: 80,
       Cell: ({ cell }) =>
-        dayjs(cell.getValue<string>()).format("MMM D, YYYY h:mm A"),
+        dayjs(cell.getValue<string>()).format("DD/MM/YYYY, HH:MM:ss"),
     },
     {
-      accessorFn: (row) => row.tasks?.length ?? 0,
-      id: "tasks",
-      header: "Dataset Count",
+      id: "status",
+      accessorFn: (row) => getTasksStatus(row.tasks),
+      header: "Status",
       minSize: 50,
       maxSize: 80,
-      Cell: ({ cell }) => cell.getValue<number>().toString(),
+      Cell: ({ cell }) => cell.getValue<string>().toString(),
     },
     {
       id: "total",
-      header: "Total Count",
+      header: "Total",
       minSize: 50,
       maxSize: 80,
       Cell: ({ cell }) => formatNumber(cell.getValue<number>()),
       accessorFn: (row) => {
         const tasks = row.tasks || [];
-        const count = tasks
-          .filter((t) => t.completed_at !== null)
-          .filter((t) => !!t.result)
-          .reduce((sum, t) => sum + (t.result?.count || 0), 0);
-        return count;
+        return getTotalAllTasks(tasks);
       },
-    },
-    {
-      id: "percentComplete",
-      header: "Percent Complete",
-      minSize: 50,
-      maxSize: 80,
-      accessorFn: (row) => {
-        const tasks = row.tasks || [];
-        if (tasks.length === 0) return "0%";
-        const completedCount = tasks.filter(
-          (t) => t.completed_at !== null
-        ).length;
-        const percent = Math.round((completedCount / tasks.length) * 100);
-        return `${percent}%`;
-      },
-      Cell: ({ cell }) => (
-        <span data-testid="percent-complete">{cell.getValue<string>()}</span>
-      ),
     },
   ];
+
+  const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({
+    [queries.data[0]?.pid]: true,
+  });
+  const [expanded, setExpanded] = useState<MRT_ExpandedState>({
+    [queries.data[0]?.pid]: true,
+  });
 
   const table = usePaginatedTable<Query>({
     columns,
     data: queries.data,
+    enableSorting: false,
     rowCount: queries.total,
     perPageDefault: queries.per_page,
     expandFirstRow: true,
+    initialState: { columnVisibility },
+    enableRowSelection: true,
+    manualExpanding: true,
+    enableExpanding: true,
+    onRowSelectionChange: (updaterOrValue) => {
+      setRowSelection((prev) => {
+        const nextSelection =
+          typeof updaterOrValue === "function"
+            ? updaterOrValue(prev)
+            : updaterOrValue;
+
+        setExpanded(() => {
+          const nextExpanded: Record<string, boolean> = {};
+          for (const rowId of Object.keys(nextSelection)) {
+            nextExpanded[rowId] = true;
+          }
+          return nextExpanded;
+        });
+
+        return nextSelection;
+      });
+    },
+    state: {
+      rowSelection,
+      expanded,
+    },
     renderDetailPanel: ({ row }) => (
-      <Grid
-        container
-        spacing={2}
-        sx={{
-          p: 4,
-          borderRadius: 4,
-          border: 1,
-          borderColor: "grey.300",
-          backgroundColor: "#fff",
-        }}
+      <Paper
+        onClick={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
       >
-        <Grid size={12}>
-          <TaskResults tasks={row.original.tasks} />
-        </Grid>
-        <Grid size={6}>
-          <Paper
-            elevation={1}
-            sx={{
-              p: 2,
-              bgcolor: "grey.200",
-              cursor: "pointer",
-              transition: "all 0.2s ease-in-out",
-              "&:hover": {
-                bgcolor: "grey.300",
-                boxShadow: 3,
+        <QueryResultsTable
+          query={row.original}
+          useTableProps={{ enableRowSelection: false }}
+          tableProps={{
+            leftAction: (
+              <Title title={row.original.name} subTitle={"Results"} />
+            ),
+            details: (
+              <Grid container sx={{ pt: 1 }}>
+                <Grid size={10}>
+                  <Typography>
+                    {queryToText(row.original.definition)}
+                  </Typography>
+                </Grid>
+                <Grid size={1}>
+                  <Typography>
+                    Total{" "}
+                    <b> {formatNumber(getTotalAllTasks(row.original.tasks))}</b>
+                  </Typography>
+                </Grid>
+                <Grid size={1}>
+                  <Typography>
+                    {dayjs(row.original.created_at).format(
+                      "DD/MM/YYYY, HH:MM:ss"
+                    )}
+                  </Typography>
+                </Grid>
+              </Grid>
+            ),
+            rightAction: {
+              downloadProps: {
+                id: row.original.pid,
+                entity: "queries",
+                format: "json",
               },
-            }}
-            onClick={() => {
-              if (row.original.definition) {
-                setQueryBuilderJson(row.original.definition);
-                setSelectedDatasets(
-                  row.original.tasks.map((t) => t.collection.pid)
-                );
-                router.push("new-query");
-              }
-            }}
-          >
-            <pre
-              style={{
-                whiteSpace: "pre-wrap",
-                wordBreak: "break-word",
-                margin: 0,
-              }}
-            >
-              {/* to be implemetned */}
-            </pre>
-          </Paper>
-        </Grid>
-      </Grid>
+              refreshProps: { tag: row.original.pid, disabled: true },
+              editProps: {
+                onClick: () => {
+                  setQueryBuilderJson(row.original.definition);
+                  router.push(routes.dashboardNewQuery());
+                },
+              },
+              deleteProps: { disabled: true },
+            },
+          }}
+        />
+      </Paper>
     ),
   });
 
-  return <Table table={table} />;
+  return (
+    <Table
+      table={table}
+      leftAction={
+        <ControlledSearchBox placeholder="Search your historical queries..." />
+      }
+      rightAction={{
+        refreshProps: { tag: "queries" },
+        downloadProps: { disabled: true },
+        deleteProps: {
+          disabled: true,
+          onClick: (rows) => {
+            // to be implemented...
+            console.log(rows);
+          },
+        },
+        sortProps: { field: "name" },
+      }}
+    />
+  );
 };
 
 export default QueriesTable;
