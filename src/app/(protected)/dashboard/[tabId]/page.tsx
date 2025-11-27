@@ -37,7 +37,7 @@ const DashboardTabPage = async (props: {
       id: "new-query",
       label: "New Query",
       href: routes.dashboardNewQuery(),
-      page: <NewQueryPage />,
+      page: <NewQueryPage query={query as string} />,
     },
     ...(showQueryResult
       ? [

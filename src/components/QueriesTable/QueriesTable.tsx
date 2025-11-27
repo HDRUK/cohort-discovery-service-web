@@ -40,6 +40,7 @@ const QueriesTable = ({
 
   const { setQueryBuilderJson, setSelectedDatasets } = useQueryBuilder(
     (qb) => ({
+      resetQueryBuilderJson: qb.resetQueryBuilderJson,
       setSelectedDatasets: qb.setSelectedDatasets,
       setQueryBuilderJson: qb.setQueryBuilderJson,
     })
@@ -200,7 +201,9 @@ const QueriesTable = ({
               editProps: {
                 onClick: () => {
                   setQueryBuilderJson(row.original.definition);
-                  router.push(routes.dashboardNewQuery());
+                  router.push(
+                    routes.dashboardNewQuery(`query=${row.original.pid}`)
+                  );
                 },
               },
               deleteProps: { disabled: true },

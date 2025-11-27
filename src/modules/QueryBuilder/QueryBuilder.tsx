@@ -32,8 +32,9 @@ import DragOverlay from "@/components/DragOverlay";
 import { RuleNodeType } from "@/types/rules";
 import { findById, moveItemIntoGroup } from "@/utils/rules";
 import MarqueeSelection from "@/components/MarqueeSelection";
+import { Query } from "@/types/api";
 
-const QueryBuilder = () => {
+const QueryBuilder = ({ query }: { query?: Query }) => {
   const {
     queryBuilderJson,
     resetQueryBuilderJson,
@@ -53,6 +54,12 @@ const QueryBuilder = () => {
   useEffect(() => {
     resetQueryBuilderJson();
   }, [resetQueryBuilderJson]);
+
+  useEffect(() => {
+    if (query?.definition) {
+      setQueryBuilderJson(query.definition);
+    }
+  }, [query, setQueryBuilderJson]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),

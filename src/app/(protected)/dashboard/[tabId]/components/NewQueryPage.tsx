@@ -4,10 +4,12 @@ import { Skeleton } from "@mui/material";
 import { Suspense } from "react";
 import CohortBuilder from "./CohortBuilder";
 
-const NewQueryPage = async () => {
+type PageSearchParams = { query?: string };
+
+const NewQueryPage = async (props: PageSearchParams) => {
   return (
     <Suspense fallback={<Skeleton height={600} />}>
-      <CohortBuilder />
+      <CohortBuilder {...props} />
     </Suspense>
   );
 };
