@@ -20,12 +20,12 @@ type KVRow = {
 const UserDetailsTable = ({ user }: { user: CombinedUser }) => {
   const data: KVRow[] = [
     { label: "ID", value: user.id },
-    { label: "Gateway ID", value: user?.gateway_user?.id },
+    { label: "Gateway ID", value: user?.token_user?.id },
     {
       label: "Gateway Teams",
-      value: user.gateway_user?.admin_teams?.length ? (
+      value: user.token_user?.cohort_admin_teams?.length ? (
         <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-          {user.gateway_user.admin_teams.map((t) => (
+          {user.token_user.cohort_admin_teams.map((t) => (
             <Chip key={t.id} size="small" label={t.name} />
           ))}
         </Stack>
@@ -35,7 +35,7 @@ const UserDetailsTable = ({ user }: { user: CombinedUser }) => {
     },
     { label: "Name", value: user.name },
     { label: "Email", value: user.email },
-    { label: "Orcid", value: user.gateway_user?.orcid || "—" },
+    { label: "Orcid", value: user.token_user?.orcid || "—" },
     {
       label: "Email Verified",
       value: user.email_verified_at ? (
@@ -65,10 +65,10 @@ const UserDetailsTable = ({ user }: { user: CombinedUser }) => {
         : "—",
     },
 
-    { label: "Provider", value: user.gateway_user?.provider ?? "—" },
+    { label: "Provider", value: user.token_user?.provider ?? "—" },
     {
       label: "Admin",
-      value: user.gateway_user?.is_admin ? (
+      value: user.token_user?.is_admin ? (
         <Chip size="small" color="success" label="Admin" />
       ) : (
         <Chip size="small" variant="outlined" label="User" />
@@ -76,7 +76,7 @@ const UserDetailsTable = ({ user }: { user: CombinedUser }) => {
     },
     {
       label: "NHSE SDE Approved",
-      value: user.gateway_user?.is_nhse_sde_approval ? (
+      value: user.token_user?.is_nhse_sde_approval ? (
         <CheckCircleOutlineIcon color="success" />
       ) : (
         <BlockIcon color="error" />
@@ -84,9 +84,9 @@ const UserDetailsTable = ({ user }: { user: CombinedUser }) => {
     },
     {
       label: "Roles",
-      value: user.gateway_user?.cohort_discovery_roles?.length ? (
+      value: user.token_user?.cohort_discovery_roles?.length ? (
         <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-          {user.gateway_user.cohort_discovery_roles.map((r) => (
+          {user.token_user.cohort_discovery_roles.map((r) => (
             <Chip key={r} size="small" label={r} />
           ))}
         </Stack>
@@ -96,9 +96,9 @@ const UserDetailsTable = ({ user }: { user: CombinedUser }) => {
     },
     {
       label: "Workgroups",
-      value: user.gateway_user?.workgroups?.length ? (
+      value: user.token_user?.workgroups?.length ? (
         <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-          {user.gateway_user.workgroups.map((wg) => (
+          {user.token_user.workgroups.map((wg) => (
             <Chip color="secondary" key={wg.id} size="small" label={wg.name} />
           ))}
         </Stack>
