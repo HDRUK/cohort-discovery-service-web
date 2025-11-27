@@ -24,7 +24,7 @@ export default function LeftSidebar() {
   } = useDaphneStore();
 
   const teamIds = useMemo(
-    () => user?.gateway_user?.admin_teams?.map((t) => t.id) ?? [],
+    () => user?.gateway_user?.cohort_admin_teams?.map((t) => t.id) ?? [],
     [user]
   );
   const userCustodians = useMemo(

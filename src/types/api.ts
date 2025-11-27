@@ -168,7 +168,7 @@ export interface TokenUser {
   provider: string;
   workgroups: Workgroups[];
   cohort_discovery_roles: Roles[];
-  admin_teams: GatewayTeam[];
+  cohort_admin_teams: GatewayTeam[];
 }
 
 export interface Custodian {
