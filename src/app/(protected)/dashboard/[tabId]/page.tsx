@@ -9,6 +9,7 @@ import getQuery from "@/actions/getQuery";
 import { capVarChar } from "@/utils/string";
 import { Query } from "@/types/api";
 import { SearchParams } from "@/types/api";
+import QueryHistoryPage from "./components/QueryHistoryPage";
 
 type Params = Promise<{ tabId: string }>;
 
@@ -29,35 +30,32 @@ const DashboardTabPage = async (props: {
     queryName = capVarChar(queryData.name, 30, true);
   }
 
-  // note - work in progress
-  // - to be completed and cleaned up in the next few tasks
+  const showQueryResult = query && queryName;
+
   const TABS = [
     {
       id: "new-query",
       label: "New Query",
       href: routes.dashboardNewQuery(),
+      page: <NewQueryPage query={query as string} />,
     },
-    ...(query && queryName
+    ...(showQueryResult
       ? [
           {
             id: "query-result",
-            label: queryName,
+            label: queryName || "Query Result",
             href: routes.dashboardQueryResult(query as string),
             onCloseHref: routes.dashboardNewQuery(),
+            page: tabId === "query-result" && <QueryResultsPage {...props} />,
           },
         ]
       : []),
-    /*{ id: "history", label: "History", href: routes.dashboardHistory },
-  {
-    id: "collections",
-    label: "Collections",
-    href: routes.dashboardCollections,
-  },
-  {
-    id: "codes",
-    label: "Codes",
-    href: routes.dashboardCodes,
-  },*/
+    {
+      id: "query-history",
+      label: "Query History",
+      href: routes.dashboardHistory,
+      page: tabId === "query-history" && <QueryHistoryPage {...props} />,
+    },
   ];
 
   const isValidTabId = (tabId: string) => TABS.some((t) => t.id === tabId);
@@ -67,14 +65,7 @@ const DashboardTabPage = async (props: {
 
   if (!isValidTabId(tabId)) return notFound();
 
-  return (
-    token && (
-      <TabsShell initial={tabId} tabs={TABS}>
-        <NewQueryPage />
-        <QueryResultsPage {...props} />
-      </TabsShell>
-    )
-  );
+  return token && <TabsShell value={tabId} tabs={TABS} />;
 };
 
 export default DashboardTabPage;

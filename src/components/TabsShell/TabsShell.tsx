@@ -19,6 +19,7 @@ import {
 import { useRouter } from "next/navigation";
 
 type TabType = {
+  page: React.ReactNode;
   id?: string;
   label: string;
   href?: string;
@@ -27,8 +28,7 @@ type TabType = {
 
 type TabsShellProps = {
   tabs: TabType[];
-  children: React.ReactNode | React.ReactNode[];
-  initial?: number | string;
+  value?: number | string;
   sx?: BoxProps["sx"];
   tabSx?: BoxProps["sx"];
   tabHeaderSx?: BoxProps["sx"];
@@ -37,25 +37,28 @@ type TabsShellProps = {
 
 export default function TabsShell({
   tabs,
-  children,
-  initial,
+  value,
   sx = defaultRootSx,
   tabSx = defaultTabSx,
   tabHeaderSx = defaultTabHeaderSx,
   tabContentSx = defaultTabContentSx,
 }: TabsShellProps) {
-  const [value, setValue] = React.useState(
-    initial ? initial : tabs[0]?.id || 0
-  );
-  const handleChange = (_: React.SyntheticEvent, newValue: string) =>
-    setValue(newValue);
-
-  const kids = React.Children.toArray(children);
   const router = useRouter();
+  const [internalValue, setInternalValue] = React.useState(
+    value ? value : tabs[0]?.id || 0
+  );
+  const handleChange = (_: React.SyntheticEvent, newValue: string) => {
+    if (value && value === internalValue) return;
+    setInternalValue(newValue);
+  };
+
+  const pages = tabs.map((tab) => tab.page);
+
+  const kids = React.Children.toArray(pages);
 
   return (
     <Box sx={sx}>
-      <TabContext value={value}>
+      <TabContext value={internalValue}>
         <Box sx={tabHeaderSx}>
           <TabList
             onChange={handleChange}
@@ -87,8 +90,8 @@ export default function TabsShell({
                     )}
                   </Typography>
                 }
-                component={Link}
-                href={href ?? "#"}
+                component={href ? Link : "a"}
+                href={href ?? undefined}
                 sx={tabSx}
                 onClick={(e) => {
                   if (!href) e.preventDefault();

@@ -112,7 +112,7 @@ const CollectionsTable = ({
       <Table
         key="custodian-collection-table"
         table={table}
-        handleDeleteRows={handleDeleteCollections}
+        rightAction={{ deleteProps: { onClick: handleDeleteCollections } }}
       />
     </Box>
   );

@@ -72,6 +72,7 @@ function makeDefaultStore(): DaphneStoreState {
       createNewOperator: (_above: boolean = true) => {},
 
       setQueryBuilderJson: NOOP,
+      resetQueryBuilderJson: NOOP,
       getQueryFromText: (_input: string) => {},
 
       selectedDatasets: [],

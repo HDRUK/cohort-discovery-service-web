@@ -1,7 +1,7 @@
 "use client";
 import useQueryBuilder from "@/store/useQueryBuilder";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { Grid } from "@mui/material";
 import SwimLane from "@/components/SwimLane";
 import ActionMenu from "../ActionMenu";
@@ -32,21 +32,34 @@ import DragOverlay from "@/components/DragOverlay";
 import { RuleNodeType } from "@/types/rules";
 import { findById, moveItemIntoGroup } from "@/utils/rules";
 import MarqueeSelection from "@/components/MarqueeSelection";
+import { Query } from "@/types/api";
 
-const QueryBuilder = () => {
+const QueryBuilder = ({ query }: { query?: Query }) => {
   const {
     queryBuilderJson,
+    resetQueryBuilderJson,
     setQueryBuilderJson,
     boardIndex,
     select,
     deselect,
   } = useQueryBuilder((qb) => ({
+    resetQueryBuilderJson: qb.resetQueryBuilderJson,
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
     boardIndex: qb.boardIndex,
     select: qb.select,
     deselect: qb.deselect,
   }));
+
+  useEffect(() => {
+    resetQueryBuilderJson();
+  }, [resetQueryBuilderJson]);
+
+  useEffect(() => {
+    if (query?.definition) {
+      setQueryBuilderJson(query.definition);
+    }
+  }, [query, setQueryBuilderJson]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),

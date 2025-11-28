@@ -1,25 +1,58 @@
-import { Box, IconButton } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { Box, Divider, Grid } from "@mui/material";
 import {
   MaterialReactTable,
   MaterialReactTableProps,
   MRT_RowData,
 } from "material-react-table";
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { trueKeys } from "@/utils/numbers";
+import RevalidateButton from "@/components/RevalidateButton";
+import DownloadButton from "../DownloadButton";
+import { DownloadButtonProps } from "../DownloadButton/DownloadButton";
+import SortButton, { SortButtonProps } from "../SortButton/SortButton";
+import EditButton, { EditButtonProps } from "../EditButton";
+import { RevalidateButtonProps } from "../RevalidateButton/RevalidateButton";
+import DeleteButton, { DeleteButtonProps } from "../DeleteButton";
 
-type TableProps<TData extends MRT_RowData> = MaterialReactTableProps<TData> & {
-  handleDeleteRows?: (rowIds: string[]) => void;
-};
+export interface TableProps {
+  leftAction?: React.ReactNode;
+  rightAction?: {
+    refreshProps?: RevalidateButtonProps;
+    deleteProps?: Omit<DeleteButtonProps, "onClick"> & {
+      onClick?: (selectedRowIds: string[]) => void;
+    };
+    downloadProps?: Omit<DownloadButtonProps, "onClick"> & {
+      onClick?: (selectedRowIds: string[]) => void;
+    };
+    sortProps?: SortButtonProps;
+    editProps?: Omit<EditButtonProps, "onClick"> & {
+      onClick?: (selectedRowIds: string[]) => void;
+    };
+  };
+  details?: React.ReactNode;
+}
+
+type DTableProps<TData extends MRT_RowData> = MaterialReactTableProps<TData> &
+  TableProps;
 
 const Table = <TData extends MRT_RowData>({
-  handleDeleteRows,
+  leftAction,
+  rightAction,
+  details,
   ...props
-}: TableProps<TData>) => {
+}: DTableProps<TData>) => {
   const { table } = props;
   const { rowSelection = {} } = table?.getState() || {};
 
   const selectedRows = useMemo(() => trueKeys(rowSelection), [rowSelection]);
+
+  const { sortProps, editProps, refreshProps, deleteProps, downloadProps } =
+    rightAction || {};
+
+  const { onClick: onDeleteClick, ...restDeleteProps } = deleteProps ?? {};
+  const { onClick: onDownloadClick, ...restDownloadProps } =
+    downloadProps ?? {};
+  const { onClick: onEditClick, ...restEditProps } = editProps ?? {};
 
   return (
     <Box
@@ -32,20 +65,52 @@ const Table = <TData extends MRT_RowData>({
         overflow: "hidden",
       }}
     >
-      <Box
-        sx={{
-          minHeight: 40,
-          display: "flex",
-          justifyContent: "flex-end",
-        }}
-      >
-        {selectedRows?.length > 0 && handleDeleteRows && (
-          <IconButton onClick={() => handleDeleteRows(selectedRows)}>
-            <DeleteIcon data-testid="DeleteIcon" />
-          </IconButton>
-        )}
-      </Box>
+      {(rightAction || leftAction) && (
+        <Grid container sx={{ pb: 2 }}>
+          <Grid size={10}>{leftAction}</Grid>
+          <Grid size={2}>
+            {rightAction && (
+              <Box
+                sx={{
+                  minHeight: 40,
+                  display: "flex",
+                  justifyContent: "flex-end",
+                }}
+              >
+                {sortProps && <SortButton {...sortProps} />}
 
+                {refreshProps && <RevalidateButton {...refreshProps} />}
+
+                {editProps && (
+                  <EditButton
+                    {...restEditProps}
+                    onClick={() => onEditClick?.(selectedRows)}
+                  />
+                )}
+
+                {deleteProps && (
+                  <DeleteButton
+                    {...restDeleteProps}
+                    onClick={() => onDeleteClick?.(selectedRows)}
+                  />
+                )}
+
+                {downloadProps && (
+                  <DownloadButton
+                    {...restDownloadProps}
+                    onClick={() => onDownloadClick?.(selectedRows)}
+                  />
+                )}
+              </Box>
+            )}
+          </Grid>
+        </Grid>
+      )}
+      {details && (
+        <Box sx={{ pb: 1 }}>
+          <Divider /> {details}
+        </Box>
+      )}
       <MaterialReactTable {...props} />
     </Box>
   );

@@ -1,41 +1,36 @@
 "use client";
 
 import { Query, Task, Result } from "../../types/api";
-import { type MRT_ColumnDef } from "material-react-table";
-import {
-  Box,
-  CircularProgress,
-  Divider,
-  Link,
-  Paper,
-  Typography,
-} from "@mui/material";
+import { MRT_TableOptions, type MRT_ColumnDef } from "material-react-table";
+import { Box, CircularProgress, Link } from "@mui/material";
 import ErrorIcon from "@mui/icons-material/Error";
+import LaunchIcon from "@mui/icons-material/Launch";
 import { revalidateAction } from "@/actions/revalidate";
-import { useCallback, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useTable } from "../../hooks/useTable";
 import { formatNumber } from "@/utils/numbers";
-import Title from "../Title";
 import useQueryBuilder from "@/store/useQueryBuilder";
-
-import ControlledSearchBox from "@/modules/ControlledSearchBox";
-import DownloadButton from "../DownloadButton";
-import SortButton from "../SortButton";
-import { SortAscendingIcon } from "@/icons/SortAscendingIcon";
-import { SortDescendingIcon } from "@/icons/SortDescendingIcon";
 import useSearchParams from "@/hooks/useSearchParams";
-import { SortDirection } from "@/types/common";
 import { STATUS_LABELS } from "@/config/defaults";
 import Table from "../Table";
+import { TableProps } from "../Table/Table";
 
-const QueryResultsTable = ({ query }: { query: Query }) => {
-  const { setQueryName, setQueryBuilderJson, queryAsText } = useQueryBuilder(
-    (qb) => ({
-      setQueryName: qb.setQueryName,
-      setQueryBuilderJson: qb.setQueryBuilderJson,
-      queryAsText: qb.queryAsText,
-    })
-  );
+interface QueryResultsTableProps {
+  query: Query;
+  tableProps?: TableProps;
+  useTableProps?: Omit<MRT_TableOptions<Task>, "data" | "columns">;
+}
+
+const QueryResultsTable = ({
+  query,
+  tableProps,
+  useTableProps,
+}: QueryResultsTableProps) => {
+  const { setQueryName, setQueryBuilderJson } = useQueryBuilder((qb) => ({
+    setQueryName: qb.setQueryName,
+    setQueryBuilderJson: qb.setQueryBuilderJson,
+    queryAsText: qb.queryAsText,
+  }));
 
   const { tasks, name, definition } = query;
 
@@ -70,19 +65,32 @@ const QueryResultsTable = ({ query }: { query: Query }) => {
       accessorKey: "collection_name",
       accessorFn: (row) => ({
         name: row.collection.name,
-        url: row.collection.url || "#",
+        url: row.collection.url,
       }),
       Cell: ({ cell }) => {
         const { name, url } = cell.getValue<{ name: string; url: string }>();
+        if (!url) {
+          return <span> {name} </span>;
+        }
         return (
-          <Link component="a" href={url}>
-            {name}
+          <Link
+            component={"a"}
+            href={url}
+            sx={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+            }}
+          >
+            <span>{name}</span>
+            <LaunchIcon fontSize="small" />
           </Link>
         );
       },
       header: "Dataset",
-      size: 400,
-      minSize: 400,
+      size: 200,
+      minSize: 200,
       maxSize: 400,
     },
     {
@@ -122,19 +130,8 @@ const QueryResultsTable = ({ query }: { query: Query }) => {
     },
   ];
 
-  const { getSearchParam, setSearchParam } = useSearchParams("sort");
+  const { getSearchParam } = useSearchParams("sort");
   const currentSortDirection = getSearchParam()?.split(":")[1];
-
-  const handleSort = useCallback(
-    (direction: SortDirection) => {
-      setSearchParam(
-        direction !== currentSortDirection
-          ? `collection.name:${direction}`
-          : null
-      );
-    },
-    [currentSortDirection, setSearchParam]
-  );
 
   // ideally this would be done on the BE
   // - made a note of this for the BE
@@ -152,70 +149,12 @@ const QueryResultsTable = ({ query }: { query: Query }) => {
   const table = useTable<Task>({
     columns,
     data: sortedTasks,
+    ...useTableProps,
   });
 
   return (
     <Box sx={{ p: 2, gap: 2, display: "flex", flexDirection: "column" }}>
-      <Title title={"Query Results"} subTitle={query.pid} />
-      <Typography variant="h6">{queryAsText}</Typography>
-      <Divider />
-      <ControlledSearchBox
-        placeholder="Search your query results..."
-        actions={[
-          <SortButton
-            key="sort"
-            active={!!currentSortDirection}
-            items={[
-              {
-                id: SortDirection.ASCENDING,
-                label: (
-                  <Typography
-                    component="span"
-                    sx={{ display: "flex", alignItems: "center" }}
-                    fontWeight={
-                      currentSortDirection == SortDirection.ASCENDING
-                        ? "bold"
-                        : "normal"
-                    }
-                  >
-                    <SortAscendingIcon sx={{ mr: 1 }} /> Sort alphabetically
-                    (A-Z)
-                  </Typography>
-                ),
-                onClick: () => handleSort(SortDirection.ASCENDING),
-              },
-              {
-                id: SortDirection.DESCENDING,
-                label: (
-                  <Typography
-                    component="span"
-                    sx={{ display: "flex", alignItems: "center" }}
-                    fontWeight={
-                      currentSortDirection == SortDirection.DESCENDING
-                        ? "bold"
-                        : "normal"
-                    }
-                  >
-                    <SortDescendingIcon sx={{ mr: 1 }} /> Sort alphabetically
-                    (Z-A)
-                  </Typography>
-                ),
-                onClick: () => handleSort(SortDirection.DESCENDING),
-              },
-            ]}
-          />,
-          <DownloadButton
-            key="download"
-            id={query.pid}
-            entity="queries"
-            format="json"
-          />,
-        ]}
-      />
-
-      <Paper sx={{ p: 2, gap: 2, display: "flex", flexDirection: "column" }}>
-        <Table table={table} />
-      </Paper>
+      <Table table={table} {...tableProps} />
     </Box>
   );
 };

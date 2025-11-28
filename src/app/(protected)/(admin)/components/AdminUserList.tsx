@@ -27,10 +27,18 @@ const AdminUserList = ({ users }: { users: User[] }) => {
         }}
         placeholder="Search users..."
       />
-      <TabsShell tabs={[{ label: "New Users" }, { label: "Existing Users" }]}>
-        <AdminUserTable users={newUsers || []} />
-        <AdminUserTable users={existingUsers || []} />
-      </TabsShell>
+      <TabsShell
+        tabs={[
+          {
+            label: "New Users",
+            page: <AdminUserTable users={newUsers || []} />,
+          },
+          {
+            label: "Existing Users",
+            page: <AdminUserTable users={existingUsers || []} />,
+          },
+        ]}
+      />
     </>
   );
 };

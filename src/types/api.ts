@@ -9,6 +9,7 @@ export interface ApiSearchParams {
   per_page?: number;
   page?: number;
   sort?: string;
+  searchTerm?: string;
 }
 
 export interface ApiResponse<T> {

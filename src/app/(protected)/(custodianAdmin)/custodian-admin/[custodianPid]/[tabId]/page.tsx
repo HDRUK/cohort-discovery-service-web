@@ -25,11 +25,28 @@ const CustodianAdminPage = async ({
   const apiSearchParams = await searchParams;
 
   const tabs = [
-    { id: "hosts", label: "Hosts", href: routes.teamHosts(custodianPid) },
+    {
+      id: "hosts",
+      label: "Hosts",
+      href: routes.teamHosts(custodianPid),
+      page: (
+        <Suspense fallback={<CollectionHostsSkeleton />}>
+          <CollectionHostsTab custodianPid={custodianPid} />
+        </Suspense>
+      ),
+    },
     {
       id: "collections",
       label: "Collections",
       href: routes.teamCollections(custodianPid),
+      page: (
+        <Suspense fallback={<CollectionsSkeleton />}>
+          <CollectionsTab
+            custodianPid={custodianPid}
+            searchParams={apiSearchParams}
+          />
+        </Suspense>
+      ),
     },
   ];
 
@@ -40,21 +57,7 @@ const CustodianAdminPage = async ({
 
   if (!isValidTabId(tabId)) return notFound();
 
-  return (
-    token && (
-      <TabsShell initial={tabId} tabs={tabs}>
-        <Suspense fallback={<CollectionHostsSkeleton />}>
-          <CollectionHostsTab custodianPid={custodianPid} />
-        </Suspense>
-        <Suspense fallback={<CollectionsSkeleton />}>
-          <CollectionsTab
-            custodianPid={custodianPid}
-            searchParams={apiSearchParams}
-          />
-        </Suspense>
-      </TabsShell>
-    )
-  );
+  return token && <TabsShell value={tabId} tabs={tabs} />;
 };
 
 export default CustodianAdminPage;
