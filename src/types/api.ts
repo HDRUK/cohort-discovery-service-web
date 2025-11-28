@@ -81,17 +81,28 @@ export interface Collection extends WithTimestamps {
   name: string;
   description: string;
   pid: string;
-  url: string | null;
+  url: UrlString | null;
   type: QueryContext;
   status: CollectionStatus;
   last_active: string | null;
   size?: Distribution;
   demographics?: Distribution[];
   custodian: Custodian;
+  custodian_id: number;
+}
+
+export interface CollectionConfig {
+  id: number;
+  enabled: boolean;
+  frequency_mode: FrequencyMode;
+  run_time_frequency: number;
+  run_time_hour: number;
+  run_time_minute: number;
 }
 
 export interface CollectionWithHosts extends Collection {
-  host: CollectionHost;
+  host: CollectionHost[];
+  config: CollectionConfig;
 }
 
 export interface Result extends WithTimestamps {

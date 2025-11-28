@@ -5,14 +5,12 @@ export interface CollectionHostFormValues {
   context: string;
 }
 
-export interface UpdateCollectionFormValues {
-  name: string;
-  description?: string;
-  url: string;
-  host_id: number;
-}
-
 export interface CreateCollectionFormValues {
   collection: CreateCollectionPost;
   config: CreateCollectionConfigPost;
+}
+
+export interface UpdateCollectionFormValues {
+  collection: Partial<CreateCollectionPost>;
+  config: Partial<CreateCollectionConfigPost>;
 }

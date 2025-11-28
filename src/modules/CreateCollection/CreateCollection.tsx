@@ -1,6 +1,6 @@
 import { Box, Stack, Button, MenuItem } from "@mui/material";
 
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, FormProvider } from "react-hook-form";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { CreateCollectionFormValues } from "@/types/forms";
 import { QueryContext } from "@/types/context";
@@ -29,17 +29,11 @@ const CreateCollection = ({
   onCancel,
 }: CreateCollectionProps) => {
   const {
-    custodianData: { createCollection, createCollectionConfig },
+    custodianData: { createCollection },
   } = useDaphneStore();
   const notify = useNotify();
 
-  const {
-    setValue,
-    handleSubmit,
-    control,
-    reset,
-    formState: { isSubmitting },
-  } = useForm<CreateCollectionFormValues>({
+  const formMethods = useForm<CreateCollectionFormValues>({
     defaultValues: {
       collection: {
         name: "",
@@ -60,170 +54,183 @@ const CreateCollection = ({
     },
   });
 
+  const {
+    handleSubmit,
+    control,
+    reset,
+    formState: { isSubmitting },
+  } = formMethods;
+
   const onSubmit = async (data: CreateCollectionFormValues) => {
     const createdCollection = await createCollection(
       custodian.pid,
-      data.collection
+      data.collection,
+      data.config
     );
-    createCollectionConfig({
-      ...data.config,
-      collection_id: createdCollection.id,
-    });
+
     notify.success(`Created collection ${createdCollection.name} `);
     onCancel?.();
   };
 
   return (
-    <Box
-      component="form"
-      onSubmit={handleSubmit(onSubmit)}
-      sx={{
-        mt: 2,
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        mb: 5,
-      }}
-    >
-      <ActionMenuSection
-        title={"New Collection"}
-        fixedExpanded
-        defaultExpanded
-        underline
+    <FormProvider {...formMethods}>
+      <Box
+        component="form"
+        onSubmit={handleSubmit(onSubmit)}
+        sx={{
+          mt: 2,
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          mb: 5,
+        }}
       >
-        <Stack spacing={2} width={"70%"} height={"100%"}>
-          <Controller
-            name="collection.name"
-            control={control}
-            rules={{ required: "Name is required" }}
-            render={({ field, fieldState: { error } }) => (
-              <FormTextField
-                {...field}
-                label="Name"
-                error={error}
-                fullWidth
-                required
-              />
-            )}
-          />
-
-          <Controller
-            name="collection.description"
-            control={control}
-            rules={{ required: "A description is required" }}
-            render={({ field, fieldState: { error } }) => (
-              <FormTextField
-                {...field}
-                label="Description"
-                error={error}
-                fullWidth
-                required
-              />
-            )}
-          />
-
-          <Controller
-            name="collection.url"
-            control={control}
-            rules={{
-              required: "A link to this associated dataset(s) is required",
-              pattern: {
-                value: REGEX_URL_NO_WWW,
-                message: "Enter a valid URL (including http(s):// )",
-              },
-            }}
-            render={({ field, fieldState: { error } }) => (
-              <FormTextField
-                {...field}
-                error={error}
-                required
-                label="Link to Associated Datasets"
-                fullWidth
-              />
-            )}
-          />
-
-          <Controller
-            name="collection.type"
-            control={control}
-            rules={{ required: "Query context type is required" }}
-            render={({ field, fieldState: { error } }) => (
-              <FormDropdown
-                {...field}
-                disabled
-                select
-                label="Query Context Type"
-                error={error}
-                fullWidth
-                required
-                options={Object.values(QueryContext).map((opt) => ({
-                  value: opt,
-                  label: opt.toUpperCase(),
-                }))}
-              />
-            )}
-          />
-
-          <Controller
-            name="collection.host_id"
-            control={control}
-            rules={{
-              required: "A collection host is required",
-              validate: (value) =>
-                Number(value) > 0 || "Please select a valid collection host",
-            }}
-            render={({ field, fieldState: { error } }) => (
-              <FormDropdown
-                {...field}
-                select
-                label="Collection Host"
-                error={error}
-                fullWidth
-                required
-                placeHolderOption={
-                  <MenuItem value={0} disabled>
-                    Select a collection host
-                  </MenuItem>
-                }
-                options={collectionHosts.map((ch) => ({
-                  label: ch.name,
-                  value: ch.id,
-                }))}
-                chipColor="secondary"
-              />
-            )}
-          />
-        </Stack>
-      </ActionMenuSection>
-
-      <ActionMenuSection
-        title={"Collection Configuration"}
-        fixedExpanded
-        defaultExpanded
-        underline
-      >
-        <CollectionConfig keepExpanded control={control} setValue={setValue} />
-      </ActionMenuSection>
-
-      <Stack direction="row" spacing={1} justifyContent="flex-end">
-        <Button
-          type="button"
-          onClick={() => {
-            onCancel?.();
-            reset();
-          }}
-          disabled={isSubmitting}
-          variant="contained"
-          sx={{ bgcolor: "background.default", color: "text.primary" }}
+        <ActionMenuSection
+          title={"New Collection"}
+          fixedExpanded
+          defaultExpanded
+          underline
         >
-          Cancel
-        </Button>
-        <Button type="submit" variant="outlined" disabled={isSubmitting}>
-          {isSubmitting ? "Creating..." : "Create"}
-        </Button>
-      </Stack>
-    </Box>
+          <Stack spacing={2} width={"70%"} height={"100%"}>
+            <Controller
+              name="collection.name"
+              control={control}
+              rules={{ required: "Name is required" }}
+              render={({ field, fieldState: { error } }) => (
+                <FormTextField
+                  {...field}
+                  label="Name"
+                  error={error}
+                  fullWidth
+                  required
+                />
+              )}
+            />
+
+            <Controller
+              name="collection.description"
+              control={control}
+              rules={{ required: "A description is required" }}
+              render={({ field, fieldState: { error } }) => (
+                <FormTextField
+                  {...field}
+                  label="Description"
+                  error={error}
+                  fullWidth
+                  required
+                />
+              )}
+            />
+
+            <Controller
+              name="collection.url"
+              control={control}
+              rules={{
+                required: "A link to this associated dataset(s) is required",
+                pattern: {
+                  value: REGEX_URL_NO_WWW,
+                  message: "Enter a valid URL (including http(s):// )",
+                },
+              }}
+              render={({ field, fieldState: { error } }) => (
+                <FormTextField
+                  {...field}
+                  error={error}
+                  required
+                  label="Link to Associated Datasets"
+                  fullWidth
+                />
+              )}
+            />
+
+            <Controller
+              name="collection.type"
+              control={control}
+              rules={{ required: "Query context type is required" }}
+              render={({ field, fieldState: { error } }) => (
+                <FormDropdown
+                  {...field}
+                  disabled
+                  select
+                  label="Query Context Type"
+                  error={error}
+                  fullWidth
+                  required
+                  options={Object.values(QueryContext).map((opt) => ({
+                    value: opt,
+                    label: opt.toUpperCase(),
+                  }))}
+                />
+              )}
+            />
+
+            <Controller
+              name="collection.host_id"
+              control={control}
+              rules={{
+                required: "A collection host is required",
+                validate: (value) =>
+                  Number(value) > 0 || "Please select a valid collection host",
+              }}
+              render={({ field, fieldState: { error } }) => (
+                <FormDropdown
+                  {...field}
+                  select
+                  label="Collection Host"
+                  error={error}
+                  fullWidth
+                  required
+                  placeHolderOption={
+                    <MenuItem value={0} disabled>
+                      Select a collection host
+                    </MenuItem>
+                  }
+                  options={collectionHosts.map((ch) => ({
+                    label: ch.name,
+                    value: ch.id,
+                  }))}
+                  chipColor="secondary"
+                />
+              )}
+            />
+          </Stack>
+        </ActionMenuSection>
+
+        <ActionMenuSection
+          title={"Collection Configuration"}
+          fixedExpanded
+          defaultExpanded
+          underline
+        >
+          <CollectionConfig<CreateCollectionFormValues>
+            keepExpanded
+            frequencyFieldName={"config.frequency_mode"}
+            runTimeFrequencyFieldName={"config.run_time_frequency"}
+            runTimeHourFieldName={"config.run_time_hour"}
+            runTimeMinuteFieldName={"config.run_time_minute"}
+          />
+        </ActionMenuSection>
+
+        <Stack direction="row" spacing={1} justifyContent="flex-end">
+          <Button
+            type="button"
+            onClick={() => {
+              onCancel?.();
+              reset();
+            }}
+            disabled={isSubmitting}
+            variant="contained"
+            sx={{ bgcolor: "background.default", color: "text.primary" }}
+          >
+            Cancel
+          </Button>
+          <Button type="submit" variant="outlined" disabled={isSubmitting}>
+            {isSubmitting ? "Creating..." : "Create"}
+          </Button>
+        </Stack>
+      </Box>
+    </FormProvider>
   );
 };
 

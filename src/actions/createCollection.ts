@@ -8,6 +8,8 @@ const createCollection = async (
   custodianPid: string,
   payload: CreateCollectionPost
 ): Promise<ApiResponse<Collection>> => {
+  console.log(payload);
+
   return await apiPost<ApiResponse<Collection>, CreateCollectionPost>(
     API_ROUTES.custodianCollections(custodianPid),
     payload

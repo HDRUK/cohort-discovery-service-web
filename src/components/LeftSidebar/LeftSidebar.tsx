@@ -23,8 +23,6 @@ export default function LeftSidebar() {
     custodianData: { custodians },
   } = useDaphneStore();
 
-  console.log(user?.gateway_user);
-
   const teamIds = useMemo(
     () => user?.token_user?.cohort_admin_teams?.map((t) => t.id) ?? [],
     [user]

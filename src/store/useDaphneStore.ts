@@ -51,6 +51,8 @@ import { trueKeys } from "@/utils/numbers";
 import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
 import parseQuery from "@/actions/parseQuery";
 import createCollectionConfig from "@/actions/createCollectionConfig";
+import updateCollection from "@/actions/updateCollection";
+import updateCollectionConfig from "@/actions/updateCollectionConfig";
 
 export enum NodeKind {
   RULE = "RULE",
@@ -143,6 +145,8 @@ export interface DaphneStoreState {
     removeConceptSet: (conceptSetId: number) => Promise<void>;
   };
   custodianData: {
+    currentCustodian: Custodian | null;
+    setCurrentCustodian: (custodian: Custodian) => void;
     custodians: Custodian[];
     setCustodians: (custodains: Custodian[]) => void;
     createCollectionHost: (
@@ -156,14 +160,17 @@ export interface DaphneStoreState {
     deleteCollectionHost: (id: number) => Promise<void>;
     createCollection: (
       custodianPid: string,
-      payload: CreateCollectionPost
+      payload: CreateCollectionPost,
+      payloadConfig: Omit<CreateCollectionConfigPost, "collection_id">
+    ) => Promise<Collection>;
+    updateCollection: (
+      id: number,
+      payload: Partial<CreateCollectionPost>,
+      payloadConfig: Partial<CreateCollectionConfigPost>
     ) => Promise<Collection>;
     deleteCollection: (
       id: number | string,
       custodianPid: string
-    ) => Promise<void>;
-    createCollectionConfig: (
-      payload: CreateCollectionConfigPost
     ) => Promise<void>;
   };
 }
@@ -525,6 +532,12 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
   },
 
   custodianData: {
+    currentCustodian: null,
+    setCurrentCustodian: (custodian: Custodian) =>
+      set((state) => ({
+        ...state,
+        custodianData: { ...state.custodianData, currentCustodian: custodian },
+      })),
     custodians: [],
     setCustodians: (custodians) =>
       set((state) => ({
@@ -544,13 +557,31 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       await deleteCollectionHost(id);
       await revalidateAction(`collection-hosts`);
     },
-    createCollection: async (custodianPid, payload) => {
+    createCollection: async (custodianPid, payload, payloadConfig) => {
       // note: inconsistancy between using custodian Id and custodian Pid
       // - this is because the BE uses different endpoints:
       // - Route::post('/v1/collection_hosts'... (custodianId in the payload)
       // - Route::post('/v1/custodians/{custodianPid}/collections'...
       const { data } = await createCollection(custodianPid, payload);
+
+      await createCollectionConfig({
+        ...payloadConfig,
+        collection_id: data.id,
+      });
+
       await revalidateAction(`collections-${custodianPid}`);
+      return data;
+    },
+    updateCollection: async (id, payload, payloadConfig) => {
+      const { data } = await updateCollection(id, payload);
+
+      const idConfig = data.config.id;
+      await updateCollectionConfig(idConfig, payloadConfig);
+
+      await revalidateAction(`collections-${data.custodian_id}`);
+
+      // revalidate custodians
+      // - as noted above, keep to sort out the tags for caching first
       return data;
     },
     deleteCollection: async (id, custodianPid) => {
@@ -559,9 +590,6 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       // to revalidate cache
       // - created a ticket for this
       await revalidateAction(`collections-${custodianPid}`);
-    },
-    createCollectionConfig: async (payload: CreateCollectionConfigPost) => {
-      await createCollectionConfig(payload);
     },
   },
 }));

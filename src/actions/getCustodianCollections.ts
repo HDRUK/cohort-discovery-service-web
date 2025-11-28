@@ -22,7 +22,11 @@ const getCustodianCollections = async (
   return await apiGet<ApiResponse<Paginated<CollectionWithHosts[]>>>(url, {
     next: {
       revalidate: 3600,
-      tags: [`collections-${custodianPid}`, `collections-${queryString}`, key],
+      tags: [
+        `collections-${custodianPid}`,
+        `collections-${custodianPid}-${queryString}`,
+        key,
+      ],
     },
     cache: "force-cache",
   });

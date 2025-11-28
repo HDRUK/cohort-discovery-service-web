@@ -9,6 +9,7 @@ export const API_ROUTES = {
   collections: `${API_URL}/collections`,
   collection: (id: number | string) => `${API_URL}/collections/${id}`,
   custodians: `${API_URL}/custodians`,
+  custodian: (id: number | string) => `${API_URL}/custodians/${id}`,
   getMe: `${API_URL}/user`,
   signIn: `${API_AUTH_URL}/login`,
   getQuery: (pid: string) => `${API_URL}/query/${pid}`,

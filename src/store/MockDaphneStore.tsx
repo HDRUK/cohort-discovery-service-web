@@ -14,6 +14,7 @@ import type {
   Paginated,
   CreateConceptSetPost,
   UpdateCollectionHostPayload,
+  CreateCollectionConfigPost,
 } from "@/types/api";
 import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
 import type {
@@ -125,6 +126,8 @@ function makeDefaultStore(): DaphneStoreState {
     },
 
     custodianData: {
+      currentCustodian: null,
+      setCurrentCustodian: NOOP,
       custodians: [] as Custodian[],
       setCustodians: NOOP,
 
@@ -137,14 +140,18 @@ function makeDefaultStore(): DaphneStoreState {
         _payload: UpdateCollectionHostPayload
       ) => RESOLVE<void>(undefined),
       deleteCollectionHost: (_id: number) => RESOLVE<void>(undefined),
-
       createCollection: (
         _custodianPid: string,
-        _payload: CreateCollectionPost
+        _payload: CreateCollectionPost,
+        _payloadConfig: Omit<CreateCollectionConfigPost, "collection_id">
+      ) => RESOLVE<Collection>(getMockCollection()),
+      updateCollection: (
+        _id: number,
+        _payload: Partial<CreateCollectionPost>,
+        _payloadConfig: Partial<CreateCollectionConfigPost>
       ) => RESOLVE<Collection>(getMockCollection()),
       deleteCollection: (_id: number | string, _custodianPid: string) =>
         RESOLVE<void>(undefined),
-      createCollectionConfig: () => RESOLVE<void>(undefined),
     },
   };
 }

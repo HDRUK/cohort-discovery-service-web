@@ -6,14 +6,13 @@ import Title from "@/components/Title";
 import ThreePaneSwimLaneLayout, {
   ExpandedSide,
 } from "@/modules/ThreePaneSwimLaneLayout";
-import { useEffect, useMemo, useState } from "react";
-import CollectionsCreatePanel from "./CollectionsCreatePanel";
+import { useMemo, useState } from "react";
+import CollectionsLeftPanel from "./CollectionsLeftPanel";
 import CollectionsTable from "@/components/CollectionsTable";
 import { MRT_RowSelectionState } from "material-react-table";
 import { trueKeys } from "@/utils/numbers";
 import CollectionsDetailPanel from "./CollectionsDetailPanel";
-import { useForm } from "react-hook-form";
-import { UpdateCollectionFormValues } from "@/types/forms";
+import ControlledSearchBox from "@/modules/ControlledSearchBox";
 
 const CollectionAdmin = ({
   pid,
@@ -64,47 +63,6 @@ const CollectionAdmin = ({
 
   const custodian = custodians.find((c) => c.pid === pid);
 
-  const { handleSubmit, control, setValue } =
-    useForm<UpdateCollectionFormValues>({
-      defaultValues: {
-        name: "",
-        description: "",
-        url: "",
-      },
-    });
-
-  useEffect(() => {
-    if (!selectedCollection) return;
-    const { name, description, url } = selectedCollection;
-    setValue("name", name);
-    setValue("description", description || "");
-    setValue("url", url || "");
-  }, [selectedCollection, setValue]);
-
-  const submitForm = async (
-    _data: UpdateCollectionFormValues,
-    closeAfter = false
-  ) => {
-    if (!selectedCollection?.id) return;
-
-    // to-do: dependent on missing BE and other FE tickets
-    //const { id } = selectedCollection;
-
-    // await updateCollection(id, ...);
-    //notify.success(`Updated collection`);
-
-    if (closeAfter) {
-      toggleExpandRight();
-    }
-  };
-
-  const handleEnter = handleSubmit((values) => submitForm(values, false));
-  const handleLockClick = handleSubmit((values) => submitForm(values, true));
-
-  const handleUnlockClick = () => {
-    toggleExpandRight();
-  };
-
   if (!custodian) return <Skeleton height={"100%"} />;
 
   return (
@@ -112,12 +70,16 @@ const CollectionAdmin = ({
       sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}
     >
       <Title title="Collections" subTitle="Create" />
+      <ControlledSearchBox
+        paramName="search_collection"
+        placeholder="Search by collection name..."
+      />
       <ThreePaneSwimLaneLayout
         expandedSide={expandedSide}
         rightDisabled={false}
         panelWidth={3}
         left={
-          <CollectionsCreatePanel
+          <CollectionsLeftPanel
             expandedLeft={expandedLeft}
             custodian={custodian}
             collectionHosts={collectionHosts}
@@ -134,15 +96,16 @@ const CollectionAdmin = ({
           />
         }
         right={
-          <CollectionsDetailPanel
-            selectedCollection={selectedCollection || null}
-            expandedRight={expandedRight}
-            expandedLeft={expandedLeft}
-            control={control}
-            handleEnter={handleEnter}
-            handleLockClick={handleLockClick}
-            handleUnlockClick={handleUnlockClick}
-          />
+          selectedCollection ? (
+            <CollectionsDetailPanel
+              selectedCollection={selectedCollection}
+              expandedRight={expandedRight}
+              expandedLeft={expandedLeft}
+              onClose={() => toggleExpandRight()}
+            />
+          ) : (
+            <b> guidannceee</b>
+          )
         }
       />
     </Box>
