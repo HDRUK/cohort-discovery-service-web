@@ -5,36 +5,71 @@ import LockOpenIcon from "@mui/icons-material/LockOpen";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import CopyableVariable from "@/components/CopyableVariable";
 import { CollectionHost } from "@/types/api";
-import { Control, Controller } from "react-hook-form";
-import GuidancePanel from "./CollectionHostGuidancePanel";
+import { Controller, FormProvider, useForm } from "react-hook-form";
+import { useEffect } from "react";
+import { useNotify } from "@/providers/NotifyProvider";
+import { useDaphneStore } from "@/store/useDaphneStore";
 
 type CollectionHostFormValues = { hostName: string };
 
-type CollectionHostDetailPanelProps = {
-  selectedCollectionHost: CollectionHost | null;
+export type UpdateCollectionHostProps = {
+  selectedCollectionHost: CollectionHost;
   expandedRight: boolean;
   expandedLeft: boolean;
-  control: Control<CollectionHostFormValues>;
-  handleEnter: () => void;
-  handleLockClick: () => void;
-  handleUnlockClick: () => void;
+  onClose?: () => void;
 };
 
-const CollectionHostDetailPanel = ({
+const UpdateCollectionHost = ({
   selectedCollectionHost,
   expandedRight,
-  expandedLeft,
-  control,
-  handleEnter,
-  handleLockClick,
-  handleUnlockClick,
-}: CollectionHostDetailPanelProps) => {
-  if (!selectedCollectionHost) {
-    return <GuidancePanel creating={expandedLeft} />;
-  }
+  onClose,
+}: UpdateCollectionHostProps) => {
+  const notify = useNotify();
+
+  const {
+    custodianData: { updateCollectionHost },
+  } = useDaphneStore();
+
+  const formMethods = useForm<CollectionHostFormValues>({
+    defaultValues: {
+      hostName: selectedCollectionHost?.name,
+    },
+  });
+
+  const { handleSubmit, control, setValue } = formMethods;
+
+  useEffect(() => {
+    if (selectedCollectionHost)
+      setValue("hostName", selectedCollectionHost.name);
+  }, [selectedCollectionHost, setValue]);
+
+  const submitHostForm = async (
+    { hostName }: CollectionHostFormValues,
+    closeAfter = false
+  ) => {
+    if (!selectedCollectionHost?.id) return;
+    const { id } = selectedCollectionHost;
+
+    if (hostName !== selectedCollectionHost.name) {
+      await updateCollectionHost(id, { name: hostName });
+      notify.success(`Updated host name ${hostName}`);
+    }
+
+    if (closeAfter) {
+      onClose?.();
+    }
+  };
+
+  const handleEnter = handleSubmit((values) => submitHostForm(values, false));
+  const handleLockClick = handleSubmit((values) =>
+    submitHostForm(values, true)
+  );
+  const handleUnlockClick = () => {
+    onClose?.();
+  };
 
   return (
-    <>
+    <FormProvider {...formMethods}>
       <Typography
         component="div"
         variant="overline"
@@ -102,8 +137,8 @@ const CollectionHostDetailPanel = ({
         Client Secret
         <CopyableVariable hidden value={selectedCollectionHost.client_secret} />
       </ActionMenuSection>
-    </>
+    </FormProvider>
   );
 };
 
-export default CollectionHostDetailPanel;
+export default UpdateCollectionHost;

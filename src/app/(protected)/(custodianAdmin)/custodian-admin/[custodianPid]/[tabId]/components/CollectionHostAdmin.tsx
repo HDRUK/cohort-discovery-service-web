@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Box, Skeleton } from "@mui/material";
 import Title from "@/components/Title";
 import { useDaphneStore } from "@/store/useDaphneStore";
@@ -7,15 +7,12 @@ import { CollectionHost } from "@/types/api";
 import { MRT_RowSelectionState } from "material-react-table";
 import { trueKeys } from "@/utils/numbers";
 import { useNotify } from "@/providers/NotifyProvider";
-import { useForm } from "react-hook-form";
 import ThreePaneSwimLaneLayout, {
   ExpandedSide,
 } from "@/modules/ThreePaneSwimLaneLayout";
-import CollectionHostCreatePanel from "./CollectionHostCreatePanel";
+import CollectionHostLeftPanel from "./CollectionHostLeftPanel";
 import CollectionHostListPanel from "./CollectionHostListPanel";
-import CollectionHostDetailPanel from "./CollectionHostDetailPanel";
-
-type CollectionHostFormValues = { hostName: string };
+import CollectionHostRightPanel from "./CollectionHostRightPanel";
 
 const CollectionHostAdmin = ({
   pid,
@@ -26,7 +23,7 @@ const CollectionHostAdmin = ({
 }) => {
   const notify = useNotify();
   const {
-    custodianData: { custodians, updateCollectionHost, deleteCollectionHost },
+    custodianData: { custodians, deleteCollectionHost },
   } = useDaphneStore();
 
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
@@ -61,45 +58,6 @@ const CollectionHostAdmin = ({
   const custodian = custodians.find((c) => c.pid === pid);
   const noCollectionHosts = collectionHosts.length === 0;
 
-  const { handleSubmit, control, setValue } = useForm<CollectionHostFormValues>(
-    {
-      defaultValues: {
-        hostName: selectedCollectionHost?.name,
-      },
-    }
-  );
-
-  useEffect(() => {
-    if (selectedCollectionHost)
-      setValue("hostName", selectedCollectionHost.name);
-  }, [selectedCollectionHost, setValue]);
-
-  const submitHostForm = async (
-    { hostName }: CollectionHostFormValues,
-    closeAfter = false
-  ) => {
-    if (!selectedCollectionHost?.id) return;
-    const { id } = selectedCollectionHost;
-
-    if (hostName !== selectedCollectionHost.name) {
-      await updateCollectionHost(id, { name: hostName });
-      notify.success(`Updated host name ${hostName}`);
-    }
-
-    if (closeAfter) {
-      toggleExpandRight();
-    }
-  };
-
-  const handleEnter = handleSubmit((values) => submitHostForm(values, false));
-  const handleLockClick = handleSubmit((values) =>
-    submitHostForm(values, true)
-  );
-
-  const handleUnlockClick = () => {
-    toggleExpandRight();
-  };
-
   const handleDeleteHost = async () => {
     selectedHostIds.map((clientId) => {
       const id = collectionHosts.find((h) => h.client_id === clientId)?.id;
@@ -126,7 +84,7 @@ const CollectionHostAdmin = ({
         rightDisabled={noCollectionHosts}
         panelWidth={3}
         left={
-          <CollectionHostCreatePanel
+          <CollectionHostLeftPanel
             custodianId={custodian.id}
             expandedLeft={expandedLeft}
             onCreateNewHost={toggleExpandLeft}
@@ -143,14 +101,11 @@ const CollectionHostAdmin = ({
           />
         }
         right={
-          <CollectionHostDetailPanel
+          <CollectionHostRightPanel
             selectedCollectionHost={selectedCollectionHost || null}
             expandedRight={expandedRight}
             expandedLeft={expandedLeft}
-            control={control}
-            handleEnter={handleEnter}
-            handleLockClick={handleLockClick}
-            handleUnlockClick={handleUnlockClick}
+            onClose={toggleExpandRight}
           />
         }
       />

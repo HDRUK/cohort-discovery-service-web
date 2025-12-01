@@ -2,6 +2,7 @@ import CollectionsAdmin from "./CollectionsAdmin";
 import getCollectionHosts from "@/actions/getCollectionHosts";
 import getCustodianCollections from "@/actions/getCustodianCollections";
 import { ApiSearchParams } from "@/types/api";
+import { buildSearchParams } from "@/utils/params";
 import { Box, Skeleton } from "@mui/material";
 
 export const CollectionsSkeleton = () => (
@@ -16,16 +17,21 @@ const CollectionsTab = async ({
   searchParams,
 }: {
   custodianPid: string;
-  searchParams: ApiSearchParams;
+  searchParams: ApiSearchParams & {
+    collection_filter?: string;
+    search_collection?: string;
+  };
 }) => {
-  const { page, per_page } = searchParams;
-  const params = new URLSearchParams();
-  if (page) {
-    params.append("page", page.toString());
-  }
-  if (per_page) {
-    params.append("per_page", per_page.toString());
-  }
+  const { page, per_page, collection_filter, search_collection } =
+    searchParams ?? {};
+  const queryParams = {
+    page,
+    per_page,
+    status: collection_filter,
+    ["name[]"]: search_collection,
+  };
+
+  const params = buildSearchParams(queryParams);
 
   const [{ data: collectionHosts }, { data: custodianCollections }] =
     await Promise.all([

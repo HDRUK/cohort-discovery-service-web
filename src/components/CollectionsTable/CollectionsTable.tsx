@@ -79,7 +79,7 @@ const CollectionsTable = ({
     enableSorting: false,
     ...(setRowSelection && { onRowSelectionChange: setRowSelection }),
     ...(rowSelection && { state: { rowSelection } }),
-    getRowId: (row) => String(row.id),
+    getRowId: (row) => String(row?.id),
   });
 
   const handleDeleteCollections = async (ids: string[]) => {

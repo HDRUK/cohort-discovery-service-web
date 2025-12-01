@@ -2,11 +2,12 @@ import { Box, Stack, MenuItem, Chip, Typography } from "@mui/material";
 
 import {
   Controller,
-  Control,
+  FieldValues,
+  Path,
+  PathValue,
   useController,
-  UseFormSetValue,
+  useFormContext,
 } from "react-hook-form";
-import { CreateCollectionFormValues } from "@/types/forms";
 import FormTextField from "@/components/FormTextField";
 import { capitaliseFirstLetter, getEnumLabel } from "@/utils/string";
 import { FrequencyMode, frequencyMap } from "@/types/api";
@@ -14,34 +15,46 @@ import FormRadioGroup from "@/components/FormRadioGroup";
 import { useEffect, useMemo, useState } from "react";
 import HourMinuteSelect from "../HourMinuteSelect";
 
-interface CollectionConfigProps {
-  control: Control<CreateCollectionFormValues>;
-  setValue: UseFormSetValue<CreateCollectionFormValues>;
+interface BaseCollectionConfigProps {
+  disabled?: boolean;
   keepExpanded?: boolean;
   hideSynchronisationTime?: boolean;
 }
 
-const CollectionConfig = ({
-  control,
-  setValue,
+interface CollectionConfigProps<TFormValues extends FieldValues>
+  extends BaseCollectionConfigProps {
+  frequencyFieldName: Path<TFormValues>;
+  runTimeFrequencyFieldName: Path<TFormValues>;
+  runTimeHourFieldName: Path<TFormValues>;
+  runTimeMinuteFieldName: Path<TFormValues>;
+}
+
+const CollectionConfig = <TFormValues extends FieldValues>({
+  disabled = false,
   keepExpanded = false,
   hideSynchronisationTime = true,
-}: CollectionConfigProps) => {
+  frequencyFieldName,
+  runTimeFrequencyFieldName,
+  runTimeHourFieldName,
+  runTimeMinuteFieldName,
+}: CollectionConfigProps<TFormValues>) => {
+  const { control, setValue } = useFormContext<TFormValues>();
+
   const [frequencyExpanded, setFrequencyExpanded] = useState(
     keepExpanded ? true : false
   );
 
   const {
     field: { value: frequencyField },
-  } = useController({
-    name: "config.frequency_mode",
+  } = useController<TFormValues>({
+    name: frequencyFieldName,
     control,
   });
 
   const {
     field: { value: runTime },
-  } = useController({
-    name: "config.run_time_frequency",
+  } = useController<TFormValues>({
+    name: runTimeFrequencyFieldName,
     control,
   });
 
@@ -56,8 +69,11 @@ const CollectionConfig = ({
   );
 
   useEffect(() => {
-    setValue("config.run_time_frequency", 0);
-  }, [frequencyField, setValue]);
+    setValue(
+      runTimeFrequencyFieldName,
+      0 as PathValue<TFormValues, typeof runTimeFrequencyFieldName>
+    );
+  }, [runTimeFrequencyFieldName, frequencyField, setValue]);
 
   return (
     <Stack spacing={2} width={300} height={"100%"}>
@@ -78,10 +94,10 @@ const CollectionConfig = ({
           label={frequencyLabels[runTime]}
         />
       </Box>
-      {frequencyExpanded && (
+      {frequencyExpanded && !disabled && (
         <>
           <Controller
-            name="config.frequency_mode"
+            name={frequencyFieldName}
             control={control}
             rules={{ required: "Frequency Mode is required" }}
             render={({ field, fieldState }) => (
@@ -99,7 +115,7 @@ const CollectionConfig = ({
           />
 
           <Controller
-            name="config.run_time_frequency"
+            name={runTimeFrequencyFieldName}
             control={control}
             rules={{ required: "Run time frequency is required" }}
             render={({ field, fieldState: { error } }) => (
@@ -118,9 +134,9 @@ const CollectionConfig = ({
       {!hideSynchronisationTime && (
         <Typography> Synchronisation Time</Typography>
       )}
-      <HourMinuteSelect<CreateCollectionFormValues>
-        hourValueName={"config.run_time_hour"}
-        minuteValueName="config.run_time_minute"
+      <HourMinuteSelect<TFormValues>
+        hourValueName={runTimeHourFieldName}
+        minuteValueName={runTimeMinuteFieldName}
         control={control}
         hidden={hideSynchronisationTime}
       />
