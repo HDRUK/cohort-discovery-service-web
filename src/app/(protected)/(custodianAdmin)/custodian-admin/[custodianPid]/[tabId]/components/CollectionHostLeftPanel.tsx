@@ -4,19 +4,19 @@ import ActionMenuSection from "@/components/ActionMenuSection";
 import AddButton from "@/components/AddButton";
 import CreateCollectionHost from "@/modules/CreateCollectionHost";
 
-type CollectionHostCreatePanelProps = {
+type CollectionHostLeftPanelProps = {
   custodianId: number;
   expandedLeft: boolean;
   onCreateNewHost: () => void;
   onCancelCreate: () => void;
 };
 
-const CollectionHostCreatePanel = ({
+const CollectionHostLeftPanel = ({
   custodianId,
   expandedLeft,
   onCreateNewHost,
   onCancelCreate,
-}: CollectionHostCreatePanelProps) => {
+}: CollectionHostLeftPanelProps) => {
   return (
     <Box
       sx={{
@@ -58,4 +58,4 @@ const CollectionHostCreatePanel = ({
   );
 };
 
-export default CollectionHostCreatePanel;
+export default CollectionHostLeftPanel;

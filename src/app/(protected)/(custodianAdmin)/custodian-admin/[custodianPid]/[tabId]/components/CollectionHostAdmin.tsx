@@ -10,7 +10,7 @@ import { useNotify } from "@/providers/NotifyProvider";
 import ThreePaneSwimLaneLayout, {
   ExpandedSide,
 } from "@/modules/ThreePaneSwimLaneLayout";
-import CollectionHostCreatePanel from "./CollectionHostCreatePanel";
+import CollectionHostLeftPanel from "./CollectionHostLeftPanel";
 import CollectionHostListPanel from "./CollectionHostListPanel";
 import CollectionHostRightPanel from "./CollectionHostRightPanel";
 
@@ -84,7 +84,7 @@ const CollectionHostAdmin = ({
         rightDisabled={noCollectionHosts}
         panelWidth={3}
         left={
-          <CollectionHostCreatePanel
+          <CollectionHostLeftPanel
             custodianId={custodian.id}
             expandedLeft={expandedLeft}
             onCreateNewHost={toggleExpandLeft}
