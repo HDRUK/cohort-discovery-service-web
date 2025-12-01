@@ -12,6 +12,7 @@ import { UpdateCollectionFormValues } from "@/types/forms";
 import { useEffect } from "react";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { revalidateAction } from "@/actions/revalidate";
+import { useNotify } from "@/providers/NotifyProvider";
 
 type CollectionsDetailPanelProps = {
   selectedCollection: CollectionWithHosts;
@@ -28,6 +29,7 @@ const CollectionsDetailPanel = ({
   const {
     custodianData: { currentCustodian, updateCollection },
   } = useDaphneStore();
+  const notify = useNotify();
 
   const formMethods = useForm<UpdateCollectionFormValues>({
     defaultValues: {
@@ -79,7 +81,7 @@ const CollectionsDetailPanel = ({
     const { id } = selectedCollection;
 
     await updateCollection(id, data.collection, data.config);
-    //notify.success(`Updated collection`);
+    notify.success(`Updated collection ${data.collection.name}`);
 
     if (currentCustodian) {
       revalidateAction(`collections-${currentCustodian.pid}`);
