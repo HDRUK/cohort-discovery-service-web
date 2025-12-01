@@ -6,7 +6,12 @@ import ActionMenuSection from "@/components/ActionMenuSection";
 import CopyableVariable from "@/components/CopyableVariable";
 import { CollectionHost } from "@/types/api";
 import { Control, Controller } from "react-hook-form";
-import GuidancePanel from "./CollectionHostGuidancePanel";
+import { maskClientTest } from "@/lib/maskClientTest";
+import { CollectionHostGuidanceProps } from "./CollectionHostGuidance";
+
+const CollectionHostGuidance = maskClientTest<CollectionHostGuidanceProps>(
+  () => import("./CollectionHostGuidance")
+);
 
 type CollectionHostFormValues = { hostName: string };
 
@@ -30,7 +35,7 @@ const CollectionHostDetailPanel = ({
   handleUnlockClick,
 }: CollectionHostDetailPanelProps) => {
   if (!selectedCollectionHost) {
-    return <GuidancePanel creating={expandedLeft} />;
+    return <CollectionHostGuidance creating={expandedLeft} />;
   }
 
   return (

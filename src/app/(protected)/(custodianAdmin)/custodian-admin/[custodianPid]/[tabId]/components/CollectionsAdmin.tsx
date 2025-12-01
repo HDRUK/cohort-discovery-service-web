@@ -11,8 +11,8 @@ import CollectionsLeftPanel from "./CollectionsLeftPanel";
 import CollectionsTable from "@/components/CollectionsTable";
 import { MRT_RowSelectionState } from "material-react-table";
 import { trueKeys } from "@/utils/numbers";
-import CollectionsDetailPanel from "./CollectionsDetailPanel";
 import ControlledSearchBox from "@/modules/ControlledSearchBox";
+import CollectionsRightPanel from "./CollectionsRightPanel";
 
 const CollectionAdmin = ({
   pid,
@@ -96,16 +96,12 @@ const CollectionAdmin = ({
           />
         }
         right={
-          selectedCollection ? (
-            <CollectionsDetailPanel
-              selectedCollection={selectedCollection}
-              expandedRight={expandedRight}
-              expandedLeft={expandedLeft}
-              onClose={() => toggleExpandRight()}
-            />
-          ) : (
-            <b> guidannceee</b>
-          )
+          <CollectionsRightPanel
+            selectedCollection={selectedCollection}
+            expandedRight={expandedRight}
+            expandedLeft={expandedLeft}
+            onClose={() => toggleExpandRight()}
+          />
         }
       />
     </Box>
