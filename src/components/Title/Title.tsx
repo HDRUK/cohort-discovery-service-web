@@ -36,7 +36,7 @@ const Title = ({
           noWrap
           sx={{ overflow: "hidden", textOverflow: "ellipsis", minWidth: 0 }}
         >
-          {startIcon} {title} {useSeparator && "/"}
+          {startIcon} {title} {useSeparator && subTitle && "/"}
         </Typography>
 
         {subTitle && (
