@@ -97,7 +97,7 @@ const CollectionAdmin = ({
         }
         right={
           <CollectionsRightPanel
-            selectedCollection={selectedCollection}
+            selectedCollection={selectedCollection || null}
             expandedRight={expandedRight}
             expandedLeft={expandedLeft}
             onClose={() => toggleExpandRight()}

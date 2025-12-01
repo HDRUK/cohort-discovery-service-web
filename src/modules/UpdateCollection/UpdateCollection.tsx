@@ -14,18 +14,18 @@ import { useDaphneStore } from "@/store/useDaphneStore";
 import { revalidateAction } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
 
-type CollectionsDetailPanelProps = {
+export type UpdateCollectionProps = {
   selectedCollection: CollectionWithHosts;
   expandedRight: boolean;
   expandedLeft: boolean;
   onClose?: () => void;
 };
 
-const CollectionsDetailPanel = ({
+const UpdateCollection = ({
   selectedCollection,
   expandedRight,
   onClose,
-}: CollectionsDetailPanelProps) => {
+}: UpdateCollectionProps) => {
   const {
     custodianData: { currentCustodian, updateCollection },
   } = useDaphneStore();
@@ -240,4 +240,4 @@ const CollectionsDetailPanel = ({
   );
 };
 
-export default CollectionsDetailPanel;
+export default UpdateCollection;
