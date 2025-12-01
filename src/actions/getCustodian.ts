@@ -10,7 +10,7 @@ const getCustodian = async (
   return await apiGet<ApiResponse<Custodian>>(API_ROUTES.custodian(id), {
     next: {
       revalidate: 60,
-      tags: ["all", "custodians"],
+      tags: ["all", "custodians", `custodian-${id}`],
     },
     cache: "force-cache",
   });
