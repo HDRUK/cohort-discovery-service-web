@@ -279,6 +279,12 @@ export interface CreateCollectionPost {
   type: QueryContext;
   host_id: number;
   url: UrlString | "" | null;
+  custodian_id: string;
+}
+
+export interface UpdateCollectionPayload {
+  name?: string;
+  query_context_type?: string;
 }
 
 export interface CreateCollectionConfigPost {
@@ -289,6 +295,14 @@ export interface CreateCollectionConfigPost {
   run_time_frequency: number;
   enabled: number;
   type: string;
+}
+
+export interface Workgroup {
+  id: number;
+  name: string;
+  external_name?: string;
+  users: User[];
+  collections: Collection[];
 }
 
 export interface Concept {

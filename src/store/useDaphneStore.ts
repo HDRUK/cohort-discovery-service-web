@@ -2,6 +2,7 @@ import { create } from "zustand";
 import submitQuery from "@/actions/submitQuery";
 import createCollectionHost from "@/actions/createCollectionHost";
 import updateCollectionHost from "@/actions/updateCollectionHost";
+import updateCollection from "@/actions/updateCollection";
 import deleteCollectionHost from "@/actions/deleteCollectionHost";
 import { revalidateAction } from "@/actions/revalidate";
 import {
@@ -12,6 +13,7 @@ import {
   Query,
   Custodian,
   CreateCollectionPost,
+  UpdateCollectionPayload,
   Concept,
   Paginated,
   CreateConceptSetPost,
@@ -172,6 +174,16 @@ export interface DaphneStoreState {
       id: number | string,
       custodianPid: string
     ) => Promise<void>;
+  };
+  adminData: {
+    collections: Collection[];
+    setCollections: (collections: Collection[]) => void;
+    createCollection: (payload: CreateCollectionPost) => Promise<Collection>;
+    updateCollection: (
+      id: number,
+      payload: UpdateCollectionPayload
+    ) => Promise<Collection>;
+    deleteCollection: (id: number, custodianPid: string) => Promise<void>;
   };
 }
 
@@ -582,6 +594,38 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
 
       // revalidate custodians
       // - as noted above, keep to sort out the tags for caching first
+      return data;
+    },
+    deleteCollection: async (id, custodianPid) => {
+      await deleteCollection(id);
+      //this needs to be re-done, mixing of pid and id makes it diffcult
+      // to revalidate cache
+      // - created a ticket for this
+      await revalidateAction(`collections-${custodianPid}`);
+    },
+  },
+  adminData: {
+    collections: [],
+    setCollections: (collections: Collection[]) =>
+      set((state) => ({
+        ...state,
+        adminData: { ...state.adminData, collections },
+      })),
+    createCollection: async (payload) => {
+      // note: inconsistancy between using custodian Id and custodian Pid
+      // - this is because the BE uses different endpoints:
+      // - Route::post('/v1/collection_hosts'... (custodianId in the payload)
+      // - Route::post('/v1/custodians/{custodianPid}/collections'...
+      const { data } = await createCollection(payload["custodian_id"], payload);
+      await revalidateAction(`collections-${payload["custodian_id"]}`);
+      return data;
+    },
+    updateCollection: async (id, payload) => {
+      const { data } = await updateCollection(id, payload);
+      //this needs to be re-done, mixing of pid and id makes it diffcult
+      // to revalidate cache
+      // - created a ticket for this
+      await revalidateAction(`collections-${data.custodian.pid}`);
       return data;
     },
     deleteCollection: async (id, custodianPid) => {

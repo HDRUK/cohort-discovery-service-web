@@ -1,0 +1,30 @@
+"use server";
+
+import { apiGet } from "../lib/apiClient";
+import { API_ROUTES } from "../lib/apiRoutes";
+import { ApiResponse, Paginated, CollectionWithHosts } from "../types/api";
+import { cookies } from "next/headers";
+import { getTokenKey } from "@/utils/string";
+
+const getAdminCollections = async (
+  params?: URLSearchParams
+): Promise<ApiResponse<Paginated<CollectionWithHosts[]>>> => {
+  const token = (await cookies()).get("token")?.value || "";
+  const key = getTokenKey(token);
+
+  let url = API_ROUTES.adminCollections;
+  const queryString = params?.toString();
+  if (queryString) {
+    url += `?${queryString}`;
+  }
+
+  return await apiGet<ApiResponse<Paginated<CollectionWithHosts[]>>>(url, {
+    next: {
+      revalidate: 3600,
+      tags: [`collections`, `collections-${queryString}`, key],
+    },
+    cache: "force-cache",
+  });
+};
+
+export default getAdminCollections;
