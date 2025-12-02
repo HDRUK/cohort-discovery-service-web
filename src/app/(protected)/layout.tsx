@@ -7,13 +7,13 @@ import ProtectedPage from "./components/ProtectedPage";
 import getMe from "@/actions/getMe";
 import getCustodians from "@/actions/getCustodians";
 
+const applicationMode = process.env.APPLICATION_MODE;
+
 export default async function ProtectedLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const applicationMode = process.env.APPLICATION_MODE;
-
   const cookieStore = await cookies();
   const token = cookieStore.get(GATEWAY_TOKEN_NAME)?.value;
   const decoded = token ? (jwt.decode(token) as JwtPayload) : undefined;
