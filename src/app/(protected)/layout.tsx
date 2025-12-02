@@ -17,6 +17,7 @@ export default async function ProtectedLayout({
   const cookieStore = await cookies();
   const token = cookieStore.get(GATEWAY_TOKEN_NAME)?.value;
   const decoded = token ? (jwt.decode(token) as JwtPayload) : undefined;
+
   if (!token || !decoded) {
     if (applicationMode === "standalone") {
       // No token — render the client SignIn component so users can sign in.
