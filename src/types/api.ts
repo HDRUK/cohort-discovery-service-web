@@ -90,7 +90,7 @@ export interface Collection extends WithTimestamps {
   last_active: string | null;
   size?: Distribution;
   demographics?: Distribution[];
-  custodian?: Custodian;
+  custodian: Custodian;
   custodian_id?: number;
 }
 

@@ -107,7 +107,7 @@ const CollectionConfig = <TFormValues extends FieldValues>({
                 error={!!fieldState.error}
                 required
                 options={Object.entries(FrequencyMode).map(([key, value]) => ({
-                  value,
+                  value: Number(value),
                   label: capitaliseFirstLetter(key.toLowerCase()),
                 }))}
               />
