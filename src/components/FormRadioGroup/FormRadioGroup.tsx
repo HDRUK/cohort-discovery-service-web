@@ -47,7 +47,7 @@ const FormRadioGroup = ({
       >
         {options.map((option) => (
           <FormControlLabel
-            key={option.value}
+            key={option.value || ""}
             value={option.value}
             control={<Radio />}
             label={option.label}

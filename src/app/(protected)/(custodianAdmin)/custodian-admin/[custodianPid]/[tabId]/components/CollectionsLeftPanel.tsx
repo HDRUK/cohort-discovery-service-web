@@ -47,7 +47,12 @@ const CollectionsLeftPanel = ({
         minHeight: 0,
       }}
     >
-      <ActionMenuSection title={"Create"} defaultExpanded underline>
+      <ActionMenuSection
+        title={"Create"}
+        defaultExpanded
+        underline
+        fixedExpanded={expandedLeft}
+      >
         <AddButton
           action={onCreate}
           label={"Collection"}

@@ -97,7 +97,7 @@ export interface Collection extends WithTimestamps {
 export interface CollectionConfig {
   id: number;
   enabled: boolean;
-  frequency_mode: FrequencyMode;
+  frequency_mode: number;
   run_time_frequency: number;
   run_time_hour: number;
   run_time_minute: number;
@@ -178,10 +178,10 @@ export enum Roles {
 }
 
 export enum FrequencyMode {
-  WEEKLY = 1,
-  MONTHLY = 2,
-  QUARTERLY = 3,
-  BIANNUALLY = 4,
+  WEEKLY = "1",
+  MONTHLY = "2",
+  QUARTERLY = "3",
+  BIANNUALLY = "4",
 }
 
 const WEEK_DAYS = [
@@ -288,7 +288,7 @@ export interface CreateCollectionConfigPost {
   collection_id: number;
   run_time_hour: number;
   run_time_minute: number;
-  frequency_mode: FrequencyMode;
+  frequency_mode: number;
   run_time_frequency: number;
   enabled: number;
   type: string;

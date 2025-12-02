@@ -43,7 +43,7 @@ const UpdateCollection = ({
     defaultValues: {
       collection: { name: "", description: "", url: "", host_id: 0 },
       config: {
-        frequency_mode: FrequencyMode.WEEKLY,
+        frequency_mode: Number(FrequencyMode.WEEKLY),
         run_time_frequency: 0,
         run_time_hour: 0,
         run_time_minute: 0,
@@ -67,8 +67,7 @@ const UpdateCollection = ({
         host_id: host.id,
       },
       config: {
-        //note: types need fixing on returned value coming back as "1" rather than 1
-        frequency_mode: config.frequency_mode as FrequencyMode,
+        frequency_mode: config.frequency_mode,
         run_time_frequency: config.run_time_frequency,
         // run_time_hour: config.run_time_hour 0,
         // run_time_minute: config.run_time_minute ?? 0,
