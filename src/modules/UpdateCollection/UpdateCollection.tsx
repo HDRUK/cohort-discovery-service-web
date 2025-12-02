@@ -75,8 +75,6 @@ const UpdateCollection = ({
       },
     };
 
-    console.log(newValues);
-
     reset(newValues, {
       keepDirty: false,
       keepTouched: false,
