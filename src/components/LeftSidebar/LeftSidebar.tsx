@@ -43,7 +43,7 @@ export default function LeftSidebar() {
 
   const menu: MenuItem[] = useMemo(
     () => [
-      { label: "Home", path: routes.dashboard },
+      { label: "Home", path: routes.dashboardNewQuery() },
       { label: "Profile", path: routes.profile },
       /*{ label: "My Definitions", path: routes.definitions },*/
       ...(custodianChildren.length > 0
