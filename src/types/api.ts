@@ -70,10 +70,13 @@ export interface Distribution extends WithTimestamps {
   median: number;
 }
 
+// soon to be switched to modelState
 export enum CollectionStatus {
-  INACTIVE = 0,
-  ACTIVE = 1,
-  SUSPENDED = 2,
+  DRAFT = 0,
+  PENDING = 1,
+  ACTIVE = 2,
+  REJECTED = 3,
+  SUSPENDED = 4,
 }
 
 export interface Collection extends WithTimestamps {
@@ -87,8 +90,8 @@ export interface Collection extends WithTimestamps {
   last_active: string | null;
   size?: Distribution;
   demographics?: Distribution[];
-  custodian: Custodian;
-  custodian_id: number;
+  custodian?: Custodian;
+  custodian_id?: number;
 }
 
 export interface CollectionConfig {
@@ -175,10 +178,10 @@ export enum Roles {
 }
 
 export enum FrequencyMode {
-  WEEKLY = "1",
-  MONTHLY = "2",
-  QUARTERLY = "3",
-  BIANNUALLY = "4",
+  WEEKLY = 1,
+  MONTHLY = 2,
+  QUARTERLY = 3,
+  BIANNUALLY = 4,
 }
 
 const WEEK_DAYS = [

@@ -1,8 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import LoginClient from "./components/LoginClient";
-import { Box, Typography } from "@mui/material";
-import Circles from "./components/Circles";
+import { Box } from "@mui/material";
 import { GATEWAY_TOKEN_NAME } from "@/config/internals";
 import TabsShell from "@/components/TabsShell";
 

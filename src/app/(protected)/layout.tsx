@@ -38,9 +38,11 @@ export default async function ProtectedLayout({
   const hasGeneralAccess = user?.cohort_discovery_roles?.includes(
     Roles.GENERAL_ACCESS
   );
+
+  const roles = user?.cohort_discovery_roles || [];
+
   const hasAdminAccess =
-    user?.cohort_discovery_roles?.includes(Roles.ADMIN) ||
-    user?.cohort_discovery_roles.includes(Roles.SYSTEM_ADMIN);
+    roles.includes(Roles.ADMIN) || roles.includes(Roles.SYSTEM_ADMIN);
 
   if (!(hasGeneralAccess || hasAdminAccess)) {
     forbidden();

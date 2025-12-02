@@ -27,6 +27,7 @@ export default function LeftSidebar() {
     () => user?.token_user?.cohort_admin_teams?.map((t) => t.id) ?? [],
     [user]
   );
+
   const userCustodians = useMemo(
     () => (custodians ?? []).filter((c) => teamIds.includes(c.gateway_team_id)),
     [custodians, teamIds]

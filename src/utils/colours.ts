@@ -3,8 +3,10 @@ import type { ChipProps } from "@mui/material/Chip";
 import { getEnumLabel } from "./string";
 
 const statusColorMap: Record<CollectionStatus, ChipProps["color"]> = {
+  [CollectionStatus.DRAFT]: "default",
+  [CollectionStatus.PENDING]: "default",
   [CollectionStatus.ACTIVE]: "success",
-  [CollectionStatus.INACTIVE]: "error",
+  [CollectionStatus.REJECTED]: "error",
   [CollectionStatus.SUSPENDED]: "warning",
 };
 

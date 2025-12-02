@@ -69,7 +69,9 @@ const CollectionsLeftPanel = ({
         defaultExpanded
         underline
       >
+        {/*disabled until the BE can handle model states */}
         <List
+          disabled
           items={[
             {
               label: "All Collections",

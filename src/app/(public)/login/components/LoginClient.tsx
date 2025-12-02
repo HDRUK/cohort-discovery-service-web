@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Typography, Box } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import StandaloneLoginForm from "./StandaloneLoginForm";
