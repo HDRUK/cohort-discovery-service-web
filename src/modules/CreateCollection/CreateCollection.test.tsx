@@ -138,7 +138,7 @@ describe("CreateCollection", () => {
       {
         collection_id: 0,
         enabled: 1,
-        frequency_mode: "1", // something to be fix here with 1 and "1" - BE driven
+        frequency_mode: 1,
         run_time_frequency: 0,
         run_time_hour: 0,
         run_time_minute: 0,
