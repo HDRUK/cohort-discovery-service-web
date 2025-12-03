@@ -89,7 +89,6 @@ const CollectionAdmin = ({
         }
         middle={
           <CollectionsTable
-            custodianPid={custodian.pid}
             collections={collections}
             rowSelection={rowSelection}
             setRowSelection={setRowSelection}

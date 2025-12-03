@@ -9,9 +9,7 @@ describe("CollectionsTable", () => {
   it("renders the correct column headers", async () => {
     const collections = await getCustodianCollections("abc");
 
-    render(
-      <CollectionsTable custodianPid={"abc"} collections={collections.data} />
-    );
+    render(<CollectionsTable collections={collections.data} />);
 
     const columns = ["Name", "Last Active", "Status"];
     for (const column of columns) {
@@ -24,9 +22,7 @@ describe("CollectionsTable", () => {
   it("displays data when collections exist", async () => {
     const collections = await getCustodianCollections("abc");
 
-    render(
-      <CollectionsTable custodianPid={"abc"} collections={collections.data} />
-    );
+    render(<CollectionsTable collections={collections.data} />);
 
     expect(screen.getByText("Test Dataset #1")).toBeInTheDocument();
     expect(screen.getByText("Test Dataset #2")).toBeInTheDocument();
@@ -40,7 +36,6 @@ describe("CollectionsTable", () => {
 
     render(
       <CollectionsTable
-        custodianPid={"abc"}
         collections={collections.data}
         rowSelection={rowSelection}
         setRowSelection={setRowSelection}

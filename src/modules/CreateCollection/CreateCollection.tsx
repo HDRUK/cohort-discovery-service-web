@@ -18,7 +18,7 @@ import { REGEX_URL_NO_WWW } from "@/config/regex";
 import FormDropdown from "@/components/FormDropdown";
 
 interface CreateCollectionProps {
-  custodian: Custodian;
+  custodian?: Custodian;
   collectionHosts: CollectionHost[];
   onCancel?: () => void;
 }
@@ -63,7 +63,7 @@ const CreateCollection = ({
 
   const onSubmit = async (data: CreateCollectionFormValues) => {
     const createdCollection = await createCollection(
-      custodian.pid,
+      custodian?.pid,
       data.collection,
       data.config
     );

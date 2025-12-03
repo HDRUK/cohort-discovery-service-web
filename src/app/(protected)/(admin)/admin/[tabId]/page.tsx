@@ -9,48 +9,61 @@ import CollectionsTab, {
 } from "./components/CollectionsTab";
 import UsersTab, { UsersSkeleton } from "./components/UsersTab";
 import WorkgroupsTab, { WorkgroupsSkeleton } from "./components/WorkgroupsTab";
+import { SearchParams } from "@/types/api";
 
-type Params = Promise<{ custodianPid: string; tabId: string }>;
+type Params = Promise<{ tabId: string }>;
 
-const CustodianAdminPage = async ({ params }: { params: Params }) => {
-  const { custodianPid, tabId } = await params;
+const CustodianAdminPage = async ({
+  params,
+  searchParams,
+}: {
+  params: Params;
+  searchParams: SearchParams;
+}) => {
+  const { tabId } = await params;
+  const apiSearchParams = await searchParams;
 
-  const tabs = [
-    { id: "users", label: "Users", href: `${routes.admin}/users` },
+  const TABS = [
+    {
+      id: "users",
+      label: "Users",
+      href: `${routes.admin}/users`,
+      page: (
+        <Suspense fallback={<UsersSkeleton />}>
+          <UsersTab />
+        </Suspense>
+      ),
+    },
     {
       id: "workgroups",
       label: "Workgroups",
       href: `${routes.admin}/workgroups`,
+      page: (
+        <Suspense fallback={<WorkgroupsSkeleton />}>
+          <WorkgroupsTab />
+        </Suspense>
+      ),
     },
     {
       id: "collections",
       label: "Collections",
       href: `${routes.admin}/collections`,
+      page: (
+        <Suspense fallback={<CollectionsSkeleton />}>
+          <CollectionsTab searchParams={apiSearchParams} />
+        </Suspense>
+      ),
     },
   ];
 
-  const isValidTabId = (tabId: string) => tabs.some((t) => t.id === tabId);
+  const isValidTabId = (tabId: string) => TABS.some((t) => t.id === tabId);
 
   const cookieStore = await cookies();
   const token = cookieStore.get(GATEWAY_TOKEN_NAME)?.value;
 
   if (!isValidTabId(tabId)) return notFound();
 
-  return (
-    token && (
-      <TabsShell initial={tabId} tabs={tabs}>
-        <Suspense fallback={<UsersSkeleton />}>
-          <UsersTab />
-        </Suspense>
-        <Suspense fallback={<WorkgroupsSkeleton />}>
-          <WorkgroupsTab />
-        </Suspense>
-        <Suspense fallback={<CollectionsSkeleton />}>
-          <CollectionsTab />
-        </Suspense>
-      </TabsShell>
-    )
-  );
+  return token && <TabsShell value={tabId} tabs={TABS} />;
 };
 
 export default CustodianAdminPage;

@@ -2,7 +2,6 @@ import { create } from "zustand";
 import submitQuery from "@/actions/submitQuery";
 import createCollectionHost from "@/actions/createCollectionHost";
 import updateCollectionHost from "@/actions/updateCollectionHost";
-import updateCollection from "@/actions/updateCollection";
 import deleteCollectionHost from "@/actions/deleteCollectionHost";
 import { revalidateAction } from "@/actions/revalidate";
 import {
@@ -183,7 +182,7 @@ export interface DaphneStoreState {
       id: number,
       payload: UpdateCollectionPayload
     ) => Promise<Collection>;
-    deleteCollection: (id: number, custodianPid: string) => Promise<void>;
+    deleteCollection: (id: number | string) => Promise<void>;
   };
 }
 
@@ -628,12 +627,11 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       await revalidateAction(`collections-${data.custodian.pid}`);
       return data;
     },
-    deleteCollection: async (id, custodianPid) => {
+    deleteCollection: async (id) => {
       await deleteCollection(id);
       //this needs to be re-done, mixing of pid and id makes it diffcult
-      // to revalidate cache
-      // - created a ticket for this
-      await revalidateAction(`collections-${custodianPid}`);
+      // to revalidate cache, and here we don't know the custodian
+      await revalidateAction(`collections`);
     },
   },
 }));

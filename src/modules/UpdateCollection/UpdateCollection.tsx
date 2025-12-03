@@ -56,12 +56,12 @@ const UpdateCollection = ({
         name,
         description: description || "",
         url: url,
-        host_id: host.id,
+        host_id: host?.id || "",
       },
       config: {
         //note: types need fixing on returned value coming back as "1" rather than 1
-        frequency_mode: String(config.frequency_mode) as FrequencyMode,
-        run_time_frequency: config.run_time_frequency,
+        frequency_mode: (String(config?.frequency_mode) as FrequencyMode) || "",
+        run_time_frequency: config?.run_time_frequency,
         // run_time_hour: config.run_time_hour 0,
         // run_time_minute: config.run_time_minute ?? 0,
       },

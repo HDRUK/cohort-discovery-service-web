@@ -71,9 +71,26 @@ export interface Distribution extends WithTimestamps {
 }
 
 export enum CollectionStatus {
-  INACTIVE = 0,
-  ACTIVE = 1,
-  SUSPENDED = 2,
+  DRAFT = 1,
+  PENDING = 2,
+  ACTIVE = 3,
+  REJECTED = 4,
+  SUSPENDED = 5,
+}
+
+export interface State {
+  id: number;
+  name: string;
+  slug: string;
+}
+
+export interface ModelState {
+  id: number;
+  state: State;
+  state_id: number;
+  stateable_id: number;
+  stateable_type: string;
+  updated_at: string | null;
 }
 
 export interface Collection extends WithTimestamps {
@@ -83,12 +100,12 @@ export interface Collection extends WithTimestamps {
   pid: string;
   url: UrlString | null;
   type: QueryContext;
-  status: CollectionStatus;
   last_active: string | null;
   size?: Distribution;
   demographics?: Distribution[];
   custodian: Custodian;
   custodian_id: number;
+  model_state?: ModelState;
 }
 
 export interface CollectionConfig {

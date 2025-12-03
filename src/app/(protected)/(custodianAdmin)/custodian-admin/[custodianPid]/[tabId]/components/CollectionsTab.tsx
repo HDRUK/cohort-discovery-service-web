@@ -1,5 +1,5 @@
 import CollectionsAdmin from "./CollectionsAdmin";
-import getCollectionHosts from "@/actions/getCollectionHosts";
+import getCustodianCollectionHosts from "@/actions/getCustodianCollectionHosts";
 import getCustodianCollections from "@/actions/getCustodianCollections";
 import { ApiSearchParams } from "@/types/api";
 import { buildSearchParams } from "@/utils/params";
@@ -27,7 +27,7 @@ const CollectionsTab = async ({
   const queryParams = {
     page,
     per_page,
-    status: collection_filter,
+    state: collection_filter,
     ["name[]"]: search_collection,
   };
 
@@ -35,7 +35,7 @@ const CollectionsTab = async ({
 
   const [{ data: collectionHosts }, { data: custodianCollections }] =
     await Promise.all([
-      getCollectionHosts(custodianPid),
+      getCustodianCollectionHosts(custodianPid),
       getCustodianCollections(custodianPid, params),
     ]);
 

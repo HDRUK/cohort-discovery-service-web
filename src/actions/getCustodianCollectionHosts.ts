@@ -6,19 +6,21 @@ import { apiGet } from "../lib/apiClient";
 import { API_ROUTES } from "../lib/apiRoutes";
 import { ApiResponse, CollectionHost } from "../types/api";
 
-const getCollectionHosts = async (): Promise<ApiResponse<CollectionHost[]>> => {
+const getCustodianCollectionHosts = async (
+  custodianPid: string
+): Promise<ApiResponse<CollectionHost[]>> => {
   const token = (await cookies()).get("token")?.value || "";
   const key = getTokenKey(token);
   return await apiGet<ApiResponse<CollectionHost[]>>(
-    API_ROUTES.collectionHosts,
+    API_ROUTES.custodianCollectionHosts(custodianPid),
     {
       next: {
         revalidate: 3600,
-        tags: ["collection-hosts", key],
+        tags: ["collection-hosts", `collection-hosts-${custodianPid}`, key],
       },
       cache: "force-cache",
     }
   );
 };
 
-export default getCollectionHosts;
+export default getCustodianCollectionHosts;

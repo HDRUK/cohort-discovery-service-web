@@ -1,9 +1,9 @@
-import { Box, Skeleton } from "@mui/material";
 import CollectionsAdmin from "./CollectionsAdmin";
+import getCollectionHosts from "@/actions/getCollectionHosts";
 import getAdminCollections from "@/actions/getAdminCollections";
-import ThreePaneSwimLaneLayout, {
-  ExpandedSide,
-} from "@/modules/ThreePaneSwimLaneLayout";
+import { ApiSearchParams } from "@/types/api";
+import { buildSearchParams } from "@/utils/params";
+import { Box, Skeleton } from "@mui/material";
 
 export const CollectionsSkeleton = () => (
   <Box sx={{ height: "100%", p: 2 }}>
@@ -12,10 +12,34 @@ export const CollectionsSkeleton = () => (
   </Box>
 );
 
-const CollectionsTab = async () => {
-  const { data: collections } = await getAdminCollections();
+const CollectionsTab = async ({
+  searchParams,
+}: {
+  searchParams: ApiSearchParams & {
+    collection_filter?: string;
+    search_collection?: string;
+  };
+}) => {
+  const { page, per_page, collection_filter, search_collection } =
+    searchParams ?? {};
+  const queryParams = {
+    page,
+    per_page,
+    state: collection_filter,
+    ["name[]"]: search_collection,
+  };
 
-  return <CollectionsAdmin collections={collections} />;
+  const params = buildSearchParams(queryParams);
+
+  const [{ data: collectionHosts }, { data: custodianCollections }] =
+    await Promise.all([getCollectionHosts(), getAdminCollections(params)]);
+
+  return (
+    <CollectionsAdmin
+      collectionHosts={collectionHosts}
+      collections={custodianCollections}
+    />
+  );
 };
 
 export default CollectionsTab;
