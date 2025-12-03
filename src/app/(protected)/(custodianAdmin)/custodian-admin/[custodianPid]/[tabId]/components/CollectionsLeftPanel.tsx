@@ -96,6 +96,11 @@ const CollectionsLeftPanel = ({
               onClick: () =>
                 onSelectCollectionsStatus(CollectionFilterStatus.SUSPENDED),
             },
+            {
+              label: "Rejected Collections",
+              onClick: () =>
+                onSelectCollectionsStatus(CollectionFilterStatus.REJECTED),
+            },
           ]}
         />
       </ActionMenuSection>

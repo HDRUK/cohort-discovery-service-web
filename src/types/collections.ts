@@ -3,5 +3,6 @@ export enum CollectionFilterStatus {
   DRAFT = "draft",
   ACTIVE = "active",
   PENDING = "pending",
+  REJECTED = "rejected",
   SUSPENDED = "suspended",
 }
