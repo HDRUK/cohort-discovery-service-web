@@ -56,7 +56,7 @@ const UpdateCollection = ({
         name,
         description: description || "",
         url: url,
-        host_id: host?.id || "",
+        host_id: host?.id || undefined,
       },
       config: {
         //note: types need fixing on returned value coming back as "1" rather than 1

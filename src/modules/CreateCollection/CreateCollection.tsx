@@ -63,7 +63,7 @@ const CreateCollection = ({
 
   const onSubmit = async (data: CreateCollectionFormValues) => {
     const createdCollection = await createCollection(
-      custodian?.pid,
+      custodian?.pid || "",
       data.collection,
       data.config
     );

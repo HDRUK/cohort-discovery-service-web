@@ -48,11 +48,7 @@ const CollectionCreatePanel = ({
           underline
           scrollable
         >
-          <CreateCollection
-            custodian={[]}
-            collectionHosts={[]}
-            onCancel={onCancelCreate}
-          />
+          <CreateCollection collectionHosts={[]} onCancel={onCancelCreate} />
         </ActionMenuSection>
       )}
     </Box>

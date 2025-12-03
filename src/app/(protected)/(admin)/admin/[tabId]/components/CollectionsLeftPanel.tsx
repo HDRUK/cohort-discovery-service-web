@@ -55,7 +55,6 @@ const CollectionsLeftPanel = ({
         {expandedLeft && (
           <CreateCollection
             // Need to be able to select a custodian here - for later
-            custodian={null}
             collectionHosts={collectionHosts}
             onCancel={onCancelCreate}
           />
