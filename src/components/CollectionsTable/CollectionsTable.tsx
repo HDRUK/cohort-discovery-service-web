@@ -33,7 +33,7 @@ const CollectionsTable = ({
     custodianData: { deleteCollection, currentCustodian },
     adminData: { deleteCollection: deleteCollectionAdmin },
   } = useDaphneStore();
-  console.log("currentCustodian", currentCustodian);
+
   const columns = useMemo<MRT_ColumnDef<Collection>[]>(
     () => [
       {
