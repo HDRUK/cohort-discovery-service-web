@@ -86,7 +86,7 @@ const CollectionConfig = <TFormValues extends FieldValues>({
               : () => setFrequencyExpanded((prev) => !prev)
           }
           color="secondary"
-          label={getEnumLabel(FrequencyMode, frequencyField)}
+          label={getEnumLabel(FrequencyMode, String(frequencyField))}
         />
         <Chip
           color="secondary"
@@ -103,13 +103,13 @@ const CollectionConfig = <TFormValues extends FieldValues>({
             render={({ field, fieldState }) => (
               <FormRadioGroup
                 {...field}
+                onChange={(_event, value) => field.onChange(Number(value))}
                 label="Frequency"
                 error={!!fieldState.error}
                 required
                 options={Object.entries(FrequencyMode).map(([key, value]) => ({
                   value: Number(value),
                   label: capitaliseFirstLetter(key.toLowerCase()),
-                  test: { key, value },
                 }))}
               />
             )}
@@ -131,7 +131,6 @@ const CollectionConfig = <TFormValues extends FieldValues>({
           />
         </>
       )}
-
       {!hideSynchronisationTime && (
         <Typography> Synchronisation Time</Typography>
       )}
