@@ -304,6 +304,8 @@ export interface CreateCollectionPost {
   host_id: number;
   url: UrlString | "" | null;
   custodian_id: string;
+  status?: boolean;
+  pid: string;
 }
 
 export interface UpdateCollectionPayload {

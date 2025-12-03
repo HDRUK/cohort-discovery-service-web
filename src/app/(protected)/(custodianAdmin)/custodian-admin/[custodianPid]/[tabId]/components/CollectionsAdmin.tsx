@@ -80,7 +80,6 @@ const CollectionAdmin = ({
         left={
           <CollectionsLeftPanel
             expandedLeft={expandedLeft}
-            custodian={custodian}
             collectionHosts={collectionHosts}
             onCreate={toggleExpandLeft}
             onCancelCreate={toggleExpandLeft}
