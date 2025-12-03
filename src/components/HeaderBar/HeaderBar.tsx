@@ -15,17 +15,21 @@ const HeaderBar = () => {
   return (
     <AppBar
       position="static"
-      color="default"
-      elevation={1}
       sx={(theme) => ({
-        backgroundColor: "#fff",
-        color: theme.palette.background.paper,
+        backgroundColor: theme.palette.secondary.main,
+        color: theme.palette.secondary.contrastText,
+        border: 0,
       })}
     >
       <Toolbar sx={{ justifyContent: "space-between" }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Box sx={{ py: 2 }}>
-            <Image priority src={logo} alt={"cohort discovery logo"} />
+            <Image
+              height={30}
+              priority
+              src={logo}
+              alt={"cohort discovery logo"}
+            />
           </Box>
         </Box>
         {user && (
@@ -33,7 +37,7 @@ const HeaderBar = () => {
             <IconButton color="inherit">
               <Image priority src={userIcon} alt={"user icon"} />
             </IconButton>
-            <Typography color="primary.dark">{user.name}</Typography>
+            <Typography color="secondary.contrastText">{user.name}</Typography>
           </Box>
         )}
       </Toolbar>

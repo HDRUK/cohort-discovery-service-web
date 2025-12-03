@@ -3,7 +3,7 @@ import { Source_Sans_3, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Box } from "@mui/material";
 import ThemeRegistry from "@/components/ThemeRegistry";
-import LeftSidebar from "@/components/LeftSidebar";
+import TopMenu from "@/components/TopMenu";
 import HeaderBar from "@/components/HeaderBar";
 
 const sourceSans = Source_Sans_3({
@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Project Daphne",
+  title: "Cohort Discovery Service",
   description: "New cohort discovery tool",
 };
 
@@ -38,12 +38,16 @@ export default function RootLayout({
             {!hideNav && <HeaderBar />}
             <Box
               sx={{
+                p: hideNav ? 0 : 2,
+                bgcolor: "background.paper",
                 display: "flex",
-                flexGrow: 1,
-                overflow: "hidden",
+                flexDirection: "column",
+                height: "100%",
+                flex: 1,
               }}
             >
-              {!hideNav && <LeftSidebar />}
+              {!hideNav && <TopMenu />}
+
               <Box
                 component="main"
                 sx={{

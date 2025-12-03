@@ -76,20 +76,22 @@ export const themeOptions: ThemeOptions = {
   components: {
     MuiListItemButton: {
       styleOverrides: {
-        root: {
-          color: "#475da7",
+        root: ({ theme }) => ({
+          color: theme.palette.text.primary,
+          borderRadius: theme.shape.borderRadius,
           "&.Mui-selected": {
-            backgroundColor: "primary.main",
-            color: "primary.contrastText",
+            backgroundColor: theme.palette.highlight.main,
+            color: theme.palette.success.dark,
             "&:hover": {
-              backgroundColor: "#4D5B59",
-              color: "primary.contrastText",
+              backgroundColor: theme.palette.success.light,
+              color: theme.palette.success.contrastText,
             },
           },
           "&:hover": {
-            color: "#4D5B59",
+            backgroundColor: theme.palette.highlight.main,
+            color: theme.palette.success.dark,
           },
-        },
+        }),
       },
     },
     MuiTab: {

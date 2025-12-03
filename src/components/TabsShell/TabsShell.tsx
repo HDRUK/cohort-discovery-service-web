@@ -17,6 +17,7 @@ import {
   tabPanelSx,
 } from "./TabsShell.styles";
 import { useRouter } from "next/navigation";
+import { mergeSx } from "@/utils/helpers";
 
 type TabType = {
   page: React.ReactNode;
@@ -33,15 +34,17 @@ type TabsShellProps = {
   tabSx?: BoxProps["sx"];
   tabHeaderSx?: BoxProps["sx"];
   tabContentSx?: BoxProps["sx"];
+  forceValue?: boolean;
 };
 
 export default function TabsShell({
   tabs,
   value,
-  sx = defaultRootSx,
-  tabSx = defaultTabSx,
-  tabHeaderSx = defaultTabHeaderSx,
-  tabContentSx = defaultTabContentSx,
+  sx,
+  tabSx,
+  tabHeaderSx,
+  tabContentSx,
+  forceValue = false,
 }: TabsShellProps) {
   const router = useRouter();
   const [internalValue, setInternalValue] = React.useState(
@@ -57,9 +60,9 @@ export default function TabsShell({
   const kids = React.Children.toArray(pages);
 
   return (
-    <Box sx={sx}>
-      <TabContext value={internalValue}>
-        <Box sx={tabHeaderSx}>
+    <Box sx={mergeSx(defaultRootSx, sx)}>
+      <TabContext value={forceValue ? value || 0 : internalValue}>
+        <Box sx={mergeSx(defaultTabHeaderSx, tabHeaderSx)}>
           <TabList
             onChange={handleChange}
             allowScrollButtonsMobile
@@ -92,7 +95,7 @@ export default function TabsShell({
                 }
                 component={href ? Link : "a"}
                 href={href ?? undefined}
-                sx={tabSx}
+                sx={mergeSx(defaultTabSx, tabSx)}
                 onClick={(e) => {
                   if (!href) e.preventDefault();
                 }}
@@ -101,13 +104,15 @@ export default function TabsShell({
           </TabList>
         </Box>
 
-        <Box sx={tabContentSx}>
-          {kids.map((child, i) => (
-            <TabPanel key={i} value={tabs[i]?.id || i} sx={tabPanelSx}>
-              {child}
-            </TabPanel>
-          ))}
-        </Box>
+        {kids.length > 0 && (
+          <Box sx={mergeSx(defaultTabContentSx, tabContentSx)}>
+            {kids.map((child, i) => (
+              <TabPanel key={i} value={tabs[i]?.id || i} sx={tabPanelSx}>
+                {child}
+              </TabPanel>
+            ))}
+          </Box>
+        )}
       </TabContext>
     </Box>
   );
