@@ -128,12 +128,8 @@ const QueriesTable = ({
     },
   ];
 
-  const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({
-    [queries.data[0]?.pid]: true,
-  });
-  const [expanded, setExpanded] = useState<MRT_ExpandedState>({
-    [queries.data[0]?.pid]: true,
-  });
+  const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
+  const [expanded, setExpanded] = useState<MRT_ExpandedState>({});
 
   const table = usePaginatedTable<Query>({
     columns,
@@ -141,7 +137,7 @@ const QueriesTable = ({
     enableSorting: false,
     rowCount: queries.total,
     perPageDefault: queries.per_page,
-    expandFirstRow: true,
+    expandFirstRow: false,
     initialState: { columnVisibility },
     enableRowSelection: true,
     manualExpanding: true,
