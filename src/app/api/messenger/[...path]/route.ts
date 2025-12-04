@@ -52,7 +52,7 @@ async function proxyRequest(request: NextRequest, pathParts: string[]) {
 function createHandler(method: string) {
   return async function handler(
     request: NextRequest,
-    context: { params?: { path?: string[] } } | any
+    context: { params?: { path?: string[] } } | undefined,
   ) {
     // Handle possible Promise for params
     let pathParts: string[] = [];
