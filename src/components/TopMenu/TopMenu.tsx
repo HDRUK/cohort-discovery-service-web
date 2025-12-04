@@ -4,10 +4,10 @@
 import { useMemo } from "react";
 import { usePathname } from "next/navigation";
 
-import TabsShell from "@/components/TabsShell"; // <- adjust path as needed
+import TabsShell from "@/components/TabsShell";
 import { routes } from "../../config/routes";
 import { useDaphneStore } from "@/store/useDaphneStore";
-import React from "react";
+import { TabType } from "../TabsShell/TabsShell";
 
 export default function TopMenu() {
   const pathname = usePathname();
@@ -28,12 +28,13 @@ export default function TopMenu() {
 
   const isAdmin = useMemo(() => user?.token_user?.is_admin, [user]);
 
-  const tabs = useMemo(() => {
+  const tabs = useMemo<TabType[]>(() => {
     const baseTabs = [
       {
         id: routes.dashboardNewQuery(),
         label: "Cohorts",
         href: routes.dashboardNewQuery(),
+        route: routes.dashboard,
         page: null,
       },
 
@@ -42,6 +43,7 @@ export default function TopMenu() {
         id: routes.teamCollections(uc.pid),
         label: `${uc.name} Management`,
         href: routes.teamCollections(uc.pid),
+        route: routes.teamHome(uc.pid),
         page: null,
       })),
       {
@@ -65,11 +67,12 @@ export default function TopMenu() {
   }, [userCustodians, isAdmin]);
 
   const currentTabValue =
-    tabs.find(
-      (tab) =>
-        tab.href &&
-        (pathname === tab.href || pathname.startsWith(tab.href + "/"))
-    )?.id ??
+    tabs.find((tab) => {
+      const matchPath = tab?.route ?? tab.href;
+      if (!matchPath) return false;
+
+      return pathname === matchPath || pathname.startsWith(matchPath + "/");
+    })?.id ??
     tabs[0]?.id ??
     0;
 

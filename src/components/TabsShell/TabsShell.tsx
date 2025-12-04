@@ -19,11 +19,12 @@ import {
 import { useRouter } from "next/navigation";
 import { mergeSx } from "@/utils/helpers";
 
-type TabType = {
+export type TabType = {
   page: React.ReactNode;
   id?: string;
   label: string;
   href?: string;
+  route?: string;
   onCloseHref?: string;
   disabled?: boolean;
 };
@@ -53,9 +54,6 @@ export default function TabsShell({
   );
   const handleChange = (_: React.SyntheticEvent, newValue: string) => {
     if (value && value === internalValue) return;
-
-    console.log("setting new internal value", newValue, value);
-
     setInternalValue(newValue);
   };
 
@@ -74,7 +72,6 @@ export default function TabsShell({
           >
             {tabs.map(
               ({ id, label, href, onCloseHref, disabled = false }, i) => {
-                if (disabled) return null;
                 return (
                   <Tab
                     disabled={disabled}
@@ -103,7 +100,11 @@ export default function TabsShell({
                     }
                     component={href ? Link : "a"}
                     href={href ?? undefined}
-                    sx={mergeSx(defaultTabSx, tabSx)}
+                    sx={mergeSx(
+                      defaultTabSx,
+                      tabSx,
+                      disabled ? { display: "none" } : {}
+                    )}
                     onClick={(e) => {
                       if (!href) e.preventDefault();
                     }}

@@ -2,10 +2,9 @@ import type { SxProps, Theme } from "@mui/material/styles";
 
 const mergeSx = (
   base: SxProps<Theme>,
-  override?: SxProps<Theme>
+  ...overrides: Array<SxProps<Theme> | undefined>
 ): SxProps<Theme> => {
-  if (!override) return base;
-  return [base, override] as SxProps<Theme>;
+  return [base, ...overrides] as SxProps<Theme>;
 };
 
 export { mergeSx };

@@ -38,21 +38,19 @@ const DashboardTabPage = async (props: {
       href: routes.dashboardNewQuery(),
       page: <NewQueryPage query={query as string} />,
     },
-
     {
       id: "query-result",
       disabled: !hasQuery,
       label: queryName ?? "Query Result",
       href: routes.dashboardQueryResult(query as string),
       onCloseHref: routes.dashboardNewQuery(),
-      page: tabId === "query-result" && <QueryResultsPage {...props} />,
+      page: <QueryResultsPage {...props} />,
     },
-
     {
       id: "query-history",
       label: "Query History",
       href: routes.dashboardHistory,
-      page: tabId === "query-history" && <QueryHistoryPage {...props} />,
+      page: <QueryHistoryPage {...props} />,
     },
   ];
 
