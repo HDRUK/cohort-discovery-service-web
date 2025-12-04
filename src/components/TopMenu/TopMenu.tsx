@@ -32,23 +32,24 @@ export default function TopMenu() {
     const baseTabs = [
       {
         id: routes.dashboardNewQuery(),
-        label: "Home",
+        label: "Cohorts",
         href: routes.dashboardNewQuery(),
         page: null,
       },
-      {
-        id: routes.profile,
-        label: "Profile",
-        href: routes.profile,
-        page: null,
-      },
+
       // each custodian becomes its own tab
       ...userCustodians.map((uc) => ({
         id: routes.teamCollections(uc.pid),
-        label: uc.name,
+        label: `${uc.name} Management`,
         href: routes.teamCollections(uc.pid),
         page: null,
       })),
+      {
+        id: routes.profile,
+        label: "My Account",
+        href: routes.profile,
+        page: null,
+      },
     ];
 
     if (isAdmin) {

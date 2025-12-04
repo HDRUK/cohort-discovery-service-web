@@ -9,26 +9,30 @@ import { themeOptions } from "../../config/theme";
 import { NotifyProvider } from "../../providers/NotifyProvider";
 import { HdrukUiProvider } from "@hdruk/ui";
 import { ThemeOptions } from "@mui/material";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+const queryClient = new QueryClient();
 
 export default function ThemeRegistry({ children }: { children: ReactNode }) {
   return (
     <AppRouterCacheProvider>
       <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <GlobalStyles
-            styles={{
-              body: {
-                margin: 0,
-                width: "100%",
-                height: "100%",
-              },
-              main: {
-                height: "100%",
-              },
-            }}
-          />
-          <NotifyProvider>{children}</NotifyProvider>
-        </LocalizationProvider>
+        <QueryClientProvider client={queryClient}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <GlobalStyles
+              styles={{
+                body: {
+                  margin: 0,
+                  width: "100%",
+                  height: "100%",
+                },
+                main: {
+                  height: "100%",
+                },
+              }}
+            />
+            <NotifyProvider>{children}</NotifyProvider>
+          </LocalizationProvider>
+        </QueryClientProvider>
       </HdrukUiProvider>
     </AppRouterCacheProvider>
   );

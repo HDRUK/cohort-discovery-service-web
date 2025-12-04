@@ -163,7 +163,7 @@ const QueriesTable = ({
         onMouseDown={(e) => e.stopPropagation()}
       >
         <QueryResultsTable
-          query={row.original}
+          initialData={row.original}
           useTableProps={{ enableRowSelection: false }}
           tableProps={{
             leftAction: (

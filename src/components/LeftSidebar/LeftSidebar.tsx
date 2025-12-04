@@ -43,8 +43,7 @@ export default function LeftSidebar() {
 
   const menu: MenuItem[] = useMemo(
     () => [
-      { label: "Home", path: routes.dashboardNewQuery() },
-      { label: "Profile", path: routes.profile },
+      { label: "Cohorts", path: routes.dashboardNewQuery() },
       /*{ label: "My Definitions", path: routes.definitions },*/
       ...(custodianChildren.length > 0
         ? [
@@ -63,6 +62,7 @@ export default function LeftSidebar() {
             },
           ]
         : []),
+      { label: "Profile", path: routes.profile },
     ],
     [custodianChildren, isAdmin]
   );

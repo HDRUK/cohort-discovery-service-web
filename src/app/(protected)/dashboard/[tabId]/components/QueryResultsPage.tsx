@@ -41,7 +41,8 @@ const QueryResultsPageContent = async ({
       {queryToText(queryData.data.definition)}
       <Divider />
       <QueryResultsTable
-        query={queryData.data}
+        initialData={queryData.data}
+        initialSearchParams={searchParamsObject}
         useTableProps={{ enableRowSelection: true }}
         tableProps={{
           leftAction: (

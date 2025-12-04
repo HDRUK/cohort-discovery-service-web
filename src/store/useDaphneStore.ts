@@ -202,6 +202,16 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         queryBuilder: { setQueryBuilderJson },
       } = get();
       setQueryBuilderJson(DEFAULT_QUERY);
+
+      set((state) => {
+        return {
+          ...state,
+          queryBuilder: {
+            ...state.queryBuilder,
+            selected: {},
+          },
+        };
+      });
     },
     boardIndex: buildIndexFromModel(DEFAULT_QUERY),
     sizeCache: {},

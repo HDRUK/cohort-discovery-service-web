@@ -9,6 +9,6 @@ export async function GET(req: Request) {
     path: "/",
   });
 
-  const url = new URL("/login?expired=true", req.url);
+  const url = new URL("/login", req.url);
   return NextResponse.redirect(url);
 }

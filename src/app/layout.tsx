@@ -36,14 +36,15 @@ export default function RootLayout({
             sx={{ display: "flex", flexDirection: "column", height: "100vh" }}
           >
             {!hideNav && <HeaderBar />}
+
             <Box
               sx={{
                 p: hideNav ? 0 : 2,
                 bgcolor: "background.paper",
                 display: "flex",
                 flexDirection: "column",
-                height: "100%",
                 flex: 1,
+                minHeight: 0,
               }}
             >
               {!hideNav && <TopMenu />}

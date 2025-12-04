@@ -5,24 +5,27 @@ import { MRT_TableOptions, type MRT_ColumnDef } from "material-react-table";
 import { Box, CircularProgress, Link } from "@mui/material";
 import ErrorIcon from "@mui/icons-material/Error";
 import LaunchIcon from "@mui/icons-material/Launch";
-import { revalidateAction } from "@/actions/revalidate";
 import { useEffect, useMemo } from "react";
 import { useTable } from "../../hooks/useTable";
 import { formatNumber } from "@/utils/numbers";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import useSearchParams from "@/hooks/useSearchParams";
-import { STATUS_LABELS } from "@/config/defaults";
+import { DEFAULT_INTERVAL, STATUS_LABELS } from "@/config/defaults";
 import Table from "../Table";
 import { TableProps } from "../Table/Table";
+import getQuery from "@/actions/getQuery";
+import { useQuery } from "@tanstack/react-query";
 
 interface QueryResultsTableProps {
-  query: Query;
+  initialData: Query;
+  initialSearchParams?: URLSearchParams;
   tableProps?: TableProps;
   useTableProps?: Omit<MRT_TableOptions<Task>, "data" | "columns">;
 }
 
 const QueryResultsTable = ({
-  query,
+  initialData,
+  initialSearchParams = new URLSearchParams(),
   tableProps,
   useTableProps,
 }: QueryResultsTableProps) => {
@@ -31,6 +34,25 @@ const QueryResultsTable = ({
     setQueryBuilderJson: qb.setQueryBuilderJson,
     queryAsText: qb.queryAsText,
   }));
+
+  const { data: query } = useQuery<Query>({
+    queryKey: [
+      "query",
+      initialData.pid,
+      `${initialData.pid}-${initialSearchParams.toString()}`,
+    ],
+    queryFn: async () => {
+      const res = await getQuery(initialData.pid, initialSearchParams, false);
+      return res.data;
+    },
+    initialData,
+    staleTime: 2 * DEFAULT_INTERVAL,
+    refetchInterval: (query) => {
+      const data = query.state.data;
+      const hasPending = data?.tasks?.some((t) => !t.result);
+      return hasPending ? DEFAULT_INTERVAL : false;
+    },
+  });
 
   const { tasks, name, definition } = query;
 
@@ -41,16 +63,6 @@ const QueryResultsTable = ({
   useEffect(() => {
     setQueryName(name);
   }, [name, setQueryName]);
-
-  const isPending = tasks.some((t) => !t.result);
-
-  useEffect(() => {
-    if (!isPending) return;
-    const interval = setInterval(() => {
-      revalidateAction(query.pid);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [isPending, query.pid]);
 
   const columns: MRT_ColumnDef<Task>[] = [
     {
