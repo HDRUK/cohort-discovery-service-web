@@ -25,6 +25,7 @@ type TabType = {
   label: string;
   href?: string;
   onCloseHref?: string;
+  disabled?: boolean;
 };
 
 type TabsShellProps = {
@@ -52,6 +53,9 @@ export default function TabsShell({
   );
   const handleChange = (_: React.SyntheticEvent, newValue: string) => {
     if (value && value === internalValue) return;
+
+    console.log("setting new internal value", newValue, value);
+
     setInternalValue(newValue);
   };
 
@@ -68,39 +72,45 @@ export default function TabsShell({
             allowScrollButtonsMobile
             sx={tabListSx}
           >
-            {tabs.map(({ id, label, href, onCloseHref }, i) => (
-              <Tab
-                value={id || i}
-                key={id || label}
-                label={
-                  <Typography
-                    sx={{ p: 0, m: 0 }}
-                    variant="body1"
-                    component="span"
-                  >
-                    {label}
-                    {onCloseHref && (
-                      <IconButton
-                        size="small"
-                        onClick={async (e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          router.replace(onCloseHref);
-                        }}
+            {tabs.map(
+              ({ id, label, href, onCloseHref, disabled = false }, i) => {
+                if (disabled) return null;
+                return (
+                  <Tab
+                    disabled={disabled}
+                    value={id || i}
+                    key={id || label}
+                    label={
+                      <Typography
+                        sx={{ p: 0, m: 0 }}
+                        variant="body1"
+                        component="span"
                       >
-                        <CloseIcon />
-                      </IconButton>
-                    )}
-                  </Typography>
-                }
-                component={href ? Link : "a"}
-                href={href ?? undefined}
-                sx={mergeSx(defaultTabSx, tabSx)}
-                onClick={(e) => {
-                  if (!href) e.preventDefault();
-                }}
-              />
-            ))}
+                        {label}
+                        {onCloseHref && (
+                          <IconButton
+                            size="small"
+                            onClick={async (e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              router.replace(onCloseHref);
+                            }}
+                          >
+                            <CloseIcon />
+                          </IconButton>
+                        )}
+                      </Typography>
+                    }
+                    component={href ? Link : "a"}
+                    href={href ?? undefined}
+                    sx={mergeSx(defaultTabSx, tabSx)}
+                    onClick={(e) => {
+                      if (!href) e.preventDefault();
+                    }}
+                  />
+                );
+              }
+            )}
           </TabList>
         </Box>
 

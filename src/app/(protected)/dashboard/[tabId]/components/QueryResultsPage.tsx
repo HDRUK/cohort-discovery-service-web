@@ -1,6 +1,6 @@
 "use server";
 
-import { Divider, Skeleton } from "@mui/material";
+import { Alert, Divider, Skeleton } from "@mui/material";
 import { Suspense } from "react";
 import QueryResultsTable from "@/components/QueryResultsTable";
 import getQuery from "@/actions/getQuery";
@@ -70,7 +70,11 @@ const QueryResultsPage = async (props: PageProps) => {
 
   return (
     <Suspense fallback={<Skeleton height={600} />}>
-      {query && <QueryResultsPageContent searchParams={searchParams} />}
+      {query ? (
+        <QueryResultsPageContent searchParams={searchParams} />
+      ) : (
+        <Alert severity="error">No query found</Alert>
+      )}
     </Suspense>
   );
 };
