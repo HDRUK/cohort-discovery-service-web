@@ -25,7 +25,7 @@ export const themeOptions: ThemeOptions = {
       main: "#1976d2",
       light: "#90caf9",
       dark: "#0d47a1",
-    },
+    }
   },
   zIndex: {
     drawer: 2,

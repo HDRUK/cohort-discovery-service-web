@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { Source_Sans_3, Geist_Mono } from "next/font/google";
+import { cookies } from "next/headers";
 import "./globals.css";
 import { Box } from "@mui/material";
 import ThemeRegistry from "@/components/ThemeRegistry";
 import LeftSidebar from "@/components/LeftSidebar";
 import HeaderBar from "@/components/HeaderBar";
+import FloatingChatBubble from "@/components/FloatingChatBubble/FloatingChatBubble";
+import { GATEWAY_TOKEN_NAME } from "@/config/internals";
 
 const sourceSans = Source_Sans_3({
   variable: "--font-source-sans-3",
@@ -25,9 +28,12 @@ export const metadata: Metadata = {
 
 const hideNav = process.env.APPLICATION_MODE === "integrated";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(GATEWAY_TOKEN_NAME)?.value || "";
+
   return (
     <ThemeRegistry>
       <html lang="en">
@@ -57,6 +63,7 @@ export default function RootLayout({
               </Box>
             </Box>
           </Box>
+          <FloatingChatBubble token={token} />
         </body>
       </html>
     </ThemeRegistry>
