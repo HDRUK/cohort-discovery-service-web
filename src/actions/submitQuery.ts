@@ -5,7 +5,6 @@ import { apiPost } from "../lib/apiClient";
 import { API_ROUTES } from "../lib/apiRoutes";
 import { CreateQuery, CreateQueryPost, ApiResponse } from "../types/api";
 import { capVarChar } from "@/utils/string";
-import { revalidateUserAction } from "@/actions/revalidate";
 
 const submitQuery = async (
   query: RuleGroupType,
@@ -13,7 +12,7 @@ const submitQuery = async (
   collection_filter?: string[]
 ): Promise<ApiResponse<CreateQuery>> => {
   const safeName = capVarChar(queryName);
-  const res = await apiPost<ApiResponse<CreateQuery>, CreateQueryPost>(
+  return await apiPost<ApiResponse<CreateQuery>, CreateQueryPost>(
     API_ROUTES.queries,
     {
       name: safeName,
@@ -22,10 +21,6 @@ const submitQuery = async (
       ...(collection_filter && { collection_filter }),
     }
   );
-
-  revalidateUserAction("queries");
-
-  return res;
 };
 
 export default submitQuery;

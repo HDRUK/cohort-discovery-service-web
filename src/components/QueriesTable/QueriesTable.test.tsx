@@ -36,10 +36,7 @@ describe("QueriesTable", () => {
     const mockQueries = [getMockQuery()];
     render(
       <MockDaphneStore>
-        <QueriesTable
-          queries={paginateData({ data: mockQueries })}
-          hasIncomplete={false}
-        />
+        <QueriesTable initialData={paginateData({ data: mockQueries })} />
       </MockDaphneStore>
     );
 

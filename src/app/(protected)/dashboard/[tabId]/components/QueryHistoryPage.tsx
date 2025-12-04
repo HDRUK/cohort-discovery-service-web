@@ -41,8 +41,8 @@ const QueryHistoryPageContent = async ({ searchParams }: PageProps) => {
     >
       <Title title={"History"} subTitle={`${queries.data.total}`} />
       <QueriesTable
-        queries={queries.data}
-        hasIncomplete={queries.hasIncomplete}
+        initialData={queries.data}
+        initialSearchParams={searchParamsObject}
       />
     </Box>
   );

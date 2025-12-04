@@ -3,7 +3,7 @@ import submitQuery from "@/actions/submitQuery";
 import createCollectionHost from "@/actions/createCollectionHost";
 import updateCollectionHost from "@/actions/updateCollectionHost";
 import deleteCollectionHost from "@/actions/deleteCollectionHost";
-import { revalidateAction } from "@/actions/revalidate";
+import { revalidateAction, revalidateUserAction } from "@/actions/revalidate";
 import {
   ApiResponse,
   Collection,
@@ -494,6 +494,8 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         queryName,
         selectedDatasets
       );
+
+      await revalidateUserAction("queries");
 
       set((state) => ({
         ...state,

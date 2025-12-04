@@ -2,7 +2,7 @@
 
 import useQueryBuilder from "@/store/useQueryBuilder";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Query, Paginated } from "../../types/api";
 import {
   MRT_ExpandedState,
@@ -11,7 +11,6 @@ import {
 } from "material-react-table";
 import { Grid, Paper, Typography } from "@mui/material";
 import dayjs from "dayjs";
-import { revalidateAction } from "@/actions/revalidate";
 import { usePaginatedTable } from "../../hooks/usePaginatedTable";
 import { formatNumber } from "@/utils/numbers";
 import Link from "next/link";
@@ -24,16 +23,19 @@ import ControlledSearchBox from "@/modules/ControlledSearchBox";
 import Title from "../Title";
 import { queryToText } from "@/utils/queryBuilder";
 import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import getQueries from "@/actions/getQueries";
+import { DEFAULT_INTERVAL } from "@/config/defaults";
 
 interface QueriesTableProps {
-  queries: Paginated<Query[]>;
-  hasIncomplete: boolean;
+  initialData: Paginated<Query[]>;
+  initialSearchParams?: URLSearchParams;
   columnVisibility?: Record<string, boolean>;
 }
 
 const QueriesTable = ({
-  queries,
-  hasIncomplete,
+  initialData,
+  initialSearchParams = new URLSearchParams(),
   columnVisibility = { pid: false, "mrt-row-expand": false },
 }: QueriesTableProps) => {
   const router = useRouter();
@@ -46,13 +48,22 @@ const QueriesTable = ({
     })
   );
 
-  useEffect(() => {
-    if (!hasIncomplete) return;
-    const interval = setInterval(() => {
-      revalidateAction("queries");
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [hasIncomplete]);
+  const { data: queries } = useQuery<Paginated<Query[]>>({
+    queryKey: [`queries-${initialSearchParams.toString()}`],
+    queryFn: async () => {
+      const res = await getQueries(initialSearchParams, false);
+      return res.data;
+    },
+    initialData,
+    staleTime: 2 * DEFAULT_INTERVAL,
+    refetchInterval: (query) => {
+      const data = query.state.data;
+      const hasIncomplete = data?.data.filter((q) =>
+        q.tasks.some((t) => !t.completed_at)
+      );
+      return hasIncomplete ? DEFAULT_INTERVAL : false;
+    },
+  });
 
   const columns: MRT_ColumnDef<Query>[] = [
     {
