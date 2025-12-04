@@ -6,7 +6,6 @@ import useQueryBuilder from "@/store/useQueryBuilder";
 import { useRouter } from "next/navigation";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { routes } from "@/config/routes";
-import { revalidateUserAction } from "@/actions/revalidate";
 
 const SubmitQueryButton = () => {
   const router = useRouter();
@@ -29,7 +28,6 @@ const SubmitQueryButton = () => {
       const newPid = res.data.query_pid;
       setIsLoading(false);
       router.replace(routes.dashboardQueryResult(newPid));
-      revalidateUserAction("queries");
     });
   };
 
