@@ -7,7 +7,7 @@ import { ReactNode, useEffect } from "react";
 interface ProtectedPageProps {
   user: CombinedUser;
   custodians: Custodian[];
-  featureFlags: FeatureFlag[];
+  featureFlags: FeatureFlag;
   children: ReactNode;
 }
 

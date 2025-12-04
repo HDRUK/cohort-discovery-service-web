@@ -8,7 +8,7 @@ export default function InAppMessengerFeatureWrapper({ token }: { token: string 
 
     return (
         <>
-            {flags?.["in-app-messenger"] && (
+            {(flags as Record<string, boolean>)?.["in-app-messenger"] && (
                 <FloatingChatBubble token={token} />
             )}
         </>

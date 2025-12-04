@@ -66,10 +66,11 @@ export default function MessengerContent({ onClose, token, initialThreads = [] }
 
     const handleSend = useCallback(async () => {
     if (!selectedThread) return;
+    if (!user) return;
 
     const payload = {
         sender_id: user.id,
-        receiver_id: 2,
+        receiver_id: 2, // NEEDS TO NOT BE HARDCODED
         thread_id: selectedThread.id,
         subject: selectedThread.subject,
         body: composer,
@@ -125,7 +126,7 @@ export default function MessengerContent({ onClose, token, initialThreads = [] }
                 <Box>No messages.</Box>
               ) : (
                 messages.map((m) => {
-                  const isCurrentUser = m.sender_id === user.id;
+                  const isCurrentUser = m.sender_id === user?.id;
                   return (
                     <Box
                       key={m.id}
@@ -140,9 +141,14 @@ export default function MessengerContent({ onClose, token, initialThreads = [] }
                         marginRight: isCurrentUser ? 0 : 2,
                       }}
                     >
-                      <div style={{ fontSize: 12, color: "text.primary", marginBottom: 4 }}>
-                        {isCurrentUser ? "You" : `From: ${m.receiver.name}`}
-                      </div>
+                      {(() => {
+                        const sender = selectedThread?.participants.find(p => p.id === m.sender_id);
+                        return (
+                          <div style={{ fontSize: 12, color: "text.primary", marginBottom: 4 }}>
+                            {isCurrentUser ? "You" : `From: ${sender?.name || 'Unknown'}`}
+                          </div>
+                        );
+                      })()}
                       <div style={{ marginTop: 6, fontWeight: 500 }}>{m.body}</div>
                       <div style={{ fontSize: 11, color: "text.secondary", marginTop: 6 }}>{new Date(m.created_at).toLocaleString()}</div>
                     </Box>

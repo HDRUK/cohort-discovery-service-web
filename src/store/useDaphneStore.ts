@@ -186,8 +186,8 @@ export interface DaphneStoreState {
     deleteCollection: (id: number | string) => Promise<void>;
   };
   featureFlags: {
-    flags: FeatureFlag[] | null;
-    setFlags: (flags: FeatureFlag[]) => void;
+    flags: FeatureFlag | null;
+    setFlags: (flags: FeatureFlag) => void;
   };
 }
 
@@ -641,7 +641,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
   },
   featureFlags: {
     flags: null,
-    setFlags: (flags: FeatureFlag[]) =>
+    setFlags: (flags: FeatureFlag) =>
       set((state) => ({
         ...state,
         featureFlags: { ...state.featureFlags, flags },

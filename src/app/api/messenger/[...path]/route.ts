@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { GATEWAY_TOKEN_NAME } from '@/config/internals';
 
@@ -9,21 +9,25 @@ function joinPath(parts: string[] = []) {
   return p === '/' ? '' : p;
 }
 
-async function proxyRequest(request: Request, pathParts: string[]) {
+async function proxyRequest(request: NextRequest, pathParts: string[]) {
   if (!UPSTREAM) {
     return NextResponse.json({ message: 'Upstream base url not configured' }, { status: 500 });
   }
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get(GATEWAY_TOKEN_NAME)?.value;
 
-  const upstreamUrl = `${UPSTREAM.replace(/\/+$/g, '')}${joinPath(pathParts)}${request.url.includes('?') ? '?' + request.url.split('?')[1] : ''}`;
+  const urlObj = new URL(request.url);
+  const upstreamUrl =
+    UPSTREAM.replace(/\/+$/g, '') +
+    joinPath(pathParts) +
+    (urlObj.search ? urlObj.search : '');
 
   const headers: Record<string, string> = {};
   if (token) headers['Authorization'] = `Bearer ${token}`;
-  // Forward content-type if present
-  const ct = request.headers.get('content-type');
-  if (ct) headers['Content-Type'] = ct;
+
+  const contentType = request.headers.get('content-type');
+  if (contentType) headers['Content-Type'] = contentType;
 
   const init: RequestInit = {
     method: request.method,
@@ -36,26 +40,39 @@ async function proxyRequest(request: Request, pathParts: string[]) {
   }
 
   const res = await fetch(upstreamUrl, init);
-  const contentType = res.headers.get('content-type') || 'application/json';
+  const responseContentType = res.headers.get('content-type') || 'application/json';
   const body = await res.arrayBuffer();
 
   const resp = new NextResponse(body, { status: res.status });
-  resp.headers.set('Content-Type', contentType);
+  resp.headers.set('Content-Type', responseContentType);
   return resp;
 }
 
-export async function GET(request: Request, { params }: { params: { path?: string[] } }) {
-  return proxyRequest(request, params?.path || []);
+// Lean unified handler generator
+function createHandler(method: string) {
+  return async function handler(
+    request: NextRequest,
+    context: { params?: { path?: string[] } } | any
+  ) {
+    // Handle possible Promise for params
+    let pathParts: string[] = [];
+    if (context?.params instanceof Promise) {
+      pathParts = (await context.params).path || [];
+    } else {
+      pathParts = context?.params?.path || [];
+    }
+
+    if (request.method !== method) {
+      return NextResponse.json({ message: 'Method Not Allowed' }, { status: 405 });
+    }
+
+    return proxyRequest(request, pathParts);
+  };
 }
-export async function POST(request: Request, { params }: { params: { path?: string[] } }) {
-  return proxyRequest(request, params?.path || []);
-}
-export async function PUT(request: Request, { params }: { params: { path?: string[] } }) {
-  return proxyRequest(request, params?.path || []);
-}
-export async function DELETE(request: Request, { params }: { params: { path?: string[] } }) {
-  return proxyRequest(request, params?.path || []);
-}
-export async function PATCH(request: Request, { params }: { params: { path?: string[] } }) {
-  return proxyRequest(request, params?.path || []);
-}
+
+// Export handlers
+export const GET = createHandler('GET');
+export const POST = createHandler('POST');
+export const PUT = createHandler('PUT');
+export const DELETE = createHandler('DELETE');
+export const PATCH = createHandler('PATCH');

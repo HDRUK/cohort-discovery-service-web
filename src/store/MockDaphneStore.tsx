@@ -165,6 +165,11 @@ function makeDefaultStore(): DaphneStoreState {
       ) => RESOLVE<Collection>(getMockCollection()),
       deleteCollection: (_id: number | string) => RESOLVE<void>(undefined),
     },
+
+    featureFlags: {
+      flags: null,
+      setFlags: NOOP,
+    },
   };
 }
 
@@ -194,6 +199,10 @@ const MockDaphneStore = ({
     adminData: {
       ...defaults.adminData,
       ...(overrides?.adminData ?? {}),
+    },
+    featureFlags: {
+      ...defaults.featureFlags,
+      ...(overrides?.featureFlags ?? {}),
     },
   };
 
