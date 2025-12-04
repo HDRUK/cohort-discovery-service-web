@@ -1,7 +1,7 @@
 import { Box, BoxProps, Typography } from "@mui/material";
 import { ReactNode } from "react";
 
-interface TableTitleProps extends BoxProps {
+export interface TableTitleProps extends BoxProps {
   title: string;
   subTitle?: number | string | ReactNode;
   children?: React.ReactNode;
