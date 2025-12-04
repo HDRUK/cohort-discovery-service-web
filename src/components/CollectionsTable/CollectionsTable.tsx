@@ -19,20 +19,19 @@ import Table from "../Table";
 import { useDaphneStore } from "@/store/useDaphneStore";
 
 export interface CollectionsTableProps {
-  custodianPid: string;
   collections: Paginated<CollectionWithHosts[]>;
   rowSelection?: MRT_RowSelectionState;
   setRowSelection?: Dispatch<SetStateAction<MRT_RowSelectionState>>;
 }
 
 const CollectionsTable = ({
-  custodianPid,
   collections,
   rowSelection,
   setRowSelection,
 }: CollectionsTableProps) => {
   const {
-    custodianData: { deleteCollection },
+    custodianData: { deleteCollection, currentCustodian },
+    adminData: { deleteCollection: deleteCollectionAdmin },
   } = useDaphneStore();
 
   const columns = useMemo<MRT_ColumnDef<Collection>[]>(
@@ -57,7 +56,7 @@ const CollectionsTable = ({
       {
         id: "status",
         header: "Status",
-        accessorFn: (row) => row.status,
+        accessorFn: (row) => row.model_state?.state_id,
         Cell: ({ cell }) => {
           const status = cell.getValue<CollectionStatus>();
           const { label, color } = getCollectionStatus(status);
@@ -85,7 +84,11 @@ const CollectionsTable = ({
   const handleDeleteCollections = async (ids: string[]) => {
     await Promise.all(
       ids.map((id) => {
-        deleteCollection(id, custodianPid);
+        if (currentCustodian) {
+          deleteCollection(id, currentCustodian.pid);
+        } else {
+          deleteCollectionAdmin(id);
+        }
       })
     );
   };
@@ -94,7 +97,7 @@ const CollectionsTable = ({
     return (
       <Box sx={{ mx: "auto", my: "auto" }}>
         <Typography variant="h5">
-          Collection will appear here when they are created
+          Collections will appear here when they are created
         </Typography>
       </Box>
     );

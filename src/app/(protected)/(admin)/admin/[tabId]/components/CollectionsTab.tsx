@@ -1,6 +1,6 @@
 import CollectionsAdmin from "./CollectionsAdmin";
-import getCustodianCollectionHosts from "@/actions/getCustodianCollectionHosts";
-import getCustodianCollections from "@/actions/getCustodianCollections";
+import getCollectionHosts from "@/actions/getCollectionHosts";
+import getAdminCollections from "@/actions/getAdminCollections";
 import { ApiSearchParams } from "@/types/api";
 import { buildSearchParams } from "@/utils/params";
 import { Box, Skeleton } from "@mui/material";
@@ -13,10 +13,8 @@ export const CollectionsSkeleton = () => (
 );
 
 const CollectionsTab = async ({
-  custodianPid,
   searchParams,
 }: {
-  custodianPid: string;
   searchParams: ApiSearchParams & {
     collection_filter?: string;
     search_collection?: string;
@@ -34,14 +32,10 @@ const CollectionsTab = async ({
   const params = buildSearchParams(queryParams);
 
   const [{ data: collectionHosts }, { data: custodianCollections }] =
-    await Promise.all([
-      getCustodianCollectionHosts(custodianPid),
-      getCustodianCollections(custodianPid, params),
-    ]);
+    await Promise.all([getCollectionHosts(), getAdminCollections(params)]);
 
   return (
     <CollectionsAdmin
-      pid={custodianPid}
       collectionHosts={collectionHosts}
       collections={custodianCollections}
     />

@@ -23,6 +23,7 @@ export const API_ROUTES = {
     `${API_URL}/custodians/${pid}/collection_hosts`,
   custodianCollections: (pid: string) =>
     `${API_URL}/custodians/${pid}/collections`,
+  adminCollections: `${API_URL}/admin/collections`,
   collectionConfig: `${API_URL}/collection_config`,
   conceptSets: `${API_URL}/concept_sets`,
   getConceptSet: (id: number) => `${API_URL}/concept_sets/${id}`,

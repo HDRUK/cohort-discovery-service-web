@@ -1,22 +1,6 @@
-import AdminUserList from "../components/AdminUserList";
-import { Paper } from "@mui/material";
-import getSearchUsers from "@/actions/admin/getSearchUsers";
+import { routes } from "@/config/routes";
+import { redirect } from "next/navigation";
 
-interface PageProps {
-  searchParams: Promise<{
-    searchTerm?: string;
-  }>;
+export default async function Admin() {
+  redirect(routes.admin + "/workgroups");
 }
-
-const AdminHomePage = async ({ searchParams }: PageProps) => {
-  const params = await searchParams;
-  const users = await getSearchUsers(params?.searchTerm);
-
-  return (
-    <Paper sx={{ width: "100%", height: "100%" }}>
-      <AdminUserList users={users.data} />
-    </Paper>
-  );
-};
-
-export default AdminHomePage;

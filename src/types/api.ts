@@ -70,13 +70,27 @@ export interface Distribution extends WithTimestamps {
   median: number;
 }
 
-// soon to be switched to modelState
 export enum CollectionStatus {
-  DRAFT = 0,
-  PENDING = 1,
-  ACTIVE = 2,
-  REJECTED = 3,
-  SUSPENDED = 4,
+  DRAFT = 1,
+  PENDING = 2,
+  ACTIVE = 3,
+  REJECTED = 4,
+  SUSPENDED = 5,
+}
+
+export interface State {
+  id: number;
+  name: string;
+  slug: string;
+}
+
+export interface ModelState {
+  id: number;
+  state: State;
+  state_id: number;
+  stateable_id: number;
+  stateable_type: string;
+  updated_at: string | null;
 }
 
 export interface Collection extends WithTimestamps {
@@ -86,12 +100,12 @@ export interface Collection extends WithTimestamps {
   pid: string;
   url: UrlString | null;
   type: QueryContext;
-  status: CollectionStatus;
   last_active: string | null;
   size?: Distribution;
   demographics?: Distribution[];
   custodian: Custodian;
   custodian_id?: number;
+  model_state?: ModelState;
 }
 
 export interface CollectionConfig {
@@ -282,6 +296,12 @@ export interface CreateCollectionPost {
   type: QueryContext;
   host_id: number;
   url: UrlString | "" | null;
+  custodian_id: string;
+}
+
+export interface UpdateCollectionPayload {
+  name?: string;
+  query_context_type?: string;
 }
 
 export interface CreateCollectionConfigPost {
@@ -292,6 +312,14 @@ export interface CreateCollectionConfigPost {
   run_time_frequency: number;
   enabled: number;
   type: string;
+}
+
+export interface Workgroup {
+  id: number;
+  name: string;
+  external_name?: string;
+  users: User[];
+  collections: Collection[];
 }
 
 export interface Concept {
