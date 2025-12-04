@@ -153,7 +153,7 @@ export interface DaphneStoreState {
     currentCustodian: Custodian | null;
     setCurrentCustodian: (custodian: Custodian) => void;
     custodians: Custodian[];
-    setCustodians: (custodains: Custodian[]) => void;
+    setCustodians: (custodians: Custodian[]) => void;
     createCollectionHost: (
       custodianId: number,
       payload: { name: string; context: string }
