@@ -56,9 +56,6 @@ export default async function ProtectedLayout({
   }
 
   const { data: flags } = await getFeatureFlags();
-
-  console.log("Feature Flags:", flags);
-
   const { data: custodians } = await getCustodians();
 
   const combinedUser = { ...me, token_user: user } as unknown as CombinedUser;
