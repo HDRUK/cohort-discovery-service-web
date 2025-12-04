@@ -6,7 +6,7 @@ import { Collection, ApiResponse } from "../types/api";
 
 const getCollections = async (): Promise<ApiResponse<Collection[]>> => {
   return await apiGet<ApiResponse<Collection[]>>(API_ROUTES.collections, {
-    next: { revalidate: 3600, tags: ["collections"] },
+    next: { revalidate: 60, tags: ["collections"] },
     cache: "force-cache",
   });
 };
