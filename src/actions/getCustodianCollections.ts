@@ -5,6 +5,7 @@ import { API_ROUTES } from "../lib/apiRoutes";
 import { ApiResponse, Paginated, CollectionWithHosts } from "../types/api";
 import { cookies } from "next/headers";
 import { getTokenKey } from "@/utils/string";
+import { DEFAULT_REVALIDATE } from "@/config/defaults";
 
 const getCustodianCollections = async (
   custodianPid: string,
@@ -21,7 +22,7 @@ const getCustodianCollections = async (
 
   return await apiGet<ApiResponse<Paginated<CollectionWithHosts[]>>>(url, {
     next: {
-      revalidate: 3600,
+      revalidate: DEFAULT_REVALIDATE,
       tags: [
         `collections-${custodianPid}`,
         `collections-${custodianPid}-${queryString}`,

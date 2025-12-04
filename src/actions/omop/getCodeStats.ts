@@ -3,7 +3,10 @@
 import { apiGet } from "../../lib/apiClient";
 import { API_ROUTES } from "../../lib/apiRoutes";
 import { CodeStat, ApiResponse, Paginated } from "../../types/api";
-import { DEFAULT_CODES_PER_PAGE } from "../../config/defaults";
+import {
+  DEFAULT_CODES_PER_PAGE,
+  DEFAULT_REVALIDATE,
+} from "../../config/defaults";
 
 const getCodeStats = async (
   page = 1,
@@ -12,7 +15,7 @@ const getCodeStats = async (
   return await apiGet<ApiResponse<Paginated<CodeStat[]>>>(
     `${API_ROUTES.getCodes("stats")}?page=${page}&per_page=${per_page}`,
     {
-      next: { revalidate: 60, tags: ["omop", "stats"] },
+      next: { revalidate: DEFAULT_REVALIDATE, tags: ["omop", "stats"] },
       cache: "force-cache",
     }
   );

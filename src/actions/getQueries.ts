@@ -1,5 +1,6 @@
 "use server";
 
+import { DEFAULT_REVALIDATE } from "@/config/defaults";
 import { apiGet } from "../lib/apiClient";
 import { API_ROUTES } from "../lib/apiRoutes";
 import { Query, ApiResponse, Paginated, WithIncomplete } from "../types/api";
@@ -17,7 +18,7 @@ const getQueries = async (
       : API_ROUTES.queries,
     {
       next: {
-        revalidate: 60,
+        revalidate: DEFAULT_REVALIDATE,
         tags: [
           "all",
           "queries",

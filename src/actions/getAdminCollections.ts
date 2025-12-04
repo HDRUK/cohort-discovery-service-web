@@ -5,6 +5,7 @@ import { API_ROUTES } from "../lib/apiRoutes";
 import { ApiResponse, Paginated, CollectionWithHosts } from "../types/api";
 import { cookies } from "next/headers";
 import { getTokenKey } from "@/utils/string";
+import { DEFAULT_REVALIDATE } from "@/config/defaults";
 
 const getAdminCollections = async (
   params?: URLSearchParams
@@ -20,7 +21,7 @@ const getAdminCollections = async (
 
   return await apiGet<ApiResponse<Paginated<CollectionWithHosts[]>>>(url, {
     next: {
-      revalidate: 3600,
+      revalidate: DEFAULT_REVALIDATE,
       tags: [`collections`, `collections-${queryString}`, key],
     },
     cache: "force-cache",

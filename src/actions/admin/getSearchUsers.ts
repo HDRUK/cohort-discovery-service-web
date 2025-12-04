@@ -1,5 +1,6 @@
 "use server";
 
+import { DEFAULT_REVALIDATE } from "@/config/defaults";
 import { apiGet } from "../../lib/apiClient";
 import { API_ROUTES } from "../../lib/apiRoutes";
 import { ApiResponse } from "../../types/api";
@@ -12,7 +13,7 @@ const getSearchUsers = async (term?: string): Promise<ApiResponse<User[]>> => {
       : API_ROUTES.users,
     {
       next: {
-        revalidate: 60,
+        revalidate: DEFAULT_REVALIDATE,
         tags: ["all", "admin", `admin-users-search-${term}`],
       },
       cache: "force-cache",
