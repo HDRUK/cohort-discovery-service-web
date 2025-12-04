@@ -1,5 +1,4 @@
 "use client";
-import { useDaphneStore } from "@/store/useDaphneStore";
 import { CollectionWithHosts, CollectionHost, Paginated } from "@/types/api";
 import { Box, Skeleton } from "@mui/material";
 import Title from "@/components/Title";
@@ -15,18 +14,12 @@ import ControlledSearchBox from "@/modules/ControlledSearchBox";
 import CollectionsRightPanel from "./CollectionsRightPanel";
 
 const CollectionAdmin = ({
-  pid,
   collections,
   collectionHosts,
 }: {
-  pid: string;
   collections: Paginated<CollectionWithHosts[]>;
   collectionHosts: CollectionHost[];
 }) => {
-  const {
-    custodianData: { custodians },
-  } = useDaphneStore();
-
   const [expandedSide, setExpandedSide] = useState<ExpandedSide | null>(null);
   const expandedLeft = expandedSide === ExpandedSide.LEFT;
   const expandedRight = expandedSide === ExpandedSide.RIGHT;
@@ -61,9 +54,7 @@ const CollectionAdmin = ({
     [collections, selectedCollectionIds]
   );
 
-  const custodian = custodians.find((c) => c.pid === pid);
-
-  if (!custodian) return <Skeleton height={"100%"} />;
+  if (!collections) return <Skeleton height={"100%"} />;
 
   return (
     <Box
@@ -81,7 +72,6 @@ const CollectionAdmin = ({
         left={
           <CollectionsLeftPanel
             expandedLeft={expandedLeft}
-            custodian={custodian}
             collectionHosts={collectionHosts}
             onCreate={toggleExpandLeft}
             onCancelCreate={toggleExpandLeft}

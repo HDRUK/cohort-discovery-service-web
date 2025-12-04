@@ -153,6 +153,18 @@ function makeDefaultStore(): DaphneStoreState {
       deleteCollection: (_id: number | string, _custodianPid: string) =>
         RESOLVE<void>(undefined),
     },
+
+    adminData: {
+      collections: [] as Collection[],
+      setCollections: NOOP,
+      createCollection: (_payload: CreateCollectionPost) =>
+        RESOLVE<Collection>(getMockCollection()),
+      updateCollection: (
+        _id: number,
+        _payload: Partial<CreateCollectionPost>
+      ) => RESOLVE<Collection>(getMockCollection()),
+      deleteCollection: (_id: number | string) => RESOLVE<void>(undefined),
+    },
   };
 }
 
@@ -178,6 +190,10 @@ const MockDaphneStore = ({
     custodianData: {
       ...defaults.custodianData,
       ...(overrides?.custodianData ?? {}),
+    },
+    adminData: {
+      ...defaults.adminData,
+      ...(overrides?.adminData ?? {}),
     },
   };
 

@@ -1,10 +1,5 @@
 import { QueryContext } from "@/types/context";
-import {
-  ApiResponse,
-  Collection,
-  CollectionStatus,
-  Distribution,
-} from "@/types/api";
+import { ApiResponse, Collection, Distribution, ModelState } from "@/types/api";
 import { v4 as uuidv4 } from "uuid";
 import getCustodian from "./getCustodian";
 
@@ -45,6 +40,18 @@ const getMockDemographics = ({
   ];
 };
 
+const getMockModelState = (rest?: Partial<ModelState>): ModelState => {
+  return {
+    id: 1,
+    state: { id: 1, name: "DRAFT", slug: "draft" },
+    state_id: 1,
+    stateable_id: 2,
+    stateable_type: "App\\Models\\Collection",
+    updated_at: "2025-01-01 00:00:00",
+    ...rest,
+  };
+};
+
 export const getMockCollection = (
   rest?: Partial<Collection>,
   count: number = 1213
@@ -54,7 +61,7 @@ export const getMockCollection = (
   name: "Test Dataset #1",
   description: "test datast #1 description",
   url: "https://www.test.com",
-  status: CollectionStatus.ACTIVE,
+  model_state: getMockModelState({ stateable_id: 1 }),
   last_active: null,
   type: QueryContext.BUNNY,
   created_at: "2025-01-01 00:00:00",

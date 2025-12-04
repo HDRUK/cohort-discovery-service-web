@@ -1,9 +1,11 @@
 import AdminPage from "./components/AdminPage";
 
-export default async function ProtectedLayout({
+const ProtectedAdminPageLayout = async ({
   children,
 }: {
   children: React.ReactNode;
-}) {
+}) => {
   return <AdminPage>{children}</AdminPage>;
-}
+};
+
+export default ProtectedAdminPageLayout;
