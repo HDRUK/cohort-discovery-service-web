@@ -638,6 +638,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       // to revalidate cache, and here we don't know the custodian
       await revalidateAction(`collections`);
     },
+  },
   featureFlags: {
     flags: null,
     setFlags: (flags: FeatureFlag[]) =>
