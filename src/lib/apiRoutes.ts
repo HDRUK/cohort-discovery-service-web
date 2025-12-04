@@ -36,6 +36,7 @@ export const API_ROUTES = {
   searchConcepts: `${API_URL}/omop/concepts/search`,
   authCallback: "http://localhost:8100/auth/callback",
   users: `${API_URL}/users`,
+  featureFlags: `${API_URL}/features`,
 };
 
 export const GATEWAY_ROUTES = {

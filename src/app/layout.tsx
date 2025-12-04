@@ -6,8 +6,8 @@ import { Box } from "@mui/material";
 import ThemeRegistry from "@/components/ThemeRegistry";
 import LeftSidebar from "@/components/LeftSidebar";
 import HeaderBar from "@/components/HeaderBar";
-import FloatingChatBubble from "@/components/FloatingChatBubble/FloatingChatBubble";
 import { GATEWAY_TOKEN_NAME } from "@/config/internals";
+import InAppMessengerFeatureWrapper from "@/components/InAppMessengerFeatureWrapper";
 
 const sourceSans = Source_Sans_3({
   variable: "--font-source-sans-3",
@@ -63,7 +63,7 @@ export default async function RootLayout({
               </Box>
             </Box>
           </Box>
-          <FloatingChatBubble token={token} />
+          <InAppMessengerFeatureWrapper token={token} />
         </body>
       </html>
     </ThemeRegistry>

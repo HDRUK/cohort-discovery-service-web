@@ -6,6 +6,7 @@ import { TokenUser, CombinedUser, Roles } from "@/types/api";
 import ProtectedPage from "./components/ProtectedPage";
 import getMe from "@/actions/getMe";
 import getCustodians from "@/actions/getCustodians";
+import getFeatureFlags from "@/actions/getFeatureFlags";
 
 export default async function ProtectedLayout({
   children,
@@ -54,12 +55,16 @@ export default async function ProtectedLayout({
     forbidden();
   }
 
+  const { data: flags } = await getFeatureFlags();
+
+  console.log("Feature Flags:", flags);
+
   const { data: custodians } = await getCustodians();
 
   const combinedUser = { ...me, token_user: user } as unknown as CombinedUser;
 
   return (
-    <ProtectedPage user={combinedUser} custodians={custodians}>
+    <ProtectedPage user={combinedUser} custodians={custodians} featureFlags={flags}>
       {children}
     </ProtectedPage>
   );
