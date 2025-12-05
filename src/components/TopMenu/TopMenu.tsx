@@ -1,4 +1,3 @@
-// components/layout/TopMenu.tsx
 "use client";
 
 import { useMemo } from "react";
@@ -8,6 +7,7 @@ import TabsShell from "@/components/TabsShell";
 import { routes } from "../../config/routes";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { TabType } from "../TabsShell/TabsShell";
+import { isAdmin } from "@/utils/token";
 
 export default function TopMenu() {
   const pathname = usePathname();
@@ -26,8 +26,6 @@ export default function TopMenu() {
     [custodians, teamIds]
   );
 
-  const isAdmin = useMemo(() => user?.token_user?.is_admin, [user]);
-
   const tabs = useMemo<TabType[]>(() => {
     const baseTabs = [
       {
@@ -37,8 +35,6 @@ export default function TopMenu() {
         route: routes.dashboard,
         page: null,
       },
-
-      // each custodian becomes its own tab
       ...userCustodians.map((uc) => ({
         id: routes.teamCollections(uc.pid),
         label: `${uc.name} Management`,
@@ -46,25 +42,30 @@ export default function TopMenu() {
         route: routes.teamHome(uc.pid),
         page: null,
       })),
-      {
-        id: routes.profile,
-        label: "My Account",
-        href: routes.profile,
-        page: null,
-      },
+      ...(user
+        ? [
+            {
+              id: routes.profile,
+              label: "My Account",
+              href: routes.profile,
+              page: null,
+            },
+          ]
+        : []),
+      ...(isAdmin(user?.token_user)
+        ? [
+            {
+              id: routes.admin,
+              label: "Admin",
+              href: routes.admin,
+              page: null,
+            },
+          ]
+        : []),
     ];
 
-    if (isAdmin) {
-      baseTabs.push({
-        id: routes.admin,
-        label: "Admin",
-        href: routes.admin,
-        page: null,
-      });
-    }
-
     return baseTabs;
-  }, [userCustodians, isAdmin]);
+  }, [user, userCustodians]);
 
   const currentTabValue =
     tabs.find((tab) => {
