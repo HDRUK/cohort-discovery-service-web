@@ -32,7 +32,7 @@ const ActionMenu: React.FC = () => {
       </ActionMenuSection>
       <ActionMenuSection
         title={"Hierarchy"}
-        defaultExpanded={queryBuilderJson.rules.length > 0}
+        defaultExpanded
         disabled={queryBuilderJson.rules.length === 0}
         underline
       >
