@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 
 const hideNav = process.env.APPLICATION_MODE === "integrated";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (

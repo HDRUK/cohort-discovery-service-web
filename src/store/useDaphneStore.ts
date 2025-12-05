@@ -119,7 +119,7 @@ export interface DaphneStoreState {
   };
   userData: {
     user: CombinedUser | undefined | null;
-    setUser: (user: CombinedUser) => void;
+    setUser: (user: CombinedUser | null) => void;
     queries: Query[];
     setQueries: (queries: Query[]) => void;
     fetchResults: (
@@ -515,7 +515,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         userData: { ...state.userData, collections },
       })),
     user: null,
-    setUser: (user: CombinedUser) => {
+    setUser: (user: CombinedUser | null) => {
       set((state) => ({ ...state, userData: { ...state.userData, user } }));
     },
     conceptSets: [],

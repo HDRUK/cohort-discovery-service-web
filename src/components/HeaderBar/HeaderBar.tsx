@@ -1,16 +1,29 @@
 "use client";
 
-import React from "react";
-import { AppBar, Toolbar, IconButton, Box, Typography } from "@mui/material";
+import { AppBar, Toolbar, Box, Typography } from "@mui/material";
 import Image from "next/image";
 import logo from "@/assets/logo.svg";
 import userIcon from "@/assets/user_logo.svg";
 import { useDaphneStore } from "@/store/useDaphneStore";
+import PositionedMenu, { PositionedMenuItem } from "../PositionedMenu";
+import { useRouter } from "next/navigation";
 
 const HeaderBar = () => {
+  const router = useRouter();
   const {
-    userData: { user },
+    userData: { user, setUser },
   } = useDaphneStore();
+
+  const links: PositionedMenuItem[] = [
+    {
+      id: "logout",
+      label: "Logout",
+      onClick: () => {
+        setUser(null);
+        router.push("/api/auth/logout");
+      },
+    },
+  ];
 
   return (
     <AppBar
@@ -33,10 +46,10 @@ const HeaderBar = () => {
           </Box>
         </Box>
         {user && (
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <IconButton color="inherit">
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <PositionedMenu isIcon items={links}>
               <Image priority src={userIcon} alt={"user icon"} />
-            </IconButton>
+            </PositionedMenu>
             <Typography color="secondary.contrastText">{user.name}</Typography>
           </Box>
         )}
