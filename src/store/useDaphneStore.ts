@@ -27,6 +27,7 @@ import {
   FeatureName,
   DistributionType,
   CollectionWithHosts,
+  Workgroup,
 } from "@/types/api";
 import createCollection from "@/actions/createCollection";
 import deleteCollection from "@/actions/deleteCollection";
@@ -210,6 +211,8 @@ export interface DaphneStoreState {
       payload: UpdateCollectionPayload
     ) => Promise<Collection>;
     deleteCollection: (id: number | string) => Promise<void>;
+    currentWorkgroup: Workgroup | null;
+    setCurrentWorkgroup: (workgroup?: Workgroup) => void;
   };
   featureFlags: {
     flags: FeatureFlag | null;
@@ -732,6 +735,12 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       // to revalidate cache, and here we don't know the custodian
       await revalidateAction(`collections`);
     },
+    currentWorkgroup: null,
+    setCurrentWorkgroup: (workgroup: Workgroup) =>
+      set((state) => ({
+        ...state,
+        adminData: { ...state.adminData, currentWorkgroup: workgroup },
+      })),
   },
   featureFlags: {
     flags: null,

@@ -40,7 +40,7 @@ const CustodianAdminPage = async ({
       href: `${routes.admin}/workgroups`,
       page: (
         <Suspense fallback={<WorkgroupsSkeleton />}>
-          <WorkgroupsTab />
+          <WorkgroupsTab searchParams={apiSearchParams} />
         </Suspense>
       ),
     },
