@@ -46,7 +46,7 @@ const CreateCollection = ({
         collection_id: 0,
         run_time_hour: 0,
         run_time_minute: 0,
-        frequency_mode: FrequencyMode.WEEKLY,
+        frequency_mode: Number(FrequencyMode.WEEKLY),
         run_time_frequency: 0,
         enabled: 1,
         type: TaskType.B,

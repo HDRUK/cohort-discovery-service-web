@@ -36,7 +36,7 @@ const Circles = ({ children, scale = 1 }: CirclesProps) => {
           width: scaleResponsive(baseCircle),
           height: scaleResponsive(baseCircle),
           borderRadius: "50%",
-          bgcolor: theme.palette.secondary.dark,
+          bgcolor: theme.palette.primary.dark,
           opacity: 0.7,
           zIndex: 2,
         })}
@@ -50,7 +50,7 @@ const Circles = ({ children, scale = 1 }: CirclesProps) => {
           width: scaleResponsive(baseCircle),
           height: scaleResponsive(baseCircle),
           borderRadius: "50%",
-          bgcolor: theme.palette.secondary.light,
+          bgcolor: theme.palette.primary.main,
           opacity: 0.6,
           zIndex: 1,
         })}
@@ -64,7 +64,7 @@ const Circles = ({ children, scale = 1 }: CirclesProps) => {
           width: scaleResponsive(baseCircle),
           height: scaleResponsive(baseCircle),
           borderRadius: "50%",
-          bgcolor: theme.palette.secondary.main,
+          bgcolor: theme.palette.primary.light,
           opacity: 0.55,
           zIndex: 2,
         })}

@@ -47,7 +47,12 @@ const CollectionsLeftPanel = ({
         minHeight: 0,
       }}
     >
-      <ActionMenuSection title={"Create"} defaultExpanded underline>
+      <ActionMenuSection
+        title={"Create"}
+        defaultExpanded
+        underline
+        fixedExpanded={expandedLeft}
+      >
         <AddButton
           action={onCreate}
           label={"Collection"}
@@ -69,7 +74,9 @@ const CollectionsLeftPanel = ({
         defaultExpanded
         underline
       >
+        {/*disabled until the BE can handle model states */}
         <List
+          disabled
           items={[
             {
               label: "All Collections",

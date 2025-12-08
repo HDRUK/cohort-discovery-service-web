@@ -4,7 +4,6 @@ import { IconButton } from "@mui/material";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import { useRouter } from "next/navigation";
-import { revalidateAction } from "@/actions/revalidate";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { routes } from "@/config/routes";
 
@@ -27,11 +26,7 @@ const SubmitQueryButton = () => {
     setIsLoading(true);
     fetchResults(queryName).then(async (res) => {
       const newPid = res.data.query_pid;
-
-      //needs to be used queries
-      revalidateAction("queries");
       setIsLoading(false);
-
       router.replace(routes.dashboardQueryResult(newPid));
     });
   };

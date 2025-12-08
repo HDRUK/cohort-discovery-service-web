@@ -104,14 +104,14 @@ export interface Collection extends WithTimestamps {
   size?: Distribution;
   demographics?: Distribution[];
   custodian: Custodian;
-  custodian_id: number;
+  custodian_id?: number;
   model_state?: ModelState;
 }
 
 export interface CollectionConfig {
   id: number;
   enabled: boolean;
-  frequency_mode: FrequencyMode;
+  frequency_mode: number;
   run_time_frequency: number;
   run_time_hour: number;
   run_time_minute: number;
@@ -236,7 +236,7 @@ export interface User extends WithTimestamps {
   new_user_status?: number;
 }
 
-export interface GatewayTeam {
+export interface ExternalCustodian {
   id: number;
   name: string;
 }
@@ -254,15 +254,15 @@ export interface TokenUser {
   provider: string;
   workgroups: Workgroups[];
   cohort_discovery_roles: Roles[];
-  cohort_admin_teams: GatewayTeam[];
+  cohort_admin_teams: ExternalCustodian[];
 }
 
 export interface Custodian {
   id: number;
   pid: string;
   name: string;
-  gateway_team_id: number;
-  gateway_team_name: string;
+  external_custodian_id: number | string;
+  external_custodian_name: string;
 }
 
 export interface CombinedUser extends User {
@@ -308,7 +308,7 @@ export interface CreateCollectionConfigPost {
   collection_id: number;
   run_time_hour: number;
   run_time_minute: number;
-  frequency_mode: FrequencyMode;
+  frequency_mode: number;
   run_time_frequency: number;
   enabled: number;
   type: string;

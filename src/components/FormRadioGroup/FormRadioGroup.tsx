@@ -8,16 +8,16 @@ import {
   RadioGroupProps,
 } from "@mui/material";
 
-type Option = {
+type RadioOption = {
   label: ReactNode;
-  value: string;
+  value: string | number;
   disabled?: boolean;
 };
 
 interface FormRadioGroupProps extends Omit<RadioGroupProps, "children"> {
   label: string;
   required?: boolean;
-  options: Option[];
+  options: RadioOption[];
   error?: boolean;
 }
 
@@ -47,7 +47,7 @@ const FormRadioGroup = ({
       >
         {options.map((option) => (
           <FormControlLabel
-            key={option.value}
+            key={option.value || ""}
             value={option.value}
             control={<Radio />}
             label={option.label}

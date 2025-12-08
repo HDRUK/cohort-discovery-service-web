@@ -1,7 +1,7 @@
 "use client";
 
 import { useDaphneStore } from "@/store/useDaphneStore";
-import { Roles } from "@/types/api";
+import { isAdmin } from "@/utils/token";
 import { forbidden } from "next/navigation";
 
 const AdminPage = ({ children }: { children: React.ReactNode }) => {
@@ -10,10 +10,7 @@ const AdminPage = ({ children }: { children: React.ReactNode }) => {
   } = useDaphneStore();
 
   const { token_user } = user || {};
-  const is_admin =
-    token_user?.cohort_discovery_roles.includes(Roles.ADMIN) ||
-    token_user?.cohort_discovery_roles.includes(Roles.SYSTEM_ADMIN) ||
-    {};
+  const is_admin = isAdmin(token_user);
 
   if (!is_admin) forbidden();
 

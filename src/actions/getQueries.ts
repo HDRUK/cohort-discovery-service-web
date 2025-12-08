@@ -1,12 +1,14 @@
 "use server";
 
+import { DEFAULT_REVALIDATE } from "@/config/defaults";
 import { apiGet } from "../lib/apiClient";
 import { API_ROUTES } from "../lib/apiRoutes";
 import { Query, ApiResponse, Paginated, WithIncomplete } from "../types/api";
 import { getTokenUser } from "@/lib/auth";
 
 const getQueries = async (
-  searchParams?: URLSearchParams
+  searchParams?: URLSearchParams,
+  useCache: boolean = true
 ): Promise<WithIncomplete<ApiResponse<Paginated<Query[]>>>> => {
   const { user } = await getTokenUser();
   const userId = user.id;
@@ -17,7 +19,7 @@ const getQueries = async (
       : API_ROUTES.queries,
     {
       next: {
-        revalidate: 60,
+        revalidate: DEFAULT_REVALIDATE,
         tags: [
           "all",
           "queries",
@@ -25,7 +27,7 @@ const getQueries = async (
           `${userId}-queries-${searchParams?.toString()}`,
         ],
       },
-      cache: "force-cache",
+      cache: useCache ? "force-cache" : undefined,
     }
   );
 

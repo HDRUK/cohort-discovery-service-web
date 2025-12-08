@@ -24,11 +24,15 @@ export default function LeftSidebar() {
   } = useDaphneStore();
 
   const teamIds = useMemo(
-    () => user?.token_user?.cohort_admin_teams?.map((t) => t.id) ?? [],
+    () => user?.token_user?.cohort_admin_teams?.map((t) => String(t.id)) ?? [],
     [user]
   );
+
   const userCustodians = useMemo(
-    () => (custodians ?? []).filter((c) => teamIds.includes(c.gateway_team_id)),
+    () =>
+      (custodians ?? []).filter((c) =>
+        teamIds.includes(String(c.external_custodian_id))
+      ),
     [custodians, teamIds]
   );
 
@@ -42,9 +46,8 @@ export default function LeftSidebar() {
 
   const menu: MenuItem[] = useMemo(
     () => [
-      { label: "Home", path: routes.dashboard },
-      { label: "Profile", path: routes.profile },
-      { label: "My Definitions", path: routes.definitions },
+      { label: "Cohorts", path: routes.dashboardNewQuery() },
+      /*{ label: "My Definitions", path: routes.definitions },*/
       ...(custodianChildren.length > 0
         ? [
             {
@@ -62,6 +65,7 @@ export default function LeftSidebar() {
             },
           ]
         : []),
+      { label: "Profile", path: routes.profile },
     ],
     [custodianChildren, isAdmin]
   );

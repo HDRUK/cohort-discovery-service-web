@@ -1,9 +1,14 @@
 "use client";
-import { Typography, IconButton, Chip, Box } from "@mui/material";
+import { Typography, IconButton, Chip, Box, MenuItem } from "@mui/material";
 import LockOutlineIcon from "@mui/icons-material/LockOutline";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import ActionMenuSection from "@/components/ActionMenuSection";
-import { CollectionWithHosts, FrequencyMode } from "@/types/api";
+import {
+  CollectionHost,
+  CollectionWithHosts,
+  FrequencyMode,
+  UrlString,
+} from "@/types/api";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import AddButton from "@/components/AddButton";
 import FormTextField from "@/components/FormTextField";
@@ -13,9 +18,11 @@ import { useEffect } from "react";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { revalidateAction } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
+import FormDropdown from "@/components/FormDropdown";
 
 export type UpdateCollectionProps = {
   selectedCollection: CollectionWithHosts;
+  collectionHosts: CollectionHost[];
   expandedRight: boolean;
   expandedLeft: boolean;
   onClose?: () => void;
@@ -23,6 +30,7 @@ export type UpdateCollectionProps = {
 
 const UpdateCollection = ({
   selectedCollection,
+  collectionHosts,
   expandedRight,
   onClose,
 }: UpdateCollectionProps) => {
@@ -35,7 +43,7 @@ const UpdateCollection = ({
     defaultValues: {
       collection: { name: "", description: "", url: "", host_id: 0 },
       config: {
-        frequency_mode: FrequencyMode.WEEKLY,
+        frequency_mode: Number(FrequencyMode.WEEKLY),
         run_time_frequency: 0,
         run_time_hour: 0,
         run_time_minute: 0,
@@ -55,13 +63,12 @@ const UpdateCollection = ({
       collection: {
         name,
         description: description || "",
-        url: url,
-        host_id: host?.id || undefined,
+        url: url || ("" as UrlString),
+        host_id: host.id,
       },
       config: {
-        //note: types need fixing on returned value coming back as "1" rather than 1
-        frequency_mode: (String(config?.frequency_mode) as FrequencyMode) || "",
-        run_time_frequency: config?.run_time_frequency,
+        frequency_mode: config.frequency_mode,
+        run_time_frequency: config.run_time_frequency,
         // run_time_hour: config.run_time_hour 0,
         // run_time_minute: config.run_time_minute ?? 0,
       },
@@ -216,6 +223,36 @@ const UpdateCollection = ({
                   handleEnter();
                 }
               }}
+            />
+          )}
+        />
+
+        <Controller
+          name="collection.host_id"
+          control={control}
+          rules={{
+            required: "A collection host is required",
+            validate: (value) =>
+              Number(value) > 0 || "Please select a valid collection host",
+          }}
+          render={({ field, fieldState: { error } }) => (
+            <FormDropdown
+              {...field}
+              select
+              label="Collection Host"
+              error={error}
+              fullWidth
+              required
+              placeHolderOption={
+                <MenuItem value={0} disabled>
+                  Select a collection host
+                </MenuItem>
+              }
+              options={collectionHosts.map((ch) => ({
+                label: ch.name,
+                value: ch.id,
+              }))}
+              chipColor="secondary"
             />
           )}
         />

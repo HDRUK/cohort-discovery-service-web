@@ -3,7 +3,7 @@ import submitQuery from "@/actions/submitQuery";
 import createCollectionHost from "@/actions/createCollectionHost";
 import updateCollectionHost from "@/actions/updateCollectionHost";
 import deleteCollectionHost from "@/actions/deleteCollectionHost";
-import { revalidateAction } from "@/actions/revalidate";
+import { revalidateAction, revalidateUserAction } from "@/actions/revalidate";
 import {
   ApiResponse,
   Collection,
@@ -119,7 +119,7 @@ export interface DaphneStoreState {
   };
   userData: {
     user: CombinedUser | undefined | null;
-    setUser: (user: CombinedUser) => void;
+    setUser: (user: CombinedUser | null) => void;
     queries: Query[];
     setQueries: (queries: Query[]) => void;
     fetchResults: (
@@ -213,6 +213,16 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         queryBuilder: { setQueryBuilderJson },
       } = get();
       setQueryBuilderJson(DEFAULT_QUERY);
+
+      set((state) => {
+        return {
+          ...state,
+          queryBuilder: {
+            ...state.queryBuilder,
+            selected: {},
+          },
+        };
+      });
     },
     boardIndex: buildIndexFromModel(DEFAULT_QUERY),
     sizeCache: {},
@@ -485,6 +495,8 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         selectedDatasets
       );
 
+      await revalidateUserAction("queries");
+
       set((state) => ({
         ...state,
         queryBuilder: {
@@ -503,7 +515,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         userData: { ...state.userData, collections },
       })),
     user: null,
-    setUser: (user: CombinedUser) => {
+    setUser: (user: CombinedUser | null) => {
       set((state) => ({ ...state, userData: { ...state.userData, user } }));
     },
     conceptSets: [],

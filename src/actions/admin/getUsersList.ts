@@ -3,7 +3,10 @@
 import { apiGet } from "../../lib/apiClient";
 import { API_ROUTES } from "../../lib/apiRoutes";
 import { ApiResponse, Paginated } from "../../types/api";
-import { DEFAULT_USERS_PER_PAGE } from "../../config/defaults";
+import {
+  DEFAULT_REVALIDATE,
+  DEFAULT_USERS_PER_PAGE,
+} from "../../config/defaults";
 import { User } from "@/types/api";
 
 const getUsersList = async (
@@ -14,7 +17,7 @@ const getUsersList = async (
     `${API_ROUTES.users}?page=${page}&per_page=${per_page}`,
     {
       next: {
-        revalidate: 60,
+        revalidate: DEFAULT_REVALIDATE,
         tags: [
           "all",
           "admin",

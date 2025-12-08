@@ -3,7 +3,7 @@
 import { apiGet } from "../lib/apiClient";
 import { API_ROUTES } from "../lib/apiRoutes";
 import { Concept, ApiResponse, Paginated } from "../types/api";
-import { DEFAULT_CODES_PER_PAGE } from "../config/defaults";
+import { DEFAULT_CODES_PER_PAGE, DEFAULT_REVALIDATE } from "../config/defaults";
 import { getTokenKey } from "@/utils/string";
 
 const getConcepts = async (
@@ -29,7 +29,7 @@ const getConcepts = async (
     ApiResponse<Paginated<Partial<Concept>[]>>
   >(url, {
     next: {
-      revalidate: 3600,
+      revalidate: DEFAULT_REVALIDATE,
       tags: [
         "all",
         "concepts",

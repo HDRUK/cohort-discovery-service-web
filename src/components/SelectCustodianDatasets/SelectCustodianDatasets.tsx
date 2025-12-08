@@ -90,7 +90,7 @@ const SelectCustodianDatasets = ({
           borderColor: "lightgrey",
         }}
       >
-        <Box sx={{ display: "flex", gap: 2, p: 2 }}>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, p: 2 }}>
           {custodianCollections.items.map((c) => (
             <Chip
               size="small"

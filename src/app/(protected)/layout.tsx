@@ -7,16 +7,17 @@ import ProtectedPage from "./components/ProtectedPage";
 import getMe from "@/actions/getMe";
 import getCustodians from "@/actions/getCustodians";
 
+const applicationMode = process.env.APPLICATION_MODE;
+
 export default async function ProtectedLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const applicationMode = process.env.APPLICATION_MODE;
-
   const cookieStore = await cookies();
   const token = cookieStore.get(GATEWAY_TOKEN_NAME)?.value;
   const decoded = token ? (jwt.decode(token) as JwtPayload) : undefined;
+
   if (!token || !decoded) {
     if (applicationMode === "standalone") {
       // No token — render the client SignIn component so users can sign in.
@@ -38,9 +39,11 @@ export default async function ProtectedLayout({
   const hasGeneralAccess = user?.cohort_discovery_roles?.includes(
     Roles.GENERAL_ACCESS
   );
+
+  const roles = user?.cohort_discovery_roles || [];
+
   const hasAdminAccess =
-    user?.cohort_discovery_roles?.includes(Roles.ADMIN) ||
-    user?.cohort_discovery_roles.includes(Roles.SYSTEM_ADMIN);
+    roles.includes(Roles.ADMIN) || roles.includes(Roles.SYSTEM_ADMIN);
 
   if (!(hasGeneralAccess || hasAdminAccess)) {
     forbidden();

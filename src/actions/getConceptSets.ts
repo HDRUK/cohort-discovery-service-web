@@ -1,5 +1,6 @@
 "use server";
 
+import { DEFAULT_REVALIDATE } from "@/config/defaults";
 import { apiGet } from "../lib/apiClient";
 import { API_ROUTES } from "../lib/apiRoutes";
 import { ConceptSet, ApiResponse } from "../types/api";
@@ -11,7 +12,7 @@ const getConceptSets = async (): Promise<ApiResponse<ConceptSet[]>> => {
   const key = getTokenKey(token);
   return await apiGet<ApiResponse<ConceptSet[]>>(API_ROUTES.conceptSets, {
     next: {
-      revalidate: 3600,
+      revalidate: DEFAULT_REVALIDATE,
       tags: ["all", "concept-sets", `concept-sets-${key}}`],
     },
     cache: "force-cache",

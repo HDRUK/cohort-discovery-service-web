@@ -7,7 +7,6 @@ import { GATEWAY_TOKEN_NAME } from "@/config/internals";
 import { cookies } from "next/headers";
 import getQuery from "@/actions/getQuery";
 import { capVarChar } from "@/utils/string";
-import { Query } from "@/types/api";
 import { SearchParams } from "@/types/api";
 import QueryHistoryPage from "./components/QueryHistoryPage";
 
@@ -21,16 +20,16 @@ const DashboardTabPage = async (props: {
   const { tabId } = await params;
   const { query } = await searchParams;
 
-  let queryData: Query | undefined;
   let queryName: string | undefined;
 
-  if (query) {
+  if (query && query !== "undefined") {
     const { data } = await getQuery(query as string);
-    queryData = data;
-    queryName = capVarChar(queryData.name, 30, true);
-  }
 
-  const showQueryResult = query && queryName;
+    if (data) {
+      queryName = capVarChar(data.name, 30, true);
+    }
+  }
+  const hasQuery = !!query;
 
   const TABS = [
     {
@@ -39,22 +38,19 @@ const DashboardTabPage = async (props: {
       href: routes.dashboardNewQuery(),
       page: <NewQueryPage query={query as string} />,
     },
-    ...(showQueryResult
-      ? [
-          {
-            id: "query-result",
-            label: queryName || "Query Result",
-            href: routes.dashboardQueryResult(query as string),
-            onCloseHref: routes.dashboardNewQuery(),
-            page: tabId === "query-result" && <QueryResultsPage {...props} />,
-          },
-        ]
-      : []),
+    {
+      id: "query-result",
+      disabled: !hasQuery,
+      label: queryName ?? "Query Result",
+      href: routes.dashboardQueryResult(query as string),
+      onCloseHref: routes.dashboardNewQuery(),
+      page: <QueryResultsPage {...props} />,
+    },
     {
       id: "query-history",
       label: "Query History",
       href: routes.dashboardHistory,
-      page: tabId === "query-history" && <QueryHistoryPage {...props} />,
+      page: <QueryHistoryPage {...props} />,
     },
   ];
 

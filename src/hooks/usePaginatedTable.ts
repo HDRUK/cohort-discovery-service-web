@@ -26,7 +26,7 @@ export function usePaginatedTable<TData extends { pid: string }>({
   rowCount,
   perPageDefault,
   expandFirstRow = false,
-  getRowId = (row) => row.pid,
+  getRowId = (row) => row?.pid,
   state,
   initialState,
   ...rest

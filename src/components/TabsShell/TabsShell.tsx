@@ -17,13 +17,16 @@ import {
   tabPanelSx,
 } from "./TabsShell.styles";
 import { useRouter } from "next/navigation";
+import { mergeSx } from "@/utils/helpers";
 
-type TabType = {
+export type TabType = {
   page: React.ReactNode;
   id?: string;
   label: string;
   href?: string;
+  route?: string;
   onCloseHref?: string;
+  disabled?: boolean;
 };
 
 type TabsShellProps = {
@@ -33,15 +36,17 @@ type TabsShellProps = {
   tabSx?: BoxProps["sx"];
   tabHeaderSx?: BoxProps["sx"];
   tabContentSx?: BoxProps["sx"];
+  forceValue?: boolean;
 };
 
 export default function TabsShell({
   tabs,
   value,
-  sx = defaultRootSx,
-  tabSx = defaultTabSx,
-  tabHeaderSx = defaultTabHeaderSx,
-  tabContentSx = defaultTabContentSx,
+  sx,
+  tabSx,
+  tabHeaderSx,
+  tabContentSx,
+  forceValue = false,
 }: TabsShellProps) {
   const router = useRouter();
   const [internalValue, setInternalValue] = React.useState(
@@ -57,57 +62,68 @@ export default function TabsShell({
   const kids = React.Children.toArray(pages);
 
   return (
-    <Box sx={sx}>
-      <TabContext value={internalValue}>
-        <Box sx={tabHeaderSx}>
+    <Box sx={mergeSx(defaultRootSx, sx)}>
+      <TabContext value={forceValue ? value || 0 : internalValue}>
+        <Box sx={mergeSx(defaultTabHeaderSx, tabHeaderSx)}>
           <TabList
             onChange={handleChange}
             allowScrollButtonsMobile
             sx={tabListSx}
           >
-            {tabs.map(({ id, label, href, onCloseHref }, i) => (
-              <Tab
-                value={id || i}
-                key={id || label}
-                label={
-                  <Typography
-                    sx={{ p: 0, m: 0 }}
-                    variant="body1"
-                    component="span"
-                  >
-                    {label}
-                    {onCloseHref && (
-                      <IconButton
-                        size="small"
-                        onClick={async (e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          router.replace(onCloseHref);
-                        }}
+            {tabs.map(
+              ({ id, label, href, onCloseHref, disabled = false }, i) => {
+                return (
+                  <Tab
+                    disabled={disabled}
+                    value={id || i}
+                    key={id || label}
+                    label={
+                      <Typography
+                        sx={{ p: 0, m: 0 }}
+                        variant="body1"
+                        component="span"
                       >
-                        <CloseIcon />
-                      </IconButton>
+                        {label}
+                        {onCloseHref && (
+                          <IconButton
+                            size="small"
+                            onClick={async (e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              router.replace(onCloseHref);
+                            }}
+                          >
+                            <CloseIcon />
+                          </IconButton>
+                        )}
+                      </Typography>
+                    }
+                    component={href ? Link : "a"}
+                    href={href ?? undefined}
+                    sx={mergeSx(
+                      defaultTabSx,
+                      tabSx,
+                      disabled ? { display: "none" } : {}
                     )}
-                  </Typography>
-                }
-                component={href ? Link : "a"}
-                href={href ?? undefined}
-                sx={tabSx}
-                onClick={(e) => {
-                  if (!href) e.preventDefault();
-                }}
-              />
-            ))}
+                    onClick={(e) => {
+                      if (!href) e.preventDefault();
+                    }}
+                  />
+                );
+              }
+            )}
           </TabList>
         </Box>
 
-        <Box sx={tabContentSx}>
-          {kids.map((child, i) => (
-            <TabPanel key={i} value={tabs[i]?.id || i} sx={tabPanelSx}>
-              {child}
-            </TabPanel>
-          ))}
-        </Box>
+        {kids.length > 0 && (
+          <Box sx={mergeSx(defaultTabContentSx, tabContentSx)}>
+            {kids.map((child, i) => (
+              <TabPanel key={i} value={tabs[i]?.id || i} sx={tabPanelSx}>
+                {child}
+              </TabPanel>
+            ))}
+          </Box>
+        )}
       </TabContext>
     </Box>
   );

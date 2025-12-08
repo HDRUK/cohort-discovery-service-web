@@ -1,4 +1,4 @@
-Web for Project Daphne
+Web for Cohort Discovery Service
 
 ## Getting Started
 
