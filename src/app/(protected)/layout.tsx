@@ -1,7 +1,7 @@
 import { cookies, headers } from "next/headers";
 import { forbidden, redirect } from "next/navigation";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { GATEWAY_TOKEN_NAME } from "@/config/internals";
+import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import { TokenUser, CombinedUser, Roles } from "@/types/api";
 import ProtectedPage from "./components/ProtectedPage";
 import getMe from "@/actions/getMe";
@@ -15,7 +15,7 @@ export default async function ProtectedLayout({
   children: React.ReactNode;
 }) {
   const cookieStore = await cookies();
-  const token = cookieStore.get(GATEWAY_TOKEN_NAME)?.value;
+  const token = cookieStore.get(ACCESS_TOKEN_NAME)?.value;
   const decoded = token ? (jwt.decode(token) as JwtPayload) : undefined;
 
   if (!token || !decoded) {
