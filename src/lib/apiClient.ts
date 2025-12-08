@@ -1,6 +1,6 @@
 "use server";
 
-import { GATEWAY_TOKEN_NAME } from "@/config/internals";
+import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import { cookies } from "next/headers";
 import { ApiError } from "./https";
 import { notFound, forbidden } from "next/navigation";
@@ -26,7 +26,7 @@ async function request<TResponse, TBody = undefined>(
   const { headers = {}, body, signal, cache, next } = options;
 
   const cookieStore = await cookies();
-  const token = cookieStore.get(GATEWAY_TOKEN_NAME)?.value;
+  const token = cookieStore.get(ACCESS_TOKEN_NAME)?.value;
 
   try {
     const response = await fetch(fullUrl, {

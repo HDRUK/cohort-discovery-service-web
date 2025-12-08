@@ -3,7 +3,7 @@ import NewQueryPage from "./components/NewQueryPage";
 import QueryResultsPage from "./components/QueryResultsPage";
 import { routes } from "@/config/routes";
 import TabsShell from "@/components/TabsShell";
-import { GATEWAY_TOKEN_NAME } from "@/config/internals";
+import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import { cookies } from "next/headers";
 import getQuery from "@/actions/getQuery";
 import { capVarChar } from "@/utils/string";
@@ -57,7 +57,7 @@ const DashboardTabPage = async (props: {
   const isValidTabId = (tabId: string) => TABS.some((t) => t.id === tabId);
 
   const cookieStore = await cookies();
-  const token = cookieStore.get(GATEWAY_TOKEN_NAME)?.value;
+  const token = cookieStore.get(ACCESS_TOKEN_NAME)?.value;
 
   if (!isValidTabId(tabId)) return notFound();
 

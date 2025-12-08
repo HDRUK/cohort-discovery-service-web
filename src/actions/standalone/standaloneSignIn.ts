@@ -5,6 +5,7 @@ import { API_ROUTES } from "@/lib/apiRoutes";
 import { apiPost } from "@/lib/apiClient";
 import { cookies } from "next/headers";
 import { ApiError } from "@/lib/https";
+import { ACCESS_TOKEN_NAME } from "@/config/internals";
 
 interface SignInResponse {
   access_token: string;
@@ -24,7 +25,7 @@ const standaloneSignIn = async (payload: SignInPost): Promise<boolean> => {
     }
 
     const cookieStore = await cookies();
-    cookieStore.set("token", token, {
+    cookieStore.set(ACCESS_TOKEN_NAME, token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

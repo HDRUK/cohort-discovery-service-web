@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import TabsShell from "@/components/TabsShell";
 import { notFound } from "next/navigation";
-import { GATEWAY_TOKEN_NAME } from "@/config/internals";
+import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import { cookies } from "next/headers";
 import { routes } from "@/config/routes";
 import CollectionHostsTab, {
@@ -53,7 +53,7 @@ const CustodianAdminPage = async ({
   const isValidTabId = (tabId: string) => tabs.some((t) => t.id === tabId);
 
   const cookieStore = await cookies();
-  const token = cookieStore.get(GATEWAY_TOKEN_NAME)?.value;
+  const token = cookieStore.get(ACCESS_TOKEN_NAME)?.value;
 
   if (!isValidTabId(tabId)) return notFound();
 

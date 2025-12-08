@@ -2,13 +2,13 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import LoginClient from "./components/LoginClient";
 import { Box } from "@mui/material";
-import { GATEWAY_TOKEN_NAME } from "@/config/internals";
+import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import TabsShell from "@/components/TabsShell";
 
 const IS_STANDALONE = process.env.APPLICATION_MODE === "standalone";
 
 export default async function LoginPage() {
-  if ((await cookies()).get(GATEWAY_TOKEN_NAME)) {
+  if ((await cookies()).get(ACCESS_TOKEN_NAME)) {
     redirect("/");
   }
 
