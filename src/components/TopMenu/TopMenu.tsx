@@ -22,7 +22,10 @@ export default function TopMenu() {
   );
 
   const userCustodians = useMemo(
-    () => (custodians ?? []).filter((c) => teamIds.includes(c.gateway_team_id)),
+    () =>
+      (custodians ?? []).filter((c) =>
+        teamIds.includes(c.external_custodian_id)
+      ),
     [custodians, teamIds]
   );
 

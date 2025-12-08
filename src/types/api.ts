@@ -261,8 +261,8 @@ export interface Custodian {
   id: number;
   pid: string;
   name: string;
-  gateway_team_id: number;
-  gateway_team_name: string;
+  external_custodian_id: number;
+  external_custodian_name: string;
 }
 
 export interface CombinedUser extends User {
