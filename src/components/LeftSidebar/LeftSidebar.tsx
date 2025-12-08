@@ -24,14 +24,14 @@ export default function LeftSidebar() {
   } = useDaphneStore();
 
   const teamIds = useMemo(
-    () => user?.token_user?.cohort_admin_teams?.map((t) => t.id) ?? [],
+    () => user?.token_user?.cohort_admin_teams?.map((t) => String(t.id)) ?? [],
     [user]
   );
 
   const userCustodians = useMemo(
     () =>
       (custodians ?? []).filter((c) =>
-        teamIds.includes(c.external_custodian_id)
+        teamIds.includes(String(c.external_custodian_id))
       ),
     [custodians, teamIds]
   );
