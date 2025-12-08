@@ -30,8 +30,8 @@ const CustodianPage = ({
     const { token_user } = user;
     if (
       !token_user?.cohort_admin_teams
-        .map((team) => team.id)
-        .includes(custodian.external_custodian_id)
+        .map((team) => String(team.id))
+        .includes(String(custodian.external_custodian_id))
     ) {
       return forbidden();
     }
