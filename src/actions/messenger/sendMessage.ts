@@ -1,7 +1,7 @@
 "use server";
 
 import { cookies } from 'next/headers';
-import { ServerAdapter } from 'nextjs-messenger';
+import { ServerAdapter } from 'nextjs-messenger/dist/messenger/api/serverAdapter';
 import { GATEWAY_TOKEN_NAME } from '@/config/internals';
 import type { Message, SendMessagePayload } from 'nextjs-messenger';
 
