@@ -1,5 +1,4 @@
 import {
-  Typography,
   Box,
   BoxProps,
   IconButton,
@@ -28,7 +27,6 @@ import {
   cardHeaderSx,
   cardActionsSx,
   chipSx,
-  headerActionSx,
   selectedCaptionSx,
   headerRowSx,
 } from "./RuleWrapper.styles";
@@ -38,6 +36,7 @@ import EditableText from "@/components/EditableText";
 import { useLogDependencyChanges } from "@/utils/deps";
 import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
 import InvalidRule from "@/components/InvalidRule";
+import Title from "@/components/Title";
 
 interface Action {
   action: () => void;
@@ -230,21 +229,22 @@ const RuleWrapper = ({
             {!hideHeader && (
               <CardHeader
                 sx={cardHeaderSx}
-                avatar={
-                  <>
-                    <Chip
-                      color={exclude ? "error" : "primary"}
-                      sx={chipSx}
-                      variant="outlined"
-                      label={exclude ? "Exclude" : "Include"}
-                    />
-                    {!valid && <InvalidRule reasons={invalidReason ?? []} />}
-                  </>
-                }
-                action={
-                  <Box sx={headerActionSx}>
-                    <Typography variant="h5">{type}</Typography>
-                    {headerExtra}
+                title={
+                  <Box
+                    width={"100%"}
+                    display={"flex"}
+                    justifyContent={"space-between"}
+                  >
+                    <Box display={"flex"}>
+                      <Chip
+                        color={exclude ? "error" : "primary"}
+                        sx={chipSx}
+                        variant="outlined"
+                        label={exclude ? "Exclude" : "Include"}
+                      />
+                      {!valid && <InvalidRule reasons={invalidReason ?? []} />}
+                    </Box>
+                    <Title small title={type} subTitle={headerExtra} />
                   </Box>
                 }
               />

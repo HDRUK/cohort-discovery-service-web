@@ -1,4 +1,4 @@
-import { Typography, Chip, Alert } from "@mui/material";
+import { Chip, Alert } from "@mui/material";
 import SearchConcepts from "@/components/SearchConcepts";
 import { Concept } from "@/types/api";
 import { useCallback } from "react";
@@ -127,21 +127,9 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       groupId={groupId}
       sortable={true}
       headerExtra={
-        <>
-          {!isEmptyRule(rule) && domain && (
-            <>
-              <Typography variant="h5">/</Typography>
-              <Chip
-                sx={{
-                  bgcolor: "white",
-                  borderColor: "white",
-                }}
-                variant="outlined"
-                label={domain}
-              />
-            </>
-          )}
-        </>
+        !isEmptyRule(rule) && domain ? (
+          <Chip variant="outlined" label={domain} />
+        ) : null
       }
       render={() => (
         <>

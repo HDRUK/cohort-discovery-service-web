@@ -1,6 +1,8 @@
 {/**
   * @typedef Props
   * @property {string} category
+  * @property {string} verb
+  * @property {string} verbPastTense
   *  OMOP domain name
   */}
 
@@ -20,11 +22,11 @@ Toggle <b>Excluding</b> to remove items that meet the selected criteria. Use thi
 
 # Rule Parameters
 
-<AddTimeFrameButton label={`Add timeframe when ${props.category.toLowerCase()} was diagnosed`} />
+<AddTimeFrameButton label={`Add timeframe when ${props.category.toLowerCase()} was ${props.verb}`} />
 
 
 
-<RuleTimeframeSelector title={`Timeframe of ${props.category} Diagnosis`} />
+<RuleTimeframeSelector title={`Timeframe of ${props.category} ${props.verb}`} />
 
 
 # Guidance

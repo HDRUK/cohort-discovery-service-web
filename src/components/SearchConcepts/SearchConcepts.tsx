@@ -43,6 +43,7 @@ const SearchConcepts = ({
   const initialSelectedRef = useRef<Record<number, boolean>>({ ...selected });
 
   const [options, setOptions] = useState<Concept[]>([]);
+  const [noOptionsFound, setNoOptionsFound] = useState(false);
 
   const allSelected = useMemo(() => {
     if (options?.length === 0) return false;
@@ -72,6 +73,7 @@ const SearchConcepts = ({
       lastQueryRef.current = value;
       setSelected?.({ ...initialSelectedRef.current });
       const { data } = await searchForConcepts(value, domain);
+      setNoOptionsFound(data.length === 0);
       if (data) {
         setOptions(data as Concept[]);
         return;
@@ -92,7 +94,16 @@ const SearchConcepts = ({
 
   return (
     <Box>
-      <SearchBar onSearch={onSearch} />
+      <SearchBar
+        onSearch={onSearch}
+        filters={
+          noOptionsFound ? (
+            <Box sx={{ fontSize: 14, color: "text.secondary" }}>
+              No options found
+            </Box>
+          ) : null
+        }
+      />
       <FormGroup sx={{ mt: 2 }}>
         {multiple && options?.length > 0 && (
           <>
