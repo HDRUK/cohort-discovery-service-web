@@ -19,6 +19,8 @@ import {
   ConceptSet,
   UpdateCollectionHostPayload,
   CreateCollectionConfigPost,
+  FeatureFlag,
+  FeatureName,
 } from "@/types/api";
 import createCollection from "@/actions/createCollection";
 import deleteCollection from "@/actions/deleteCollection";
@@ -116,6 +118,7 @@ export interface DaphneStoreState {
       id: UniqueIdentifier | UniqueIdentifier[],
       next?: boolean
     ) => void;
+    validateRules: (root: RuleGroupType) => RuleGroupType;
   };
   userData: {
     user: CombinedUser | undefined | null;
@@ -183,6 +186,10 @@ export interface DaphneStoreState {
       payload: UpdateCollectionPayload
     ) => Promise<Collection>;
     deleteCollection: (id: number | string) => Promise<void>;
+  };
+  featureFlags: {
+    flags: FeatureFlag | null;
+    setFlags: (flags: FeatureFlag) => void;
   };
 }
 
@@ -362,7 +369,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       get().queryBuilder.createNewNode(NodeKind.OPERATOR, above),
     queryAsText: queryToText(DEFAULT_QUERY),
     setQueryBuilderJson: (query: RuleGroupType) => {
-      const updatedQuery = validateRuleTree(query);
+      const updatedQuery = get().queryBuilder.validateRules(query);
 
       const text = updatedQuery.valid ? queryToText(query) : "";
 
@@ -460,12 +467,20 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         ...state,
         queryBuilder: {
           ...state.queryBuilder,
-          queryBuilderJson: validateRuleTree(newQuery),
+          queryBuilderJson: get().queryBuilder.validateRules(newQuery),
           boardIndex: buildIndexFromModel(newQuery),
           queryAsText: queryToText(newQuery),
         },
         stateManagement: { ...state.stateManagement, isLoading: false },
       }));
+    },
+    validateRules: (root: RuleGroupType) => {
+      const featureFlags = get().featureFlags.flags;
+
+      return validateRuleTree(root, {
+        constrainForBunnyV1:
+          featureFlags?.[FeatureName.ConstrainForBunnyV1] || false,
+      });
     },
   },
   userData: {
@@ -645,5 +660,13 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       // to revalidate cache, and here we don't know the custodian
       await revalidateAction(`collections`);
     },
+  },
+  featureFlags: {
+    flags: null,
+    setFlags: (flags: FeatureFlag) =>
+      set((state) => ({
+        ...state,
+        featureFlags: { ...state.featureFlags, flags },
+      })),
   },
 }));

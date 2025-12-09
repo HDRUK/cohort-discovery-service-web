@@ -80,9 +80,9 @@ export const inputAdornmentSx: SxProps<Theme> = {
   zIndex: 3,
 };
 
-export const iconButtonSx: SxProps<Theme> = {
-  bgcolor: "grey.600",
-  boxShadow: "-4px 0px 6px -2px rgba(0, 0, 0, 0.4)",
+export const iconButtonSx = (disabled = false): SxProps<Theme> => ({
+  bgcolor: disabled ? "grey.500" : "grey.600",
+  boxShadow: disabled ? "none" : "-4px 0px 6px -2px rgba(0, 0, 0, 0.4)",
   color: "common.white",
   borderRadius: "999px",
   height: 40,
@@ -90,7 +90,10 @@ export const iconButtonSx: SxProps<Theme> = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  cursor: "pointer",
+  cursor: disabled ? "default" : "pointer",
   lineHeight: 0,
-  "&:hover": { bgcolor: "grey.700" },
-};
+  opacity: disabled ? 0.5 : 1,
+  "&:hover": {
+    bgcolor: disabled ? "grey.500" : "grey.700",
+  },
+});

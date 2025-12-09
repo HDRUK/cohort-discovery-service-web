@@ -18,7 +18,6 @@ import { ReactNode, RefObject, useCallback, useMemo, useState } from "react";
 import useSortable from "@/hooks/useSortable";
 import { DragIndicator } from "@mui/icons-material";
 import useQueryBuilder from "@/store/useQueryBuilder";
-import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 
 import {
   containerSx,
@@ -38,6 +37,7 @@ import { RuleNodeType } from "@/types/rules";
 import EditableText from "@/components/EditableText";
 import { useLogDependencyChanges } from "@/utils/deps";
 import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
+import InvalidRule from "@/components/InvalidRule";
 
 interface Action {
   action: () => void;
@@ -51,8 +51,6 @@ export interface RuleWrapperProps extends BoxProps {
   hideHeader?: boolean;
   groupId?: string;
   sortable?: boolean;
-  valid?: boolean;
-  exclude?: boolean;
   cardProps?: CardProps;
   containerProps?: BoxProps;
   render: (
@@ -71,8 +69,6 @@ const RuleWrapper = ({
   headerExtra,
   hideHeader = false,
   sortable = true,
-  valid = true,
-  exclude = false,
   cardProps = undefined,
   containerProps = undefined,
   render,
@@ -80,7 +76,7 @@ const RuleWrapper = ({
   forceShowHandle = false,
   useLeftDragPlaceHolder = false,
 }: RuleWrapperProps) => {
-  const { id } = node;
+  const { id, valid = true, invalidReason, exclude = false } = node;
 
   const { isSelected, toggleSelected, getNodeName, setNodeName } =
     useQueryBuilder((qb) => ({
@@ -242,7 +238,7 @@ const RuleWrapper = ({
                       variant="outlined"
                       label={exclude ? "Exclude" : "Include"}
                     />
-                    {!valid && <WarningAmberIcon color="warning" />}
+                    {!valid && <InvalidRule reasons={invalidReason ?? []} />}
                   </>
                 }
                 action={

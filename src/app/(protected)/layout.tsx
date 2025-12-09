@@ -6,6 +6,7 @@ import { TokenUser, CombinedUser, Roles } from "@/types/api";
 import ProtectedPage from "./components/ProtectedPage";
 import getMe from "@/actions/getMe";
 import getCustodians from "@/actions/getCustodians";
+import getFeatureFlags from "@/actions/getFeatureFlags";
 
 const applicationMode = process.env.APPLICATION_MODE;
 
@@ -17,7 +18,6 @@ export default async function ProtectedLayout({
   const cookieStore = await cookies();
   const token = cookieStore.get(ACCESS_TOKEN_NAME)?.value;
   const decoded = token ? (jwt.decode(token) as JwtPayload) : undefined;
-
   if (!token || !decoded) {
     if (applicationMode === "standalone") {
       // No token — render the client SignIn component so users can sign in.
@@ -57,12 +57,17 @@ export default async function ProtectedLayout({
     forbidden();
   }
 
+  const { data: flags } = await getFeatureFlags();
   const { data: custodians } = await getCustodians();
 
   const combinedUser = { ...me, token_user: user } as unknown as CombinedUser;
 
   return (
-    <ProtectedPage user={combinedUser} custodians={custodians}>
+    <ProtectedPage
+      user={combinedUser}
+      custodians={custodians}
+      featureFlags={flags}
+    >
       {children}
     </ProtectedPage>
   );

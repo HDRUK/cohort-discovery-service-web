@@ -7,6 +7,8 @@ import { useEffect } from "react";
 import SearchBox from "../SearchBox";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import SubmitQueryButton from "../SubmitQueryButton";
+import { RuleErrors } from "@/utils/rules";
+import { MAX_INVALID_REASONS } from "@/config/defaults";
 
 type FormValues = {
   cohortQueryInput: string;
@@ -37,13 +39,33 @@ const CohortQueryInput = () => {
 
   useEffect(() => {
     clearErrors();
+
     if (!queryBuilderJson.valid) {
       setValue("cohortQueryInput", "");
-      setError("cohortQueryInput", { message: "This query is invalid..." });
+
+      const maskInitialError =
+        queryBuilderJson?.invalidReason?.length === 1 &&
+        queryBuilderJson?.invalidReason[0] === RuleErrors.EMPTY_RULE;
+
+      if (!maskInitialError) {
+        setError("cohortQueryInput", {
+          message:
+            queryBuilderJson?.invalidReason
+              ?.slice(0, MAX_INVALID_REASONS)
+              .join(" ") || "This query is invalid...",
+        });
+      }
       return;
     }
     setValue("cohortQueryInput", queryAsText);
-  }, [queryAsText, queryBuilderJson.valid, setValue, setError, clearErrors]);
+  }, [
+    queryAsText,
+    queryBuilderJson.valid,
+    queryBuilderJson.invalidReason,
+    setValue,
+    setError,
+    clearErrors,
+  ]);
 
   return (
     <Box
@@ -72,7 +94,7 @@ const CohortQueryInput = () => {
             margin="normal"
             onSubmit={handleSubmit(onSubmit)}
             loading={isLoading}
-            disabled={isLoading}
+            disabled={isLoading || !queryBuilderJson.valid}
             actionIcon={<SubmitQueryButton />}
           />
         )}

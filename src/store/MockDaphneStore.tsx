@@ -89,6 +89,7 @@ function makeDefaultStore(): DaphneStoreState {
       setOpenSelectDatasetsPanel: NOOP,
       showDescendants: {},
       setShowDescendants: NOOP,
+      validateRules: (_root: RuleGroupType) => _root,
     },
 
     userData: {
@@ -167,6 +168,11 @@ function makeDefaultStore(): DaphneStoreState {
       ) => RESOLVE<Collection>(getMockCollection()),
       deleteCollection: (_id: number | string) => RESOLVE<void>(undefined),
     },
+
+    featureFlags: {
+      flags: null,
+      setFlags: NOOP,
+    },
   };
 }
 
@@ -196,6 +202,10 @@ const MockDaphneStore = ({
     adminData: {
       ...defaults.adminData,
       ...(overrides?.adminData ?? {}),
+    },
+    featureFlags: {
+      ...defaults.featureFlags,
+      ...(overrides?.featureFlags ?? {}),
     },
   };
 
