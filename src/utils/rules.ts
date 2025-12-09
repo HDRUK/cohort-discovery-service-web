@@ -49,7 +49,7 @@ export const createOperator = (
 });
 
 export function ruleToGroup(
-  ruleOrRules: RuleLeafType | RuleLeafType[],
+  r: RuleLeafType,
   opts?: {
     groupId?: string;
     groupCombinator?: CombinatorType;
@@ -60,20 +60,12 @@ export function ruleToGroup(
 ): RuleGroupType {
   const groupCombinator = opts?.groupCombinator ?? CombinatorType.AND;
 
-  const rulesArray: RuleLeafType[] = Array.isArray(ruleOrRules)
-    ? ruleOrRules
-    : [ruleOrRules];
-
-  const children: RuleLeafType[] = rulesArray.map((r) => ({
-    ...r,
-    combinator: opts?.childCombinator ?? groupCombinator,
-    exclude: opts?.childExclude ?? false,
-  }));
+  const rule: RuleLeafType = { ...r, exclude: opts?.childExclude ?? r.exclude };
 
   const group: RuleGroupType = {
     id: opts?.groupId ?? uuidv4(),
     ...(opts?.groupExclude !== undefined ? { exclude: opts.groupExclude } : {}),
-    rules: children,
+    rules: [createRule(), createOperator(groupCombinator), rule],
   };
 
   return group;
@@ -337,16 +329,6 @@ export function validateRuleTree(
 
   const isContent = (n: RuleNodeType) => isRuleLeaf(n) || isRuleGroup(n);
 
-  const withValidTrue = <T extends RuleNodeType>(n: T): T => {
-    const { invalidReason, ...rest } = n as RuleNodeType & {
-      invalidReason?: string[];
-    };
-
-    if (isRuleGroup(n)) return { ...rest, valid: true } as T;
-    if (isRuleLeaf(n)) return { ...rest, valid: true } as T;
-    return { ...(rest as OperatorType), valid: true } as T;
-  };
-
   const setValid = <T extends RuleNodeType>(n: T, v: boolean): T => {
     if (isRuleGroup(n)) return { ...n, valid: v } as T;
     if (isRuleLeaf(n)) return { ...n, valid: v } as T;
@@ -364,13 +346,21 @@ export function validateRuleTree(
     return `${op.combinator}-${op.exclude}`;
   };
 
-  const invalidateNode = <T extends RuleNodeType>(node: T, msg: string): T => {
+  const invalidateNode = (node: RuleNodeType, msg: string): RuleNodeType => {
     const anyNode: RuleNodeType = node;
     const existing: string[] = anyNode.invalidReason ?? [];
     const nextReasons = existing.includes(msg) ? existing : [...existing, msg];
 
-    const nodeWithReason = { ...anyNode, invalidReason: nextReasons } as T;
+    const nodeWithReason = {
+      ...anyNode,
+      invalidReason: nextReasons,
+    } as RuleNodeType;
     return setValid(nodeWithReason, false);
+  };
+
+  const validateNode = (node: RuleNodeType): RuleNodeType => {
+    const { invalidReason, ...nodeWithoutReason } = node;
+    return setValid(nodeWithoutReason, true);
   };
 
   const validateGroup = (
@@ -387,11 +377,10 @@ export function validateRuleTree(
 
     const children = group.rules.map((child) => {
       if (isRuleGroup(child)) {
-        // Bunny V1: no groups within groups, BUT allow groups directly under root
+        // Bunny V1: no groups within groups
         if (constrainForBunnyV1 && depth >= 1) {
           return invalidateNode(child, RuleErrors.NO_NESTED_GROUPS);
         }
-        // recurse, increasing depth
         return validateGroup(child, 2, depth + 1);
       }
 
@@ -400,10 +389,10 @@ export function validateRuleTree(
         if (empty) {
           return invalidateNode(child, RuleErrors.EMPTY_RULE);
         }
-        return withValidTrue(child);
+        return validateNode(child);
       }
 
-      return withValidTrue(child as OperatorType);
+      return validateNode(child);
     });
 
     const n = children.length;
@@ -470,7 +459,7 @@ export function validateRuleTree(
       if (!isContent(children[i])) continue;
       const prev = children[i - 1];
       const next = children[i + 1];
-      if ((i > 0 && !prev) || (i < n - 1 && !next)) continue; // edges handled above
+      if ((i > 0 && !prev) || (i < n - 1 && !next)) continue;
       if (i > 0 && i < n - 1) {
         if (isContent(prev) || isContent(next)) {
           const msg = RuleErrors.GROUP_NEEDS_OPERATORS;
@@ -502,16 +491,10 @@ export function validateRuleTree(
     }
     const reasons = Array.from(reasonSet);
 
-    const invalidReason = groupIsValid
-      ? undefined
-      : depth > 0
-      ? [RuleErrors.GROUP_IS_INVALID]
-      : reasons.length < 5
-      ? reasons
-      : [RuleErrors.MANY];
+    const invalidReason = groupIsValid ? undefined : reasons;
 
     const base = {
-      ...withValidTrue(group),
+      ...validateNode(group),
       rules: children,
       valid: groupIsValid,
       invalidReason,
@@ -521,13 +504,10 @@ export function validateRuleTree(
   };
 
   if (root.rules.length === 0) {
-    return withValidTrue(root);
+    return validateNode(root) as RuleGroupType;
   }
 
-  // root starts at depth 0
-  const validatedRoot = validateGroup(withValidTrue(root), 1, 0);
+  const validatedRoot = validateGroup(root);
 
-  // validatedRoot.invalidReason (if present) is already the union of
-  // all child/group reasons, so we can just return it directly.
   return validatedRoot;
 }

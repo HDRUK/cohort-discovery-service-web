@@ -8,6 +8,7 @@ import SearchBox from "../SearchBox";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import SubmitQueryButton from "../SubmitQueryButton";
 import { RuleErrors } from "@/utils/rules";
+import { MAX_INVALID_REASONS } from "@/config/defaults";
 
 type FormValues = {
   cohortQueryInput: string;
@@ -49,8 +50,9 @@ const CohortQueryInput = () => {
       if (!maskInitialError) {
         setError("cohortQueryInput", {
           message:
-            queryBuilderJson?.invalidReason?.join(" ") ||
-            "This query is invalid...",
+            queryBuilderJson?.invalidReason
+              ?.slice(0, MAX_INVALID_REASONS)
+              .join(" ") || "This query is invalid...",
         });
       }
       return;
