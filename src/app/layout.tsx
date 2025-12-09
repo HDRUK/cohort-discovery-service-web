@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { Source_Sans_3, Geist_Mono } from "next/font/google";
+import { cookies } from "next/headers";
 import "./globals.css";
 import { Box } from "@mui/material";
 import ThemeRegistry from "@/components/ThemeRegistry";
 import TopMenu from "@/components/TopMenu";
 import HeaderBar from "@/components/HeaderBar";
+import { GATEWAY_TOKEN_NAME } from "@/config/internals";
+import InAppMessengerFeatureWrapper from "@/components/InAppMessengerFeatureWrapper";
 
 const sourceSans = Source_Sans_3({
   variable: "--font-source-sans-3",
@@ -28,6 +31,9 @@ const hideNav = process.env.APPLICATION_MODE === "integrated";
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(GATEWAY_TOKEN_NAME)?.value || "";
+
   return (
     <ThemeRegistry>
       <html lang="en">
@@ -62,6 +68,7 @@ export default async function RootLayout({
               </Box>
             </Box>
           </Box>
+          <InAppMessengerFeatureWrapper token={token} />
         </body>
       </html>
     </ThemeRegistry>
