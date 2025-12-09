@@ -60,8 +60,12 @@ export const ConceptItem = ({
   const labelEl = (
     <Title
       small
+      useSeparator={false}
       title={titleText}
       subTitle={showDomain ? concept.category : ""}
+      display={"flex"}
+      justifyContent={"space-between"}
+      width={"100%"}
     />
   );
 

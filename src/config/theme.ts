@@ -65,11 +65,11 @@ export const themeOptions: ThemeOptions = {
       lineHeight: 1.1,
     },
     guidance1: {
-      fontSize: "20px",
+      fontSize: "16px",
       fontWeight: 400,
     },
     guidance2: {
-      fontSize: "18px",
+      fontSize: "14px",
       fontWeight: 600,
     },
   },

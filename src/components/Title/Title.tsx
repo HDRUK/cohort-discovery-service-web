@@ -1,8 +1,9 @@
-import { Box, Typography } from "@mui/material";
+import { Box, BoxProps, Typography } from "@mui/material";
+import { ReactNode } from "react";
 
-interface TableTitleProps {
+interface TableTitleProps extends BoxProps {
   title: string;
-  subTitle?: number | string;
+  subTitle?: number | string | ReactNode;
   children?: React.ReactNode;
   startIcon?: React.ReactNode;
   useSeparator?: boolean;
@@ -21,15 +22,11 @@ const Title = ({
   return (
     <Box
       sx={{
-        width: "100%",
         display: "flex",
         alignItems: "baseline",
-        gap: 2,
-        flexWrap: "nowrap",
-        ...rest,
       }}
     >
-      <Box>
+      <Box display={"flex"} {...rest}>
         <Typography
           variant={small ? "body1" : "h4"}
           component="span"
@@ -44,7 +41,7 @@ const Title = ({
             variant={small ? "h6" : "h5"}
             component="span"
             noWrap
-            sx={{ flexShrink: 0, ml: 1 }}
+            sx={{ flexShrink: 0, mx: 1 }}
           >
             {subTitle}
           </Typography>

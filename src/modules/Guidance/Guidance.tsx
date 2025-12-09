@@ -28,6 +28,9 @@ import { AddButtonProps } from "@/components/AddButton/AddButton";
 import AddTimeFrameButton from "@/components/AddTimeFrameButton";
 import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
 import { CustomH1, CustomH2 } from "@/components/GuidanceHeaders";
+import { getDomainVerbs } from "@/utils/omop";
+import DeleteTimeFrameButton from "@/components/DeleteTimeFrameButton";
+import { DeleteMenuItemProps } from "@/components/DeleteMenuItem/DeleteMenuItem";
 
 export const baseComponents = {
   h1: CustomH1,
@@ -100,6 +103,9 @@ const Guidance = () => {
     RuleTimeframeSelector: (props: { title: string }) => (
       <RuleTimeframeSelector rule={node} {...props} />
     ),
+    DeleteTimeFrameButton: (props: DeleteMenuItemProps) => (
+      <DeleteTimeFrameButton rule={node} {...props} />
+    ),
   });
 
   const makeOperatorComponents = (node: OperatorType) => ({
@@ -120,44 +126,49 @@ const Guidance = () => {
     };
   };
 
-  return (
-    <>
-      {empty && (
-        <ActionMenuSection title={"Build Guidance"} fixedExpanded scrollable>
-          <BuildGuidance components={baseComponents} />
+  if (empty) {
+    return (
+      <ActionMenuSection title={"Build Guidance"} fixedExpanded scrollable>
+        <BuildGuidance components={baseComponents} />
+      </ActionMenuSection>
+    );
+  }
+
+  if (!selectedNode) {
+    return (
+      <ActionMenuSection title={"Tool Guidance"} fixedExpanded scrollable>
+        <ToolGuidance components={baseComponents} />
+      </ActionMenuSection>
+    );
+  } else {
+    if (isRuleLeaf(selectedNode)) {
+      const category = selectedNode?.rule?.concept?.category || "";
+      const { verb, verbPastTense } = getDomainVerbs(category);
+
+      return (
+        <ActionMenuSection title={"Rule"} fixedExpanded scrollable>
+          <RuleGuidance
+            category={selectedNode.rule.concept?.category || ""}
+            verb={verb}
+            verbPastTense={verbPastTense}
+            components={makeRuleComponents(selectedNode)}
+          />
         </ActionMenuSection>
-      )}
-      {!selectedNode && !empty && (
-        <ActionMenuSection title={"Tool Guidance"} fixedExpanded scrollable>
-          <ToolGuidance components={baseComponents} />
+      );
+    } else if (isOperator(selectedNode)) {
+      return (
+        <ActionMenuSection title={"Operator"} fixedExpanded scrollable>
+          <OperatorGuidance components={makeOperatorComponents(selectedNode)} />
         </ActionMenuSection>
-      )}
-      {selectedNode && (
-        <>
-          {isRuleLeaf(selectedNode) && (
-            <ActionMenuSection title={"Rule"} fixedExpanded scrollable>
-              <RuleGuidance
-                category={selectedNode.rule.concept?.category || ""}
-                components={makeRuleComponents(selectedNode)}
-              />
-            </ActionMenuSection>
-          )}
-          {isOperator(selectedNode) && (
-            <ActionMenuSection title={"Operator"} fixedExpanded scrollable>
-              <OperatorGuidance
-                components={makeOperatorComponents(selectedNode)}
-              />
-            </ActionMenuSection>
-          )}
-          {isRuleGroup(selectedNode) && (
-            <ActionMenuSection title={"Group"} fixedExpanded scrollable>
-              <GroupGuidance components={makeGroupComponents(selectedNode)} />
-            </ActionMenuSection>
-          )}
-        </>
-      )}
-    </>
-  );
+      );
+    } else if (isRuleGroup(selectedNode)) {
+      return (
+        <ActionMenuSection title={"Group"} fixedExpanded scrollable>
+          <GroupGuidance components={makeGroupComponents(selectedNode)} />
+        </ActionMenuSection>
+      );
+    }
+  }
 };
 
 export default Guidance;

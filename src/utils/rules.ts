@@ -12,8 +12,8 @@ import { v4 as uuidv4 } from "uuid";
 
 export enum RuleErrors {
   EMPTY_RULE = "A rule cannot be empty.",
-  NO_NESTED_GROUPS = "Nested groups are not allowed.",
-  GROUP_OPERATORS_ARE_THE_SAME = "All operators within a group must be the same.",
+  NO_NESTED_GROUPS = "Nested groups are not supported yet.",
+  GROUP_OPERATORS_ARE_THE_SAME = "All operators within a group must be the same for now.",
   GROUP_CANNOT_START_WITH_AN_OPERATOR = "A group cannot start with an operator.",
   GROUP_CANNOT_END_WITH_AN_OPERATOR = "A group cannot end with an operator.",
   RULE_NEEDS_OPERATOR = "Two rule conditions cannot be adjacent without an operator between them.",
@@ -343,7 +343,7 @@ export function validateRuleTree(
       : (n as OperatorType).valid) !== false;
 
   const getOperatorKind = (op: OperatorType): string => {
-    return `${op.combinator}-${op.exclude}`;
+    return `${op.combinator}-${op.exclude ?? false}`;
   };
 
   const invalidateNode = (node: RuleNodeType, msg: string): RuleNodeType => {
