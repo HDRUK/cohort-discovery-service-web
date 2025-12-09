@@ -343,7 +343,7 @@ export function validateRuleTree(
       : (n as OperatorType).valid) !== false;
 
   const getOperatorKind = (op: OperatorType): string => {
-    return `${op.combinator}-${op.exclude}`;
+    return `${op.combinator}-${op.exclude ?? false}`;
   };
 
   const invalidateNode = (node: RuleNodeType, msg: string): RuleNodeType => {
