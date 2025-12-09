@@ -229,6 +229,12 @@ const RuleWrapper = ({
             {!hideHeader && (
               <CardHeader
                 sx={cardHeaderSx}
+                slotProps={{
+                  title: {
+                    component: "h2",
+                    variant: "h5",
+                  },
+                }}
                 title={
                   <Box
                     width={"100%"}
