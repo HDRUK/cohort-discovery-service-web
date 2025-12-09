@@ -3,7 +3,7 @@ import submitQuery from "@/actions/submitQuery";
 import createCollectionHost from "@/actions/createCollectionHost";
 import updateCollectionHost from "@/actions/updateCollectionHost";
 import deleteCollectionHost from "@/actions/deleteCollectionHost";
-import { revalidateAction, revalidateUserAction } from "@/actions/revalidate";
+import { revalidateAction } from "@/actions/revalidate";
 import {
   ApiResponse,
   Collection,
@@ -19,6 +19,7 @@ import {
   ConceptSet,
   UpdateCollectionHostPayload,
   CreateCollectionConfigPost,
+  FeatureFlag,
 } from "@/types/api";
 import createCollection from "@/actions/createCollection";
 import deleteCollection from "@/actions/deleteCollection";
@@ -119,7 +120,7 @@ export interface DaphneStoreState {
   };
   userData: {
     user: CombinedUser | undefined | null;
-    setUser: (user: CombinedUser | null) => void;
+    setUser: (user: CombinedUser) => void;
     queries: Query[];
     setQueries: (queries: Query[]) => void;
     fetchResults: (
@@ -184,6 +185,10 @@ export interface DaphneStoreState {
     ) => Promise<Collection>;
     deleteCollection: (id: number | string) => Promise<void>;
   };
+  featureFlags: {
+    flags: FeatureFlag | null;
+    setFlags: (flags: FeatureFlag) => void;
+  };
 }
 
 export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
@@ -213,16 +218,6 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         queryBuilder: { setQueryBuilderJson },
       } = get();
       setQueryBuilderJson(DEFAULT_QUERY);
-
-      set((state) => {
-        return {
-          ...state,
-          queryBuilder: {
-            ...state.queryBuilder,
-            selected: {},
-          },
-        };
-      });
     },
     boardIndex: buildIndexFromModel(DEFAULT_QUERY),
     sizeCache: {},
@@ -495,8 +490,6 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         selectedDatasets
       );
 
-      await revalidateUserAction("queries");
-
       set((state) => ({
         ...state,
         queryBuilder: {
@@ -515,7 +508,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         userData: { ...state.userData, collections },
       })),
     user: null,
-    setUser: (user: CombinedUser | null) => {
+    setUser: (user: CombinedUser) => {
       set((state) => ({ ...state, userData: { ...state.userData, user } }));
     },
     conceptSets: [],
@@ -645,5 +638,13 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       // to revalidate cache, and here we don't know the custodian
       await revalidateAction(`collections`);
     },
+  },
+  featureFlags: {
+    flags: null,
+    setFlags: (flags: FeatureFlag) =>
+      set((state) => ({
+        ...state,
+        featureFlags: { ...state.featureFlags, flags },
+      })),
   },
 }));

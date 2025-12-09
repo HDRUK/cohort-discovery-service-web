@@ -6,18 +6,18 @@ import { TokenUser, CombinedUser, Roles } from "@/types/api";
 import ProtectedPage from "./components/ProtectedPage";
 import getMe from "@/actions/getMe";
 import getCustodians from "@/actions/getCustodians";
-
-const applicationMode = process.env.APPLICATION_MODE;
+import getFeatureFlags from "@/actions/getFeatureFlags";
 
 export default async function ProtectedLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const applicationMode = process.env.APPLICATION_MODE;
+
   const cookieStore = await cookies();
   const token = cookieStore.get(ACCESS_TOKEN_NAME)?.value;
   const decoded = token ? (jwt.decode(token) as JwtPayload) : undefined;
-
   if (!token || !decoded) {
     if (applicationMode === "standalone") {
       // No token — render the client SignIn component so users can sign in.
@@ -39,11 +39,9 @@ export default async function ProtectedLayout({
   const hasGeneralAccess = user?.cohort_discovery_roles?.includes(
     Roles.GENERAL_ACCESS
   );
-
-  const roles = user?.cohort_discovery_roles || [];
-
   const hasAdminAccess =
-    roles.includes(Roles.ADMIN) || roles.includes(Roles.SYSTEM_ADMIN);
+    user?.cohort_discovery_roles?.includes(Roles.ADMIN) ||
+    user?.cohort_discovery_roles.includes(Roles.SYSTEM_ADMIN);
 
   if (!(hasGeneralAccess || hasAdminAccess)) {
     forbidden();
@@ -57,12 +55,17 @@ export default async function ProtectedLayout({
     forbidden();
   }
 
+  const { data: flags } = await getFeatureFlags();
   const { data: custodians } = await getCustodians();
 
   const combinedUser = { ...me, token_user: user } as unknown as CombinedUser;
 
   return (
-    <ProtectedPage user={combinedUser} custodians={custodians}>
+    <ProtectedPage
+      user={combinedUser}
+      custodians={custodians}
+      featureFlags={flags}
+    >
       {children}
     </ProtectedPage>
   );

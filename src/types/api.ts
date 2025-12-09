@@ -350,4 +350,8 @@ export interface SignInPost {
   password: string;
 }
 
+export interface FeatureFlag {
+  [featureName: string]: boolean;
+}
+
 export type GroupedCollection = { custodian: Custodian; items: Collection[] };
