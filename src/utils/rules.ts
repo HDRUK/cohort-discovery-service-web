@@ -19,6 +19,8 @@ export enum RuleErrors {
   RULE_NEEDS_OPERATOR = "Two rule conditions cannot be adjacent without an operator between them.",
   OPERATOR_NEEDS_RULE = "Two operators cannot be adjacent to each other.",
   GROUP_NEEDS_OPERATORS = "Each condition inside a group must be surrounded by operators.",
+  GROUP_IS_INVALID = "A group contains errors.",
+  MANY = "A group contains many errors.",
 }
 
 export const createRule = (
@@ -491,9 +493,6 @@ export function validateRuleTree(
     const groupIsValid =
       children.length >= minChildren && children.every((c) => getValid(c));
 
-    // Build group's invalidReason as union of:
-    // - groupReasons (own, like minChildren)
-    // - all children invalidReason entries
     const reasonSet = new Set<string>(groupReasons);
     for (const child of children) {
       const childReasons: string[] | undefined = child.invalidReason;
@@ -501,16 +500,22 @@ export function validateRuleTree(
         childReasons.forEach((r) => reasonSet.add(r));
       }
     }
+    const reasons = Array.from(reasonSet);
+
+    const invalidReason = groupIsValid
+      ? undefined
+      : depth > 0
+      ? [RuleErrors.GROUP_IS_INVALID]
+      : reasons.length < 5
+      ? reasons
+      : [RuleErrors.MANY];
 
     const base = {
       ...withValidTrue(group),
       rules: children,
       valid: groupIsValid,
+      invalidReason,
     };
-
-    if (!groupIsValid && reasonSet.size > 0) {
-      base.invalidReason = Array.from(reasonSet);
-    }
 
     return base as RuleGroupType;
   };

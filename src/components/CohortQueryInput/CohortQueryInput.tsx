@@ -50,7 +50,7 @@ const CohortQueryInput = () => {
         setError("cohortQueryInput", {
           message:
             queryBuilderJson?.invalidReason?.join(" ") ||
-            "This query is invalid",
+            "This query is invalid...",
         });
       }
       return;
