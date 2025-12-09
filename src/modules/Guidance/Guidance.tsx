@@ -29,6 +29,8 @@ import AddTimeFrameButton from "@/components/AddTimeFrameButton";
 import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
 import { CustomH1, CustomH2 } from "@/components/GuidanceHeaders";
 import { getDomainVerbs } from "@/utils/omop";
+import DeleteTimeFrameButton from "@/components/DeleteTimeFrameButton";
+import { DeleteMenuItemProps } from "@/components/DeleteMenuItem/DeleteMenuItem";
 
 export const baseComponents = {
   h1: CustomH1,
@@ -100,6 +102,9 @@ const Guidance = () => {
     ),
     RuleTimeframeSelector: (props: { title: string }) => (
       <RuleTimeframeSelector rule={node} {...props} />
+    ),
+    DeleteTimeFrameButton: (props: DeleteMenuItemProps) => (
+      <DeleteTimeFrameButton rule={node} {...props} />
     ),
   });
 

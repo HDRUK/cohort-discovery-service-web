@@ -1,7 +1,7 @@
 "use client";
 
 import { Stack } from "@mui/material";
-import { useMemo } from "react";
+import { ReactNode, useMemo } from "react";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import { updateById } from "@/utils/rules";
 import { RuleNodeType } from "@/types/rules";
@@ -16,6 +16,7 @@ import { CustomH1 } from "@/components/GuidanceHeaders";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 export interface RuleTimeframeSelectorProps extends DatePickerProps {
+  children?: ReactNode;
   rule: RuleNodeType;
   title?: string;
 }
@@ -23,6 +24,7 @@ export interface RuleTimeframeSelectorProps extends DatePickerProps {
 const RuleTimeframeSelector = ({
   rule,
   title,
+  children,
   views = ["month", "year"],
   format = "MM YYYY",
   slotProps,
@@ -110,6 +112,7 @@ const RuleTimeframeSelector = ({
           onChange={handleRightChange}
         />
       </Stack>
+      {children}
     </>
   );
 };
