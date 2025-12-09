@@ -51,7 +51,6 @@ export interface RuleWrapperProps extends BoxProps {
   hideHeader?: boolean;
   groupId?: string;
   sortable?: boolean;
-  exclude?: boolean;
   cardProps?: CardProps;
   containerProps?: BoxProps;
   render: (
@@ -70,7 +69,6 @@ const RuleWrapper = ({
   headerExtra,
   hideHeader = false,
   sortable = true,
-  exclude = false,
   cardProps = undefined,
   containerProps = undefined,
   render,
@@ -78,7 +76,7 @@ const RuleWrapper = ({
   forceShowHandle = false,
   useLeftDragPlaceHolder = false,
 }: RuleWrapperProps) => {
-  const { id, valid = true, invalidReason } = node;
+  const { id, valid = true, invalidReason, exclude = false } = node;
 
   const { isSelected, toggleSelected, getNodeName, setNodeName } =
     useQueryBuilder((qb) => ({

@@ -26,8 +26,6 @@ export interface RuleProps {
 const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
   const {
     id,
-    exclude,
-    valid = true,
     rule: { concept },
   } = rule;
 
@@ -128,8 +126,6 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       type="Rule"
       groupId={groupId}
       sortable={true}
-      exclude={exclude}
-      valid={valid}
       headerExtra={
         <>
           {!isEmptyRule(rule) && domain && (

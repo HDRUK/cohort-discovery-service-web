@@ -19,7 +19,7 @@ export interface RuleGroupProps {
 }
 
 const RuleGroup = ({ group, parentGroupId, ...rest }: RuleGroupProps) => {
-  const { id, rules, exclude, valid = true } = group;
+  const { id, rules } = group;
 
   const { queryBuilderJson, setQueryBuilderJson } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
@@ -55,8 +55,6 @@ const RuleGroup = ({ group, parentGroupId, ...rest }: RuleGroupProps) => {
       type="Group"
       groupId={parentGroupId}
       sortable={true}
-      exclude={exclude}
-      valid={valid}
       render={() => <RuleBoard ruleGroup={group} />}
       actions={actions}
       {...rest}
