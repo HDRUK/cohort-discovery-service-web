@@ -1,13 +1,13 @@
 "use client";
 
 import { Box, Chip, Divider } from "@mui/material";
-import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import { CombinatorType, OperatorType } from "@/types/rules";
 import RuleWrapper from "../RuleWrapper";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import { isOperator, removeById, updateById } from "@/utils/rules";
 import { cardSx, rootSx, dividerSx, chipSx } from "./RuleOperator.styles";
 import { useCallback } from "react";
+import InvalidRule from "@/components/InvalidRule";
 
 export interface RuleOperatorProps {
   operator: OperatorType;
@@ -21,7 +21,7 @@ const RuleOperator = ({
   hidden = false,
   ...rest
 }: RuleOperatorProps) => {
-  const { id, combinator, valid = true } = operator;
+  const { id, combinator, valid = true, invalidReason } = operator;
 
   const { isSelected, queryBuilderJson, setQueryBuilderJson } = useQueryBuilder(
     (qb) => ({
@@ -81,11 +81,7 @@ const RuleOperator = ({
             />
           </Box>
 
-          {valid ? (
-            <Box />
-          ) : (
-            <WarningAmberIcon fontSize="small" color="warning" />
-          )}
+          {valid ? <Box /> : <InvalidRule reasons={invalidReason ?? []} />}
         </Box>
       )}
       actions={actions}

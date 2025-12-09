@@ -89,6 +89,7 @@ function makeDefaultStore(): DaphneStoreState {
       setOpenSelectDatasetsPanel: NOOP,
       showDescendants: {},
       setShowDescendants: NOOP,
+      validateRules: (_root: RuleGroupType) => _root,
     },
 
     userData: {

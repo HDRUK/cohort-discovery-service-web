@@ -1,6 +1,5 @@
 "use client";
 import ActionMenuSection from "@/components/ActionMenuSection";
-import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import useSortable from "@/hooks/useSortable";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import { RuleNodeType } from "@/types/rules";
@@ -17,6 +16,7 @@ import {
 import EditableText from "@/components/EditableText";
 import { ID_REF_SUFFIX } from "@/config/defaults";
 import { listItemButtonSx, INDENT_STEP } from "./HierarchyItem.style";
+import InvalidRule from "../InvalidRule";
 
 type HierarchyItemProps = {
   node: RuleNodeType;
@@ -105,11 +105,7 @@ export const HierarchyItem = ({
           />
         }
       />
-      {!node.valid ? (
-        <WarningAmberIcon fontSize="small" color="warning" />
-      ) : (
-        <></>
-      )}
+      {!node.valid ? <InvalidRule reasons={node.invalidReason || []} /> : <></>}
     </ListItemButton>
   );
 

@@ -17,6 +17,7 @@ type Node = {
   id: string;
   exclude?: boolean;
   valid?: boolean;
+  invalidReason?: string[];
   name?: string;
   timeConstraint?: [string | null, string | null];
 };

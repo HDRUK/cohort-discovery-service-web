@@ -20,6 +20,7 @@ import {
   UpdateCollectionHostPayload,
   CreateCollectionConfigPost,
   FeatureFlag,
+  FeatureName,
 } from "@/types/api";
 import createCollection from "@/actions/createCollection";
 import deleteCollection from "@/actions/deleteCollection";
@@ -117,6 +118,7 @@ export interface DaphneStoreState {
       id: UniqueIdentifier | UniqueIdentifier[],
       next?: boolean
     ) => void;
+    validateRules: (root: RuleGroupType) => RuleGroupType;
   };
   userData: {
     user: CombinedUser | undefined | null;
@@ -367,7 +369,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       get().queryBuilder.createNewNode(NodeKind.OPERATOR, above),
     queryAsText: queryToText(DEFAULT_QUERY),
     setQueryBuilderJson: (query: RuleGroupType) => {
-      const updatedQuery = validateRuleTree(query);
+      const updatedQuery = get().queryBuilder.validateRules(query);
 
       const text = updatedQuery.valid ? queryToText(query) : "";
 
@@ -465,12 +467,20 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         ...state,
         queryBuilder: {
           ...state.queryBuilder,
-          queryBuilderJson: validateRuleTree(newQuery),
+          queryBuilderJson: get().queryBuilder.validateRules(newQuery),
           boardIndex: buildIndexFromModel(newQuery),
           queryAsText: queryToText(newQuery),
         },
         stateManagement: { ...state.stateManagement, isLoading: false },
       }));
+    },
+    validateRules: (root: RuleGroupType) => {
+      const featureFlags = get().featureFlags.flags;
+
+      return validateRuleTree(root, {
+        constrainForBunnyV1:
+          featureFlags?.[FeatureName.ConstrainForBunnyV1] || false,
+      });
     },
   },
   userData: {

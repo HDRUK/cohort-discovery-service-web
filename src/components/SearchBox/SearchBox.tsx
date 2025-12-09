@@ -43,6 +43,7 @@ const SearchBox = ({
   inputBgColor = "#fff",
   actionIcon,
   actions,
+  disabled,
   ...rest
 }: SearchBoxProps) => {
   const [expanded, setExpanded] = useState(
@@ -96,6 +97,7 @@ const SearchBox = ({
                 endAdornment: (
                   <InputAdornment position="end" sx={inputAdornmentSx}>
                     <IconButton
+                      disabled={disabled}
                       onClick={handleIconClick}
                       aria-label={
                         collapsible
@@ -104,7 +106,7 @@ const SearchBox = ({
                             : "Expand search"
                           : "Submit search"
                       }
-                      sx={iconButtonSx}
+                      sx={iconButtonSx(disabled)}
                     >
                       {loading ? (
                         <CircularProgress size={24} color="inherit" />
@@ -131,6 +133,7 @@ const SearchBox = ({
               }
             }}
             {...rest}
+            disabled={disabled}
           />
         </Grid>
         {actionsCols > 0 && (

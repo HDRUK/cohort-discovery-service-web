@@ -350,8 +350,13 @@ export interface SignInPost {
   password: string;
 }
 
-export interface FeatureFlag {
-  [featureName: string]: boolean;
+export enum FeatureName {
+  QueryBuilder = "query-builder",
+  ConstrainForBunnyV1 = "constrain-for-bunny-v1",
+  QueryNlp = "query-nlp",
+  InAppMessenger = "in-app-messenger",
 }
+
+export type FeatureFlag = Record<FeatureName, boolean>;
 
 export type GroupedCollection = { custodian: Custodian; items: Collection[] };
