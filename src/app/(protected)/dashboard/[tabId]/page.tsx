@@ -9,6 +9,7 @@ import getQuery from "@/actions/getQuery";
 import { capVarChar } from "@/utils/string";
 import { SearchParams } from "@/types/api";
 import QueryHistoryPage from "./components/QueryHistoryPage";
+import { getQueryName } from "@/utils/query";
 
 type Params = Promise<{ tabId: string }>;
 
@@ -26,7 +27,7 @@ const DashboardTabPage = async (props: {
     const { data } = await getQuery(query as string);
 
     if (data) {
-      queryName = capVarChar(data.name, 30, true);
+      queryName = capVarChar(getQueryName(data), 30, true);
     }
   }
   const hasQuery = !!query;

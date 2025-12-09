@@ -42,7 +42,7 @@ export interface Paginated<T> {
 export type WithIncomplete<T> = T & { hasIncomplete: boolean };
 
 export interface CreateQueryPost {
-  name: string;
+  name: string | null;
   definition: RuleGroupType;
   task_type: string;
 }

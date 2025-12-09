@@ -8,10 +8,10 @@ import { capVarChar } from "@/utils/string";
 
 const submitQuery = async (
   query: RuleGroupType,
-  queryName: string,
+  queryName: string | null,
   collection_filter?: string[]
 ): Promise<ApiResponse<CreateQuery>> => {
-  const safeName = capVarChar(queryName);
+  const safeName = queryName ? capVarChar(queryName) : null;
   return await apiPost<ApiResponse<CreateQuery>, CreateQueryPost>(
     API_ROUTES.queries,
     {

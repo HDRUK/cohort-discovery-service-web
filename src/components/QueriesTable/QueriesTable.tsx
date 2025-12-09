@@ -26,6 +26,7 @@ import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import getQueries from "@/actions/getQueries";
 import { DEFAULT_INTERVAL } from "@/config/defaults";
+import { getQueryName } from "@/utils/query";
 
 interface QueriesTableProps {
   initialData: Paginated<Query[]>;
@@ -93,7 +94,7 @@ const QueriesTable = ({
       },
     },
     {
-      accessorKey: "name",
+      accessorFn: (row) => getQueryName(row),
       header: "Query Name",
       minSize: 100,
       maxSize: 300,
