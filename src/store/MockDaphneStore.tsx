@@ -31,6 +31,8 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { NotifyProvider } from "@/providers/NotifyProvider";
 import { getMockCollection } from "@/actions/__mocks__/getCollections";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+const queryClient = new QueryClient();
 
 type SliceOverrides = {
   [K in keyof DaphneStoreState]?: Partial<DaphneStoreState[K]>;
@@ -208,9 +210,11 @@ const MockDaphneStore = ({
 
   useDaphneStore.setState(mock, true);
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <NotifyProvider>{children}</NotifyProvider>
-    </LocalizationProvider>
+    <QueryClientProvider client={queryClient}>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <NotifyProvider>{children}</NotifyProvider>
+      </LocalizationProvider>
+    </QueryClientProvider>
   );
 };
 
