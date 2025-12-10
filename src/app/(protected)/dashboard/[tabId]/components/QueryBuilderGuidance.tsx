@@ -34,7 +34,7 @@ const QueryBuilderGuidance = ({ onClose }: { onClose: () => void }) => {
     SectionTitle: (props: ActionMenuSectionProps) => (
       <ActionMenuSection fixedExpanded underline {...props} />
     ),
-    Video: () => <Skeleton variant="rectangular" height={300} />,
+    Video: () => <Skeleton variant="rectangular" height={200} />,
   };
 
   return (

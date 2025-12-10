@@ -59,7 +59,7 @@ export const ConceptItem = ({
 
   const labelEl = (
     <Title
-      small
+      size="small"
       useSeparator={false}
       title={titleText}
       subTitle={showDomain ? concept.category : ""}
