@@ -1,14 +1,13 @@
 "use client";
 
 import { Box, Chip, Divider } from "@mui/material";
-import { CombinatorType, OperatorType } from "@/types/rules";
+import { OperatorType } from "@/types/rules";
 import RuleWrapper from "../RuleWrapper";
 import useQueryBuilder from "@/store/useQueryBuilder";
-import { isOperator, removeById, updateById } from "@/utils/rules";
 import { cardSx, rootSx, dividerSx, chipSx } from "./RuleOperator.styles";
-import { useCallback } from "react";
 import InvalidRule from "@/components/InvalidRule";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
+import useNodeActions from "@/hooks/useNodeActions";
 
 export interface RuleOperatorProps
   extends Omit<RuleWrapperProps, "node" | "type" | "render"> {
@@ -25,39 +24,11 @@ const RuleOperator = ({
 }: RuleOperatorProps) => {
   const { id, combinator, valid = true, invalidReason } = operator;
 
-  const { isSelected, queryBuilderJson, setQueryBuilderJson } = useQueryBuilder(
-    (qb) => ({
-      isSelected: !!qb.selected[id],
-      queryBuilderJson: qb.queryBuilderJson,
-      setQueryBuilderJson: qb.setQueryBuilderJson,
-    })
-  );
+  const { isSelected } = useQueryBuilder((qb) => ({
+    isSelected: !!qb.selected[id],
+  }));
 
-  const handleDeleteRule = useCallback(() => {
-    setQueryBuilderJson(removeById(queryBuilderJson, id));
-  }, [id, queryBuilderJson, setQueryBuilderJson]);
-
-  const handleChange = useCallback(() => {
-    setQueryBuilderJson(
-      updateById(queryBuilderJson, id, (node) => {
-        if (isOperator(node)) {
-          return {
-            ...node,
-            combinator:
-              node.combinator === CombinatorType.AND
-                ? CombinatorType.OR
-                : CombinatorType.AND,
-          };
-        }
-        return node;
-      })
-    );
-  }, [id, queryBuilderJson, setQueryBuilderJson]);
-
-  const actions = [
-    { action: handleDeleteRule, label: "Delete" },
-    { action: handleChange, label: "Change" },
-  ];
+  const actions = useNodeActions(operator);
 
   return (
     <RuleWrapper

@@ -17,6 +17,9 @@ import EditableText from "@/components/EditableText";
 import { ID_REF_SUFFIX } from "@/config/defaults";
 import { listItemButtonSx, INDENT_STEP } from "./HierarchyItem.style";
 import InvalidRule from "../InvalidRule";
+import useRightClickMenu from "@/hooks/useRightClickMenu";
+import RightClickMenu from "../RightClickMenu/RightClickMenu";
+import useNodeActions from "@/hooks/useNodeActions";
 
 type HierarchyItemProps = {
   node: RuleNodeType;
@@ -78,8 +81,12 @@ export const HierarchyItem = ({
 
   const nodeName = getNodeName(node);
 
+  const { handleContextMenu, ...rightClickMenuMethods } = useRightClickMenu();
+  const actions = useNodeActions(node);
+
   const content = (
     <ListItemButton
+      onContextMenu={handleContextMenu}
       component="div"
       sx={listItemButtonSx(isDragging, isOver, isAbove)}
     >
@@ -106,6 +113,7 @@ export const HierarchyItem = ({
         }
       />
       {!node.valid ? <InvalidRule reasons={node.invalidReason || []} /> : <></>}
+      <RightClickMenu {...rightClickMenuMethods} actions={actions} />
     </ListItemButton>
   );
 
