@@ -63,8 +63,10 @@ export const HierarchyItem = ({
     e.preventDefault();
     e.stopPropagation();
 
+    const isShift = e.shiftKey;
+
     const nextParent = !selected[node.id];
-    toggleSelected(node.id, !isGroup);
+    toggleSelected(node.id, isShift ? false : !isGroup);
     if (!isRuleGroup(node)) return;
 
     node.rules.forEach((r) => {
