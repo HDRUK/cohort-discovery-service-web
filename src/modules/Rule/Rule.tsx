@@ -17,8 +17,10 @@ import {
 } from "@/utils/rules";
 
 import RuleWrapper from "../RuleWrapper";
+import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 
-export interface RuleProps {
+export interface RuleProps
+  extends Omit<RuleWrapperProps, "node" | "type" | "render"> {
   rule: RuleLeafType;
   groupId?: string;
 }

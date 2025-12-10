@@ -8,6 +8,7 @@ interface TableTitleProps extends BoxProps {
   startIcon?: React.ReactNode;
   useSeparator?: boolean;
   small?: boolean;
+  wrapperSx?: BoxProps;
 }
 
 const Title = ({
@@ -17,14 +18,16 @@ const Title = ({
   startIcon,
   useSeparator = true,
   small = false,
+  wrapperSx,
   ...rest
 }: TableTitleProps) => {
   return (
     <Box
       sx={{
         display: "flex",
-        alignItems: "baseline",
+        overflow: "hidden",
       }}
+      {...wrapperSx}
     >
       <Box display={"flex"} alignItems={"baseline"} {...rest}>
         <Typography

@@ -31,17 +31,18 @@ export const themeOptions: ThemeOptions = {
     drawer: 2,
   },
   typography: {
-    fontFamily: '"tt-commons-pro", sans-serif',
+    fontFamily: '"Source Sans 3", sans-serif',
     fontWeightLight: 100,
     fontWeightRegular: 400,
     fontWeightMedium: 700,
     h4: {
-      fontSize: "24px",
-      fontWeight: 500,
+      fontSize: "20px",
+      fontWeight: 600,
+      fontStyle: "normal",
     },
     h5: {
-      fontSize: "24px",
-      fontWeight: 200,
+      fontSize: "20px",
+      fontWeight: 400,
       color: "rgba(0, 0, 0, 0.4)",
     },
     h6: {
@@ -54,7 +55,7 @@ export const themeOptions: ThemeOptions = {
       fontWeight: 400,
     },
     body2: {
-      fontSize: "13px",
+      fontSize: "14px",
       fontWeight: 400,
     },
     overline: {
@@ -99,7 +100,7 @@ export const themeOptions: ThemeOptions = {
         root: ({ theme }) => ({
           "&.Mui-selected": {
             backgroundColor: theme.palette.background.default,
-            color: "#000",
+            color: theme.palette.text.primary,
           },
         }),
       },

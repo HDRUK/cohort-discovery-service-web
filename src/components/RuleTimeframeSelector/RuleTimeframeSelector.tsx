@@ -146,6 +146,7 @@ const RuleTimeframeSelector = ({
     ...slotProps,
     textField: {
       ...slotProps?.textField,
+      size: "small",
       sx: {
         backgroundColor: "white",
         width: readOnly ? 120 : 150,

@@ -12,51 +12,37 @@ const FilterDatasets = () => {
   }));
 
   return (
-    <Box sx={{ display: "flex", my: 2 }}>
-      <Title title="Filter" subTitle="Collections">
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 2,
-            minHeight: 30,
-          }}
-        >
-          <Chip
-            onClick={() => setOpen(!open)}
+    <Title title="Filter" subTitle="Collections">
+      <Chip
+        onClick={() => setOpen(!open)}
+        sx={{
+          bgcolor: open ? "secondary.main" : "white",
+          color: open ? "secondary.contrastText" : "inherit",
+          borderRadius: 10,
+          height: 30,
+        }}
+        label={
+          <Box
             sx={{
-              bgcolor: open ? "secondary.main" : "white",
-              color: open ? "secondary.contrastText" : "inherit",
-              p: 1,
-              borderRadius: 10,
-              height: 40,
-              fontSize: "1rem",
+              width: "100%",
+              display: "flex",
+              alignItems: "baseline",
+              flexWrap: "nowrap",
             }}
-            label={
-              <Box
-                sx={{
-                  width: "100%",
-                  display: "flex",
-                  alignItems: "baseline",
-                  flexWrap: "nowrap",
-                }}
-              >
-                <Chip
-                  label={selectedDatasets.length}
-                  sx={{
-                    bgcolor: "white",
-                    borderRadius: 10,
-                    fontSize: "1rem",
-                    mx: 1,
-                  }}
-                />
-                Selected
-              </Box>
-            }
-          />
-        </Box>
-      </Title>
-    </Box>
+          >
+            <Chip
+              label={selectedDatasets.length}
+              sx={{
+                bgcolor: "background.default",
+                borderRadius: 10,
+                mr: 1,
+              }}
+            />
+            Selected
+          </Box>
+        }
+      />
+    </Title>
   );
 };
 

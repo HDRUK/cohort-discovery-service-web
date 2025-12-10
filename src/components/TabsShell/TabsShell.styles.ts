@@ -13,10 +13,13 @@ export const rootSx: Sx = {
 
 export const tabSx: Sx = {
   minWidth: 200,
+  minHeight: 20,
+  p: 1,
 };
 
 export const tabHeaderSx: Sx = {
   bgcolor: "white",
+  height: 40,
 };
 
 export const tabContentSx: Sx = {
@@ -29,9 +32,10 @@ export const tabContentSx: Sx = {
 
 export const tabListSx: Sx = {
   "& .MuiTabs-indicator": {
-    display: "none",
     top: 0,
     bottom: "auto",
+    bgcolor: "currentColor",
+    opacity: 0.2,
   },
 };
 

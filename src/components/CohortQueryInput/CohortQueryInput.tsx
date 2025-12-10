@@ -73,6 +73,8 @@ const CohortQueryInput = () => {
       onSubmit={handleSubmit(onSubmit)}
       sx={{
         width: "95%",
+        overflow: "hidden",
+        py: 1,
       }}
     >
       <Controller
@@ -90,7 +92,6 @@ const CohortQueryInput = () => {
             placeholder="Search for a cohort e.g. females above 50 with diabetes type-ii"
             fullWidth
             variant="outlined"
-            margin="normal"
             onSubmit={handleSubmit(onSubmit)}
             loading={isLoading}
             disabled={isLoading || !queryBuilderJson.valid}

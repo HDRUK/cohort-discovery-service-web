@@ -33,7 +33,7 @@ export default function TopMenu() {
     const baseTabs = [
       {
         id: routes.dashboardNewQuery(),
-        label: "Cohorts",
+        label: "Cohort Discovery",
         href: routes.dashboardNewQuery(),
         route: routes.dashboard,
         page: null,

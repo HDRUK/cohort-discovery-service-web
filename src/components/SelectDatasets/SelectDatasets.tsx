@@ -6,12 +6,11 @@ import {
   AccordionSummary,
   AccordionDetails,
   Collapse,
-  Box,
+  Paper,
 } from "@mui/material";
 import { useEffect, useRef } from "react";
 import Title from "../Title";
 import SelectCustodianDatasets from "../SelectCustodianDatasets";
-import SearchDatasets from "../SearchDatasets";
 
 const SelectDatasets = ({
   initialSelection,
@@ -47,8 +46,14 @@ const SelectDatasets = ({
   const nSelected = selectedDatasets.length;
 
   return (
-    <Collapse in={open} timeout={300} mountOnEnter unmountOnExit>
-      <Box sx={{ mt: 2, bgcolor: "white" }}>
+    <Collapse in={open} timeout={300}>
+      <Paper
+        sx={{
+          my: 2,
+          bgcolor: "white",
+          mb: 1000,
+        }}
+      >
         <AccordionSummary>
           <Title
             title="All Collections"
@@ -56,14 +61,13 @@ const SelectDatasets = ({
             useSeparator={false}
           />
         </AccordionSummary>
-        <SearchDatasets />
-
         <AccordionDetails
           sx={{
             p: 0,
             display: "flex",
             flexDirection: "column",
             gap: 0.5,
+            mb: 2,
           }}
         >
           {groupedCollections.map((gc) => (
@@ -73,7 +77,7 @@ const SelectDatasets = ({
             />
           ))}
         </AccordionDetails>
-      </Box>
+      </Paper>
     </Collapse>
   );
 };

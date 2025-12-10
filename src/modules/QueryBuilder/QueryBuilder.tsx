@@ -2,8 +2,6 @@
 import useQueryBuilder from "@/store/useQueryBuilder";
 
 import { useState, useCallback, useRef, useEffect } from "react";
-import { Grid } from "@mui/material";
-import SwimLane from "@/components/SwimLane";
 import ActionMenu from "../ActionMenu";
 import RuleMenu from "../RuleMenu";
 
@@ -33,6 +31,7 @@ import { RuleNodeType } from "@/types/rules";
 import { findById, moveItemIntoGroup } from "@/utils/rules";
 import MarqueeSelection from "@/components/MarqueeSelection";
 import { Query } from "@/types/api";
+import ThreePaneSwimLaneLayout from "../ThreePaneSwimLaneLayout";
 
 const QueryBuilder = ({ query }: { query?: Query }) => {
   const {
@@ -181,47 +180,37 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
   const boardRef = useRef<HTMLDivElement>(null);
 
   return (
-    <Grid
-      container
-      spacing={2}
-      sx={{
-        flex: 1,
-        minHeight: 0,
-        overflow: "hidden",
-      }}
-    >
-      <SwimLane size={3}>
-        <ActionMenu />
-      </SwimLane>
+    <ThreePaneSwimLaneLayout
+      left={<ActionMenu />}
+      middle={
+        <>
+          <DndContext
+            sensors={sensors}
+            onDragStart={onDragStart}
+            onDragOver={onDragOver}
+            onDragEnd={onDragEnd}
+            modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
+            collisionDetection={closestCorners}
+            measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
+          >
+            <RuleBoard ruleGroup={queryBuilderJson} />
+            <DragOverlay node={activeNode} />
+          </DndContext>
 
-      <SwimLane ref={boardRef} size={6}>
-        <DndContext
-          sensors={sensors}
-          onDragStart={onDragStart}
-          onDragOver={onDragOver}
-          onDragEnd={onDragEnd}
-          modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
-          collisionDetection={closestCorners}
-          measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
-        >
-          <RuleBoard ruleGroup={queryBuilderJson} />
-          <DragOverlay node={activeNode} />
-        </DndContext>
-
-        <MarqueeSelection
-          containerRef={boardRef}
-          selectable='[data-selectable="true"]'
-          idAttr="data-id"
-          ignoreWhenInside='[data-draggable="true"]'
-          requireModifierKey="Shift"
-          onChange={onChangeSelection}
-        />
-      </SwimLane>
-
-      <SwimLane size={3} scrollable={false}>
-        <RuleMenu />
-      </SwimLane>
-    </Grid>
+          <MarqueeSelection
+            containerRef={boardRef}
+            selectable='[data-selectable="true"]'
+            idAttr="data-id"
+            ignoreWhenInside='[data-draggable="true"]'
+            requireModifierKey="Shift"
+            onChange={onChangeSelection}
+          />
+        </>
+      }
+      middleProps={{ ref: boardRef }}
+      right={<RuleMenu />}
+      rightProps={{ scrollable: false }}
+    />
   );
 };
 

@@ -39,7 +39,8 @@ export default async function RootLayout({
 
             <Box
               sx={{
-                p: hideNav ? 0 : 2,
+                py: hideNav ? 0 : 1,
+                px: hideNav ? 0 : 2,
                 bgcolor: "background.paper",
                 display: "flex",
                 flexDirection: "column",
@@ -54,7 +55,7 @@ export default async function RootLayout({
                 sx={{
                   flexGrow: 1,
                   bgcolor: "secondary.main",
-                  p: 3,
+                  p: 2,
                   overflow: "auto",
                 }}
               >

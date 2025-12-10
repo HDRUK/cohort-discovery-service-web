@@ -1,10 +1,11 @@
-import Paper from "@mui/material/Paper";
+import Paper, { PaperProps } from "@mui/material/Paper";
 import { Box, Grid, GridProps } from "@mui/material";
 import { useState, TransitionEvent } from "react";
 
 export interface SwimLaneProps extends GridProps {
   scrollable?: boolean;
   hideOnTransiton?: boolean;
+  paperSx?: PaperProps["sx"];
 }
 
 const SwimLane = ({
@@ -12,6 +13,7 @@ const SwimLane = ({
   scrollable = true,
   hideOnTransiton = false,
   size,
+  paperSx,
   ...rest
 }: SwimLaneProps) => {
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -59,6 +61,7 @@ const SwimLane = ({
           minHeight: 0,
           p: 2,
           mx: 1,
+          ...paperSx,
         }}
       >
         <Box

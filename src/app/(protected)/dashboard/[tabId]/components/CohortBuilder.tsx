@@ -1,6 +1,6 @@
 "use server";
 
-import { Stack } from "@mui/material";
+import { Box, Divider, Stack } from "@mui/material";
 import QueryBuilder from "@/modules/QueryBuilder";
 import CohortQueryInput from "@/components/CohortQueryInput";
 import SelectDatasets from "@/components/SelectDatasets";
@@ -21,7 +21,14 @@ const CohortBuilder = async (props: { query?: string }) => {
   const initialSelection = activeCollections.map((c) => c.pid);
 
   return (
-    <>
+    <Box
+      flex={1}
+      minHeight={0}
+      display={"flex"}
+      flexDirection={"column"}
+      px={2}
+      py={1}
+    >
       <Stack
         direction="row"
         alignItems="center"
@@ -37,23 +44,21 @@ const CohortBuilder = async (props: { query?: string }) => {
         collections={activeCollections}
       />
 
-      <Stack
-        direction="row"
-        alignItems="center"
-        justifyContent="space-between"
-        spacing={1}
-        borderBottom={1}
-        marginBottom={2}
+      <Title
+        title="Cohort Builder"
+        subTitle="Natural Language"
+        marginY={"auto"}
       >
-        <Title title="Cohort Builder" subTitle="Natural Language" />
         <CohortQueryInput />
-      </Stack>
+      </Title>
 
-      <Stack direction="column" spacing={1}>
-        <Title title="Cohort Builder" subTitle="Query Rules" />
-        <QueryBuilder query={query?.data} />
-      </Stack>
-    </>
+      <Box sx={{ overflow: "hidden" }}>
+        <Divider />
+      </Box>
+
+      <Title title="Cohort Builder" subTitle="Query Rules" marginY={1} />
+      <QueryBuilder query={query?.data} />
+    </Box>
   );
 };
 
