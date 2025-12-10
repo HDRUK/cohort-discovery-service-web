@@ -229,7 +229,7 @@ const RuleWrapper = ({
                       />
                       {!valid && <InvalidRule reasons={invalidReason ?? []} />}
                     </Box>
-                    <Title small title={type} subTitle={headerExtra} />
+                    <Title size={"small"} title={type} subTitle={headerExtra} />
                   </Box>
                 }
               />

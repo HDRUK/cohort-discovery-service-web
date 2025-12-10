@@ -54,7 +54,7 @@ const SelectNetworkDatasets = ({
     >
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Title
-          small
+          size="small"
           startIcon={
             <SquareRadio
               checked={nSelected > 0}

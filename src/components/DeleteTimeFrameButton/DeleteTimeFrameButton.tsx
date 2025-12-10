@@ -25,7 +25,6 @@ const DeleteTimeFrameButton = ({
   const onClick = () => {
     setQueryBuilderJson(
       updateById(queryBuilderJson, rule.id, (node) => {
-        console.log(node);
         if (!isRuleLeaf(node)) {
           return node;
         }

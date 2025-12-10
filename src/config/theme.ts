@@ -35,6 +35,11 @@ export const themeOptions: ThemeOptions = {
     fontWeightLight: 100,
     fontWeightRegular: 400,
     fontWeightMedium: 700,
+    h3: {
+      fontSize: "1.8rem",
+      fontWeight: 400,
+      color: "rgba(0, 0, 0, 0.4)",
+    },
     h4: {
       fontSize: "20px",
       fontWeight: 600,
