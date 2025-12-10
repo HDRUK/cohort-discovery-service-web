@@ -6,13 +6,7 @@ import { RuleNodeType } from "@/types/rules";
 import { isRuleGroup } from "@/utils/rules";
 
 import { SortableContext } from "@dnd-kit/sortable";
-import {
-  Checkbox,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-} from "@mui/material";
+import { List, ListItem, ListItemButton, ListItemText } from "@mui/material";
 import EditableText from "@/components/EditableText";
 import { ID_REF_SUFFIX } from "@/config/defaults";
 import { listItemButtonSx, INDENT_STEP } from "./HierarchyItem.style";
@@ -91,7 +85,7 @@ export const HierarchyItem = ({
       onClick={toggleCheckbox}
       onContextMenu={handleContextMenu}
       component="div"
-      sx={listItemButtonSx(isDragging, isOver, isAbove)}
+      sx={listItemButtonSx(isDragging, isOver, isAbove, depth)}
     >
       <SquareRadio
         size="medium"

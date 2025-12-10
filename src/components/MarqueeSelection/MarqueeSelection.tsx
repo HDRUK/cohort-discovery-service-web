@@ -86,6 +86,7 @@ export default function MarqueeSelection({
 
       const x = clampedX - r.left + el.scrollLeft;
       const y = clampedY - r.top + el.scrollTop;
+
       return { x, y };
     },
     [containerRef]

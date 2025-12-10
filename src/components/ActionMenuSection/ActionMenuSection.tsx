@@ -126,7 +126,6 @@ const ActionMenuSection = ({
           m: 0,
           p: 0,
           borderBottom: underline ? 1 : 0,
-          my: 1,
         }}
       >
         {summary ?? (
