@@ -37,6 +37,7 @@ import InvalidRule from "@/components/InvalidRule";
 import Title from "@/components/Title";
 import useRightClickMenu from "@/hooks/useRightClickMenu";
 import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
+import { mergeSx } from "@/utils/helpers";
 
 interface Action {
   action: () => void;
@@ -68,7 +69,7 @@ const RuleWrapper = ({
   headerExtra,
   hideHeader = false,
   sortable = true,
-  cardProps = undefined,
+  cardProps: { sx: cardPropsSx, ...cardProps } = {},
   containerProps = undefined,
   render,
   actions,
@@ -199,7 +200,7 @@ const RuleWrapper = ({
             data-draggable="true"
             component="div"
             data-testid="clickable-card"
-            sx={cardSx(isSelected, valid)}
+            sx={mergeSx(cardSx(isSelected, valid), cardPropsSx)}
             onContextMenu={handleContextMenu}
             onClick={handleOnSelect}
             {...cardProps}
