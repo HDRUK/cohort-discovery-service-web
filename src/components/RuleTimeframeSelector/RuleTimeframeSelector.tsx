@@ -2,6 +2,7 @@
 
 import {
   IconButton,
+  Paper,
   Stack,
   ToggleButton,
   ToggleButtonGroup,
@@ -172,25 +173,29 @@ const RuleTimeframeSelector = ({
         {title && <CustomH1>{title}</CustomH1>}
         <Stack direction="row" spacing={2} alignItems="center">
           {readOnly ? (
-            <IconButton disabled>{operator === "gt" ? ">" : "<"}</IconButton>
+            <Paper sx={{ border: 1, p: 1 }}>
+              {operator === "gt" ? "After" : "Before"}{" "}
+              {singleDate?.format("MM-YYYY")}
+            </Paper>
           ) : (
-            <ToggleButtonGroup
-              exclusive
-              size="small"
-              value={operator}
-              onChange={handlOperatorChange}
-              disabled={!!readOnly}
-            >
-              <ToggleButton value="gt">{">"}</ToggleButton>
-              <ToggleButton value="lt">{"<"}</ToggleButton>
-            </ToggleButtonGroup>
+            <>
+              <ToggleButtonGroup
+                exclusive
+                size="small"
+                value={operator}
+                onChange={handlOperatorChange}
+                disabled={!!readOnly}
+              >
+                <ToggleButton value="gt">{">"}</ToggleButton>
+                <ToggleButton value="lt">{"<"}</ToggleButton>
+              </ToggleButtonGroup>
+              <DatePicker
+                {...commonPickerProps}
+                value={singleDate}
+                onChange={handleSingleDateChange}
+              />
+            </>
           )}
-
-          <DatePicker
-            {...commonPickerProps}
-            value={singleDate}
-            onChange={handleSingleDateChange}
-          />
         </Stack>
         {children}
       </>

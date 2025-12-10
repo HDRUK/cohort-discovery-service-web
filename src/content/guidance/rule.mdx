@@ -24,11 +24,17 @@ Toggle <b>Excluding</b> to remove items that meet the selected criteria. Use thi
 
 <AddTimeFrameButton label={`Add timeframe when ${props.category.toLowerCase()} was ${props.verb}`} />
 
+<AddAgeButton label={`Add age of patient when ${props.category.toLowerCase()} was ${props.verb}`} />
 
 
-<RuleTimeframeSelector title={`Timeframe of ${props.category} ${props.verb}`}>
-<DeleteTimeFrameButton label={`Delete timeframe from this rule`} />
+
+<RuleTimeframeSelector title={`Timeframe of when the ${props.category} was ${props.verb}`}>
+<DeleteTimeFrameButton label={`Remove timeframe constraint for this ${props.category}`} />
 </RuleTimeframeSelector>
+
+<RuleAgeSelector title={`Age of person when the ${props.category} was ${props.verb}`}>
+<DeleteAgeButton label={`Remove age of person constraint for this ${props.category}`} />
+</RuleAgeSelector>
 
 
 # Guidance

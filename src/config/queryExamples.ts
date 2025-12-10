@@ -28,6 +28,7 @@ export const EXAMPLE_1: RuleGroupType = {
             "2024-11-10T00:00:00.000Z",
             "2025-11-15T00:00:00.000Z",
           ],
+          ageConstraint: [0, 18],
         },
         {
           id: uuidv4(),

@@ -31,6 +31,9 @@ import { CustomH1, CustomH2 } from "@/components/GuidanceHeaders";
 import { getDomainVerbs } from "@/utils/omop";
 import DeleteTimeFrameButton from "@/components/DeleteTimeFrameButton";
 import { DeleteMenuItemProps } from "@/components/DeleteMenuItem/DeleteMenuItem";
+import AddAgeButton from "@/components/AddAgeButton";
+import RuleAgeSelector from "@/components/RuleAgeSelector";
+import DeleteAgeButton from "@/components/DeleteAgeButton";
 
 export const baseComponents = {
   h1: CustomH1,
@@ -98,13 +101,26 @@ const Guidance = () => {
     ToggleExclusion: () => <ToggleExclusion node={node} />,
     ShowDescendants: () => <ShowDescendants node={node} />,
     AddTimeFrameButton: (props: AddButtonProps) => (
-      <AddTimeFrameButton rule={node} {...props} />
+      <AddTimeFrameButton
+        rule={node}
+        disabled={!!node.timeConstraint}
+        {...props}
+      />
+    ),
+    AddAgeButton: (props: AddButtonProps) => (
+      <AddAgeButton rule={node} disabled={!!node.ageConstraint} {...props} />
     ),
     RuleTimeframeSelector: (props: { title: string }) => (
       <RuleTimeframeSelector rule={node} {...props} />
     ),
     DeleteTimeFrameButton: (props: DeleteMenuItemProps) => (
       <DeleteTimeFrameButton rule={node} {...props} />
+    ),
+    RuleAgeSelector: (props: { title: string }) => (
+      <RuleAgeSelector rule={node} {...props} />
+    ),
+    DeleteAgeButton: (props: DeleteMenuItemProps) => (
+      <DeleteAgeButton rule={node} {...props} />
     ),
   });
 

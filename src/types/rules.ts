@@ -20,6 +20,7 @@ type Node = {
   invalidReason?: string[];
   name?: string;
   timeConstraint?: [string | null, string | null];
+  ageConstraint?: [number | null, number | null];
 };
 
 export interface OperatorType extends Node {
