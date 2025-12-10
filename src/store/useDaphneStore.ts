@@ -677,6 +677,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       });
 
       await revalidateAction(`collections-${custodianPid}`);
+      await revalidateAction("collections-admin");
       return data;
     },
     updateCollection: async (id, payload, payloadConfig) => {
@@ -686,6 +687,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       await updateCollectionConfig(idConfig, payloadConfig);
 
       await revalidateAction(`collections-${data.custodian_id}`);
+      await revalidateAction("collections-admin");
 
       // revalidate custodians
       // - as noted above, keep to sort out the tags for caching first
@@ -697,6 +699,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       // to revalidate cache
       // - created a ticket for this
       await revalidateAction(`collections-${custodianPid}`);
+      await revalidateAction("collections-admin");
     },
   },
   adminData: {
@@ -719,6 +722,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       });
 
       await revalidateAction(`collections-${payload["custodian_id"]}`);
+      await revalidateAction("collections-admin");
       return data;
     },
     updateCollection: async (id, payload) => {
@@ -727,6 +731,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       // to revalidate cache
       // - created a ticket for this
       await revalidateAction(`collections-${data.custodian.pid}`);
+      await revalidateAction("collections-admin");
       return data;
     },
     deleteCollection: async (id) => {

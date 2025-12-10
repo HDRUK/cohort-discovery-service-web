@@ -25,6 +25,7 @@ const getCustodianCollections = async (
     next: {
       revalidate: DEFAULT_REVALIDATE,
       tags: [
+        "collections-admin",
         `collections-${custodianPid}`,
         `collections-${custodianPid}-${queryString}`,
         key,
