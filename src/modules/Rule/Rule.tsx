@@ -1,4 +1,4 @@
-import { Chip, Alert } from "@mui/material";
+import { Chip, Alert, Box } from "@mui/material";
 import SearchConcepts from "@/components/SearchConcepts";
 import { Concept } from "@/types/api";
 import { useCallback } from "react";
@@ -115,7 +115,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
         ) : null
       }
       render={() => (
-        <>
+        <Box py={1}>
           {isEmptyRule(rule) ? (
             <SearchConcepts onClick={onClick} />
           ) : (
@@ -151,7 +151,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
               )}
             </>
           )}
-        </>
+        </Box>
       )}
       actions={actions}
       {...rest}
