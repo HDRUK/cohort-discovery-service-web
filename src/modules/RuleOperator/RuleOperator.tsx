@@ -8,8 +8,10 @@ import { isOperator, removeById, updateById } from "@/utils/rules";
 import { cardSx, rootSx, dividerSx, chipSx } from "./RuleOperator.styles";
 import { useCallback } from "react";
 import InvalidRule from "@/components/InvalidRule";
+import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 
-export interface RuleOperatorProps {
+export interface RuleOperatorProps
+  extends Omit<RuleWrapperProps, "node" | "type" | "render"> {
   operator: OperatorType;
   groupId?: string;
   hidden?: boolean;

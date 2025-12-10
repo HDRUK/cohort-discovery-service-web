@@ -10,7 +10,7 @@ export enum ExpandedSide {
 }
 
 type ThreePaneSwimLaneLayoutProps = {
-  expandedSide: ExpandedSide | null;
+  expandedSide?: ExpandedSide | null;
   rightDisabled?: boolean;
   panelWidth?: number;
   totalWidth?: number;
@@ -56,7 +56,7 @@ const getPanelSizes = (
 const ThreePaneSwimLaneLayout = ({
   expandedSide,
   rightDisabled = false,
-  panelWidth = 3,
+  panelWidth = 2,
   totalWidth = 12,
   left,
   middle,
@@ -69,17 +69,22 @@ const ThreePaneSwimLaneLayout = ({
     left: leftSize,
     middle: middleSize,
     right: rightSize,
-  } = getPanelSizes(expandedSide, rightDisabled, panelWidth, totalWidth);
+  } = getPanelSizes(
+    expandedSide ?? null,
+    rightDisabled,
+    panelWidth,
+    totalWidth
+  );
 
   return (
     <SwimLaneContainer>
-      <SwimLane size={leftSize} {...leftProps}>
+      <SwimLane size={leftSize} paperSx={{ ml: 0 }} {...leftProps}>
         {left}
       </SwimLane>
       <SwimLane size={middleSize} {...middleProps}>
         {middle}
       </SwimLane>
-      <SwimLane size={rightSize} {...rightProps}>
+      <SwimLane size={rightSize} paperSx={{ mr: 0 }} {...rightProps}>
         {right}
       </SwimLane>
     </SwimLaneContainer>

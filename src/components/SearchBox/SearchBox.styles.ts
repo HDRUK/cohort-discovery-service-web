@@ -1,5 +1,7 @@
 import { SxProps, Theme } from "@mui/material/styles";
 
+const HEIGHT = 10;
+
 export const getContainerSx =
   (
     collapsible: boolean,
@@ -72,6 +74,7 @@ export const getHtmlInputSx = (
 ): SxProps<Theme> => ({
   opacity: collapsible ? (expanded ? 1 : 0) : 1,
   transition: collapsible ? "opacity 150ms" : "none",
+  maxHeight: HEIGHT,
 });
 
 export const inputAdornmentSx: SxProps<Theme> = {
@@ -85,8 +88,8 @@ export const iconButtonSx = (disabled = false): SxProps<Theme> => ({
   boxShadow: disabled ? "none" : "-4px 0px 6px -2px rgba(0, 0, 0, 0.4)",
   color: "common.white",
   borderRadius: "999px",
-  height: 40,
-  width: 40,
+  height: 3 * HEIGHT,
+  width: 3 * HEIGHT,
   display: "flex",
   alignItems: "center",
   justifyContent: "center",

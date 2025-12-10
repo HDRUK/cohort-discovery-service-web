@@ -35,6 +35,16 @@ const CohortQueryTitle = () => {
           }}
           textFieldProps={{
             variant: "standard",
+            size: "small",
+            slotProps: {
+              input: {
+                sx: (theme) => ({
+                  fontSize: theme.typography.h5.fontSize,
+                  fontWeight: theme.typography.h5.fontWeight,
+                  lineHeight: theme.typography.h5.lineHeight,
+                }),
+              },
+            },
           }}
         />
       }

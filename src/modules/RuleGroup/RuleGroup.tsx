@@ -11,8 +11,10 @@ import {
 import RuleBoard from "../RuleBoard";
 import RuleWrapper from "../RuleWrapper";
 import { useCallback } from "react";
+import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 
-export interface RuleGroupProps {
+export interface RuleGroupProps
+  extends Omit<RuleWrapperProps, "node" | "type" | "render"> {
   group: RuleGroupType;
   parentGroupId?: string;
   showConnector?: boolean;
