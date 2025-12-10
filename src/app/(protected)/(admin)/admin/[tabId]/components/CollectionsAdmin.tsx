@@ -68,7 +68,6 @@ const CollectionAdmin = ({
       <ThreePaneSwimLaneLayout
         expandedSide={expandedSide}
         rightDisabled={false}
-        panelWidth={3}
         left={
           <CollectionsLeftPanel
             expandedLeft={expandedLeft}
