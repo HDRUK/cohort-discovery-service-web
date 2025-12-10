@@ -1,7 +1,6 @@
 "use client";
 import { QUERY_BUILDER_GUIDANCE_COOKIE } from "@/config/internals";
 import { maskClientTest } from "@/lib/maskClientTest";
-import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import { ReactNode, useState } from "react";
 
 const QueryBuilderGuidance = maskClientTest(
@@ -9,16 +8,14 @@ const QueryBuilderGuidance = maskClientTest(
 );
 
 interface QueryBuilderGuidanceWrapperProps {
-  cookie: RequestCookie | undefined;
+  initialShowGuidance: boolean;
   children: ReactNode;
 }
 
 const QueryBuilderGuidanceWrapper = ({
-  cookie,
+  initialShowGuidance,
   children,
 }: QueryBuilderGuidanceWrapperProps) => {
-  const initialShowGuidance = !cookie?.value;
-
   const [showGuidance, setShowGuidance] = useState(initialShowGuidance);
 
   const handleClose = () => {

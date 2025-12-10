@@ -27,7 +27,7 @@ const CohortBuilder = async (props: { query?: string }) => {
   const cookie = cookieStore?.get(QUERY_BUILDER_GUIDANCE_COOKIE);
 
   return (
-    <QueryBuilderGuidanceWrapper cookie={cookie}>
+    <QueryBuilderGuidanceWrapper initialShowGuidance={!cookie?.value}>
       <Box
         flex={1}
         minHeight={0}
