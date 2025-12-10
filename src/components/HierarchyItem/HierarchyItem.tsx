@@ -20,6 +20,7 @@ import InvalidRule from "../InvalidRule";
 import useRightClickMenu from "@/hooks/useRightClickMenu";
 import RightClickMenu from "../RightClickMenu/RightClickMenu";
 import useNodeActions from "@/hooks/useNodeActions";
+import { trueKeys } from "@/utils/numbers";
 
 type HierarchyItemProps = {
   node: RuleNodeType;
@@ -68,13 +69,13 @@ export const HierarchyItem = ({
     e.stopPropagation();
 
     const nextParent = !selected[node.id];
-    toggleSelected(node.id);
+    toggleSelected(node.id, !isGroup);
     if (!isRuleGroup(node)) return;
 
     node.rules.forEach((r) => {
       const childVal = !!selected[r.id];
       if (childVal !== nextParent) {
-        toggleSelected(r.id);
+        toggleSelected(r.id, false);
       }
     });
   };
@@ -86,6 +87,7 @@ export const HierarchyItem = ({
 
   const content = (
     <ListItemButton
+      onClick={toggleCheckbox}
       onContextMenu={handleContextMenu}
       component="div"
       sx={listItemButtonSx(isDragging, isOver, isAbove)}
@@ -127,12 +129,19 @@ export const HierarchyItem = ({
     );
   }
 
+  const groupIds = node.rules.map((rule) => rule.id);
+  const selectedIds = trueKeys(selected);
+  const hasAnySelectedInGroup = selectedIds.some((id) =>
+    groupIds.includes(id as string)
+  );
+
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <ActionMenuSection
         id={`rule-${node.id}`}
         summary={content}
         sx={{ pl: depth }}
+        externalValue={hasAnySelectedInGroup ? true : undefined}
       >
         {({ expanded }) => (
           <List disablePadding>

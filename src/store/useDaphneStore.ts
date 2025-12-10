@@ -50,7 +50,7 @@ import {
   validateRuleTree,
 } from "@/utils/rules";
 import { UniqueIdentifier } from "@dnd-kit/core";
-import { trueKeys } from "@/utils/numbers";
+import { removeFalseKeys, trueKeys } from "@/utils/numbers";
 import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
 import parseQuery from "@/actions/parseQuery";
 import createCollectionConfig from "@/actions/createCollectionConfig";
@@ -102,7 +102,7 @@ export interface DaphneStoreState {
     ) => void;
     select: (id: UniqueIdentifier | UniqueIdentifier[]) => void;
     deselect: (id: UniqueIdentifier | UniqueIdentifier[]) => void;
-    toggleSelected: (id: UniqueIdentifier) => void;
+    toggleSelected: (id: UniqueIdentifier, reset?: boolean) => void;
     createNewNode: (kind: NodeKind, above?: boolean) => void;
     createNewRule: (above?: boolean) => void;
     createNewGroup: (above?: boolean) => void;
@@ -281,17 +281,23 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       get().queryBuilder.setSelected(id, true),
     deselect: (id: UniqueIdentifier | UniqueIdentifier[]) =>
       get().queryBuilder.setSelected(id, false),
-    toggleSelected: (id: UniqueIdentifier) => {
-      set((state) => ({
-        ...state,
-        queryBuilder: {
-          ...state.queryBuilder,
-          selected: {
-            ...state.queryBuilder.selected,
-            [id]: !(state.queryBuilder.selected?.[id] ?? false),
+    toggleSelected: (id: UniqueIdentifier, reset = true) => {
+      set((state) => {
+        const prevSelected = state.queryBuilder.selected ?? {};
+
+        return {
+          ...state,
+          queryBuilder: {
+            ...state.queryBuilder,
+            selected: {
+              ...(reset
+                ? removeFalseKeys(prevSelected)
+                : state.queryBuilder.selected),
+              [id]: !(state.queryBuilder.selected?.[id] ?? false),
+            },
           },
-        },
-      }));
+        };
+      });
     },
     createNewNode: (kind: NodeKind, above: boolean = true) => {
       const fn = Creators[kind];

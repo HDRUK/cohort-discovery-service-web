@@ -32,6 +32,9 @@ const EditableText = ({
   const [draft, setDraft] = useState(value);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const clickTimeoutRef = useRef<number | null>(null);
+  const CLICK_DELAY = 250;
+
   useEffect(() => {
     if (editing) {
       inputRef.current?.focus();
@@ -63,13 +66,25 @@ const EditableText = ({
     setDraft(value);
   };
 
+  const handleClick = (e: React.MouseEvent<HTMLSpanElement>) => {
+    if (clickTimeoutRef.current !== null) {
+      window.clearTimeout(clickTimeoutRef.current);
+      clickTimeoutRef.current = null;
+      startEditing(e);
+      return;
+    }
+
+    clickTimeoutRef.current = window.setTimeout(() => {
+      clickTimeoutRef.current = null;
+    }, CLICK_DELAY);
+  };
+
   const displayText = value || placeholder || "";
 
   return (
     <Typography
       {...typographyProps}
-      onClick={stop}
-      onDoubleClick={startEditing}
+      onClick={handleClick}
       sx={{
         ...(typographyProps?.sx || {}),
         ...(value
