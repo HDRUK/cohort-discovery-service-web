@@ -81,7 +81,7 @@ const ThreePaneSwimLaneLayout = ({
       <SwimLane size={leftSize} paperSx={{ ml: 0 }} {...leftProps}>
         {left}
       </SwimLane>
-      <SwimLane size={middleSize} paperSx={{ border: 1 }} {...middleProps}>
+      <SwimLane size={middleSize} {...middleProps}>
         {middle}
       </SwimLane>
       <SwimLane size={rightSize} paperSx={{ mr: 0 }} {...rightProps}>
