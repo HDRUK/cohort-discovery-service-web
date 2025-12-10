@@ -257,12 +257,19 @@ export interface TokenUser {
   cohort_admin_teams: ExternalCustodian[];
 }
 
+export interface Network {
+  name: string;
+  pid: string;
+  id: number;
+}
+
 export interface Custodian {
   id: number;
   pid: string;
   name: string;
   external_custodian_id: number | string;
   external_custodian_name: string;
+  network?: Network;
 }
 
 export interface CombinedUser extends User {

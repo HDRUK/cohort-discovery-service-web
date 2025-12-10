@@ -1,7 +1,7 @@
 "use client";
 
 import useQueryBuilder from "@/store/useQueryBuilder";
-import { Collection, GroupedCollection } from "../../types/api";
+import { Collection, GroupedCollection, Network } from "../../types/api";
 import {
   AccordionSummary,
   AccordionDetails,
@@ -10,7 +10,9 @@ import {
 } from "@mui/material";
 import { useEffect, useRef } from "react";
 import Title from "../Title";
-import SelectCustodianDatasets from "../SelectCustodianDatasets";
+import SelectNetworkDatasets, {
+  NetworkGroupedCollections,
+} from "../SelectNetworkDatasets";
 
 const SelectDatasets = ({
   initialSelection,
@@ -34,12 +36,29 @@ const SelectDatasets = ({
     setSelectedDatasets(initialSelection ?? []);
   }, [initialSelection, setSelectedDatasets]);
 
-  const groupedCollections = Object.values(
+  const custodianGroups = Object.values(
     collections.reduce<Record<number, GroupedCollection>>((acc, c) => {
       const { custodian } = c;
       (acc[custodian.id] ??= { custodian, items: [] }).items.push(c);
       return acc;
     }, {})
+  );
+
+  const networkGroups: NetworkGroupedCollections[] = Object.values(
+    custodianGroups.reduce<Record<string, NetworkGroupedCollections>>(
+      (acc, gc) => {
+        const network: Network | null = gc.custodian.network ?? null;
+        const key = network ? String(network.id) : "no-network";
+
+        if (!acc[key]) {
+          acc[key] = { network, custodians: [] };
+        }
+
+        acc[key].custodians.push(gc);
+        return acc;
+      },
+      {}
+    )
   );
 
   const nTotal = collections.length;
@@ -70,10 +89,10 @@ const SelectDatasets = ({
             mb: 2,
           }}
         >
-          {groupedCollections.map((gc) => (
-            <SelectCustodianDatasets
-              key={gc.custodian.id}
-              custodianCollections={gc}
+          {networkGroups.map((ng) => (
+            <SelectNetworkDatasets
+              key={ng.network?.id ?? "no-network"}
+              networkCollections={ng}
             />
           ))}
         </AccordionDetails>
