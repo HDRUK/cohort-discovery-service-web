@@ -82,7 +82,6 @@ const CollectionHostAdmin = ({
       <ThreePaneSwimLaneLayout
         expandedSide={expandedSide}
         rightDisabled={noCollectionHosts}
-        panelWidth={3}
         left={
           <CollectionHostLeftPanel
             custodianId={custodian.id}

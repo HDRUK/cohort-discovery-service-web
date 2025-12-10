@@ -21,6 +21,7 @@ interface ActionMenuSectionProps extends Omit<AccordionProps, "children"> {
   listeners?: SyntheticListenerMap;
   disabled?: boolean;
   fixedExpanded?: boolean;
+  externalValue?: boolean;
   additionalAction?: React.ReactNode;
   scrollable?: boolean;
   children?:
@@ -36,6 +37,7 @@ const ActionMenuSection = ({
   underline = false,
   defaultExpanded = false,
   fixedExpanded = false,
+  externalValue,
   additionalAction,
   attributes,
   listeners,
@@ -49,6 +51,11 @@ const ActionMenuSection = ({
   const [expanded, setExpanded] = React.useState<boolean>(
     fixedExpanded ? true : defaultExpanded
   );
+
+  React.useEffect(() => {
+    if (fixedExpanded || externalValue === undefined) return;
+    setExpanded(externalValue);
+  }, [externalValue, fixedExpanded]);
 
   const handleChange = (event: React.SyntheticEvent) => {
     event.preventDefault();
@@ -119,7 +126,6 @@ const ActionMenuSection = ({
           m: 0,
           p: 0,
           borderBottom: underline ? 1 : 0,
-          my: 1,
         }}
       >
         {summary ?? (

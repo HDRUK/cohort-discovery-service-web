@@ -7,8 +7,6 @@ import {
   CardHeader,
   Chip,
   CardContent,
-  Menu,
-  MenuItem,
   CardProps,
   Collapse,
   CardActions,
@@ -37,6 +35,8 @@ import { useLogDependencyChanges } from "@/utils/deps";
 import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
 import InvalidRule from "@/components/InvalidRule";
 import Title from "@/components/Title";
+import useRightClickMenu from "@/hooks/useRightClickMenu";
+import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
 
 interface Action {
   action: () => void;
@@ -129,28 +129,7 @@ const RuleWrapper = ({
     }
   }, [showHandle, isDragging, setShowHandle]);
 
-  const [menuPos, setMenuPos] = useState<{
-    mouseX: number;
-    mouseY: number;
-  } | null>(null);
-
-  const handleContextMenu = useCallback(
-    (event: React.MouseEvent<HTMLDivElement>) => {
-      event.preventDefault();
-      event.stopPropagation();
-      setMenuPos(
-        menuPos === null
-          ? {
-              mouseX: event.clientX + 2,
-              mouseY: event.clientY - 6,
-            }
-          : null
-      );
-    },
-    [menuPos]
-  );
-
-  const handleClose = () => setMenuPos(null);
+  const { handleContextMenu, ...rightClickMenuMethods } = useRightClickMenu();
 
   const nodeName = useMemo(() => getNodeName(node), [node, getNodeName]);
 
@@ -161,7 +140,6 @@ const RuleWrapper = ({
     exclude,
     valid,
     handleContextMenu,
-    menuPos,
     onMouseLeave,
     onMouseMove,
     handleOnSelect,
@@ -264,30 +242,7 @@ const RuleWrapper = ({
               </CardActions>
             )}
 
-            {actions && (
-              <Menu
-                open={menuPos !== null}
-                onClose={handleClose}
-                anchorReference="anchorPosition"
-                anchorPosition={
-                  menuPos !== null
-                    ? { top: menuPos.mouseY, left: menuPos.mouseX }
-                    : undefined
-                }
-              >
-                {actions.map(({ action, label }) => (
-                  <MenuItem
-                    key={label}
-                    onClick={() => {
-                      action();
-                      handleClose();
-                    }}
-                  >
-                    {label}
-                  </MenuItem>
-                ))}
-              </Menu>
-            )}
+            <RightClickMenu {...rightClickMenuMethods} actions={actions} />
           </Card>
         )}
 

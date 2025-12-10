@@ -7,7 +7,7 @@ export const containerSx = (
 ): SxProps<Theme> => ({
   border: 1,
   borderColor: isSelected ? "blue" : "transparent",
-  p: 0,
+  p: 1,
   position: "relative",
   ...rest,
 });

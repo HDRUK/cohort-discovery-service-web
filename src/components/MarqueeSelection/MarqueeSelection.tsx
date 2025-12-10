@@ -86,6 +86,7 @@ export default function MarqueeSelection({
 
       const x = clampedX - r.left + el.scrollLeft;
       const y = clampedY - r.top + el.scrollTop;
+
       return { x, y };
     },
     [containerRef]
@@ -250,10 +251,14 @@ export default function MarqueeSelection({
 
   if (!portalTarget || !rectState) return null;
 
+  const containerRect = portalTarget.getBoundingClientRect();
+  const left = containerRect.left + rectState.x - portalTarget.scrollLeft;
+  const top = containerRect.top + rectState.y - portalTarget.scrollTop;
+
   const style: React.CSSProperties = {
-    position: "absolute",
-    left: rectState.x,
-    top: rectState.y,
+    position: "fixed",
+    left,
+    top,
     width: rectState.w,
     height: rectState.h,
     pointerEvents: "none",

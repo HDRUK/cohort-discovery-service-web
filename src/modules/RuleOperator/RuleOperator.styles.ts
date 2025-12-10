@@ -15,6 +15,7 @@ export const cardSx = (selected: boolean): SxProps<Theme> => ({
 
 export const rootSx = (hidden: boolean): SxProps<Theme> => ({
   minHeight: 60,
+  my: "auto",
   position: "relative",
   display: hidden ? "none" : "grid",
   gridTemplateColumns: "1fr 1fr 1fr",

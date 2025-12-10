@@ -1,4 +1,4 @@
-import { Chip, Alert } from "@mui/material";
+import { Chip, Alert, Box } from "@mui/material";
 import SearchConcepts from "@/components/SearchConcepts";
 import { Concept } from "@/types/api";
 import { useCallback } from "react";
@@ -9,15 +9,14 @@ import useQueryBuilder from "@/store/useQueryBuilder";
 import {
   isEmptyRule,
   updateById,
-  removeById,
   isSingleConcept,
   isRuleLeaf,
-  ruleToGroup,
   isMultipleConcept,
 } from "@/utils/rules";
 
 import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
+import useNodeActions from "@/hooks/useNodeActions";
 
 export interface RuleProps
   extends Omit<RuleWrapperProps, "node" | "type" | "render"> {
@@ -102,25 +101,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     return newConcept;
   }, []);
 
-  const handleDeleteRule = useCallback(() => {
-    const newQuery = removeById(queryBuilderJson, id);
-    setQueryBuilderJson(newQuery);
-  }, [id, queryBuilderJson, setQueryBuilderJson]);
-
-  const handleConvertToGroup = useCallback(() => {
-    setQueryBuilderJson(
-      updateById(queryBuilderJson, id, (node) => {
-        if (!isRuleLeaf(node)) return node;
-        const newGroup = ruleToGroup(node);
-        return newGroup;
-      })
-    );
-  }, [id, queryBuilderJson, setQueryBuilderJson]);
-
-  const actions = [
-    { action: handleConvertToGroup, label: "Convert to Group" },
-    { action: handleDeleteRule, label: "Delete" },
-  ];
+  const actions = useNodeActions(rule);
 
   return (
     <RuleWrapper
@@ -134,7 +115,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
         ) : null
       }
       render={() => (
-        <>
+        <Box py={1}>
           {isEmptyRule(rule) ? (
             <SearchConcepts onClick={onClick} />
           ) : (
@@ -170,7 +151,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
               )}
             </>
           )}
-        </>
+        </Box>
       )}
       actions={actions}
       {...rest}

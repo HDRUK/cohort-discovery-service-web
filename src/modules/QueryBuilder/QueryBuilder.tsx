@@ -180,37 +180,38 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
   const boardRef = useRef<HTMLDivElement>(null);
 
   return (
-    <ThreePaneSwimLaneLayout
-      left={<ActionMenu />}
-      middle={
-        <>
-          <DndContext
-            sensors={sensors}
-            onDragStart={onDragStart}
-            onDragOver={onDragOver}
-            onDragEnd={onDragEnd}
-            modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
-            collisionDetection={closestCorners}
-            measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
-          >
-            <RuleBoard ruleGroup={queryBuilderJson} />
-            <DragOverlay node={activeNode} />
-          </DndContext>
-
-          <MarqueeSelection
-            containerRef={boardRef}
-            selectable='[data-selectable="true"]'
-            idAttr="data-id"
-            ignoreWhenInside='[data-draggable="true"]'
-            requireModifierKey="Shift"
-            onChange={onChangeSelection}
-          />
-        </>
-      }
-      middleProps={{ ref: boardRef }}
-      right={<RuleMenu />}
-      rightProps={{ scrollable: false }}
-    />
+    <>
+      <ThreePaneSwimLaneLayout
+        left={<ActionMenu />}
+        middle={
+          <>
+            <DndContext
+              sensors={sensors}
+              onDragStart={onDragStart}
+              onDragOver={onDragOver}
+              onDragEnd={onDragEnd}
+              modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
+              collisionDetection={closestCorners}
+              measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
+            >
+              <RuleBoard ruleGroup={queryBuilderJson} />
+              <DragOverlay node={activeNode} />
+            </DndContext>
+          </>
+        }
+        middleProps={{ ref: boardRef }}
+        right={<RuleMenu />}
+        rightProps={{ scrollable: false }}
+      />
+      <MarqueeSelection
+        containerRef={boardRef}
+        selectable='[data-selectable="true"]'
+        idAttr="data-id"
+        ignoreWhenInside='[data-draggable="true"]'
+        requireModifierKey="Shift"
+        onChange={onChangeSelection}
+      />
+    </>
   );
 };
 

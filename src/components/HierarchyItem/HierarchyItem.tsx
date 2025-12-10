@@ -6,17 +6,16 @@ import { RuleNodeType } from "@/types/rules";
 import { isRuleGroup } from "@/utils/rules";
 
 import { SortableContext } from "@dnd-kit/sortable";
-import {
-  Checkbox,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-} from "@mui/material";
+import { List, ListItem, ListItemButton, ListItemText } from "@mui/material";
 import EditableText from "@/components/EditableText";
 import { ID_REF_SUFFIX } from "@/config/defaults";
 import { listItemButtonSx, INDENT_STEP } from "./HierarchyItem.style";
 import InvalidRule from "../InvalidRule";
+import useRightClickMenu from "@/hooks/useRightClickMenu";
+import RightClickMenu from "../RightClickMenu/RightClickMenu";
+import useNodeActions from "@/hooks/useNodeActions";
+import { trueKeys } from "@/utils/numbers";
+import SquareRadio from "../SquareRadio";
 
 type HierarchyItemProps = {
   node: RuleNodeType;
@@ -64,26 +63,33 @@ export const HierarchyItem = ({
     e.preventDefault();
     e.stopPropagation();
 
+    const isShift = e.shiftKey;
+
     const nextParent = !selected[node.id];
-    toggleSelected(node.id);
+    toggleSelected(node.id, isShift ? false : !isGroup);
     if (!isRuleGroup(node)) return;
 
     node.rules.forEach((r) => {
       const childVal = !!selected[r.id];
       if (childVal !== nextParent) {
-        toggleSelected(r.id);
+        toggleSelected(r.id, false);
       }
     });
   };
 
   const nodeName = getNodeName(node);
 
+  const { handleContextMenu, ...rightClickMenuMethods } = useRightClickMenu();
+  const actions = useNodeActions(node);
+
   const content = (
     <ListItemButton
+      onClick={toggleCheckbox}
+      onContextMenu={handleContextMenu}
       component="div"
-      sx={listItemButtonSx(isDragging, isOver, isAbove)}
+      sx={listItemButtonSx(isDragging, isOver, isAbove, depth)}
     >
-      <Checkbox
+      <SquareRadio
         size="medium"
         checked={selected[node.id] || false}
         onClick={toggleCheckbox}
@@ -106,6 +112,7 @@ export const HierarchyItem = ({
         }
       />
       {!node.valid ? <InvalidRule reasons={node.invalidReason || []} /> : <></>}
+      <RightClickMenu {...rightClickMenuMethods} actions={actions} />
     </ListItemButton>
   );
 
@@ -119,12 +126,19 @@ export const HierarchyItem = ({
     );
   }
 
+  const groupIds = node.rules.map((rule) => rule.id);
+  const selectedIds = trueKeys(selected);
+  const hasAnySelectedInGroup = selectedIds.some((id) =>
+    groupIds.includes(id as string)
+  );
+
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <ActionMenuSection
         id={`rule-${node.id}`}
         summary={content}
         sx={{ pl: depth }}
+        externalValue={hasAnySelectedInGroup ? true : undefined}
       >
         {({ expanded }) => (
           <List disablePadding>
