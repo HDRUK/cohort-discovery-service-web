@@ -21,6 +21,7 @@ import useRightClickMenu from "@/hooks/useRightClickMenu";
 import RightClickMenu from "../RightClickMenu/RightClickMenu";
 import useNodeActions from "@/hooks/useNodeActions";
 import { trueKeys } from "@/utils/numbers";
+import SquareRadio from "../SquareRadio";
 
 type HierarchyItemProps = {
   node: RuleNodeType;
@@ -92,7 +93,7 @@ export const HierarchyItem = ({
       component="div"
       sx={listItemButtonSx(isDragging, isOver, isAbove)}
     >
-      <Checkbox
+      <SquareRadio
         size="medium"
         checked={selected[node.id] || false}
         onClick={toggleCheckbox}

@@ -215,6 +215,16 @@ export const themeOptions: ThemeOptions = {
         },
       },
     },
+    MuiCardContent: {
+      padding: 0,
+      styleOverrides: {
+        root: () => ({
+          "&:last-child": {
+            paddingBottom: 0,
+          },
+        }),
+      },
+    },
   },
   transitions: {
     duration: {

@@ -284,6 +284,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     toggleSelected: (id: UniqueIdentifier, reset = true) => {
       set((state) => {
         const prevSelected = state.queryBuilder.selected ?? {};
+        const isAlreadySelected = state.queryBuilder.selected?.[id] === true;
 
         return {
           ...state,
@@ -291,7 +292,9 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
             ...state.queryBuilder,
             selected: {
               ...(reset
-                ? removeFalseKeys(prevSelected)
+                ? isAlreadySelected
+                  ? removeFalseKeys(prevSelected)
+                  : {}
                 : state.queryBuilder.selected),
               [id]: !(state.queryBuilder.selected?.[id] ?? false),
             },
