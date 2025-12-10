@@ -217,8 +217,8 @@ export const themeOptions: ThemeOptions = {
     },
     MuiCardContent: {
       styleOverrides: {
-        padding: 0,
         root: () => ({
+          padding: 0,
           "&:last-child": {
             paddingBottom: 0,
           },
