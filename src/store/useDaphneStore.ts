@@ -496,13 +496,8 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         stateManagement: { ...state.stateManagement, isLoading: true },
       }));
 
-      const { queryBuilderJson, queryAsText, selectedDatasets } =
-        get().queryBuilder;
-      const queryName = name ? name : queryAsText;
-
-      if (get().queryBuilder.queryName !== queryName) {
-        get().queryBuilder.setQueryName(queryName);
-      }
+      const { queryBuilderJson, selectedDatasets } = get().queryBuilder;
+      const queryName = name ? name : null;
 
       const res = await submitQuery(
         queryBuilderJson,

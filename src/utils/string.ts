@@ -31,6 +31,6 @@ const getEnumLabel = <T extends Record<string, string | number>>(
 };
 
 const capVarChar = (s: string, max = MAX_VARCHAR_LENGTH, addDots = false) =>
-  `${[...s].slice(0, max).join("")} ${addDots ? "..." : ""}`;
+  `${[...s].slice(0, max).join("")} ${s.length > max && addDots ? "..." : ""}`;
 
 export { capitaliseFirstLetter, getTokenKey, capVarChar, getEnumLabel };

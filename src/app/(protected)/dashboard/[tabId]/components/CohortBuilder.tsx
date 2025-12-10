@@ -8,6 +8,7 @@ import getCollections from "@/actions/getCollections";
 import CohortQueryTitle from "@/components/CohortQueryTitle";
 import FilterDatasets from "@/components/FilterDatasets/FilterDatasets";
 import getQuery from "@/actions/getQuery";
+import Title from "@/components/Title";
 
 const CohortBuilder = async (props: { query?: string }) => {
   const collections = await getCollections();
@@ -25,18 +26,33 @@ const CohortBuilder = async (props: { query?: string }) => {
         direction="row"
         alignItems="center"
         justifyContent="space-between"
-        spacing={2}
+        spacing={1}
       >
         <CohortQueryTitle />
         <FilterDatasets />
       </Stack>
+
       <SelectDatasets
         initialSelection={initialSelection}
         collections={activeCollections}
       />
-      <CohortQueryInput />
 
-      <QueryBuilder query={query?.data} />
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
+        spacing={1}
+        borderBottom={1}
+        marginBottom={2}
+      >
+        <Title title="Cohort Builder" subTitle="Natural Language" />
+        <CohortQueryInput />
+      </Stack>
+
+      <Stack direction="column" spacing={1}>
+        <Title title="Cohort Builder" subTitle="Query Rules" />
+        <QueryBuilder query={query?.data} />
+      </Stack>
     </>
   );
 };

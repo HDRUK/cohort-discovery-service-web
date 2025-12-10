@@ -28,7 +28,7 @@ const EditableText = ({
   trim = true,
   placeholder,
 }: EditableTextProps) => {
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditing] = useState(!value);
   const [draft, setDraft] = useState(value);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -52,11 +52,13 @@ const EditableText = ({
 
   const commit = () => {
     const next = trim ? draft.trim() : draft;
+    if (!next) return;
     setEditing(false);
     if (next !== value) onCommit(next);
   };
 
   const cancel = () => {
+    if (!value) return;
     setEditing(false);
     setDraft(value);
   };

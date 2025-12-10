@@ -26,7 +26,7 @@ const Title = ({
         alignItems: "baseline",
       }}
     >
-      <Box display={"flex"} {...rest}>
+      <Box display={"flex"} alignItems={"baseline"} {...rest}>
         <Typography
           variant={small ? "body1" : "h4"}
           component="span"
