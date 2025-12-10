@@ -12,7 +12,7 @@ const AdminPage = ({ children }: { children: React.ReactNode }) => {
   const { token_user } = user || {};
   const is_admin = isAdmin(token_user);
 
-  if (!is_admin) forbidden();
+  if (user && !is_admin) forbidden();
 
   return children;
 };
