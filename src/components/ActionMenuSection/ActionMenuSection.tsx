@@ -13,7 +13,8 @@ import AccordionExpandIcon from "@/components/AccordionExpandIcon";
 import { DraggableAttributes } from "@dnd-kit/core";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 
-interface ActionMenuSectionProps extends Omit<AccordionProps, "children"> {
+export interface ActionMenuSectionProps
+  extends Omit<AccordionProps, "children"> {
   summary?: React.ReactNode;
   title?: string;
   underline?: boolean;

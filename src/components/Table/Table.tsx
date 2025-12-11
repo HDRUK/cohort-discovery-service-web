@@ -13,14 +13,14 @@ import SortButton, { SortButtonProps } from "../SortButton/SortButton";
 import EditButton, { EditButtonProps } from "../EditButton";
 import { RevalidateButtonProps } from "../RevalidateButton/RevalidateButton";
 import DeleteButton, { DeleteButtonProps } from "../DeleteButton";
-import Title, { TableTitleProps } from "@/components/Title";
+import Title, { TitleProps } from "@/components/Title";
 import ControlledSearchBox, {
   ControlledSearchBoxProps,
 } from "@/modules/ControlledSearchBox";
 
 export interface TableProps {
   leftAction?: {
-    titleProps?: TableTitleProps;
+    titleProps?: TitleProps;
     searchProps?: ControlledSearchBoxProps;
   };
   rightAction?: {

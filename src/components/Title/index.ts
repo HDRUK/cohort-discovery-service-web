@@ -1,5 +1,5 @@
 import Title from "./Title";
-import { TableTitleProps } from "./Title";
+import { TitleProps } from "./Title";
 
-export type { TableTitleProps };
+export type { TitleProps };
 export default Title;

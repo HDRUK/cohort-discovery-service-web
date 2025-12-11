@@ -3,9 +3,6 @@ import { SxProps } from "@mui/system";
 
 export const cardSx = (selected: boolean): SxProps<Theme> => ({
   border: 0,
-  mx: "auto",
-  width: "fit-content",
-  minWidth: "100%",
   bgcolor: selected ? undefined : "transparent",
   "&:hover": {
     bgcolor: selected ? undefined : "highlight.main",

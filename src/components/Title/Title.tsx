@@ -1,13 +1,13 @@
 import { Box, BoxProps, Typography } from "@mui/material";
 import { ReactNode } from "react";
 
-export interface TableTitleProps extends BoxProps {
+export interface TitleProps extends BoxProps {
   title: string;
   subTitle?: number | string | ReactNode;
-  children?: React.ReactNode;
-  startIcon?: React.ReactNode;
+  children?: ReactNode;
+  startIcon?: ReactNode;
   useSeparator?: boolean;
-  small?: boolean;
+  size?: "small" | "medium" | "large";
   wrapperSx?: BoxProps;
 }
 
@@ -17,10 +17,16 @@ const Title = ({
   children,
   startIcon,
   useSeparator = true,
-  small = false,
+  size = "medium",
   wrapperSx,
   ...rest
-}: TableTitleProps) => {
+}: TitleProps) => {
+  const titleVariant =
+    size === "small" ? "body1" : size === "medium" ? "h4" : "h2";
+
+  const subTitleVariant =
+    size === "small" ? "h6" : size === "medium" ? "h5" : "h3";
+
   return (
     <Box
       sx={{
@@ -29,9 +35,9 @@ const Title = ({
       }}
       {...wrapperSx}
     >
-      <Box display={"flex"} alignItems={"baseline"} {...rest}>
+      <Box display="flex" alignItems="baseline" {...rest}>
         <Typography
-          variant={small ? "body1" : "h4"}
+          variant={titleVariant}
           component="span"
           noWrap
           sx={{ overflow: "hidden", textOverflow: "ellipsis", minWidth: 0 }}
@@ -41,7 +47,7 @@ const Title = ({
 
         {subTitle && (
           <Typography
-            variant={small ? "h6" : "h5"}
+            variant={subTitleVariant}
             component="span"
             noWrap
             sx={{ flexShrink: 0, mx: 1 }}
