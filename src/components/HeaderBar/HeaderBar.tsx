@@ -38,7 +38,7 @@ const HeaderBar = () => {
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Box sx={{ py: 0.5 }}>
             <Image
-              height={25}
+              height={30}
               priority
               src={logo}
               alt={"cohort discovery logo"}
