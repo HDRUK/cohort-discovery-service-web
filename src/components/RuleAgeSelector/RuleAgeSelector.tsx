@@ -5,22 +5,21 @@ import { ReactNode, useState } from "react";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import { updateById } from "@/utils/rules";
 import { RuleNodeType } from "@/types/rules";
-
 import { CustomH1 } from "@/components/GuidanceHeaders";
-import useFeatures from "@/store/useFeatures";
-import { FeatureName } from "@/types/api";
 
 export interface RuleAgeSelectorProps {
   children?: ReactNode;
   rule: RuleNodeType;
   title?: string;
   readOnly?: boolean;
+  uniDirectional?: boolean;
 }
 
 const RuleAgeSelector = ({
   rule,
   title,
   children,
+  uniDirectional = false,
   readOnly = false,
 }: RuleAgeSelectorProps) => {
   const minAge = 0;
@@ -31,14 +30,10 @@ const RuleAgeSelector = ({
     setQueryBuilderJson: qb.setQueryBuilderJson,
   }));
 
-  const featureFlags = useFeatures();
-  const constrainForBunnyV1 =
-    featureFlags?.[FeatureName.ConstrainForBunnyV1] || false;
+  const from = rule.ageConstraint?.[0] ?? minAge;
+  const to = rule.ageConstraint?.[1] ?? maxAge;
 
-  const [age, setAge] = useState<number[]>([
-    rule.ageConstraint?.[0] ?? minAge,
-    rule.ageConstraint?.[1] ?? maxAge,
-  ]);
+  const [age, setAge] = useState<number[]>([from, to]);
 
   const handleCommitChange = () => {
     setQueryBuilderJson(
@@ -46,7 +41,7 @@ const RuleAgeSelector = ({
         return {
           ...node,
           ageConstraint: [
-            age[0] > minAge ? age[0] : null,
+            age[0] >= minAge ? age[0] : null,
             age[1] < maxAge ? age[1] : null,
           ],
         };
@@ -57,9 +52,6 @@ const RuleAgeSelector = ({
   if (!rule.ageConstraint) return null;
 
   if (readOnly) {
-    const from = rule.ageConstraint?.[0] ?? minAge;
-    const to = rule.ageConstraint?.[1] ?? maxAge;
-
     let label: string;
 
     if (from === minAge && to === maxAge) {
@@ -71,7 +63,17 @@ const RuleAgeSelector = ({
     } else {
       label = `Age ${from} - ${to}`;
     }
-    return <Paper sx={{ border: 1, p: 1 }}>{label}</Paper>;
+    return (
+      <Paper
+        sx={{
+          border: 1,
+          p: 1,
+          borderColor: rule.valid ? undefined : "error.main",
+        }}
+      >
+        {label}
+      </Paper>
+    );
   }
 
   return (
@@ -90,7 +92,7 @@ const RuleAgeSelector = ({
           min={minAge}
           max={maxAge}
           onChange={(_e, newValue, activeThumb) => {
-            if (constrainForBunnyV1) {
+            if (uniDirectional) {
               if (activeThumb === 0) {
                 setAge([newValue[0], maxAge]);
               } else {

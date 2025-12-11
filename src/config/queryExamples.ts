@@ -1,9 +1,25 @@
 import { CombinatorType, RuleGroupType } from "@/types/rules";
 import { v4 as uuidv4 } from "uuid";
 
-export const NO_QUERY = {
+export const NO_QUERY: RuleGroupType = {
   id: uuidv4(),
-  rules: [],
+  rules: [
+    {
+      id: uuidv4(),
+      exclude: true,
+      rule: {
+        concept: {
+          concept_id: 3955322,
+          description:
+            "Oxford, AstraZeneca - SARS-CoV-2 (COVID-19) vaccine AZD1222",
+          category: "Drug",
+          children: [],
+        },
+      },
+      timeConstraint: [null, "2024-11-10T00:00:00.000Z"],
+      ageConstraint: [60, 90],
+    },
+  ],
 };
 
 export const EXAMPLE_1: RuleGroupType = {
@@ -25,7 +41,7 @@ export const EXAMPLE_1: RuleGroupType = {
             },
           },
           timeConstraint: ["2020-11-10T00:00:00.000Z", null],
-          ageConstraint: [0, 55],
+          ageConstraint: [10, 55],
         },
         {
           id: uuidv4(),
@@ -43,6 +59,7 @@ export const EXAMPLE_1: RuleGroupType = {
               children: [],
             },
           },
+          ageConstraint: [null, 55],
         },
       ],
     },

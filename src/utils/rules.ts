@@ -21,6 +21,9 @@ export enum RuleErrors {
   GROUP_NEEDS_OPERATORS = "Each condition inside a group must be surrounded by operators.",
   GROUP_IS_INVALID = "A group contains errors.",
   MANY = "A group contains many errors.",
+  TIME_CONSTRAINT_IS_UNIDIRECTIONAL = "Time constraints needs to be unidirectional.",
+  AGE_CONSTRAINT_IS_UNIDIRECTIONAL = "Age constraints needs to be unidirectional.",
+  CANNOT_CONSTRAIN_AGE_AND_TIME = "A rule can only be constrained by either age OR time currently.",
 }
 
 export const createRule = (
@@ -346,7 +349,7 @@ export function validateRuleTree(
     return `${op.combinator}-${op.exclude ?? false}`;
   };
 
-  const invalidateNode = (node: RuleNodeType, msg: string): RuleNodeType => {
+  const invalidateNode = <T extends RuleNodeType>(node: T, msg: string): T => {
     const anyNode: RuleNodeType = node;
     const existing: string[] = anyNode.invalidReason ?? [];
     const nextReasons = existing.includes(msg) ? existing : [...existing, msg];
@@ -354,13 +357,66 @@ export function validateRuleTree(
     const nodeWithReason = {
       ...anyNode,
       invalidReason: nextReasons,
-    } as RuleNodeType;
+    } as T;
     return setValid(nodeWithReason, false);
   };
 
   const validateNode = (node: RuleNodeType): RuleNodeType => {
     const { invalidReason, ...nodeWithoutReason } = node;
     return setValid(nodeWithoutReason, true);
+  };
+
+  const validateLeaf = (leaf: RuleLeafType): RuleLeafType => {
+    const validateTimeConstraint = (leaf: RuleLeafType) => {
+      const timeConstraint = leaf.timeConstraint ?? [null, null];
+      if (timeConstraint) {
+        const [left, right] = timeConstraint;
+        if (constrainForBunnyV1) {
+          if (left && right) {
+            leaf = invalidateNode(
+              leaf,
+              RuleErrors.TIME_CONSTRAINT_IS_UNIDIRECTIONAL
+            );
+          }
+        }
+      }
+      return leaf;
+    };
+    const validateAgeConstraint = (leaf: RuleLeafType) => {
+      const ageConstraint = leaf.ageConstraint ?? [null, null];
+      if (ageConstraint) {
+        const [left, right] = ageConstraint;
+        if (constrainForBunnyV1) {
+          if (left && right) {
+            leaf = invalidateNode(
+              leaf,
+              RuleErrors.AGE_CONSTRAINT_IS_UNIDIRECTIONAL
+            );
+          }
+        }
+      }
+      return leaf;
+    };
+    const validateConstraints = (leaf: RuleLeafType) => {
+      leaf = validateTimeConstraint(leaf);
+      leaf = validateAgeConstraint(leaf);
+
+      const [tLeft, tRight] = leaf.timeConstraint ?? [null, null];
+      const [aLeft, aRight] = leaf.ageConstraint ?? [null, null];
+
+      if (constrainForBunnyV1 && (tLeft || tRight) && (aLeft || aRight)) {
+        leaf = invalidateNode(leaf, RuleErrors.CANNOT_CONSTRAIN_AGE_AND_TIME);
+        return leaf;
+      }
+      return leaf;
+    };
+
+    let node = validateNode(leaf);
+    if (isEmptyRule(leaf)) {
+      node = invalidateNode(node, RuleErrors.EMPTY_RULE);
+    }
+    node = validateConstraints(node as RuleLeafType);
+    return node;
   };
 
   const validateGroup = (
@@ -385,11 +441,7 @@ export function validateRuleTree(
       }
 
       if (isRuleLeaf(child)) {
-        const empty = isEmptyRule(child);
-        if (empty) {
-          return invalidateNode(child, RuleErrors.EMPTY_RULE);
-        }
-        return validateNode(child);
+        return validateLeaf(child);
       }
 
       return validateNode(child);

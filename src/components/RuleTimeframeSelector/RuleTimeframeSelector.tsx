@@ -15,7 +15,6 @@ import { PickerValue } from "@mui/x-date-pickers/internals";
 import { CustomH1 } from "@/components/GuidanceHeaders";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import useFeatures from "@/store/useFeatures";
-import { FeatureName } from "@/types/api";
 import { getDomainVerbs } from "@/utils/omop";
 import { capitaliseFirstLetter } from "@/utils/string";
 
@@ -44,9 +43,7 @@ const RuleTimeframeSelector = ({
     setQueryBuilderJson: qb.setQueryBuilderJson,
   }));
 
-  const featureFlags = useFeatures();
-  const constrainForBunnyV1 =
-    featureFlags?.[FeatureName.ConstrainForBunnyV1] || false;
+  const { constrainForBunnyV1 } = useFeatures();
 
   const [leftValue, rightValue] = useMemo<[Dayjs | null, Dayjs | null]>(() => {
     const [start, end] = rule.timeConstraint ?? [null, null];

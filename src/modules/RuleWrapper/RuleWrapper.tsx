@@ -40,6 +40,7 @@ import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
 import { mergeSx } from "@/utils/helpers";
 import RuleAgeSelector from "@/components/RuleAgeSelector";
 import { isRuleLeaf } from "@/utils/rules";
+import useFeatures from "@/store/useFeatures";
 
 interface Action {
   action: () => void;
@@ -87,6 +88,8 @@ const RuleWrapper = ({
       getNodeName: qb.getNodeName,
       setNodeName: qb.setNodeName,
     }));
+
+  const { constrainForBunnyV1 } = useFeatures();
 
   const {
     setNodeRef,
@@ -246,7 +249,15 @@ const RuleWrapper = ({
                     <RuleTimeframeSelector rule={node} readOnly />
                   )}
                   {node.ageConstraint && (
-                    <RuleAgeSelector rule={node} readOnly />
+                    <RuleAgeSelector
+                      rule={node}
+                      readOnly
+                      uniDirectional={
+                        constrainForBunnyV1
+                          ? node.rule.concept?.category !== "Gender"
+                          : false
+                      }
+                    />
                   )}
                 </CardActions>
               )}

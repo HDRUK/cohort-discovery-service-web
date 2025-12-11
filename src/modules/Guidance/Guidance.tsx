@@ -34,6 +34,7 @@ import { DeleteMenuItemProps } from "@/components/DeleteMenuItem/DeleteMenuItem"
 import AddAgeButton from "@/components/AddAgeButton";
 import RuleAgeSelector from "@/components/RuleAgeSelector";
 import DeleteAgeButton from "@/components/DeleteAgeButton";
+import useFeatures from "@/store/useFeatures";
 
 export const baseComponents = {
   h1: CustomH1,
@@ -96,6 +97,8 @@ const Guidance = () => {
     [queryBuilderJson, setQueryBuilderJson]
   );
 
+  const { constrainForBunnyV1 } = useFeatures();
+
   const makeRuleComponents = (node: RuleLeafType) => ({
     ...baseComponents,
     ToggleExclusion: () => <ToggleExclusion node={node} />,
@@ -117,7 +120,13 @@ const Guidance = () => {
       <DeleteTimeFrameButton rule={node} {...props} />
     ),
     RuleAgeSelector: (props: { title: string }) => (
-      <RuleAgeSelector rule={node} {...props} />
+      <RuleAgeSelector
+        rule={node}
+        {...props}
+        uniDirectional={
+          constrainForBunnyV1 ? node.rule.concept?.category !== "Gender" : false
+        }
+      />
     ),
     DeleteAgeButton: (props: DeleteMenuItemProps) => (
       <DeleteAgeButton rule={node} {...props} />
