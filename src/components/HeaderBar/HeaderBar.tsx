@@ -36,9 +36,9 @@ const HeaderBar = () => {
     >
       <Toolbar sx={{ justifyContent: "space-between" }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Box sx={{ py: 2 }}>
+          <Box sx={{ py: 0.5 }}>
             <Image
-              height={30}
+              height={25}
               priority
               src={logo}
               alt={"cohort discovery logo"}
