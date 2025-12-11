@@ -174,9 +174,11 @@ const RuleTimeframeSelector = ({
         <Stack direction="row" spacing={2} alignItems="center">
           {readOnly ? (
             <Paper sx={{ border: 1, p: 1 }}>
-              {capitaliseFirstLetter(verb)}{" "}
-              {operator === "gt" ? "after" : "before"}{" "}
-              {singleDate?.format("MM-YYYY")}
+              {singleDate
+                ? `${capitaliseFirstLetter(verb)} ${
+                    operator === "gt" ? "after" : "before"
+                  } ${singleDate.format("MM-YYYY")}`
+                : `${capitaliseFirstLetter(verb)} at any time`}
             </Paper>
           ) : (
             <>
