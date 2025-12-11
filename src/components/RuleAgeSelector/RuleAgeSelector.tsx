@@ -41,7 +41,7 @@ const RuleAgeSelector = ({
         return {
           ...node,
           ageConstraint: [
-            age[0] >= minAge ? age[0] : null,
+            age[0] > minAge ? age[0] : null,
             age[1] < maxAge ? age[1] : null,
           ],
         };
@@ -68,7 +68,6 @@ const RuleAgeSelector = ({
         sx={{
           border: 1,
           p: 1,
-          borderColor: rule.valid ? undefined : "error.main",
         }}
       >
         {label}

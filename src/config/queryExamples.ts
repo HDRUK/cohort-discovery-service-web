@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 export const NO_QUERY: RuleGroupType = {
   id: uuidv4(),
   rules: [
-    {
+    /*{
       id: uuidv4(),
       exclude: true,
       rule: {
@@ -18,7 +18,7 @@ export const NO_QUERY: RuleGroupType = {
       },
       timeConstraint: [null, "2024-11-10T00:00:00.000Z"],
       ageConstraint: [60, 90],
-    },
+    },*/
   ],
 };
 
@@ -41,7 +41,6 @@ export const EXAMPLE_1: RuleGroupType = {
             },
           },
           timeConstraint: ["2020-11-10T00:00:00.000Z", null],
-          ageConstraint: [10, 55],
         },
         {
           id: uuidv4(),
