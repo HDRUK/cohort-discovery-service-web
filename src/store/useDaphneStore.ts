@@ -56,6 +56,7 @@ import parseQuery from "@/actions/parseQuery";
 import createCollectionConfig from "@/actions/createCollectionConfig";
 import updateCollection from "@/actions/updateCollection";
 import updateCollectionConfig from "@/actions/updateCollectionConfig";
+import createCustodianCollection from "@/actions/createCustodianCollection";
 
 export enum NodeKind {
   RULE = "RULE",
@@ -152,7 +153,7 @@ export interface DaphneStoreState {
     currentCustodian: Custodian | null;
     setCurrentCustodian: (custodian: Custodian) => void;
     custodians: Custodian[];
-    setCustodians: (custodains: Custodian[]) => void;
+    setCustodians: (custodians: Custodian[]) => void;
     createCollectionHost: (
       custodianId: number,
       payload: { name: string; context: string }
@@ -180,7 +181,10 @@ export interface DaphneStoreState {
   adminData: {
     collections: Collection[];
     setCollections: (collections: Collection[]) => void;
-    createCollection: (payload: CreateCollectionPost) => Promise<Collection>;
+    createCollection: (
+      payload: CreateCollectionPost,
+      payloadConfig: Omit<CreateCollectionConfigPost, "collection_id">
+    ) => Promise<Collection>;
     updateCollection: (
       id: number,
       payload: UpdateCollectionPayload
@@ -604,7 +608,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       // - this is because the BE uses different endpoints:
       // - Route::post('/v1/collection_hosts'... (custodianId in the payload)
       // - Route::post('/v1/custodians/{custodianPid}/collections'...
-      const { data } = await createCollection(custodianPid, payload);
+      const { data } = await createCustodianCollection(custodianPid, payload);
 
       await createCollectionConfig({
         ...payloadConfig,
@@ -641,12 +645,18 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         ...state,
         adminData: { ...state.adminData, collections },
       })),
-    createCollection: async (payload) => {
+    createCollection: async (payload, payloadConfig) => {
       // note: inconsistancy between using custodian Id and custodian Pid
       // - this is because the BE uses different endpoints:
       // - Route::post('/v1/collection_hosts'... (custodianId in the payload)
       // - Route::post('/v1/custodians/{custodianPid}/collections'...
-      const { data } = await createCollection(payload["custodian_id"], payload);
+      const { data } = await createCollection(payload);
+
+      await createCollectionConfig({
+        ...payloadConfig,
+        collection_id: data.id,
+      });
+
       await revalidateAction(`collections-${payload["custodian_id"]}`);
       return data;
     },

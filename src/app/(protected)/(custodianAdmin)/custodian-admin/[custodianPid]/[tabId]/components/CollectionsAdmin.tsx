@@ -69,7 +69,7 @@ const CollectionAdmin = ({
     <Box
       sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}
     >
-      <Title title="Collections" subTitle="Create" />
+      <Title title="Collections" subTitle="Management" />
       <ControlledSearchBox
         paramName="search_collection"
         placeholder="Search by collection name..."
@@ -80,7 +80,6 @@ const CollectionAdmin = ({
         left={
           <CollectionsLeftPanel
             expandedLeft={expandedLeft}
-            custodian={custodian}
             collectionHosts={collectionHosts}
             onCreate={toggleExpandLeft}
             onCancelCreate={toggleExpandLeft}

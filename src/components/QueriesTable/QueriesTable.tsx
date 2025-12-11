@@ -19,8 +19,6 @@ import { routes } from "../../config/routes";
 import Table from "../Table";
 import { getTasksStatus, getTotalAllTasks } from "@/utils/tasks";
 import QueryResultsTable from "../QueryResultsTable";
-import ControlledSearchBox from "@/modules/ControlledSearchBox";
-import Title from "../Title";
 import { queryToText } from "@/utils/queryBuilder";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
@@ -174,9 +172,12 @@ const QueriesTable = ({
           initialData={row.original}
           useTableProps={{ enableRowSelection: false }}
           tableProps={{
-            leftAction: (
-              <Title title={row.original.name} subTitle={"Results"} />
-            ),
+            leftAction: {
+              titleProps: {
+                title: row.original.name,
+                subTitle: "Results",
+              },
+            },
             details: (
               <Grid container sx={{ pt: 1 }}>
                 <Grid size={10}>
@@ -225,9 +226,11 @@ const QueriesTable = ({
   return (
     <Table
       table={table}
-      leftAction={
-        <ControlledSearchBox placeholder="Search your historical queries..." />
-      }
+      leftAction={{
+        searchProps: {
+          placeholder: "Search your historical queries...",
+        },
+      }}
       rightAction={{
         refreshProps: { tag: "queries" },
         downloadProps: { disabled: true },

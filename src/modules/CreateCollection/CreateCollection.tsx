@@ -16,20 +16,22 @@ import { useNotify } from "@/providers/NotifyProvider";
 import CollectionConfig from "@/components/CollectionConfig";
 import { REGEX_URL_NO_WWW } from "@/config/regex";
 import FormDropdown from "@/components/FormDropdown";
+import { v4 as uuidv4 } from "uuid";
 
 interface CreateCollectionProps {
-  custodian?: Custodian;
   collectionHosts: CollectionHost[];
+  custodians?: Custodian[];
   onCancel?: () => void;
 }
 
 const CreateCollection = ({
-  custodian,
   collectionHosts,
+  custodians,
   onCancel,
 }: CreateCollectionProps) => {
   const {
-    custodianData: { createCollection },
+    custodianData: { createCollection, currentCustodian },
+    adminData: { createCollection: createCollectionAdmin },
   } = useDaphneStore();
   const notify = useNotify();
 
@@ -41,6 +43,8 @@ const CreateCollection = ({
         url: "",
         type: QueryContext.BUNNY,
         host_id: 0,
+        custodian_id: "",
+        status: true,
       },
       config: {
         collection_id: 0,
@@ -62,13 +66,16 @@ const CreateCollection = ({
   } = formMethods;
 
   const onSubmit = async (data: CreateCollectionFormValues) => {
-    const createdCollection = await createCollection(
-      custodian?.pid || "",
-      data.collection,
-      data.config
-    );
+    data.collection.pid = uuidv4();
+    const createdCollection = currentCustodian
+      ? await createCollection(
+          currentCustodian.pid,
+          data.collection,
+          data.config
+        )
+      : await createCollectionAdmin(data.collection, data.config);
 
-    notify.success(`Created collection ${createdCollection.name} `);
+    notify.success(`Created collection ${createdCollection.name}`);
     onCancel?.();
   };
 
@@ -93,6 +100,27 @@ const CreateCollection = ({
           underline
         >
           <Stack spacing={2} width={"70%"} height={"100%"}>
+            {!currentCustodian && !!custodians && (
+              <Controller
+                name="collection.custodian_id"
+                control={control}
+                rules={{ required: "Custodian is required" }}
+                render={({ field, fieldState: { error } }) => (
+                  <FormDropdown
+                    {...field}
+                    select
+                    label="Custodian"
+                    error={error}
+                    fullWidth
+                    required
+                    options={Object.values(custodians).map((opt) => ({
+                      value: opt.id,
+                      label: opt.name.toUpperCase(),
+                    }))}
+                  />
+                )}
+              />
+            )}
             <Controller
               name="collection.name"
               control={control}
@@ -107,7 +135,6 @@ const CreateCollection = ({
                 />
               )}
             />
-
             <Controller
               name="collection.description"
               control={control}
@@ -122,7 +149,6 @@ const CreateCollection = ({
                 />
               )}
             />
-
             <Controller
               name="collection.url"
               control={control}
@@ -143,7 +169,6 @@ const CreateCollection = ({
                 />
               )}
             />
-
             <Controller
               name="collection.type"
               control={control}
@@ -164,7 +189,6 @@ const CreateCollection = ({
                 />
               )}
             />
-
             <Controller
               name="collection.host_id"
               control={control}
