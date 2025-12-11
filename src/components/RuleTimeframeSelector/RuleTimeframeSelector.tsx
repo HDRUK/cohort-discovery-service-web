@@ -1,16 +1,10 @@
 "use client";
 
-import {
-  IconButton,
-  Paper,
-  Stack,
-  ToggleButton,
-  ToggleButtonGroup,
-} from "@mui/material";
+import { Paper, Stack, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { ReactNode, useMemo } from "react";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import { updateById } from "@/utils/rules";
-import { RuleNodeType } from "@/types/rules";
+import { RuleLeafType } from "@/types/rules";
 import dayjs, { Dayjs } from "dayjs";
 import {
   DatePicker,
@@ -22,10 +16,12 @@ import { CustomH1 } from "@/components/GuidanceHeaders";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import useFeatures from "@/store/useFeatures";
 import { FeatureName } from "@/types/api";
+import { getDomainVerbs } from "@/utils/omop";
+import { capitaliseFirstLetter } from "@/utils/string";
 
 export interface RuleTimeframeSelectorProps extends DatePickerProps {
   children?: ReactNode;
-  rule: RuleNodeType;
+  rule: RuleLeafType;
   title?: string;
 }
 
@@ -167,6 +163,10 @@ const RuleTimeframeSelector = ({
     disableOpenPicker: readOnly ? true : false,
   };
 
+  const { verb } = rule.rule.concept?.category
+    ? getDomainVerbs(rule.rule.concept?.category)
+    : { verb: "" };
+
   if (constrainForBunnyV1) {
     return (
       <>
@@ -174,7 +174,8 @@ const RuleTimeframeSelector = ({
         <Stack direction="row" spacing={2} alignItems="center">
           {readOnly ? (
             <Paper sx={{ border: 1, p: 1 }}>
-              {operator === "gt" ? "After" : "Before"}{" "}
+              {capitaliseFirstLetter(verb)}{" "}
+              {operator === "gt" ? "after" : "before"}{" "}
               {singleDate?.format("MM-YYYY")}
             </Paper>
           ) : (

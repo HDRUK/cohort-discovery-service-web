@@ -39,6 +39,7 @@ import useRightClickMenu from "@/hooks/useRightClickMenu";
 import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
 import { mergeSx } from "@/utils/helpers";
 import RuleAgeSelector from "@/components/RuleAgeSelector";
+import { isRuleLeaf } from "@/utils/rules";
 
 interface Action {
   action: () => void;
@@ -238,14 +239,17 @@ const RuleWrapper = ({
 
             <CardContent>{render(node, anchorRef)}</CardContent>
 
-            {(node.timeConstraint || node.ageConstraint) && (
-              <CardActions sx={cardActionsSx}>
-                {node.timeConstraint && (
-                  <RuleTimeframeSelector rule={node} readOnly />
-                )}
-                {node.ageConstraint && <RuleAgeSelector rule={node} readOnly />}
-              </CardActions>
-            )}
+            {(node.timeConstraint || node.ageConstraint) &&
+              isRuleLeaf(node) && (
+                <CardActions sx={cardActionsSx}>
+                  {node.timeConstraint && (
+                    <RuleTimeframeSelector rule={node} readOnly />
+                  )}
+                  {node.ageConstraint && (
+                    <RuleAgeSelector rule={node} readOnly />
+                  )}
+                </CardActions>
+              )}
 
             <RightClickMenu {...rightClickMenuMethods} actions={actions} />
           </Card>
