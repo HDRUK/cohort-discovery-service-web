@@ -1,8 +1,7 @@
 import { PrismAsyncLight as SyntaxHighlighter } from "react-syntax-highlighter";
-import { materialLight } from "react-syntax-highlighter/dist/cjs/styles/prism";
-import { IconButton, Box } from "@mui/material";
-import { CopyAllOutlined } from "@mui/icons-material";
-import { useNotify } from "@/providers/NotifyProvider";
+import { materialDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
+import { Box } from "@mui/material";
+
 import type { ComponentProps } from "react";
 
 type SyntaxHighlighterProps = ComponentProps<typeof SyntaxHighlighter>;
@@ -12,25 +11,14 @@ interface CodeBlockProps extends Omit<SyntaxHighlighterProps, "children"> {
 }
 
 const CodeBlock = ({ code, ...rest }: CodeBlockProps) => {
-  const notify = useNotify();
   const codeString =
     typeof code === "string" ? code : JSON.stringify(code, null, 2);
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(codeString);
-    notify.success("Copied to clipboard");
-  };
+
   return (
-    <Box sx={{ display: "flex", direction: "row" }}>
-      <Box>
-        <SyntaxHighlighter language="json" style={materialLight} {...rest}>
-          {codeString}
-        </SyntaxHighlighter>
-      </Box>
-      <Box sx={{ display: "flex", justifyContent: "center" }}>
-        <IconButton onClick={handleCopy}>
-          <CopyAllOutlined />
-        </IconButton>
-      </Box>
+    <Box>
+      <SyntaxHighlighter language="json" style={materialDark} {...rest}>
+        {codeString}
+      </SyntaxHighlighter>
     </Box>
   );
 };

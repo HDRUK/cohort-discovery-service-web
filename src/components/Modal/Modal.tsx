@@ -10,7 +10,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import { ReactNode } from "react";
 
-interface ModalProps extends Omit<DialogProps, "children"> {
+export interface ModalProps extends Omit<DialogProps, "children"> {
   title?: string;
   open: boolean;
   onClose: () => void;
@@ -20,6 +20,7 @@ interface ModalProps extends Omit<DialogProps, "children"> {
   actionLabel?: string;
   secondaryActionLabel?: string;
   onSecondaryAction?: () => void;
+  additionalActions?: ReactNode;
 }
 
 const Modal = ({
@@ -32,6 +33,7 @@ const Modal = ({
   actionLabel = "Close",
   secondaryActionLabel,
   onSecondaryAction,
+  additionalActions,
   ...dialogProps
 }: ModalProps) => {
   return (
@@ -43,6 +45,7 @@ const Modal = ({
       {...dialogProps}
     >
       <DialogTitle
+        variant="h3"
         sx={{
           display: "flex",
           justifyContent: "space-between",
@@ -71,6 +74,7 @@ const Modal = ({
             </Button>
           )}
           <Button onClick={onClose}>{actionLabel}</Button>
+          {additionalActions}
         </DialogActions>
       )}
     </Dialog>
