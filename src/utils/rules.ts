@@ -397,7 +397,7 @@ export function validateRuleTree(
       const ageConstraint = leaf.ageConstraint ?? [null, null];
       if (ageConstraint) {
         const [left, right] = ageConstraint;
-        if (constrainForBunnyV1 && leaf.rule.concept?.category !== "Gender") {
+        if (constrainForBunnyV1) {
           if (left && right) {
             leaf = invalidateNode(
               leaf,

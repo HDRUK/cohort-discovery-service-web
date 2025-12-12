@@ -259,11 +259,7 @@ const RuleWrapper = ({
                     <RuleAgeSelector
                       rule={node}
                       readOnly
-                      uniDirectional={
-                        constrainForBunnyV1
-                          ? node.rule.concept?.category !== "Gender"
-                          : false
-                      }
+                      uniDirectional={constrainForBunnyV1}
                     />
                   )}
                 </CardActions>

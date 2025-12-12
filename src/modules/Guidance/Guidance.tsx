@@ -130,9 +130,7 @@ const Guidance = () => {
       <RuleAgeSelector
         rule={node}
         {...props}
-        uniDirectional={
-          constrainForBunnyV1 ? node.rule.concept?.category !== "Gender" : false
-        }
+        uniDirectional={constrainForBunnyV1}
       />
     ),
     DeleteAgeButton: (props: DeleteMenuItemProps) => (
