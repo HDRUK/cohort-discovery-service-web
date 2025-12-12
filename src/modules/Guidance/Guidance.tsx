@@ -206,7 +206,7 @@ const Guidance = () => {
       );
     } else if (isAgeFilter(selectedNode)) {
       return (
-        <ActionMenuSection title={"Age Filter"} fixedExpanded scrollable>
+        <ActionMenuSection title={"Age"} fixedExpanded scrollable>
           <AgeFilterGuidance
             components={makeAgeFilterComponents(selectedNode)}
           />

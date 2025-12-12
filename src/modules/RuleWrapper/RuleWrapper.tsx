@@ -52,13 +52,14 @@ export interface RuleWrapperProps extends BoxProps {
   type: "Rule" | "Group" | "Operator";
   headerExtra?: ReactNode;
   hideHeader?: boolean;
+  renderInHeader?: boolean;
   groupId?: string;
   sortable?: boolean;
   cardProps?: CardProps;
   containerProps?: BoxProps;
   render: (
     rule: RuleNodeType,
-    ref: RefObject<HTMLDivElement | HTMLLIElement | null>
+    ref?: RefObject<HTMLDivElement | HTMLLIElement | null>
   ) => ReactNode;
   actions?: Action[];
   forceShowHandle?: boolean;
@@ -71,6 +72,7 @@ const RuleWrapper = ({
   groupId,
   headerExtra,
   hideHeader = false,
+  renderInHeader = false,
   sortable = true,
   cardProps: { sx: cardPropsSx, ...cardProps } = {},
   containerProps = undefined,
@@ -230,6 +232,7 @@ const RuleWrapper = ({
                     display={"flex"}
                     justifyContent={"space-between"}
                   >
+                    {renderInHeader && render(node)}
                     <Box display={"flex"}>
                       {exclude !== undefined && (
                         <Chip
@@ -247,7 +250,9 @@ const RuleWrapper = ({
               />
             )}
 
-            <CardContent>{render(node, anchorRef)}</CardContent>
+            {!renderInHeader && (
+              <CardContent>{render(node, anchorRef)}</CardContent>
+            )}
 
             {isRuleLeaf(node) &&
               (node.timeConstraint || node.ageConstraint) && (
