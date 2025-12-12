@@ -21,9 +21,10 @@ const RuleAgeFilter = ({ rule, groupId, ...rest }: RuleProps) => {
       type="Rule"
       groupId={groupId}
       sortable={true}
+      renderInHeader
       headerExtra={<Chip variant="outlined" label={"Age"} />}
       render={() => (
-        <Box sx={{ display: "flex", justifyContent: "flex-start", p: 2 }}>
+        <Box sx={{ mx: "auto" }}>
           <RuleAgeSelector rule={rule} readOnly />
         </Box>
       )}

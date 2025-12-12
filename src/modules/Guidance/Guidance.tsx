@@ -130,9 +130,7 @@ const Guidance = () => {
       <RuleAgeSelector
         rule={node}
         {...props}
-        uniDirectional={
-          constrainForBunnyV1 ? node.rule.concept?.category !== "Gender" : false
-        }
+        uniDirectional={constrainForBunnyV1}
       />
     ),
     DeleteAgeButton: (props: DeleteMenuItemProps) => (
@@ -208,7 +206,7 @@ const Guidance = () => {
       );
     } else if (isAgeFilter(selectedNode)) {
       return (
-        <ActionMenuSection title={"Age Filter"} fixedExpanded scrollable>
+        <ActionMenuSection title={"Age"} fixedExpanded scrollable>
           <AgeFilterGuidance
             components={makeAgeFilterComponents(selectedNode)}
           />
