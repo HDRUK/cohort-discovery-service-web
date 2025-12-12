@@ -9,7 +9,7 @@ type FormValues = {
   searchTerm: string;
 };
 
-interface ControlledSearchBoxProps extends SearchBoxProps {
+export interface ControlledSearchBoxProps extends SearchBoxProps {
   paramName?: string;
   useErrors?: boolean;
 }

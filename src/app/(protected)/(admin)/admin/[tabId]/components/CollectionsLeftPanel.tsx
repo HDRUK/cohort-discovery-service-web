@@ -4,13 +4,14 @@ import List from "@/components/List";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import AddButton from "@/components/AddButton";
 import CreateCollection from "@/modules/CreateCollection";
-import { CollectionHost } from "@/types/api";
+import { CollectionHost, Custodian } from "@/types/api";
 import { useCallback } from "react";
 import useSearchParams from "@/hooks/useSearchParams";
 import { CollectionFilterStatus } from "@/types/collections";
 
 type CollectionsCreatePanelProps = {
   collectionHosts: CollectionHost[];
+  custodians: Custodian[];
   expandedLeft: boolean;
   onCreate: () => void;
   onCancelCreate: () => void;
@@ -18,6 +19,7 @@ type CollectionsCreatePanelProps = {
 
 const CollectionsLeftPanel = ({
   collectionHosts,
+  custodians,
   expandedLeft,
   onCreate,
   onCancelCreate,
@@ -54,8 +56,8 @@ const CollectionsLeftPanel = ({
 
         {expandedLeft && (
           <CreateCollection
-            // Need to be able to select a custodian here - for later
             collectionHosts={collectionHosts}
+            custodians={custodians}
             onCancel={onCancelCreate}
           />
         )}

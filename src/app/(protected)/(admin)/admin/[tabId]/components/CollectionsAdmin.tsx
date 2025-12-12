@@ -1,5 +1,10 @@
 "use client";
-import { CollectionWithHosts, CollectionHost, Paginated } from "@/types/api";
+import {
+  CollectionWithHosts,
+  CollectionHost,
+  Paginated,
+  Custodian,
+} from "@/types/api";
 import { Box, Skeleton } from "@mui/material";
 import Title from "@/components/Title";
 import ThreePaneSwimLaneLayout, {
@@ -16,9 +21,11 @@ import CollectionsRightPanel from "./CollectionsRightPanel";
 const CollectionAdmin = ({
   collections,
   collectionHosts,
+  custodians,
 }: {
   collections: Paginated<CollectionWithHosts[]>;
   collectionHosts: CollectionHost[];
+  custodians: Custodian[];
 }) => {
   const [expandedSide, setExpandedSide] = useState<ExpandedSide | null>(null);
   const expandedLeft = expandedSide === ExpandedSide.LEFT;
@@ -60,7 +67,7 @@ const CollectionAdmin = ({
     <Box
       sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}
     >
-      <Title title="Collections" subTitle="Create" />
+      <Title title="Collections" subTitle="Management" />
       <ControlledSearchBox
         paramName="search_collection"
         placeholder="Search by collection name..."
@@ -72,6 +79,7 @@ const CollectionAdmin = ({
           <CollectionsLeftPanel
             expandedLeft={expandedLeft}
             collectionHosts={collectionHosts}
+            custodians={custodians}
             onCreate={toggleExpandLeft}
             onCancelCreate={toggleExpandLeft}
           />

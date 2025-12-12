@@ -6,7 +6,6 @@ import QueryResultsTable from "@/components/QueryResultsTable";
 import getQuery from "@/actions/getQuery";
 import Title from "@/components/Title";
 import { queryToText } from "@/utils/queryBuilder";
-import ControlledSearchBox from "@/modules/ControlledSearchBox";
 import { buildSearchParams } from "@/utils/params";
 import { ApiSearchParams } from "@/types/api";
 
@@ -45,9 +44,11 @@ const QueryResultsPageContent = async ({
         initialSearchParams={searchParamsObject}
         useTableProps={{ enableRowSelection: true }}
         tableProps={{
-          leftAction: (
-            <ControlledSearchBox placeholder="Search your query results..." />
-          ),
+          leftAction: {
+            searchProps: {
+              placeholder: "Search your query results...",
+            },
+          },
           rightAction: {
             downloadProps: {
               id: queryData.data.pid,

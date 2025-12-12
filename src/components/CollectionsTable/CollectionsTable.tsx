@@ -15,9 +15,12 @@ import { Box, Chip, Typography } from "@mui/material";
 import { getCollectionStatus } from "@/utils/colours";
 import dayjs from "dayjs";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
-import Table from "../Table";
+import Table from "@/components/Table";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import CopyableVariable from "../CopyableVariable";
+import Title from "@/components/Title";
+import useSearchParams from "@/hooks/useSearchParams";
+import { capitaliseFirstLetter } from "@/utils/string";
 
 export interface CollectionsTableProps {
   collections: Paginated<CollectionWithHosts[]>;
@@ -34,6 +37,9 @@ const CollectionsTable = ({
     custodianData: { deleteCollection, currentCustodian },
     adminData: { deleteCollection: deleteCollectionAdmin },
   } = useDaphneStore();
+
+  const { getSearchParam } = useSearchParams("collection_filter");
+  const filter_name = getSearchParam() || "all";
 
   const columns = useMemo<MRT_ColumnDef<Collection>[]>(
     () => [
@@ -118,10 +124,24 @@ const CollectionsTable = ({
 
   if (collections.total === 0)
     return (
-      <Box sx={{ mx: "auto", my: "auto" }}>
-        <Typography variant="h5">
-          Collections will appear here when they are created
-        </Typography>
+      <Box
+        sx={{
+          px: 2,
+          display: "flex",
+          flexDirection: "column",
+          flex: 1,
+          minHeight: 0,
+        }}
+      >
+        <Title
+          title="Collections"
+          subTitle={capitaliseFirstLetter(filter_name)}
+        />
+        <Box sx={{ mx: "auto", my: "auto" }}>
+          <Typography variant="h5">
+            Collections will appear here when they are created
+          </Typography>
+        </Box>
       </Box>
     );
 
@@ -138,6 +158,12 @@ const CollectionsTable = ({
       <Table
         key="custodian-collection-table"
         table={table}
+        leftAction={{
+          titleProps: {
+            title: "Collections",
+            subTitle: capitaliseFirstLetter(filter_name),
+          },
+        }}
         rightAction={{ deleteProps: { onClick: handleDeleteCollections } }}
       />
     </Box>

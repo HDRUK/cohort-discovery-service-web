@@ -13,9 +13,16 @@ import SortButton, { SortButtonProps } from "../SortButton/SortButton";
 import EditButton, { EditButtonProps } from "../EditButton";
 import { RevalidateButtonProps } from "../RevalidateButton/RevalidateButton";
 import DeleteButton, { DeleteButtonProps } from "../DeleteButton";
+import Title, { TitleProps } from "@/components/Title";
+import ControlledSearchBox, {
+  ControlledSearchBoxProps,
+} from "@/modules/ControlledSearchBox";
 
 export interface TableProps {
-  leftAction?: React.ReactNode;
+  leftAction?: {
+    titleProps?: TitleProps;
+    searchProps?: ControlledSearchBoxProps;
+  };
   rightAction?: {
     refreshProps?: RevalidateButtonProps;
     deleteProps?: Omit<DeleteButtonProps, "onClick"> & {
@@ -46,6 +53,7 @@ const Table = <TData extends MRT_RowData>({
 
   const selectedRows = useMemo(() => trueKeys(rowSelection), [rowSelection]);
 
+  const { titleProps, searchProps } = leftAction || {};
   const { sortProps, editProps, refreshProps, deleteProps, downloadProps } =
     rightAction || {};
 
@@ -67,7 +75,12 @@ const Table = <TData extends MRT_RowData>({
     >
       {(rightAction || leftAction) && (
         <Grid container sx={{ pb: 2 }}>
-          <Grid size={10}>{leftAction}</Grid>
+          <Grid size={10}>
+            {leftAction && titleProps && <Title {...titleProps} />}
+            {leftAction && searchProps && (
+              <ControlledSearchBox {...searchProps} />
+            )}
+          </Grid>
           <Grid size={2}>
             {rightAction && (
               <Box
