@@ -8,7 +8,7 @@ import { getTokenKey } from "@/utils/string";
 
 const getAdminWorkgroups = async (
   params?: URLSearchParams
-): Promise<ApiResponse<Paginated<Workgroup[]>>> => {
+): Promise<ApiResponse<Workgroup[]>> => {
   const token = (await cookies()).get("token")?.value || "";
   const key = getTokenKey(token);
 
@@ -18,7 +18,7 @@ const getAdminWorkgroups = async (
     url += `?${queryString}`;
   }
 
-  return await apiGet<ApiResponse<Paginated<Workgroup[]>>>(url, {
+  return await apiGet<ApiResponse<Workgroup[]>>(url, {
     next: {
       revalidate: 3600,
       tags: [`workgroups`, `workgroups-${queryString}`, key],
