@@ -4,6 +4,7 @@ import ToolGuidance from "@/content/guidance/tool.mdx";
 import RuleGuidance from "@/content/guidance/rule.mdx";
 import OperatorGuidance from "@/content/guidance/operator.mdx";
 import GroupGuidance from "@/content/guidance/group.mdx";
+import AgeFilterGuidance from "@/content/guidance/ageFilter.mdx";
 import BuildGuidance from "@/content/guidance/build.mdx";
 import { Box, BoxProps } from "@mui/material";
 import { useCallback, useMemo } from "react";
@@ -13,13 +14,19 @@ import {
   createOperator,
   createRule,
   findById,
+  isAgeFilter,
   isOperator,
   isRuleGroup,
   updateById,
 } from "@/utils/rules";
 import { isRuleLeaf } from "@/utils/rules";
 import { trueKeys } from "@/utils/numbers";
-import { OperatorType, RuleGroupType, RuleLeafType } from "@/types/rules";
+import {
+  AgeFilterType,
+  OperatorType,
+  RuleGroupType,
+  RuleLeafType,
+} from "@/types/rules";
 import ToggleExclusion from "@/content/guidance/components/ToggleExclusion";
 import ShowDescendants from "@/content/guidance/components/ShowDescendants";
 import ToggleOperator from "@/content/guidance/components/ToggleOperator";
@@ -31,6 +38,10 @@ import { CustomH1, CustomH2 } from "@/components/GuidanceHeaders";
 import { getDomainVerbs } from "@/utils/omop";
 import DeleteTimeFrameButton from "@/components/DeleteTimeFrameButton";
 import { DeleteMenuItemProps } from "@/components/DeleteMenuItem/DeleteMenuItem";
+import AddAgeButton from "@/components/AddAgeButton";
+import RuleAgeSelector from "@/components/RuleAgeSelector";
+import DeleteAgeButton from "@/components/DeleteAgeButton";
+import useFeatures from "@/store/useFeatures";
 
 export const baseComponents = {
   h1: CustomH1,
@@ -93,18 +104,37 @@ const Guidance = () => {
     [queryBuilderJson, setQueryBuilderJson]
   );
 
+  const { constrainForBunnyV1 } = useFeatures();
+
   const makeRuleComponents = (node: RuleLeafType) => ({
     ...baseComponents,
     ToggleExclusion: () => <ToggleExclusion node={node} />,
     ShowDescendants: () => <ShowDescendants node={node} />,
     AddTimeFrameButton: (props: AddButtonProps) => (
-      <AddTimeFrameButton rule={node} {...props} />
+      <AddTimeFrameButton
+        rule={node}
+        disabled={!!node.timeConstraint}
+        {...props}
+      />
+    ),
+    AddAgeButton: (props: AddButtonProps) => (
+      <AddAgeButton rule={node} disabled={!!node.ageConstraint} {...props} />
     ),
     RuleTimeframeSelector: (props: { title: string }) => (
       <RuleTimeframeSelector rule={node} {...props} />
     ),
     DeleteTimeFrameButton: (props: DeleteMenuItemProps) => (
       <DeleteTimeFrameButton rule={node} {...props} />
+    ),
+    RuleAgeSelector: (props: { title: string }) => (
+      <RuleAgeSelector
+        rule={node}
+        {...props}
+        uniDirectional={constrainForBunnyV1}
+      />
+    ),
+    DeleteAgeButton: (props: DeleteMenuItemProps) => (
+      <DeleteAgeButton rule={node} {...props} />
     ),
   });
 
@@ -125,6 +155,13 @@ const Guidance = () => {
       ),
     };
   };
+
+  const makeAgeFilterComponents = (node: AgeFilterType) => ({
+    ...baseComponents,
+    RuleAgeSelector: (props: { title: string }) => (
+      <RuleAgeSelector rule={node} {...props} uniDirectional={false} />
+    ),
+  });
 
   if (empty) {
     return (
@@ -165,6 +202,14 @@ const Guidance = () => {
       return (
         <ActionMenuSection title={"Group"} fixedExpanded scrollable>
           <GroupGuidance components={makeGroupComponents(selectedNode)} />
+        </ActionMenuSection>
+      );
+    } else if (isAgeFilter(selectedNode)) {
+      return (
+        <ActionMenuSection title={"Age"} fixedExpanded scrollable>
+          <AgeFilterGuidance
+            components={makeAgeFilterComponents(selectedNode)}
+          />
         </ActionMenuSection>
       );
     }

@@ -25,7 +25,9 @@ const CopyableVariable = ({ value, hidden = false }: CopyableVariableProps) => {
     setShow((prev) => !prev);
   };
 
-  const handleCopy = async () => {
+  const handleCopy = async (e: React.SyntheticEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     await navigator.clipboard.writeText(String(value));
     notify.success("Copied to clipboard");
   };

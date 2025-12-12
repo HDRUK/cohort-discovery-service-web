@@ -161,6 +161,9 @@ const UpdateCollection = ({
         fixedExpanded
         defaultExpanded
         underline
+        accordionSummarySx={{
+          mb: 1,
+        }}
       >
         {/* to-do: implement in a future ticket */}
         <Box>
@@ -173,7 +176,17 @@ const UpdateCollection = ({
         fixedExpanded
         defaultExpanded
         underline
+        accordionSummarySx={{
+          mb: 1,
+        }}
       >
+        <FormTextField
+          copyable
+          disabled
+          value={selectedCollection.pid}
+          label="Identifier"
+        />
+
         <Controller
           name="collection.name"
           disabled={!expandedRight}
@@ -189,7 +202,6 @@ const UpdateCollection = ({
             />
           )}
         />
-
         <Controller
           name="collection.description"
           disabled={!expandedRight}
@@ -205,7 +217,6 @@ const UpdateCollection = ({
             />
           )}
         />
-
         <Controller
           disabled={!expandedRight}
           name="collection.url"
@@ -226,7 +237,6 @@ const UpdateCollection = ({
             />
           )}
         />
-
         <Controller
           name="collection.host_id"
           control={control}

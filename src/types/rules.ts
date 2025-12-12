@@ -20,6 +20,7 @@ type Node = {
   invalidReason?: string[];
   name?: string;
   timeConstraint?: [string | null, string | null];
+  ageConstraint?: [number | null, number | null];
 };
 
 export interface OperatorType extends Node {
@@ -34,7 +35,16 @@ export interface RuleLeafType extends Node {
   rule: ConceptOperator;
 }
 
-export type RuleNodeType = RuleGroupType | RuleLeafType | OperatorType;
+export interface AgeFilterType
+  extends Omit<Node, "exclude" | "timeConstraint" | "ageConstraint"> {
+  value: [number, number];
+}
+
+export type RuleNodeType =
+  | RuleGroupType
+  | RuleLeafType
+  | OperatorType
+  | AgeFilterType;
 
 export interface BoardIndex {
   containers: string[];

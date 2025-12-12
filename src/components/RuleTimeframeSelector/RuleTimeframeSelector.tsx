@@ -1,15 +1,10 @@
 "use client";
 
-import {
-  IconButton,
-  Stack,
-  ToggleButton,
-  ToggleButtonGroup,
-} from "@mui/material";
+import { Paper, Stack, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { ReactNode, useMemo } from "react";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import { updateById } from "@/utils/rules";
-import { RuleNodeType } from "@/types/rules";
+import { RuleLeafType } from "@/types/rules";
 import dayjs, { Dayjs } from "dayjs";
 import {
   DatePicker,
@@ -20,11 +15,12 @@ import { PickerValue } from "@mui/x-date-pickers/internals";
 import { CustomH1 } from "@/components/GuidanceHeaders";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import useFeatures from "@/store/useFeatures";
-import { FeatureName } from "@/types/api";
+import { getDomainVerbs } from "@/utils/omop";
+import { capitaliseFirstLetter } from "@/utils/string";
 
 export interface RuleTimeframeSelectorProps extends DatePickerProps {
   children?: ReactNode;
-  rule: RuleNodeType;
+  rule: RuleLeafType;
   title?: string;
 }
 
@@ -47,9 +43,7 @@ const RuleTimeframeSelector = ({
     setQueryBuilderJson: qb.setQueryBuilderJson,
   }));
 
-  const featureFlags = useFeatures();
-  const constrainForBunnyV1 =
-    featureFlags?.[FeatureName.ConstrainForBunnyV1] || false;
+  const { constrainForBunnyV1 } = useFeatures();
 
   const [leftValue, rightValue] = useMemo<[Dayjs | null, Dayjs | null]>(() => {
     const [start, end] = rule.timeConstraint ?? [null, null];
@@ -166,31 +160,42 @@ const RuleTimeframeSelector = ({
     disableOpenPicker: readOnly ? true : false,
   };
 
+  const { verb } = rule.rule.concept?.category
+    ? getDomainVerbs(rule.rule.concept?.category)
+    : { verb: "" };
+
   if (constrainForBunnyV1) {
     return (
       <>
         {title && <CustomH1>{title}</CustomH1>}
         <Stack direction="row" spacing={2} alignItems="center">
           {readOnly ? (
-            <IconButton disabled>{operator === "gt" ? ">" : "<"}</IconButton>
+            <Paper sx={{ border: 1, p: 1 }}>
+              {singleDate
+                ? `${capitaliseFirstLetter(verb)} ${
+                    operator === "gt" ? "after" : "before"
+                  } ${singleDate.format("MM-YYYY")}`
+                : `${capitaliseFirstLetter(verb)} at any time`}
+            </Paper>
           ) : (
-            <ToggleButtonGroup
-              exclusive
-              size="small"
-              value={operator}
-              onChange={handlOperatorChange}
-              disabled={!!readOnly}
-            >
-              <ToggleButton value="gt">{">"}</ToggleButton>
-              <ToggleButton value="lt">{"<"}</ToggleButton>
-            </ToggleButtonGroup>
+            <>
+              <ToggleButtonGroup
+                exclusive
+                size="small"
+                value={operator}
+                onChange={handlOperatorChange}
+                disabled={!!readOnly}
+              >
+                <ToggleButton value="gt">{">"}</ToggleButton>
+                <ToggleButton value="lt">{"<"}</ToggleButton>
+              </ToggleButtonGroup>
+              <DatePicker
+                {...commonPickerProps}
+                value={singleDate}
+                onChange={handleSingleDateChange}
+              />
+            </>
           )}
-
-          <DatePicker
-            {...commonPickerProps}
-            value={singleDate}
-            onChange={handleSingleDateChange}
-          />
         </Stack>
         {children}
       </>

@@ -12,6 +12,9 @@ import Title from "@/components/Title";
 import { cookies } from "next/headers";
 import { QUERY_BUILDER_GUIDANCE_COOKIE } from "@/config/internals";
 import QueryBuilderGuidanceWrapper from "./QueryBuilderGuidanceWrapper";
+import ShowJsonButton from "@/components/ShowJsonButton";
+
+const NODE_ENV = process.env?.NODE_ENV;
 
 const CohortBuilder = async (props: { query?: string }) => {
   const collections = await getCollections();
@@ -63,7 +66,13 @@ const CohortBuilder = async (props: { query?: string }) => {
           <Divider />
         </Box>
 
-        <Title title="Cohort Builder" subTitle="Query Rules" marginY={1} />
+        <Title title="Cohort Builder" subTitle="Query Rules" marginY={1}>
+          {NODE_ENV === "development" && (
+            <Box sx={{ ml: "auto" }}>
+              <ShowJsonButton />
+            </Box>
+          )}
+        </Title>
         <QueryBuilder query={query?.data} />
       </Box>
     </QueryBuilderGuidanceWrapper>

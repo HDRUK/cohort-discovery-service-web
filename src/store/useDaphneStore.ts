@@ -40,6 +40,7 @@ import {
 import {
   buildIndexFromModel,
   createOperator,
+  createAgeFilter,
   createRule,
   createRuleGroup,
   findById,
@@ -48,6 +49,7 @@ import {
   isRuleLeaf,
   updateById,
   validateRuleTree,
+  isAgeFilter,
 } from "@/utils/rules";
 import { UniqueIdentifier } from "@dnd-kit/core";
 import { removeFalseKeys, trueKeys } from "@/utils/numbers";
@@ -62,6 +64,7 @@ export enum NodeKind {
   RULE = "RULE",
   GROUP = "GROUP",
   OPERATOR = "OPERATOR",
+  AGE_FILTER = "AGE_FILTER",
 }
 
 type NodeFactory = () => RuleNodeType;
@@ -69,6 +72,7 @@ export const Creators: Record<string, NodeFactory> = {
   [NodeKind.RULE]: createRule,
   [NodeKind.GROUP]: createRuleGroup,
   [NodeKind.OPERATOR]: createOperator,
+  [NodeKind.AGE_FILTER]: createAgeFilter,
 };
 
 const DEFAULT_QUERY: RuleGroupType =
@@ -108,6 +112,7 @@ export interface DaphneStoreState {
     createNewRule: (above?: boolean) => void;
     createNewGroup: (above?: boolean) => void;
     createNewOperator: (above?: boolean) => void;
+    createNewAgeFilter: (above?: boolean) => void;
     queryAsText: string;
     getQueryFromText: (input: string) => void;
     selectedDatasets: string[];
@@ -380,6 +385,8 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       get().queryBuilder.createNewNode(NodeKind.GROUP, above),
     createNewOperator: (above: boolean = true) =>
       get().queryBuilder.createNewNode(NodeKind.OPERATOR, above),
+    createNewAgeFilter: (above: boolean = true) =>
+      get().queryBuilder.createNewNode(NodeKind.AGE_FILTER, above),
     queryAsText: queryToText(DEFAULT_QUERY),
     setQueryBuilderJson: (query: RuleGroupType) => {
       const updatedQuery = get().queryBuilder.validateRules(query);
@@ -398,15 +405,21 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     },
     getNodeName: (node: RuleNodeType) => {
       if (node.name) return node.name;
-      let name = node.exclude ? "Excluded " : "";
+      let name = "";
+      if (!isAgeFilter(node) && node.exclude) {
+        name = "Excluded ";
+      }
+
       if (isRuleGroup(node)) name += "Group";
       else if (isRuleLeaf(node)) {
         const c = node.rule?.concept;
         const category = Array.isArray(c) ? c[0]?.category : c?.category;
         name += `${category ?? "Blank"} rule`.trim();
-      } else if (isOperator(node))
+      } else if (isOperator(node)) {
         name += `${node.combinator.toUpperCase()} operator`;
-      else name += "Unknown";
+      } else if (isAgeFilter(node)) {
+        name += "Age Filter";
+      } else name += "Unknown";
       return name;
     },
     setNodeName: (node: RuleNodeType, name: string) => {

@@ -17,20 +17,24 @@ import dayjs from "dayjs";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import Table from "@/components/Table";
 import { useDaphneStore } from "@/store/useDaphneStore";
+import CopyableVariable from "../CopyableVariable";
 import Title from "@/components/Title";
 import useSearchParams from "@/hooks/useSearchParams";
 import { capitaliseFirstLetter } from "@/utils/string";
+import { formatNumber } from "@/utils/numbers";
 
 export interface CollectionsTableProps {
   collections: Paginated<CollectionWithHosts[]>;
   rowSelection?: MRT_RowSelectionState;
   setRowSelection?: Dispatch<SetStateAction<MRT_RowSelectionState>>;
+  showPid?: boolean;
 }
 
 const CollectionsTable = ({
   collections,
   rowSelection,
   setRowSelection,
+  showPid = false,
 }: CollectionsTableProps) => {
   const {
     custodianData: { deleteCollection, currentCustodian },
@@ -42,6 +46,22 @@ const CollectionsTable = ({
 
   const columns = useMemo<MRT_ColumnDef<Collection>[]>(
     () => [
+      ...(showPid
+        ? [
+            {
+              id: "pid",
+              header: "Identifier",
+              accessorFn: (row) => row.pid,
+              size: 200,
+              minSize: 200,
+              maxSize: 200,
+              Cell: ({ cell }) => {
+                const pid = cell.getValue<string>();
+                return <CopyableVariable value={pid} />;
+              },
+            } as MRT_ColumnDef<Collection>,
+          ]
+        : []),
       {
         id: "name",
         header: "Name",
@@ -54,7 +74,18 @@ const CollectionsTable = ({
         id: "last_active",
         header: "Last Active",
         accessorFn: (row) =>
-          row.last_active ? dayjs(row.last_active).format("DD/MM/YYYY") : "—",
+          row.last_active
+            ? dayjs(row.last_active).format("DD/MM/YYYY HH:MM:ss")
+            : "—",
+        size: 50,
+        minSize: 50,
+        maxSize: 50,
+      },
+      {
+        id: "counts",
+        header: "Counts",
+        accessorFn: (row) => row?.size?.count,
+        Cell: ({ cell }) => formatNumber(cell.getValue<number>()),
         size: 50,
         minSize: 50,
         maxSize: 50,
@@ -73,8 +104,10 @@ const CollectionsTable = ({
         maxSize: 20,
       },
     ],
-    []
+    [showPid]
   );
+
+  console.log(collections.data);
 
   const table = usePaginatedTable({
     columns,

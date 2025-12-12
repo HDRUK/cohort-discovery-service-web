@@ -38,6 +38,9 @@ import Title from "@/components/Title";
 import useRightClickMenu from "@/hooks/useRightClickMenu";
 import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
 import { mergeSx } from "@/utils/helpers";
+import RuleAgeSelector from "@/components/RuleAgeSelector";
+import { isAgeFilter, isRuleLeaf } from "@/utils/rules";
+import useFeatures from "@/store/useFeatures";
 
 interface Action {
   action: () => void;
@@ -49,13 +52,14 @@ export interface RuleWrapperProps extends BoxProps {
   type: "Rule" | "Group" | "Operator";
   headerExtra?: ReactNode;
   hideHeader?: boolean;
+  renderInHeader?: boolean;
   groupId?: string;
   sortable?: boolean;
   cardProps?: CardProps;
   containerProps?: BoxProps;
   render: (
     rule: RuleNodeType,
-    ref: RefObject<HTMLDivElement | HTMLLIElement | null>
+    ref?: RefObject<HTMLDivElement | HTMLLIElement | null>
   ) => ReactNode;
   actions?: Action[];
   forceShowHandle?: boolean;
@@ -68,6 +72,7 @@ const RuleWrapper = ({
   groupId,
   headerExtra,
   hideHeader = false,
+  renderInHeader = false,
   sortable = true,
   cardProps: { sx: cardPropsSx, ...cardProps } = {},
   containerProps = undefined,
@@ -76,7 +81,12 @@ const RuleWrapper = ({
   forceShowHandle = false,
   useLeftDragPlaceHolder = false,
 }: RuleWrapperProps) => {
-  const { id, valid = true, invalidReason, exclude = false } = node;
+  const { id, valid = true, invalidReason } = node;
+
+  let exclude;
+  if (!isAgeFilter(node)) {
+    exclude = !!node.exclude;
+  }
 
   const { isSelected, toggleSelected, getNodeName, setNodeName } =
     useQueryBuilder((qb) => ({
@@ -85,6 +95,8 @@ const RuleWrapper = ({
       getNodeName: qb.getNodeName,
       setNodeName: qb.setNodeName,
     }));
+
+  const { constrainForBunnyV1 } = useFeatures();
 
   const {
     setNodeRef,
@@ -220,13 +232,16 @@ const RuleWrapper = ({
                     display={"flex"}
                     justifyContent={"space-between"}
                   >
+                    {renderInHeader && render(node)}
                     <Box display={"flex"}>
-                      <Chip
-                        color={exclude ? "error" : "primary"}
-                        sx={chipSx}
-                        variant="outlined"
-                        label={exclude ? "Exclude" : "Include"}
-                      />
+                      {exclude !== undefined && (
+                        <Chip
+                          color={exclude == true ? "error" : "primary"}
+                          sx={chipSx}
+                          variant="outlined"
+                          label={exclude == true ? "Exclude" : "Include"}
+                        />
+                      )}
                       {!valid && <InvalidRule reasons={invalidReason ?? []} />}
                     </Box>
                     <Title size={"small"} title={type} subTitle={headerExtra} />
@@ -235,13 +250,25 @@ const RuleWrapper = ({
               />
             )}
 
-            <CardContent>{render(node, anchorRef)}</CardContent>
-
-            {node.timeConstraint && (
-              <CardActions sx={cardActionsSx}>
-                <RuleTimeframeSelector rule={node} readOnly />
-              </CardActions>
+            {!renderInHeader && (
+              <CardContent>{render(node, anchorRef)}</CardContent>
             )}
+
+            {isRuleLeaf(node) &&
+              (node.timeConstraint || node.ageConstraint) && (
+                <CardActions sx={cardActionsSx}>
+                  {node.timeConstraint && (
+                    <RuleTimeframeSelector rule={node} readOnly />
+                  )}
+                  {node.ageConstraint && (
+                    <RuleAgeSelector
+                      rule={node}
+                      readOnly
+                      uniDirectional={constrainForBunnyV1}
+                    />
+                  )}
+                </CardActions>
+              )}
 
             <RightClickMenu {...rightClickMenuMethods} actions={actions} />
           </Card>

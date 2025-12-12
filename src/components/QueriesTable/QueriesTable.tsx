@@ -39,13 +39,13 @@ const QueriesTable = ({
 }: QueriesTableProps) => {
   const router = useRouter();
 
-  const { setQueryBuilderJson, setSelectedDatasets } = useQueryBuilder(
-    (qb) => ({
+  const { setQueryBuilderJson, setSelectedDatasets, setQueryName } =
+    useQueryBuilder((qb) => ({
       resetQueryBuilderJson: qb.resetQueryBuilderJson,
       setSelectedDatasets: qb.setSelectedDatasets,
       setQueryBuilderJson: qb.setQueryBuilderJson,
-    })
-  );
+      setQueryName: qb.setQueryName,
+    }));
 
   const { data: queries } = useQuery<Paginated<Query[]>>({
     queryKey: [`queries-${initialSearchParams.toString()}`],
@@ -209,6 +209,12 @@ const QueriesTable = ({
               refreshProps: { tag: row.original.pid, disabled: true },
               editProps: {
                 onClick: () => {
+                  const ranCollectionPids = row.original.tasks.map(
+                    (t) => t.collection.pid
+                  );
+                  setSelectedDatasets(ranCollectionPids);
+                  setQueryName("");
+
                   setQueryBuilderJson(row.original.definition);
                   router.push(
                     routes.dashboardNewQuery(`query=${row.original.pid}`)

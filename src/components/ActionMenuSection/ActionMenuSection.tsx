@@ -8,6 +8,7 @@ import {
   Typography,
   AccordionProps,
   Box,
+  BoxProps,
 } from "@mui/material";
 import AccordionExpandIcon from "@/components/AccordionExpandIcon";
 import { DraggableAttributes } from "@dnd-kit/core";
@@ -25,6 +26,7 @@ export interface ActionMenuSectionProps
   externalValue?: boolean;
   additionalAction?: React.ReactNode;
   scrollable?: boolean;
+  accordionSummarySx?: BoxProps["sx"];
   children?:
     | React.ReactNode
     | ((args: { expanded: boolean }) => React.ReactNode);
@@ -43,6 +45,7 @@ const ActionMenuSection = ({
   attributes,
   listeners,
   disabled,
+  accordionSummarySx,
   scrollable = false,
   ...rest
 }: ActionMenuSectionProps) => {
@@ -127,6 +130,7 @@ const ActionMenuSection = ({
           m: 0,
           p: 0,
           borderBottom: underline ? 1 : 0,
+          ...accordionSummarySx,
         }}
       >
         {summary ?? (

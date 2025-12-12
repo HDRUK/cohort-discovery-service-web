@@ -3,7 +3,7 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import Box from "@mui/material/Box";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import Modal from "@/components/Modal";
+import Modal, { ModalProps } from "@/components/Modal";
 
 interface ShowOnClickProps {
   children: ReactNode;
@@ -13,6 +13,7 @@ interface ShowOnClickProps {
   disabled?: boolean;
   dialogTitle?: string;
   onSave?: () => Promise<void>;
+  modalProps?: Omit<ModalProps, "onClose" | "open" | "title" | "children">;
 }
 
 const ShowOnClick = ({
@@ -23,6 +24,7 @@ const ShowOnClick = ({
   disabled = false,
   modal = true,
   dialogTitle = "Details",
+  modalProps,
 }: ShowOnClickProps) => {
   const [open, setOpen] = useState(false);
 
@@ -51,6 +53,7 @@ const ShowOnClick = ({
       {!disabled &&
         (modal ? (
           <Modal
+            {...modalProps}
             open={open}
             onClose={handleClose}
             title={dialogTitle}

@@ -6,14 +6,14 @@ import { updateById } from "@/utils/rules";
 import { isRuleLeaf } from "@/utils/rules";
 
 import { RuleLeafType } from "@/types/rules";
-import AddButton from "@/components/AddButton";
-import { AddButtonProps } from "@/components/AddButton/AddButton";
+import DeleteMenuItem from "../DeleteMenuItem";
+import { DeleteMenuItemProps } from "../DeleteMenuItem/DeleteMenuItem";
 
-interface AddAgeButtonProps extends AddButtonProps {
+interface DeleteAgeButtonProps extends DeleteMenuItemProps {
   rule: RuleLeafType;
 }
 
-const AddAgeButton = ({ rule, ...props }: AddAgeButtonProps) => {
+const DeleteAgeButton = ({ rule, ...props }: DeleteAgeButtonProps) => {
   const { queryBuilderJson, setQueryBuilderJson } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
@@ -25,16 +25,15 @@ const AddAgeButton = ({ rule, ...props }: AddAgeButtonProps) => {
         if (!isRuleLeaf(node)) {
           return node;
         }
-        if (node.timeConstraint?.length == 2) return node;
         return {
           ...node,
-          timeConstraint: [null, null],
+          ageConstraint: undefined,
         };
       })
     );
   };
 
-  return <AddButton {...props} action={onClick} />;
+  return <DeleteMenuItem {...props} action={onClick} />;
 };
 
-export default AddAgeButton;
+export default DeleteAgeButton;

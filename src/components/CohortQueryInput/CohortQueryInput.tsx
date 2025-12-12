@@ -82,12 +82,11 @@ const CohortQueryInput = () => {
         control={control}
         defaultValue=""
         rules={{ required: "Query is required" }}
-        render={({ field, fieldState: { error, isDirty } }) => (
+        render={({ field, fieldState: { error } }) => (
           <SearchBox
             {...field}
             collapsible={false}
             error={!!error}
-            label={!isDirty && error?.message}
             type="search"
             placeholder="Search for a cohort e.g. females above 50 with diabetes type-ii"
             fullWidth

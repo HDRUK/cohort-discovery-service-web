@@ -73,6 +73,7 @@ function makeDefaultStore(): DaphneStoreState {
       createNewRule: (_above: boolean = true) => {},
       createNewGroup: (_above: boolean = true) => {},
       createNewOperator: (_above: boolean = true) => {},
+      createNewAgeFilter: (_above: boolean = true) => {},
 
       setQueryBuilderJson: NOOP,
       resetQueryBuilderJson: NOOP,
