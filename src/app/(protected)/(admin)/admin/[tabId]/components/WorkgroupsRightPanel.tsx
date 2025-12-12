@@ -19,7 +19,7 @@ const WorkgroupsRightPanel = ({
   ...props
 }: WorkgroupsRightPanelProps) => {
   if (selectedWorkgroup) {
-    // return <UpdateWorkgroup selectedWorkgroup={selectedWorkgroup} {...props} />;
+    return <UpdateWorkgroup selectedWorkgroup={selectedWorkgroup} {...props} />;
   }
   return <WorkgroupGuidance />;
 };

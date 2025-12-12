@@ -4,50 +4,29 @@ import List from "@/components/List";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import AddButton from "@/components/AddButton";
 import CreateWorkgroup from "@/modules/CreateWorkgroup";
-import {
-  Collection,
-  CollectionWithHosts,
-  Custodian,
-  Workgroup,
-} from "@/types/api";
-import { useCallback, useMemo, useState } from "react";
+import { Custodian, Workgroup } from "@/types/api";
+import { Dispatch, SetStateAction, useCallback } from "react";
 import useSearchParams from "@/hooks/useSearchParams";
-import { CollectionFilterStatus } from "@/types/collections";
-import { useDaphneStore } from "@/store/useDaphneStore";
-import { MRT_RowSelectionState } from "material-react-table";
-import { trueKeys } from "@/utils/numbers";
 import { capitaliseFirstLetter } from "@/utils/string";
 
 type WorkgroupsLeftPanelProps = {
-  collections: CollectionWithHosts[];
   workgroups: Workgroup[];
   custodians: Custodian[];
   expandedLeft: boolean;
-  expandedRight: boolean;
   onCreate: () => void;
   onCancelCreate: () => void;
-  setSelectedWorkgroupId;
+  setSelectedWorkgroupId: Dispatch<SetStateAction<number | undefined>>;
 };
 
 const WorkgroupsLeftPanel = ({
-  collections,
   workgroups,
   custodians,
   expandedLeft,
-  expandedRight,
   onCreate,
   onCancelCreate,
   setSelectedWorkgroupId,
-}: // setSearchParam,
-WorkgroupsLeftPanelProps) => {
+}: WorkgroupsLeftPanelProps) => {
   const { setSearchParam } = useSearchParams("workgroup_filter");
-  // const {
-  //   adminData: { currentWorkgroup, setCurrentWorkgroup },
-  // } = useDaphneStore();
-
-  // useEffect(() => {
-  //   setCurrentWorkgroup(workgroup);
-  // }, [workgroup, setCurrentWorkgroup]);
 
   const onSelectWorkgroup = useCallback(
     (id?: number) => {

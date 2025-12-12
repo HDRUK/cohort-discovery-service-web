@@ -11,7 +11,7 @@ type WorkgroupsMiddlePanelProps = {
   collections: Paginated<CollectionWithHosts[]>;
   expandedLeft: boolean;
   expandedRight: boolean;
-  selectedWorkgroup: Workgroup;
+  selectedWorkgroup?: Workgroup;
   rowSelection?: MRT_RowSelectionState;
   setRowSelection?: Dispatch<SetStateAction<MRT_RowSelectionState>>;
 };

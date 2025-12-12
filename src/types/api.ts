@@ -334,6 +334,11 @@ export interface Workgroup {
   collections: Collection[];
 }
 
+export interface AddCollectionToWorkgroupPost {
+  id: number;
+  workgroup_id: number;
+}
+
 export interface Concept {
   concept_id: number;
   name?: string;

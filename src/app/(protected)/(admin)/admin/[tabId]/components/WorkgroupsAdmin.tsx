@@ -1,7 +1,7 @@
 "use client";
 import {
+  Collection,
   CollectionWithHosts,
-  CollectionHost,
   Paginated,
   Custodian,
   Workgroup,
@@ -13,21 +13,21 @@ import ThreePaneSwimLaneLayout, {
 } from "@/modules/ThreePaneSwimLaneLayout";
 import { useMemo, useState } from "react";
 import { MRT_RowSelectionState } from "material-react-table";
-import { trueKeys } from "@/utils/numbers";
+// import { trueKeys } from "@/utils/numbers";
 import ControlledSearchBox from "@/modules/ControlledSearchBox";
 import WorkgroupsLeftPanel from "./WorkgroupsLeftPanel";
 import WorkgroupsMiddlePanel from "./WorkgroupsMiddlePanel";
 import WorkgroupsRightPanel from "./WorkgroupsRightPanel";
-import useSearchParams from "@/hooks/useSearchParams";
+// import useSearchParams from "@/hooks/useSearchParams";
 
 const WorkgroupsAdmin = ({
   collections,
-  // collectionHosts,
+  allCollections,
   custodians,
   workgroups,
 }: {
   collections: Paginated<CollectionWithHosts[]>;
-  // collectionHosts: CollectionHost[];
+  allCollections: Collection[];
   custodians: Custodian[];
   workgroups: Workgroup[];
 }) => {
@@ -47,36 +47,34 @@ const WorkgroupsAdmin = ({
     );
   };
 
-  const [selectedWorkgroupId, setSelectedWorkgroupId] = useState<number>(0);
-  const { setSearchParam } = useSearchParams("workgroup_filter");
-  // setSearchParam(selectedWorkgroupId.toString());
+  const [selectedWorkgroupId, setSelectedWorkgroupId] = useState<
+    number | undefined
+  >(undefined);
+  // const { setSearchParam } = useSearchParams("workgroup_filter");
 
-  console.log("selectedWorkgroupId", selectedWorkgroupId);
-  console.log("workgroups", workgroups);
   const selectedWorkgroup = useMemo(() => {
-    // setSearchParam(selectedWorkgroupId.toString());
     return selectedWorkgroupId
       ? workgroups.find((w) => w.id === selectedWorkgroupId)
       : undefined;
   }, [workgroups, selectedWorkgroupId]);
   console.log("selectedWorkgroup", selectedWorkgroup);
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
-  const selectedCollectionIds = useMemo(
-    () => trueKeys(rowSelection),
-    [rowSelection]
-  );
+  // const selectedCollectionIds = useMemo(
+  //   () => trueKeys(rowSelection),
+  //   [rowSelection]
+  // );
 
-  const selectedCollection = useMemo(
-    () =>
-      selectedCollectionIds.length > 0
-        ? collections.data.find(
-            (h) =>
-              String(h.id) ===
-              selectedCollectionIds[selectedCollectionIds.length - 1]
-          )
-        : null,
-    [collections, selectedCollectionIds]
-  );
+  // const selectedCollection = useMemo(
+  //   () =>
+  //     selectedCollectionIds.length > 0
+  //       ? collections.data.find(
+  //           (h) =>
+  //             String(h.id) ===
+  //             selectedCollectionIds[selectedCollectionIds.length - 1]
+  //         )
+  //       : null,
+  //   [collections, selectedCollectionIds]
+  // );
 
   if (!collections) return <Skeleton height={"100%"} />;
 
@@ -95,14 +93,12 @@ const WorkgroupsAdmin = ({
         panelWidth={3}
         left={
           <WorkgroupsLeftPanel
-            collections={collections}
             workgroups={workgroups}
             expandedLeft={expandedLeft}
             custodians={custodians}
             onCreate={toggleExpandLeft}
             onCancelCreate={toggleExpandLeft}
             setSelectedWorkgroupId={setSelectedWorkgroupId}
-            // setSearchParam={setSearchParam}
           />
         }
         middle={
@@ -117,7 +113,8 @@ const WorkgroupsAdmin = ({
         }
         right={
           <WorkgroupsRightPanel
-            selectedCollection={selectedCollection || null}
+            selectedWorkgroup={selectedWorkgroup || null}
+            collections={allCollections}
             expandedRight={expandedRight}
             expandedLeft={expandedLeft}
             onClose={() => toggleExpandRight()}
