@@ -39,7 +39,7 @@ import useRightClickMenu from "@/hooks/useRightClickMenu";
 import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
 import { mergeSx } from "@/utils/helpers";
 import RuleAgeSelector from "@/components/RuleAgeSelector";
-import { isRuleLeaf } from "@/utils/rules";
+import { isAgeFilter, isRuleLeaf } from "@/utils/rules";
 import useFeatures from "@/store/useFeatures";
 
 interface Action {
@@ -79,7 +79,12 @@ const RuleWrapper = ({
   forceShowHandle = false,
   useLeftDragPlaceHolder = false,
 }: RuleWrapperProps) => {
-  const { id, valid = true, invalidReason, exclude = false } = node;
+  const { id, valid = true, invalidReason } = node;
+
+  let exclude;
+  if (!isAgeFilter(node)) {
+    exclude = !!node.exclude;
+  }
 
   const { isSelected, toggleSelected, getNodeName, setNodeName } =
     useQueryBuilder((qb) => ({
@@ -226,12 +231,14 @@ const RuleWrapper = ({
                     justifyContent={"space-between"}
                   >
                     <Box display={"flex"}>
-                      <Chip
-                        color={exclude ? "error" : "primary"}
-                        sx={chipSx}
-                        variant="outlined"
-                        label={exclude ? "Exclude" : "Include"}
-                      />
+                      {exclude !== undefined && (
+                        <Chip
+                          color={exclude == true ? "error" : "primary"}
+                          sx={chipSx}
+                          variant="outlined"
+                          label={exclude == true ? "Exclude" : "Include"}
+                        />
+                      )}
                       {!valid && <InvalidRule reasons={invalidReason ?? []} />}
                     </Box>
                     <Title size={"small"} title={type} subTitle={headerExtra} />
@@ -242,8 +249,8 @@ const RuleWrapper = ({
 
             <CardContent>{render(node, anchorRef)}</CardContent>
 
-            {(node.timeConstraint || node.ageConstraint) &&
-              isRuleLeaf(node) && (
+            {isRuleLeaf(node) &&
+              (node.timeConstraint || node.ageConstraint) && (
                 <CardActions sx={cardActionsSx}>
                   {node.timeConstraint && (
                     <RuleTimeframeSelector rule={node} readOnly />

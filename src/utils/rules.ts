@@ -1,3 +1,4 @@
+import { MAX_AGE_FILTER, MIN_AGE_FILTER } from "@/config/rules";
 import { Concept } from "@/types/api";
 import {
   RuleGroupType,
@@ -7,6 +8,7 @@ import {
   ConceptOperator,
   BoardIndex,
   OperatorType,
+  AgeFilterType,
 } from "@/types/rules";
 import { v4 as uuidv4 } from "uuid";
 
@@ -51,6 +53,11 @@ export const createOperator = (
   combinator,
 });
 
+export const createAgeFilter = (): AgeFilterType => ({
+  id: uuidv4(),
+  value: [MIN_AGE_FILTER, MAX_AGE_FILTER],
+});
+
 export function ruleToGroup(
   r: RuleLeafType,
   opts?: {
@@ -92,6 +99,9 @@ export const isMultipleConcept = (
 export const isRuleGroup = (n: RuleNodeType): n is RuleGroupType =>
   "rules" in n;
 export const isRuleLeaf = (n: RuleNodeType): n is RuleLeafType => "rule" in n;
+
+export const isAgeFilter = (n: RuleNodeType): n is AgeFilterType =>
+  "value" in n;
 
 export const isOperator = (n: RuleNodeType): n is OperatorType =>
   "combinator" in n;
@@ -330,7 +340,8 @@ export function validateRuleTree(
 ): RuleGroupType {
   const constrainForBunnyV1 = options?.constrainForBunnyV1 ?? false;
 
-  const isContent = (n: RuleNodeType) => isRuleLeaf(n) || isRuleGroup(n);
+  const isContent = (n: RuleNodeType) =>
+    isRuleLeaf(n) || isRuleGroup(n) || isAgeFilter(n);
 
   const setValid = <T extends RuleNodeType>(n: T, v: boolean): T => {
     if (isRuleGroup(n)) return { ...n, valid: v } as T;
@@ -386,7 +397,7 @@ export function validateRuleTree(
       const ageConstraint = leaf.ageConstraint ?? [null, null];
       if (ageConstraint) {
         const [left, right] = ageConstraint;
-        if (constrainForBunnyV1) {
+        if (constrainForBunnyV1 && leaf.rule.concept?.category !== "Gender") {
           if (left && right) {
             leaf = invalidateNode(
               leaf,

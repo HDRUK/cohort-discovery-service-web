@@ -8,13 +8,17 @@ import useQueryBuilder from "@/store/useQueryBuilder";
 import { Box } from "@mui/material";
 
 const ActionMenu: React.FC = () => {
-  const { queryBuilderJson, createNewGroup, createNewRule } = useQueryBuilder(
-    (qb) => ({
-      queryBuilderJson: qb.queryBuilderJson,
-      createNewGroup: qb.createNewGroup,
-      createNewRule: qb.createNewRule,
-    })
-  );
+  const {
+    queryBuilderJson,
+    createNewGroup,
+    createNewRule,
+    createNewAgeFilter,
+  } = useQueryBuilder((qb) => ({
+    queryBuilderJson: qb.queryBuilderJson,
+    createNewGroup: qb.createNewGroup,
+    createNewRule: qb.createNewRule,
+    createNewAgeFilter: qb.createNewAgeFilter,
+  }));
 
   return (
     <Box
@@ -27,6 +31,7 @@ const ActionMenu: React.FC = () => {
       }}
     >
       <ActionMenuSection title={"Insert"} defaultExpanded underline>
+        <AddButton action={createNewAgeFilter} label={"Add age filter"} />
         <AddButton action={createNewRule} label={"Add rule"} />
         <AddButton action={createNewGroup} label={"Add group"} />
       </ActionMenuSection>

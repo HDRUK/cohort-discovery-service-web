@@ -4,7 +4,12 @@ import { Fragment } from "react";
 import { RuleBoardSkeleton } from "./RuleBoardSkeleton";
 
 import Rule from "@/modules/Rule";
-import { isOperator, isRuleGroup, isRuleLeaf } from "@/utils/rules";
+import {
+  isAgeFilter,
+  isOperator,
+  isRuleGroup,
+  isRuleLeaf,
+} from "@/utils/rules";
 import { Box } from "@mui/material";
 import { RuleGroupType, RuleNodeType } from "@/types/rules";
 import RuleGroup from "@/modules/RuleGroup";
@@ -16,6 +21,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import useHasMounted from "@/hooks/useHasMounted";
+import RuleAgeFilter from "../RuleAgeFilter";
 
 interface RuleBoardProps {
   ruleGroup: RuleGroupType;
@@ -28,6 +34,8 @@ function renderRule(item: RuleNodeType, ruleGroupId: string) {
     return <RuleGroup key={item.id} group={item} parentGroupId={ruleGroupId} />;
   } else if (isOperator(item)) {
     return <RuleOperator key={item.id} operator={item} groupId={ruleGroupId} />;
+  } else if (isAgeFilter(item)) {
+    return <RuleAgeFilter key={item.id} rule={item} groupId={ruleGroupId} />;
   }
 }
 

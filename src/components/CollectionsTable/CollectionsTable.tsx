@@ -17,6 +17,7 @@ import dayjs from "dayjs";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import Table from "../Table";
 import { useDaphneStore } from "@/store/useDaphneStore";
+import CopyableVariable from "../CopyableVariable";
 
 export interface CollectionsTableProps {
   collections: Paginated<CollectionWithHosts[]>;
@@ -37,6 +38,18 @@ const CollectionsTable = ({
   const columns = useMemo<MRT_ColumnDef<Collection>[]>(
     () => [
       {
+        id: "pid",
+        header: "Identifier",
+        accessorFn: (row) => row.pid,
+        size: 200,
+        minSize: 200,
+        maxSize: 200,
+        Cell: ({ cell }) => {
+          const pid = cell.getValue<string>();
+          return <CopyableVariable value={pid} />;
+        },
+      },
+      {
         id: "name",
         header: "Name",
         accessorFn: (row) => row.name,
@@ -49,6 +62,14 @@ const CollectionsTable = ({
         header: "Last Active",
         accessorFn: (row) =>
           row.last_active ? dayjs(row.last_active).format("DD/MM/YYYY") : "—",
+        size: 50,
+        minSize: 50,
+        maxSize: 50,
+      },
+      {
+        id: "counts",
+        header: "Counts",
+        accessorFn: (row) => row.demographics?.[0].count,
         size: 50,
         minSize: 50,
         maxSize: 50,
@@ -69,6 +90,8 @@ const CollectionsTable = ({
     ],
     []
   );
+
+  console.log(collections.data);
 
   const table = usePaginatedTable({
     columns,

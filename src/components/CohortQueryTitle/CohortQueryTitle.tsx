@@ -1,7 +1,6 @@
 "use client";
 
 import useQueryBuilder from "@/store/useQueryBuilder";
-import { useEffect } from "react";
 import Title from "@/components/Title";
 import { useNotify } from "../../providers/NotifyProvider";
 import EditableText from "../EditableText";
@@ -12,12 +11,6 @@ const CohortQueryTitle = () => {
     setQueryName: qb.setQueryName,
   }));
   const notify = useNotify();
-
-  useEffect(() => {
-    return () => {
-      setQueryName("");
-    };
-  }, [setQueryName]);
 
   return (
     <Title

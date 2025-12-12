@@ -4,6 +4,7 @@ import ToolGuidance from "@/content/guidance/tool.mdx";
 import RuleGuidance from "@/content/guidance/rule.mdx";
 import OperatorGuidance from "@/content/guidance/operator.mdx";
 import GroupGuidance from "@/content/guidance/group.mdx";
+import AgeFilterGuidance from "@/content/guidance/ageFilter.mdx";
 import BuildGuidance from "@/content/guidance/build.mdx";
 import { Box, BoxProps } from "@mui/material";
 import { useCallback, useMemo } from "react";
@@ -13,13 +14,19 @@ import {
   createOperator,
   createRule,
   findById,
+  isAgeFilter,
   isOperator,
   isRuleGroup,
   updateById,
 } from "@/utils/rules";
 import { isRuleLeaf } from "@/utils/rules";
 import { trueKeys } from "@/utils/numbers";
-import { OperatorType, RuleGroupType, RuleLeafType } from "@/types/rules";
+import {
+  AgeFilterType,
+  OperatorType,
+  RuleGroupType,
+  RuleLeafType,
+} from "@/types/rules";
 import ToggleExclusion from "@/content/guidance/components/ToggleExclusion";
 import ShowDescendants from "@/content/guidance/components/ShowDescendants";
 import ToggleOperator from "@/content/guidance/components/ToggleOperator";
@@ -151,6 +158,13 @@ const Guidance = () => {
     };
   };
 
+  const makeAgeFilterComponents = (node: AgeFilterType) => ({
+    ...baseComponents,
+    RuleAgeSelector: (props: { title: string }) => (
+      <RuleAgeSelector rule={node} {...props} uniDirectional={false} />
+    ),
+  });
+
   if (empty) {
     return (
       <ActionMenuSection title={"Build Guidance"} fixedExpanded scrollable>
@@ -190,6 +204,14 @@ const Guidance = () => {
       return (
         <ActionMenuSection title={"Group"} fixedExpanded scrollable>
           <GroupGuidance components={makeGroupComponents(selectedNode)} />
+        </ActionMenuSection>
+      );
+    } else if (isAgeFilter(selectedNode)) {
+      return (
+        <ActionMenuSection title={"Age Filter"} fixedExpanded scrollable>
+          <AgeFilterGuidance
+            components={makeAgeFilterComponents(selectedNode)}
+          />
         </ActionMenuSection>
       );
     }

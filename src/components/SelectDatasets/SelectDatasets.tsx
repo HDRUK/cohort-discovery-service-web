@@ -33,8 +33,10 @@ const SelectDatasets = ({
   useEffect(() => {
     if (mountedRef.current) return;
     mountedRef.current = true;
-    setSelectedDatasets(initialSelection ?? []);
-  }, [initialSelection, setSelectedDatasets]);
+    if (selectedDatasets.length === 0) {
+      setSelectedDatasets(initialSelection ?? []);
+    }
+  }, [selectedDatasets, initialSelection, setSelectedDatasets]);
 
   const custodianGroups = Object.values(
     collections.reduce<Record<number, GroupedCollection>>((acc, c) => {
