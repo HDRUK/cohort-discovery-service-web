@@ -105,8 +105,6 @@ const UpdateCollection = ({
     onClose?.();
   };
 
-  console.log(selectedCollection);
-
   return (
     <FormProvider {...formMethods}>
       <Typography
