@@ -105,8 +105,6 @@ const UpdateCollection = ({
     onClose?.();
   };
 
-  console.log(selectedCollection);
-
   return (
     <FormProvider {...formMethods}>
       <Typography
@@ -276,7 +274,6 @@ const UpdateCollection = ({
         defaultExpanded
         underline
       >
-        test
         <CollectionConfig<UpdateCollectionFormValues>
           disabled={!expandedRight}
           keepExpanded
