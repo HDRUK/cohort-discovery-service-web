@@ -79,103 +79,55 @@ const FormMultiSelect = ({
   const [values, setValues] = useState<OptionsType[]>([]);
 
   return (
-    <>
-      <Autocomplete
-        id={id}
-        {...field}
-        value={field.value ?? []}
-        {...restProps}
-        freeSolo={freeSolo}
-        multiple={multiple}
-        defaultValue={[]}
-        getOptionLabel={(option) => {
-          if (isLoadingOptions) return "Loading...";
-          if (!option) return "";
-          if (Array.isArray(option) && option.length === 0) return "";
-          if (typeof option === "object") return option?.label;
-          return (
-            options.find((item) => item.value.toString() === option.toString())
-              ?.label ?? option.toString()
-          );
-        }}
-        {...(!multiple && {
-          isOptionEqualToValue: (option, value) =>
-            option.value === value?.value || option.value === value,
-        })}
-        options={options}
-        disabled={disabled}
-        renderValue={(tagValue, getTagProps) => {
-          const visibleOptions = tagValue.slice(0, MAX_DISPLAYED_TAGS);
-          const additionalOptions = tagValue.length - visibleOptions.length;
+    <Autocomplete
+      id={id}
+      {...field}
+      value={field.value ?? []}
+      {...restProps}
+      freeSolo={freeSolo}
+      multiple={multiple}
+      defaultValue={[]}
+      getOptionLabel={(option) => {
+        if (isLoadingOptions) return "Loading...";
+        if (!option) return "";
+        if (Array.isArray(option) && option.length === 0) return "";
+        if (typeof option === "object") return option?.label;
+        return (
+          options.find((item) => item.value.toString() === option.toString())
+            ?.label ?? option.toString()
+        );
+      }}
+      isOptionEqualToValue={(option, value) =>
+        option.value === value?.value || option.value === value
+      }
+      options={options}
+      getOptionKey={(option) => option.value}
+      disabled={disabled}
+      limitTags={MAX_DISPLAYED_TAGS} // Make configurable
+      onChange={(_, value) => {
+        let newValue: ValueType | ValueType[] | null = null;
 
-          return [
-            ...visibleOptions.map((option, index) => {
-              const tagProps = getTagProps({ index });
-              const { key, ...restTagProps } = tagProps;
+        if (Array.isArray(value)) {
+          newValue = value.map((v) => (typeof v === "object" ? v.value : v));
+        } else if (typeof value === "object" && value !== null) {
+          newValue = value.value;
+        } else {
+          newValue = value;
+        }
+        newValue = [...new Set(newValue)];
 
-              const rawLabel =
-                typeof getChipLabel === "function"
-                  ? getChipLabel(options, option)
-                  : option?.label ?? String(option);
-
-              const truncated =
-                rawLabel && rawLabel.length > maxLabelLength
-                  ? `${rawLabel.slice(0, maxLabelLength)}...`
-                  : null;
-
-              const label = truncated ?? rawLabel;
-              const isTruncated = truncated !== null;
-
-              const chip = (
-                <Chip
-                  label={label ?? ""}
-                  size="small"
-                  color={chipColor ?? undefined}
-                  {...restTagProps}
-                  key={option?.label}
-                />
-              );
-
-              return isTruncated ? (
-                <Tooltip key={key} title={rawLabel} enterDelay={400} arrow>
-                  {/* Tooltip needs a single child */}
-                  <span style={{ display: "inline-flex" }}>{chip}</span>
-                </Tooltip>
-              ) : (
-                <span key={key} style={{ display: "inline-flex" }}>
-                  {chip}
-                </span>
-              );
-            }),
-            additionalOptions > 0 ? (
-              <Typography key="more" style={{ marginLeft: 4 }}>
-                + {additionalOptions} more
-              </Typography>
-            ) : null,
-          ];
-        }}
-        onChange={(_, value) => {
-          let newValue: ValueType | ValueType[] | null = null;
-
-          if (Array.isArray(value)) {
-            newValue = value.map((v) => (typeof v === "object" ? v.value : v));
-          } else if (typeof value === "object" && value !== null) {
-            newValue = value.value;
-          } else {
-            newValue = value;
-          }
-
-          field.onChange(newValue);
-        }}
-        {...(canCreate && {
-          filterOptions,
-        })}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            sx={{ padding: 0 }}
-            placeholder={placeholder}
-            InputProps={{
+        field.onChange(newValue);
+      }}
+      {...(canCreate && {
+        filterOptions,
+      })}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          sx={{ padding: 0 }}
+          placeholder={placeholder}
+          slotProps={{
+            input: {
               ...params.InputProps,
               ...(startAdornmentIcon && {
                 startAdornment: (
@@ -190,22 +142,13 @@ const FormMultiSelect = ({
                   </>
                 ),
               }),
-            }}
-            size="small"
-          />
-        )}
-        renderOption={(props, item) => (
-          <li {...props} key={item.value as string}>
-            <ListItemText>{item.label}</ListItemText>
-          </li>
-        )}
-        noOptionsText={noOptionsText}
-      />
-      {/* {Array.isArray(values) &&
-        values?.map((v) => (
-          <Chip key={v.value} label={v.label} onDelete={onDelete(v.value)} />
-        ))} */}
-    </>
+            },
+          }}
+          size="small"
+        />
+      )}
+      noOptionsText={noOptionsText}
+    />
   );
 };
 export default FormMultiSelect;
