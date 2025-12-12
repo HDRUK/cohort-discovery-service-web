@@ -37,10 +37,13 @@ const getPanelSizes = (
   }
 
   if (expanded === ExpandedSide.RIGHT) {
+    const left = 0.5 * panelWidth;
+    const right = rightDisabled ? panelWidth : (totalWidth - left) / 2;
+
     return {
-      left: 1,
-      middle: rightDisabled ? totalWidth - panelWidth : 2 * panelWidth - 0.5,
-      right: rightDisabled ? 0 : 2 * panelWidth - 0.5,
+      left,
+      middle: totalWidth - right - left,
+      right,
     };
   }
 
