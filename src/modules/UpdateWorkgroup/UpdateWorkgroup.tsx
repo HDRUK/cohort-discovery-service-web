@@ -9,7 +9,7 @@ import { UpdateWorkgroupFormValues } from "@/types/forms";
 import { useEffect } from "react";
 import { revalidateAction } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
-import FormDropdown from "@/components/FormDropdown";
+import FormMultiSelect from "@/components/FormMultiSelect";
 import addCollectionToWorkgroup from "@/actions/addCollectionToWorkgroup";
 export type UpdateCollectionProps = {
   selectedWorkgroup: Workgroup;
@@ -29,7 +29,7 @@ const UpdateWorkgroup = ({
 
   const formMethods = useForm<UpdateWorkgroupFormValues>({
     defaultValues: {
-      collectionId: "",
+      collectionIds: [],
     },
   });
 
@@ -39,7 +39,7 @@ const UpdateWorkgroup = ({
     if (!selectedWorkgroup) return;
 
     const newValues = {
-      collectionId: "",
+      collectionIds: [],
     };
 
     reset(newValues, {
@@ -56,15 +56,18 @@ const UpdateWorkgroup = ({
 
     const { id } = selectedWorkgroup;
 
-    if (data.collectionId) {
-      await addCollectionToWorkgroup({
-        id: +data.collectionId,
-        workgroup_id: id,
-      });
-      notify.success(`Updated workgroup ${selectedWorkgroup?.name}`);
+    if (data.collectionIds.length > 0) {
+      console.log(data.collectionIds);
+      data.collectionIds.map(async (collectionId) => {
+        await addCollectionToWorkgroup({
+          id: +collectionId,
+          workgroup_id: id,
+        });
+        notify.success(`Updated workgroup ${selectedWorkgroup?.name}`);
 
-      revalidateAction(`collections-admin`);
-      revalidateAction(`workgroups-admin`);
+        revalidateAction(`collections-admin`);
+        revalidateAction(`workgroups-admin`);
+      });
     }
 
     if (closeAfter) {
@@ -76,13 +79,6 @@ const UpdateWorkgroup = ({
   const handleUnlockClick = () => {
     onClose?.();
   };
-
-  function renderVal(option) {
-    return <Typography>{option.label}</Typography>;
-  }
-  function renderSelectedVal(option) {
-    return <Typography>{option.label}</Typography>;
-  }
 
   return (
     <FormProvider {...formMethods}>
@@ -118,27 +114,24 @@ const UpdateWorkgroup = ({
         underline
       >
         <Controller
-          name="collectionId"
+          name="collectionIds"
           disabled={!expandedRight}
           control={control}
           render={({ field, fieldState: { error } }) => (
-            <FormDropdown
-              {...field}
-              select
-              renderMenuOption={renderVal}
-              renderSelectedOption={renderSelectedVal}
-              error={error}
-              fullWidth
-              placeHolderOption={
-                <MenuItem value={0} disabled>
-                  Add approved collections...
-                </MenuItem>
-              }
+            <FormMultiSelect
+              field={field}
+              placeholder="Add approved collections..."
+              disabled={!expandedRight}
+              multiple
               options={collections.map((c) => ({
                 label: c.name,
                 value: c.id.toString(),
+                onClick: () => {},
               }))}
-              chipColor="secondary"
+              getChipLabel={(options, value) =>
+                options.find((option) => option.value.toString() === value)
+                  ?.label || ""
+              }
             />
           )}
         />

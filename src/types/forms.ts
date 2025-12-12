@@ -16,5 +16,5 @@ export interface UpdateCollectionFormValues {
 }
 
 export interface UpdateWorkgroupFormValues {
-  collectionId?: string;
+  collectionIds: string[];
 }
