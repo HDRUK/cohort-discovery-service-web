@@ -276,7 +276,6 @@ const UpdateCollection = ({
         defaultExpanded
         underline
       >
-        test
         <CollectionConfig<UpdateCollectionFormValues>
           disabled={!expandedRight}
           keepExpanded
