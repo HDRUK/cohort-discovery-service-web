@@ -120,7 +120,7 @@ const UpdateWorkgroup = ({
           render={({ field, fieldState: { error } }) => (
             <FormMultiSelect
               field={field}
-              placeholder="Add approved collections..."
+              placeholder="Search and add approved collections..."
               disabled={!expandedRight}
               multiple
               options={collections.map((c) => ({
@@ -133,6 +133,8 @@ const UpdateWorkgroup = ({
                   ?.label || ""
               }
               tagsBelow
+              error={error}
+              sx={{ pt: 1 }}
             />
           )}
         />

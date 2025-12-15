@@ -1,60 +1,31 @@
-import { Box, Stack, Button, MenuItem } from "@mui/material";
+import { Box, Stack, Button } from "@mui/material";
 
 import { useForm, Controller, FormProvider } from "react-hook-form";
 import { useDaphneStore } from "@/store/useDaphneStore";
-import { CreateCollectionFormValues } from "@/types/forms";
-import { QueryContext } from "@/types/context";
+import { CreateWorkgroupFormValues } from "@/types/forms";
 import FormTextField from "@/components/FormTextField";
-import {
-  CollectionHost,
-  Custodian,
-  TaskType,
-  FrequencyMode,
-} from "@/types/api";
+import { Collection } from "@/types/api";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import { useNotify } from "@/providers/NotifyProvider";
-import CollectionConfig from "@/components/CollectionConfig";
-import { REGEX_URL_NO_WWW } from "@/config/regex";
-import FormDropdown from "@/components/FormDropdown";
-import { v4 as uuidv4 } from "uuid";
+
+import FormMultiSelect from "@/components/FormMultiSelect";
+import addCollectionToWorkgroup from "@/actions/addCollectionToWorkgroup";
 
 interface CreateCollectionProps {
-  // collectionHosts: CollectionHost[];
-  custodians?: Custodian[];
+  collections?: Collection[];
   onCancel?: () => void;
 }
 
-const CreateWorkgroup = ({
-  // collectionHosts,
-  custodians,
-  onCancel,
-}: CreateCollectionProps) => {
+const CreateWorkgroup = ({ collections, onCancel }: CreateCollectionProps) => {
   const {
-    custodianData: { createCollection, currentCustodian },
-    adminData: { createCollection: createCollectionAdmin },
+    adminData: { createWorkgroup },
   } = useDaphneStore();
   const notify = useNotify();
 
-  const formMethods = useForm<CreateCollectionFormValues>({
+  const formMethods = useForm<CreateWorkgroupFormValues>({
     defaultValues: {
-      collection: {
-        name: "",
-        description: "",
-        url: "",
-        type: QueryContext.BUNNY,
-        host_id: 0,
-        custodian_id: "",
-        status: true,
-      },
-      config: {
-        collection_id: 0,
-        run_time_hour: 0,
-        run_time_minute: 0,
-        frequency_mode: FrequencyMode.WEEKLY,
-        run_time_frequency: 0,
-        enabled: 1,
-        type: TaskType.B,
-      },
+      name: "",
+      collectionIds: [],
     },
   });
 
@@ -65,17 +36,26 @@ const CreateWorkgroup = ({
     formState: { isSubmitting },
   } = formMethods;
 
-  const onSubmit = async (data: CreateCollectionFormValues) => {
-    data.collection.pid = uuidv4();
-    const createdCollection = currentCustodian
-      ? await createCollection(
-          currentCustodian.pid,
-          data.collection,
-          data.config
-        )
-      : await createCollectionAdmin(data.collection, data.config);
+  const onSubmit = async (data: CreateWorkgroupFormValues) => {
+    const createdWorkgroup = await createWorkgroup({
+      name: data.name,
+      collections: data.collectionIds, // not used in BE but we provide it anyway
+      active: true, // hardoded until/unless we add active field to form
+    });
+    notify.success(`Created workgroup ${createdWorkgroup.name}`);
 
-    notify.success(`Created collection ${createdCollection.name}`);
+    if (data.collectionIds.length > 0) {
+      data.collectionIds.map(async (collectionId) => {
+        await addCollectionToWorkgroup({
+          id: +collectionId,
+          workgroup_id: createdWorkgroup.id,
+        });
+      });
+      notify.success(
+        `Added ${data.collectionIds.length} collections to workgroup ${createdWorkgroup.name}`
+      );
+    }
+
     onCancel?.();
   };
 
@@ -93,147 +73,55 @@ const CreateWorkgroup = ({
           mb: 5,
         }}
       >
-        {/* <ActionMenuSection
-          title={"New Collection"}
+        <ActionMenuSection
+          title={"New Workgroup"}
           fixedExpanded
           defaultExpanded
           underline
         >
-          <Stack spacing={2} width={"70%"} height={"100%"}>
-            {!currentCustodian && !!custodians && (
-              <Controller
-                name="collection.custodian_id"
-                control={control}
-                rules={{ required: "Custodian is required" }}
-                render={({ field, fieldState: { error } }) => (
-                  <FormDropdown
-                    {...field}
-                    select
-                    label="Custodian"
-                    error={error}
-                    fullWidth
-                    required
-                    options={Object.values(custodians).map((opt) => ({
-                      value: opt.id,
-                      label: opt.name.toUpperCase(),
-                    }))}
-                  />
-                )}
-              />
-            )}
+          <Stack spacing={2} width={"70%"} height={"100%"} sx={{ py: 1 }}>
             <Controller
-              name="collection.name"
+              name="name"
               control={control}
               rules={{ required: "Name is required" }}
               render={({ field, fieldState: { error } }) => (
                 <FormTextField
                   {...field}
-                  label="Name"
+                  label="Workgroup name"
                   error={error}
                   fullWidth
                   required
+                  sx={{ pt: 1 }}
                 />
               )}
             />
             <Controller
-              name="collection.description"
+              name="collectionIds"
               control={control}
-              rules={{ required: "A description is required" }}
               render={({ field, fieldState: { error } }) => (
-                <FormTextField
-                  {...field}
-                  label="Description"
-                  error={error}
-                  fullWidth
-                  required
-                />
-              )}
-            />
-            <Controller
-              name="collection.url"
-              control={control}
-              rules={{
-                required: "A link to this associated dataset(s) is required",
-                pattern: {
-                  value: REGEX_URL_NO_WWW,
-                  message: "Enter a valid URL (including http(s):// )",
-                },
-              }}
-              render={({ field, fieldState: { error } }) => (
-                <FormTextField
-                  {...field}
-                  error={error}
-                  required
-                  label="Link to Associated Datasets"
-                  fullWidth
-                />
-              )}
-            />
-            <Controller
-              name="collection.type"
-              control={control}
-              rules={{ required: "Query context type is required" }}
-              render={({ field, fieldState: { error } }) => (
-                <FormDropdown
-                  {...field}
-                  disabled
-                  select
-                  label="Query Context Type"
-                  error={error}
-                  fullWidth
-                  required
-                  options={Object.values(QueryContext).map((opt) => ({
-                    value: opt,
-                    label: opt.toUpperCase(),
-                  }))}
-                />
-              )}
-            />
-            <Controller
-              name="collection.host_id"
-              control={control}
-              rules={{
-                required: "A collection host is required",
-                validate: (value) =>
-                  Number(value) > 0 || "Please select a valid collection host",
-              }}
-              render={({ field, fieldState: { error } }) => (
-                <FormDropdown
-                  {...field}
-                  select
-                  label="Collection Host"
-                  error={error}
-                  fullWidth
-                  required
-                  placeHolderOption={
-                    <MenuItem value={0} disabled>
-                      Select a collection host
-                    </MenuItem>
+                <FormMultiSelect
+                  field={field}
+                  label={"Add collections"}
+                  placeholder="Search and add approved collections..."
+                  multiple
+                  options={
+                    collections?.map((c) => ({
+                      label: c.name,
+                      value: c.id,
+                      onClick: () => {},
+                    })) || []
                   }
-                  options={collectionHosts.map((ch) => ({
-                    label: ch.name,
-                    value: ch.id,
-                  }))}
-                  chipColor="secondary"
+                  getChipLabel={(options, value) =>
+                    options.find((option) => option.value === value)?.label ||
+                    ""
+                  }
+                  tagsBelow
+                  error={error}
+                  sx={{ pt: 1 }}
                 />
               )}
             />
           </Stack>
-        </ActionMenuSection>
-
-        <ActionMenuSection
-          title={"Collection Configuration"}
-          fixedExpanded
-          defaultExpanded
-          underline
-        >
-          <CollectionConfig<CreateCollectionFormValues>
-            keepExpanded
-            frequencyFieldName={"config.frequency_mode"}
-            runTimeFrequencyFieldName={"config.run_time_frequency"}
-            runTimeHourFieldName={"config.run_time_hour"}
-            runTimeMinuteFieldName={"config.run_time_minute"}
-          />
         </ActionMenuSection>
 
         <Stack direction="row" spacing={1} justifyContent="flex-end">
@@ -252,7 +140,7 @@ const CreateWorkgroup = ({
           <Button type="submit" variant="outlined" disabled={isSubmitting}>
             {isSubmitting ? "Creating..." : "Create"}
           </Button>
-        </Stack> */}
+        </Stack>
       </Box>
     </FormProvider>
   );

@@ -4,14 +4,14 @@ import List from "@/components/List";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import AddButton from "@/components/AddButton";
 import CreateWorkgroup from "@/modules/CreateWorkgroup";
-import { Custodian, Workgroup } from "@/types/api";
+import { Collection, Workgroup } from "@/types/api";
 import { Dispatch, SetStateAction, useCallback } from "react";
 import useSearchParams from "@/hooks/useSearchParams";
 import { capitaliseFirstLetter } from "@/utils/string";
 
 type WorkgroupsLeftPanelProps = {
   workgroups: Workgroup[];
-  custodians: Custodian[];
+  collections: Collection[];
   expandedLeft: boolean;
   onCreate: () => void;
   onCancelCreate: () => void;
@@ -20,7 +20,7 @@ type WorkgroupsLeftPanelProps = {
 
 const WorkgroupsLeftPanel = ({
   workgroups,
-  custodians,
+  collections,
   expandedLeft,
   onCreate,
   onCancelCreate,
@@ -59,7 +59,10 @@ const WorkgroupsLeftPanel = ({
         />
 
         {expandedLeft && (
-          <CreateWorkgroup custodians={custodians} onCancel={onCancelCreate} />
+          <CreateWorkgroup
+            collections={collections}
+            onCancel={onCancelCreate}
+          />
         )}
       </ActionMenuSection>
 

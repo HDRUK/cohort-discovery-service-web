@@ -16,5 +16,11 @@ export interface UpdateCollectionFormValues {
 }
 
 export interface UpdateWorkgroupFormValues {
-  collectionIds: string[];
+  collectionIds: number[];
+}
+
+export interface CreateWorkgroupFormValues {
+  name: string;
+  collectionIds: number[];
+  active: boolean;
 }

@@ -95,7 +95,7 @@ const WorkgroupsAdmin = ({
           <WorkgroupsLeftPanel
             workgroups={workgroups}
             expandedLeft={expandedLeft}
-            custodians={custodians}
+            collections={allCollections}
             onCreate={toggleExpandLeft}
             onCancelCreate={toggleExpandLeft}
             setSelectedWorkgroupId={setSelectedWorkgroupId}

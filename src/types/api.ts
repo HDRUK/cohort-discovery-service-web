@@ -334,6 +334,12 @@ export interface Workgroup {
   collections: Collection[];
 }
 
+export interface CreateWorkgroupPost {
+  name: string;
+  collections?: number[];
+  active: boolean;
+}
+
 export interface AddCollectionToWorkgroupPost {
   id: number;
   workgroup_id: number;

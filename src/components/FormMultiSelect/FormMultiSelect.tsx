@@ -6,8 +6,11 @@ import {
   Chip,
   TextField,
   Stack,
+  FormControl,
+  FormLabel,
 } from "@mui/material";
-import { ReactNode, useState } from "react";
+import { ReactNode, useId, useState } from "react";
+import { FieldError } from "react-hook-form";
 
 export type ValueType = string | number;
 export type OptionsType = {
@@ -16,6 +19,7 @@ export type OptionsType = {
 };
 
 interface FormMultiSelectProps extends BaseSelectProps<OptionsType> {
+  label?: string;
   options: OptionsType[];
   startIcon?: ReactNode;
   onClear?: () => void;
@@ -51,11 +55,14 @@ interface FormMultiSelectProps extends BaseSelectProps<OptionsType> {
   clearIcon?: boolean;
   maxLabelLength?: number;
   tagsBelow?: boolean;
+  required?: boolean;
+  error?: FieldError;
 }
 
 const MAX_DISPLAYED_TAGS = 20;
 
 const FormMultiSelect = ({
+  label,
   options,
   multiple = false,
   startIcon,
@@ -75,9 +82,15 @@ const FormMultiSelect = ({
   clearIcon = false,
   maxLabelLength = 40,
   tagsBelow = false,
+  required = false,
+  error,
+  sx,
   ...restProps
 }: FormMultiSelectProps) => {
   const [values, setValues] = useState<number[]>([]);
+
+  const generatedId = useId();
+  const inputId = id ?? generatedId;
 
   const handleDelete = (value: any) => {
     const newValue = values.filter((v: any) => v !== value);
@@ -86,7 +99,13 @@ const FormMultiSelect = ({
   };
 
   return (
-    <>
+    <FormControl fullWidth error={!!error} required={required}>
+      {label && (
+        <FormLabel htmlFor={inputId} required={required}>
+          {label}
+        </FormLabel>
+      )}
+
       <Autocomplete
         id={id}
         {...field}
@@ -137,7 +156,17 @@ const FormMultiSelect = ({
         renderInput={(params) => (
           <TextField
             {...params}
-            sx={{ padding: 0 }}
+            sx={{
+              borderRadius: 0,
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 0,
+              },
+              "& .MuiOutlinedInput-notchedOutline": {
+                borderRadius: 0,
+              },
+              padding: 0,
+              ...sx,
+            }}
             placeholder={placeholder}
             slotProps={{
               input: {
@@ -199,7 +228,7 @@ const FormMultiSelect = ({
           })}
         </Stack>
       )}
-    </>
+    </FormControl>
   );
 };
 export default FormMultiSelect;
