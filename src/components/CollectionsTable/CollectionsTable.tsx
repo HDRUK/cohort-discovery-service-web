@@ -107,8 +107,6 @@ const CollectionsTable = ({
     [showPid]
   );
 
-  console.log(collections.data);
-
   const table = usePaginatedTable({
     columns,
     data: collections.data,

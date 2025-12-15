@@ -58,6 +58,7 @@ export interface Distribution extends WithTimestamps {
   id: number;
   collection_id: number;
   task_id: number;
+  task?: Task;
   name: string;
   category: string;
   description: string;
@@ -102,6 +103,7 @@ export interface Collection extends WithTimestamps {
   type: QueryContext;
   last_active: string | null;
   size?: Distribution;
+  latest_concept?: Distribution;
   demographics?: Distribution[];
   custodian: Custodian;
   custodian_id?: number;

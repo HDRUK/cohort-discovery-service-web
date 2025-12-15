@@ -19,6 +19,7 @@ import { useDaphneStore } from "@/store/useDaphneStore";
 import { revalidateAction } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
 import FormDropdown from "@/components/FormDropdown";
+import DistributionStatus from "../DistrubutionStatus";
 
 export type UpdateCollectionProps = {
   selectedCollection: CollectionWithHosts;
@@ -274,6 +275,7 @@ const UpdateCollection = ({
         defaultExpanded
         underline
       >
+        <DistributionStatus collection={selectedCollection} />
         <CollectionConfig<UpdateCollectionFormValues>
           disabled={!expandedRight}
           keepExpanded

@@ -3,7 +3,11 @@ import submitQuery from "@/actions/submitQuery";
 import createCollectionHost from "@/actions/createCollectionHost";
 import updateCollectionHost from "@/actions/updateCollectionHost";
 import deleteCollectionHost from "@/actions/deleteCollectionHost";
-import { revalidateAction, revalidateUserAction } from "@/actions/revalidate";
+import {
+  revalidateAction,
+  revalidateCustodian,
+  revalidateUserAction,
+} from "@/actions/revalidate";
 import {
   ApiResponse,
   Collection,
@@ -59,6 +63,7 @@ import createCollectionConfig from "@/actions/createCollectionConfig";
 import updateCollection from "@/actions/updateCollection";
 import updateCollectionConfig from "@/actions/updateCollectionConfig";
 import createCustodianCollection from "@/actions/createCustodianCollection";
+import rerunTask from "@/actions/rerunTask";
 
 export enum NodeKind {
   RULE = "RULE",
@@ -135,6 +140,7 @@ export interface DaphneStoreState {
       queryName?: string,
       reset?: boolean
     ) => Promise<ApiResponse<CreateQuery>>;
+    rerunTask: (id: string) => void;
     collections: Collection[];
     setCollections: (collections: Collection[]) => void;
     conceptSets: ConceptSet[];
@@ -543,6 +549,13 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       }));
 
       return res;
+    },
+    rerunTask: async (id) => {
+      await rerunTask(id);
+      const custodian = get().custodianData.currentCustodian;
+      if (custodian) {
+        revalidateCustodian(custodian);
+      }
     },
     collections: [],
     setCollections: (collections) =>
