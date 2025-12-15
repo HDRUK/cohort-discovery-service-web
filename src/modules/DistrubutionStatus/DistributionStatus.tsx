@@ -1,10 +1,15 @@
-import { revalidateCustodian } from "@/actions/revalidate";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { Collection } from "@/types/api";
 import { getDate } from "@/utils/date";
 import { Box, Button, Chip, Stack, Typography } from "@mui/material";
 
-const DistributionStatus = ({ collection }: { collection: Collection }) => {
+const DistributionStatus = ({
+  collection,
+  disabled = false,
+}: {
+  collection: Collection;
+  disabled?: boolean;
+}) => {
   const demographic = collection.size;
   const latestConcept = collection.latest_concept;
 
@@ -14,7 +19,6 @@ const DistributionStatus = ({ collection }: { collection: Collection }) => {
     const pid = demographic?.task?.pid;
     if (pid) {
       rerunTask(pid);
-      revalidateCustodian(collection.custodian);
     }
   };
 
@@ -22,7 +26,6 @@ const DistributionStatus = ({ collection }: { collection: Collection }) => {
     const pid = latestConcept?.task?.pid;
     if (pid) {
       rerunTask(pid);
-      revalidateCustodian(collection.custodian);
     }
   };
 
@@ -31,14 +34,16 @@ const DistributionStatus = ({ collection }: { collection: Collection }) => {
       <Typography> Distribution (Demographics) Status</Typography>
       <Box>
         <Chip label={`Last Distribution ${getDate(demographic?.created_at)}`} />
-        <Button
-          color="inherit"
-          size="small"
-          variant="text"
-          onClick={handleRunDemographicsNow}
-        >
-          Run now
-        </Button>
+        {!disabled && (
+          <Button
+            color="inherit"
+            size="small"
+            variant="text"
+            onClick={handleRunDemographicsNow}
+          >
+            Run now
+          </Button>
+        )}
       </Box>
 
       <Typography> Distribution (Generic) Status</Typography>
@@ -46,14 +51,16 @@ const DistributionStatus = ({ collection }: { collection: Collection }) => {
         <Chip
           label={`Last Distribution ${getDate(latestConcept?.created_at)}`}
         />
-        <Button
-          color="inherit"
-          size="small"
-          variant="text"
-          onClick={handleRunConceptsNow}
-        >
-          Run now
-        </Button>
+        {!disabled && (
+          <Button
+            color="inherit"
+            size="small"
+            variant="text"
+            onClick={handleRunConceptsNow}
+          >
+            Run now
+          </Button>
+        )}
       </Box>
     </Stack>
   );

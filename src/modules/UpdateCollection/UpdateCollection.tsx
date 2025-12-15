@@ -35,32 +35,27 @@ const UpdateCollection = ({
   expandedRight,
   onClose,
 }: UpdateCollectionProps) => {
-  const {
-    custodianData: { currentCustodian, updateCollection },
-  } = useDaphneStore();
-  const notify = useNotify();
+  const getDefaultValues = (collection: CollectionWithHosts | null) => {
+    if (!collection) {
+      return {
+        collection: {
+          name: "",
+          description: "",
+          url: "" as UrlString,
+          host_id: 0,
+        },
+        config: {
+          frequency_mode: Number(FrequencyMode.WEEKLY),
+          run_time_frequency: 0,
+          run_time_hour: 0,
+          run_time_minute: 0,
+        },
+      };
+    }
 
-  const formMethods = useForm<UpdateCollectionFormValues>({
-    defaultValues: {
-      collection: { name: "", description: "", url: "", host_id: 0 },
-      config: {
-        frequency_mode: Number(FrequencyMode.WEEKLY),
-        run_time_frequency: 0,
-        run_time_hour: 0,
-        run_time_minute: 0,
-      },
-    },
-  });
-
-  const { control, handleSubmit, reset } = formMethods;
-
-  useEffect(() => {
-    if (!selectedCollection) return;
-
-    const { name, description, url, host: hosts, config } = selectedCollection;
+    const { name, description, url, host: hosts, config } = collection;
     const [host] = hosts;
-
-    const newValues = {
+    return {
       collection: {
         name,
         description: description || "",
@@ -70,10 +65,32 @@ const UpdateCollection = ({
       config: {
         frequency_mode: config.frequency_mode,
         run_time_frequency: config.run_time_frequency,
-        // run_time_hour: config.run_time_hour 0,
-        // run_time_minute: config.run_time_minute ?? 0,
+        run_time_hour: config.run_time_hour ?? 0,
+        run_time_minute: config.run_time_minute ?? 0,
       },
     };
+  };
+
+  const {
+    custodianData: { currentCustodian, updateCollection },
+  } = useDaphneStore();
+  const notify = useNotify();
+
+  const formMethods = useForm<UpdateCollectionFormValues>({
+    defaultValues: getDefaultValues(selectedCollection),
+  });
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { isDirty },
+  } = formMethods;
+
+  useEffect(() => {
+    if (!selectedCollection) return;
+
+    const newValues = getDefaultValues(selectedCollection);
 
     reset(newValues, {
       keepDirty: false,
@@ -88,11 +105,13 @@ const UpdateCollection = ({
 
     const { id } = selectedCollection;
 
-    await updateCollection(id, data.collection, data.config);
-    notify.success(`Updated collection ${data.collection.name}`);
+    if (isDirty) {
+      await updateCollection(id, data.collection, data.config);
+      notify.success(`Updated collection ${data.collection.name}`);
 
-    if (currentCustodian) {
-      revalidateAction(`collections-${currentCustodian.pid}`);
+      if (currentCustodian) {
+        revalidateAction(`collections-${currentCustodian.pid}`);
+      }
     }
 
     if (closeAfter) {
@@ -275,7 +294,10 @@ const UpdateCollection = ({
         defaultExpanded
         underline
       >
-        <DistributionStatus collection={selectedCollection} />
+        <DistributionStatus
+          disabled={!expandedRight}
+          collection={selectedCollection}
+        />
         <CollectionConfig<UpdateCollectionFormValues>
           disabled={!expandedRight}
           keepExpanded
