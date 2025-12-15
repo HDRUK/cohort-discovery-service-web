@@ -2,7 +2,7 @@
 
 import { apiGet } from "../lib/apiClient";
 import { API_ROUTES } from "../lib/apiRoutes";
-import { ApiResponse, Paginated, Workgroup } from "../types/api";
+import { ApiResponse, Workgroup } from "../types/api";
 import { cookies } from "next/headers";
 import { getTokenKey } from "@/utils/string";
 

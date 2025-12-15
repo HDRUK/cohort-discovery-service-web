@@ -1,5 +1,5 @@
 "use client";
-import { Typography, IconButton, MenuItem } from "@mui/material";
+import { Typography, IconButton } from "@mui/material";
 import LockOutlineIcon from "@mui/icons-material/LockOutline";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import ActionMenuSection from "@/components/ActionMenuSection";
@@ -132,6 +132,7 @@ const UpdateWorkgroup = ({
                 options.find((option) => option.value.toString() === value)
                   ?.label || ""
               }
+              tagsBelow
             />
           )}
         />
