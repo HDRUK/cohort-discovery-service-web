@@ -7,6 +7,7 @@ import { isAgeFilter, isRuleLeaf, updateById } from "@/utils/rules";
 import { AgeFilterType, RuleLeafType } from "@/types/rules";
 import { CustomH1 } from "@/components/GuidanceHeaders";
 import { MAX_AGE_FILTER, MIN_AGE_FILTER } from "@/config/rules";
+import useFeatures from "@/store/useFeatures";
 
 export interface RuleAgeSelectorProps {
   children?: ReactNode;
@@ -64,6 +65,7 @@ const RuleAgeSelector = ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
   }));
+  const { constrainForBunnyV1 } = useFeatures();
 
   const values = isRuleLeaf(rule) ? rule.ageConstraint : rule.value;
 
@@ -111,30 +113,50 @@ const RuleAgeSelector = ({
     <>
       {title && <CustomH1>{title}</CustomH1>}
       <Stack direction="column" spacing={2} alignItems="center" padding={2}>
-        <Slider
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-          onChangeCommitted={(_e) => {
-            handleCommitChange();
-          }}
-          value={age}
-          min={minAge}
-          max={maxAge}
-          onChange={(_e, newValue, activeThumb) => {
-            if (uniDirectional) {
-              if (activeThumb === 0) {
-                setAge([newValue[0], maxAge]);
+        {constrainForBunnyV1 ? (
+          <>
+            <ToggleButtonGroup
+              exclusive
+              size="small"
+              value={operator}
+              onChange={handlOperatorChange}
+              disabled={!!readOnly}
+            >
+              <ToggleButton value="gt">{">"}</ToggleButton>
+              <ToggleButton value="lt">{"<"}</ToggleButton>
+            </ToggleButtonGroup>
+            <DatePicker
+              {...commonPickerProps}
+              value={singleDate}
+              onChange={handleSingleDateChange}
+            />
+          </>
+        ) : (
+          <Slider
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            onChangeCommitted={(_e) => {
+              handleCommitChange();
+            }}
+            value={age}
+            min={minAge}
+            max={maxAge}
+            onChange={(_e, newValue, activeThumb) => {
+              if (uniDirectional) {
+                if (activeThumb === 0) {
+                  setAge([newValue[0], maxAge]);
+                } else {
+                  setAge([minAge, newValue[1]]);
+                }
               } else {
-                setAge([minAge, newValue[1]]);
+                setAge(newValue);
               }
-            } else {
-              setAge(newValue);
-            }
-          }}
-          valueLabelDisplay="auto"
-        />
+            }}
+            valueLabelDisplay="auto"
+          />
+        )}
         <RuleAgeSelectorReadOnly
           to={to}
           from={from}
