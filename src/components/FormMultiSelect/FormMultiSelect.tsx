@@ -18,15 +18,15 @@ export type OptionsType = {
   label: string;
 };
 
-interface FormMultiSelectProps extends BaseSelectProps<OptionsType> {
+interface FormMultiSelectProps
+  extends Omit<BaseSelectProps<OptionsType>, "error"> {
   label?: string;
   options: OptionsType[];
   startIcon?: ReactNode;
-  onClear?: () => void;
   placeholder?: string;
   startAdornmentIcon?: ReactNode;
   field: {
-    onChange: (value: any) => void;
+    onChange: (value: ValueType | ValueType[]) => void;
     value: ValueType | ValueType[] | null;
     name?: string;
   };
@@ -52,7 +52,6 @@ interface FormMultiSelectProps extends BaseSelectProps<OptionsType> {
     | "success"
     | "warning";
   noOptionsText?: ReactNode;
-  clearIcon?: boolean;
   maxLabelLength?: number;
   tagsBelow?: boolean;
   required?: boolean;
@@ -66,7 +65,6 @@ const FormMultiSelect = ({
   options,
   multiple = false,
   startIcon,
-  onClear,
   placeholder,
   startAdornmentIcon,
   field,
@@ -79,7 +77,6 @@ const FormMultiSelect = ({
   filterOptions,
   chipColor,
   noOptionsText = "No options",
-  clearIcon = false,
   maxLabelLength = 40,
   tagsBelow = false,
   required = false,
@@ -87,13 +84,13 @@ const FormMultiSelect = ({
   sx,
   ...restProps
 }: FormMultiSelectProps) => {
-  const [values, setValues] = useState<number[]>([]);
+  const [values, setValues] = useState<ValueType[]>([]);
 
   const generatedId = useId();
   const inputId = id ?? generatedId;
 
-  const handleDelete = (value: any) => {
-    const newValue = values.filter((v: any) => v !== value);
+  const handleDelete = (value: ValueType) => {
+    const newValue = values.filter((v: ValueType) => v !== value);
     field.onChange(newValue);
     setValues(newValue);
   };
@@ -108,7 +105,7 @@ const FormMultiSelect = ({
 
       <Autocomplete
         id={id}
-        {...field}
+        // {...field}
         value={field.value ?? {}}
         {...restProps}
         freeSolo={freeSolo}
@@ -124,8 +121,8 @@ const FormMultiSelect = ({
               ?.label ?? option.toString()
           );
         }}
-        isOptionEqualToValue={(option, value) =>
-          option.value === value?.value || option.value === value
+        isOptionEqualToValue={
+          (option, value) => option.value === value?.value // || option.value === value
         }
         options={options}
         getOptionKey={(option) => option.value}
@@ -149,7 +146,7 @@ const FormMultiSelect = ({
         }}
         {...(tagsBelow && {
           renderValue: () => null,
-        })} // Means we don't render the chips in the input
+        })}
         {...(canCreate && {
           filterOptions,
         })}

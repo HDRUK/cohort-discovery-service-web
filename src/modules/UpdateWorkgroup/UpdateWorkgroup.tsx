@@ -11,11 +11,10 @@ import { revalidateAction } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
 import FormMultiSelect from "@/components/FormMultiSelect";
 import addCollectionToWorkgroup from "@/actions/addCollectionToWorkgroup";
-export type UpdateCollectionProps = {
+export type UpdateWorkgroupProps = {
   selectedWorkgroup: Workgroup;
   collections: Collection[];
   expandedRight: boolean;
-  expandedLeft: boolean;
   onClose?: () => void;
 };
 
@@ -24,7 +23,7 @@ const UpdateWorkgroup = ({
   collections,
   expandedRight,
   onClose,
-}: UpdateCollectionProps) => {
+}: UpdateWorkgroupProps) => {
   const notify = useNotify();
 
   const formMethods = useForm<UpdateWorkgroupFormValues>({
