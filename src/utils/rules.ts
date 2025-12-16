@@ -81,6 +81,35 @@ export function ruleToGroup(
   return group;
 }
 
+export function groupToRules(
+  group: RuleGroupType,
+  opts?: { normaliseExclude?: boolean }
+): RuleNodeType[] {
+  const normaliseExclude = opts?.normaliseExclude ?? true;
+
+  function normaliseGroupExclude(group: RuleGroupType): RuleGroupType {
+    const clonedRules = group.rules.map((item: RuleNodeType) => {
+      if (isRuleGroup(item)) return normaliseGroupExclude(item);
+      if (isOperator(item)) return { ...item };
+      return { ...item };
+    });
+
+    /*if (group.exclude) {
+      const rulesNoGroupNot = clonedRules.map((item: any) => {
+        if (isOperator(item))
+          return { ...item, combinator: invertCombinator(item.combinator) };
+        return toggleExclude(item);
+      });
+
+      const { exclude: _omit, ...rest } = group as any;
+      return { ...rest, rules: rulesNoGroupNot };
+    }*/
+
+    return { ...group, rules: clonedRules };
+  }
+
+  return (normaliseExclude ? normaliseGroupExclude(group) : group).rules;
+}
 export const isEmptyRule = (rule: RuleLeafType): boolean =>
   rule.rule.concept === null;
 
@@ -155,7 +184,7 @@ export const findByIdWithNeighbors = (
 export const updateById = <T extends RuleNodeType>(
   root: T,
   id: string,
-  updater: (node: RuleNodeType) => RuleNodeType,
+  updater: (node: RuleNodeType) => RuleNodeType | RuleNodeType[],
   insert?: {
     node: RuleNodeType | RuleNodeType[];
     position?: "before" | "after";
@@ -186,7 +215,7 @@ export const updateById = <T extends RuleNodeType>(
           changed = true;
         }
 
-        nextRules.push(updatedChild);
+        nextRules.push(...toArray(updatedChild));
 
         if (insert && pos === "after") {
           nextRules.push(...toArray(insert.node));

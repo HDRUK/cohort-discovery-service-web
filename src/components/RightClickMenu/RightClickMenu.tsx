@@ -32,9 +32,11 @@ const RightClickMenu = ({
         {actions.map(({ action, label }) => (
           <MenuItem
             key={label}
-            onClick={() => {
-              action();
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
               handleClose();
+              action();
             }}
           >
             {label}
