@@ -28,7 +28,6 @@ import {
   selectedCaptionSx,
   headerRowSx,
 } from "./RuleWrapper.styles";
-import { TRIGGER_GUTTER_PX } from "@/config/defaults";
 import { RuleNodeType } from "@/types/rules";
 import EditableText from "@/components/EditableText";
 import { useLogDependencyChanges } from "@/utils/deps";
@@ -125,22 +124,16 @@ const RuleWrapper = ({
     [id, toggleSelected]
   );
 
-  const onMouseMove = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      e.stopPropagation();
-      const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-      const xFromLeft = e.clientX - rect.left;
-      const shouldShow = xFromLeft <= TRIGGER_GUTTER_PX;
-      if (shouldShow !== showHandle) setShowHandle(shouldShow);
-    },
-    [showHandle]
-  );
+  const onMouseEnter = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    setShowHandle(true);
+  }, []);
 
   const onMouseLeave = useCallback(() => {
-    if (showHandle && !isDragging) {
+    if (showHandle && !isDragging && !isSelected) {
       setShowHandle(false);
     }
-  }, [showHandle, isDragging, setShowHandle]);
+  }, [showHandle, isDragging, isSelected, setShowHandle]);
 
   const { handleContextMenu, ...rightClickMenuMethods } = useRightClickMenu();
 
@@ -154,7 +147,7 @@ const RuleWrapper = ({
     valid,
     handleContextMenu,
     onMouseLeave,
-    onMouseMove,
+    onMouseEnter,
     handleOnSelect,
     showHandle,
     setNodeRef,
@@ -176,7 +169,7 @@ const RuleWrapper = ({
       ref={setNodeRef}
       style={sortable ? style : {}}
       {...containerProps}
-      onMouseMove={onMouseMove}
+      onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       sx={containerSx(isSelected, containerProps?.sx)}
     >
