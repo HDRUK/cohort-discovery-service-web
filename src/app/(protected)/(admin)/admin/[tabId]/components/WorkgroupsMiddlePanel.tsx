@@ -9,8 +9,6 @@ import { capitaliseFirstLetter } from "@/utils/string";
 
 type WorkgroupsMiddlePanelProps = {
   collections: Paginated<CollectionWithHosts[]>;
-  expandedLeft: boolean;
-  expandedRight: boolean;
   selectedWorkgroup?: Workgroup;
   rowSelection?: MRT_RowSelectionState;
   setRowSelection?: Dispatch<SetStateAction<MRT_RowSelectionState>>;
@@ -18,8 +16,6 @@ type WorkgroupsMiddlePanelProps = {
 
 const WorkgroupsMiddlePanel = ({
   collections,
-  expandedLeft,
-  expandedRight,
   selectedWorkgroup,
   rowSelection,
   setRowSelection,

@@ -28,6 +28,7 @@ import {
   DistributionType,
   CollectionWithHosts,
   Workgroup,
+  CreateWorkgroupPost,
 } from "@/types/api";
 import createCollection from "@/actions/createCollection";
 import deleteCollection from "@/actions/deleteCollection";
@@ -68,6 +69,8 @@ import updateCollectionConfig from "@/actions/updateCollectionConfig";
 import createCustodianCollection from "@/actions/createCustodianCollection";
 import rerunTask from "@/actions/rerunTask";
 import rerunDistributions from "@/actions/rerunDistributions";
+import getCollections from "@/actions/getCollections";
+import createWorkgroup from "@/actions/createWorkgroup";
 
 export enum NodeKind {
   RULE = "RULE",
@@ -211,8 +214,7 @@ export interface DaphneStoreState {
       payload: UpdateCollectionPayload
     ) => Promise<Collection>;
     deleteCollection: (id: number | string) => Promise<void>;
-    currentWorkgroup: Workgroup | null;
-    setCurrentWorkgroup: (workgroup?: Workgroup) => void;
+    createWorkgroup: (payload: CreateWorkgroupPost) => Promise<Workgroup>;
   };
   featureFlags: {
     flags: FeatureFlag | null;
@@ -740,12 +742,11 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       // to revalidate cache, and here we don't know the custodian
       await revalidateAction(`collections`);
     },
-    currentWorkgroup: null,
-    setCurrentWorkgroup: (workgroup: Workgroup) =>
-      set((state) => ({
-        ...state,
-        adminData: { ...state.adminData, currentWorkgroup: workgroup },
-      })),
+    createWorkgroup: async (payload) => {
+      const { data } = await createWorkgroup(payload);
+      await revalidateAction("workgroups");
+      return data;
+    },
   },
   featureFlags: {
     flags: null,

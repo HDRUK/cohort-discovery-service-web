@@ -3,7 +3,6 @@ import {
   Collection,
   CollectionWithHosts,
   Paginated,
-  Custodian,
   Workgroup,
 } from "@/types/api";
 import { Box, Skeleton } from "@mui/material";
@@ -13,22 +12,18 @@ import ThreePaneSwimLaneLayout, {
 } from "@/modules/ThreePaneSwimLaneLayout";
 import { useMemo, useState } from "react";
 import { MRT_RowSelectionState } from "material-react-table";
-// import { trueKeys } from "@/utils/numbers";
 import ControlledSearchBox from "@/modules/ControlledSearchBox";
 import WorkgroupsLeftPanel from "./WorkgroupsLeftPanel";
 import WorkgroupsMiddlePanel from "./WorkgroupsMiddlePanel";
 import WorkgroupsRightPanel from "./WorkgroupsRightPanel";
-// import useSearchParams from "@/hooks/useSearchParams";
 
 const WorkgroupsAdmin = ({
   collections,
   allCollections,
-  custodians,
   workgroups,
 }: {
   collections: Paginated<CollectionWithHosts[]>;
   allCollections: Collection[];
-  custodians: Custodian[];
   workgroups: Workgroup[];
 }) => {
   const [expandedSide, setExpandedSide] = useState<ExpandedSide | null>(null);
@@ -50,31 +45,14 @@ const WorkgroupsAdmin = ({
   const [selectedWorkgroupId, setSelectedWorkgroupId] = useState<
     number | undefined
   >(undefined);
-  // const { setSearchParam } = useSearchParams("workgroup_filter");
 
   const selectedWorkgroup = useMemo(() => {
     return selectedWorkgroupId
       ? workgroups.find((w) => w.id === selectedWorkgroupId)
       : undefined;
   }, [workgroups, selectedWorkgroupId]);
-  console.log("selectedWorkgroup", selectedWorkgroup);
-  const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
-  // const selectedCollectionIds = useMemo(
-  //   () => trueKeys(rowSelection),
-  //   [rowSelection]
-  // );
 
-  // const selectedCollection = useMemo(
-  //   () =>
-  //     selectedCollectionIds.length > 0
-  //       ? collections.data.find(
-  //           (h) =>
-  //             String(h.id) ===
-  //             selectedCollectionIds[selectedCollectionIds.length - 1]
-  //         )
-  //       : null,
-  //   [collections, selectedCollectionIds]
-  // );
+  const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
 
   if (!collections) return <Skeleton height={"100%"} />;
 
@@ -116,7 +94,6 @@ const WorkgroupsAdmin = ({
             selectedWorkgroup={selectedWorkgroup || null}
             collections={allCollections}
             expandedRight={expandedRight}
-            expandedLeft={expandedLeft}
             onClose={() => toggleExpandRight()}
           />
         }

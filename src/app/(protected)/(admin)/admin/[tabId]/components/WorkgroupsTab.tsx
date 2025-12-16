@@ -22,8 +22,7 @@ const WorkgroupsTab = async ({
     search_collection?: string;
   };
 }) => {
-  const { page, per_page, workgroup_filter, search_collection } =
-    searchParams ?? {};
+  const { page, per_page, workgroup_filter } = searchParams ?? {};
   const queryParams = {
     page,
     per_page,
