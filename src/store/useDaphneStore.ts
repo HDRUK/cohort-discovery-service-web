@@ -335,10 +335,18 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
           queryBuilderJson,
           setQueryBuilderJson,
           setSelected,
+          boardIndex,
         },
       } = get();
 
       const idsToAddTo = trueKeys(selected);
+      const allIds = Object.entries(boardIndex.itemsByGroup).flatMap(
+        ([k, v]) => [k, ...v]
+      );
+      const allSet = new Set(allIds);
+      const validIdsToAddTo = idsToAddTo.filter((id) =>
+        allSet.has(id as string)
+      );
 
       const normaliseAdditions = (
         belowNeighbor?: RuleNodeType
@@ -359,15 +367,6 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
           ...(skipFirstOperator ? additions.slice(1) : additions),
         ];
       };
-
-      const boardIndex = get().queryBuilder.boardIndex;
-      const allIds = Object.entries(boardIndex.itemsByGroup).flatMap(
-        ([k, v]) => [k, ...v]
-      );
-      const allSet = new Set(allIds);
-      const validIdsToAddTo = idsToAddTo.filter((id) =>
-        allSet.has(id as string)
-      );
 
       if (validIdsToAddTo.length > 0) {
         let updated = queryBuilderJson;
@@ -414,27 +413,14 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     queryAsText: queryToText(DEFAULT_QUERY),
     setQueryBuilderJson: (query: RuleGroupType) => {
       const updatedQuery = get().queryBuilder.validateRules(query);
-      const deselect = get().queryBuilder.deselect;
-      const boardIndex = buildIndexFromModel(updatedQuery);
-      const selected = trueKeys(get().queryBuilder.selected);
-
       const text = updatedQuery.valid ? queryToText(query) : "";
-
-      const allIds = Object.entries(boardIndex.itemsByGroup).flatMap(
-        ([k, v]) => [k, ...v]
-      );
-      const allSet = new Set(allIds);
-      const missingSelectedIds = selected.filter(
-        (id) => !allSet.has(id as string)
-      );
-      missingSelectedIds.forEach((id) => deselect(id));
 
       set((state) => ({
         ...state,
         queryBuilder: {
           ...state.queryBuilder,
           queryBuilderJson: updatedQuery,
-          boardIndex,
+          boardIndex: buildIndexFromModel(updatedQuery),
           queryAsText: text,
         },
       }));
