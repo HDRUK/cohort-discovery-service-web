@@ -107,7 +107,7 @@ export interface Collection extends WithTimestamps {
   url: UrlString | null;
   type: QueryContext;
   last_active: string | null;
-  size?: Distribution;
+  latest_demographic?: Distribution;
   latest_concept?: Distribution;
   demographics?: Distribution[];
   latest_concept_task?: Task;

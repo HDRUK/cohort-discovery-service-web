@@ -11,8 +11,8 @@ const DistributionStatus = ({
   collection: CollectionWithHosts;
   disabled?: boolean;
 }) => {
-  const demographic = collection.size;
-  const latestConcept = collection.latest_concept;
+  const demographic = collection.latest_demographic;
+  const concept = collection.latest_concept;
 
   const runDistributions = useDaphneStore((s) => s.userData.runDistributions);
 
@@ -45,14 +45,12 @@ const DistributionStatus = ({
         <Typography variant="body2" component={"div"}>
           Concepts:{" "}
           <Chip
-            label={`Last Distribution ${getDatetime(
-              latestConcept?.created_at
-            )}`}
+            label={`Last Distribution ${getDatetime(concept?.created_at)}`}
           />
           {!disabled && (
             <ReRunButton
               task={collection.latest_concept_task}
-              lastSuccessfullTask={latestConcept?.task}
+              lastSuccessfullTask={concept?.task}
               onClick={handleRunConceptsNow}
             />
           )}

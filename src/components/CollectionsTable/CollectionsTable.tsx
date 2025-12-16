@@ -10,7 +10,7 @@ import {
   MRT_RowSelectionState,
   type MRT_ColumnDef,
 } from "material-react-table";
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Box, Chip, Tooltip, Typography } from "@mui/material";
 import { getCollectionStatus } from "@/utils/colours";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
@@ -66,6 +66,7 @@ const CollectionsTable = ({
               false
             )
           : await getAdminCollections(searchParams, false);
+
       return res.data;
     },
     initialData,
@@ -77,8 +78,10 @@ const CollectionsTable = ({
       const runningCollections =
         data?.data.filter(
           (c) =>
-            !isEqualTask(c?.latest_demographic_task, c.size?.task) ||
-            !isEqualTask(c?.latest_concept_task, c.latest_concept?.task)
+            !isEqualTask(
+              c?.latest_demographic_task,
+              c.latest_demographic?.task
+            ) || !isEqualTask(c?.latest_concept_task, c.latest_concept?.task)
         ) ?? [];
 
       const hasIncomplete = runningCollections?.length > 0;
@@ -148,12 +151,16 @@ const CollectionsTable = ({
         id: "last_demographic",
         header: "Last Distribution Demographics",
         accessorFn: (row) =>
-          row.size?.task ? getDatetime(row.size.created_at) : "—",
+          row.latest_demographic?.task
+            ? getDatetime(row.latest_demographic.created_at)
+            : "—",
         size: 50,
         minSize: 50,
         maxSize: 50,
         Cell: ({ cell, row }) => {
-          const counts = formatNumber(row.original?.size?.count ?? 0);
+          const counts = formatNumber(
+            row.original?.latest_demographic?.count ?? 0
+          );
           const date = cell.getValue<string>();
           return (
             <Tooltip title={`Number of studies = ${counts}`}>
@@ -173,15 +180,6 @@ const CollectionsTable = ({
         minSize: 50,
         maxSize: 50,
       },
-      /*{
-        id: "counts",
-        header: "Counts",
-        accessorFn: (row) => row?.size?.count,
-        Cell: ({ cell }) => formatNumber(cell.getValue<number>()),
-        size: 50,
-        minSize: 50,
-        maxSize: 50,
-      },*/
       {
         id: "status",
         header: "Status",

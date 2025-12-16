@@ -9,9 +9,8 @@ import ThreePaneSwimLaneLayout, {
 import { useState } from "react";
 import CollectionsLeftPanel from "./CollectionsLeftPanel";
 import CollectionsTable from "@/components/CollectionsTable";
-
 import ControlledSearchBox from "@/modules/ControlledSearchBox";
-import CollectionsRightPanel from "./CollectionsRightPanel";
+import CollectionsRightPanel from "@/modules/CollectionsRightPanel";
 
 const CollectionsCustodianAdmin = ({
   pid,
