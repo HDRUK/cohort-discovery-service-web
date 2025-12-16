@@ -58,6 +58,7 @@ export interface Distribution extends WithTimestamps {
   id: number;
   collection_id: number;
   task_id: number;
+  task?: Task;
   name: string;
   category: string;
   description: string;
@@ -76,6 +77,11 @@ export enum CollectionStatus {
   ACTIVE = 3,
   REJECTED = 4,
   SUSPENDED = 5,
+}
+
+export enum DistributionType {
+  GENERIC = "GENERIC",
+  DEMOGRAPHICS = "DEMOGRAPHICS",
 }
 
 export interface State {
@@ -101,8 +107,11 @@ export interface Collection extends WithTimestamps {
   url: UrlString | null;
   type: QueryContext;
   last_active: string | null;
-  size?: Distribution;
+  latest_demographic?: Distribution;
+  latest_concept?: Distribution;
   demographics?: Distribution[];
+  latest_concept_task?: Task;
+  latest_demographic_task?: Task;
   custodian: Custodian;
   custodian_id?: number;
   model_state?: ModelState;

@@ -1,27 +1,23 @@
-import { CollectionWithHosts } from "@/types/api";
 import UpdateCollection, {
   UpdateCollectionProps,
 } from "@/modules/UpdateCollection";
 import { maskClientTest } from "@/lib/maskClientTest";
 import { CollectionGuidanceProps } from "./CollectionsGuidance";
+import { useDaphneStore } from "@/store/useDaphneStore";
 
 const CollectionGuidance = maskClientTest<CollectionGuidanceProps>(
   () => import("./CollectionsGuidance")
 );
 
-interface CollectionsRightPanelProps
-  extends Omit<UpdateCollectionProps, "selectedCollection"> {
-  selectedCollection: CollectionWithHosts | null;
-}
+type CollectionsRightPanelProps = Omit<UpdateCollectionProps, "collection">;
 
-const CollectionsRightPanel = ({
-  selectedCollection,
-  ...props
-}: CollectionsRightPanelProps) => {
+const CollectionsRightPanel = ({ ...props }: CollectionsRightPanelProps) => {
+  const {
+    userData: { selectedCollection },
+  } = useDaphneStore();
+
   if (selectedCollection) {
-    return (
-      <UpdateCollection selectedCollection={selectedCollection} {...props} />
-    );
+    return <UpdateCollection collection={selectedCollection} {...props} />;
   }
   return <CollectionGuidance />;
 };

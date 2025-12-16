@@ -19,9 +19,10 @@ import { useDaphneStore } from "@/store/useDaphneStore";
 import { revalidateAction } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
 import FormDropdown from "@/components/FormDropdown";
+import DistributionStatus from "../DistrubutionStatus";
 
 export type UpdateCollectionProps = {
-  selectedCollection: CollectionWithHosts;
+  collection: CollectionWithHosts;
   collectionHosts: CollectionHost[];
   expandedRight: boolean;
   expandedLeft: boolean;
@@ -29,37 +30,32 @@ export type UpdateCollectionProps = {
 };
 
 const UpdateCollection = ({
-  selectedCollection,
+  collection,
   collectionHosts,
   expandedRight,
   onClose,
 }: UpdateCollectionProps) => {
-  const {
-    custodianData: { currentCustodian, updateCollection },
-  } = useDaphneStore();
-  const notify = useNotify();
+  const getDefaultValues = (collection: CollectionWithHosts | null) => {
+    if (!collection) {
+      return {
+        collection: {
+          name: "",
+          description: "",
+          url: "" as UrlString,
+          host_id: 0,
+        },
+        config: {
+          frequency_mode: Number(FrequencyMode.WEEKLY),
+          run_time_frequency: 0,
+          run_time_hour: 0,
+          run_time_minute: 0,
+        },
+      };
+    }
 
-  const formMethods = useForm<UpdateCollectionFormValues>({
-    defaultValues: {
-      collection: { name: "", description: "", url: "", host_id: 0 },
-      config: {
-        frequency_mode: Number(FrequencyMode.WEEKLY),
-        run_time_frequency: 0,
-        run_time_hour: 0,
-        run_time_minute: 0,
-      },
-    },
-  });
-
-  const { control, handleSubmit, reset } = formMethods;
-
-  useEffect(() => {
-    if (!selectedCollection) return;
-
-    const { name, description, url, host: hosts, config } = selectedCollection;
+    const { name, description, url, host: hosts, config } = collection;
     const [host] = hosts;
-
-    const newValues = {
+    return {
       collection: {
         name,
         description: description || "",
@@ -69,29 +65,54 @@ const UpdateCollection = ({
       config: {
         frequency_mode: config.frequency_mode,
         run_time_frequency: config.run_time_frequency,
-        // run_time_hour: config.run_time_hour 0,
-        // run_time_minute: config.run_time_minute ?? 0,
+        run_time_hour: config.run_time_hour ?? 0,
+        run_time_minute: config.run_time_minute ?? 0,
       },
     };
+  };
+
+  const {
+    custodianData: { currentCustodian, updateCollection },
+  } = useDaphneStore();
+  const notify = useNotify();
+
+  const formMethods = useForm<UpdateCollectionFormValues>({
+    defaultValues: getDefaultValues(collection),
+  });
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { isDirty },
+  } = formMethods;
+
+  useEffect(() => {
+    if (!collection) return;
+
+    const newValues = getDefaultValues(collection);
 
     reset(newValues, {
       keepDirty: false,
       keepTouched: false,
     });
-  }, [selectedCollection, reset]);
+  }, [collection, reset]);
+
   const submitForm = async (
     data: UpdateCollectionFormValues,
     closeAfter = false
   ) => {
-    if (!selectedCollection?.id) return;
+    if (!collection?.id) return;
 
-    const { id } = selectedCollection;
+    const { id } = collection;
 
-    await updateCollection(id, data.collection, data.config);
-    notify.success(`Updated collection ${data.collection.name}`);
+    if (isDirty) {
+      await updateCollection(id, data.collection, data.config);
+      notify.success(`Updated collection ${data.collection.name}`);
 
-    if (currentCustodian) {
-      revalidateAction(`collections-${currentCustodian.pid}`);
+      if (currentCustodian) {
+        revalidateAction(`collections-${currentCustodian.pid}`);
+      }
     }
 
     if (closeAfter) {
@@ -183,10 +204,9 @@ const UpdateCollection = ({
         <FormTextField
           copyable
           disabled
-          value={selectedCollection.pid}
+          value={collection.pid}
           label="Identifier"
         />
-
         <Controller
           name="collection.name"
           disabled={!expandedRight}
@@ -266,6 +286,20 @@ const UpdateCollection = ({
             />
           )}
         />
+
+        <FormTextField
+          copyable
+          disabled
+          value={collection.host?.[0]?.client_id}
+          label="Client ID"
+        />
+        <FormTextField
+          type="password"
+          copyable
+          disabled
+          value={collection.host?.[0]?.client_secret}
+          label="Client Secret"
+        />
       </ActionMenuSection>
 
       <ActionMenuSection
@@ -274,6 +308,7 @@ const UpdateCollection = ({
         defaultExpanded
         underline
       >
+        <DistributionStatus disabled={!expandedRight} collection={collection} />
         <CollectionConfig<UpdateCollectionFormValues>
           disabled={!expandedRight}
           keepExpanded

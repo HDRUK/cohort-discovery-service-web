@@ -40,6 +40,12 @@ const CollectionHostsTable = ({
     <Box>
       <Table
         table={table}
+        leftAction={{
+          titleProps: {
+            title: "Collection Hosts",
+            subTitle: "All",
+          },
+        }}
         rightAction={{ deleteProps: { onClick: onDelete } }}
       />
     </Box>

@@ -1,17 +1,30 @@
 import "@testing-library/jest-dom";
-import { render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import CollectionsTable from "./CollectionsTable";
+import { render, screen } from "@testing-library/react";
+import CollectionsTable, { CollectionsTableProps } from "./CollectionsTable";
 import getCustodianCollections from "@/actions/getCustodianCollections";
+import MockDaphneStore from "@/store/MockDaphneStore";
 jest.mock("@/actions/getCustodianCollections");
 
 describe("CollectionsTable", () => {
+  const renderCollectionsTable = (props: CollectionsTableProps) =>
+    render(
+      <MockDaphneStore>
+        <CollectionsTable {...props} />
+      </MockDaphneStore>
+    );
+
   it("renders the correct column headers", async () => {
     const collections = await getCustodianCollections("abc");
 
-    render(<CollectionsTable collections={collections.data} />);
+    renderCollectionsTable({ initialData: collections.data });
 
-    const columns = ["Name", "Last Active", "Status"];
+    const columns = [
+      "Name",
+      "Last Query",
+      "Last Distribution Demographics",
+      "Last Distribution Concepts",
+      "Status",
+    ];
     for (const column of columns) {
       expect(
         screen.getByRole("columnheader", { name: column })
@@ -22,40 +35,9 @@ describe("CollectionsTable", () => {
   it("displays data when collections exist", async () => {
     const collections = await getCustodianCollections("abc");
 
-    render(<CollectionsTable collections={collections.data} />);
+    renderCollectionsTable({ initialData: collections.data });
 
     expect(screen.getByText("Test Dataset #1")).toBeInTheDocument();
     expect(screen.getByText("Test Dataset #2")).toBeInTheDocument();
-  });
-
-  it("it can change selected rows", async () => {
-    const collections = await getCustodianCollections("abc");
-
-    const setRowSelection = jest.fn();
-    const rowSelection = {};
-
-    render(
-      <CollectionsTable
-        collections={collections.data}
-        rowSelection={rowSelection}
-        setRowSelection={setRowSelection}
-      />
-    );
-
-    const row = screen.getByRole("row", { name: /Test Dataset #1/i });
-
-    const checkbox = within(row).getByRole("checkbox", {
-      name: /toggle select row/i,
-    });
-
-    await userEvent.click(checkbox);
-
-    const id = collections.data.data[0].id;
-    expect(setRowSelection).toHaveBeenCalledTimes(1);
-    const updater = (setRowSelection as jest.Mock).mock.calls[0][0];
-    expect(updater).toEqual(expect.any(Function));
-
-    const nextState = updater(rowSelection);
-    expect(nextState).toEqual({ [id]: true });
   });
 });

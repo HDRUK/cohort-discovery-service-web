@@ -9,7 +9,8 @@ import { DEFAULT_REVALIDATE } from "@/config/defaults";
 
 const getCustodianCollections = async (
   custodianPid: string,
-  params?: URLSearchParams
+  params?: URLSearchParams,
+  useCache: boolean = true
 ): Promise<ApiResponse<Paginated<CollectionWithHosts[]>>> => {
   const token = (await cookies()).get("token")?.value || "";
   const key = getTokenKey(token);
@@ -29,7 +30,7 @@ const getCustodianCollections = async (
         key,
       ],
     },
-    cache: "force-cache",
+    cache: useCache ? "force-cache" : undefined,
   });
 };
 

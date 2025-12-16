@@ -3,6 +3,7 @@ const API_AUTH_URL = "/api/auth";
 
 export const API_ROUTES = {
   task: `${API_URL}/task`,
+  rerunTask: (id: string) => `${API_URL}/task/re-run/${id}`,
   tasks: `${API_URL}/tasks`,
   queries: `${API_URL}/queries`,
   parseQuery: `${API_URL}/parse-query`,
@@ -25,6 +26,8 @@ export const API_ROUTES = {
     `${API_URL}/custodians/${pid}/collections`,
   adminCollections: `${API_URL}/admin/collections`,
   collectionConfig: `${API_URL}/collection_config`,
+  rerunDistributions: (pid: string) =>
+    `${API_URL}/collection/${pid}/distributions/run-manually`,
   conceptSets: `${API_URL}/concept_sets`,
   getConceptSet: (id: number) => `${API_URL}/concept_sets/${id}`,
   clearConceptSet: (conceptSetId: number) =>

@@ -146,7 +146,7 @@ describe("CreateCollection", () => {
         host_id: 20,
         custodian_id: "",
         status: true,
-        pid: "mocked-uuid-15",
+        pid: "mocked-uuid-17",
       },
       {
         collection_id: 0,
@@ -237,7 +237,7 @@ describe("CreateCollection", () => {
         host_id: 20,
         custodian_id: custodians[0].id,
         status: true,
-        pid: "mocked-uuid-16",
+        pid: "mocked-uuid-18",
       },
       {
         collection_id: 0,

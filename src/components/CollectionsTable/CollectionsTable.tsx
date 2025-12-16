@@ -10,10 +10,9 @@ import {
   MRT_RowSelectionState,
   type MRT_ColumnDef,
 } from "material-react-table";
-import { Dispatch, SetStateAction, useMemo } from "react";
-import { Box, Chip, Typography } from "@mui/material";
+import { useEffect, useMemo, useState } from "react";
+import { Box, Chip, Tooltip, Typography } from "@mui/material";
 import { getCollectionStatus } from "@/utils/colours";
-import dayjs from "dayjs";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import Table from "@/components/Table";
 import { useDaphneStore } from "@/store/useDaphneStore";
@@ -21,27 +20,96 @@ import CopyableVariable from "../CopyableVariable";
 import Title from "@/components/Title";
 import useSearchParams from "@/hooks/useSearchParams";
 import { capitaliseFirstLetter } from "@/utils/string";
-import { formatNumber } from "@/utils/numbers";
+import { getDatetime } from "@/utils/date";
+import { formatNumber, trueKeys } from "@/utils/numbers";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { DEFAULT_INTERVAL } from "@/config/defaults";
+import getCustodianCollections from "@/actions/getCustodianCollections";
+import getAdminCollections from "@/actions/getAdminCollections";
+import { isEqualTask } from "@/utils/distributions";
 
 export interface CollectionsTableProps {
-  collections: Paginated<CollectionWithHosts[]>;
-  rowSelection?: MRT_RowSelectionState;
-  setRowSelection?: Dispatch<SetStateAction<MRT_RowSelectionState>>;
+  initialData: Paginated<CollectionWithHosts[]>;
   showPid?: boolean;
+  admin?: boolean;
+  refreshRate?: number;
 }
 
 const CollectionsTable = ({
-  collections,
-  rowSelection,
-  setRowSelection,
+  initialData,
   showPid = false,
+  admin = false,
+  refreshRate = 5,
 }: CollectionsTableProps) => {
+  const { searchParams, getSearchParam } = useSearchParams("collection_filter");
+  const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
+
   const {
+    userData: { setSelectedCollection },
     custodianData: { deleteCollection, currentCustodian },
     adminData: { deleteCollection: deleteCollectionAdmin },
   } = useDaphneStore();
 
-  const { getSearchParam } = useSearchParams("collection_filter");
+  const queryKey = useMemo(
+    () => [`collections-${searchParams.toString()}`],
+    [searchParams]
+  );
+  const qc = useQueryClient();
+  const { data: collections } = useQuery<Paginated<CollectionWithHosts[]>>({
+    queryKey,
+    queryFn: async () => {
+      const res =
+        currentCustodian?.pid && !admin
+          ? await getCustodianCollections(
+              currentCustodian.pid,
+              searchParams,
+              false
+            )
+          : await getAdminCollections(searchParams, false);
+
+      return res.data;
+    },
+    initialData,
+    staleTime: 2 * refreshRate * DEFAULT_INTERVAL,
+    refetchInterval: (query) => {
+      const data = query.state.data;
+      if (data?.total === 0) return false;
+
+      const runningCollections =
+        data?.data.filter(
+          (c) =>
+            !isEqualTask(
+              c?.latest_demographic_task,
+              c.latest_demographic?.task
+            ) || !isEqualTask(c?.latest_concept_task, c.latest_concept?.task)
+        ) ?? [];
+
+      const hasIncomplete = runningCollections?.length > 0;
+      return hasIncomplete ? refreshRate * DEFAULT_INTERVAL : false;
+    },
+  });
+
+  useEffect(() => {
+    qc.setQueryData(queryKey, initialData);
+  }, [qc, queryKey, initialData]);
+
+  const selectedCollectionIds = useMemo(
+    () => trueKeys(rowSelection ?? {}),
+    [rowSelection]
+  );
+
+  useEffect(() => {
+    const selectedCollection =
+      selectedCollectionIds.length > 0
+        ? collections.data.find(
+            (h) =>
+              String(h.id) ===
+              selectedCollectionIds[selectedCollectionIds.length - 1]
+          )
+        : null;
+    setSelectedCollection(selectedCollection ?? null);
+  }, [collections.data, selectedCollectionIds, setSelectedCollection]);
+
   const filter_name = getSearchParam() || "all";
 
   const columns = useMemo<MRT_ColumnDef<Collection>[]>(
@@ -72,20 +140,42 @@ const CollectionsTable = ({
       },
       {
         id: "last_active",
-        header: "Last Active",
+        header: "Last Query",
         accessorFn: (row) =>
-          row.last_active
-            ? dayjs(row.last_active).format("DD/MM/YYYY HH:MM:ss")
-            : "—",
+          row.last_active ? getDatetime(row.last_active) : "—",
         size: 50,
         minSize: 50,
         maxSize: 50,
       },
       {
-        id: "counts",
-        header: "Counts",
-        accessorFn: (row) => row?.size?.count,
-        Cell: ({ cell }) => formatNumber(cell.getValue<number>()),
+        id: "last_demographic",
+        header: "Last Distribution Demographics",
+        accessorFn: (row) =>
+          row.latest_demographic?.task
+            ? getDatetime(row.latest_demographic.created_at)
+            : "—",
+        size: 50,
+        minSize: 50,
+        maxSize: 50,
+        Cell: ({ cell, row }) => {
+          const counts = formatNumber(
+            row.original?.latest_demographic?.count ?? 0
+          );
+          const date = cell.getValue<string>();
+          return (
+            <Tooltip title={`Number of studies = ${counts}`}>
+              <Typography>{date}</Typography>
+            </Tooltip>
+          );
+        },
+      },
+      {
+        id: "last_concept",
+        header: "Last Distribution Concepts",
+        accessorFn: (row) =>
+          row.latest_concept?.created_at
+            ? getDatetime(row.latest_concept.created_at)
+            : "—",
         size: 50,
         minSize: 50,
         maxSize: 50,
@@ -106,8 +196,6 @@ const CollectionsTable = ({
     ],
     [showPid]
   );
-
-  console.log(collections.data);
 
   const table = usePaginatedTable({
     columns,

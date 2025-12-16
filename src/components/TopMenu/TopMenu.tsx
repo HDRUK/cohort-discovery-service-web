@@ -39,9 +39,9 @@ export default function TopMenu() {
         page: null,
       },
       ...userCustodians.map((uc) => ({
-        id: routes.teamCollections(uc.pid),
+        id: routes.teamHosts(uc.pid),
         label: `${uc.name} Management`,
-        href: routes.teamCollections(uc.pid),
+        href: routes.teamHosts(uc.pid),
         route: routes.teamHome(uc.pid),
         page: null,
       })),

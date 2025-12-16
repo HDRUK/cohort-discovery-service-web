@@ -8,7 +8,8 @@ import { getTokenKey } from "@/utils/string";
 import { DEFAULT_REVALIDATE } from "@/config/defaults";
 
 const getAdminCollections = async (
-  params?: URLSearchParams
+  params?: URLSearchParams,
+  useCache = true
 ): Promise<ApiResponse<Paginated<CollectionWithHosts[]>>> => {
   const token = (await cookies()).get("token")?.value || "";
   const key = getTokenKey(token);
@@ -24,7 +25,7 @@ const getAdminCollections = async (
       revalidate: DEFAULT_REVALIDATE,
       tags: [`collections`, `collections-${queryString}`, key],
     },
-    cache: "force-cache",
+    cache: useCache ? "force-cache" : undefined,
   });
 };
 
