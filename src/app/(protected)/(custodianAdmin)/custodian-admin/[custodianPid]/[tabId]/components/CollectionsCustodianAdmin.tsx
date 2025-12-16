@@ -6,15 +6,14 @@ import Title from "@/components/Title";
 import ThreePaneSwimLaneLayout, {
   ExpandedSide,
 } from "@/modules/ThreePaneSwimLaneLayout";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import CollectionsLeftPanel from "./CollectionsLeftPanel";
 import CollectionsTable from "@/components/CollectionsTable";
-import { MRT_RowSelectionState } from "material-react-table";
-import { trueKeys } from "@/utils/numbers";
+
 import ControlledSearchBox from "@/modules/ControlledSearchBox";
 import CollectionsRightPanel from "./CollectionsRightPanel";
 
-const CollectionAdmin = ({
+const CollectionsCustodianAdmin = ({
   pid,
   collections,
   collectionHosts,
@@ -43,24 +42,6 @@ const CollectionAdmin = ({
     );
   };
 
-  const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
-  const selectedCollectionIds = useMemo(
-    () => trueKeys(rowSelection),
-    [rowSelection]
-  );
-
-  const selectedCollection = useMemo(
-    () =>
-      selectedCollectionIds.length > 0
-        ? collections.data.find(
-            (h) =>
-              String(h.id) ===
-              selectedCollectionIds[selectedCollectionIds.length - 1]
-          )
-        : null,
-    [collections, selectedCollectionIds]
-  );
-
   const custodian = custodians.find((c) => c.pid === pid);
 
   if (!custodian) return <Skeleton height={"100%"} />;
@@ -85,16 +66,9 @@ const CollectionAdmin = ({
             onCancelCreate={toggleExpandLeft}
           />
         }
-        middle={
-          <CollectionsTable
-            collections={collections}
-            rowSelection={rowSelection}
-            setRowSelection={setRowSelection}
-          />
-        }
+        middle={<CollectionsTable initialData={collections} />}
         right={
           <CollectionsRightPanel
-            selectedCollection={selectedCollection || null}
             collectionHosts={collectionHosts}
             expandedRight={expandedRight}
             expandedLeft={expandedLeft}
@@ -106,4 +80,4 @@ const CollectionAdmin = ({
   );
 };
 
-export default CollectionAdmin;
+export default CollectionsCustodianAdmin;

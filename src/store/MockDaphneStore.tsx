@@ -106,8 +106,10 @@ function makeDefaultStore(): DaphneStoreState {
           message: "ok",
         }),
 
+      rerunTask: NOOP,
       collections: [] as Collection[],
       setCollections: NOOP,
+      runDistributions: NOOP,
 
       conceptSets: [] as ConceptSet[],
       setConceptSets: NOOP,

@@ -79,6 +79,11 @@ export enum CollectionStatus {
   SUSPENDED = 5,
 }
 
+export enum DistributionType {
+  GENERIC = "GENERIC",
+  DEMOGRAPHICS = "DEMOGRAPHICS",
+}
+
 export interface State {
   id: number;
   name: string;
@@ -105,6 +110,8 @@ export interface Collection extends WithTimestamps {
   size?: Distribution;
   latest_concept?: Distribution;
   demographics?: Distribution[];
+  latest_concept_task?: Task;
+  latest_demographic_task?: Task;
   custodian: Custodian;
   custodian_id?: number;
   model_state?: ModelState;

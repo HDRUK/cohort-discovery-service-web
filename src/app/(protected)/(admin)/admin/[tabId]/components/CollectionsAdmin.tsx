@@ -86,7 +86,8 @@ const CollectionAdmin = ({
         }
         middle={
           <CollectionsTable
-            collections={collections}
+            admin
+            initialData={collections}
             rowSelection={rowSelection}
             setRowSelection={setRowSelection}
           />

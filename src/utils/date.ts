@@ -1,8 +1,8 @@
 import dayjs from "dayjs";
 
-const getDate = (
+const getDatetime = (
   date?: string,
-  format = "DD-MM-YYYY HH:MM:ss",
+  format = "DD/MM/YYYY HH:mm:ss",
   emptyFallback = "--/--/----"
 ) => {
   if (!date) return emptyFallback;
@@ -13,4 +13,4 @@ const getDate = (
   return parsed.format(format);
 };
 
-export { getDate };
+export { getDatetime };

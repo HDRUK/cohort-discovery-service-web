@@ -6,6 +6,7 @@ import deleteCollectionHost from "@/actions/deleteCollectionHost";
 import {
   revalidateAction,
   revalidateCustodian,
+  revalidateCustodianByPid,
   revalidateUserAction,
 } from "@/actions/revalidate";
 import {
@@ -25,6 +26,8 @@ import {
   CreateCollectionConfigPost,
   FeatureFlag,
   FeatureName,
+  DistributionType,
+  CollectionWithHosts,
 } from "@/types/api";
 import createCollection from "@/actions/createCollection";
 import deleteCollection from "@/actions/deleteCollection";
@@ -64,6 +67,7 @@ import updateCollection from "@/actions/updateCollection";
 import updateCollectionConfig from "@/actions/updateCollectionConfig";
 import createCustodianCollection from "@/actions/createCustodianCollection";
 import rerunTask from "@/actions/rerunTask";
+import rerunDistributions from "@/actions/rerunDistributions";
 
 export enum NodeKind {
   RULE = "RULE",
@@ -143,6 +147,12 @@ export interface DaphneStoreState {
     rerunTask: (id: string) => void;
     collections: Collection[];
     setCollections: (collections: Collection[]) => void;
+    selectedCollection: CollectionWithHosts | null;
+    setSelectedCollection: (collection: CollectionWithHosts | null) => void;
+    runDistributions: (
+      collection: CollectionWithHosts,
+      query_type: DistributionType
+    ) => Promise<Query>;
     conceptSets: ConceptSet[];
     setConceptSets: (conceptSets: ConceptSet[]) => void;
     createConceptSet: (payload: CreateConceptSetPost) => Promise<void>;
@@ -563,6 +573,21 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         ...state,
         userData: { ...state.userData, collections },
       })),
+    selectedCollection: null,
+    setSelectedCollection: (selectedCollection: CollectionWithHosts | null) =>
+      set((state) => ({
+        ...state,
+        userData: { ...state.userData, selectedCollection },
+      })),
+    runDistributions: async (
+      collection: CollectionWithHosts,
+      query_type: DistributionType
+    ) => {
+      const { pid, custodian } = collection;
+      const res = await rerunDistributions(pid, { query_type });
+      revalidateCustodian(custodian);
+      return res.data;
+    },
     user: null,
     setUser: (user: CombinedUser | null) => {
       set((state) => ({ ...state, userData: { ...state.userData, user } }));

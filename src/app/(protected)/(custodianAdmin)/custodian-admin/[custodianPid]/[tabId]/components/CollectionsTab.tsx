@@ -1,4 +1,4 @@
-import CollectionsAdmin from "./CollectionsAdmin";
+import CollectionsCustodianAdmin from "./CollectionsCustodianAdmin";
 import getCustodianCollectionHosts from "@/actions/getCustodianCollectionHosts";
 import getCustodianCollections from "@/actions/getCustodianCollections";
 import { ApiSearchParams } from "@/types/api";
@@ -40,7 +40,7 @@ const CollectionsTab = async ({
     ]);
 
   return (
-    <CollectionsAdmin
+    <CollectionsCustodianAdmin
       pid={custodianPid}
       collectionHosts={collectionHosts}
       collections={custodianCollections}

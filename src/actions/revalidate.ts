@@ -14,9 +14,13 @@ export const revalidateUserAction = async (tagName: string) => {
   revalidateAction(`${userId}-${tagName}`);
 };
 
+export const revalidateCustodianByPid = async (custodianPid: string) => {
+  console.log("revalidate", custodianPid);
+  revalidateAction(`collections-${custodianPid}`);
+};
+
 export const revalidateCustodian = async (custodian: Custodian) => {
-  console.log(custodian);
   const { id, pid } = custodian;
   revalidateAction(`custodian-${id}`);
-  revalidateAction(`collections-${pid}`);
+  revalidateCustodianByPid(pid);
 };

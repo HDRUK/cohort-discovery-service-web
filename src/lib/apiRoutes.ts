@@ -26,6 +26,8 @@ export const API_ROUTES = {
     `${API_URL}/custodians/${pid}/collections`,
   adminCollections: `${API_URL}/admin/collections`,
   collectionConfig: `${API_URL}/collection_config`,
+  rerunDistributions: (pid: string) =>
+    `${API_URL}/collection/${pid}/distributions/run-manually`,
   conceptSets: `${API_URL}/concept_sets`,
   getConceptSet: (id: number) => `${API_URL}/concept_sets/${id}`,
   clearConceptSet: (conceptSetId: number) =>

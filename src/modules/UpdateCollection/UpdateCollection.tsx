@@ -22,7 +22,7 @@ import FormDropdown from "@/components/FormDropdown";
 import DistributionStatus from "../DistrubutionStatus";
 
 export type UpdateCollectionProps = {
-  selectedCollection: CollectionWithHosts;
+  collection: CollectionWithHosts;
   collectionHosts: CollectionHost[];
   expandedRight: boolean;
   expandedLeft: boolean;
@@ -30,7 +30,7 @@ export type UpdateCollectionProps = {
 };
 
 const UpdateCollection = ({
-  selectedCollection,
+  collection,
   collectionHosts,
   expandedRight,
   onClose,
@@ -77,7 +77,7 @@ const UpdateCollection = ({
   const notify = useNotify();
 
   const formMethods = useForm<UpdateCollectionFormValues>({
-    defaultValues: getDefaultValues(selectedCollection),
+    defaultValues: getDefaultValues(collection),
   });
 
   const {
@@ -88,22 +88,23 @@ const UpdateCollection = ({
   } = formMethods;
 
   useEffect(() => {
-    if (!selectedCollection) return;
+    if (!collection) return;
 
-    const newValues = getDefaultValues(selectedCollection);
+    const newValues = getDefaultValues(collection);
 
     reset(newValues, {
       keepDirty: false,
       keepTouched: false,
     });
-  }, [selectedCollection, reset]);
+  }, [collection, reset]);
+
   const submitForm = async (
     data: UpdateCollectionFormValues,
     closeAfter = false
   ) => {
-    if (!selectedCollection?.id) return;
+    if (!collection?.id) return;
 
-    const { id } = selectedCollection;
+    const { id } = collection;
 
     if (isDirty) {
       await updateCollection(id, data.collection, data.config);
@@ -203,10 +204,9 @@ const UpdateCollection = ({
         <FormTextField
           copyable
           disabled
-          value={selectedCollection.pid}
+          value={collection.pid}
           label="Identifier"
         />
-
         <Controller
           name="collection.name"
           disabled={!expandedRight}
@@ -286,6 +286,20 @@ const UpdateCollection = ({
             />
           )}
         />
+
+        <FormTextField
+          copyable
+          disabled
+          value={collection.host?.[0]?.client_id}
+          label="Client ID"
+        />
+        <FormTextField
+          type="password"
+          copyable
+          disabled
+          value={collection.host?.[0]?.client_secret}
+          label="Client Secret"
+        />
       </ActionMenuSection>
 
       <ActionMenuSection
@@ -294,10 +308,7 @@ const UpdateCollection = ({
         defaultExpanded
         underline
       >
-        <DistributionStatus
-          disabled={!expandedRight}
-          collection={selectedCollection}
-        />
+        <DistributionStatus disabled={!expandedRight} collection={collection} />
         <CollectionConfig<UpdateCollectionFormValues>
           disabled={!expandedRight}
           keepExpanded
