@@ -15,6 +15,8 @@ import type {
   CreateConceptSetPost,
   UpdateCollectionHostPayload,
   CreateCollectionConfigPost,
+  CollectionWithHosts,
+  DistributionType,
 } from "@/types/api";
 import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
 import type {
@@ -32,6 +34,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { NotifyProvider } from "@/providers/NotifyProvider";
 import { getMockCollection } from "@/actions/__mocks__/getCollections";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { getMockQuery } from "@/actions/__mocks__/getQueries";
 const queryClient = new QueryClient();
 
 type SliceOverrides = {
@@ -109,7 +112,12 @@ function makeDefaultStore(): DaphneStoreState {
       rerunTask: NOOP,
       collections: [] as Collection[],
       setCollections: NOOP,
-      runDistributions: NOOP,
+      selectedCollection: null,
+      setSelectedCollection: NOOP,
+      runDistributions: (
+        _collection: CollectionWithHosts,
+        _query_type: DistributionType
+      ) => RESOLVE<Query>(getMockQuery()),
 
       conceptSets: [] as ConceptSet[],
       setConceptSets: NOOP,

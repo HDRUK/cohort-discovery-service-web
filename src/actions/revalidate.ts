@@ -15,7 +15,6 @@ export const revalidateUserAction = async (tagName: string) => {
 };
 
 export const revalidateCustodianByPid = async (custodianPid: string) => {
-  console.log("revalidate", custodianPid);
   revalidateAction(`collections-${custodianPid}`);
 };
 
