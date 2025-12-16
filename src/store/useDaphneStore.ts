@@ -29,6 +29,7 @@ import {
   CollectionWithHosts,
   Workgroup,
   CreateWorkgroupPost,
+  AddCollectionToWorkgroupPost,
 } from "@/types/api";
 import createCollection from "@/actions/createCollection";
 import deleteCollection from "@/actions/deleteCollection";
@@ -71,6 +72,7 @@ import rerunTask from "@/actions/rerunTask";
 import rerunDistributions from "@/actions/rerunDistributions";
 import getCollections from "@/actions/getCollections";
 import createWorkgroup from "@/actions/createWorkgroup";
+import addCollectionToWorkgroup from "@/actions/addCollectionToWorkgroup";
 
 export enum NodeKind {
   RULE = "RULE",
@@ -215,6 +217,9 @@ export interface DaphneStoreState {
     ) => Promise<Collection>;
     deleteCollection: (id: number | string) => Promise<void>;
     createWorkgroup: (payload: CreateWorkgroupPost) => Promise<Workgroup>;
+    addCollectionToWorkgroup: (
+      payload: AddCollectionToWorkgroupPost
+    ) => Promise<number>;
   };
   featureFlags: {
     flags: FeatureFlag | null;
@@ -744,6 +749,11 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     },
     createWorkgroup: async (payload) => {
       const { data } = await createWorkgroup(payload);
+      await revalidateAction("workgroups");
+      return data;
+    },
+    addCollectionToWorkgroup: async (payload) => {
+      const { data } = await addCollectionToWorkgroup(payload);
       await revalidateAction("workgroups");
       return data;
     },

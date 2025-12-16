@@ -42,7 +42,6 @@ const CreateWorkgroup = ({ collections, onCancel }: CreateCollectionProps) => {
       collections: data.collectionIds, // not used in BE but we provide it anyway
       active: true, // hardoded until/unless we add active field to form
     });
-    notify.success(`Created workgroup ${createdWorkgroup.name}`);
 
     if (data.collectionIds.length > 0) {
       data.collectionIds.map(async (collectionId) => {
@@ -51,10 +50,9 @@ const CreateWorkgroup = ({ collections, onCancel }: CreateCollectionProps) => {
           workgroup_id: createdWorkgroup.id,
         });
       });
-      notify.success(
-        `Added ${data.collectionIds.length} collections to workgroup ${createdWorkgroup.name}`
-      );
     }
+
+    notify.success(`Created workgroup ${createdWorkgroup.name}`);
 
     onCancel?.();
   };
