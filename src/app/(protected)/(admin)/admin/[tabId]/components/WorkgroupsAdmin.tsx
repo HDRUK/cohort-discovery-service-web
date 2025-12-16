@@ -82,8 +82,6 @@ const WorkgroupsAdmin = ({
         middle={
           <WorkgroupsMiddlePanel
             collections={collections}
-            expandedLeft={expandedLeft}
-            expandedRight={expandedRight}
             selectedWorkgroup={selectedWorkgroup}
             rowSelection={rowSelection}
             setRowSelection={setRowSelection}

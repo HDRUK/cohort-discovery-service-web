@@ -3,7 +3,6 @@ import getAdminWorkgroups from "@/actions/getAdminWorkgroups";
 import { ApiSearchParams } from "@/types/api";
 import { buildSearchParams } from "@/utils/params";
 import { Box, Skeleton } from "@mui/material";
-import getCustodians from "@/actions/getCustodians";
 import getCollections from "@/actions/getCollections";
 import getAdminCollections from "@/actions/getAdminCollections";
 
@@ -35,12 +34,10 @@ const WorkgroupsTab = async ({
   const [
     { data: collections },
     { data: allCollections },
-    { data: custodians },
     { data: workgroups },
   ] = await Promise.all([
     getAdminCollections(params),
     getCollections(),
-    getCustodians(),
     getAdminWorkgroups(params),
   ]);
 
@@ -48,7 +45,6 @@ const WorkgroupsTab = async ({
     <WorkgroupsAdmin
       collections={collections}
       allCollections={allCollections}
-      custodians={custodians}
       workgroups={workgroups}
     />
   );
