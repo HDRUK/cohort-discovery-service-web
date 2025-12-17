@@ -1,7 +1,7 @@
 import { Query, Task } from "@/types/api";
 import { isEqualTask } from "@/utils/distributions";
-
-import { Button } from "@mui/material";
+import CheckIcon from "@mui/icons-material/Check";
+import { Button, CircularProgress } from "@mui/material";
 import { useState } from "react";
 
 interface ReRunButtonProps {
@@ -25,20 +25,20 @@ export const ReRunButton = ({
     setCurrentTask(newTask);
   };
 
-  const taskLoading = taskIncomplete && task?.id !== currentTask?.id;
-
   const isLastSuccessfullTask =
     !!lastSuccessfullTask &&
     !!currentTask &&
     isEqualTask(currentTask, lastSuccessfullTask);
 
-  const isLoading =
-    currentTask === null || taskLoading || !isLastSuccessfullTask;
+  const taskLoading =
+    currentTask === null || (taskIncomplete && task?.id !== currentTask?.id);
+
+  const isLoading = !lastSuccessfullTask
+    ? false
+    : taskLoading || !isLastSuccessfullTask;
 
   return (
     <Button
-      disabled={isLoading}
-      loading={isLoading}
       loadingPosition="end"
       color="inherit"
       size="small"
@@ -46,6 +46,8 @@ export const ReRunButton = ({
       onClick={handleClick}
     >
       Run now
+      {isLoading && <CircularProgress sx={{ mx: 1 }} size={15} />}
+      {isLastSuccessfullTask && <CheckIcon color="success" />}
     </Button>
   );
 };
