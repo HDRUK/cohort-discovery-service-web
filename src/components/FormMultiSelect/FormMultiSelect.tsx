@@ -101,7 +101,6 @@ const FormMultiSelect = ({
         value={value}
         {...restProps}
         multiple={multiple}
-        defaultValue={[]}
         getOptionLabel={(option) => {
           console.log("getOptionLabel option:", option);
           if (!option) return "";
@@ -118,7 +117,7 @@ const FormMultiSelect = ({
         disabled={disabled}
         limitTags={MAX_DISPLAYED_TAGS} // Make configurable later
         onChange={(_, value) => {
-          let newValue: OptionsType | OptionsType[] | null = null;
+          let newValue: OptionsType[] | null = null;
           console.log("before", newValue, value);
           if (Array.isArray(value)) {
             console.log("onChange 1", value);
@@ -130,7 +129,9 @@ const FormMultiSelect = ({
             console.log("onChange 3", value);
             newValue = [];
           }
-          newValue = [...new Set(newValue)];
+          if (multiple) {
+            newValue = [...new Set(newValue)];
+          }
           console.log("after", newValue, value);
 
           onChange(newValue);
