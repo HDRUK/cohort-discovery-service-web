@@ -47,7 +47,11 @@ export const cardSx = (
   border: 1,
   borderColor: valid ? "black" : "warning.main",
   width: "100%",
-  bgcolor: isSelected ? "undefined" : "white",
+  bgcolor: isSelected ? "background.default" : "white",
+  "&:hover": {
+    bgcolor: isSelected ? "background.default" : "highlight.main",
+  },
+  cursor: "pointer",
 });
 
 export const cardHeaderSx: SxProps<Theme> = {

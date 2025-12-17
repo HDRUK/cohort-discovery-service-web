@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import QueryBuilder from "./QueryBuilder";
 
@@ -7,29 +7,6 @@ import { getQueryJson } from "./__mocks__/getQueryJson";
 
 import MockDaphneStore from "@/store/MockDaphneStore";
 const setQueryBuilderJson = jest.fn();
-
-const mockRectsForSortableRules = () => {
-  const rules = screen.getAllByTestId("sortable-rule");
-  rules.forEach((el, i) => {
-    const top = i * 100;
-    const height = 80;
-    const left = 0;
-    const width = 800;
-    const rect = {
-      x: left,
-      y: top,
-      top,
-      bottom: top + height,
-      left,
-      right: left + width,
-      width,
-      height,
-      toJSON: () => {},
-    } as DOMRect;
-
-    el.getBoundingClientRect = jest.fn(() => rect);
-  });
-};
 
 describe("QueryBuilder", () => {
   const renderComponent = () => {
@@ -96,12 +73,11 @@ describe("QueryBuilder", () => {
   });
 
   it("moves the selected rule to the bottom after drag-and-drop", async () => {
+    const user = userEvent.setup();
     renderComponent();
 
     const TARGET_TEXT =
       "Oxford, AstraZeneca - SARS-CoV-2 (COVID-19) vaccine AZD1222";
-
-    mockRectsForSortableRules();
 
     const allRules = () => screen.getAllByTestId("sortable-rule");
     const indexOfRuleByText = (text: string) =>
@@ -114,24 +90,17 @@ describe("QueryBuilder", () => {
 
     const startCard = allRules()[initialIndex];
 
-    jest.spyOn(startCard, "getBoundingClientRect").mockReturnValue({
-      left: 100,
-      top: 0,
-      right: 300,
-      bottom: 50,
-      width: 200,
-      height: 50,
-      x: 100,
-      y: 0,
-      toJSON: () => {},
-    } as DOMRect);
-    fireEvent.mouseMove(startCard, { clientX: 100, clientY: 10 });
-
-    const dragHandleStart = startCard.querySelector(
-      '[aria-label="Drag"]'
+    const wrapper = startCard.closest(
+      '[data-testid="sortable-rule"]'
     ) as HTMLElement;
+    expect(wrapper).toBeTruthy();
 
-    expect(dragHandleStart).toBeTruthy();
+    expect(within(wrapper).queryByLabelText("Drag")).not.toBeInTheDocument();
+
+    await user.hover(wrapper);
+
+    const dragHandleStart = await within(wrapper).findByLabelText("Drag");
+    expect(dragHandleStart).toBeVisible();
 
     await userEvent.pointer([
       { target: dragHandleStart, keys: "[MouseLeft>]" },
