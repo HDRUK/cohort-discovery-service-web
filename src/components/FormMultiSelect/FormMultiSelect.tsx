@@ -9,6 +9,7 @@ import {
   FormControl,
   FormLabel,
 } from "@mui/material";
+import type { ChipProps } from "@mui/material/Chip";
 import { ReactNode, useId, useState } from "react";
 import { FieldError } from "react-hook-form";
 
@@ -30,14 +31,7 @@ interface FormMultiSelectProps
   id?: string;
   disabled?: boolean;
   getChipLabel?: (options: OptionsType[], value: OptionsType) => string;
-  chipColor?:
-    | "default"
-    | "primary"
-    | "secondary"
-    | "error"
-    | "info"
-    | "success"
-    | "warning";
+  chipColor?: ChipProps["color"];
   noOptionsText?: ReactNode;
   maxLabelLength?: number;
   tagsBelow?: boolean;
@@ -154,10 +148,7 @@ const FormMultiSelect = ({
                 ...(startAdornmentIcon && {
                   startAdornment: (
                     <>
-                      <InputAdornment
-                        sx={{ my: "16px", pl: "5px" }}
-                        position="start"
-                      >
+                      <InputAdornment sx={{ my: 4, pl: 1 }} position="start">
                         {startAdornmentIcon}
                       </InputAdornment>
                       {params.InputProps.startAdornment}

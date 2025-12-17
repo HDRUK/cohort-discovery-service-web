@@ -10,8 +10,8 @@ import { useEffect } from "react";
 import { revalidateAction } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
 import FormMultiSelect from "@/components/FormMultiSelect";
-import addCollectionToWorkgroup from "@/actions/addCollectionToWorkgroup";
 import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
+import { useDaphneStore } from "@/store/useDaphneStore";
 export type UpdateWorkgroupProps = {
   selectedWorkgroup: Workgroup;
   collections: Collection[];
@@ -25,6 +25,9 @@ const UpdateWorkgroup = ({
   expandedRight,
   onClose,
 }: UpdateWorkgroupProps) => {
+  const {
+    adminData: { addCollectionToWorkgroup },
+  } = useDaphneStore();
   const notify = useNotify();
 
   const formMethods = useForm<UpdateWorkgroupFormValues>({
@@ -63,10 +66,10 @@ const UpdateWorkgroup = ({
           workgroup_id: id,
         });
         notify.success(`Updated workgroup ${selectedWorkgroup?.name}`);
-
-        revalidateAction(`collections-admin`);
-        revalidateAction(`workgroups-admin`);
       });
+
+      revalidateAction(`collections-admin`);
+      revalidateAction(`workgroups-admin`);
     }
 
     reset();

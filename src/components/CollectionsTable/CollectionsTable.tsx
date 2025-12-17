@@ -55,7 +55,7 @@ const CollectionsTable = ({
   } = useDaphneStore();
 
   const queryKey = useMemo(
-    () => [`collections-${searchParams.toString()}`],
+    () => [`collections-admin-${searchParams.toString()}`],
     [searchParams]
   );
   const qc = useQueryClient();

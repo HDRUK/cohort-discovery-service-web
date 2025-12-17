@@ -9,7 +9,6 @@ import ActionMenuSection from "@/components/ActionMenuSection";
 import { useNotify } from "@/providers/NotifyProvider";
 
 import FormMultiSelect from "@/components/FormMultiSelect";
-import addCollectionToWorkgroup from "@/actions/addCollectionToWorkgroup";
 import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
 
 interface CreateCollectionProps {
@@ -19,7 +18,7 @@ interface CreateCollectionProps {
 
 const CreateWorkgroup = ({ collections, onCancel }: CreateCollectionProps) => {
   const {
-    adminData: { createWorkgroup },
+    adminData: { createWorkgroup, addCollectionToWorkgroup },
   } = useDaphneStore();
   const notify = useNotify();
 
