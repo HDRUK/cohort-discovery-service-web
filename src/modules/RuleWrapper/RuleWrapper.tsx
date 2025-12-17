@@ -124,10 +124,10 @@ const RuleWrapper = ({
     [id, toggleSelected]
   );
 
-  const onMouseEnter = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+  const onMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     setShowHandle(true);
-  }, []);
+  };
 
   const onMouseLeave = useCallback(() => {
     if (showHandle && !isDragging && !isSelected) {
