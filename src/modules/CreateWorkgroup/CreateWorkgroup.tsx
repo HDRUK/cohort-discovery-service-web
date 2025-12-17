@@ -26,7 +26,7 @@ const CreateWorkgroup = ({ collections, onCancel }: CreateCollectionProps) => {
   const formMethods = useForm<CreateWorkgroupFormValues>({
     defaultValues: {
       name: "",
-      collections: [] as Collection[],
+      collections: [],
     },
   });
 
@@ -40,14 +40,13 @@ const CreateWorkgroup = ({ collections, onCancel }: CreateCollectionProps) => {
   const onSubmit = async (data: CreateWorkgroupFormValues) => {
     const createdWorkgroup = await createWorkgroup({
       name: data.name,
-      // collections: data.collectionIds, // not used in BE but we provide it anyway
       active: true, // hardoded until/unless we add active field to form
     });
 
     if (data.collections.length > 0) {
       data.collections.map(async (collection) => {
         await addCollectionToWorkgroup({
-          id: +(collection as Collection).id,
+          id: +collection.value,
           workgroup_id: createdWorkgroup.id,
         });
       });
@@ -60,7 +59,7 @@ const CreateWorkgroup = ({ collections, onCancel }: CreateCollectionProps) => {
 
   return (
     <FormProvider {...formMethods}>
-      {/* <Box
+      <Box
         component="form"
         onSubmit={handleSubmit(onSubmit)}
         sx={{
@@ -107,12 +106,11 @@ const CreateWorkgroup = ({ collections, onCancel }: CreateCollectionProps) => {
                     collections?.map((c) => ({
                       label: c.name,
                       value: c.id as ValueType,
-                      // onClick: () => {},
                     })) || []
                   }
                   getChipLabel={(options, value) =>
-                    options.find((option) => option.value === value)?.label ||
-                    ""
+                    options.find((option) => option.value === value.value)
+                      ?.label || ""
                   }
                   tagsBelow
                   error={error}
@@ -140,7 +138,7 @@ const CreateWorkgroup = ({ collections, onCancel }: CreateCollectionProps) => {
             {isSubmitting ? "Creating..." : "Create"}
           </Button>
         </Stack>
-      </Box> */}
+      </Box>
     </FormProvider>
   );
 };

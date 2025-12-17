@@ -57,9 +57,7 @@ const UpdateWorkgroup = ({
     const { id } = selectedWorkgroup;
 
     if (data.collections.length > 0) {
-      console.log(data.collections);
       data.collections.map(async (collection) => {
-        console.log("collection:", collection);
         await addCollectionToWorkgroup({
           id: +collection.value,
           workgroup_id: id,
@@ -120,7 +118,6 @@ const UpdateWorkgroup = ({
           disabled={!expandedRight}
           control={control}
           render={({ field, fieldState: { error } }) => {
-            console.log("field.:", field);
             return (
               <FormMultiSelect
                 {...field}
@@ -139,7 +136,6 @@ const UpdateWorkgroup = ({
                 error={error}
                 sx={{ pt: 1 }}
                 onChange={(value) => {
-                  console.log("onChange value:", value);
                   field.onChange(value);
                 }}
               />

@@ -1,4 +1,3 @@
-import { Options } from "@mdx-js/loader";
 import { Close } from "@mui/icons-material";
 import {
   Autocomplete,
@@ -75,9 +74,8 @@ const FormMultiSelect = ({
   const inputId = id ?? generatedId;
 
   const handleDelete = (value: OptionsType) => {
-    console.log("handleDelete", value, values);
     const newValue = values.filter((v: OptionsType) => v.value !== value.value);
-    console.log("handleDelete after", newValue);
+
     onChange(newValue);
     setValues(newValue);
   };
@@ -102,7 +100,6 @@ const FormMultiSelect = ({
         {...restProps}
         multiple={multiple}
         getOptionLabel={(option) => {
-          console.log("getOptionLabel option:", option);
           if (!option) return "";
           if (Array.isArray(option) && option.length === 0) return "";
           if (typeof option === "object") return option?.label;
@@ -118,21 +115,16 @@ const FormMultiSelect = ({
         limitTags={MAX_DISPLAYED_TAGS} // Make configurable later
         onChange={(_, value) => {
           let newValue: OptionsType[] | null = null;
-          console.log("before", newValue, value);
           if (Array.isArray(value)) {
-            console.log("onChange 1", value);
             newValue = value;
           } else if (typeof value === "object" && value !== null) {
-            console.log("onChange 2", value);
             newValue = [value];
           } else {
-            console.log("onChange 3", value);
             newValue = [];
           }
           if (multiple) {
             newValue = [...new Set(newValue)];
           }
-          console.log("after", newValue, value);
 
           onChange(newValue);
           setValues(newValue);
