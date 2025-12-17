@@ -82,7 +82,6 @@ describe("CreateWorkgroup", () => {
 
     expect(createWorkgroup).toHaveBeenCalledWith({
       name: "My Workgroup",
-      collections: [],
       active: true,
     });
 
