@@ -69,6 +69,7 @@ const FormMultiSelect = ({
   ...restProps
 }: FormMultiSelectProps) => {
   const [values, setValues] = useState<OptionsType[]>([]);
+  const [prevDisabled, setPrevDisabled] = useState<boolean>(disabled);
 
   const generatedId = useId();
   const inputId = id ?? generatedId;
@@ -80,11 +81,10 @@ const FormMultiSelect = ({
     setValues(newValue);
   };
 
-  useEffect(() => {
-    if (disabled) {
-      setValues([]);
-    }
-  }, [disabled]);
+  if (disabled !== prevDisabled) {
+    setPrevDisabled(disabled);
+    setValues([]);
+  }
 
   return (
     <FormControl fullWidth error={!!error} required={required}>
