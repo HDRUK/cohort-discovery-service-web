@@ -188,6 +188,8 @@ function makeDefaultStore(): DaphneStoreState {
       }) => RESOLVE<Workgroup>(getMockWorkgroup()),
       addCollectionToWorkgroup: (_payload: AddCollectionToWorkgroupPost) =>
         RESOLVE<number>(1),
+      selectedWorkgroup: null,
+      setSelectedWorkgroup: NOOP,
     },
 
     featureFlags: {

@@ -1,19 +1,20 @@
 "use client";
 
-import { CollectionWithHosts, Paginated, Workgroup } from "@/types/api";
+import { CollectionWithHosts, Paginated } from "@/types/api";
 import CollectionsTable from "@/components/CollectionsTable";
 import { Box, Typography } from "@mui/material";
 import { capitaliseFirstLetter } from "@/utils/string";
+import { useDaphneStore } from "@/store/useDaphneStore";
 
 type WorkgroupsMiddlePanelProps = {
   collections: Paginated<CollectionWithHosts[]>;
-  selectedWorkgroup?: Workgroup;
 };
 
-const WorkgroupsMiddlePanel = ({
-  collections,
-  selectedWorkgroup,
-}: WorkgroupsMiddlePanelProps) => {
+const WorkgroupsMiddlePanel = ({ collections }: WorkgroupsMiddlePanelProps) => {
+  const {
+    adminData: { selectedWorkgroup },
+  } = useDaphneStore();
+
   return (
     <Box
       sx={{

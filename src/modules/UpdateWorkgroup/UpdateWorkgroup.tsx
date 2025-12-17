@@ -3,7 +3,7 @@ import { Typography, IconButton } from "@mui/material";
 import LockOutlineIcon from "@mui/icons-material/LockOutline";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import ActionMenuSection from "@/components/ActionMenuSection";
-import { Collection, Workgroup } from "@/types/api";
+import { Collection } from "@/types/api";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { UpdateWorkgroupFormValues } from "@/types/forms";
 import { useEffect } from "react";
@@ -13,20 +13,18 @@ import FormMultiSelect from "@/components/FormMultiSelect";
 import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
 import { useDaphneStore } from "@/store/useDaphneStore";
 export type UpdateWorkgroupProps = {
-  selectedWorkgroup: Workgroup;
   collections: Collection[];
   expandedRight: boolean;
   onClose?: () => void;
 };
 
 const UpdateWorkgroup = ({
-  selectedWorkgroup,
   collections,
   expandedRight,
   onClose,
 }: UpdateWorkgroupProps) => {
   const {
-    adminData: { addCollectionToWorkgroup },
+    adminData: { addCollectionToWorkgroup, selectedWorkgroup },
   } = useDaphneStore();
   const notify = useNotify();
 

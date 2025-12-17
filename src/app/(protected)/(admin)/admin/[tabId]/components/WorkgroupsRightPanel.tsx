@@ -1,25 +1,21 @@
-import { Workgroup } from "@/types/api";
 import UpdateWorkgroup, {
   UpdateWorkgroupProps,
 } from "@/modules/UpdateWorkgroup";
 import { maskClientTest } from "@/lib/maskClientTest";
 import { WorkgroupGuidanceProps } from "./WorkgroupsGuidance";
+import { useDaphneStore } from "@/store/useDaphneStore";
 
 const WorkgroupGuidance = maskClientTest<WorkgroupGuidanceProps>(
   () => import("./WorkgroupsGuidance")
 );
 
-interface WorkgroupsRightPanelProps
-  extends Omit<UpdateWorkgroupProps, "selectedWorkgroup"> {
-  selectedWorkgroup: Workgroup | null;
-}
+const WorkgroupsRightPanel = ({ ...props }: UpdateWorkgroupProps) => {
+  const {
+    adminData: { selectedWorkgroup },
+  } = useDaphneStore();
 
-const WorkgroupsRightPanel = ({
-  selectedWorkgroup,
-  ...props
-}: WorkgroupsRightPanelProps) => {
   if (selectedWorkgroup) {
-    return <UpdateWorkgroup selectedWorkgroup={selectedWorkgroup} {...props} />;
+    return <UpdateWorkgroup {...props} />;
   }
   return <WorkgroupGuidance />;
 };

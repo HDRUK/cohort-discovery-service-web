@@ -10,7 +10,7 @@ import Title from "@/components/Title";
 import ThreePaneSwimLaneLayout, {
   ExpandedSide,
 } from "@/modules/ThreePaneSwimLaneLayout";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import ControlledSearchBox from "@/modules/ControlledSearchBox";
 import WorkgroupsLeftPanel from "./WorkgroupsLeftPanel";
 import WorkgroupsMiddlePanel from "./WorkgroupsMiddlePanel";
@@ -41,16 +41,6 @@ const WorkgroupsAdmin = ({
     );
   };
 
-  const [selectedWorkgroupId, setSelectedWorkgroupId] = useState<
-    number | undefined
-  >(undefined);
-
-  const selectedWorkgroup = useMemo(() => {
-    return selectedWorkgroupId
-      ? workgroups.find((w) => w.id === selectedWorkgroupId)
-      : undefined;
-  }, [workgroups, selectedWorkgroupId]);
-
   if (!collections) return <Skeleton height={"100%"} />;
 
   return (
@@ -73,18 +63,11 @@ const WorkgroupsAdmin = ({
             collections={allCollections}
             onCreate={toggleExpandLeft}
             onCancelCreate={toggleExpandLeft}
-            setSelectedWorkgroupId={setSelectedWorkgroupId}
           />
         }
-        middle={
-          <WorkgroupsMiddlePanel
-            collections={collections}
-            selectedWorkgroup={selectedWorkgroup}
-          />
-        }
+        middle={<WorkgroupsMiddlePanel collections={collections} />}
         right={
           <WorkgroupsRightPanel
-            selectedWorkgroup={selectedWorkgroup || null}
             collections={allCollections}
             expandedRight={expandedRight}
             onClose={() => toggleExpandRight()}

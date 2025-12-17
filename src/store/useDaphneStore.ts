@@ -219,6 +219,8 @@ export interface DaphneStoreState {
     addCollectionToWorkgroup: (
       payload: AddCollectionToWorkgroupPost
     ) => Promise<number>;
+    selectedWorkgroup: Workgroup | null;
+    setSelectedWorkgroup: (workgroup: Workgroup | null) => void;
   };
   featureFlags: {
     flags: FeatureFlag | null;
@@ -756,6 +758,12 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       await revalidateAction("workgroups");
       return data;
     },
+    selectedWorkgroup: null,
+    setSelectedWorkgroup: (selectedWorkgroup: Workgroup | null) =>
+      set((state) => ({
+        ...state,
+        adminData: { ...state.adminData, selectedWorkgroup },
+      })),
   },
   featureFlags: {
     flags: null,

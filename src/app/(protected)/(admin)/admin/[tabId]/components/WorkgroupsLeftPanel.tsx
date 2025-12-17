@@ -5,9 +5,10 @@ import ActionMenuSection from "@/components/ActionMenuSection";
 import AddButton from "@/components/AddButton";
 import CreateWorkgroup from "@/modules/CreateWorkgroup";
 import { Collection, Workgroup } from "@/types/api";
-import { Dispatch, SetStateAction, useCallback } from "react";
+import { useCallback } from "react";
 import useSearchParams from "@/hooks/useSearchParams";
 import { capitaliseFirstLetter } from "@/utils/string";
+import { useDaphneStore } from "@/store/useDaphneStore";
 
 type WorkgroupsLeftPanelProps = {
   workgroups: Workgroup[];
@@ -15,7 +16,6 @@ type WorkgroupsLeftPanelProps = {
   expandedLeft: boolean;
   onCreate: () => void;
   onCancelCreate: () => void;
-  setSelectedWorkgroupId: Dispatch<SetStateAction<number | undefined>>;
 };
 
 const WorkgroupsLeftPanel = ({
@@ -24,21 +24,23 @@ const WorkgroupsLeftPanel = ({
   expandedLeft,
   onCreate,
   onCancelCreate,
-  setSelectedWorkgroupId,
 }: WorkgroupsLeftPanelProps) => {
+  const {
+    adminData: { setSelectedWorkgroup },
+  } = useDaphneStore();
   const { setSearchParam } = useSearchParams("workgroup_filter");
 
   const onSelectWorkgroup = useCallback(
-    (id?: number) => {
-      if (!id) {
-        setSelectedWorkgroupId(undefined);
+    (workgroup?: Workgroup) => {
+      if (!workgroup) {
+        setSelectedWorkgroup(null);
         setSearchParam(null);
         return;
       }
-      setSelectedWorkgroupId(id);
-      setSearchParam(id.toString());
+      setSelectedWorkgroup(workgroup);
+      setSearchParam(workgroup.id.toString());
     },
-    [setSelectedWorkgroupId, setSearchParam]
+    [setSelectedWorkgroup, setSearchParam]
   );
 
   return (
@@ -73,9 +75,9 @@ const WorkgroupsLeftPanel = ({
         underline
       >
         <List
-          items={workgroups.map((workgroup, idx) => ({
+          items={workgroups.map((workgroup) => ({
             label: capitaliseFirstLetter(workgroup.name.toLowerCase()),
-            onClick: () => onSelectWorkgroup(idx + 1),
+            onClick: () => onSelectWorkgroup(workgroup),
           }))}
         />
       </ActionMenuSection>
