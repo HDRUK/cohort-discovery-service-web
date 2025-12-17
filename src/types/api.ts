@@ -336,7 +336,6 @@ export interface Workgroup {
 
 export interface CreateWorkgroupPost {
   name: string;
-  collections?: number[];
   active: boolean;
 }
 

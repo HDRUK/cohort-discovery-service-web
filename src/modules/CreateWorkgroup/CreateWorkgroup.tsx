@@ -10,6 +10,7 @@ import { useNotify } from "@/providers/NotifyProvider";
 
 import FormMultiSelect from "@/components/FormMultiSelect";
 import addCollectionToWorkgroup from "@/actions/addCollectionToWorkgroup";
+import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
 
 interface CreateCollectionProps {
   collections?: Collection[];
@@ -25,7 +26,7 @@ const CreateWorkgroup = ({ collections, onCancel }: CreateCollectionProps) => {
   const formMethods = useForm<CreateWorkgroupFormValues>({
     defaultValues: {
       name: "",
-      collectionIds: [],
+      collections: [] as Collection[],
     },
   });
 
@@ -39,14 +40,14 @@ const CreateWorkgroup = ({ collections, onCancel }: CreateCollectionProps) => {
   const onSubmit = async (data: CreateWorkgroupFormValues) => {
     const createdWorkgroup = await createWorkgroup({
       name: data.name,
-      collections: data.collectionIds, // not used in BE but we provide it anyway
+      // collections: data.collectionIds, // not used in BE but we provide it anyway
       active: true, // hardoded until/unless we add active field to form
     });
 
-    if (data.collectionIds.length > 0) {
-      data.collectionIds.map(async (collectionId) => {
+    if (data.collections.length > 0) {
+      data.collections.map(async (collection) => {
         await addCollectionToWorkgroup({
-          id: +collectionId,
+          id: +(collection as Collection).id,
           workgroup_id: createdWorkgroup.id,
         });
       });
@@ -59,7 +60,7 @@ const CreateWorkgroup = ({ collections, onCancel }: CreateCollectionProps) => {
 
   return (
     <FormProvider {...formMethods}>
-      <Box
+      {/* <Box
         component="form"
         onSubmit={handleSubmit(onSubmit)}
         sx={{
@@ -94,19 +95,19 @@ const CreateWorkgroup = ({ collections, onCancel }: CreateCollectionProps) => {
               )}
             />
             <Controller
-              name="collectionIds"
+              name="collections"
               control={control}
               render={({ field, fieldState: { error } }) => (
                 <FormMultiSelect
-                  field={field}
+                  {...field}
                   label={"Add collections"}
                   placeholder="Search and add approved collections..."
                   multiple
                   options={
                     collections?.map((c) => ({
                       label: c.name,
-                      value: c.id,
-                      onClick: () => {},
+                      value: c.id as ValueType,
+                      // onClick: () => {},
                     })) || []
                   }
                   getChipLabel={(options, value) =>
@@ -139,7 +140,7 @@ const CreateWorkgroup = ({ collections, onCancel }: CreateCollectionProps) => {
             {isSubmitting ? "Creating..." : "Create"}
           </Button>
         </Stack>
-      </Box>
+      </Box> */}
     </FormProvider>
   );
 };

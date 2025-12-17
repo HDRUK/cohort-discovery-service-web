@@ -11,6 +11,7 @@ import { revalidateAction } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
 import FormMultiSelect from "@/components/FormMultiSelect";
 import addCollectionToWorkgroup from "@/actions/addCollectionToWorkgroup";
+import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
 export type UpdateWorkgroupProps = {
   selectedWorkgroup: Workgroup;
   collections: Collection[];
@@ -28,7 +29,7 @@ const UpdateWorkgroup = ({
 
   const formMethods = useForm<UpdateWorkgroupFormValues>({
     defaultValues: {
-      collectionIds: [],
+      collections: [],
     },
   });
 
@@ -38,7 +39,7 @@ const UpdateWorkgroup = ({
     if (!selectedWorkgroup) return;
 
     const newValues = {
-      collectionIds: [],
+      collections: [],
     };
 
     reset(newValues, {
@@ -55,11 +56,12 @@ const UpdateWorkgroup = ({
 
     const { id } = selectedWorkgroup;
 
-    if (data.collectionIds.length > 0) {
-      console.log(data.collectionIds);
-      data.collectionIds.map(async (collectionId) => {
+    if (data.collections.length > 0) {
+      console.log(data.collections);
+      data.collections.map(async (collection) => {
+        console.log("collection:", collection);
         await addCollectionToWorkgroup({
-          id: +collectionId,
+          id: +collection.value,
           workgroup_id: id,
         });
         notify.success(`Updated workgroup ${selectedWorkgroup?.name}`);
@@ -69,6 +71,7 @@ const UpdateWorkgroup = ({
       });
     }
 
+    reset();
     if (closeAfter) {
       onClose?.();
     }
@@ -113,29 +116,35 @@ const UpdateWorkgroup = ({
         underline
       >
         <Controller
-          name="collectionIds"
+          name="collections"
           disabled={!expandedRight}
           control={control}
-          render={({ field, fieldState: { error } }) => (
-            <FormMultiSelect
-              field={field}
-              placeholder="Search and add approved collections..."
-              disabled={!expandedRight}
-              multiple
-              options={collections.map((c) => ({
-                label: c.name,
-                value: c.id.toString(),
-                onClick: () => {},
-              }))}
-              getChipLabel={(options, value) =>
-                options.find((option) => option.value.toString() === value)
-                  ?.label || ""
-              }
-              tagsBelow
-              error={error}
-              sx={{ pt: 1 }}
-            />
-          )}
+          render={({ field, fieldState: { error } }) => {
+            console.log("field.:", field);
+            return (
+              <FormMultiSelect
+                {...field}
+                placeholder="Search and add approved collections..."
+                disabled={!expandedRight}
+                multiple
+                options={collections.map((c) => ({
+                  label: c.name,
+                  value: c.id as ValueType,
+                }))}
+                getChipLabel={(options, value) =>
+                  options.find((option) => option.value === value.value)
+                    ?.label || ""
+                }
+                tagsBelow
+                error={error}
+                sx={{ pt: 1 }}
+                onChange={(value) => {
+                  console.log("onChange value:", value);
+                  field.onChange(value);
+                }}
+              />
+            );
+          }}
         />
       </ActionMenuSection>
     </FormProvider>

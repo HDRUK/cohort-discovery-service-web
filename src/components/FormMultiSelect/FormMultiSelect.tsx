@@ -1,3 +1,4 @@
+import { Options } from "@mdx-js/loader";
 import { Close } from "@mui/icons-material";
 import {
   Autocomplete,
@@ -9,40 +10,27 @@ import {
   FormControl,
   FormLabel,
 } from "@mui/material";
-import { ReactNode, useId, useState } from "react";
+import { ReactNode, useEffect, useId, useState } from "react";
 import { FieldError } from "react-hook-form";
 
-export type ValueType = string | number;
+export type ValueType = number | string;
 export type OptionsType = {
   value: ValueType;
   label: string;
 };
 
 interface FormMultiSelectProps
-  extends Omit<BaseSelectProps<OptionsType>, "error"> {
+  extends Omit<BaseSelectProps<OptionsType>, "onChange" | "value" | "error"> {
   label?: string;
   options: OptionsType[];
   startIcon?: ReactNode;
   placeholder?: string;
   startAdornmentIcon?: ReactNode;
-  field: {
-    onChange: (value: ValueType | ValueType[]) => void;
-    value: ValueType | ValueType[] | null;
-    name?: string;
-  };
-  freeSolo?: boolean;
+  onChange: (value: OptionsType | OptionsType[]) => void;
+  value: OptionsType | OptionsType[] | null;
   id?: string;
   disabled?: boolean;
-  isLoadingOptions?: boolean;
-  getChipLabel?: (
-    options: OptionsType[],
-    value: OptionsType | string | number
-  ) => string;
-  canCreate?: boolean;
-  filterOptions?: (
-    options: OptionsType[],
-    state: { inputValue: string }
-  ) => OptionsType[];
+  getChipLabel?: (options: OptionsType[], value: OptionsType) => string;
   chipColor?:
     | "default"
     | "primary"
@@ -67,14 +55,11 @@ const FormMultiSelect = ({
   startIcon,
   placeholder,
   startAdornmentIcon,
-  field,
-  freeSolo,
+  onChange,
+  value,
   id,
   disabled = false,
-  isLoadingOptions = false,
   getChipLabel,
-  canCreate = false,
-  filterOptions,
   chipColor,
   noOptionsText = "No options",
   maxLabelLength = 40,
@@ -84,16 +69,24 @@ const FormMultiSelect = ({
   sx,
   ...restProps
 }: FormMultiSelectProps) => {
-  const [values, setValues] = useState<ValueType[]>([]);
+  const [values, setValues] = useState<OptionsType[]>([]);
 
   const generatedId = useId();
   const inputId = id ?? generatedId;
 
-  const handleDelete = (value: ValueType) => {
-    const newValue = values.filter((v: ValueType) => v !== value);
-    field.onChange(newValue);
+  const handleDelete = (value: OptionsType) => {
+    console.log("handleDelete", value, values);
+    const newValue = values.filter((v: OptionsType) => v.value !== value.value);
+    console.log("handleDelete after", newValue);
+    onChange(newValue);
     setValues(newValue);
   };
+
+  useEffect(() => {
+    if (disabled) {
+      setValues([]);
+    }
+  }, [disabled]);
 
   return (
     <FormControl fullWidth error={!!error} required={required}>
@@ -105,50 +98,46 @@ const FormMultiSelect = ({
 
       <Autocomplete
         id={id}
-        // {...field}
-        value={field.value ?? {}}
+        value={value}
         {...restProps}
-        freeSolo={freeSolo}
         multiple={multiple}
         defaultValue={[]}
         getOptionLabel={(option) => {
-          if (isLoadingOptions) return "Loading...";
+          console.log("getOptionLabel option:", option);
           if (!option) return "";
           if (Array.isArray(option) && option.length === 0) return "";
           if (typeof option === "object") return option?.label;
           return (
-            options.find((item) => item.value.toString() === option.toString())
-              ?.label ?? option.toString()
+            options.find((item) => item.value.toString() === option)?.label ??
+            (option as string).toString()
           );
         }}
-        isOptionEqualToValue={
-          (option, value) => option.value === value?.value // || option.value === value
-        }
+        isOptionEqualToValue={(option, value) => option.value === value?.value}
         options={options}
         getOptionKey={(option) => option.value}
         disabled={disabled}
-        limitTags={MAX_DISPLAYED_TAGS} // Make configurable
+        limitTags={MAX_DISPLAYED_TAGS} // Make configurable later
         onChange={(_, value) => {
-          let newValue: ValueType | ValueType[] | null = null;
+          let newValue: OptionsType | OptionsType[] | null = null;
           console.log("before", newValue, value);
           if (Array.isArray(value)) {
-            newValue = value.map((v) => (typeof v === "object" ? v.value : v));
-          } else if (typeof value === "object" && value !== null) {
-            newValue = value.value;
-          } else {
+            console.log("onChange 1", value);
             newValue = value;
+          } else if (typeof value === "object" && value !== null) {
+            console.log("onChange 2", value);
+            newValue = [value];
+          } else {
+            console.log("onChange 3", value);
+            newValue = [];
           }
           newValue = [...new Set(newValue)];
           console.log("after", newValue, value);
 
-          field.onChange(newValue);
+          onChange(newValue);
           setValues(newValue);
         }}
         {...(tagsBelow && {
           renderValue: () => null,
-        })}
-        {...(canCreate && {
-          filterOptions,
         })}
         renderInput={(params) => (
           <TextField
@@ -193,7 +182,7 @@ const FormMultiSelect = ({
           {values.map((val) => {
             return (
               <Chip
-                key={val}
+                key={val.value}
                 label={
                   <div
                     style={{
