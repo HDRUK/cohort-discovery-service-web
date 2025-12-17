@@ -1,9 +1,5 @@
 import { OptionsType } from "@/components/FormMultiSelect/FormMultiSelect";
-import {
-  CreateCollectionPost,
-  CreateCollectionConfigPost,
-  Collection,
-} from "./api";
+import { CreateCollectionPost, CreateCollectionConfigPost } from "./api";
 
 export interface CollectionHostFormValues {
   name: string;

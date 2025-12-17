@@ -9,7 +9,7 @@ import {
   FormControl,
   FormLabel,
 } from "@mui/material";
-import { ReactNode, useEffect, useId, useState } from "react";
+import { ReactNode, useId, useState } from "react";
 import { FieldError } from "react-hook-form";
 
 export type ValueType = number | string;
@@ -93,8 +93,8 @@ const FormMultiSelect = ({
           {label}
         </FormLabel>
       )}
-      {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore */}
+      {/* eslint-disable-next-line */}
+      {/* @ts-ignore */}
       <Autocomplete
         id={id}
         value={value}

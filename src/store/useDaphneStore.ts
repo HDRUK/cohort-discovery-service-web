@@ -70,7 +70,6 @@ import updateCollectionConfig from "@/actions/updateCollectionConfig";
 import createCustodianCollection from "@/actions/createCustodianCollection";
 import rerunTask from "@/actions/rerunTask";
 import rerunDistributions from "@/actions/rerunDistributions";
-import getCollections from "@/actions/getCollections";
 import createWorkgroup from "@/actions/createWorkgroup";
 import addCollectionToWorkgroup from "@/actions/addCollectionToWorkgroup";
 
