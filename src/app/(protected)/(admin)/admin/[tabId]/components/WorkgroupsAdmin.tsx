@@ -11,7 +11,6 @@ import ThreePaneSwimLaneLayout, {
   ExpandedSide,
 } from "@/modules/ThreePaneSwimLaneLayout";
 import { useMemo, useState } from "react";
-import { MRT_RowSelectionState } from "material-react-table";
 import ControlledSearchBox from "@/modules/ControlledSearchBox";
 import WorkgroupsLeftPanel from "./WorkgroupsLeftPanel";
 import WorkgroupsMiddlePanel from "./WorkgroupsMiddlePanel";
@@ -52,8 +51,6 @@ const WorkgroupsAdmin = ({
       : undefined;
   }, [workgroups, selectedWorkgroupId]);
 
-  const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
-
   if (!collections) return <Skeleton height={"100%"} />;
 
   return (
@@ -83,8 +80,6 @@ const WorkgroupsAdmin = ({
           <WorkgroupsMiddlePanel
             collections={collections}
             selectedWorkgroup={selectedWorkgroup}
-            rowSelection={rowSelection}
-            setRowSelection={setRowSelection}
           />
         }
         right={
