@@ -79,10 +79,6 @@ const Guidance = () => {
       setQueryBuilderJson: qb.setQueryBuilderJson,
     })
   );
-  const empty = useMemo(
-    () => queryBuilderJson.rules.length === 0,
-    [queryBuilderJson]
-  );
 
   const selectedIds = useMemo(() => trueKeys(selected), [selected]);
   const selectedNode = useMemo(() => {
