@@ -87,6 +87,18 @@ export function groupToRules(
 ): RuleNodeType[] {
   const normaliseExclude = opts?.normaliseExclude ?? true;
 
+  const toggleExclude = (item: RuleNodeType) =>
+    isOperator(item) || isAgeFilter(item) || item.exclude === undefined
+      ? item
+      : { ...item, exclude: !item.exclude };
+
+  const invertCombinator = (combinator: CombinatorType) =>
+    combinator === CombinatorType.AND
+      ? CombinatorType.OR
+      : combinator === CombinatorType.OR
+      ? CombinatorType.AND
+      : combinator;
+
   function normaliseGroupExclude(group: RuleGroupType): RuleGroupType {
     const clonedRules = group.rules.map((item: RuleNodeType) => {
       if (isRuleGroup(item)) return normaliseGroupExclude(item);
@@ -94,16 +106,16 @@ export function groupToRules(
       return { ...item };
     });
 
-    /*if (group.exclude) {
-      const rulesNoGroupNot = clonedRules.map((item: any) => {
+    if (group.exclude) {
+      const rulesNoGroupNot = clonedRules.map((item: RuleNodeType) => {
         if (isOperator(item))
           return { ...item, combinator: invertCombinator(item.combinator) };
         return toggleExclude(item);
       });
 
-      const { exclude: _omit, ...rest } = group as any;
+      const { exclude: _omit, ...rest } = group;
       return { ...rest, rules: rulesNoGroupNot };
-    }*/
+    }
 
     return { ...group, rules: clonedRules };
   }
