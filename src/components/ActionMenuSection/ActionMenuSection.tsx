@@ -149,7 +149,6 @@ const ActionMenuSection = ({
           </Box>
         )}
       </AccordionSummary>
-
       <AccordionDetails
         id={`${baseId}-content`}
         sx={{
