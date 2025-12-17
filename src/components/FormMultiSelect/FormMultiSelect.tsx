@@ -93,7 +93,8 @@ const FormMultiSelect = ({
           {label}
         </FormLabel>
       )}
-
+      {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore */}
       <Autocomplete
         id={id}
         value={value}

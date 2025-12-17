@@ -185,7 +185,7 @@ function makeDefaultStore(): DaphneStoreState {
         name: string;
         collections?: number[];
         active: boolean;
-      }) => RESOLVE<Workgroup>(getMockWorkgroup),
+      }) => RESOLVE<Workgroup>(getMockWorkgroup()),
       addCollectionToWorkgroup: (_payload: AddCollectionToWorkgroupPost) =>
         RESOLVE<number>(1),
     },
