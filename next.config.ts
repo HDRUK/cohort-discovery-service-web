@@ -1,5 +1,6 @@
 import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
   logging: {
@@ -11,6 +12,7 @@ const nextConfig: NextConfig = {
     authInterrupts: true,
   },
   transpilePackages: ["@faker-js/faker"],
+  outputFileTracingRoot: path.join(__dirname, "../"),
 };
 
 const withMDX = createMDX({

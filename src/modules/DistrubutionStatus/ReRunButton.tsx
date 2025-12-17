@@ -32,8 +32,9 @@ export const ReRunButton = ({
     !!currentTask &&
     isEqualTask(currentTask, lastSuccessfullTask);
 
-  const isLoading =
-    currentTask === null || taskLoading || !isLastSuccessfullTask;
+  const isLoading = !lastSuccessfullTask
+    ? false
+    : currentTask === null || taskLoading || !isLastSuccessfullTask;
 
   return (
     <Button
