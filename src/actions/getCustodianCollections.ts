@@ -21,17 +21,19 @@ const getCustodianCollections = async (
     url += `?${queryString}`;
   }
 
-  return await apiGet<ApiResponse<Paginated<CollectionWithHosts[]>>>(url, {
+  const res = await apiGet<ApiResponse<Paginated<CollectionWithHosts[]>>>(url, {
     next: {
-      revalidate: DEFAULT_REVALIDATE,
+      revalidate: useCache ? DEFAULT_REVALIDATE : undefined,
       tags: [
         `collections-${custodianPid}`,
         `collections-${custodianPid}-${queryString}`,
         key,
       ],
     },
-    cache: useCache ? "force-cache" : undefined,
+    cache: useCache ? "force-cache" : "no-store",
   });
+
+  return res;
 };
 
 export default getCustodianCollections;

@@ -1,8 +1,10 @@
-import { useDaphneStore } from "@/store/useDaphneStore";
 import { CollectionWithHosts, DistributionType } from "@/types/api";
 import { getDatetime } from "@/utils/date";
 import { Box, Chip, Stack, Typography } from "@mui/material";
 import { ReRunButton } from "./ReRunButton";
+import { useLogDependencyChanges } from "@/utils/deps";
+import useUserStore from "@/store/useUserStore";
+import { useCallback } from "react";
 
 const DistributionStatus = ({
   collection,
@@ -14,14 +16,23 @@ const DistributionStatus = ({
   const demographic = collection.latest_demographic;
   const concept = collection.latest_concept;
 
-  const runDistributions = useDaphneStore((s) => s.userData.runDistributions);
+  const runDistributions = useUserStore((s) => s.runDistributions);
 
-  const handleRunDemographicsNow = async () => {
+  const handleRunDemographicsNow = useCallback(async () => {
     return await runDistributions(collection, DistributionType.DEMOGRAPHICS);
-  };
-  const handleRunConceptsNow = async () => {
+  }, [runDistributions, collection]);
+
+  const handleRunConceptsNow = useCallback(async () => {
     return await runDistributions(collection, DistributionType.GENERIC);
-  };
+  }, [runDistributions, collection]);
+
+  useLogDependencyChanges("DistributionStatus", {
+    collection,
+    demographic,
+    concept,
+    handleRunDemographicsNow,
+    handleRunConceptsNow,
+  });
 
   return (
     <Stack spacing={1} height={"100%"} justifyContent={"center"}>
@@ -34,8 +45,8 @@ const DistributionStatus = ({
           />
           {!disabled && (
             <ReRunButton
-              lastSuccessfullTask={demographic?.task}
               task={collection.latest_demographic_task}
+              lastSuccessfullTask={demographic?.task}
               onClick={handleRunDemographicsNow}
             />
           )}

@@ -10,7 +10,7 @@ import {
   MRT_RowSelectionState,
   type MRT_ColumnDef,
 } from "material-react-table";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Box, Chip, Tooltip, Typography } from "@mui/material";
 import { getCollectionStatus } from "@/utils/colours";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
@@ -27,6 +27,7 @@ import { DEFAULT_INTERVAL } from "@/config/defaults";
 import getCustodianCollections from "@/actions/getCustodianCollections";
 import getAdminCollections from "@/actions/getAdminCollections";
 import { isEqualTask } from "@/utils/distributions";
+import { useLogDependencyChanges } from "@/utils/deps";
 
 export interface CollectionsTableProps {
   initialData: Paginated<CollectionWithHosts[]>;
@@ -45,14 +46,18 @@ const CollectionsTable = ({
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
 
   const {
-    userData: { setSelectedCollection },
+    userData: { selectedCollection, setSelectedCollection },
     custodianData: { deleteCollection, currentCustodian },
     adminData: { deleteCollection: deleteCollectionAdmin },
   } = useDaphneStore();
 
   const queryKey = useMemo(
-    () => [`collections-${searchParams.toString()}`],
-    [searchParams]
+    () => [
+      `collections-${
+        currentCustodian?.pid ? currentCustodian.pid : "admin"
+      }-${searchParams.toString()}`,
+    ],
+    [searchParams, currentCustodian]
   );
   const qc = useQueryClient();
   const { data: collections } = useQuery<Paginated<CollectionWithHosts[]>>({
@@ -65,7 +70,7 @@ const CollectionsTable = ({
               searchParams,
               false
             )
-          : await getAdminCollections(searchParams, false);
+          : await getAdminCollections(searchParams ?? {}, false);
 
       return res.data;
     },
@@ -99,16 +104,21 @@ const CollectionsTable = ({
   );
 
   useEffect(() => {
-    const selectedCollection =
+    const newSelectedCollection =
       selectedCollectionIds.length > 0
         ? collections.data.find(
             (h) =>
               String(h.id) ===
               selectedCollectionIds[selectedCollectionIds.length - 1]
-          )
+          ) ?? null
         : null;
-    setSelectedCollection(selectedCollection ?? null);
-  }, [collections.data, selectedCollectionIds, setSelectedCollection]);
+    setSelectedCollection(newSelectedCollection);
+  }, [
+    collections.data,
+    selectedCollection,
+    selectedCollectionIds,
+    setSelectedCollection,
+  ]);
 
   const filter_name = getSearchParam() || "all";
 
@@ -208,17 +218,35 @@ const CollectionsTable = ({
     getRowId: (row) => String(row?.id),
   });
 
-  const handleDeleteCollections = async (ids: string[]) => {
-    await Promise.all(
-      ids.map((id) => {
-        if (currentCustodian) {
-          deleteCollection(id, currentCustodian.pid);
-        } else {
-          deleteCollectionAdmin(id);
-        }
-      })
-    );
-  };
+  const handleDeleteCollections = useCallback(
+    async (ids: string[]) => {
+      await Promise.all(
+        ids.map((id) => {
+          if (currentCustodian) {
+            deleteCollection(id, currentCustodian.pid);
+          } else {
+            deleteCollectionAdmin(id);
+          }
+        })
+      );
+    },
+    [currentCustodian, deleteCollection, deleteCollectionAdmin]
+  );
+
+  useLogDependencyChanges("collectionsTable", {
+    queryKey,
+    table,
+    filter_name,
+    handleDeleteCollections,
+    collections,
+    searchParams,
+    getSearchParam,
+    rowSelection,
+    setRowSelection,
+    setSelectedCollection,
+    deleteCollection,
+    deleteCollectionAdmin,
+  });
 
   if (collections.total === 0)
     return (
@@ -262,7 +290,14 @@ const CollectionsTable = ({
             subTitle: capitaliseFirstLetter(filter_name),
           },
         }}
-        rightAction={{ deleteProps: { onClick: handleDeleteCollections } }}
+        rightAction={{
+          deleteProps: { onClick: handleDeleteCollections },
+          refreshProps: {
+            tag: currentCustodian?.pid
+              ? `collections-${currentCustodian.pid}`
+              : "collections",
+          },
+        }}
       />
     </Box>
   );

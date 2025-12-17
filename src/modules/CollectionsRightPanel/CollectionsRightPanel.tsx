@@ -3,7 +3,7 @@ import UpdateCollection, {
 } from "@/modules/UpdateCollection";
 import { maskClientTest } from "@/lib/maskClientTest";
 import { CollectionGuidanceProps } from "./CollectionsGuidance";
-import { useDaphneStore } from "@/store/useDaphneStore";
+import useUserStore from "@/store/useUserStore";
 
 const CollectionGuidance = maskClientTest<CollectionGuidanceProps>(
   () => import("./CollectionsGuidance")
@@ -12,9 +12,7 @@ const CollectionGuidance = maskClientTest<CollectionGuidanceProps>(
 type CollectionsRightPanelProps = Omit<UpdateCollectionProps, "collection">;
 
 const CollectionsRightPanel = ({ ...props }: CollectionsRightPanelProps) => {
-  const {
-    userData: { selectedCollection },
-  } = useDaphneStore();
+  const selectedCollection = useUserStore((u) => u.selectedCollection);
 
   if (selectedCollection) {
     return <UpdateCollection collection={selectedCollection} {...props} />;

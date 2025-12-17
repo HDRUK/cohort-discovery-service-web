@@ -11,6 +11,8 @@ const List = ({
   disabled = false,
   ...props
 }: ListProps & { items: ListItem[]; disabled?: boolean }) => {
+  // to-do: to implement a compact version
+  //const { compact } = useActionMenuSection();
   return (
     <MuiList disablePadding {...props}>
       {items.map(({ label, onClick }) => (
