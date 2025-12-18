@@ -5,6 +5,7 @@ import CollectionsTable from "@/components/CollectionsTable";
 import { Box, Typography } from "@mui/material";
 import { capitaliseFirstLetter } from "@/utils/string";
 import useAdminStore from "@/store/useAdminStore";
+import { useNotify } from "@/providers/NotifyProvider";
 
 type WorkgroupsMiddlePanelProps = {
   collections: Paginated<CollectionWithHosts[]>;
@@ -15,6 +16,8 @@ const WorkgroupsMiddlePanel = ({ collections }: WorkgroupsMiddlePanelProps) => {
   const removeCollectionFromWorkgroup = useAdminStore(
     (s) => s.removeCollectionFromWorkgroup
   );
+
+  const notify = useNotify();
 
   return (
     <Box
@@ -42,6 +45,11 @@ const WorkgroupsMiddlePanel = ({ collections }: WorkgroupsMiddlePanelProps) => {
                       workgroup_id: selectedWorkgroup.id,
                     })
                 )
+              );
+              notify.success(
+                `${ids.length} Collection${
+                  ids.length > 1 ? "s" : ""
+                } removed from workgroup ${selectedWorkgroup.name}`
               );
             }}
           />

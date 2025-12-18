@@ -752,6 +752,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       //this needs to be re-done, mixing of pid and id makes it diffcult
       // to revalidate cache, and here we don't know the custodian
       await revalidateAction(`collections`);
+      await revalidateAction(`collections-admin`);
     },
     createWorkgroup: async (payload) => {
       const { data } = await createWorkgroup(payload);

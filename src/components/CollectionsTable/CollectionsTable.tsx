@@ -30,6 +30,7 @@ import { useLogDependencyChanges } from "@/utils/deps";
 import useAdminStore from "@/store/useAdminStore";
 import useCustodianStore from "@/store/useCustodianStore";
 import useUserStore from "@/store/useUserStore";
+import { useNotify } from "@/providers/NotifyProvider";
 
 export interface CollectionsTableProps {
   initialData: Paginated<CollectionWithHosts[]>;
@@ -38,7 +39,7 @@ export interface CollectionsTableProps {
   refreshRate?: number;
   tableTitle?: string;
   tableSubTitle?: string;
-  deleteOverride: (ids: string[]) => Promise<void>;
+  deleteOverride?: (ids: string[]) => Promise<void>;
 }
 
 const CollectionsTable = ({
@@ -58,6 +59,8 @@ const CollectionsTable = ({
   const currentCustodian = useCustodianStore((s) => s.currentCustodian);
   const selectedCollection = useUserStore((s) => s.selectedCollection);
   const setSelectedCollection = useUserStore((s) => s.setSelectedCollection);
+
+  const notify = useNotify();
 
   const queryKey = useMemo(
     () => [
@@ -239,6 +242,9 @@ const CollectionsTable = ({
           }
         })
       );
+      notify.success(
+        `${ids.length} Collection${ids.length > 1 ? "s" : ""} deleted`
+      );
     },
     [currentCustodian, deleteCollection, deleteCollectionAdmin, deleteOverride]
   );
@@ -305,7 +311,7 @@ const CollectionsTable = ({
           refreshProps: {
             tag: currentCustodian?.pid
               ? `collections-${currentCustodian.pid}`
-              : "collections",
+              : "collections-admin",
           },
         }}
       />
