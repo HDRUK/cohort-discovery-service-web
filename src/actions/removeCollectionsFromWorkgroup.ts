@@ -8,11 +8,10 @@ const removeCollectionsFromWorkgroup = async (
   payload: RemoveCollectionsFromWorkgroupPost
 ): Promise<void> => {
   await Promise.all(
-    payload.ids.map(
-      async (id) =>
-        await apiDelete<ApiResponse<number>>(
-          `${API_ROUTES.collection(id)}/workgroup/${payload.workgroup_id}`
-        )
+    payload.ids.map(async (id) =>
+      apiDelete<ApiResponse<number>>(
+        `${API_ROUTES.collection(id)}/workgroup/${payload.workgroup_id}`
+      )
     )
   );
 };

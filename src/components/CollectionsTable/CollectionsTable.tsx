@@ -231,20 +231,20 @@ const CollectionsTable = ({
     async (ids: string[]) => {
       if (deleteOverride) {
         await deleteOverride(ids);
-        return;
+      } else {
+        await Promise.all(
+          ids.map((id) => {
+            if (currentCustodian) {
+              deleteCollection(id, currentCustodian.pid);
+            } else {
+              deleteCollectionAdmin(id);
+            }
+          })
+        );
+        notify.success(
+          `${ids.length} Collection${ids.length > 1 ? "s" : ""} deleted`
+        );
       }
-      await Promise.all(
-        ids.map((id) => {
-          if (currentCustodian) {
-            deleteCollection(id, currentCustodian.pid);
-          } else {
-            deleteCollectionAdmin(id);
-          }
-        })
-      );
-      notify.success(
-        `${ids.length} Collection${ids.length > 1 ? "s" : ""} deleted`
-      );
     },
     [
       currentCustodian,
