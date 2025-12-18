@@ -8,7 +8,7 @@ import { Collection, Workgroup } from "@/types/api";
 import { useCallback } from "react";
 import useSearchParams from "@/hooks/useSearchParams";
 import { capitaliseFirstLetter } from "@/utils/string";
-import { useDaphneStore } from "@/store/useDaphneStore";
+import useAdminStore from "@/store/useAdminStore";
 
 type WorkgroupsLeftPanelProps = {
   workgroups: Workgroup[];
@@ -25,9 +25,8 @@ const WorkgroupsLeftPanel = ({
   onCreate,
   onCancelCreate,
 }: WorkgroupsLeftPanelProps) => {
-  const {
-    adminData: { setSelectedWorkgroup },
-  } = useDaphneStore();
+  const setSelectedWorkgroup = useAdminStore((s) => s.setSelectedWorkgroup);
+
   const { setSearchParam } = useSearchParams("workgroup_filter");
 
   const onSelectWorkgroup = useCallback(

@@ -10,12 +10,11 @@ import {
   MRT_RowSelectionState,
   type MRT_ColumnDef,
 } from "material-react-table";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Box, Chip, Tooltip, Typography } from "@mui/material";
 import { getCollectionStatus } from "@/utils/colours";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import Table from "@/components/Table";
-import { useDaphneStore } from "@/store/useDaphneStore";
 import CopyableVariable from "../CopyableVariable";
 import Title from "@/components/Title";
 import useSearchParams from "@/hooks/useSearchParams";
@@ -27,6 +26,10 @@ import { DEFAULT_INTERVAL } from "@/config/defaults";
 import getCustodianCollections from "@/actions/getCustodianCollections";
 import getAdminCollections from "@/actions/getAdminCollections";
 import { isEqualTask } from "@/utils/distributions";
+import { useLogDependencyChanges } from "@/utils/deps";
+import useAdminStore from "@/store/useAdminStore";
+import useCustodianStore from "@/store/useCustodianStore";
+import useUserStore from "@/store/useUserStore";
 
 export interface CollectionsTableProps {
   initialData: Paginated<CollectionWithHosts[]>;
@@ -48,15 +51,19 @@ const CollectionsTable = ({
   const { searchParams, getSearchParam } = useSearchParams("collection_filter");
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
 
-  const {
-    userData: { setSelectedCollection },
-    custodianData: { deleteCollection, currentCustodian },
-    adminData: { deleteCollection: deleteCollectionAdmin },
-  } = useDaphneStore();
+  const deleteCollectionAdmin = useAdminStore((s) => s.deleteCollection);
+  const deleteCollection = useCustodianStore((s) => s.deleteCollection);
+  const currentCustodian = useCustodianStore((s) => s.currentCustodian);
+  const selectedCollection = useUserStore((s) => s.selectedCollection);
+  const setSelectedCollection = useUserStore((s) => s.setSelectedCollection);
 
   const queryKey = useMemo(
-    () => [`collections-admin-${searchParams.toString()}`],
-    [searchParams]
+    () => [
+      `collections-${
+        currentCustodian?.pid ? currentCustodian.pid : "admin"
+      }-${searchParams.toString()}`,
+    ],
+    [searchParams, currentCustodian]
   );
   const qc = useQueryClient();
   const { data: collections } = useQuery<Paginated<CollectionWithHosts[]>>({
@@ -64,12 +71,10 @@ const CollectionsTable = ({
     queryFn: async () => {
       const res =
         currentCustodian?.pid && !admin
-          ? await getCustodianCollections(
-              currentCustodian.pid,
-              searchParams,
-              false
-            )
-          : await getAdminCollections(searchParams, false);
+          ? await getCustodianCollections(currentCustodian.pid, searchParams, {
+              fresh: true,
+            })
+          : await getAdminCollections(searchParams, { fresh: true });
 
       return res.data;
     },
@@ -103,16 +108,21 @@ const CollectionsTable = ({
   );
 
   useEffect(() => {
-    const selectedCollection =
+    const newSelectedCollection =
       selectedCollectionIds.length > 0
         ? collections.data.find(
             (h) =>
               String(h.id) ===
               selectedCollectionIds[selectedCollectionIds.length - 1]
-          )
+          ) ?? null
         : null;
-    setSelectedCollection(selectedCollection ?? null);
-  }, [collections.data, selectedCollectionIds, setSelectedCollection]);
+    setSelectedCollection(newSelectedCollection);
+  }, [
+    collections.data,
+    selectedCollection,
+    selectedCollectionIds,
+    setSelectedCollection,
+  ]);
 
   const filter_name = getSearchParam() || "all";
 
@@ -212,17 +222,35 @@ const CollectionsTable = ({
     getRowId: (row) => String(row?.id),
   });
 
-  const handleDeleteCollections = async (ids: string[]) => {
-    await Promise.all(
-      ids.map((id) => {
-        if (currentCustodian) {
-          deleteCollection(id, currentCustodian.pid);
-        } else {
-          deleteCollectionAdmin(id);
-        }
-      })
-    );
-  };
+  const handleDeleteCollections = useCallback(
+    async (ids: string[]) => {
+      await Promise.all(
+        ids.map((id) => {
+          if (currentCustodian) {
+            deleteCollection(id, currentCustodian.pid);
+          } else {
+            deleteCollectionAdmin(id);
+          }
+        })
+      );
+    },
+    [currentCustodian, deleteCollection, deleteCollectionAdmin]
+  );
+
+  useLogDependencyChanges("collectionsTable", {
+    queryKey,
+    table,
+    filter_name,
+    handleDeleteCollections,
+    collections,
+    searchParams,
+    getSearchParam,
+    rowSelection,
+    setRowSelection,
+    setSelectedCollection,
+    deleteCollection,
+    deleteCollectionAdmin,
+  });
 
   if (collections.total === 0)
     return (
@@ -266,7 +294,14 @@ const CollectionsTable = ({
             subTitle: tableSubTitle || capitaliseFirstLetter(filter_name),
           },
         }}
-        rightAction={{ deleteProps: { onClick: handleDeleteCollections } }}
+        rightAction={{
+          deleteProps: { onClick: handleDeleteCollections },
+          refreshProps: {
+            tag: currentCustodian?.pid
+              ? `collections-${currentCustodian.pid}`
+              : "collections",
+          },
+        }}
       />
     </Box>
   );

@@ -22,7 +22,7 @@ function summarise(value: unknown): string {
   if (isRef(value)) return `ref(${summarise(value.current)})`;
   if (isObject(value)) {
     const ctorName = value.constructor?.name as unknown as string | undefined;
-    return ctorName || "object";
+    return JSON.stringify(value) || ctorName || "object";
   }
   return String(value);
 }
@@ -38,6 +38,7 @@ function useLogDependencyChanges(
   options?: Options
 ): void {
   const { enabled = !isProd && useDebug, pretty = true } = options ?? {};
+
   const prev = useRef<Deps>(depsObj);
 
   useEffect(() => {

@@ -1,8 +1,8 @@
 import { Query, Task } from "@/types/api";
-import { isEqualTask } from "@/utils/distributions";
 import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
 import { Button, CircularProgress } from "@mui/material";
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 interface ReRunButtonProps {
   task?: Task;
@@ -11,43 +11,54 @@ interface ReRunButtonProps {
 }
 
 export const ReRunButton = ({
-  lastSuccessfullTask,
   task,
+  lastSuccessfullTask,
   onClick,
 }: ReRunButtonProps) => {
-  const taskIncomplete = Boolean(task && !task.completed_at);
-  const [currentTask, setCurrentTask] = useState<Task | null>(task ?? null);
+  const [submittedTask, setSubmittedTask] = useState<Task | null>(null);
 
-  const handleClick = async () => {
-    setCurrentTask(null);
+  const handleClick = useCallback(async () => {
+    setSubmittedTask(null);
+
     const newQuery = await onClick();
-    const [newTask] = newQuery.tasks;
-    setCurrentTask(newTask);
-  };
+    const newTask = newQuery.tasks?.[0];
+    setSubmittedTask(newTask ?? null);
+  }, [onClick]);
 
-  const isLastSuccessfullTask =
-    !!lastSuccessfullTask &&
-    !!currentTask &&
-    isEqualTask(currentTask, lastSuccessfullTask);
+  const submittedId = submittedTask?.id;
+  const lastSuccessId = lastSuccessfullTask?.id;
 
-  const taskLoading =
-    currentTask === null || (taskIncomplete && task?.id !== currentTask?.id);
+  const hasFailed = useMemo(
+    () =>
+      submittedTask?.id && task?.id && submittedTask?.id === task?.id
+        ? !!task.failed_at
+        : false,
+    [task, submittedTask]
+  );
 
-  const isLoading = !lastSuccessfullTask
-    ? false
-    : taskLoading || !isLastSuccessfullTask;
+  const isLoading =
+    !hasFailed && !!submittedId && submittedId !== lastSuccessId;
 
   return (
     <Button
-      loadingPosition="end"
       color="inherit"
       size="small"
       variant="text"
       onClick={handleClick}
+      disabled={isLoading}
     >
-      Run now
-      {isLoading && <CircularProgress sx={{ mx: 1 }} size={15} />}
-      {isLastSuccessfullTask && <CheckIcon color="success" />}
+      {isLoading ? "Running" : "Run now"}
+      {submittedTask && (
+        <>
+          {isLoading ? (
+            <CircularProgress sx={{ mx: 1 }} size={15} />
+          ) : hasFailed ? (
+            <CloseIcon color="error" sx={{ mx: 1, fontSize: 20 }} />
+          ) : (
+            <CheckIcon color="success" sx={{ mx: 1, fontSize: 20 }} />
+          )}
+        </>
+      )}
     </Button>
   );
 };

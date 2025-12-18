@@ -4,16 +4,14 @@ import { CollectionWithHosts, Paginated } from "@/types/api";
 import CollectionsTable from "@/components/CollectionsTable";
 import { Box, Typography } from "@mui/material";
 import { capitaliseFirstLetter } from "@/utils/string";
-import { useDaphneStore } from "@/store/useDaphneStore";
+import useAdminStore from "@/store/useAdminStore";
 
 type WorkgroupsMiddlePanelProps = {
   collections: Paginated<CollectionWithHosts[]>;
 };
 
 const WorkgroupsMiddlePanel = ({ collections }: WorkgroupsMiddlePanelProps) => {
-  const {
-    adminData: { selectedWorkgroup },
-  } = useDaphneStore();
+  const selectedWorkgroup = useAdminStore((s) => s.selectedWorkgroup);
 
   return (
     <Box

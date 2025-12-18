@@ -14,12 +14,13 @@ import AddButton from "@/components/AddButton";
 import FormTextField from "@/components/FormTextField";
 import CollectionConfig from "@/components/CollectionConfig";
 import { UpdateCollectionFormValues } from "@/types/forms";
-import { useEffect } from "react";
-import { useDaphneStore } from "@/store/useDaphneStore";
+import { useCallback, useEffect } from "react";
 import { revalidateAction } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
 import FormDropdown from "@/components/FormDropdown";
 import DistributionStatus from "../DistrubutionStatus";
+import useCustodianStore from "@/store/useCustodianStore";
+import { useLogDependencyChanges } from "@/utils/deps";
 
 export type UpdateCollectionProps = {
   collection: CollectionWithHosts;
@@ -29,51 +30,55 @@ export type UpdateCollectionProps = {
   onClose?: () => void;
 };
 
+const getDefaultValues = (collection: CollectionWithHosts | null) => {
+  if (!collection) {
+    return {
+      collection: {
+        name: "",
+        description: "",
+        url: "" as UrlString,
+        host_id: 0,
+      },
+      config: {
+        frequency_mode: Number(FrequencyMode.WEEKLY),
+        run_time_frequency: 0,
+        run_time_hour: 0,
+        run_time_minute: 0,
+      },
+    };
+  }
+
+  const { name, description, url, host: hosts, config } = collection;
+  const [host] = hosts;
+  return {
+    collection: {
+      name,
+      description: description || "",
+      url: url || ("" as UrlString),
+      host_id: host.id,
+    },
+    config: {
+      frequency_mode: config.frequency_mode,
+      run_time_frequency: config.run_time_frequency,
+      run_time_hour: config.run_time_hour ?? 0,
+      run_time_minute: config.run_time_minute ?? 0,
+    },
+  };
+};
+
 const UpdateCollection = ({
   collection,
   collectionHosts,
   expandedRight,
   onClose,
 }: UpdateCollectionProps) => {
-  const getDefaultValues = (collection: CollectionWithHosts | null) => {
-    if (!collection) {
-      return {
-        collection: {
-          name: "",
-          description: "",
-          url: "" as UrlString,
-          host_id: 0,
-        },
-        config: {
-          frequency_mode: Number(FrequencyMode.WEEKLY),
-          run_time_frequency: 0,
-          run_time_hour: 0,
-          run_time_minute: 0,
-        },
-      };
-    }
+  const { currentCustodian, updateCollection } = useCustodianStore(
+    (custodianData) => ({
+      currentCustodian: custodianData.currentCustodian,
+      updateCollection: custodianData.updateCollection,
+    })
+  );
 
-    const { name, description, url, host: hosts, config } = collection;
-    const [host] = hosts;
-    return {
-      collection: {
-        name,
-        description: description || "",
-        url: url || ("" as UrlString),
-        host_id: host.id,
-      },
-      config: {
-        frequency_mode: config.frequency_mode,
-        run_time_frequency: config.run_time_frequency,
-        run_time_hour: config.run_time_hour ?? 0,
-        run_time_minute: config.run_time_minute ?? 0,
-      },
-    };
-  };
-
-  const {
-    custodianData: { currentCustodian, updateCollection },
-  } = useDaphneStore();
   const notify = useNotify();
 
   const formMethods = useForm<UpdateCollectionFormValues>({
@@ -98,34 +103,55 @@ const UpdateCollection = ({
     });
   }, [collection, reset]);
 
-  const submitForm = async (
-    data: UpdateCollectionFormValues,
-    closeAfter = false
-  ) => {
-    if (!collection?.id) return;
+  const submitForm = useCallback(
+    async (data: UpdateCollectionFormValues, closeAfter = false) => {
+      if (!collection?.id) return;
 
-    const { id } = collection;
+      const { id } = collection;
 
-    if (isDirty) {
-      await updateCollection(id, data.collection, data.config);
-      notify.success(`Updated collection ${data.collection.name}`);
+      if (isDirty) {
+        await updateCollection(id, data.collection, data.config);
+        notify.success(`Updated collection ${data.collection.name}`);
 
-      revalidateAction(`collections-admin`);
-      if (currentCustodian) {
-        revalidateAction(`collections-${currentCustodian.pid}`);
+        revalidateAction(`collections-admin`);
+        if (currentCustodian) {
+          revalidateAction(`collections-${currentCustodian.pid}`);
+        }
       }
-    }
 
-    if (closeAfter) {
-      onClose?.();
-    }
-  };
+      if (closeAfter) {
+        onClose?.();
+      }
+    },
+    [collection, currentCustodian, isDirty, notify, updateCollection, onClose]
+  );
 
-  const handleEnter = handleSubmit((values) => submitForm(values, false));
-  const handleLockClick = handleSubmit((values) => submitForm(values, true));
-  const handleUnlockClick = () => {
+  const handleEnter = useCallback(
+    () => handleSubmit((values) => submitForm(values, false))(),
+    [handleSubmit, submitForm]
+  );
+
+  const handleLockClick = useCallback(
+    () => handleSubmit((values) => submitForm(values, true))(),
+    [handleSubmit, submitForm]
+  );
+
+  const handleUnlockClick = useCallback(() => {
     onClose?.();
-  };
+  }, [onClose]);
+
+  useLogDependencyChanges("UpdateCollection", {
+    collection,
+    collectionHosts,
+    ...formMethods,
+    currentCustodian,
+    getDefaultValues,
+    updateCollection,
+    handleEnter,
+    handleLockClick,
+    handleUnlockClick,
+    submitForm,
+  });
 
   return (
     <FormProvider {...formMethods}>

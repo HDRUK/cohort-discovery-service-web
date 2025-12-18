@@ -29,7 +29,10 @@ const useSearchParams = (paramName: string = "searchTerm") => {
     [router, searchParams, paramName]
   );
 
-  const getSearchParam = () => searchParams?.get(paramName);
+  const getSearchParam = useCallback(
+    () => searchParams?.get(paramName),
+    [paramName, searchParams]
+  );
 
   const clearSearchParams = useCallback(() => {
     router.replace(pathname);

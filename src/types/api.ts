@@ -5,6 +5,11 @@ export type SearchParams = Promise<{
   [key: string]: string | string[] | undefined;
 }>;
 
+export interface CacheOptions {
+  fresh?: boolean;
+  force?: boolean;
+}
+
 export interface ApiSearchParams {
   per_page?: number;
   page?: number;

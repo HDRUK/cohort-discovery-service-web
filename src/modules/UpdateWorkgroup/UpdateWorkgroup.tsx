@@ -11,7 +11,7 @@ import { revalidateAction } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
 import FormMultiSelect from "@/components/FormMultiSelect";
 import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
-import { useDaphneStore } from "@/store/useDaphneStore";
+import useAdminStore from "@/store/useAdminStore";
 export type UpdateWorkgroupProps = {
   collections: Collection[];
   expandedRight: boolean;
@@ -23,9 +23,11 @@ const UpdateWorkgroup = ({
   expandedRight,
   onClose,
 }: UpdateWorkgroupProps) => {
-  const {
-    adminData: { addCollectionToWorkgroup, selectedWorkgroup },
-  } = useDaphneStore();
+  const addCollectionToWorkgroup = useAdminStore(
+    (s) => s.addCollectionToWorkgroup
+  );
+  const selectedWorkgroup = useAdminStore((s) => s.selectedWorkgroup);
+
   const notify = useNotify();
 
   const formMethods = useForm<UpdateWorkgroupFormValues>({

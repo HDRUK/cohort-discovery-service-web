@@ -1,7 +1,6 @@
 import { Box, Stack, Button } from "@mui/material";
 
 import { useForm, Controller, FormProvider } from "react-hook-form";
-import { useDaphneStore } from "@/store/useDaphneStore";
 import { CreateWorkgroupFormValues } from "@/types/forms";
 import FormTextField from "@/components/FormTextField";
 import { Collection } from "@/types/api";
@@ -10,6 +9,7 @@ import { useNotify } from "@/providers/NotifyProvider";
 
 import FormMultiSelect from "@/components/FormMultiSelect";
 import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
+import useAdminStore from "@/store/useAdminStore";
 
 interface CreateCollectionProps {
   collections?: Collection[];
@@ -17,9 +17,11 @@ interface CreateCollectionProps {
 }
 
 const CreateWorkgroup = ({ collections, onCancel }: CreateCollectionProps) => {
-  const {
-    adminData: { createWorkgroup, addCollectionToWorkgroup },
-  } = useDaphneStore();
+  const createWorkgroup = useAdminStore((s) => s.createWorkgroup);
+  const addCollectionToWorkgroup = useAdminStore(
+    (s) => s.addCollectionToWorkgroup
+  );
+
   const notify = useNotify();
 
   const formMethods = useForm<CreateWorkgroupFormValues>({

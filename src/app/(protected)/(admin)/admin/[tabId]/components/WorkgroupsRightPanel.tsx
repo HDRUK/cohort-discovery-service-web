@@ -3,16 +3,14 @@ import UpdateWorkgroup, {
 } from "@/modules/UpdateWorkgroup";
 import { maskClientTest } from "@/lib/maskClientTest";
 import { WorkgroupGuidanceProps } from "./WorkgroupsGuidance";
-import { useDaphneStore } from "@/store/useDaphneStore";
+import useAdminStore from "@/store/useAdminStore";
 
 const WorkgroupGuidance = maskClientTest<WorkgroupGuidanceProps>(
   () => import("./WorkgroupsGuidance")
 );
 
 const WorkgroupsRightPanel = ({ ...props }: UpdateWorkgroupProps) => {
-  const {
-    adminData: { selectedWorkgroup },
-  } = useDaphneStore();
+  const selectedWorkgroup = useAdminStore((s) => s.selectedWorkgroup);
 
   if (selectedWorkgroup) {
     return <UpdateWorkgroup {...props} />;

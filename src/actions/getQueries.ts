@@ -19,7 +19,7 @@ const getQueries = async (
       : API_ROUTES.queries,
     {
       next: {
-        revalidate: DEFAULT_REVALIDATE,
+        revalidate: useCache ? DEFAULT_REVALIDATE : undefined,
         tags: [
           "all",
           "queries",
@@ -27,7 +27,7 @@ const getQueries = async (
           `${userId}-queries-${searchParams?.toString()}`,
         ],
       },
-      cache: useCache ? "force-cache" : undefined,
+      cache: useCache ? "force-cache" : "no-store",
     }
   );
 

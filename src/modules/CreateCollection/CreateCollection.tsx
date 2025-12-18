@@ -1,7 +1,6 @@
 import { Box, Stack, Button, MenuItem } from "@mui/material";
 
 import { useForm, Controller, FormProvider } from "react-hook-form";
-import { useDaphneStore } from "@/store/useDaphneStore";
 import { CreateCollectionFormValues } from "@/types/forms";
 import { QueryContext } from "@/types/context";
 import FormTextField from "@/components/FormTextField";
@@ -17,6 +16,8 @@ import CollectionConfig from "@/components/CollectionConfig";
 import { REGEX_URL_NO_WWW } from "@/config/regex";
 import FormDropdown from "@/components/FormDropdown";
 import { v4 as uuidv4 } from "uuid";
+import useAdminStore from "@/store/useAdminStore";
+import useCustodianStore from "@/store/useCustodianStore";
 
 interface CreateCollectionProps {
   collectionHosts: CollectionHost[];
@@ -29,10 +30,10 @@ const CreateCollection = ({
   custodians,
   onCancel,
 }: CreateCollectionProps) => {
-  const {
-    custodianData: { createCollection, currentCustodian },
-    adminData: { createCollection: createCollectionAdmin },
-  } = useDaphneStore();
+  const createCollectionAdmin = useAdminStore((s) => s.createCollection);
+  const createCollection = useCustodianStore((s) => s.createCollection);
+  const currentCustodian = useCustodianStore((s) => s.currentCustodian);
+
   const notify = useNotify();
 
   const formMethods = useForm<CreateCollectionFormValues>({

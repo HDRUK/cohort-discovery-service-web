@@ -5,7 +5,7 @@ export const MAX_VARCHAR_LENGTH = 255;
 export const TRIGGER_GUTTER_PX = 70;
 export const ID_REF_SUFFIX = "hierarchyMenuItem";
 export const DEFAULT_INTERVAL = 1000;
-export const DEFAULT_REVALIDATE = 1;
+export const DEFAULT_REVALIDATE = 300;
 export const MAX_INVALID_REASONS = 4;
 
 export const STATUS_LABELS: Record<string, string> = {

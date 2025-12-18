@@ -5,7 +5,7 @@ import {
   type MRT_TableOptions,
 } from "material-react-table";
 
-const SELECT_COL_SIZE = 30;
+const SELECT_COL_SIZE = 40;
 
 export const useTable = <TData extends MRT_RowData>({
   columns,

@@ -3,6 +3,7 @@
 import * as React from "react";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import AddButton from "@/components/AddButton";
+import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
 import Hierarchy from "../Hierarchy";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import { Box } from "@mui/material";
@@ -30,7 +31,12 @@ const ActionMenu: React.FC = () => {
         minHeight: 0,
       }}
     >
-      <ActionMenuSection title={"Insert"} defaultExpanded underline>
+      <ActionMenuSection
+        title={"Insert"}
+        shortTitle={<LibraryAddIcon />}
+        defaultExpanded
+        underline
+      >
         <AddButton action={createNewAgeFilter} label={"Add age filter"} />
         <AddButton action={createNewRule} label={"Add rule"} />
         <AddButton action={createNewGroup} label={"Add group"} />

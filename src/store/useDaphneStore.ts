@@ -603,7 +603,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       const { pid, custodian } = collection;
       const res = await rerunDistributions(pid, { query_type });
       revalidateCustodian(custodian);
-      revalidateAction("collections"); // for admin
+      revalidateAction("collections-admin"); // for admin
       return res.data;
     },
     user: null,
