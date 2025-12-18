@@ -21,9 +21,8 @@ function summarise(value: unknown): string {
   if (isFunction(value)) return `fn(${value.name || "anonymous"})`;
   if (isRef(value)) return `ref(${summarise(value.current)})`;
   if (isObject(value)) {
-    return JSON.stringify(value);
     const ctorName = value.constructor?.name as unknown as string | undefined;
-    return ctorName || "object";
+    return JSON.stringify(value) || ctorName || "object";
   }
   return String(value);
 }
