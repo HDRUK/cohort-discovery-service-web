@@ -19,6 +19,7 @@ import type {
   CollectionWithHosts,
   DistributionType,
   AddCollectionToWorkgroupPost,
+  RemoveCollectionsFromWorkgroupPost,
 } from "@/types/api";
 import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
 import type {
@@ -190,6 +191,9 @@ function makeDefaultStore(): DaphneStoreState {
         RESOLVE<number>(1),
       selectedWorkgroup: null,
       setSelectedWorkgroup: NOOP,
+      removeCollectionsFromWorkgroup: (
+        _payload: RemoveCollectionsFromWorkgroupPost
+      ) => RESOLVE<void>(undefined),
     },
 
     featureFlags: {

@@ -350,6 +350,11 @@ export interface AddCollectionToWorkgroupPost {
   workgroup_id: number;
 }
 
+export interface RemoveCollectionsFromWorkgroupPost {
+  ids: number[];
+  workgroup_id: number;
+}
+
 export interface Concept {
   concept_id: number;
   name?: string;
