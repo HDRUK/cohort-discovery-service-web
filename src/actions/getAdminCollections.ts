@@ -23,7 +23,7 @@ const getAdminCollections = async (
   return await apiGet<ApiResponse<Paginated<CollectionWithHosts[]>>>(url, {
     next: {
       revalidate: useCache ? DEFAULT_REVALIDATE : undefined,
-      tags: [`collections`, `collections-${queryString}`, key],
+      tags: [`collections-admin`, `collections-admin-${queryString}`, key],
     },
     cache: useCache ? "force-cache" : undefined,
   });

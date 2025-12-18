@@ -184,12 +184,6 @@ export interface Token {
   local_user_id: number;
 }
 
-interface Workgroups {
-  id: number;
-  active: number;
-  name: string;
-}
-
 export enum Rquestroles {
   GENERAL_ACCESS = "GENERAL_ACCESS",
 }
@@ -261,7 +255,7 @@ export interface TokenUser {
   is_nhse_sde_approval: boolean;
   organisation: string;
   provider: string;
-  workgroups: Workgroups[];
+  workgroups: Workgroup[];
   cohort_discovery_roles: Roles[];
   cohort_admin_teams: ExternalCustodian[];
 }
@@ -338,6 +332,16 @@ export interface Workgroup {
   external_name?: string;
   users: User[];
   collections: Collection[];
+}
+
+export interface CreateWorkgroupPost {
+  name: string;
+  active: boolean;
+}
+
+export interface AddCollectionToWorkgroupPost {
+  id: number;
+  workgroup_id: number;
 }
 
 export interface Concept {

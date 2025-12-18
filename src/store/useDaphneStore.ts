@@ -27,6 +27,9 @@ import {
   FeatureName,
   DistributionType,
   CollectionWithHosts,
+  Workgroup,
+  CreateWorkgroupPost,
+  AddCollectionToWorkgroupPost,
 } from "@/types/api";
 import createCollection from "@/actions/createCollection";
 import deleteCollection from "@/actions/deleteCollection";
@@ -67,6 +70,8 @@ import updateCollectionConfig from "@/actions/updateCollectionConfig";
 import createCustodianCollection from "@/actions/createCustodianCollection";
 import rerunTask from "@/actions/rerunTask";
 import rerunDistributions from "@/actions/rerunDistributions";
+import createWorkgroup from "@/actions/createWorkgroup";
+import addCollectionToWorkgroup from "@/actions/addCollectionToWorkgroup";
 
 export enum NodeKind {
   RULE = "RULE",
@@ -210,6 +215,12 @@ export interface DaphneStoreState {
       payload: UpdateCollectionPayload
     ) => Promise<Collection>;
     deleteCollection: (id: number | string) => Promise<void>;
+    createWorkgroup: (payload: CreateWorkgroupPost) => Promise<Workgroup>;
+    addCollectionToWorkgroup: (
+      payload: AddCollectionToWorkgroupPost
+    ) => Promise<number>;
+    selectedWorkgroup: Workgroup | null;
+    setSelectedWorkgroup: (workgroup: Workgroup | null) => void;
   };
   featureFlags: {
     flags: FeatureFlag | null;
@@ -674,6 +685,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       });
 
       await revalidateAction(`collections-${custodianPid}`);
+      await revalidateAction("collections-admin");
       return data;
     },
     updateCollection: async (id, payload, payloadConfig) => {
@@ -683,6 +695,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       await updateCollectionConfig(idConfig, payloadConfig);
 
       await revalidateAction(`collections-${data.custodian_id}`);
+      await revalidateAction("collections-admin");
 
       // revalidate custodians
       // - as noted above, keep to sort out the tags for caching first
@@ -694,6 +707,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       // to revalidate cache
       // - created a ticket for this
       await revalidateAction(`collections-${custodianPid}`);
+      await revalidateAction("collections-admin");
     },
   },
   adminData: {
@@ -716,6 +730,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       });
 
       await revalidateAction(`collections-${payload["custodian_id"]}`);
+      await revalidateAction("collections-admin");
       return data;
     },
     updateCollection: async (id, payload) => {
@@ -724,6 +739,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       // to revalidate cache
       // - created a ticket for this
       await revalidateAction(`collections-${data.custodian.pid}`);
+      await revalidateAction("collections-admin");
       return data;
     },
     deleteCollection: async (id) => {
@@ -732,6 +748,22 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       // to revalidate cache, and here we don't know the custodian
       await revalidateAction(`collections`);
     },
+    createWorkgroup: async (payload) => {
+      const { data } = await createWorkgroup(payload);
+      await revalidateAction("workgroups");
+      return data;
+    },
+    addCollectionToWorkgroup: async (payload) => {
+      const { data } = await addCollectionToWorkgroup(payload);
+      await revalidateAction("workgroups");
+      return data;
+    },
+    selectedWorkgroup: null,
+    setSelectedWorkgroup: (selectedWorkgroup: Workgroup | null) =>
+      set((state) => ({
+        ...state,
+        adminData: { ...state.adminData, selectedWorkgroup },
+      })),
   },
   featureFlags: {
     flags: null,

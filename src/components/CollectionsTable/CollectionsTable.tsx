@@ -34,6 +34,8 @@ export interface CollectionsTableProps {
   showPid?: boolean;
   admin?: boolean;
   refreshRate?: number;
+  tableTitle?: string;
+  tableSubTitle?: string;
 }
 
 const CollectionsTable = ({
@@ -41,6 +43,8 @@ const CollectionsTable = ({
   showPid = false,
   admin = false,
   refreshRate = 5,
+  tableTitle,
+  tableSubTitle,
 }: CollectionsTableProps) => {
   const { searchParams, getSearchParam } = useSearchParams("collection_filter");
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
@@ -260,8 +264,8 @@ const CollectionsTable = ({
         }}
       >
         <Title
-          title="Collections"
-          subTitle={capitaliseFirstLetter(filter_name)}
+          title={tableTitle || "Collections"}
+          subTitle={tableSubTitle || capitaliseFirstLetter(filter_name)}
         />
         <Box sx={{ mx: "auto", my: "auto" }}>
           <Typography variant="h5">
@@ -286,8 +290,8 @@ const CollectionsTable = ({
         table={table}
         leftAction={{
           titleProps: {
-            title: "Collections",
-            subTitle: capitaliseFirstLetter(filter_name),
+            title: tableTitle || "Collections",
+            subTitle: tableSubTitle || capitaliseFirstLetter(filter_name),
           },
         }}
         rightAction={{
