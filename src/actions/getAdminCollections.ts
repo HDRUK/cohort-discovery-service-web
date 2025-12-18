@@ -25,7 +25,7 @@ const getAdminCollections = async (
       revalidate: useCache ? DEFAULT_REVALIDATE : undefined,
       tags: [`collections`, `collections-${queryString}`, key],
     },
-    cache: useCache ? "force-cache" : "no-store",
+    cache: useCache ? "force-cache" : undefined,
   });
 };
 

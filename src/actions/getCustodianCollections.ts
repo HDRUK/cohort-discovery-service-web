@@ -30,7 +30,7 @@ const getCustodianCollections = async (
         key,
       ],
     },
-    cache: useCache ? "force-cache" : "no-store",
+    cache: useCache ? "force-cache" : undefined,
   });
 
   return res;
