@@ -2,16 +2,16 @@
 
 import { apiGet } from "../lib/apiClient";
 import { API_ROUTES } from "../lib/apiRoutes";
-import { ApiResponse, Paginated, CollectionWithHosts } from "../types/api";
+import {
+  ApiResponse,
+  Paginated,
+  CollectionWithHosts,
+  CacheOptions,
+} from "../types/api";
 import { cookies } from "next/headers";
 import { getTokenKey } from "@/utils/string";
 import { DEFAULT_REVALIDATE } from "@/config/defaults";
 import { updateTag } from "next/cache";
-
-interface CacheOptions {
-  fresh?: boolean;
-  force?: boolean;
-}
 
 const getCustodianCollections = async (
   custodianPid: string,
