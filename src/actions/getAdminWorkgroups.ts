@@ -2,31 +2,30 @@
 
 import { apiGet } from "../lib/apiClient";
 import { API_ROUTES } from "../lib/apiRoutes";
-import { ApiResponse, Paginated, CollectionWithHosts } from "../types/api";
+import { ApiResponse, Workgroup } from "../types/api";
 import { cookies } from "next/headers";
 import { getTokenKey } from "@/utils/string";
 import { DEFAULT_REVALIDATE } from "@/config/defaults";
 
-const getAdminCollections = async (
-  params?: URLSearchParams,
-  useCache = true
-): Promise<ApiResponse<Paginated<CollectionWithHosts[]>>> => {
+const getAdminWorkgroups = async (
+  params?: URLSearchParams
+): Promise<ApiResponse<Workgroup[]>> => {
   const token = (await cookies()).get("token")?.value || "";
   const key = getTokenKey(token);
 
-  let url = API_ROUTES.adminCollections;
+  let url = API_ROUTES.adminWorkgroups;
   const queryString = params?.toString();
   if (queryString) {
     url += `?${queryString}`;
   }
 
-  return await apiGet<ApiResponse<Paginated<CollectionWithHosts[]>>>(url, {
+  return await apiGet<ApiResponse<Workgroup[]>>(url, {
     next: {
       revalidate: DEFAULT_REVALIDATE,
-      tags: [`collections-admin`, `collections-admin-${queryString}`, key],
+      tags: [`workgroups-admin`, `workgroups-admin-${queryString}`, key],
     },
-    cache: useCache ? "force-cache" : undefined,
+    cache: "force-cache",
   });
 };
 
-export default getAdminCollections;
+export default getAdminWorkgroups;

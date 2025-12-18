@@ -110,6 +110,7 @@ const UpdateCollection = ({
       await updateCollection(id, data.collection, data.config);
       notify.success(`Updated collection ${data.collection.name}`);
 
+      revalidateAction(`collections-admin`);
       if (currentCustodian) {
         revalidateAction(`collections-${currentCustodian.pid}`);
       }
