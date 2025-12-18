@@ -1,3 +1,4 @@
+import theme from "@/config/theme";
 import { Close } from "@mui/icons-material";
 import {
   Autocomplete,
@@ -178,7 +179,10 @@ const FormMultiSelect = ({
                   >
                     <Close
                       onClick={() => handleDelete(val)}
-                      sx={{ cursor: "pointer", color: "#D0D3D4" }}
+                      sx={{
+                        cursor: "pointer",
+                        color: theme.palette.grey[500],
+                      }}
                     />
                     {getChipLabel
                       ? getChipLabel(options, val)
@@ -190,7 +194,7 @@ const FormMultiSelect = ({
                 color={chipColor}
                 sx={{
                   m: 0.5,
-                  backgroundColor: "#FAFAFA",
+                  backgroundColor: theme.palette.background.paper,
                   justifyContent: "left",
                   fontWeight: 400,
                 }}
