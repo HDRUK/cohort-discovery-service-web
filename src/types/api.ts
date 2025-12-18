@@ -349,6 +349,11 @@ export interface AddCollectionToWorkgroupPost {
   workgroup_id: number;
 }
 
+export interface RemoveCollectionFromWorkgroupPost {
+  id: number;
+  workgroup_id: number;
+}
+
 export interface Concept {
   concept_id: number;
   name?: string;

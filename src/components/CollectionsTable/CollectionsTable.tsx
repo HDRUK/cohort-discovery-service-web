@@ -38,6 +38,7 @@ export interface CollectionsTableProps {
   refreshRate?: number;
   tableTitle?: string;
   tableSubTitle?: string;
+  deleteOverride: (ids: string[]) => Promise<void>;
 }
 
 const CollectionsTable = ({
@@ -47,6 +48,7 @@ const CollectionsTable = ({
   refreshRate = 5,
   tableTitle,
   tableSubTitle,
+  deleteOverride,
 }: CollectionsTableProps) => {
   const { searchParams, getSearchParam } = useSearchParams("collection_filter");
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
@@ -224,6 +226,10 @@ const CollectionsTable = ({
 
   const handleDeleteCollections = useCallback(
     async (ids: string[]) => {
+      if (deleteOverride) {
+        await deleteOverride(ids);
+        return;
+      }
       await Promise.all(
         ids.map((id) => {
           if (currentCustodian) {
@@ -234,7 +240,7 @@ const CollectionsTable = ({
         })
       );
     },
-    [currentCustodian, deleteCollection, deleteCollectionAdmin]
+    [currentCustodian, deleteCollection, deleteCollectionAdmin, deleteOverride]
   );
 
   useLogDependencyChanges("collectionsTable", {

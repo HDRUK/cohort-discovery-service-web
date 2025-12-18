@@ -30,6 +30,7 @@ import {
   Workgroup,
   CreateWorkgroupPost,
   AddCollectionToWorkgroupPost,
+  RemoveCollectionFromWorkgroupPost,
 } from "@/types/api";
 import createCollection from "@/actions/createCollection";
 import deleteCollection from "@/actions/deleteCollection";
@@ -72,6 +73,7 @@ import rerunTask from "@/actions/rerunTask";
 import rerunDistributions from "@/actions/rerunDistributions";
 import createWorkgroup from "@/actions/createWorkgroup";
 import addCollectionToWorkgroup from "@/actions/addCollectionToWorkgroup";
+import removeCollectionFromWorkgroup from "@/actions/removeCollectionFromWorkgroup";
 
 export enum NodeKind {
   RULE = "RULE",
@@ -219,6 +221,9 @@ export interface DaphneStoreState {
     addCollectionToWorkgroup: (
       payload: AddCollectionToWorkgroupPost
     ) => Promise<number>;
+    removeCollectionFromWorkgroup: (
+      payload: RemoveCollectionFromWorkgroupPost
+    ) => Promise<void>;
     selectedWorkgroup: Workgroup | null;
     setSelectedWorkgroup: (workgroup: Workgroup | null) => void;
   };
@@ -757,6 +762,10 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       const { data } = await addCollectionToWorkgroup(payload);
       await revalidateAction("workgroups");
       return data;
+    },
+    removeCollectionFromWorkgroup: async (payload) => {
+      await removeCollectionFromWorkgroup(payload);
+      await revalidateAction("workgroups");
     },
     selectedWorkgroup: null,
     setSelectedWorkgroup: (selectedWorkgroup: Workgroup | null) =>

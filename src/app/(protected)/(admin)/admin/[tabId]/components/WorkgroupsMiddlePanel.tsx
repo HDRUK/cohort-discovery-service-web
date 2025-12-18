@@ -12,6 +12,9 @@ type WorkgroupsMiddlePanelProps = {
 
 const WorkgroupsMiddlePanel = ({ collections }: WorkgroupsMiddlePanelProps) => {
   const selectedWorkgroup = useAdminStore((s) => s.selectedWorkgroup);
+  const removeCollectionFromWorkgroup = useAdminStore(
+    (s) => s.removeCollectionFromWorkgroup
+  );
 
   return (
     <Box
@@ -30,6 +33,17 @@ const WorkgroupsMiddlePanel = ({ collections }: WorkgroupsMiddlePanelProps) => {
               selectedWorkgroup?.name.toLowerCase()
             )} Workgroups`}
             tableSubTitle="Collections"
+            deleteOverride={async (ids: string[]) => {
+              await Promise.all(
+                ids.map(
+                  async (id) =>
+                    await removeCollectionFromWorkgroup({
+                      id: +id,
+                      workgroup_id: selectedWorkgroup.id,
+                    })
+                )
+              );
+            }}
           />
         )
         //* Space here for Users Table post MVP
