@@ -172,12 +172,10 @@ const CollectionsTable = ({
         minSize: 50,
         maxSize: 50,
         Cell: ({ cell, row }) => {
-          const counts = formatNumber(
-            row.original?.latest_demographic?.count ?? 0
-          );
+          const counts = row.original.n_concepts || "-";
           const date = cell.getValue<string>();
           return (
-            <Tooltip title={`Number of studies = ${counts}`}>
+            <Tooltip title={`Number of concepts = ${counts}`}>
               <Typography>{date}</Typography>
             </Tooltip>
           );
@@ -193,6 +191,17 @@ const CollectionsTable = ({
         size: 50,
         minSize: 50,
         maxSize: 50,
+        Cell: ({ cell, row }) => {
+          const counts = formatNumber(
+            row.original?.latest_demographic?.count ?? 0
+          );
+          const date = cell.getValue<string>();
+          return (
+            <Tooltip title={`Number of studies = ${counts}`}>
+              <Typography>{date}</Typography>
+            </Tooltip>
+          );
+        },
       },
       {
         id: "status",
