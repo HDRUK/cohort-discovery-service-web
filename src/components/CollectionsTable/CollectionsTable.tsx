@@ -246,7 +246,13 @@ const CollectionsTable = ({
         `${ids.length} Collection${ids.length > 1 ? "s" : ""} deleted`
       );
     },
-    [currentCustodian, deleteCollection, deleteCollectionAdmin, deleteOverride]
+    [
+      currentCustodian,
+      deleteCollection,
+      deleteCollectionAdmin,
+      deleteOverride,
+      notify,
+    ]
   );
 
   useLogDependencyChanges("collectionsTable", {
