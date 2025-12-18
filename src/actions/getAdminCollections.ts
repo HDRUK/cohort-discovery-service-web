@@ -32,16 +32,21 @@ const getAdminCollections = async (
     ...(queryString ? [`collections-admin-${queryString}`] : []),
     key,
   ];
+
   if (fresh) {
     tags.forEach(updateTag);
   }
 
   const useCache = force || fresh;
 
-  return await apiGet<ApiResponse<Paginated<CollectionWithHosts[]>>>(url, {
+  console.log("called getAdminCollections", tags, { force }, { fresh });
+
+  const res = await apiGet<ApiResponse<Paginated<CollectionWithHosts[]>>>(url, {
     cache: useCache ? "force-cache" : "no-store",
     next: useCache ? { tags, revalidate: DEFAULT_REVALIDATE } : undefined,
   });
+
+  return res;
 };
 
 export default getAdminCollections;

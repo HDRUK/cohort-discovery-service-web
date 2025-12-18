@@ -80,6 +80,9 @@ const CollectionsTable = ({
     },
     initialData,
     staleTime: 2 * refreshRate * DEFAULT_INTERVAL,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
     refetchInterval: (query) => {
       const data = query.state.data;
       if (data?.total === 0) return false;
@@ -125,6 +128,8 @@ const CollectionsTable = ({
   ]);
 
   const filter_name = getSearchParam() || "all";
+
+  console.log(collections.data);
 
   const columns = useMemo<MRT_ColumnDef<Collection>[]>(
     () => [

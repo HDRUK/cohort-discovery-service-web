@@ -1,3 +1,4 @@
+export const DEFAULT_PER_PAGE = 25;
 export const DEFAULT_QUERIES_PER_PAGE = 5;
 export const DEFAULT_CODES_PER_PAGE = 20;
 export const DEFAULT_USERS_PER_PAGE = 25;

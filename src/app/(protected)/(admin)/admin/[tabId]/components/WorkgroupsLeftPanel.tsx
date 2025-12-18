@@ -5,7 +5,7 @@ import ActionMenuSection from "@/components/ActionMenuSection";
 import AddButton from "@/components/AddButton";
 import CreateWorkgroup from "@/modules/CreateWorkgroup";
 import { Collection, Workgroup } from "@/types/api";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import useSearchParams from "@/hooks/useSearchParams";
 import { capitaliseFirstLetter } from "@/utils/string";
 import useAdminStore from "@/store/useAdminStore";
@@ -27,19 +27,25 @@ const WorkgroupsLeftPanel = ({
 }: WorkgroupsLeftPanelProps) => {
   const setSelectedWorkgroup = useAdminStore((s) => s.setSelectedWorkgroup);
 
-  const { setSearchParam } = useSearchParams("workgroup_filter");
+  const { getSearchParam, setSearchParam } =
+    useSearchParams("workgroup_filter");
+
+  const workgroupId = getSearchParam();
+
+  useEffect(() => {
+    const workgroup = workgroups.find((w) => String(w.id) === workgroupId);
+    setSelectedWorkgroup(workgroup ?? null);
+  }, [workgroups, workgroupId, setSelectedWorkgroup]);
 
   const onSelectWorkgroup = useCallback(
-    (workgroup?: Workgroup) => {
-      if (!workgroup) {
-        setSelectedWorkgroup(null);
+    (id?: number) => {
+      if (!id) {
         setSearchParam(null);
         return;
       }
-      setSelectedWorkgroup(workgroup);
-      setSearchParam(workgroup.id.toString());
+      setSearchParam(String(id));
     },
-    [setSelectedWorkgroup, setSearchParam]
+    [setSearchParam]
   );
 
   return (
@@ -76,7 +82,7 @@ const WorkgroupsLeftPanel = ({
         <List
           items={workgroups.map((workgroup) => ({
             label: capitaliseFirstLetter(workgroup.name.toLowerCase()),
-            onClick: () => onSelectWorkgroup(workgroup),
+            onClick: () => onSelectWorkgroup(workgroup.id),
           }))}
         />
       </ActionMenuSection>

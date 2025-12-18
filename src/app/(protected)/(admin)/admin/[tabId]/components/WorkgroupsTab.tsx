@@ -5,6 +5,7 @@ import { buildSearchParams } from "@/utils/params";
 import { Box, Skeleton } from "@mui/material";
 import getCollections from "@/actions/getCollections";
 import getAdminCollections from "@/actions/getAdminCollections";
+import { DEFAULT_PER_PAGE } from "@/config/defaults";
 
 export const WorkgroupsSkeleton = () => (
   <Box sx={{ height: "100%", p: 2 }}>
@@ -21,13 +22,20 @@ const WorkgroupsTab = async ({
     search_collection?: string;
   };
 }) => {
-  const { page, per_page, workgroup_filter } = searchParams ?? {};
+  const {
+    page = 1,
+    per_page = DEFAULT_PER_PAGE,
+    workgroup_filter = undefined,
+  } = searchParams ?? {};
+
   const queryParams = {
     page,
     per_page,
     workgroup_id: workgroup_filter,
     // ["name[]"]: search_collection,
   };
+
+  //console.log("server", { queryParams });
 
   const params = buildSearchParams(queryParams);
 
