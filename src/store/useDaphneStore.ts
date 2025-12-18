@@ -30,6 +30,7 @@ import {
   Workgroup,
   CreateWorkgroupPost,
   AddCollectionToWorkgroupPost,
+  RemoveCollectionsFromWorkgroupPost,
 } from "@/types/api";
 import createCollection from "@/actions/createCollection";
 import deleteCollection from "@/actions/deleteCollection";
@@ -72,6 +73,7 @@ import rerunTask from "@/actions/rerunTask";
 import rerunDistributions from "@/actions/rerunDistributions";
 import createWorkgroup from "@/actions/createWorkgroup";
 import addCollectionToWorkgroup from "@/actions/addCollectionToWorkgroup";
+import removeCollectionsFromWorkgroup from "@/actions/removeCollectionsFromWorkgroup";
 
 export enum NodeKind {
   RULE = "RULE",
@@ -219,6 +221,9 @@ export interface DaphneStoreState {
     addCollectionToWorkgroup: (
       payload: AddCollectionToWorkgroupPost
     ) => Promise<number>;
+    removeCollectionsFromWorkgroup: (
+      payload: RemoveCollectionsFromWorkgroupPost
+    ) => Promise<void>;
     selectedWorkgroup: Workgroup | null;
     setSelectedWorkgroup: (workgroup: Workgroup | null) => void;
   };
@@ -686,6 +691,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
 
       await revalidateAction(`collections-${custodianPid}`);
       await revalidateAction("collections-admin");
+      await revalidateAction("collections");
       return data;
     },
     updateCollection: async (id, payload, payloadConfig) => {
@@ -696,6 +702,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
 
       await revalidateAction(`collections-${data.custodian_id}`);
       await revalidateAction("collections-admin");
+      await revalidateAction("collections");
 
       // revalidate custodians
       // - as noted above, keep to sort out the tags for caching first
@@ -731,6 +738,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
 
       await revalidateAction(`collections-${payload["custodian_id"]}`);
       await revalidateAction("collections-admin");
+      await revalidateAction("collections");
       return data;
     },
     updateCollection: async (id, payload) => {
@@ -740,6 +748,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       // - created a ticket for this
       await revalidateAction(`collections-${data.custodian.pid}`);
       await revalidateAction("collections-admin");
+      await revalidateAction("collections");
       return data;
     },
     deleteCollection: async (id) => {
@@ -747,6 +756,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       //this needs to be re-done, mixing of pid and id makes it diffcult
       // to revalidate cache, and here we don't know the custodian
       await revalidateAction(`collections`);
+      await revalidateAction(`collections-admin`);
     },
     createWorkgroup: async (payload) => {
       const { data } = await createWorkgroup(payload);
@@ -757,6 +767,10 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       const { data } = await addCollectionToWorkgroup(payload);
       await revalidateAction("workgroups");
       return data;
+    },
+    removeCollectionsFromWorkgroup: async (payload) => {
+      await removeCollectionsFromWorkgroup(payload);
+      await revalidateAction("workgroups");
     },
     selectedWorkgroup: null,
     setSelectedWorkgroup: (selectedWorkgroup: Workgroup | null) =>

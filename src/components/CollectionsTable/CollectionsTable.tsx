@@ -30,6 +30,7 @@ import { useLogDependencyChanges } from "@/utils/deps";
 import useAdminStore from "@/store/useAdminStore";
 import useCustodianStore from "@/store/useCustodianStore";
 import useUserStore from "@/store/useUserStore";
+import { useNotify } from "@/providers/NotifyProvider";
 
 export interface CollectionsTableProps {
   initialData: Paginated<CollectionWithHosts[]>;
@@ -38,6 +39,7 @@ export interface CollectionsTableProps {
   refreshRate?: number;
   tableTitle?: string;
   tableSubTitle?: string;
+  deleteOverride?: (ids: string[]) => Promise<void>;
 }
 
 const CollectionsTable = ({
@@ -47,6 +49,7 @@ const CollectionsTable = ({
   refreshRate = 5,
   tableTitle,
   tableSubTitle,
+  deleteOverride,
 }: CollectionsTableProps) => {
   const { searchParams, getSearchParam } = useSearchParams("collection_filter");
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
@@ -56,6 +59,8 @@ const CollectionsTable = ({
   const currentCustodian = useCustodianStore((s) => s.currentCustodian);
   const selectedCollection = useUserStore((s) => s.selectedCollection);
   const setSelectedCollection = useUserStore((s) => s.setSelectedCollection);
+
+  const notify = useNotify();
 
   const queryKey = useMemo(
     () => [
@@ -224,17 +229,30 @@ const CollectionsTable = ({
 
   const handleDeleteCollections = useCallback(
     async (ids: string[]) => {
-      await Promise.all(
-        ids.map((id) => {
-          if (currentCustodian) {
-            deleteCollection(id, currentCustodian.pid);
-          } else {
-            deleteCollectionAdmin(id);
-          }
-        })
-      );
+      if (deleteOverride) {
+        await deleteOverride(ids);
+      } else {
+        await Promise.all(
+          ids.map((id) => {
+            if (currentCustodian) {
+              deleteCollection(id, currentCustodian.pid);
+            } else {
+              deleteCollectionAdmin(id);
+            }
+          })
+        );
+        notify.success(
+          `${ids.length} Collection${ids.length > 1 ? "s" : ""} deleted`
+        );
+      }
     },
-    [currentCustodian, deleteCollection, deleteCollectionAdmin]
+    [
+      currentCustodian,
+      deleteCollection,
+      deleteCollectionAdmin,
+      deleteOverride,
+      notify,
+    ]
   );
 
   useLogDependencyChanges("collectionsTable", {
@@ -299,7 +317,7 @@ const CollectionsTable = ({
           refreshProps: {
             tag: currentCustodian?.pid
               ? `collections-${currentCustodian.pid}`
-              : "collections",
+              : "collections-admin",
           },
         }}
       />
