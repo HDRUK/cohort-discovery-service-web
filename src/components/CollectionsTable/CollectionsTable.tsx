@@ -15,7 +15,6 @@ import { Box, Chip, Tooltip, Typography } from "@mui/material";
 import { getCollectionStatus } from "@/utils/colours";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import Table from "@/components/Table";
-import { useDaphneStore } from "@/store/useDaphneStore";
 import CopyableVariable from "../CopyableVariable";
 import Title from "@/components/Title";
 import useSearchParams from "@/hooks/useSearchParams";
@@ -28,6 +27,9 @@ import getCustodianCollections from "@/actions/getCustodianCollections";
 import getAdminCollections from "@/actions/getAdminCollections";
 import { isEqualTask } from "@/utils/distributions";
 import { useLogDependencyChanges } from "@/utils/deps";
+import useAdminStore from "@/store/useAdminStore";
+import useCustodianStore from "@/store/useCustodianStore";
+import useUserStore from "@/store/useUserStore";
 
 export interface CollectionsTableProps {
   initialData: Paginated<CollectionWithHosts[]>;
@@ -49,11 +51,11 @@ const CollectionsTable = ({
   const { searchParams, getSearchParam } = useSearchParams("collection_filter");
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
 
-  const {
-    userData: { selectedCollection, setSelectedCollection },
-    custodianData: { deleteCollection, currentCustodian },
-    adminData: { deleteCollection: deleteCollectionAdmin },
-  } = useDaphneStore();
+  const deleteCollectionAdmin = useAdminStore((s) => s.deleteCollection);
+  const deleteCollection = useCustodianStore((s) => s.deleteCollection);
+  const currentCustodian = useCustodianStore((s) => s.currentCustodian);
+  const selectedCollection = useUserStore((s) => s.selectedCollection);
+  const setSelectedCollection = useUserStore((s) => s.setSelectedCollection);
 
   const queryKey = useMemo(
     () => [
@@ -69,12 +71,10 @@ const CollectionsTable = ({
     queryFn: async () => {
       const res =
         currentCustodian?.pid && !admin
-          ? await getCustodianCollections(
-              currentCustodian.pid,
-              searchParams,
-              false
-            )
-          : await getAdminCollections(searchParams ?? {}, false);
+          ? await getCustodianCollections(currentCustodian.pid, searchParams, {
+              fresh: true,
+            })
+          : await getAdminCollections(searchParams, { fresh: true });
 
       return res.data;
     },

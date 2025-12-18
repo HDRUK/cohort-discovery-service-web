@@ -6,12 +6,20 @@ import { ApiResponse, Paginated, CollectionWithHosts } from "../types/api";
 import { cookies } from "next/headers";
 import { getTokenKey } from "@/utils/string";
 import { DEFAULT_REVALIDATE } from "@/config/defaults";
+import { updateTag } from "next/cache";
+
+interface CacheOptions {
+  fresh?: boolean;
+  force?: boolean;
+}
 
 const getCustodianCollections = async (
   custodianPid: string,
   params?: URLSearchParams,
-  useCache: boolean = true
+  cacheOptions?: CacheOptions
 ): Promise<ApiResponse<Paginated<CollectionWithHosts[]>>> => {
+  const { fresh = false, force = true } = cacheOptions ?? {};
+
   const token = (await cookies()).get("token")?.value || "";
   const key = getTokenKey(token);
 
@@ -21,20 +29,22 @@ const getCustodianCollections = async (
     url += `?${queryString}`;
   }
 
-  const res = await apiGet<ApiResponse<Paginated<CollectionWithHosts[]>>>(url, {
-    next: {
-      revalidate: useCache ? DEFAULT_REVALIDATE : undefined,
-      tags: [
-        "collections-admin",
-        `collections-${custodianPid}`,
-        `collections-${custodianPid}-${queryString}`,
-        key,
-      ],
-    },
-    cache: useCache ? "force-cache" : undefined,
-  });
+  const tags = [
+    `collections-${custodianPid}`,
+    ...(queryString ? [`collections-${custodianPid}-${queryString}`] : []),
+    key,
+  ];
 
-  return res;
+  if (fresh) {
+    tags.forEach(updateTag);
+  }
+
+  const useCache = force || fresh;
+
+  return await apiGet<ApiResponse<Paginated<CollectionWithHosts[]>>>(url, {
+    cache: useCache ? "force-cache" : "no-store",
+    next: useCache ? { tags, revalidate: DEFAULT_REVALIDATE } : undefined,
+  });
 };
 
 export default getCustodianCollections;
