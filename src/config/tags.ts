@@ -9,7 +9,7 @@ export const getCollectionHostTag = (custodianPid: string) =>
 
 export const TAG_CUSTODIANS = "custodians";
 
-export const getCustodianTag = (id: string | number) => `custodian-${id}`;
+export const getCustodianTag = (pid: string) => `custodian-${pid}`;
 
 export const TAG_WORKGROUP_ADMIN = "workgroups-admin";
 

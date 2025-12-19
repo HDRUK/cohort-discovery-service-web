@@ -6,8 +6,7 @@ export type SearchParams = Promise<{
 }>;
 
 export interface CacheOptions {
-  fresh?: boolean;
-  force?: boolean;
+  useCache?: boolean;
 }
 
 export interface ApiSearchParams {

@@ -31,6 +31,7 @@ import useAdminStore from "@/store/useAdminStore";
 import useCustodianStore from "@/store/useCustodianStore";
 import useUserStore from "@/store/useUserStore";
 import { useNotify } from "@/providers/NotifyProvider";
+import { getTagCustodianCollection, TAG_COLLECTION_ADMIN } from "@/config/tags";
 
 export interface CollectionsTableProps {
   initialData: Paginated<CollectionWithHosts[]>;
@@ -79,13 +80,13 @@ const CollectionsTable = ({
           ? await getCustodianCollections(currentCustodian.pid, {
               params: searchParams,
               cacheOptions: {
-                fresh: true,
+                useCache: false,
               },
             })
           : await getAdminCollections({
               params: searchParams,
               cacheOptions: {
-                fresh: true,
+                useCache: false,
               },
             });
 
@@ -336,8 +337,8 @@ const CollectionsTable = ({
           deleteProps: { onClick: handleDeleteCollections },
           refreshProps: {
             tag: currentCustodian?.pid
-              ? `collections-${currentCustodian.pid}`
-              : "collections-admin",
+              ? getTagCustodianCollection(currentCustodian.pid)
+              : TAG_COLLECTION_ADMIN,
           },
         }}
       />

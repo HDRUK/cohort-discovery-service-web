@@ -20,7 +20,7 @@ export const revalidateCustodianByPid = async (custodianPid: string) => {
 };
 
 export const revalidateCustodian = async (custodian: Custodian) => {
-  const { id, pid } = custodian;
-  revalidateAction(getCustodianTag(id));
+  const { pid } = custodian;
+  revalidateAction(getCustodianTag(pid));
   revalidateCustodianByPid(pid);
 };

@@ -615,6 +615,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     ) => {
       const { pid, custodian } = collection;
       const res = await rerunDistributions(pid, { query_type });
+
       revalidateCustodian(custodian);
       revalidateAction(TAG_COLLECTION_ADMIN); // for admin
       return res.data;

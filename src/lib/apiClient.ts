@@ -7,7 +7,6 @@ import { notFound, forbidden } from "next/navigation";
 import { DEFAULT_REVALIDATE } from "@/config/defaults";
 import { getTokenUser } from "./auth";
 import { CacheOptions } from "@/types/api";
-import { revalidateAction } from "@/actions/revalidate";
 
 const baseURL = process.env.API_BASE_URL ?? "http://localhost:8100";
 
@@ -30,14 +29,6 @@ export type CachedGetArgs = {
   revalidate?: number;
 };
 
-const canonicaliseParams = (params: URLSearchParams): string => {
-  const entries = Array.from(params.entries());
-  entries.sort(([ak, av], [bk, bv]) =>
-    ak === bk ? av.localeCompare(bv) : ak.localeCompare(bk)
-  );
-  return new URLSearchParams(entries).toString();
-};
-
 const buildCachedRequest = async ({
   url,
   params,
@@ -46,9 +37,9 @@ const buildCachedRequest = async ({
   includeUserTag = true,
   revalidate = DEFAULT_REVALIDATE,
 }: CachedGetArgs) => {
-  const { fresh = false, force = true } = cacheOptions ?? {};
+  const { useCache = true } = cacheOptions ?? {};
 
-  const queryString = params ? canonicaliseParams(params) : "";
+  const queryString = params ? params.toString() : "";
   const finalUrl = queryString ? `${url}?${queryString}` : url;
 
   const {
@@ -60,15 +51,10 @@ const buildCachedRequest = async ({
 
   const allTags = [
     "admin",
+    ...(tags ? tags : []),
     ...queryTags,
     ...(includeUserTag ? [String(userId)] : []),
   ];
-
-  if (fresh) {
-    allTags.forEach(revalidateAction);
-  }
-
-  const useCache = force || fresh;
 
   const init: { cache?: RequestCache; next?: NextFetchRequestConfig } = {
     cache: useCache ? "force-cache" : "no-store",
