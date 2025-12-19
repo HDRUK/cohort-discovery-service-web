@@ -36,7 +36,7 @@ const CollectionsTab = async ({
   const [{ data: collectionHosts }, { data: custodianCollections }] =
     await Promise.all([
       getCustodianCollectionHosts(custodianPid),
-      getCustodianCollections(custodianPid, params),
+      getCustodianCollections(custodianPid, { params }),
     ]);
 
   return (

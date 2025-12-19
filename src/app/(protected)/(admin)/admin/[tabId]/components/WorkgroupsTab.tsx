@@ -35,8 +35,6 @@ const WorkgroupsTab = async ({
     // ["name[]"]: search_collection,
   };
 
-  //console.log("server", { queryParams });
-
   const params = buildSearchParams(queryParams);
 
   const [
@@ -44,9 +42,9 @@ const WorkgroupsTab = async ({
     { data: allCollections },
     { data: workgroups },
   ] = await Promise.all([
-    getAdminCollections(params),
+    getAdminCollections({ params }),
     getCollections(),
-    getAdminWorkgroups(params),
+    getAdminWorkgroups({ params }),
   ]);
 
   return (

@@ -76,10 +76,18 @@ const CollectionsTable = ({
     queryFn: async () => {
       const res =
         currentCustodian?.pid && !admin
-          ? await getCustodianCollections(currentCustodian.pid, searchParams, {
-              fresh: true,
+          ? await getCustodianCollections(currentCustodian.pid, {
+              params: searchParams,
+              cacheOptions: {
+                fresh: true,
+              },
             })
-          : await getAdminCollections(searchParams, { fresh: true });
+          : await getAdminCollections({
+              params: searchParams,
+              cacheOptions: {
+                fresh: true,
+              },
+            });
 
       return res.data;
     },

@@ -32,7 +32,9 @@ const QueryResultsPageContent = async ({
 
   const searchParamsObject = buildSearchParams(queryParams);
 
-  const queryData = await getQuery(query as string, searchParamsObject);
+  const queryData = await getQuery(query as string, {
+    params: searchParamsObject,
+  });
 
   return (
     <>

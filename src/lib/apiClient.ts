@@ -4,6 +4,10 @@ import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import { cookies } from "next/headers";
 import { ApiError } from "./https";
 import { notFound, forbidden } from "next/navigation";
+import { DEFAULT_REVALIDATE } from "@/config/defaults";
+import { updateTag } from "next/cache";
+import { getTokenUser } from "./auth";
+import { CacheOptions } from "@/types/api";
 
 const baseURL = process.env.API_BASE_URL ?? "http://localhost:8100";
 
@@ -16,6 +20,63 @@ interface RequestOptions<B = unknown> {
   cache?: RequestCache;
   next?: NextFetchRequestConfig;
 }
+
+export type CachedGetArgs = {
+  url: string;
+  params?: URLSearchParams;
+  tags?: string[];
+  cacheOptions?: CacheOptions;
+  includeUserTag?: boolean;
+  revalidate?: number;
+};
+
+const canonicaliseParams = (params: URLSearchParams): string => {
+  const entries = Array.from(params.entries());
+  entries.sort(([ak, av], [bk, bv]) =>
+    ak === bk ? av.localeCompare(bv) : ak.localeCompare(bk)
+  );
+  return new URLSearchParams(entries).toString();
+};
+
+const buildCachedRequest = async ({
+  url,
+  params,
+  tags,
+  cacheOptions,
+  includeUserTag = true,
+  revalidate = DEFAULT_REVALIDATE,
+}: CachedGetArgs) => {
+  const { fresh = false, force = true } = cacheOptions ?? {};
+
+  const queryString = params ? canonicaliseParams(params) : "";
+  const finalUrl = queryString ? `${url}?${queryString}` : url;
+
+  const {
+    user: { id: userId },
+  } = await getTokenUser();
+
+  const queryTags =
+    queryString && tags ? tags.map((t) => `${t}-${queryString}`) : [];
+
+  const allTags = [
+    "admin",
+    ...queryTags,
+    ...(includeUserTag ? [String(userId)] : []),
+  ];
+
+  if (fresh) {
+    allTags.forEach(updateTag);
+  }
+
+  const useCache = force || fresh;
+
+  const init: { cache?: RequestCache; next?: NextFetchRequestConfig } = {
+    cache: useCache ? "force-cache" : "no-store",
+    next: useCache ? { tags: allTags, revalidate } : undefined,
+  };
+
+  return { finalUrl, init, tags: allTags };
+};
 
 async function request<TResponse, TBody = undefined>(
   method: HttpMethod,
@@ -80,10 +141,13 @@ async function handleApiError(error: unknown): Promise<never> {
 }
 
 export async function apiGet<TResponse>(
-  url: string,
-  options?: RequestOptions<undefined>
+  args: CachedGetArgs & { options?: RequestOptions<undefined> }
 ) {
-  return request<TResponse>("GET", url, options);
+  const { finalUrl, init } = await buildCachedRequest(args);
+  return request<TResponse>("GET", finalUrl, {
+    ...init,
+    ...(args.options ?? {}),
+  });
 }
 
 export async function apiPost<TResponse, TBody>(

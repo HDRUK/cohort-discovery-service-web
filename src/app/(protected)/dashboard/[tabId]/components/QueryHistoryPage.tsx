@@ -27,7 +27,7 @@ const QueryHistoryPageContent = async ({ searchParams }: PageProps) => {
 
   const searchParamsObject = buildSearchParams(queryParams);
 
-  const queries = await getQueries(searchParamsObject);
+  const queries = await getQueries({ params: searchParamsObject });
 
   return (
     <Box
