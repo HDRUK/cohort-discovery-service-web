@@ -134,8 +134,6 @@ const CollectionsTable = ({
 
   const filter_name = getSearchParam() || "all";
 
-  console.log(collections.data);
-
   const columns = useMemo<MRT_ColumnDef<Collection>[]>(
     () => [
       ...(showPid

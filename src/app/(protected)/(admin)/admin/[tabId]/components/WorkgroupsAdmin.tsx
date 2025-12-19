@@ -55,7 +55,6 @@ const WorkgroupsAdmin = ({
       <ThreePaneSwimLaneLayout
         expandedSide={expandedSide}
         rightDisabled={false}
-        panelWidth={3}
         left={
           <WorkgroupsLeftPanel
             workgroups={workgroups}

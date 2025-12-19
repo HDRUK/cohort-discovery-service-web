@@ -27,7 +27,7 @@ const CustodianAdminPage = async ({
     {
       id: "users",
       label: "Users",
-      href: `${routes.admin}/users`,
+      href: routes.adminUsers,
       page: (
         <Suspense fallback={<UsersSkeleton />}>
           <UsersTab />
@@ -37,7 +37,7 @@ const CustodianAdminPage = async ({
     {
       id: "workgroups",
       label: "Workgroups",
-      href: `${routes.admin}/workgroups`,
+      href: routes.adminWorkgroups,
       page: (
         <Suspense fallback={<WorkgroupsSkeleton />}>
           <WorkgroupsTab searchParams={apiSearchParams} />
@@ -47,7 +47,7 @@ const CustodianAdminPage = async ({
     {
       id: "collections",
       label: "Collections",
-      href: `${routes.admin}/collections`,
+      href: routes.adminCollections,
       page: (
         <Suspense fallback={<CollectionsSkeleton />}>
           <CollectionsTab searchParams={apiSearchParams} />
