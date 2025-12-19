@@ -12,6 +12,7 @@ import { useNotify } from "@/providers/NotifyProvider";
 import FormMultiSelect from "@/components/FormMultiSelect";
 import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
 import useAdminStore from "@/store/useAdminStore";
+import { TAG_CUSTODIAN_COLLECTION, TAG_WORKGROUP_ADMIN } from "@/config/tags";
 export type UpdateWorkgroupProps = {
   collections: Collection[];
   expandedRight: boolean;
@@ -68,8 +69,8 @@ const UpdateWorkgroup = ({
         notify.success(`Updated workgroup ${selectedWorkgroup?.name}`);
       });
 
-      revalidateAction(`collections-admin`);
-      revalidateAction(`workgroups-admin`);
+      revalidateAction(TAG_CUSTODIAN_COLLECTION);
+      revalidateAction(TAG_WORKGROUP_ADMIN);
     }
 
     reset();
