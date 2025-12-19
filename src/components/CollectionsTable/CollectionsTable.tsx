@@ -336,9 +336,10 @@ const CollectionsTable = ({
         rightAction={{
           deleteProps: { onClick: handleDeleteCollections },
           refreshProps: {
-            tag: currentCustodian?.pid
-              ? getTagCustodianCollection(currentCustodian.pid)
-              : TAG_COLLECTION_ADMIN,
+            tag:
+              currentCustodian?.pid && !admin
+                ? getTagCustodianCollection(currentCustodian.pid)
+                : TAG_COLLECTION_ADMIN,
           },
         }}
       />

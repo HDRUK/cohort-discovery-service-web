@@ -186,7 +186,7 @@ export interface DaphneStoreState {
   };
   custodianData: {
     currentCustodian: Custodian | null;
-    setCurrentCustodian: (custodian: Custodian) => void;
+    setCurrentCustodian: (custodian: Custodian | null) => void;
     custodians: Custodian[];
     setCustodians: (custodians: Custodian[]) => void;
     createCollectionHost: (
@@ -658,7 +658,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
 
   custodianData: {
     currentCustodian: null,
-    setCurrentCustodian: (custodian: Custodian) =>
+    setCurrentCustodian: (custodian: Custodian | null) =>
       set((state) => ({
         ...state,
         custodianData: { ...state.custodianData, currentCustodian: custodian },
@@ -715,15 +715,10 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       await revalidateAction(TAG_COLLECTION_ADMIN);
       await revalidateAction(TAG_COLLECTIONS);
 
-      // revalidate custodians
-      // - as noted above, keep to sort out the tags for caching first
       return data;
     },
     deleteCollection: async (id, custodianPid) => {
       await deleteCollection(id);
-      //this needs to be re-done, mixing of pid and id makes it diffcult
-      // to revalidate cache
-      // - created a ticket for this
       await revalidateAction(getTagCustodianCollection(custodianPid));
       await revalidateAction(TAG_COLLECTION_ADMIN);
     },
@@ -736,12 +731,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         adminData: { ...state.adminData, collections },
       })),
     createCollection: async (payload, payloadConfig) => {
-      // note: inconsistancy between using custodian Id and custodian Pid
-      // - this is because the BE uses different endpoints:
-      // - Route::post('/v1/collection_hosts'... (custodianId in the payload)
-      // - Route::post('/v1/custodians/{custodianPid}/collections'...
       const { data } = await createCollection(payload);
-
       await createCollectionConfig({
         ...payloadConfig,
         collection_id: data.id,
@@ -754,9 +744,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     },
     updateCollection: async (id, payload) => {
       const { data } = await updateCollection(id, payload);
-      //this needs to be re-done, mixing of pid and id makes it diffcult
-      // to revalidate cache
-      // - created a ticket for this
+
       await revalidateAction(getTagCustodianCollection(data.custodian.pid));
       await revalidateAction(TAG_COLLECTION_ADMIN);
       await revalidateAction(TAG_COLLECTIONS);
@@ -764,8 +752,6 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     },
     deleteCollection: async (id) => {
       await deleteCollection(id);
-      //this needs to be re-done, mixing of pid and id makes it diffcult
-      // to revalidate cache, and here we don't know the custodian
       await revalidateAction(TAG_COLLECTION_ADMIN);
       await revalidateAction(TAG_COLLECTIONS);
     },
@@ -777,10 +763,12 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     addCollectionToWorkgroup: async (payload) => {
       const { data } = await addCollectionToWorkgroup(payload);
       await revalidateAction(TAG_WORKGROUP_ADMIN);
+      await revalidateAction(TAG_COLLECTION_ADMIN);
       return data;
     },
     removeCollectionsFromWorkgroup: async (payload) => {
       await removeCollectionsFromWorkgroup(payload);
+      await revalidateAction(TAG_COLLECTION_ADMIN);
       await revalidateAction(TAG_WORKGROUP_ADMIN);
     },
     selectedWorkgroup: null,

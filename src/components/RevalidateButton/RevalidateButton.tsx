@@ -1,6 +1,12 @@
 "use client";
 
-import { IconButton, Typography, Box, IconButtonProps } from "@mui/material";
+import {
+  IconButton,
+  Typography,
+  Box,
+  IconButtonProps,
+  Tooltip,
+} from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { revalidateAction } from "@/actions/revalidate";
 
@@ -16,11 +22,13 @@ export const RevalidateButton = ({
   ...rest
 }: RevalidateButtonProps) => {
   return (
-    <Box display="flex" alignItems="center" gap={1}>
-      <IconButton onClick={() => revalidateAction(tag)} {...rest}>
-        <RefreshIcon fontSize={"small"} />
-      </IconButton>
-      {text && <Typography variant="body2">{text}</Typography>}
-    </Box>
+    <Tooltip title={tag}>
+      <Box display="flex" alignItems="center" gap={1}>
+        <IconButton onClick={() => revalidateAction(tag)} {...rest}>
+          <RefreshIcon fontSize={"small"} />
+        </IconButton>
+        {text && <Typography variant="body2">{text}</Typography>}
+      </Box>
+    </Tooltip>
   );
 };
