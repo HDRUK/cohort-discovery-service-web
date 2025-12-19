@@ -13,6 +13,8 @@ import Title from "../Title";
 import SelectNetworkDatasets, {
   NetworkGroupedCollections,
 } from "../SelectNetworkDatasets";
+import RevalidateButton from "../RevalidateButton";
+import { TAG_COLLECTIONS } from "@/config/tags";
 
 const SelectDatasets = ({
   initialSelection,
@@ -80,7 +82,14 @@ const SelectDatasets = ({
             title="All Collections"
             subTitle={`${nSelected}/${nTotal} Collections Selected`}
             useSeparator={false}
-          />
+            wrapperSx={{
+              display: "flex",
+              justifyContent: "space-between",
+              width: "100%",
+            }}
+          >
+            <RevalidateButton component="div" tag={TAG_COLLECTIONS} />
+          </Title>
         </AccordionSummary>
         <AccordionDetails
           sx={{
