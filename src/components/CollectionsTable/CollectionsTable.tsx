@@ -31,6 +31,7 @@ import useAdminStore from "@/store/useAdminStore";
 import useCustodianStore from "@/store/useCustodianStore";
 import useUserStore from "@/store/useUserStore";
 import { useNotify } from "@/providers/NotifyProvider";
+import { getTagCustodianCollection, TAG_COLLECTION_ADMIN } from "@/config/tags";
 
 export interface CollectionsTableProps {
   initialData: Paginated<CollectionWithHosts[]>;
@@ -76,15 +77,26 @@ const CollectionsTable = ({
     queryFn: async () => {
       const res =
         currentCustodian?.pid && !admin
-          ? await getCustodianCollections(currentCustodian.pid, searchParams, {
-              fresh: true,
+          ? await getCustodianCollections(currentCustodian.pid, {
+              params: searchParams,
+              cacheOptions: {
+                useCache: false,
+              },
             })
-          : await getAdminCollections(searchParams, { fresh: true });
+          : await getAdminCollections({
+              params: searchParams,
+              cacheOptions: {
+                useCache: false,
+              },
+            });
 
       return res.data;
     },
     initialData,
     staleTime: 2 * refreshRate * DEFAULT_INTERVAL,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
     refetchInterval: (query) => {
       const data = query.state.data;
       if (data?.total === 0) return false;
@@ -177,12 +189,10 @@ const CollectionsTable = ({
         minSize: 50,
         maxSize: 50,
         Cell: ({ cell, row }) => {
-          const counts = formatNumber(
-            row.original?.latest_demographic?.count ?? 0
-          );
+          const counts = row.original.n_concepts || "-";
           const date = cell.getValue<string>();
           return (
-            <Tooltip title={`Number of studies = ${counts}`}>
+            <Tooltip title={`Number of concepts = ${counts}`}>
               <Typography>{date}</Typography>
             </Tooltip>
           );
@@ -198,6 +208,17 @@ const CollectionsTable = ({
         size: 50,
         minSize: 50,
         maxSize: 50,
+        Cell: ({ cell, row }) => {
+          const counts = formatNumber(
+            row.original?.latest_demographic?.count ?? 0
+          );
+          const date = cell.getValue<string>();
+          return (
+            <Tooltip title={`Number of studies = ${counts}`}>
+              <Typography>{date}</Typography>
+            </Tooltip>
+          );
+        },
       },
       {
         id: "status",
@@ -315,9 +336,10 @@ const CollectionsTable = ({
         rightAction={{
           deleteProps: { onClick: handleDeleteCollections },
           refreshProps: {
-            tag: currentCustodian?.pid
-              ? `collections-${currentCustodian.pid}`
-              : "collections-admin",
+            tag:
+              currentCustodian?.pid && !admin
+                ? getTagCustodianCollection(currentCustodian.pid)
+                : TAG_COLLECTION_ADMIN,
           },
         }}
       />

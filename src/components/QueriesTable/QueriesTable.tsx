@@ -50,11 +50,17 @@ const QueriesTable = ({
   const { data: queries } = useQuery<Paginated<Query[]>>({
     queryKey: [`queries-${initialSearchParams.toString()}`],
     queryFn: async () => {
-      const res = await getQueries(initialSearchParams, false);
+      const res = await getQueries({
+        params: initialSearchParams,
+        cacheOptions: { useCache: false },
+      });
       return res.data;
     },
     initialData,
     staleTime: 2 * DEFAULT_INTERVAL,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
     refetchInterval: (query) => {
       const data = query.state.data;
       const hasIncomplete = data?.data.filter((q) =>

@@ -1,14 +1,17 @@
 "use server";
 
-import { DEFAULT_REVALIDATE } from "@/config/defaults";
-import { apiGet } from "../lib/apiClient";
+import { apiGet, CachedGetArgs } from "../lib/apiClient";
 import { API_ROUTES } from "../lib/apiRoutes";
 import { Collection, ApiResponse } from "../types/api";
+import { TAG_COLLECTIONS } from "@/config/tags";
 
-const getCollections = async (): Promise<ApiResponse<Collection[]>> => {
-  return await apiGet<ApiResponse<Collection[]>>(API_ROUTES.collections, {
-    next: { revalidate: DEFAULT_REVALIDATE, tags: ["collections"] },
-    cache: "force-cache",
+const getCollections = async (
+  args?: Omit<CachedGetArgs, "url">
+): Promise<ApiResponse<Collection[]>> => {
+  return await apiGet<ApiResponse<Collection[]>>({
+    url: API_ROUTES.collections,
+    tags: [TAG_COLLECTIONS],
+    ...args,
   });
 };
 

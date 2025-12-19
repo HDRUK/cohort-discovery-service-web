@@ -1,21 +1,18 @@
 "use server";
 
-import { DEFAULT_REVALIDATE } from "@/config/defaults";
+import { getTokenUser } from "@/lib/auth";
 import { apiGet } from "../lib/apiClient";
 import { API_ROUTES } from "../lib/apiRoutes";
 import { ConceptSet, ApiResponse } from "../types/api";
-import { getTokenKey } from "@/utils/string";
-import { cookies } from "next/headers";
+import { getTagConceptSets } from "@/config/tags";
 
 const getConceptSets = async (): Promise<ApiResponse<ConceptSet[]>> => {
-  const token = (await cookies()).get("token")?.value || "";
-  const key = getTokenKey(token);
-  return await apiGet<ApiResponse<ConceptSet[]>>(API_ROUTES.conceptSets, {
-    next: {
-      revalidate: DEFAULT_REVALIDATE,
-      tags: ["all", "concept-sets", `concept-sets-${key}}`],
-    },
-    cache: "force-cache",
+  const {
+    user: { id: userId },
+  } = await getTokenUser();
+  return await apiGet<ApiResponse<ConceptSet[]>>({
+    url: API_ROUTES.conceptSets,
+    tags: [getTagConceptSets(userId)],
   });
 };
 

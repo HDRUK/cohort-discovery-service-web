@@ -6,8 +6,7 @@ export type SearchParams = Promise<{
 }>;
 
 export interface CacheOptions {
-  fresh?: boolean;
-  force?: boolean;
+  useCache?: boolean;
 }
 
 export interface ApiSearchParams {
@@ -117,6 +116,7 @@ export interface Collection extends WithTimestamps {
   demographics?: Distribution[];
   latest_concept_task?: Task;
   latest_demographic_task?: Task;
+  n_concepts?: number;
   custodian: Custodian;
   custodian_id?: number;
   model_state?: ModelState;

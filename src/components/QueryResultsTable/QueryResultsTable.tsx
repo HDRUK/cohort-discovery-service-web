@@ -42,11 +42,17 @@ const QueryResultsTable = ({
       `${initialData.pid}-${initialSearchParams.toString()}`,
     ],
     queryFn: async () => {
-      const res = await getQuery(initialData.pid, initialSearchParams, false);
+      const res = await getQuery(initialData.pid, {
+        params: initialSearchParams,
+        cacheOptions: { useCache: false },
+      });
       return res.data;
     },
     initialData,
     staleTime: 2 * DEFAULT_INTERVAL,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
     refetchInterval: (query) => {
       const data = query.state.data;
       const hasPending = data?.tasks?.some((t) => !t.result);

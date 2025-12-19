@@ -38,7 +38,7 @@ const CollectionsTab = async ({
     { data: custodians },
   ] = await Promise.all([
     getCollectionHosts(),
-    getAdminCollections(params),
+    getAdminCollections({ params }),
     getCustodians(),
   ]);
 

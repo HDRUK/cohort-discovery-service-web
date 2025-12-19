@@ -51,7 +51,7 @@ export default async function ProtectedLayout({
 
   let me;
   try {
-    const { data } = await getMe(token);
+    const { data } = await getMe();
     me = data;
   } catch {
     forbidden();
