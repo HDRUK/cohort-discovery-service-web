@@ -21,6 +21,10 @@ import FormDropdown from "@/components/FormDropdown";
 import DistributionStatus from "../DistrubutionStatus";
 import useCustodianStore from "@/store/useCustodianStore";
 import { useLogDependencyChanges } from "@/utils/deps";
+import {
+  getTagCustodianCollection,
+  TAG_CUSTODIAN_COLLECTION,
+} from "@/config/tags";
 
 export type UpdateCollectionProps = {
   collection: CollectionWithHosts;
@@ -113,9 +117,9 @@ const UpdateCollection = ({
         await updateCollection(id, data.collection, data.config);
         notify.success(`Updated collection ${data.collection.name}`);
 
-        revalidateAction(`collections-admin`);
+        revalidateAction(TAG_CUSTODIAN_COLLECTION);
         if (currentCustodian) {
-          revalidateAction(`collections-${currentCustodian.pid}`);
+          revalidateAction(getTagCustodianCollection(currentCustodian.pid));
         }
       }
 

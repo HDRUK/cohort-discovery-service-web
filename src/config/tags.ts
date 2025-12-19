@@ -1,11 +1,11 @@
 export const TAG_COLLECTION_ADMIN = "collection-admin";
-export const TAG_CUSTODIAN_COLLECTION = "collection-admin";
+export const TAG_CUSTODIAN_COLLECTION = "custodian-collection";
 export const TAG_COLLECTIONS = "collections";
 
 export const TAG_COLLECTION_HOSTS = "collection-hosts";
 
-export const getCollectionHostTag = (id: string | number) =>
-  `collection-host-${id}`;
+export const getCollectionHostTag = (custodianPid: string) =>
+  `collection-host-${custodianPid}`;
 
 export const TAG_CUSTODIANS = "custodians";
 
@@ -28,8 +28,10 @@ export const getTagCodes = (domain?: string) => [
 
 export const getTagCodeStats = () => ["omop", "omop-stats"];
 
+export const TAG_CONCEPT_SETS = "concept-sets";
+
 export const getTagConceptSets = (userId: string | number) =>
-  `concept-sets-${userId}`;
+  `${TAG_CONCEPT_SETS}-${userId}`;
 
 export const TAG_FEATURE_FLAGS = "feature-flags";
 export const TAG_LATEST_QUERY = "lastest-query";

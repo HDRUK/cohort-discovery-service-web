@@ -5,9 +5,9 @@ import { cookies } from "next/headers";
 import { ApiError } from "./https";
 import { notFound, forbidden } from "next/navigation";
 import { DEFAULT_REVALIDATE } from "@/config/defaults";
-import { updateTag } from "next/cache";
 import { getTokenUser } from "./auth";
 import { CacheOptions } from "@/types/api";
+import { revalidateAction } from "@/actions/revalidate";
 
 const baseURL = process.env.API_BASE_URL ?? "http://localhost:8100";
 
@@ -65,7 +65,7 @@ const buildCachedRequest = async ({
   ];
 
   if (fresh) {
-    allTags.forEach(updateTag);
+    allTags.forEach(revalidateAction);
   }
 
   const useCache = force || fresh;

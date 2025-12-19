@@ -1,5 +1,6 @@
 "use server";
 
+import { getCustodianTag, getTagCustodianCollection } from "@/config/tags";
 import { getTokenUser } from "@/lib/auth";
 import { Custodian } from "@/types/api";
 import { updateTag } from "next/cache";
@@ -11,15 +12,15 @@ export const revalidateAction = async (tagName: string) => {
 export const revalidateUserAction = async (tagName: string) => {
   const { user } = await getTokenUser();
   const userId = user.id;
-  revalidateAction(`${userId}-${tagName}`);
+  revalidateAction(`${tagName}-${userId}`);
 };
 
 export const revalidateCustodianByPid = async (custodianPid: string) => {
-  revalidateAction(`collections-${custodianPid}`);
+  revalidateAction(getTagCustodianCollection(custodianPid));
 };
 
 export const revalidateCustodian = async (custodian: Custodian) => {
   const { id, pid } = custodian;
-  revalidateAction(`custodian-${id}`);
+  revalidateAction(getCustodianTag(id));
   revalidateCustodianByPid(pid);
 };
