@@ -78,18 +78,17 @@ const CollectionsTable = ({
       const res =
         currentCustodian?.pid && !admin
           ? await getCustodianCollections(currentCustodian.pid, {
-              params: searchParams,
+              params: searchParams.toString(),
               cacheOptions: {
                 useCache: false,
               },
             })
           : await getAdminCollections({
-              params: searchParams,
+              params: searchParams.toString(),
               cacheOptions: {
                 useCache: false,
               },
             });
-
       return res.data;
     },
     initialData,

@@ -18,20 +18,20 @@ const WorkgroupsTab = async ({
   searchParams,
 }: {
   searchParams: ApiSearchParams & {
-    workgroup_filter?: string;
+    workgroup_id?: string;
     search_collection?: string;
   };
 }) => {
   const {
     page = 1,
     per_page = DEFAULT_PER_PAGE,
-    workgroup_filter = undefined,
+    workgroup_id = undefined,
   } = searchParams ?? {};
 
   const queryParams = {
     page,
     per_page,
-    workgroup_id: workgroup_filter,
+    workgroup_id,
     // ["name[]"]: search_collection,
   };
 

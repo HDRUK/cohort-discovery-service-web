@@ -13,6 +13,8 @@ const getCustodianCollections = async (
   const tag = getTagCustodianCollection(custodianPid);
   const url = API_ROUTES.custodianCollections(custodianPid);
 
+  console.log(args?.params);
+
   return await apiGet<ApiResponse<Paginated<CollectionWithHosts[]>>>({
     url,
     tags: [tag],

@@ -7,6 +7,7 @@ import { notFound, forbidden } from "next/navigation";
 import { DEFAULT_REVALIDATE } from "@/config/defaults";
 import { getTokenUser } from "./auth";
 import { CacheOptions } from "@/types/api";
+import { paramsToString } from "@/utils/string";
 
 const baseURL = process.env.API_BASE_URL ?? "http://localhost:8100";
 
@@ -22,7 +23,7 @@ interface RequestOptions<B = unknown> {
 
 export type CachedGetArgs = {
   url: string;
-  params?: URLSearchParams;
+  params?: URLSearchParams | string;
   tags?: string[];
   cacheOptions?: CacheOptions;
   includeUserTag?: boolean;
@@ -39,7 +40,7 @@ const buildCachedRequest = async ({
 }: CachedGetArgs) => {
   const { useCache = true } = cacheOptions ?? {};
 
-  const queryString = params ? params.toString() : "";
+  const queryString = paramsToString(params);
   const finalUrl = queryString ? `${url}?${queryString}` : url;
 
   const {
