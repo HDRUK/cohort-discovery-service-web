@@ -52,7 +52,7 @@ const QueriesTable = ({
     queryFn: async () => {
       const res = await getQueries({
         params: initialSearchParams,
-        cacheOptions: { fresh: true },
+        cacheOptions: { useCache: false },
       });
       return res.data;
     },

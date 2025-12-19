@@ -44,7 +44,7 @@ const QueryResultsTable = ({
     queryFn: async () => {
       const res = await getQuery(initialData.pid, {
         params: initialSearchParams,
-        cacheOptions: { fresh: true },
+        cacheOptions: { useCache: false },
       });
       return res.data;
     },

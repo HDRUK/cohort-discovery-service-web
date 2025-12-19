@@ -5,12 +5,10 @@ import { apiGet } from "../lib/apiClient";
 import { API_ROUTES } from "../lib/apiRoutes";
 import { Custodian, ApiResponse } from "../types/api";
 
-const getCustodian = async (
-  id: string | number
-): Promise<ApiResponse<Custodian>> => {
+const getCustodian = async (pid: string): Promise<ApiResponse<Custodian>> => {
   return await apiGet<ApiResponse<Custodian>>({
-    url: API_ROUTES.custodian(id),
-    tags: [TAG_CUSTODIANS, getCustodianTag(id)],
+    url: API_ROUTES.custodian(pid),
+    tags: [TAG_CUSTODIANS, getCustodianTag(pid)],
   });
 };
 
