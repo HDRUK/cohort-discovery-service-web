@@ -204,10 +204,12 @@ const UpdateCollection = ({
         underline
       >
         {collection?.model_state?.state_id != CollectionStatus.DRAFT && (
-          <StatusChip
-            state_id={collection?.model_state?.state_id}
-            sx={{ my: 1 }}
-          />
+          <Box>
+            <StatusChip
+              state_id={collection?.model_state?.state_id}
+              sx={{ my: 1 }}
+            />
+          </Box>
         )}
         {collection?.model_state?.state_id == CollectionStatus.DRAFT &&
           collection?.model_state?.state && (
