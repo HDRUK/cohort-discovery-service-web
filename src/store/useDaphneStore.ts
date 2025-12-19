@@ -162,8 +162,8 @@ export interface DaphneStoreState {
     rerunTask: (id: string) => void;
     collections: Collection[];
     setCollections: (collections: Collection[]) => void;
-    selectedCollection: CollectionWithHosts | null;
-    setSelectedCollection: (collection: CollectionWithHosts | null) => void;
+    selectedCollections: CollectionWithHosts[] | [];
+    setSelectedCollections: (collections: CollectionWithHosts[] | []) => void;
     runDistributions: (
       collection: CollectionWithHosts,
       query_type: DistributionType
@@ -614,11 +614,11 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         ...state,
         userData: { ...state.userData, collections },
       })),
-    selectedCollection: null,
-    setSelectedCollection: (selectedCollection: CollectionWithHosts | null) =>
+    selectedCollections: [],
+    setSelectedCollections: (selectedCollections: CollectionWithHosts[]) =>
       set((state) => ({
         ...state,
-        userData: { ...state.userData, selectedCollection },
+        userData: { ...state.userData, selectedCollections },
       })),
     runDistributions: async (
       collection: CollectionWithHosts,

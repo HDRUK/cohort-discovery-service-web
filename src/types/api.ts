@@ -336,6 +336,10 @@ export interface UpdateCollectionPayload {
   query_context_type?: string;
 }
 
+export interface TransitionCollectionPut {
+  state: string;
+}
+
 export interface CreateCollectionConfigPost {
   collection_id: number;
   run_time_hour: number;

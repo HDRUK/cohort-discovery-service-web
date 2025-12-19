@@ -5,7 +5,6 @@ import LockOpenIcon from "@mui/icons-material/LockOpen";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import {
   CollectionHost,
-  CollectionStatus,
   CollectionWithHosts,
   FrequencyMode,
   UrlString,
@@ -22,16 +21,9 @@ import FormDropdown from "@/components/FormDropdown";
 import DistributionStatus from "../DistrubutionStatus";
 import useCustodianStore from "@/store/useCustodianStore";
 import { useLogDependencyChanges } from "@/utils/deps";
-import {
-  getTagCustodianCollection,
-  TAG_CUSTODIAN_COLLECTION,
-} from "@/config/tags";
-import StatusChip from "@/components/StatusChip";
-import transitionCollection from "@/actions/transitionCollection";
-import { CollectionFilterStatus } from "@/types/collections";
 
-export type UpdateCollectionProps = {
-  collection: CollectionWithHosts;
+export type UpdateCollectionsProps = {
+  collections: CollectionWithHosts[];
   collectionHosts: CollectionHost[];
   expandedRight: boolean;
   expandedLeft: boolean;
@@ -46,7 +38,6 @@ const getDefaultValues = (collection: CollectionWithHosts | null) => {
         description: "",
         url: "" as UrlString,
         host_id: 0,
-        model_state: undefined,
       },
       config: {
         frequency_mode: Number(FrequencyMode.WEEKLY),
@@ -57,14 +48,7 @@ const getDefaultValues = (collection: CollectionWithHosts | null) => {
     };
   }
 
-  const {
-    name,
-    description,
-    url,
-    host: hosts,
-    config,
-    model_state,
-  } = collection;
+  const { name, description, url, host: hosts, config } = collection;
   const [host] = hosts;
   return {
     collection: {
@@ -72,7 +56,6 @@ const getDefaultValues = (collection: CollectionWithHosts | null) => {
       description: description || "",
       url: url || ("" as UrlString),
       host_id: host.id,
-      model_state: model_state,
     },
     config: {
       frequency_mode: config.frequency_mode,
@@ -83,12 +66,12 @@ const getDefaultValues = (collection: CollectionWithHosts | null) => {
   };
 };
 
-const UpdateCollection = ({
-  collection,
+const UpdateCollections = ({
+  collections,
   collectionHosts,
   expandedRight,
   onClose,
-}: UpdateCollectionProps) => {
+}: UpdateCollectionsProps) => {
   const { currentCustodian, updateCollection } = useCustodianStore(
     (custodianData) => ({
       currentCustodian: custodianData.currentCustodian,
@@ -130,9 +113,9 @@ const UpdateCollection = ({
         await updateCollection(id, data.collection, data.config);
         notify.success(`Updated collection ${data.collection.name}`);
 
-        revalidateAction(TAG_CUSTODIAN_COLLECTION);
+        revalidateAction(`collections-admin`);
         if (currentCustodian) {
-          revalidateAction(getTagCustodianCollection(currentCustodian.pid));
+          revalidateAction(`collections-${currentCustodian.pid}`);
         }
       }
 
@@ -158,7 +141,7 @@ const UpdateCollection = ({
   }, [onClose]);
 
   useLogDependencyChanges("UpdateCollection", {
-    collection,
+    collections,
     collectionHosts,
     ...formMethods,
     currentCustodian,
@@ -181,7 +164,7 @@ const UpdateCollection = ({
           width: "100%",
         }}
       >
-        Collection
+        Bulk Collection Actions
         <IconButton
           size="small"
           sx={{ ml: "auto" }}
@@ -203,32 +186,12 @@ const UpdateCollection = ({
         defaultExpanded
         underline
       >
-        {collection?.model_state?.state_id != CollectionStatus.DRAFT && (
-          <StatusChip
-            state_id={collection?.model_state?.state_id}
-            sx={{ my: 1 }}
-          />
-        )}
-        {collection?.model_state?.state_id == CollectionStatus.DRAFT &&
-          collection?.model_state?.state && (
-            <AddButton
-              label={"Request to make active"}
-              action={() => {
-                const $result = transitionCollection(collection.id, {
-                  state: CollectionFilterStatus.PENDING,
-                });
-                console.log("result", $result);
-                notify.success(
-                  `Requested for collection "${collection.name}" to be made active`
-                );
-              }}
-            />
-          )}
-        {/* Handle the logic of when to display checkboxes for certain states - this needs the logic explained before implementation
-        {!currentCustodian &&
-          (collection?.model_state?.state_id == CollectionStatus.DRAFT ||
-            collection?.model_state?.state_id == CollectionStatus.ACTIVE ||
-            collection?.model_state?.state_id == CollectionStatus.REJECTED)} */}
+        {/* to-do: implement in a future ticket */}
+        <AddButton
+          disabled
+          label={"Request to make active"}
+          action={() => ({})}
+        />
       </ActionMenuSection>
 
       <ActionMenuSection
@@ -386,4 +349,4 @@ const UpdateCollection = ({
   );
 };
 
-export default UpdateCollection;
+export default UpdateCollections;

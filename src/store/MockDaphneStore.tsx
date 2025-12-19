@@ -116,8 +116,8 @@ function makeDefaultStore(): DaphneStoreState {
       rerunTask: NOOP,
       collections: [] as Collection[],
       setCollections: NOOP,
-      selectedCollection: null,
-      setSelectedCollection: NOOP,
+      selectedCollections: [] as CollectionWithHosts[],
+      setSelectedCollections: NOOP,
       runDistributions: (
         _collection: CollectionWithHosts,
         _query_type: DistributionType
