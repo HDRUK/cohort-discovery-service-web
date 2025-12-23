@@ -190,9 +190,9 @@ const UpdateCollection = ({
             workgroup_ids: newWorkgroups.map((wg) => wg.id),
           });
           notify.success(
-            `Add collection ${id} to workgroups ${newWorkgroups
-              .map((wg) => wg.name)
-              .join(", ")}`
+            `Add collection ${id} to workgroup${
+              newWorkgroups.length > 1 ? "s" : ""
+            } ${newWorkgroups.map((wg) => wg.name).join(", ")}`
           );
         }
 
