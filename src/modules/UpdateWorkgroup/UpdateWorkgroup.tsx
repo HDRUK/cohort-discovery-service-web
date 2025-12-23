@@ -13,6 +13,7 @@ import FormMultiSelect from "@/components/FormMultiSelect";
 import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
 import useAdminStore from "@/store/useAdminStore";
 import { TAG_CUSTODIAN_COLLECTION, TAG_WORKGROUP_ADMIN } from "@/config/tags";
+import addCollectionsToWorkgroup from "@/actions/addCollectionsToWorkgroup";
 export type UpdateWorkgroupProps = {
   collections: Collection[];
   expandedRight: boolean;
@@ -24,8 +25,8 @@ const UpdateWorkgroup = ({
   expandedRight,
   onClose,
 }: UpdateWorkgroupProps) => {
-  const addCollectionToWorkgroup = useAdminStore(
-    (s) => s.addCollectionToWorkgroup
+  const addCollectionsToWorkgroup = useAdminStore(
+    (s) => s.addCollectionsToWorkgroup
   );
   const selectedWorkgroup = useAdminStore((s) => s.selectedWorkgroup);
 
@@ -61,13 +62,11 @@ const UpdateWorkgroup = ({
     const { id } = selectedWorkgroup;
 
     if (data.collections.length > 0) {
-      data.collections.map(async (collection) => {
-        await addCollectionToWorkgroup({
-          id: +collection.value,
-          workgroup_id: id,
-        });
-        notify.success(`Updated workgroup ${selectedWorkgroup?.name}`);
+      await addCollectionsToWorkgroup({
+        ids: data.collections.map((c) => +c.value),
+        workgroup_id: id,
       });
+      notify.success(`Updated workgroup ${selectedWorkgroup?.name}`);
 
       revalidateAction(TAG_CUSTODIAN_COLLECTION);
       revalidateAction(TAG_WORKGROUP_ADMIN);

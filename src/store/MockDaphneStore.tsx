@@ -170,6 +170,8 @@ function makeDefaultStore(): DaphneStoreState {
       ) => RESOLVE<Collection>(getMockCollection()),
       deleteCollection: (_id: number | string, _custodianPid: string) =>
         RESOLVE<void>(undefined),
+      workgroups: [] as Workgroup[],
+      setWorkgroups: NOOP,
     },
 
     adminData: {

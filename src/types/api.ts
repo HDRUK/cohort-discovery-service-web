@@ -149,6 +149,7 @@ export interface CollectionConfig {
 export interface CollectionWithHosts extends Collection {
   host: CollectionHost[];
   config: CollectionConfig;
+  workgroups?: Workgroup[]; //not sure this is the nicest solution
 }
 
 export interface Result extends WithTimestamps {
@@ -363,14 +364,24 @@ export interface CreateWorkgroupPost {
   active: boolean;
 }
 
-export interface AddCollectionToWorkgroupPost {
-  id: number;
+export interface AddCollectionsToWorkgroupPost {
+  ids: number[];
   workgroup_id: number;
+}
+
+export interface AddCollectionToWorkgroupsPost {
+  id: number;
+  workgroup_ids: number[];
 }
 
 export interface RemoveCollectionsFromWorkgroupPost {
   ids: number[];
   workgroup_id: number;
+}
+
+export interface RemoveCollectionFromWorkgroupsPost {
+  id: number;
+  workgroup_ids: number[];
 }
 
 export interface Concept {
