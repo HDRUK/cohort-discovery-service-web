@@ -1,5 +1,5 @@
 "use client";
-import { CollectionWithHosts, CollectionHost, Paginated } from "@/types/api";
+import { CollectionWithHosts, CollectionHost, Paginated, CollectionsSearchParams } from "@/types/api";
 import { Box, Skeleton } from "@mui/material";
 import Title from "@/components/Title";
 import ThreePaneSwimLaneLayout, {
@@ -61,8 +61,8 @@ const CollectionsCustodianAdmin = ({
       sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}
     >
       <Title title="Collections" subTitle="Management" />
-      <ControlledSearchBox
-        paramName="search_collection"
+      <ControlledSearchBox<CollectionsSearchParams>
+        paramName="search_term"
         placeholder="Search by collection name..."
       />
       <ThreePaneSwimLaneLayout

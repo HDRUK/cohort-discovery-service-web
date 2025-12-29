@@ -27,7 +27,8 @@ const WorkgroupsLeftPanel = ({
 }: WorkgroupsLeftPanelProps) => {
   const setSelectedWorkgroup = useAdminStore((s) => s.setSelectedWorkgroup);
 
-  const { getSearchParam, setSearchParam } = useSearchParams("workgroup_id");
+  const { getSearchParam, setSearchParam } =
+    useSearchParams("workgroup_filter");
 
   const workgroupId = getSearchParam();
 

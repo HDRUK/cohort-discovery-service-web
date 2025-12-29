@@ -32,6 +32,7 @@ import useCustodianStore from "@/store/useCustodianStore";
 import useUserStore from "@/store/useUserStore";
 import { useNotify } from "@/providers/NotifyProvider";
 import { getTagCustodianCollection, TAG_COLLECTION_ADMIN } from "@/config/tags";
+import { buildCollectionParams } from "@/utils/params";
 
 export interface CollectionsTableProps {
   initialData: Paginated<CollectionWithHosts[]>;
@@ -53,6 +54,8 @@ const CollectionsTable = ({
   deleteOverride,
 }: CollectionsTableProps) => {
   const { searchParams, getSearchParam } = useSearchParams("collection_filter");
+  const filter_name = getSearchParam() || "all";
+
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
 
   const deleteCollectionAdmin = useAdminStore((s) => s.deleteCollection);
@@ -75,16 +78,23 @@ const CollectionsTable = ({
   const { data: collections } = useQuery<Paginated<CollectionWithHosts[]>>({
     queryKey,
     queryFn: async () => {
+      const collectionParams = {
+        page: Number(searchParams?.get("page")) ?? initialData.current_page,
+        per_page: Number(searchParams?.get("per_page")) ?? initialData.per_page,
+      };
+
+      const params = buildCollectionParams(collectionParams).toString();
+
       const res =
         currentCustodian?.pid && !admin
           ? await getCustodianCollections(currentCustodian.pid, {
-              params: searchParams.toString(),
+              params,
               cacheOptions: {
                 useCache: false,
               },
             })
           : await getAdminCollections({
-              params: searchParams.toString(),
+              params,
               cacheOptions: {
                 useCache: false,
               },
@@ -139,8 +149,6 @@ const CollectionsTable = ({
     selectedCollectionIds,
     setSelectedCollection,
   ]);
-
-  const filter_name = getSearchParam() || "all";
 
   const columns = useMemo<MRT_ColumnDef<Collection>[]>(
     () => [

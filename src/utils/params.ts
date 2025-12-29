@@ -1,7 +1,14 @@
-import { ApiSearchParams, SearchParams } from "@/types/api";
+import {
+  CollectionsSearchParams,
+  QueryHistorySearchParams,
+  SearchParams,
+  SearchParamValue,
+} from "@/types/api";
 
-export const buildSearchParams = (
-  params: SearchParams | ApiSearchParams = {}
+export const buildSearchParams = <
+  T extends Record<string, SearchParamValue> = SearchParams
+>(
+  params: Partial<T> = {}
 ): URLSearchParams => {
   const searchParams = new URLSearchParams();
 
@@ -20,4 +27,33 @@ export const buildSearchParams = (
   });
 
   return searchParams;
+};
+
+export const buildCollectionParams = (
+  searchParams: CollectionsSearchParams
+) => {
+  const { page, per_page, workgroup_filter, collection_filter, search_term } =
+    searchParams ?? {};
+
+  const params = {
+    page,
+    per_page,
+    ...(workgroup_filter ? { workgroup_id: workgroup_filter } : {}),
+    ...(collection_filter ? { state: collection_filter } : {}),
+    ...(search_term ? { ["name[]"]: search_term } : {}),
+  };
+
+  return buildSearchParams(params);
+};
+
+export const buildQueryHistoryParams = (
+  searchParams: QueryHistorySearchParams
+) => {
+  const { search_term, ...rest } = searchParams;
+  const params = {
+    ...rest,
+    ...(search_term ? { ["name[]"]: search_term } : {}),
+  };
+
+  return buildSearchParams(params);
 };

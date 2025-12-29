@@ -4,6 +4,7 @@ import {
   CollectionHost,
   Paginated,
   Custodian,
+  CollectionsSearchParams,
 } from "@/types/api";
 import { Box, Skeleton } from "@mui/material";
 import Title from "@/components/Title";
@@ -48,8 +49,8 @@ const CollectionAdmin = ({
       sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}
     >
       <Title title="Collections" subTitle="Management" />
-      <ControlledSearchBox
-        paramName="search_collection"
+      <ControlledSearchBox<CollectionsSearchParams>
+        paramName="search_term"
         placeholder="Search by collection name..."
       />
       <ThreePaneSwimLaneLayout
