@@ -1,4 +1,4 @@
-import { Chip, Alert, Box } from "@mui/material";
+import { Chip, Box } from "@mui/material";
 import SearchConcepts from "@/components/SearchConcepts";
 import { Concept } from "@/types/api";
 import { useCallback } from "react";
@@ -17,6 +17,8 @@ import {
 import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import useNodeActions from "@/hooks/useNodeActions";
+import InvalidRule from "@/components/InvalidRule";
+import { mapDomain } from "@/utils/domains";
 
 export interface RuleProps
   extends Omit<RuleWrapperProps, "node" | "type" | "render"> {
@@ -101,6 +103,17 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     return newConcept;
   }, []);
 
+  const removeAlternative = useCallback((parent: Concept, child: Concept) => {
+    const alternatives = parent.alternatives?.filter(
+      (c) => c.concept_id !== child.concept_id
+    );
+    const newConcept = {
+      ...parent,
+      alternatives,
+    };
+    return newConcept;
+  }, []);
+
   const actions = useNodeActions(rule);
 
   return (
@@ -111,7 +124,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       sortable={true}
       headerExtra={
         !isEmptyRule(rule) && domain ? (
-          <Chip variant="outlined" label={domain} />
+          <Chip variant="outlined" label={mapDomain(domain)} />
         ) : null
       }
       render={() => (
@@ -147,7 +160,51 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
                 </>
               )}
               {isMultipleConcept(concept) && (
-                <Alert color="error"> Not yet implemented </Alert>
+                <>
+                  <ConceptChip
+                    chipSx={{
+                      borderColor: "warning.main",
+                    }}
+                    indicateIfParent={showDescendants}
+                    concept={concept}
+                    onDelete={() => {
+                      if (concept?.alternatives[0]) {
+                        setConcept(concept?.alternatives[0]);
+                      } else {
+                        clearConcept();
+                      }
+                    }}
+                    onClick={(e: React.MouseEvent) => {
+                      if (concept?.children && concept.children.length > 0) {
+                        e.stopPropagation();
+                        toggleShowDescendants();
+                      }
+                    }}
+                  >
+                    <InvalidRule reasons={[]} />
+                  </ConceptChip>
+
+                  {concept?.alternatives &&
+                    concept?.alternatives?.map((childConcept) => (
+                      <ConceptChip
+                        chipSx={{
+                          borderColor: "warning.main",
+                        }}
+                        draggable={false}
+                        key={childConcept.concept_id}
+                        concept={childConcept}
+                        onClick={() => setConcept(childConcept)}
+                        onDelete={(e) => {
+                          e.stopPropagation();
+                          e.preventDefault();
+                          setConcept(removeAlternative(concept, childConcept));
+                        }}
+                      >
+                        {" "}
+                        <InvalidRule reasons={[]} />{" "}
+                      </ConceptChip>
+                    ))}
+                </>
               )}
             </>
           )}

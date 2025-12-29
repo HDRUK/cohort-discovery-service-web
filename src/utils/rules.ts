@@ -26,6 +26,7 @@ export enum RuleErrors {
   TIME_CONSTRAINT_IS_UNIDIRECTIONAL = "Time constraints needs to be unidirectional.",
   AGE_CONSTRAINT_IS_UNIDIRECTIONAL = "Age constraints needs to be unidirectional.",
   CANNOT_CONSTRAIN_AGE_AND_TIME = "A rule can only be constrained by either age OR time currently.",
+  HAS_ALTERNATIVES = "A rule has alternatives, please choose the intended concept.",
 }
 
 export const createRule = (
@@ -466,6 +467,9 @@ export function validateRuleTree(
     let node = validateNode(leaf);
     if (isEmptyRule(leaf)) {
       node = invalidateNode(node, RuleErrors.EMPTY_RULE);
+    }
+    if (isMultipleConcept(leaf.rule.concept)) {
+      node = invalidateNode(node, RuleErrors.HAS_ALTERNATIVES);
     }
     node = validateConstraints(node as RuleLeafType);
     return node;

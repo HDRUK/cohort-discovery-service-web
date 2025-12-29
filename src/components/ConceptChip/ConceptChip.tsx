@@ -1,5 +1,5 @@
 import { Concept } from "@/types/api";
-import { Box, Chip, IconButton, Typography } from "@mui/material";
+import { Box, Chip, ChipProps, IconButton, Typography } from "@mui/material";
 import { DragIndicator } from "@mui/icons-material";
 import CancelIcon from "@mui/icons-material/Cancel";
 
@@ -40,12 +40,16 @@ export const ConceptChip = ({
   concept,
   onClick,
   onDelete,
+  chipSx,
+  children,
 }: {
   draggable?: boolean;
   indicateIfParent?: boolean;
   concept: Concept;
   onClick?: (e: React.MouseEvent) => void;
-  onDelete: () => void;
+  onDelete: (e: React.MouseEvent) => void;
+  chipSx?: ChipProps["sx"];
+  children?: React.ReactNode;
 }) => {
   const isParent = (concept?.children?.length ?? 0) > 0;
 
@@ -73,6 +77,7 @@ export const ConceptChip = ({
                 : "inherit",
             p: 2,
             borderRadius: 10,
+            ...chipSx,
           }}
           label={concept?.description}
           variant="outlined"
@@ -81,6 +86,7 @@ export const ConceptChip = ({
       <IconButton onClick={onDelete}>
         <CancelIcon />
       </IconButton>
+      {children}
     </Box>
   );
 };

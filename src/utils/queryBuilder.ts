@@ -6,6 +6,7 @@ import {
   isRuleLeaf,
   isSingleConcept,
 } from "@/utils/rules";
+import { mapDomain } from "./domains";
 
 type Piece = { verb?: string | null; text: string };
 
@@ -23,6 +24,10 @@ const queryToText = (node: RuleGroupType) => {
         return "measured with";
       case "Condition":
         return "diagnosed with";
+      case "Race":
+        return "were recorded as having race ";
+      case "Gender":
+        return `were recorded as having ${mapDomain("gender").toLowerCase()}`;
       default:
         return "associated with";
     }

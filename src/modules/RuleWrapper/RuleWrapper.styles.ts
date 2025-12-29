@@ -8,7 +8,7 @@ export const containerSx = (
   border: 1,
   borderColor: isSelected ? "blue" : "transparent",
   p: 1,
-  position: "relative",
+  mx: 1,
   ...rest,
 });
 
