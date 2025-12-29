@@ -78,9 +78,21 @@ const CollectionsTable = ({
   const { data: collections } = useQuery<Paginated<CollectionWithHosts[]>>({
     queryKey,
     queryFn: async () => {
+      const workgroupFilter =
+        searchParams?.get("workgroup_filter") ?? undefined;
+      const searchTerm = searchParams?.get("search_term") ?? undefined;
+
+      const collectionFilter =
+        searchParams?.get("collection_filter") ?? undefined;
+
       const collectionParams = {
         page: Number(searchParams?.get("page")) ?? initialData.current_page,
         per_page: Number(searchParams?.get("per_page")) ?? initialData.per_page,
+        ...(workgroupFilter
+          ? { workgroup_filter: Number(workgroupFilter) }
+          : {}),
+        ...(searchTerm ? { search_term: searchTerm } : {}),
+        ...(collectionFilter ? { collection_filter: collectionFilter } : {}),
       };
 
       const params = buildCollectionParams(collectionParams).toString();
