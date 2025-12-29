@@ -1,7 +1,7 @@
 import WorkgroupsAdmin from "./WorkgroupsAdmin";
 import getAdminWorkgroups from "@/actions/getAdminWorkgroups";
-import { ApiSearchParams } from "@/types/api";
-import { buildSearchParams } from "@/utils/params";
+import { CollectionsSearchParams } from "@/types/api";
+import { buildCollectionParams } from "@/utils/params";
 import { Box, Skeleton } from "@mui/material";
 import getCollections from "@/actions/getCollections";
 import getAdminCollections from "@/actions/getAdminCollections";
@@ -17,25 +17,15 @@ export const WorkgroupsSkeleton = () => (
 const WorkgroupsTab = async ({
   searchParams,
 }: {
-  searchParams: ApiSearchParams & {
-    workgroup_filter?: string;
-    search_collection?: string;
-  };
+  searchParams: CollectionsSearchParams;
 }) => {
-  const {
-    page = 1,
-    per_page = DEFAULT_PER_PAGE,
-    workgroup_filter = undefined,
-  } = searchParams ?? {};
+  const { page = 1, per_page = DEFAULT_PER_PAGE, ...rest } = searchParams ?? {};
 
-  const queryParams = {
+  const params = buildCollectionParams({
     page,
     per_page,
-    workgroup_id: workgroup_filter,
-    // ["name[]"]: search_collection,
-  };
-
-  const params = buildSearchParams(queryParams);
+    ...rest,
+  });
 
   const [
     { data: collections },

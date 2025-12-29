@@ -15,7 +15,7 @@ type Params = Promise<{ tabId: string }>;
 
 const DashboardTabPage = async (props: {
   params: Params;
-  searchParams: SearchParams;
+  searchParams: Promise<SearchParams>;
 }) => {
   const { params, searchParams } = props;
   const { tabId } = await params;

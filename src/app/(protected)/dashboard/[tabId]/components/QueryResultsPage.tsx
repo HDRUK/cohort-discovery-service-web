@@ -6,10 +6,10 @@ import QueryResultsTable from "@/components/QueryResultsTable";
 import getQuery from "@/actions/getQuery";
 import Title from "@/components/Title";
 import { queryToText } from "@/utils/queryBuilder";
-import { buildSearchParams } from "@/utils/params";
-import { ApiSearchParams } from "@/types/api";
+import { buildQueryHistoryParams } from "@/utils/params";
+import { QueryHistorySearchParams } from "@/types/api";
 
-type PageSearchParams = Promise<ApiSearchParams & { query?: string }>;
+type PageSearchParams = Promise<QueryHistorySearchParams>;
 
 interface PageProps {
   searchParams: PageSearchParams;
@@ -20,17 +20,9 @@ const QueryResultsPageContent = async ({
 }: {
   searchParams: PageSearchParams;
 }) => {
-  const { query, page, per_page, searchTerm, sort } =
-    (await searchParams) ?? {};
+  const { query, ...rest } = await searchParams;
 
-  const queryParams = {
-    page,
-    per_page,
-    ["name[]"]: searchTerm,
-    sort,
-  };
-
-  const searchParamsObject = buildSearchParams(queryParams);
+  const searchParamsObject = buildQueryHistoryParams(rest);
 
   const queryData = await getQuery(query as string, {
     params: searchParamsObject,

@@ -1,6 +1,7 @@
 "use client";
 import {
   Collection,
+  CollectionsSearchParams,
   CollectionWithHosts,
   Paginated,
   Workgroup,
@@ -48,8 +49,8 @@ const WorkgroupsAdmin = ({
       sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}
     >
       <Title title="Workgroups" subTitle="Management" />
-      <ControlledSearchBox
-        paramName="search_collections"
+      <ControlledSearchBox<CollectionsSearchParams>
+        paramName="search_term"
         placeholder="Search by collection name or username..."
       />
       <ThreePaneSwimLaneLayout

@@ -1,19 +1,34 @@
 import { QueryContext } from "./context";
 import { RuleGroupType } from "./rules";
 
-export type SearchParams = Promise<{
-  [key: string]: string | string[] | undefined;
-}>;
+export type SearchParamValue =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | (string | number | boolean | null | undefined)[];
 
-export interface CacheOptions {
-  useCache?: boolean;
-}
+export type SearchParams = Record<string, SearchParamValue>;
 
 export interface ApiSearchParams {
   per_page?: number;
   page?: number;
   sort?: string;
-  searchTerm?: string;
+  search_term?: string;
+}
+
+export interface CollectionsSearchParams extends ApiSearchParams {
+  workgroup_filter?: number; // workgroup-id
+  collection_filter?: string; // collection status
+}
+
+export interface QueryHistorySearchParams extends ApiSearchParams {
+  query?: string;
+}
+
+export interface CacheOptions {
+  useCache?: boolean;
 }
 
 export interface ApiResponse<T> {

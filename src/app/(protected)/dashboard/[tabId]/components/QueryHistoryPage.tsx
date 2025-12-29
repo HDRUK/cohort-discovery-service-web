@@ -7,7 +7,7 @@ import { QueriesTableSkeleton } from "@/components/QueriesTable";
 import { Box } from "@mui/material";
 import Title from "@/components/Title";
 import { ApiSearchParams } from "@/types/api";
-import { buildSearchParams } from "@/utils/params";
+import { buildQueryHistoryParams } from "@/utils/params";
 
 interface PageProps {
   searchParams: Promise<ApiSearchParams>;
@@ -16,16 +16,7 @@ interface PageProps {
 const QueryHistoryPageContent = async ({ searchParams }: PageProps) => {
   const params = await searchParams;
 
-  const { page, per_page, searchTerm, sort } = params ?? {};
-
-  const queryParams = {
-    page,
-    per_page,
-    ["name[]"]: searchTerm,
-    sort,
-  };
-
-  const searchParamsObject = buildSearchParams(queryParams);
+  const searchParamsObject = buildQueryHistoryParams(params);
 
   const queries = await getQueries({ params: searchParamsObject });
 

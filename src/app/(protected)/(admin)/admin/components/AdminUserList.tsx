@@ -1,10 +1,14 @@
 "use client";
 
 import { useMemo } from "react";
-import type { User } from "@/types/api";
+import type { ApiSearchParams, User } from "@/types/api";
 import AdminUserTable from "./AdminUserTable";
 import TabsShell from "@/components/TabsShell";
 import ControlledSearchBox from "@/modules/ControlledSearchBox";
+
+export interface UserSearchParams extends ApiSearchParams {
+  name?: string;
+}
 
 const AdminUserList = ({ users }: { users: User[] }) => {
   const newUsers = useMemo(
@@ -19,8 +23,8 @@ const AdminUserList = ({ users }: { users: User[] }) => {
 
   return (
     <>
-      <ControlledSearchBox
-        paramName="userSearchInput"
+      <ControlledSearchBox<UserSearchParams>
+        paramName="name"
         sx={{
           m: 2,
           width: "calc(100% - 60px)",
