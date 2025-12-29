@@ -17,7 +17,7 @@ type FormValues<K extends string> = Record<K, string>;
 
 export interface ControlledSearchBoxProps<
   TParams extends ApiSearchParams = ApiSearchParams,
-  K extends StringParamKey<TParams> = "search_term" & StringParamKey<TParams>
+  K extends StringParamKey<TParams> = StringParamKey<TParams>
 > extends SearchBoxProps {
   paramName?: K;
   useErrors?: boolean;
@@ -25,13 +25,14 @@ export interface ControlledSearchBoxProps<
 
 const ControlledSearchBox = <
   TParams extends ApiSearchParams = ApiSearchParams,
-  K extends StringParamKey<TParams> = "search_term" & StringParamKey<TParams>
+  K extends StringParamKey<TParams> = StringParamKey<TParams>
 >({
   paramName,
   useErrors = false,
   ...searchBoxProps
 }: ControlledSearchBoxProps<TParams, K>) => {
-  const key = (paramName ?? ("search_term" as K)) as K;
+  // default to "search_term" when paramName isn't provided
+  const key = (paramName ?? ("search_term" as StringParamKey<TParams>)) as K;
 
   const { getSearchParam, setSearchParam } = useSearchParams(key);
 
