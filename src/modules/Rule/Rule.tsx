@@ -169,7 +169,9 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
                     concept={concept}
                     onDelete={() => {
                       if (concept?.alternatives[0]) {
-                        setConcept(concept?.alternatives[0]);
+                        const [alternative, ...alternatives] =
+                          concept?.alternatives;
+                        setConcept({ ...alternative, alternatives });
                       } else {
                         clearConcept();
                       }

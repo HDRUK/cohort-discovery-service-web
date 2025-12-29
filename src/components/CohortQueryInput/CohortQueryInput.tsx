@@ -41,7 +41,7 @@ const CohortQueryInput = () => {
     clearErrors();
 
     if (!queryBuilderJson.valid) {
-      setValue("cohortQueryInput", "");
+      //setValue("cohortQueryInput", "");
 
       const maskInitialError =
         queryBuilderJson?.invalidReason?.length === 1 &&

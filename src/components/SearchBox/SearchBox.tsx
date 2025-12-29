@@ -137,7 +137,6 @@ const SearchBox = ({
               }
             }}
             {...rest}
-            disabled={disabled}
           />
         </Grid>
         {actionsCols > 0 && (
