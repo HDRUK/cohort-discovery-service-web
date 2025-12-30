@@ -1,4 +1,3 @@
-import * as React from "react";
 import {
   TextField,
   Typography,
@@ -80,7 +79,7 @@ const EditableText = ({
   };
 
   const displayText = value || placeholder || "";
-
+  const STABLE_ID = "cohort-query-name";
   return (
     <Typography
       {...typographyProps}
@@ -97,7 +96,7 @@ const EditableText = ({
     >
       {editing ? (
         <TextField
-          key="editing"
+          id={STABLE_ID}
           autoFocus
           inputRef={inputRef}
           value={draft}
@@ -117,6 +116,13 @@ const EditableText = ({
           }}
           onBlur={commitOnBlur ? commit : cancel}
           {...textFieldProps}
+          slotProps={{
+            ...textFieldProps?.slotProps,
+            htmlInput: {
+              ...(textFieldProps?.slotProps?.htmlInput ?? {}),
+              id: STABLE_ID,
+            },
+          }}
         />
       ) : (
         <>{displayText}</>

@@ -72,6 +72,8 @@ const SearchBox = ({
   const nActions = actionChildren.length;
   const actionsCols = Math.min(2, nActions * 0.5);
 
+  const STABLE_ID = "search-box";
+
   return (
     <Box
       sx={getContainerSx(collapsible, expanded, expandedWidth, collapsedWidth)}
@@ -86,12 +88,14 @@ const SearchBox = ({
       >
         <Grid size={12 - actionsCols}>
           <TextField
+            id={STABLE_ID}
             inputRef={inputRef}
             type="search"
             sx={getTextFieldSx(collapsible, expanded, inputBgColor)}
             slotProps={{
               htmlInput: {
                 sx: getHtmlInputSx(collapsible, expanded),
+                id: STABLE_ID,
               },
               input: {
                 endAdornment: (
@@ -133,7 +137,6 @@ const SearchBox = ({
               }
             }}
             {...rest}
-            disabled={disabled}
           />
         </Grid>
         {actionsCols > 0 && (

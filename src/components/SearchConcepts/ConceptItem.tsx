@@ -1,6 +1,7 @@
 import { Concept } from "@/types/api";
 import { Paper, FormControlLabel, Checkbox, PaperProps } from "@mui/material";
 import Title from "../Title";
+import { mapDomain } from "@/utils/domains";
 
 export interface ConceptItemProps {
   concept: Concept;
@@ -62,7 +63,7 @@ export const ConceptItem = ({
       size="small"
       useSeparator={false}
       title={titleText}
-      subTitle={showDomain ? concept.category : ""}
+      subTitle={showDomain ? mapDomain(concept.category) : ""}
       display={"flex"}
       justifyContent={"space-between"}
       width={"100%"}

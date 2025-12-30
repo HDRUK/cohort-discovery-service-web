@@ -32,6 +32,8 @@ import { findById, moveItemIntoGroup } from "@/utils/rules";
 import MarqueeSelection from "@/components/MarqueeSelection";
 import { Query } from "@/types/api";
 import ThreePaneSwimLaneLayout from "../ThreePaneSwimLaneLayout";
+import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
+import useRightClickMenu from "@/hooks/useRightClickMenu";
 
 const QueryBuilder = ({ query }: { query?: Query }) => {
   const {
@@ -41,6 +43,9 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
     boardIndex,
     select,
     deselect,
+    createNewGroup,
+    createNewRule,
+    createNewAgeFilter,
   } = useQueryBuilder((qb) => ({
     resetQueryBuilderJson: qb.resetQueryBuilderJson,
     queryBuilderJson: qb.queryBuilderJson,
@@ -48,6 +53,9 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
     boardIndex: qb.boardIndex,
     select: qb.select,
     deselect: qb.deselect,
+    createNewGroup: qb.createNewGroup,
+    createNewRule: qb.createNewRule,
+    createNewAgeFilter: qb.createNewAgeFilter,
   }));
 
   useEffect(() => {
@@ -178,6 +186,13 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
   );
 
   const boardRef = useRef<HTMLDivElement>(null);
+  const { handleContextMenu, ...rightClickMenuMethods } = useRightClickMenu();
+
+  const actions = [
+    { action: createNewAgeFilter, label: "Add Age Filter" },
+    { action: createNewRule, label: "Add Rule" },
+    { action: createNewGroup, label: "Add Group" },
+  ];
 
   return (
     <>
@@ -194,7 +209,13 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
               collisionDetection={closestCorners}
               measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
             >
-              <RuleBoard ruleGroup={queryBuilderJson} />
+              <RuleBoard
+                ruleGroup={queryBuilderJson}
+                onContextMenu={handleContextMenu}
+              >
+                <RightClickMenu {...rightClickMenuMethods} actions={actions} />
+              </RuleBoard>
+
               <DragOverlay node={activeNode} />
             </DndContext>
           </>

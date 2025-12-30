@@ -60,6 +60,7 @@ import {
   updateById,
   validateRuleTree,
   isAgeFilter,
+  groupToRules,
 } from "@/utils/rules";
 import { UniqueIdentifier } from "@dnd-kit/core";
 import { removeFalseKeys, trueKeys } from "@/utils/numbers";
@@ -527,13 +528,23 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       });
     },
     getQueryFromText: async (input: string) => {
+      const cleanQuery = (queryString: string) => {
+        const query = JSON.parse(queryString) as RuleGroupType;
+
+        //enforce no unnecessary group within group
+        if (query.rules.length === 1 && isRuleGroup(query.rules[0])) {
+          return { ...query, rules: groupToRules(query.rules[0]) };
+        }
+        return query;
+      };
+
       set((state) => ({
         ...state,
         stateManagement: { ...state.stateManagement, isLoading: true },
       }));
 
       const { data: newQueryString } = await parseQuery(input);
-      const newQuery = JSON.parse(newQueryString);
+      const newQuery = cleanQuery(newQueryString);
 
       set((state) => ({
         ...state,
