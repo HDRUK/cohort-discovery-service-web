@@ -3,7 +3,7 @@
 import CodeStats from "@/components/CodeStats";
 import { Paper, Skeleton } from "@mui/material";
 import { Suspense } from "react";
-import RevalidateButton from "@/components/RevalidateButton";
+import RefreshButton from "@/components/RefreshButton";
 import Title from "@/components/Title";
 import getCodeStats from "@/actions/omop/getCodeStats";
 
@@ -25,7 +25,7 @@ const CodesPageContent = async ({ searchParams }: PageProps) => {
   return (
     <Paper sx={{ p: 2, gap: 2, display: "flex", flexDirection: "column" }}>
       <Title title={"Available Codes"} subTitle={stats.data.total}>
-        <RevalidateButton tag="omop" />
+        <RefreshButton tag="omop" />
       </Title>
       <CodeStats codes={stats.data} />
     </Paper>

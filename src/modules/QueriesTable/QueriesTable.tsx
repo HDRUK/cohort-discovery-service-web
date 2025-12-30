@@ -3,7 +3,7 @@
 import useQueryBuilder from "@/store/useQueryBuilder";
 
 import { useState } from "react";
-import { Query, Paginated } from "../../types/api";
+import { Query, Paginated } from "@/types/api";
 import {
   MRT_ExpandedState,
   MRT_RowSelectionState,
@@ -11,14 +11,14 @@ import {
 } from "material-react-table";
 import { Grid, Paper, Typography } from "@mui/material";
 import dayjs from "dayjs";
-import { usePaginatedTable } from "../../hooks/usePaginatedTable";
+import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import { formatNumber } from "@/utils/numbers";
 import Link from "next/link";
 import { Link as MuiLink } from "@mui/material";
-import { routes } from "../../config/routes";
-import Table from "../Table";
+import { routes } from "@/config/routes";
+import Table from "@/components/Table";
 import { getTasksStatus, getTotalAllTasks } from "@/utils/tasks";
-import QueryResultsTable from "../../modules/QueryResultsTable";
+import QueryResultsTable from "@/modules/QueryResultsTable";
 import { queryToText } from "@/utils/queryBuilder";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
@@ -27,7 +27,8 @@ import { DEFAULT_INTERVAL } from "@/config/defaults";
 import { getQueryName } from "@/utils/query";
 import useSearchParams from "@/hooks/useSearchParams";
 import { buildQueryHistoryParams } from "@/utils/params";
-import { AvailableFormats } from "../DownloadButton/DownloadButton";
+import { AvailableFormats } from "@/components/DownloadButton/DownloadButton";
+import rerunQuery from "@/actions/rerunQuery";
 
 interface QueriesTableProps {
   initialData: Paginated<Query[]>;
@@ -71,9 +72,9 @@ const QueriesTable = ({
     refetchOnReconnect: false,
     refetchInterval: (query) => {
       const data = query.state.data;
-      const hasIncomplete = data?.data.filter((q) =>
-        q.tasks.some((t) => !t.completed_at)
-      );
+      const hasIncomplete =
+        data?.data.filter((q) => q.tasks.some((t) => !t.completed_at))
+          ?.length ?? 0 > 0;
       return hasIncomplete ? DEFAULT_INTERVAL : false;
     },
   });
@@ -215,6 +216,13 @@ const QueriesTable = ({
               </Grid>
             ),
             rightAction: {
+              refreshProps: {
+                label: "Re-run query",
+                onClick: async () => {
+                  const { data } = await rerunQuery(row.original.pid);
+                  router.push(routes.dashboardQueryResult(data.query_pid));
+                },
+              },
               downloadProps: {
                 id: row.original.pid,
                 entity: "queries",

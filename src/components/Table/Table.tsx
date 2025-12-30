@@ -6,12 +6,12 @@ import {
 } from "material-react-table";
 import React, { useMemo } from "react";
 import { trueKeys } from "@/utils/numbers";
-import RevalidateButton from "@/components/RevalidateButton";
+import RefreshButton from "@/components/RefreshButton";
 import DownloadButton from "../DownloadButton";
 import { DownloadButtonProps } from "../DownloadButton/DownloadButton";
 import SortButton, { SortButtonProps } from "../SortButton/SortButton";
 import EditButton, { EditButtonProps } from "../EditButton";
-import { RevalidateButtonProps } from "../RevalidateButton/RevalidateButton";
+import { RefreshButtonProps } from "../RefreshButton/RefreshButton";
 import DeleteButton, { DeleteButtonProps } from "../DeleteButton";
 import Title, { TitleProps } from "@/components/Title";
 import ControlledSearchBox, {
@@ -24,7 +24,7 @@ export interface TableProps {
     searchProps?: ControlledSearchBoxProps;
   };
   rightAction?: {
-    refreshProps?: RevalidateButtonProps;
+    refreshProps?: RefreshButtonProps;
     deleteProps?: Omit<DeleteButtonProps, "onClick"> & {
       onClick?: (selectedRowIds: string[]) => void;
     };
@@ -91,7 +91,7 @@ const Table = <TData extends MRT_RowData>({
               >
                 {sortProps && <SortButton {...sortProps} />}
 
-                {refreshProps && <RevalidateButton {...refreshProps} />}
+                {refreshProps && <RefreshButton {...refreshProps} />}
 
                 {editProps && (
                   <EditButton

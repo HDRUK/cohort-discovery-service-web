@@ -2,7 +2,7 @@
 
 import { Grid, Paper, Skeleton } from "@mui/material";
 import { type MRT_ColumnDef } from "material-react-table";
-import Table from "../Table";
+import Table from "@/components/Table";
 
 const skeletonRows = Array.from({ length: 5 });
 

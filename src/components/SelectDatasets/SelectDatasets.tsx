@@ -13,7 +13,7 @@ import Title from "../Title";
 import SelectNetworkDatasets, {
   NetworkGroupedCollections,
 } from "../SelectNetworkDatasets";
-import RevalidateButton from "../RevalidateButton";
+import RefreshButton from "../RefreshButton";
 import { TAG_COLLECTIONS } from "@/config/tags";
 
 const SelectDatasets = ({
@@ -88,7 +88,7 @@ const SelectDatasets = ({
               width: "100%",
             }}
           >
-            <RevalidateButton component="div" tag={TAG_COLLECTIONS} />
+            <RefreshButton component="div" tag={TAG_COLLECTIONS} />
           </Title>
         </AccordionSummary>
         <AccordionDetails
