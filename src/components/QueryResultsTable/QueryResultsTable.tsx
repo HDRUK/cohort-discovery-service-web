@@ -43,7 +43,7 @@ const QueryResultsTable = ({
     ],
     queryFn: async () => {
       const res = await getQuery(initialData.pid, {
-        params: initialSearchParams,
+        params: initialSearchParams.toString(),
         cacheOptions: { useCache: false },
       });
       return res.data;
@@ -92,17 +92,19 @@ const QueryResultsTable = ({
         }
         return (
           <Link
-            component={"a"}
+            component="a"
             href={url}
             sx={{
               display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
+              textDecoration: "none",
+              "&:hover": { textDecoration: "underline" },
             }}
           >
-            <span>{name}</span>
-            <LaunchIcon fontSize="small" />
+            {name}
+            <LaunchIcon
+              fontSize="small"
+              sx={{ ml: 0.25, verticalAlign: "middle" }}
+            />
           </Link>
         );
       },
