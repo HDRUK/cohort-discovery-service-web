@@ -15,6 +15,7 @@ const isProd = process.env.NODE_ENV === "production";
 export interface RevalidateButtonProps
   extends Omit<IconButtonProps, "onClick"> {
   tag: string;
+  label?: string;
   text?: string;
 }
 
@@ -32,11 +33,12 @@ const TooltipWrapper = ({
 
 export const RevalidateButton = ({
   tag,
+  label,
   text,
   ...rest
 }: RevalidateButtonProps) => {
   return (
-    <TooltipWrapper enabled={!isProd} title={tag}>
+    <TooltipWrapper enabled={!isProd} title={label || tag}>
       <Box display="flex" alignItems="center" gap={1}>
         <IconButton onClick={() => revalidateAction(tag)} {...rest}>
           <RefreshIcon fontSize={"small"} />
