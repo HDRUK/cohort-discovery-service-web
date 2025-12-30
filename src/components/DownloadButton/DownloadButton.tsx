@@ -6,7 +6,7 @@ import DownloadIcon from "@mui/icons-material/Download";
 import PositionedMenu, { PositionedMenuItem } from "../PositionedMenu";
 import { useNotify } from "@/providers/NotifyProvider";
 
-enum AvailableFormats {
+export enum AvailableFormats {
   JSON = "json",
   CSV = "csv",
 }
