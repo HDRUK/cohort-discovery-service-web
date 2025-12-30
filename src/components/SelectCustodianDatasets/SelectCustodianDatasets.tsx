@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Title from "../Title";
-import SquareRadio from "../SquareRadio";
+import SquareCheckbox from "../SquareCheckbox";
 
 const SelectCustodianDatasets = ({
   custodianCollections,
@@ -63,12 +63,10 @@ const SelectCustodianDatasets = ({
         <Title
           size="small"
           startIcon={
-            <SquareRadio
+            <SquareCheckbox
               checked={nSelected > 0}
-              partial={nSelected !== nTotal}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
+              indeterminate={nSelected > 0 && nSelected !== nTotal}
+              onChange={() => {
                 handleSelectAll();
               }}
             />
@@ -101,8 +99,8 @@ const SelectCustodianDatasets = ({
               label={
                 <FormControlLabel
                   control={
-                    <SquareRadio
-                      onClick={() => handleSelectDataset(c.pid)}
+                    <SquareCheckbox
+                      onChange={() => handleSelectDataset(c.pid)}
                       checked={selectedDatasets.includes(c.pid)}
                     />
                   }

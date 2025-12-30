@@ -6,7 +6,7 @@ import PositionedMenu, {
 } from "../PositionedMenu/PositionedMenu";
 import useSearchParams from "@/hooks/useSearchParams";
 import { SortDirection } from "@/types/common";
-import { Box, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { SortAscendingIcon } from "@/icons/SortAscendingIcon";
 import { SortDescendingIcon } from "@/icons/SortDescendingIcon";
 import { useCallback } from "react";
