@@ -11,8 +11,8 @@ import { formatNumber } from "@/utils/numbers";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import useSearchParams from "@/hooks/useSearchParams";
 import { DEFAULT_INTERVAL, STATUS_LABELS } from "@/config/defaults";
-import Table from "../Table";
-import { TableProps } from "../Table/Table";
+import Table from "../../components/Table";
+import { TableProps } from "../../components/Table/Table";
 import getQuery from "@/actions/getQuery";
 import { useQuery } from "@tanstack/react-query";
 

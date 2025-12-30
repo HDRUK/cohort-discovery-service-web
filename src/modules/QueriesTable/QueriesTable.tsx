@@ -18,7 +18,7 @@ import { Link as MuiLink } from "@mui/material";
 import { routes } from "../../config/routes";
 import Table from "../Table";
 import { getTasksStatus, getTotalAllTasks } from "@/utils/tasks";
-import QueryResultsTable from "../QueryResultsTable";
+import QueryResultsTable from "../../modules/QueryResultsTable";
 import { queryToText } from "@/utils/queryBuilder";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";

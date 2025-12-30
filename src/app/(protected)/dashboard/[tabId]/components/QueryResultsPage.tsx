@@ -2,7 +2,7 @@
 
 import { Alert, Divider, Skeleton } from "@mui/material";
 import { Suspense } from "react";
-import QueryResultsTable from "@/components/QueryResultsTable";
+import QueryResultsTable from "@/modules/QueryResultsTable";
 import getQuery from "@/actions/getQuery";
 import Title from "@/components/Title";
 import { queryToText } from "@/utils/queryBuilder";
