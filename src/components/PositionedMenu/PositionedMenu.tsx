@@ -80,13 +80,9 @@ const PositionedMenu = ({
           bgcolor: "white",
           borderColor: active ? "success.main" : "transparent",
           borderRadius: "50%",
-          width: 32,
-          height: 32,
-          my: "auto",
-          ml: 2,
-          mr: "auto",
+          height: 40,
+          width: 40,
         },
-        size: "small",
       }
     : {
         variant: "text",

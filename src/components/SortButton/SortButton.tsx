@@ -6,7 +6,7 @@ import PositionedMenu, {
 } from "../PositionedMenu/PositionedMenu";
 import useSearchParams from "@/hooks/useSearchParams";
 import { SortDirection } from "@/types/common";
-import { Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { SortAscendingIcon } from "@/icons/SortAscendingIcon";
 import { SortDescendingIcon } from "@/icons/SortDescendingIcon";
 import { useCallback } from "react";
@@ -64,7 +64,7 @@ const SortButton = ({ field, searchParamName = "sort" }: SortButtonProps) => {
 
   return (
     <PositionedMenu isIcon items={items} active={!!currentSortDirection}>
-      <SortIcon fontSize="small" />
+      <SortIcon sx={{ width: 20, height: 20 }} />
     </PositionedMenu>
   );
 };
