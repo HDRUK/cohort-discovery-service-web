@@ -74,18 +74,17 @@ const Table = <TData extends MRT_RowData>({
       }}
     >
       {(rightAction || leftAction) && (
-        <Grid container sx={{ pb: 2 }}>
-          <Grid size={10}>
+        <Grid container sx={{ pb: details ? 0 : 0.5 }}>
+          <Grid size={"grow"}>
             {leftAction && titleProps && <Title {...titleProps} />}
             {leftAction && searchProps && (
               <ControlledSearchBox {...searchProps} />
             )}
           </Grid>
-          <Grid size={2}>
+          <Grid size={"auto"}>
             {rightAction && (
               <Box
                 sx={{
-                  minHeight: 40,
                   display: "flex",
                   justifyContent: "flex-end",
                 }}

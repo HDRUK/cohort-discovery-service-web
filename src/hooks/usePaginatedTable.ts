@@ -9,6 +9,7 @@ import {
   MRT_SortingState,
 } from "material-react-table";
 import { useTable } from "./useTable";
+import { buildRowsPerPageOptions } from "@/utils/pagination";
 
 interface UsePaginatedTableOptions<TData extends MRT_RowData>
   extends Partial<MRT_TableOptions<TData>> {
@@ -100,7 +101,7 @@ export function usePaginatedTable<TData extends { pid: string }>({
       ...state,
     },
     muiPaginationProps: {
-      rowsPerPageOptions: Array.from(new Set([5, 10, 20, perPageDefault])),
+      rowsPerPageOptions: buildRowsPerPageOptions(perPageDefault),
     },
     muiBottomToolbarProps: {
       sx: {
