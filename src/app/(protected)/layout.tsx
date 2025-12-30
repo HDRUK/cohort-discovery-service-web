@@ -29,8 +29,8 @@ export default async function ProtectedLayout({
 
   const h = await headers();
   const requestNow = h?.get("x-request-now");
-  const now = requestNow !== null ? Number(requestNow) : 0;
-  if (decoded.exp && now >= decoded.exp) {
+  const now = requestNow !== null ? Math.floor(Number(requestNow)) : 0;
+  if (decoded.exp && now >= Math.floor(decoded.exp)) {
     redirect("/api/auth/logout");
   }
 
