@@ -1,36 +1,61 @@
 "use client";
 
-import { IconButton, IconButtonProps } from "@mui/material";
+import { IconButtonProps } from "@mui/material";
 
 import DownloadIcon from "@mui/icons-material/Download";
+import PositionedMenu, { PositionedMenuItem } from "../PositionedMenu";
+import { useNotify } from "@/providers/NotifyProvider";
+
+enum AvailableFormats {
+  JSON = "json",
+  CSV = "csv",
+}
 
 export interface DownloadButtonProps
   extends Omit<IconButtonProps<"a">, "ref" | "href" | "component"> {
   id?: string;
   entity?: string;
-  format?: "json" | "csv";
+  formats?: AvailableFormats[];
 }
 
 const DownloadButton = ({
   id,
   entity,
-  format = "json",
+  formats = [AvailableFormats.JSON],
   disabled,
   ...rest
 }: DownloadButtonProps) => {
+  const notify = useNotify();
+
+  const download = (format: AvailableFormats) => {
+    if (disabled || !id || !entity) return;
+
+    const url = `/api/download/${encodeURIComponent(
+      id
+    )}?entity=${encodeURIComponent(entity)}&format=${encodeURIComponent(
+      format
+    )}`;
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.target = "_self";
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    notify.success(`Downloading ${entity} as ${format} has started`);
+  };
+
+  const items: PositionedMenuItem[] = formats.map((format) => ({
+    id: format,
+    label: format.toUpperCase(),
+    onClick: () => download(format),
+  }));
+
   return (
-    <IconButton
-      data-testid="download-button"
-      {...rest}
-      disabled={disabled}
-      href={
-        disabled || !id || !entity || !format
-          ? "#"
-          : `/api/download/${id}?entity=${entity}&format=${format}`
-      }
-    >
+    <PositionedMenu isIcon items={items} {...rest}>
       <DownloadIcon />
-    </IconButton>
+    </PositionedMenu>
   );
 };
 
