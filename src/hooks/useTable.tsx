@@ -14,7 +14,7 @@ const SELECT_COL_SIZE = 30;
 export const useTable = <TData extends MRT_RowData>({
   columns,
   data,
-  enableRowSelection,
+  enableRowSelection = true,
   ...rest
 }: MRT_TableOptions<TData>) => {
   const hydratedColumns = useMemo<MRT_ColumnDef<TData>[]>(
@@ -27,6 +27,9 @@ export const useTable = <TData extends MRT_RowData>({
               Header: ({ table }) => (
                 <Tooltip title="Select all">
                   <SquareCheckbox
+                    slotProps={{
+                      input: { "aria-label": "Toggle select all rows" },
+                    }}
                     checked={table.getIsAllRowsSelected()}
                     indeterminate={table.getIsSomeRowsSelected()}
                     onChange={table.getToggleAllRowsSelectedHandler()}
@@ -35,6 +38,7 @@ export const useTable = <TData extends MRT_RowData>({
               ),
               Cell: ({ row }) => (
                 <SquareCheckbox
+                  slotProps={{ input: { "aria-label": "Toggle select row" } }}
                   checked={row.getIsSelected()}
                   disabled={!row.getCanSelect()}
                   onChange={row.getToggleSelectedHandler()}

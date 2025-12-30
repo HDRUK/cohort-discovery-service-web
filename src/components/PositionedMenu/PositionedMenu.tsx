@@ -28,6 +28,7 @@ const PositionedMenu = ({
   isIcon = false,
   active = false,
   items,
+  ...rest
 }: PositionedMenuProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const buttonRef = React.useRef<HTMLButtonElement | null>(null);
@@ -90,7 +91,11 @@ const PositionedMenu = ({
 
   return (
     <>
-      <ButtonComponent {...commonButtonProps} {...specificButtonProps}>
+      <ButtonComponent
+        {...commonButtonProps}
+        {...specificButtonProps}
+        {...rest}
+      >
         {children}
       </ButtonComponent>
 

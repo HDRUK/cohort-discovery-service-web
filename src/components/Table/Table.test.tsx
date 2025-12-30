@@ -120,6 +120,26 @@ describe("Table", () => {
   });
 
   it("it can donwload on click", async () => {
+    const user = userEvent.setup();
+
+    const realCreateElement = document.createElement.bind(document);
+    let createdAnchor: HTMLAnchorElement | null = null;
+
+    const createElementSpy = jest
+      .spyOn(document, "createElement")
+      .mockImplementation((tagName) => {
+        const el = realCreateElement(tagName);
+
+        if (String(tagName).toLowerCase() === "a") {
+          createdAnchor = el as HTMLAnchorElement;
+
+          jest.spyOn(createdAnchor, "click").mockImplementation(() => {});
+          jest.spyOn(createdAnchor, "remove").mockImplementation(() => {});
+        }
+
+        return el;
+      });
+
     render(<TableWithState />);
 
     const row = screen.getByRole("row", { name: /name1/i });
@@ -128,14 +148,28 @@ describe("Table", () => {
       name: /toggle select row/i,
     });
 
-    await userEvent.click(checkbox);
+    await user.click(checkbox);
+
     const downloadButton = screen.getByTestId("download-button");
 
     expect(downloadButton).toBeInTheDocument();
 
-    expect(downloadButton).toHaveAttribute(
-      "href",
+    await user.click(downloadButton);
+
+    const menu = await screen.findByRole("menu");
+    expect(menu).toBeInTheDocument();
+
+    const jsonButton = within(menu).getByRole("menuitem", { name: /json/i });
+
+    expect(jsonButton).toBeInTheDocument();
+
+    await user.click(jsonButton);
+
+    expect(createdAnchor).not.toBeNull();
+
+    expect(createdAnchor!.getAttribute("href")).toBe(
       "/api/download/download-id?entity=test-entity&format=json"
     );
+    createElementSpy.mockRestore();
   });
 });

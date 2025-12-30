@@ -23,11 +23,10 @@ const DownloadButton = ({
   entity,
   formats = [AvailableFormats.JSON],
   disabled,
-  ...rest
 }: DownloadButtonProps) => {
   const notify = useNotify();
 
-  const download = (format: AvailableFormats) => {
+  const download = async (format: AvailableFormats) => {
     if (disabled || !id || !entity) return;
 
     const url = `/api/download/${encodeURIComponent(
@@ -35,7 +34,6 @@ const DownloadButton = ({
     )}?entity=${encodeURIComponent(entity)}&format=${encodeURIComponent(
       format
     )}`;
-
     const a = document.createElement("a");
     a.href = url;
     a.target = "_self";
@@ -53,7 +51,7 @@ const DownloadButton = ({
   }));
 
   return (
-    <PositionedMenu isIcon items={items} {...rest}>
+    <PositionedMenu data-testid="download-button" isIcon items={items}>
       <DownloadIcon />
     </PositionedMenu>
   );
