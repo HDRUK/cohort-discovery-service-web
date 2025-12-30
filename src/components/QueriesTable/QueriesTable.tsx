@@ -249,7 +249,7 @@ const QueriesTable = ({
         },
       }}
       rightAction={{
-        refreshProps: { tag: "Refresh Queries" },
+        refreshProps: { tag: "queries", label: "Refresh Queries" },
         sortProps: { field: "name" },
       }}
     />
