@@ -104,7 +104,7 @@ const PositionedMenu = ({
           {
             name: "offset",
             options: {
-              offset: [0, 12],
+              offset: [0, 2],
             },
           },
         ]}
