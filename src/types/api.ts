@@ -1,15 +1,34 @@
 import { QueryContext } from "./context";
 import { RuleGroupType } from "./rules";
 
-export type SearchParams = Promise<{
-  [key: string]: string | string[] | undefined;
-}>;
+export type SearchParamValue =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | (string | number | boolean | null | undefined)[];
+
+export type SearchParams = Record<string, SearchParamValue>;
 
 export interface ApiSearchParams {
   per_page?: number;
   page?: number;
   sort?: string;
-  searchTerm?: string;
+  search_term?: string;
+}
+
+export interface CollectionsSearchParams extends ApiSearchParams {
+  workgroup_filter?: number; // workgroup-id
+  collection_filter?: string; // collection status
+}
+
+export interface QueryHistorySearchParams extends ApiSearchParams {
+  query?: string;
+}
+
+export interface CacheOptions {
+  useCache?: boolean;
 }
 
 export interface ApiResponse<T> {
@@ -112,6 +131,7 @@ export interface Collection extends WithTimestamps {
   demographics?: Distribution[];
   latest_concept_task?: Task;
   latest_demographic_task?: Task;
+  n_concepts?: number;
   custodian: Custodian;
   custodian_id?: number;
   model_state?: ModelState;
@@ -182,12 +202,6 @@ export interface Token {
   type: string;
   federated_user_id: number;
   local_user_id: number;
-}
-
-interface Workgroups {
-  id: number;
-  active: number;
-  name: string;
 }
 
 export enum Rquestroles {
@@ -261,7 +275,7 @@ export interface TokenUser {
   is_nhse_sde_approval: boolean;
   organisation: string;
   provider: string;
-  workgroups: Workgroups[];
+  workgroups: Workgroup[];
   cohort_discovery_roles: Roles[];
   cohort_admin_teams: ExternalCustodian[];
 }
@@ -338,6 +352,21 @@ export interface Workgroup {
   external_name?: string;
   users: User[];
   collections: Collection[];
+}
+
+export interface CreateWorkgroupPost {
+  name: string;
+  active: boolean;
+}
+
+export interface AddCollectionToWorkgroupPost {
+  id: number;
+  workgroup_id: number;
+}
+
+export interface RemoveCollectionsFromWorkgroupPost {
+  ids: number[];
+  workgroup_id: number;
 }
 
 export interface Concept {

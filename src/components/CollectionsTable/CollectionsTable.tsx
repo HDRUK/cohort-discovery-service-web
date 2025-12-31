@@ -10,12 +10,11 @@ import {
   MRT_RowSelectionState,
   type MRT_ColumnDef,
 } from "material-react-table";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Box, Chip, Tooltip, Typography } from "@mui/material";
 import { getCollectionStatus } from "@/utils/colours";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import Table from "@/components/Table";
-import { useDaphneStore } from "@/store/useDaphneStore";
 import CopyableVariable from "../CopyableVariable";
 import Title from "@/components/Title";
 import useSearchParams from "@/hooks/useSearchParams";
@@ -27,12 +26,22 @@ import { DEFAULT_INTERVAL } from "@/config/defaults";
 import getCustodianCollections from "@/actions/getCustodianCollections";
 import getAdminCollections from "@/actions/getAdminCollections";
 import { isEqualTask } from "@/utils/distributions";
+import { useLogDependencyChanges } from "@/utils/deps";
+import useAdminStore from "@/store/useAdminStore";
+import useCustodianStore from "@/store/useCustodianStore";
+import useUserStore from "@/store/useUserStore";
+import { useNotify } from "@/providers/NotifyProvider";
+import { getTagCustodianCollection, TAG_COLLECTION_ADMIN } from "@/config/tags";
+import { buildCollectionParams } from "@/utils/params";
 
 export interface CollectionsTableProps {
   initialData: Paginated<CollectionWithHosts[]>;
   showPid?: boolean;
   admin?: boolean;
   refreshRate?: number;
+  tableTitle?: string;
+  tableSubTitle?: string;
+  deleteOverride?: (ids: string[]) => Promise<void>;
 }
 
 const CollectionsTable = ({
@@ -40,37 +49,75 @@ const CollectionsTable = ({
   showPid = false,
   admin = false,
   refreshRate = 5,
+  tableTitle,
+  tableSubTitle,
+  deleteOverride,
 }: CollectionsTableProps) => {
   const { searchParams, getSearchParam } = useSearchParams("collection_filter");
+  const filter_name = getSearchParam() || "all";
+
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
 
-  const {
-    userData: { setSelectedCollection },
-    custodianData: { deleteCollection, currentCustodian },
-    adminData: { deleteCollection: deleteCollectionAdmin },
-  } = useDaphneStore();
+  const deleteCollectionAdmin = useAdminStore((s) => s.deleteCollection);
+  const deleteCollection = useCustodianStore((s) => s.deleteCollection);
+  const currentCustodian = useCustodianStore((s) => s.currentCustodian);
+  const selectedCollection = useUserStore((s) => s.selectedCollection);
+  const setSelectedCollection = useUserStore((s) => s.setSelectedCollection);
+
+  const notify = useNotify();
 
   const queryKey = useMemo(
-    () => [`collections-${searchParams.toString()}`],
-    [searchParams]
+    () => [
+      `collections-${
+        currentCustodian?.pid ? currentCustodian.pid : "admin"
+      }-${searchParams.toString()}`,
+    ],
+    [searchParams, currentCustodian]
   );
   const qc = useQueryClient();
   const { data: collections } = useQuery<Paginated<CollectionWithHosts[]>>({
     queryKey,
     queryFn: async () => {
+      const workgroupFilter =
+        searchParams?.get("workgroup_filter") ?? undefined;
+      const searchTerm = searchParams?.get("search_term") ?? undefined;
+
+      const collectionFilter =
+        searchParams?.get("collection_filter") ?? undefined;
+
+      const collectionParams = {
+        page: Number(searchParams?.get("page")) ?? initialData.current_page,
+        per_page: Number(searchParams?.get("per_page")) ?? initialData.per_page,
+        ...(workgroupFilter
+          ? { workgroup_filter: Number(workgroupFilter) }
+          : {}),
+        ...(searchTerm ? { search_term: searchTerm } : {}),
+        ...(collectionFilter ? { collection_filter: collectionFilter } : {}),
+      };
+
+      const params = buildCollectionParams(collectionParams).toString();
+
       const res =
         currentCustodian?.pid && !admin
-          ? await getCustodianCollections(
-              currentCustodian.pid,
-              searchParams,
-              false
-            )
-          : await getAdminCollections(searchParams, false);
-
+          ? await getCustodianCollections(currentCustodian.pid, {
+              params,
+              cacheOptions: {
+                useCache: false,
+              },
+            })
+          : await getAdminCollections({
+              params,
+              cacheOptions: {
+                useCache: false,
+              },
+            });
       return res.data;
     },
     initialData,
     staleTime: 2 * refreshRate * DEFAULT_INTERVAL,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
     refetchInterval: (query) => {
       const data = query.state.data;
       if (data?.total === 0) return false;
@@ -99,18 +146,21 @@ const CollectionsTable = ({
   );
 
   useEffect(() => {
-    const selectedCollection =
+    const newSelectedCollection =
       selectedCollectionIds.length > 0
         ? collections.data.find(
             (h) =>
               String(h.id) ===
               selectedCollectionIds[selectedCollectionIds.length - 1]
-          )
+          ) ?? null
         : null;
-    setSelectedCollection(selectedCollection ?? null);
-  }, [collections.data, selectedCollectionIds, setSelectedCollection]);
-
-  const filter_name = getSearchParam() || "all";
+    setSelectedCollection(newSelectedCollection);
+  }, [
+    collections.data,
+    selectedCollection,
+    selectedCollectionIds,
+    setSelectedCollection,
+  ]);
 
   const columns = useMemo<MRT_ColumnDef<Collection>[]>(
     () => [
@@ -158,12 +208,10 @@ const CollectionsTable = ({
         minSize: 50,
         maxSize: 50,
         Cell: ({ cell, row }) => {
-          const counts = formatNumber(
-            row.original?.latest_demographic?.count ?? 0
-          );
+          const counts = row.original.n_concepts || "-";
           const date = cell.getValue<string>();
           return (
-            <Tooltip title={`Number of studies = ${counts}`}>
+            <Tooltip title={`Number of concepts = ${counts}`}>
               <Typography>{date}</Typography>
             </Tooltip>
           );
@@ -179,6 +227,17 @@ const CollectionsTable = ({
         size: 50,
         minSize: 50,
         maxSize: 50,
+        Cell: ({ cell, row }) => {
+          const counts = formatNumber(
+            row.original?.latest_demographic?.count ?? 0
+          );
+          const date = cell.getValue<string>();
+          return (
+            <Tooltip title={`Number of studies = ${counts}`}>
+              <Typography>{date}</Typography>
+            </Tooltip>
+          );
+        },
       },
       {
         id: "status",
@@ -208,17 +267,48 @@ const CollectionsTable = ({
     getRowId: (row) => String(row?.id),
   });
 
-  const handleDeleteCollections = async (ids: string[]) => {
-    await Promise.all(
-      ids.map((id) => {
-        if (currentCustodian) {
-          deleteCollection(id, currentCustodian.pid);
-        } else {
-          deleteCollectionAdmin(id);
-        }
-      })
-    );
-  };
+  const handleDeleteCollections = useCallback(
+    async (ids: string[]) => {
+      if (deleteOverride) {
+        await deleteOverride(ids);
+      } else {
+        await Promise.all(
+          ids.map((id) => {
+            if (currentCustodian) {
+              deleteCollection(id, currentCustodian.pid);
+            } else {
+              deleteCollectionAdmin(id);
+            }
+          })
+        );
+        notify.success(
+          `${ids.length} Collection${ids.length > 1 ? "s" : ""} deleted`
+        );
+      }
+    },
+    [
+      currentCustodian,
+      deleteCollection,
+      deleteCollectionAdmin,
+      deleteOverride,
+      notify,
+    ]
+  );
+
+  useLogDependencyChanges("collectionsTable", {
+    queryKey,
+    table,
+    filter_name,
+    handleDeleteCollections,
+    collections,
+    searchParams,
+    getSearchParam,
+    rowSelection,
+    setRowSelection,
+    setSelectedCollection,
+    deleteCollection,
+    deleteCollectionAdmin,
+  });
 
   if (collections.total === 0)
     return (
@@ -232,8 +322,8 @@ const CollectionsTable = ({
         }}
       >
         <Title
-          title="Collections"
-          subTitle={capitaliseFirstLetter(filter_name)}
+          title={tableTitle || "Collections"}
+          subTitle={tableSubTitle || capitaliseFirstLetter(filter_name)}
         />
         <Box sx={{ mx: "auto", my: "auto" }}>
           <Typography variant="h5">
@@ -258,11 +348,19 @@ const CollectionsTable = ({
         table={table}
         leftAction={{
           titleProps: {
-            title: "Collections",
-            subTitle: capitaliseFirstLetter(filter_name),
+            title: tableTitle || "Collections",
+            subTitle: tableSubTitle || capitaliseFirstLetter(filter_name),
           },
         }}
-        rightAction={{ deleteProps: { onClick: handleDeleteCollections } }}
+        rightAction={{
+          deleteProps: { onClick: handleDeleteCollections },
+          refreshProps: {
+            tag:
+              currentCustodian?.pid && !admin
+                ? getTagCustodianCollection(currentCustodian.pid)
+                : TAG_COLLECTION_ADMIN,
+          },
+        }}
       />
     </Box>
   );

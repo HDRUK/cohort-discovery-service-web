@@ -13,6 +13,8 @@ import Title from "../Title";
 import SelectNetworkDatasets, {
   NetworkGroupedCollections,
 } from "../SelectNetworkDatasets";
+import RefreshButton from "../RefreshButton";
+import { TAG_COLLECTIONS } from "@/config/tags";
 
 const SelectDatasets = ({
   initialSelection,
@@ -80,7 +82,14 @@ const SelectDatasets = ({
             title="All Collections"
             subTitle={`${nSelected}/${nTotal} Collections Selected`}
             useSeparator={false}
-          />
+            wrapperSx={{
+              display: "flex",
+              justifyContent: "space-between",
+              width: "100%",
+            }}
+          >
+            <RefreshButton component="div" tag={TAG_COLLECTIONS} />
+          </Title>
         </AccordionSummary>
         <AccordionDetails
           sx={{

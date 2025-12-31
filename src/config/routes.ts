@@ -6,6 +6,8 @@ const dashboardPath = (subpath: string = "", queryParams?: string) =>
 const teamPath = (pid: string, subpath?: string) =>
   `/custodian-admin/${pid}${subpath ? `/${subpath}` : ""}`;
 
+const adminPath = (subpath?: string) => `/admin${subpath ? `/${subpath}` : ""}`;
+
 export const routes = {
   dashboard: dashboardPath(),
   dashboardNewQuery: (queryParams?: string) =>
@@ -17,7 +19,10 @@ export const routes = {
   dashboardCodes: dashboardPath("codes"),
   profile: "/profile",
   definitions: "/my-definitions",
-  admin: "/admin",
+  admin: adminPath(),
+  adminUsers: adminPath("users"),
+  adminWorkgroups: adminPath("workgroups"),
+  adminCollections: adminPath("collections"),
   teamHome: teamPath,
   teamHosts: (pid: string) => teamPath(pid, "hosts"),
   teamCollections: (pid: string) => teamPath(pid, "collections"),

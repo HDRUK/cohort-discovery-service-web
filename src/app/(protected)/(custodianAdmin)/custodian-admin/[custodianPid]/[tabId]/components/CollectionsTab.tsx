@@ -1,8 +1,8 @@
 import CollectionsCustodianAdmin from "./CollectionsCustodianAdmin";
 import getCustodianCollectionHosts from "@/actions/getCustodianCollectionHosts";
 import getCustodianCollections from "@/actions/getCustodianCollections";
-import { ApiSearchParams } from "@/types/api";
-import { buildSearchParams } from "@/utils/params";
+import { CollectionsSearchParams } from "@/types/api";
+import { buildCollectionParams } from "@/utils/params";
 import { Box, Skeleton } from "@mui/material";
 
 export const CollectionsSkeleton = () => (
@@ -17,26 +17,14 @@ const CollectionsTab = async ({
   searchParams,
 }: {
   custodianPid: string;
-  searchParams: ApiSearchParams & {
-    collection_filter?: string;
-    search_collection?: string;
-  };
+  searchParams: CollectionsSearchParams;
 }) => {
-  const { page, per_page, collection_filter, search_collection } =
-    searchParams ?? {};
-  const queryParams = {
-    page,
-    per_page,
-    state: collection_filter,
-    ["name[]"]: search_collection,
-  };
-
-  const params = buildSearchParams(queryParams);
+  const params = buildCollectionParams(searchParams);
 
   const [{ data: collectionHosts }, { data: custodianCollections }] =
     await Promise.all([
       getCustodianCollectionHosts(custodianPid),
-      getCustodianCollections(custodianPid, params),
+      getCustodianCollections(custodianPid, { params }),
     ]);
 
   return (

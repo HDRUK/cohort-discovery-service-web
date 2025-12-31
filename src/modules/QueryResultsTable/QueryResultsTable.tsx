@@ -11,8 +11,8 @@ import { formatNumber } from "@/utils/numbers";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import useSearchParams from "@/hooks/useSearchParams";
 import { DEFAULT_INTERVAL, STATUS_LABELS } from "@/config/defaults";
-import Table from "../Table";
-import { TableProps } from "../Table/Table";
+import Table from "../../components/Table";
+import { TableProps } from "../../components/Table/Table";
 import getQuery from "@/actions/getQuery";
 import { useQuery } from "@tanstack/react-query";
 
@@ -42,11 +42,17 @@ const QueryResultsTable = ({
       `${initialData.pid}-${initialSearchParams.toString()}`,
     ],
     queryFn: async () => {
-      const res = await getQuery(initialData.pid, initialSearchParams, false);
+      const res = await getQuery(initialData.pid, {
+        params: initialSearchParams.toString(),
+        cacheOptions: { useCache: false },
+      });
       return res.data;
     },
     initialData,
     staleTime: 2 * DEFAULT_INTERVAL,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
     refetchInterval: (query) => {
       const data = query.state.data;
       const hasPending = data?.tasks?.some((t) => !t.result);
@@ -86,17 +92,19 @@ const QueryResultsTable = ({
         }
         return (
           <Link
-            component={"a"}
+            component="a"
             href={url}
             sx={{
               display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
+              textDecoration: "none",
+              "&:hover": { textDecoration: "underline" },
             }}
           >
-            <span>{name}</span>
-            <LaunchIcon fontSize="small" />
+            {name}
+            <LaunchIcon
+              fontSize="small"
+              sx={{ ml: 0.25, verticalAlign: "middle" }}
+            />
           </Link>
         );
       },

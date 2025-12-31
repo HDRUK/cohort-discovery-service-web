@@ -10,7 +10,8 @@ interface ElementSizeProps {
 
 export function useElementSize<T extends HTMLElement>(
   id: UniqueIdentifier,
-  { minHeight = 100, minWidth = "100%" }: ElementSizeProps = {}
+  { minHeight = 100, minWidth = "100%" }: ElementSizeProps = {},
+  delay: number = 100
 ): [
   React.RefObject<T | null>,
   { width: number | string; height: number | string }
@@ -20,7 +21,7 @@ export function useElementSize<T extends HTMLElement>(
     setSizeCache: qb.setSizeCache,
   }));
 
-  const setSizeCacheDebounced = useDebouncedCallback(setSizeCache);
+  const setSizeCacheDebounced = useDebouncedCallback(setSizeCache, delay);
 
   const size = useMemo(
     () => sizeCache[id] ?? { height: minHeight, width: minWidth },

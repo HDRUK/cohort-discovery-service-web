@@ -6,12 +6,12 @@ import {
 } from "material-react-table";
 import React, { useMemo } from "react";
 import { trueKeys } from "@/utils/numbers";
-import RevalidateButton from "@/components/RevalidateButton";
+import RefreshButton from "@/components/RefreshButton";
 import DownloadButton from "../DownloadButton";
 import { DownloadButtonProps } from "../DownloadButton/DownloadButton";
 import SortButton, { SortButtonProps } from "../SortButton/SortButton";
 import EditButton, { EditButtonProps } from "../EditButton";
-import { RevalidateButtonProps } from "../RevalidateButton/RevalidateButton";
+import { RefreshButtonProps } from "../RefreshButton/RefreshButton";
 import DeleteButton, { DeleteButtonProps } from "../DeleteButton";
 import Title, { TitleProps } from "@/components/Title";
 import ControlledSearchBox, {
@@ -24,7 +24,7 @@ export interface TableProps {
     searchProps?: ControlledSearchBoxProps;
   };
   rightAction?: {
-    refreshProps?: RevalidateButtonProps;
+    refreshProps?: RefreshButtonProps;
     deleteProps?: Omit<DeleteButtonProps, "onClick"> & {
       onClick?: (selectedRowIds: string[]) => void;
     };
@@ -74,25 +74,24 @@ const Table = <TData extends MRT_RowData>({
       }}
     >
       {(rightAction || leftAction) && (
-        <Grid container sx={{ pb: 2 }}>
-          <Grid size={10}>
+        <Grid container gap={1} sx={{ pb: details ? 0 : 0.5 }}>
+          <Grid size={"grow"}>
             {leftAction && titleProps && <Title {...titleProps} />}
             {leftAction && searchProps && (
               <ControlledSearchBox {...searchProps} />
             )}
           </Grid>
-          <Grid size={2}>
+          <Grid size={"auto"}>
             {rightAction && (
               <Box
                 sx={{
-                  minHeight: 40,
                   display: "flex",
                   justifyContent: "flex-end",
                 }}
               >
                 {sortProps && <SortButton {...sortProps} />}
 
-                {refreshProps && <RevalidateButton {...refreshProps} />}
+                {refreshProps && <RefreshButton {...refreshProps} />}
 
                 {editProps && (
                   <EditButton

@@ -3,8 +3,8 @@
 import { apiGet } from "../lib/apiClient";
 import { API_ROUTES } from "../lib/apiRoutes";
 import { Concept, ApiResponse, Paginated } from "../types/api";
-import { DEFAULT_CODES_PER_PAGE, DEFAULT_REVALIDATE } from "../config/defaults";
-import { getTokenKey } from "@/utils/string";
+import { DEFAULT_CODES_PER_PAGE } from "../config/defaults";
+import { getTagConcepts } from "@/config/tags";
 
 const getConcepts = async (
   searchTerm: string,
@@ -12,8 +12,6 @@ const getConcepts = async (
   page = 1,
   per_page = DEFAULT_CODES_PER_PAGE
 ): Promise<ApiResponse<Paginated<Partial<Concept>[]>>> => {
-  const baseUrl = API_ROUTES.searchConcepts;
-
   const params = new URLSearchParams({
     page: String(page),
     per_page: String(per_page),
@@ -22,22 +20,12 @@ const getConcepts = async (
     ...(domain ? { domain } : {}),
   });
 
-  const url = `${baseUrl}?${params.toString()}`;
-  const key = getTokenKey(url);
-
   const { data, message } = await apiGet<
     ApiResponse<Paginated<Partial<Concept>[]>>
-  >(url, {
-    next: {
-      revalidate: DEFAULT_REVALIDATE,
-      tags: [
-        "all",
-        "concepts",
-        `concepts-${domain}`,
-        `concepts-${domain}-${key}`,
-      ],
-    },
-    cache: "force-cache",
+  >({
+    url: API_ROUTES.searchConcepts,
+    params,
+    tags: getTagConcepts(domain),
   });
 
   return {

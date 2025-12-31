@@ -15,6 +15,7 @@ import {
   createRule,
   findById,
   isAgeFilter,
+  isEmptyRule,
   isOperator,
   isRuleGroup,
   updateById,
@@ -77,10 +78,6 @@ const Guidance = () => {
       queryBuilderJson: qb.queryBuilderJson,
       setQueryBuilderJson: qb.setQueryBuilderJson,
     })
-  );
-  const empty = useMemo(
-    () => queryBuilderJson.rules.length === 0,
-    [queryBuilderJson]
   );
 
   const selectedIds = useMemo(() => trueKeys(selected), [selected]);
@@ -163,14 +160,6 @@ const Guidance = () => {
     ),
   });
 
-  if (empty) {
-    return (
-      <ActionMenuSection title={"Build Guidance"} fixedExpanded scrollable>
-        <BuildGuidance components={baseComponents} />
-      </ActionMenuSection>
-    );
-  }
-
   if (!selectedNode) {
     return (
       <ActionMenuSection title={"Tool Guidance"} fixedExpanded scrollable>
@@ -179,6 +168,14 @@ const Guidance = () => {
     );
   } else {
     if (isRuleLeaf(selectedNode)) {
+      if (isEmptyRule(selectedNode)) {
+        return (
+          <ActionMenuSection title={"Build Guidance"} fixedExpanded scrollable>
+            <BuildGuidance components={baseComponents} />
+          </ActionMenuSection>
+        );
+      }
+
       const category = selectedNode?.rule?.concept?.category || "";
       const { verb, verbPastTense } = getDomainVerbs(category);
 

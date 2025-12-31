@@ -26,6 +26,7 @@ export enum RuleErrors {
   TIME_CONSTRAINT_IS_UNIDIRECTIONAL = "Time constraints needs to be unidirectional.",
   AGE_CONSTRAINT_IS_UNIDIRECTIONAL = "Age constraints needs to be unidirectional.",
   CANNOT_CONSTRAIN_AGE_AND_TIME = "A rule can only be constrained by either age OR time currently.",
+  HAS_ALTERNATIVES = "A rule has alternatives, please choose the intended concept.",
 }
 
 export const createRule = (
@@ -81,6 +82,47 @@ export function ruleToGroup(
   return group;
 }
 
+export function groupToRules(
+  group: RuleGroupType,
+  opts?: { normaliseExclude?: boolean }
+): RuleNodeType[] {
+  const normaliseExclude = opts?.normaliseExclude ?? true;
+
+  const toggleExclude = (item: RuleNodeType) =>
+    isOperator(item) || isAgeFilter(item) || item.exclude === undefined
+      ? item
+      : { ...item, exclude: !item.exclude };
+
+  const invertCombinator = (combinator: CombinatorType) =>
+    combinator === CombinatorType.AND
+      ? CombinatorType.OR
+      : combinator === CombinatorType.OR
+      ? CombinatorType.AND
+      : combinator;
+
+  function normaliseGroupExclude(group: RuleGroupType): RuleGroupType {
+    const clonedRules = group.rules.map((item: RuleNodeType) => {
+      if (isRuleGroup(item)) return normaliseGroupExclude(item);
+      if (isOperator(item)) return { ...item };
+      return { ...item };
+    });
+
+    if (group.exclude) {
+      const rulesNoGroupNot = clonedRules.map((item: RuleNodeType) => {
+        if (isOperator(item))
+          return { ...item, combinator: invertCombinator(item.combinator) };
+        return toggleExclude(item);
+      });
+
+      const { exclude: _omit, ...rest } = group;
+      return { ...rest, rules: rulesNoGroupNot };
+    }
+
+    return { ...group, rules: clonedRules };
+  }
+
+  return (normaliseExclude ? normaliseGroupExclude(group) : group).rules;
+}
 export const isEmptyRule = (rule: RuleLeafType): boolean =>
   rule.rule.concept === null;
 
@@ -155,7 +197,7 @@ export const findByIdWithNeighbors = (
 export const updateById = <T extends RuleNodeType>(
   root: T,
   id: string,
-  updater: (node: RuleNodeType) => RuleNodeType,
+  updater: (node: RuleNodeType) => RuleNodeType | RuleNodeType[],
   insert?: {
     node: RuleNodeType | RuleNodeType[];
     position?: "before" | "after";
@@ -186,7 +228,7 @@ export const updateById = <T extends RuleNodeType>(
           changed = true;
         }
 
-        nextRules.push(updatedChild);
+        nextRules.push(...toArray(updatedChild));
 
         if (insert && pos === "after") {
           nextRules.push(...toArray(insert.node));
@@ -425,6 +467,9 @@ export function validateRuleTree(
     let node = validateNode(leaf);
     if (isEmptyRule(leaf)) {
       node = invalidateNode(node, RuleErrors.EMPTY_RULE);
+    }
+    if (isMultipleConcept(leaf.rule.concept)) {
+      node = invalidateNode(node, RuleErrors.HAS_ALTERNATIVES);
     }
     node = validateConstraints(node as RuleLeafType);
     return node;

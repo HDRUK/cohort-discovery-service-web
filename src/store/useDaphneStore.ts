@@ -27,6 +27,10 @@ import {
   FeatureName,
   DistributionType,
   CollectionWithHosts,
+  Workgroup,
+  CreateWorkgroupPost,
+  AddCollectionToWorkgroupPost,
+  RemoveCollectionsFromWorkgroupPost,
 } from "@/types/api";
 import createCollection from "@/actions/createCollection";
 import deleteCollection from "@/actions/deleteCollection";
@@ -56,6 +60,7 @@ import {
   updateById,
   validateRuleTree,
   isAgeFilter,
+  groupToRules,
 } from "@/utils/rules";
 import { UniqueIdentifier } from "@dnd-kit/core";
 import { removeFalseKeys, trueKeys } from "@/utils/numbers";
@@ -67,6 +72,17 @@ import updateCollectionConfig from "@/actions/updateCollectionConfig";
 import createCustodianCollection from "@/actions/createCustodianCollection";
 import rerunTask from "@/actions/rerunTask";
 import rerunDistributions from "@/actions/rerunDistributions";
+import createWorkgroup from "@/actions/createWorkgroup";
+import addCollectionToWorkgroup from "@/actions/addCollectionToWorkgroup";
+import removeCollectionsFromWorkgroup from "@/actions/removeCollectionsFromWorkgroup";
+import {
+  getCollectionHostTag,
+  getTagCustodianCollection,
+  TAG_COLLECTION_ADMIN,
+  TAG_COLLECTIONS,
+  TAG_CONCEPT_SETS,
+  TAG_WORKGROUP_ADMIN,
+} from "@/config/tags";
 
 export enum NodeKind {
   RULE = "RULE",
@@ -171,7 +187,7 @@ export interface DaphneStoreState {
   };
   custodianData: {
     currentCustodian: Custodian | null;
-    setCurrentCustodian: (custodian: Custodian) => void;
+    setCurrentCustodian: (custodian: Custodian | null) => void;
     custodians: Custodian[];
     setCustodians: (custodians: Custodian[]) => void;
     createCollectionHost: (
@@ -210,6 +226,15 @@ export interface DaphneStoreState {
       payload: UpdateCollectionPayload
     ) => Promise<Collection>;
     deleteCollection: (id: number | string) => Promise<void>;
+    createWorkgroup: (payload: CreateWorkgroupPost) => Promise<Workgroup>;
+    addCollectionToWorkgroup: (
+      payload: AddCollectionToWorkgroupPost
+    ) => Promise<number>;
+    removeCollectionsFromWorkgroup: (
+      payload: RemoveCollectionsFromWorkgroupPost
+    ) => Promise<void>;
+    selectedWorkgroup: Workgroup | null;
+    setSelectedWorkgroup: (workgroup: Workgroup | null) => void;
   };
   featureFlags: {
     flags: FeatureFlag | null;
@@ -503,13 +528,23 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       });
     },
     getQueryFromText: async (input: string) => {
+      const cleanQuery = (queryString: string) => {
+        const query = JSON.parse(queryString) as RuleGroupType;
+
+        //enforce no unnecessary group within group
+        if (query.rules.length === 1 && isRuleGroup(query.rules[0])) {
+          return { ...query, rules: groupToRules(query.rules[0]) };
+        }
+        return query;
+      };
+
       set((state) => ({
         ...state,
         stateManagement: { ...state.stateManagement, isLoading: true },
       }));
 
       const { data: newQueryString } = await parseQuery(input);
-      const newQuery = JSON.parse(newQueryString);
+      const newQuery = cleanQuery(newQueryString);
 
       set((state) => ({
         ...state,
@@ -591,8 +626,9 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     ) => {
       const { pid, custodian } = collection;
       const res = await rerunDistributions(pid, { query_type });
+
       revalidateCustodian(custodian);
-      revalidateAction("collections"); // for admin
+      revalidateAction(TAG_COLLECTION_ADMIN); // for admin
       return res.data;
     },
     user: null,
@@ -608,8 +644,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     },
     createConceptSet: async (payload: CreateConceptSetPost) => {
       await createConceptSet(payload);
-      // revalidate based on pid in the future... need to make a switch to pid
-      await revalidateAction(`concept-sets`);
+      await revalidateUserAction(TAG_CONCEPT_SETS);
     },
     searchForConcepts: async (searchTerm: string, domain?: string) => {
       const { data } = await getConcepts(searchTerm, domain);
@@ -617,27 +652,24 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     },
     addConceptsToSet: async (conceptSetId: number, conceptIds: number[]) => {
       await attachConcepts(conceptSetId, conceptIds);
-      // do this based on the user key too, otherwise will get all?
-      revalidateAction("concept-sets");
+      await revalidateUserAction(TAG_CONCEPT_SETS);
     },
     removeConceptsFromSet: async (
       conceptSetId: number,
       conceptIds: number[]
     ) => {
       await detachConcepts(conceptSetId, conceptIds);
-      // do this based on the user key too, otherwise will get all?
-      revalidateAction("concept-sets");
+      await revalidateUserAction(TAG_CONCEPT_SETS);
     },
     removeConceptSet: async (conceptSetId: number) => {
       await deleteConceptSet(conceptSetId);
-      // do this based on the user key too, otherwise will get all?
-      revalidateAction("concept-sets");
+      await revalidateUserAction(TAG_CONCEPT_SETS);
     },
   },
 
   custodianData: {
     currentCustodian: null,
-    setCurrentCustodian: (custodian: Custodian) =>
+    setCurrentCustodian: (custodian: Custodian | null) =>
       set((state) => ({
         ...state,
         custodianData: { ...state.custodianData, currentCustodian: custodian },
@@ -650,16 +682,22 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       })),
     createCollectionHost: async (custodianId, payload) => {
       await createCollectionHost(custodianId, payload);
-      // revalidate based on pid in the future... need to make a switch to pid
-      await revalidateAction(`collection-hosts`);
+      const currentCustodian = get().custodianData.currentCustodian;
+      if (currentCustodian?.id === custodianId) {
+        await revalidateAction(getCollectionHostTag(currentCustodian.pid));
+      }
     },
     updateCollectionHost: async (id, payload) => {
       await updateCollectionHost(id, payload);
-      await revalidateAction(`collection-hosts`);
+      const currentCustodian = get().custodianData.currentCustodian;
+      if (currentCustodian)
+        await revalidateAction(getCollectionHostTag(currentCustodian.pid));
     },
     deleteCollectionHost: async (id) => {
       await deleteCollectionHost(id);
-      await revalidateAction(`collection-hosts`);
+      const currentCustodian = get().custodianData.currentCustodian;
+      if (currentCustodian)
+        await revalidateAction(getCollectionHostTag(currentCustodian.pid));
     },
     createCollection: async (custodianPid, payload, payloadConfig) => {
       // note: inconsistancy between using custodian Id and custodian Pid
@@ -673,7 +711,9 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         collection_id: data.id,
       });
 
-      await revalidateAction(`collections-${custodianPid}`);
+      await revalidateAction(getTagCustodianCollection(custodianPid));
+      await revalidateAction(TAG_COLLECTION_ADMIN);
+      await revalidateAction(TAG_COLLECTIONS);
       return data;
     },
     updateCollection: async (id, payload, payloadConfig) => {
@@ -682,18 +722,16 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       const idConfig = data.config.id;
       await updateCollectionConfig(idConfig, payloadConfig);
 
-      await revalidateAction(`collections-${data.custodian_id}`);
+      await revalidateAction(getTagCustodianCollection(data.custodian.pid));
+      await revalidateAction(TAG_COLLECTION_ADMIN);
+      await revalidateAction(TAG_COLLECTIONS);
 
-      // revalidate custodians
-      // - as noted above, keep to sort out the tags for caching first
       return data;
     },
     deleteCollection: async (id, custodianPid) => {
       await deleteCollection(id);
-      //this needs to be re-done, mixing of pid and id makes it diffcult
-      // to revalidate cache
-      // - created a ticket for this
-      await revalidateAction(`collections-${custodianPid}`);
+      await revalidateAction(getTagCustodianCollection(custodianPid));
+      await revalidateAction(TAG_COLLECTION_ADMIN);
     },
   },
   adminData: {
@@ -704,34 +742,52 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         adminData: { ...state.adminData, collections },
       })),
     createCollection: async (payload, payloadConfig) => {
-      // note: inconsistancy between using custodian Id and custodian Pid
-      // - this is because the BE uses different endpoints:
-      // - Route::post('/v1/collection_hosts'... (custodianId in the payload)
-      // - Route::post('/v1/custodians/{custodianPid}/collections'...
       const { data } = await createCollection(payload);
-
       await createCollectionConfig({
         ...payloadConfig,
         collection_id: data.id,
       });
 
-      await revalidateAction(`collections-${payload["custodian_id"]}`);
+      await revalidateAction(getTagCustodianCollection(data.custodian.pid));
+      await revalidateAction(TAG_COLLECTION_ADMIN);
+      await revalidateAction(TAG_COLLECTIONS);
       return data;
     },
     updateCollection: async (id, payload) => {
       const { data } = await updateCollection(id, payload);
-      //this needs to be re-done, mixing of pid and id makes it diffcult
-      // to revalidate cache
-      // - created a ticket for this
-      await revalidateAction(`collections-${data.custodian.pid}`);
+
+      await revalidateAction(getTagCustodianCollection(data.custodian.pid));
+      await revalidateAction(TAG_COLLECTION_ADMIN);
+      await revalidateAction(TAG_COLLECTIONS);
       return data;
     },
     deleteCollection: async (id) => {
       await deleteCollection(id);
-      //this needs to be re-done, mixing of pid and id makes it diffcult
-      // to revalidate cache, and here we don't know the custodian
-      await revalidateAction(`collections`);
+      await revalidateAction(TAG_COLLECTION_ADMIN);
+      await revalidateAction(TAG_COLLECTIONS);
     },
+    createWorkgroup: async (payload) => {
+      const { data } = await createWorkgroup(payload);
+      await revalidateAction(TAG_WORKGROUP_ADMIN);
+      return data;
+    },
+    addCollectionToWorkgroup: async (payload) => {
+      const { data } = await addCollectionToWorkgroup(payload);
+      await revalidateAction(TAG_WORKGROUP_ADMIN);
+      await revalidateAction(TAG_COLLECTION_ADMIN);
+      return data;
+    },
+    removeCollectionsFromWorkgroup: async (payload) => {
+      await removeCollectionsFromWorkgroup(payload);
+      await revalidateAction(TAG_COLLECTION_ADMIN);
+      await revalidateAction(TAG_WORKGROUP_ADMIN);
+    },
+    selectedWorkgroup: null,
+    setSelectedWorkgroup: (selectedWorkgroup: Workgroup | null) =>
+      set((state) => ({
+        ...state,
+        adminData: { ...state.adminData, selectedWorkgroup },
+      })),
   },
   featureFlags: {
     flags: null,

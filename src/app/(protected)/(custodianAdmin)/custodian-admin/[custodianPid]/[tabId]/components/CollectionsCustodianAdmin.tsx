@@ -1,16 +1,17 @@
 "use client";
-import { useDaphneStore } from "@/store/useDaphneStore";
-import { CollectionWithHosts, CollectionHost, Paginated } from "@/types/api";
+import { CollectionWithHosts, CollectionHost, Paginated, CollectionsSearchParams } from "@/types/api";
 import { Box, Skeleton } from "@mui/material";
 import Title from "@/components/Title";
 import ThreePaneSwimLaneLayout, {
   ExpandedSide,
 } from "@/modules/ThreePaneSwimLaneLayout";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import CollectionsLeftPanel from "./CollectionsLeftPanel";
 import CollectionsTable from "@/components/CollectionsTable";
 import ControlledSearchBox from "@/modules/ControlledSearchBox";
 import CollectionsRightPanel from "@/modules/CollectionsRightPanel";
+import { useLogDependencyChanges } from "@/utils/deps";
+import useCustodianStore from "@/store/useCustodianStore";
 
 const CollectionsCustodianAdmin = ({
   pid,
@@ -21,27 +22,37 @@ const CollectionsCustodianAdmin = ({
   collections: Paginated<CollectionWithHosts[]>;
   collectionHosts: CollectionHost[];
 }) => {
-  const {
-    custodianData: { custodians },
-  } = useDaphneStore();
+  const custodian = useCustodianStore(
+    (custodianData) => custodianData.currentCustodian
+  );
 
   const [expandedSide, setExpandedSide] = useState<ExpandedSide | null>(null);
   const expandedLeft = expandedSide === ExpandedSide.LEFT;
   const expandedRight = expandedSide === ExpandedSide.RIGHT;
 
-  const toggleExpandLeft = () => {
+  const toggleExpandLeft = useCallback(() => {
     setExpandedSide((prev) =>
       prev === ExpandedSide.LEFT ? null : ExpandedSide.LEFT
     );
-  };
+  }, [setExpandedSide]);
 
-  const toggleExpandRight = () => {
+  const toggleExpandRight = useCallback(() => {
     setExpandedSide((prev) =>
       prev === ExpandedSide.RIGHT ? null : ExpandedSide.RIGHT
     );
-  };
+  }, [setExpandedSide]);
 
-  const custodian = custodians.find((c) => c.pid === pid);
+  useLogDependencyChanges("CollectionsCustodianAdmin", {
+    pid,
+    custodian,
+    collections,
+    collectionHosts,
+    expandedSide,
+    expandedLeft,
+    expandedRight,
+    toggleExpandRight,
+    toggleExpandLeft,
+  });
 
   if (!custodian) return <Skeleton height={"100%"} />;
 
@@ -50,8 +61,8 @@ const CollectionsCustodianAdmin = ({
       sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}
     >
       <Title title="Collections" subTitle="Management" />
-      <ControlledSearchBox
-        paramName="search_collection"
+      <ControlledSearchBox<CollectionsSearchParams>
+        paramName="search_term"
         placeholder="Search by collection name..."
       />
       <ThreePaneSwimLaneLayout

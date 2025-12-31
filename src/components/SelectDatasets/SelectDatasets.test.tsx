@@ -60,11 +60,11 @@ describe("SelectDatasets", () => {
 
     const { pid, name } = collections.data[0];
     const row = screen.getByText(name).closest("div")!;
-    const radio = within(row).getByRole("radio");
+    const check = within(row).getByRole("checkbox");
 
-    expect(radio).not.toBeChecked();
+    expect(check).not.toBeChecked();
 
-    await user.click(radio);
+    await user.click(check);
     expect(setSelectedDatasets).toHaveBeenLastCalledWith([pid]);
   });
 });

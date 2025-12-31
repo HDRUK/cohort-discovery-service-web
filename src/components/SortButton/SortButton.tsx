@@ -64,7 +64,7 @@ const SortButton = ({ field, searchParamName = "sort" }: SortButtonProps) => {
 
   return (
     <PositionedMenu isIcon items={items} active={!!currentSortDirection}>
-      <SortIcon fontSize="small" />
+      <SortIcon sx={{ width: 20, height: 20 }} />
     </PositionedMenu>
   );
 };

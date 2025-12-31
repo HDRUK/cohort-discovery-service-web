@@ -33,4 +33,15 @@ const getEnumLabel = <T extends Record<string, string | number>>(
 const capVarChar = (s: string, max = MAX_VARCHAR_LENGTH, addDots = false) =>
   `${[...s].slice(0, max).join("")} ${s.length > max && addDots ? "..." : ""}`;
 
-export { capitaliseFirstLetter, getTokenKey, capVarChar, getEnumLabel };
+const paramsToString = (params?: URLSearchParams | string) => {
+  if (!params) return "";
+  return params instanceof URLSearchParams ? params.toString() : params;
+};
+
+export {
+  capitaliseFirstLetter,
+  getTokenKey,
+  capVarChar,
+  getEnumLabel,
+  paramsToString,
+};

@@ -3,7 +3,7 @@
 import useQueryBuilder from "@/store/useQueryBuilder";
 
 import { useState } from "react";
-import { Query, Paginated } from "../../types/api";
+import { Query, Paginated } from "@/types/api";
 import {
   MRT_ExpandedState,
   MRT_RowSelectionState,
@@ -11,34 +11,36 @@ import {
 } from "material-react-table";
 import { Grid, Paper, Typography } from "@mui/material";
 import dayjs from "dayjs";
-import { usePaginatedTable } from "../../hooks/usePaginatedTable";
+import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import { formatNumber } from "@/utils/numbers";
 import Link from "next/link";
 import { Link as MuiLink } from "@mui/material";
-import { routes } from "../../config/routes";
-import Table from "../Table";
+import { routes } from "@/config/routes";
+import Table from "@/components/Table";
 import { getTasksStatus, getTotalAllTasks } from "@/utils/tasks";
-import QueryResultsTable from "../QueryResultsTable";
+import QueryResultsTable from "@/modules/QueryResultsTable";
 import { queryToText } from "@/utils/queryBuilder";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import getQueries from "@/actions/getQueries";
 import { DEFAULT_INTERVAL } from "@/config/defaults";
 import { getQueryName } from "@/utils/query";
+import useSearchParams from "@/hooks/useSearchParams";
+import { buildQueryHistoryParams } from "@/utils/params";
+import { AvailableFormats } from "@/components/DownloadButton/DownloadButton";
+import rerunQuery from "@/actions/rerunQuery";
 
 interface QueriesTableProps {
   initialData: Paginated<Query[]>;
-  initialSearchParams?: URLSearchParams;
   columnVisibility?: Record<string, boolean>;
 }
 
 const QueriesTable = ({
   initialData,
-  initialSearchParams = new URLSearchParams(),
   columnVisibility = { pid: false, "mrt-row-expand": false },
 }: QueriesTableProps) => {
   const router = useRouter();
-
+  const { searchParams } = useSearchParams();
   const { setQueryBuilderJson, setSelectedDatasets, setQueryName } =
     useQueryBuilder((qb) => ({
       resetQueryBuilderJson: qb.resetQueryBuilderJson,
@@ -48,18 +50,31 @@ const QueriesTable = ({
     }));
 
   const { data: queries } = useQuery<Paginated<Query[]>>({
-    queryKey: [`queries-${initialSearchParams.toString()}`],
+    queryKey: [`queries-${searchParams.toString()}`],
     queryFn: async () => {
-      const res = await getQueries(initialSearchParams, false);
+      const searchParamsObject = buildQueryHistoryParams({
+        page: Number(searchParams.get("page")) ?? initialData.current_page,
+        per_page: Number(searchParams.get("per_page")) ?? initialData.per_page,
+        sort: searchParams.get("sort") ?? undefined,
+        search_term: searchParams.get("search_term") ?? undefined,
+      });
+
+      const res = await getQueries({
+        params: searchParamsObject.toString(),
+        cacheOptions: { useCache: false },
+      });
       return res.data;
     },
     initialData,
     staleTime: 2 * DEFAULT_INTERVAL,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
     refetchInterval: (query) => {
       const data = query.state.data;
-      const hasIncomplete = data?.data.filter((q) =>
-        q.tasks.some((t) => !t.completed_at)
-      );
+      const hasIncomplete =
+        data?.data.filter((q) => q.tasks.some((t) => !t.completed_at))
+          ?.length ?? 0 > 0;
       return hasIncomplete ? DEFAULT_INTERVAL : false;
     },
   });
@@ -174,7 +189,7 @@ const QueriesTable = ({
           tableProps={{
             leftAction: {
               titleProps: {
-                title: row.original.name,
+                title: `Query ${getQueryName(row.original)}`,
                 subTitle: "Results",
               },
             },
@@ -201,12 +216,18 @@ const QueriesTable = ({
               </Grid>
             ),
             rightAction: {
+              refreshProps: {
+                label: "Re-run query",
+                onClick: async () => {
+                  const { data } = await rerunQuery(row.original.pid);
+                  router.push(routes.dashboardQueryResult(data.query_pid));
+                },
+              },
               downloadProps: {
                 id: row.original.pid,
                 entity: "queries",
-                format: "json",
+                formats: [AvailableFormats.JSON],
               },
-              refreshProps: { tag: row.original.pid, disabled: true },
               editProps: {
                 onClick: () => {
                   const ranCollectionPids = row.original.tasks.map(
@@ -221,7 +242,6 @@ const QueriesTable = ({
                   );
                 },
               },
-              deleteProps: { disabled: true },
             },
           }}
         />
@@ -238,15 +258,7 @@ const QueriesTable = ({
         },
       }}
       rightAction={{
-        refreshProps: { tag: "queries" },
-        downloadProps: { disabled: true },
-        deleteProps: {
-          disabled: true,
-          onClick: (rows) => {
-            // to be implemented...
-            console.log(rows);
-          },
-        },
+        refreshProps: { tag: "queries", label: "Refresh Queries" },
         sortProps: { field: "name" },
       }}
     />

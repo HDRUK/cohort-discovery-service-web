@@ -5,7 +5,7 @@ import { API_ROUTES } from "../lib/apiRoutes";
 import { Task, ApiResponse } from "../types/api";
 
 const rerunTask = async (pid: string): Promise<ApiResponse<Task>> => {
-  return await apiGet<ApiResponse<Task>>(API_ROUTES.rerunTask(pid));
+  return await apiGet<ApiResponse<Task>>({ url: API_ROUTES.rerunTask(pid) });
 };
 
 export default rerunTask;

@@ -1,35 +1,23 @@
 "use server";
 
-import { DEFAULT_REVALIDATE } from "@/config/defaults";
-import { apiGet } from "../lib/apiClient";
+import { getTagQueries } from "@/config/tags";
+import { apiGet, CachedGetArgs } from "../lib/apiClient";
 import { API_ROUTES } from "../lib/apiRoutes";
 import { Query, ApiResponse, Paginated, WithIncomplete } from "../types/api";
 import { getTokenUser } from "@/lib/auth";
 
 const getQueries = async (
-  searchParams?: URLSearchParams,
-  useCache: boolean = true
+  args?: Omit<CachedGetArgs, "url">
 ): Promise<WithIncomplete<ApiResponse<Paginated<Query[]>>>> => {
-  const { user } = await getTokenUser();
-  const userId = user.id;
+  const {
+    user: { id: userId },
+  } = await getTokenUser();
 
-  const { data, message } = await apiGet<ApiResponse<Paginated<Query[]>>>(
-    searchParams?.toString()
-      ? `${API_ROUTES.queries}?${searchParams.toString()}`
-      : API_ROUTES.queries,
-    {
-      next: {
-        revalidate: DEFAULT_REVALIDATE,
-        tags: [
-          "all",
-          "queries",
-          `${userId}-queries`,
-          `${userId}-queries-${searchParams?.toString()}`,
-        ],
-      },
-      cache: useCache ? "force-cache" : undefined,
-    }
-  );
+  const { data, message } = await apiGet<ApiResponse<Paginated<Query[]>>>({
+    url: API_ROUTES.queries,
+    tags: getTagQueries(userId),
+    ...args,
+  });
 
   const incompleteQueries = data.data.filter((q) =>
     q.tasks.some((t) => !t.completed_at)

@@ -2,14 +2,16 @@
 
 import { Alert, Divider, Skeleton } from "@mui/material";
 import { Suspense } from "react";
-import QueryResultsTable from "@/components/QueryResultsTable";
+import QueryResultsTable from "@/modules/QueryResultsTable";
 import getQuery from "@/actions/getQuery";
 import Title from "@/components/Title";
 import { queryToText } from "@/utils/queryBuilder";
-import { buildSearchParams } from "@/utils/params";
-import { ApiSearchParams } from "@/types/api";
+import { buildQueryHistoryParams } from "@/utils/params";
+import { QueryHistorySearchParams } from "@/types/api";
+import { getQueryName } from "@/utils/query";
+import { AvailableFormats } from "@/components/DownloadButton/DownloadButton";
 
-type PageSearchParams = Promise<ApiSearchParams & { query?: string }>;
+type PageSearchParams = Promise<QueryHistorySearchParams>;
 
 interface PageProps {
   searchParams: PageSearchParams;
@@ -20,23 +22,17 @@ const QueryResultsPageContent = async ({
 }: {
   searchParams: PageSearchParams;
 }) => {
-  const { query, page, per_page, searchTerm, sort } =
-    (await searchParams) ?? {};
+  const { query, ...rest } = await searchParams;
 
-  const queryParams = {
-    page,
-    per_page,
-    ["name[]"]: searchTerm,
-    sort,
-  };
+  const searchParamsObject = buildQueryHistoryParams(rest);
 
-  const searchParamsObject = buildSearchParams(queryParams);
-
-  const queryData = await getQuery(query as string, searchParamsObject);
+  const queryData = await getQuery(query as string, {
+    params: searchParamsObject,
+  });
 
   return (
     <>
-      <Title title={"Query Results"} subTitle={queryData.data.name} />
+      <Title title={"Query Results"} subTitle={getQueryName(queryData.data)} />
       {queryToText(queryData.data.definition)}
       <Divider />
       <QueryResultsTable
@@ -53,7 +49,7 @@ const QueryResultsPageContent = async ({
             downloadProps: {
               id: queryData.data.pid,
               entity: "queries",
-              format: "json",
+              formats: [AvailableFormats.JSON],
             },
             refreshProps: { tag: queryData.data.pid, disabled: true },
             deleteProps: { disabled: true },

@@ -2,12 +2,12 @@
 
 import { Suspense } from "react";
 import getQueries from "@/actions/getQueries";
-import QueriesTable from "@/components/QueriesTable";
-import { QueriesTableSkeleton } from "@/components/QueriesTable";
+import QueriesTable from "@/modules/QueriesTable";
+import { QueriesTableSkeleton } from "@/modules/QueriesTable";
 import { Box } from "@mui/material";
 import Title from "@/components/Title";
 import { ApiSearchParams } from "@/types/api";
-import { buildSearchParams } from "@/utils/params";
+import { buildQueryHistoryParams } from "@/utils/params";
 
 interface PageProps {
   searchParams: Promise<ApiSearchParams>;
@@ -16,18 +16,9 @@ interface PageProps {
 const QueryHistoryPageContent = async ({ searchParams }: PageProps) => {
   const params = await searchParams;
 
-  const { page, per_page, searchTerm, sort } = params ?? {};
+  const searchParamsObject = buildQueryHistoryParams(params);
 
-  const queryParams = {
-    page,
-    per_page,
-    ["name[]"]: searchTerm,
-    sort,
-  };
-
-  const searchParamsObject = buildSearchParams(queryParams);
-
-  const queries = await getQueries(searchParamsObject);
+  const queries = await getQueries({ params: searchParamsObject });
 
   return (
     <Box
@@ -40,10 +31,7 @@ const QueryHistoryPageContent = async ({ searchParams }: PageProps) => {
       }}
     >
       <Title title={"History"} subTitle={`${queries.data.total}`} />
-      <QueriesTable
-        initialData={queries.data}
-        initialSearchParams={searchParamsObject}
-      />
+      <QueriesTable initialData={queries.data} />
     </Box>
   );
 };

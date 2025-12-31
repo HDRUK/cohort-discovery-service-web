@@ -4,17 +4,18 @@ import { IconButton, Typography, Box, IconButtonProps } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { revalidateAction } from "@/actions/revalidate";
 
-export interface RevalidateButtonProps
-  extends Omit<IconButtonProps, "onClick"> {
+export interface ReRunTaskButtonProps extends Omit<IconButtonProps, "onClick"> {
   tag: string;
+  label?: string;
   text?: string;
 }
 
-export const RevalidateButton = ({
+export const ReRunTaskButton = ({
   tag,
+  label,
   text,
   ...rest
-}: RevalidateButtonProps) => {
+}: ReRunTaskButtonProps) => {
   return (
     <Box display="flex" alignItems="center" gap={1}>
       <IconButton onClick={() => revalidateAction(tag)} {...rest}>

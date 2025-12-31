@@ -8,6 +8,7 @@ import {
   isRuleLeaf,
   removeById,
   ruleToGroup,
+  groupToRules,
   updateById,
 } from "@/utils/rules";
 import { useCallback } from "react";
@@ -52,7 +53,15 @@ const useNodeActions = (node: RuleNodeType) => {
     );
   }, [id, queryBuilderJson, setQueryBuilderJson]);
 
-  //const handleCollapseGroup = () => {};
+  const handleCollapseGroup = useCallback(() => {
+    setQueryBuilderJson(
+      updateById(queryBuilderJson, id, (node) => {
+        if (!isRuleGroup(node)) return node;
+        const newGroup = groupToRules(node);
+        return newGroup;
+      })
+    );
+  }, [id, queryBuilderJson, setQueryBuilderJson]);
 
   const rules = isRuleGroup(node) ? node.rules : undefined;
   const handleCreateNewRule = useCallback(() => {
@@ -78,7 +87,7 @@ const useNodeActions = (node: RuleNodeType) => {
     ...(isRuleGroup(node)
       ? [
           { action: handleCreateNewRule, label: "Add Rule" },
-          //{ action: handleCollapseGroup, label: "Collapse Group" }, - to be implemented
+          { action: handleCollapseGroup, label: "Collapse Group" },
         ]
       : []),
   ];

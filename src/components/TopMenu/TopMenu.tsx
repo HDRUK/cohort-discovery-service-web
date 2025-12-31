@@ -60,7 +60,8 @@ export default function TopMenu() {
             {
               id: routes.admin,
               label: "Admin",
-              href: routes.admin,
+              href: routes.adminCollections,
+              route: routes.admin,
               page: null,
             },
           ]

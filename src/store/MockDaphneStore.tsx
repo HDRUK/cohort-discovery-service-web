@@ -11,12 +11,15 @@ import type {
   CreateCollectionPost,
   ConceptSet,
   Concept,
+  Workgroup,
   Paginated,
   CreateConceptSetPost,
   UpdateCollectionHostPayload,
   CreateCollectionConfigPost,
   CollectionWithHosts,
   DistributionType,
+  AddCollectionToWorkgroupPost,
+  RemoveCollectionsFromWorkgroupPost,
 } from "@/types/api";
 import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
 import type {
@@ -33,6 +36,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { NotifyProvider } from "@/providers/NotifyProvider";
 import { getMockCollection } from "@/actions/__mocks__/getCollections";
+import { getMockWorkgroup } from "@/actions/__mocks__/getWorkgroups";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { getMockQuery } from "@/actions/__mocks__/getQueries";
 const queryClient = new QueryClient();
@@ -178,6 +182,18 @@ function makeDefaultStore(): DaphneStoreState {
         _payload: Partial<CreateCollectionPost>
       ) => RESOLVE<Collection>(getMockCollection()),
       deleteCollection: (_id: number | string) => RESOLVE<void>(undefined),
+      createWorkgroup: (_payload: {
+        name: string;
+        collections?: number[];
+        active: boolean;
+      }) => RESOLVE<Workgroup>(getMockWorkgroup()),
+      addCollectionToWorkgroup: (_payload: AddCollectionToWorkgroupPost) =>
+        RESOLVE<number>(1),
+      selectedWorkgroup: null,
+      setSelectedWorkgroup: NOOP,
+      removeCollectionsFromWorkgroup: (
+        _payload: RemoveCollectionsFromWorkgroupPost
+      ) => RESOLVE<void>(undefined),
     },
 
     featureFlags: {
