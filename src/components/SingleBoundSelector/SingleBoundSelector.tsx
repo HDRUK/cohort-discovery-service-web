@@ -122,15 +122,26 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
       {title}
       <Stack direction="row" spacing={2} alignItems="center">
         {readOnly ? (
-          <Paper sx={{ border: 1, p: 1 }}>
-            {renderReadOnlyLabel
-              ? renderReadOnlyLabel({ operator, value })
-              : value == null
-              ? anyLabel
-              : operator === SingleSidedOperator.GREATER_THAN
-              ? `${greaterThanLabel} ${String(value)}`
-              : `${lessThanLabel} ${String(value)}`}
-          </Paper>
+          (() => {
+            if (renderReadOnlyLabel) {
+              const rendered = renderReadOnlyLabel({ operator, value });
+
+              return typeof rendered === "string" ? (
+                <Paper sx={{ border: 1, p: 1 }}>{rendered}</Paper>
+              ) : (
+                <>{rendered}</>
+              );
+            }
+
+            const defaultText =
+              value == null
+                ? anyLabel
+                : operator === SingleSidedOperator.GREATER_THAN
+                ? `${greaterThanLabel} ${String(value)}`
+                : `${lessThanLabel} ${String(value)}`;
+
+            return <Paper sx={{ border: 1, p: 1 }}>{defaultText}</Paper>;
+          })()
         ) : (
           <>
             <ToggleButtonGroup

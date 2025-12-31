@@ -220,25 +220,33 @@ const RuleWrapper = ({
                   },
                 }}
                 title={
-                  <Box
-                    width={"100%"}
-                    display={"flex"}
-                    justifyContent={"space-between"}
-                  >
-                    {renderInHeader && render(node)}
-                    <Box display={"flex"}>
-                      {exclude !== undefined && (
-                        <Chip
-                          color={exclude == true ? "error" : "primary"}
-                          sx={chipSx}
-                          variant="outlined"
-                          label={exclude == true ? "Exclude" : "Include"}
-                        />
-                      )}
-                      {!valid && <InvalidRule reasons={invalidReason ?? []} />}
+                  <>
+                    <Box
+                      width={"100%"}
+                      display={"flex"}
+                      justifyContent={"space-between"}
+                    >
+                      <Box display={"flex"}>
+                        {exclude !== undefined && (
+                          <Chip
+                            color={exclude == true ? "error" : "primary"}
+                            sx={chipSx}
+                            variant="outlined"
+                            label={exclude == true ? "Exclude" : "Include"}
+                          />
+                        )}
+                        {!valid && (
+                          <InvalidRule reasons={invalidReason ?? []} />
+                        )}
+                      </Box>
+                      <Title
+                        size={"small"}
+                        title={type}
+                        subTitle={headerExtra}
+                      />
                     </Box>
-                    <Title size={"small"} title={type} subTitle={headerExtra} />
-                  </Box>
+                    {renderInHeader && render(node)}
+                  </>
                 }
               />
             )}

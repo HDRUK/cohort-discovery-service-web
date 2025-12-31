@@ -11,7 +11,6 @@ import useFeatures from "@/store/useFeatures";
 
 import SingleBoundSelector, {
   NullablePair,
-  SingleSidedOperator,
 } from "@/components/SingleBoundSelector";
 import { clamp } from "@/utils/numbers";
 
@@ -208,7 +207,7 @@ const RuleAgeSelector = ({
   return (
     <>
       {title && <CustomH1>{title}</CustomH1>}
-      <Stack direction="column" spacing={2} alignItems="center" padding={2}>
+      <Stack direction="column" spacing={2} alignItems="center" paddingX={2}>
         {readOnly ? (
           <RuleAgeSelectorReadOnly
             to={to}
