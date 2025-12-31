@@ -28,6 +28,7 @@ const PositionedMenu = ({
   isIcon = false,
   active = false,
   items,
+  ...rest
 }: PositionedMenuProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const buttonRef = React.useRef<HTMLButtonElement | null>(null);
@@ -80,13 +81,9 @@ const PositionedMenu = ({
           bgcolor: "white",
           borderColor: active ? "success.main" : "transparent",
           borderRadius: "50%",
-          width: 32,
-          height: 32,
-          my: "auto",
-          ml: 2,
-          mr: "auto",
+          height: 36,
+          width: 36,
         },
-        size: "small",
       }
     : {
         variant: "text",
@@ -94,7 +91,11 @@ const PositionedMenu = ({
 
   return (
     <>
-      <ButtonComponent {...commonButtonProps} {...specificButtonProps}>
+      <ButtonComponent
+        {...commonButtonProps}
+        {...specificButtonProps}
+        {...rest}
+      >
         {children}
       </ButtonComponent>
 
@@ -108,7 +109,7 @@ const PositionedMenu = ({
           {
             name: "offset",
             options: {
-              offset: [0, 12],
+              offset: [0, 2],
             },
           },
         ]}

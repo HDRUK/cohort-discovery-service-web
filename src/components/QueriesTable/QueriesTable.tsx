@@ -27,6 +27,7 @@ import { DEFAULT_INTERVAL } from "@/config/defaults";
 import { getQueryName } from "@/utils/query";
 import useSearchParams from "@/hooks/useSearchParams";
 import { buildQueryHistoryParams } from "@/utils/params";
+import { AvailableFormats } from "../DownloadButton/DownloadButton";
 
 interface QueriesTableProps {
   initialData: Paginated<Query[]>;
@@ -217,7 +218,7 @@ const QueriesTable = ({
               downloadProps: {
                 id: row.original.pid,
                 entity: "queries",
-                format: "json",
+                formats: [AvailableFormats.JSON],
               },
               editProps: {
                 onClick: () => {

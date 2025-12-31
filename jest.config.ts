@@ -98,6 +98,7 @@ const config: Config = {
     "^@/config/(.*)$": "<rootDir>/src/config/$1",
     "^@/lib/(.*)$": "<rootDir>/src/lib/$1",
     "^@/actions/(.*)$": "<rootDir>/src/actions/$1",
+    "^@/assets/(.*)$": "<rootDir>/src/assets/$1",
     "^@/store/(.*)$": "<rootDir>/src/store/$1",
     "^@/types/(.*)$": "<rootDir>/src/types/$1",
     "^@/components/(.*)$": "<rootDir>/src/components/$1",

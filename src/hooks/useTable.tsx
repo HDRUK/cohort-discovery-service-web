@@ -1,21 +1,62 @@
 import {
   getMRT_RowSelectionHandler,
+  MRT_ColumnDef,
   useMaterialReactTable,
   type MRT_RowData,
   type MRT_TableOptions,
 } from "material-react-table";
+import { useMemo } from "react";
+import SquareCheckbox from "@/components/SquareCheckbox";
+import { Tooltip } from "@mui/material";
 
-const SELECT_COL_SIZE = 40;
+const SELECT_COL_SIZE = 30;
 
 export const useTable = <TData extends MRT_RowData>({
   columns,
   data,
+  enableRowSelection = true,
   ...rest
 }: MRT_TableOptions<TData>) => {
+  const hydratedColumns = useMemo<MRT_ColumnDef<TData>[]>(
+    () => [
+      ...(enableRowSelection
+        ? [
+            {
+              id: "custom-row-select",
+              header: "select",
+              Header: ({ table }) => (
+                <Tooltip title="Select all">
+                  <SquareCheckbox
+                    slotProps={{
+                      input: { "aria-label": "Toggle select all rows" },
+                    }}
+                    checked={table.getIsAllRowsSelected()}
+                    indeterminate={table.getIsSomeRowsSelected()}
+                    onChange={table.getToggleAllRowsSelectedHandler()}
+                  />
+                </Tooltip>
+              ),
+              Cell: ({ row }) => (
+                <SquareCheckbox
+                  slotProps={{ input: { "aria-label": "Toggle select row" } }}
+                  checked={row.getIsSelected()}
+                  disabled={!row.getCanSelect()}
+                  onChange={row.getToggleSelectedHandler()}
+                />
+              ),
+              size: 10,
+              maxSize: 10,
+            } as MRT_ColumnDef<TData>,
+          ]
+        : []),
+      ...columns,
+    ],
+    [columns, enableRowSelection]
+  );
+
   return useMaterialReactTable<TData>({
-    columns,
+    columns: hydratedColumns,
     data,
-    enableRowSelection: true,
     enablePagination: false,
     enableSorting: false,
     enableFilters: false,
@@ -24,6 +65,7 @@ export const useTable = <TData extends MRT_RowData>({
     enableFullScreenToggle: false,
     enableColumnFilters: false,
     enableExpanding: false,
+    enableRowSelection: true,
     enableGrouping: false,
     enableHiding: false,
     displayColumnDefOptions: {
@@ -40,6 +82,9 @@ export const useTable = <TData extends MRT_RowData>({
         color: "primary.main.contrastText",
         fontWeight: "bold",
         ...(column.id === "mrt-row-select" && {
+          display: "none",
+        }),
+        ...(column.id === "custom-row-select" && {
           width: SELECT_COL_SIZE,
           minWidth: SELECT_COL_SIZE,
           maxWidth: SELECT_COL_SIZE,
@@ -62,14 +107,16 @@ export const useTable = <TData extends MRT_RowData>({
       sx: { backgroundColor: "transparent !important", cursor: "pointer" },
     }),
     muiTableBodyCellProps: ({ column }) => ({
-      sx:
-        column.id === "mrt-row-select"
-          ? {
-              width: SELECT_COL_SIZE,
-              minWidth: SELECT_COL_SIZE,
-              maxWidth: SELECT_COL_SIZE,
-            }
-          : {},
+      sx: {
+        ...(column.id === "mrt-row-select" && {
+          display: "none",
+        }),
+        ...(column.id === "custom-row-select" && {
+          width: SELECT_COL_SIZE,
+          minWidth: SELECT_COL_SIZE,
+          maxWidth: SELECT_COL_SIZE,
+        }),
+      },
     }),
     muiTablePaperProps: {
       sx: {

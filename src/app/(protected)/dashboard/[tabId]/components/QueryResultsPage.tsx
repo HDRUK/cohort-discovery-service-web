@@ -9,6 +9,7 @@ import { queryToText } from "@/utils/queryBuilder";
 import { buildQueryHistoryParams } from "@/utils/params";
 import { QueryHistorySearchParams } from "@/types/api";
 import { getQueryName } from "@/utils/query";
+import { AvailableFormats } from "@/components/DownloadButton/DownloadButton";
 
 type PageSearchParams = Promise<QueryHistorySearchParams>;
 
@@ -48,7 +49,7 @@ const QueryResultsPageContent = async ({
             downloadProps: {
               id: queryData.data.pid,
               entity: "queries",
-              format: "json",
+              formats: [AvailableFormats.JSON],
             },
             refreshProps: { tag: queryData.data.pid, disabled: true },
             deleteProps: { disabled: true },

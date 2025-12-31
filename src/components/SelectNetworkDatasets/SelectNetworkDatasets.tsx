@@ -5,8 +5,8 @@ import { GroupedCollection, Network } from "../../types/api";
 import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Title from "../Title";
-import SquareRadio from "../SquareRadio";
 import SelectCustodianDatasets from "../SelectCustodianDatasets";
+import SquareCheckbox from "../SquareCheckbox";
 
 export type NetworkGroupedCollections = {
   network: Network | null;
@@ -56,12 +56,10 @@ const SelectNetworkDatasets = ({
         <Title
           size="small"
           startIcon={
-            <SquareRadio
+            <SquareCheckbox
               checked={nSelected > 0}
-              partial={nSelected !== nTotal}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
+              indeterminate={nSelected > 0 && nSelected !== nTotal}
+              onChange={() => {
                 handleSelectNetwork();
               }}
             />

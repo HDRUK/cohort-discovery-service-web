@@ -74,7 +74,7 @@ const Table = <TData extends MRT_RowData>({
       }}
     >
       {(rightAction || leftAction) && (
-        <Grid container sx={{ pb: details ? 0 : 0.5 }}>
+        <Grid container gap={1} sx={{ pb: details ? 0 : 0.5 }}>
           <Grid size={"grow"}>
             {leftAction && titleProps && <Title {...titleProps} />}
             {leftAction && searchProps && (
