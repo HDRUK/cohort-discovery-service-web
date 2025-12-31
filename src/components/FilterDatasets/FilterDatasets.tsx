@@ -16,16 +16,7 @@ const FilterDatasets = () => {
 
   return (
     <Title title="Filter" subTitle="Collections">
-      <Tooltip
-        title={DatasetErrors.NO_DATASETS}
-        slotProps={{
-          tooltip: {
-            sx: {
-              bgcolor: "error.main",
-            },
-          },
-        }}
-      >
+      <Tooltip title={DatasetErrors.NO_DATASETS} variant="error">
         <Chip
           variant={noDatasets ? "outlined" : "filled"}
           color={noDatasets ? "error" : undefined}
