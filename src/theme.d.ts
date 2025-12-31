@@ -48,3 +48,9 @@ declare module "@mui/material/Typography" {
     guidance2: true;
   }
 }
+
+declare module "@mui/material/Tooltip" {
+  interface TooltipProps {
+    variant?: "error" | "default";
+  }
+}

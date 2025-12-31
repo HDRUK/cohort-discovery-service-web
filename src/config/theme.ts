@@ -1,4 +1,5 @@
 import { createTheme, ThemeOptions } from "@mui/material/styles";
+import { tooltipClasses } from "@mui/material/Tooltip";
 
 export const themeOptions: ThemeOptions = {
   palette: {
@@ -229,6 +230,21 @@ export const themeOptions: ThemeOptions = {
           },
         }),
       },
+    },
+    MuiTooltip: {
+      variants: [
+        {
+          props: { variant: "error" },
+          style: ({ theme }) => ({
+            [`& .${tooltipClasses.tooltip}`]: {
+              backgroundColor: theme.palette.error.main,
+            },
+            [`& .${tooltipClasses.arrow}`]: {
+              color: theme.palette.error.main,
+            },
+          }),
+        },
+      ],
     },
   },
   transitions: {
