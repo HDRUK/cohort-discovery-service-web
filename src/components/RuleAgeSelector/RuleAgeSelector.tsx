@@ -114,23 +114,7 @@ const RuleAgeSelector = ({
       {title && <CustomH1>{title}</CustomH1>}
       <Stack direction="column" spacing={2} alignItems="center" padding={2}>
         {constrainForBunnyV1 ? (
-          <>
-            <ToggleButtonGroup
-              exclusive
-              size="small"
-              value={operator}
-              onChange={handlOperatorChange}
-              disabled={!!readOnly}
-            >
-              <ToggleButton value="gt">{">"}</ToggleButton>
-              <ToggleButton value="lt">{"<"}</ToggleButton>
-            </ToggleButtonGroup>
-            <DatePicker
-              {...commonPickerProps}
-              value={singleDate}
-              onChange={handleSingleDateChange}
-            />
-          </>
+          <>hi</>
         ) : (
           <Slider
             onClick={(e) => {
