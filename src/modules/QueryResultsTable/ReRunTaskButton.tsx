@@ -1,16 +1,8 @@
 "use client";
 
-import {
-  IconButton,
-  Typography,
-  Box,
-  IconButtonProps,
-  Tooltip,
-} from "@mui/material";
+import { IconButton, Typography, Box, IconButtonProps } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { revalidateAction } from "@/actions/revalidate";
-
-const isProd = process.env.NODE_ENV === "production";
 
 export interface ReRunTaskButtonProps extends Omit<IconButtonProps, "onClick"> {
   tag: string;
