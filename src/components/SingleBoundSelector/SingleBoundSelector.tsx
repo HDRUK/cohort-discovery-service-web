@@ -15,7 +15,7 @@ type ReadOnlyLabelArgs<TUi> = {
   value: TUi | null;
 };
 
-export type SingleBoundSelectorProps<TStored, TUi> = {
+export type SingleBoundSelectorProps<TStored, TUi = TStored> = {
   title?: ReactNode;
   children?: ReactNode;
 
@@ -61,7 +61,7 @@ function deriveOperatorAndValue<TStored, TUi>(
   return { operator: SingleSidedOperator.GREATER_THAN, value: null };
 }
 
-export default function SingleBoundSelector<TStored, TUi>({
+export default function SingleBoundSelector<TStored, TUi = TStored>({
   title,
   children,
   constraint,

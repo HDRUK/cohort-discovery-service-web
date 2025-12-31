@@ -1,7 +1,7 @@
 "use client";
 
-import { Paper, Slider, Stack } from "@mui/material";
-import { ReactNode, useState } from "react";
+import { Paper, Slider, Stack, TextField } from "@mui/material";
+import { ReactNode, useMemo, useState } from "react";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import { isAgeFilter, isRuleLeaf, updateById } from "@/utils/rules";
 import { AgeFilterType, RuleLeafType } from "@/types/rules";
@@ -9,11 +9,17 @@ import { CustomH1 } from "@/components/GuidanceHeaders";
 import { MAX_AGE_FILTER, MIN_AGE_FILTER } from "@/config/rules";
 import useFeatures from "@/store/useFeatures";
 
+import SingleBoundSelector, {
+  NullablePair,
+  SingleSidedOperator,
+} from "@/components/SingleBoundSelector";
+
 export interface RuleAgeSelectorProps {
   children?: ReactNode;
   rule: RuleLeafType | AgeFilterType;
   title?: string;
   readOnly?: boolean;
+  overrideConstrainForBunny?: boolean;
   uniDirectional?: boolean;
 }
 
@@ -39,32 +45,29 @@ export const RuleAgeSelectorReadOnly = ({
   } else {
     label = `Age ${from} - ${to}`;
   }
-  return (
-    <Paper
-      sx={{
-        border: 1,
-        p: 1,
-      }}
-    >
-      {label}
-    </Paper>
-  );
+
+  return <Paper sx={{ border: 1, p: 1 }}>{label} </Paper>;
 };
+
+const clamp = (n: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, n));
 
 const RuleAgeSelector = ({
   rule,
   title,
   children,
+  overrideConstrainForBunny = false,
   uniDirectional = false,
   readOnly = false,
 }: RuleAgeSelectorProps) => {
   const minAge = MIN_AGE_FILTER;
   const maxAge = MAX_AGE_FILTER;
+
   const { queryBuilderJson, setQueryBuilderJson } = useQueryBuilder((qb) => ({
-    selected: qb.selected,
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
   }));
+
   const { constrainForBunnyV1 } = useFeatures();
 
   const values = isRuleLeaf(rule) ? rule.ageConstraint : rule.value;
@@ -72,40 +75,137 @@ const RuleAgeSelector = ({
   const from = values?.[0] ?? minAge;
   const to = values?.[1] ?? maxAge;
 
-  const [age, setAge] = useState<number[]>([from, to]);
+  const committedAge = useMemo<[number, number]>(() => [from, to], [from, to]);
+
+  const [draftAge, setDraftAge] = useState<[number, number] | null>(null);
+
+  const sliderValue = draftAge ?? committedAge;
 
   const handleCommitChange = () => {
+    const [l, r] = draftAge ?? committedAge;
+    setDraftAge(null);
     setQueryBuilderJson(
       updateById(queryBuilderJson, rule.id, (node) => {
         if (isRuleLeaf(node)) {
           return {
             ...node,
-            ageConstraint: [
-              age[0] > minAge ? age[0] : null,
-              age[1] < maxAge ? age[1] : null,
-            ],
+            ageConstraint: [l > minAge ? l : null, r < maxAge ? r : null],
           };
-        } else if (isAgeFilter(node)) {
-          return {
-            ...node,
-            value: [age[0] ?? minAge, age[1] ?? maxAge],
-          };
+        }
+        if (isAgeFilter(node)) {
+          return { ...node, value: [l, r] };
         }
         return node;
       })
     );
   };
 
+  const operatorLabelOverrides = useMemo(
+    () =>
+      new Map([
+        [SingleSidedOperator.GREATER_THAN, ">"],
+        [SingleSidedOperator.LESS_THAN, "<"],
+      ]),
+    []
+  );
+
+  const bunnyConstraint: NullablePair<number> = useMemo(() => {
+    if (isRuleLeaf(rule)) {
+      return rule.ageConstraint ?? [null, null];
+    }
+
+    const l = rule.value?.[0] ?? minAge;
+    const r = rule.value?.[1] ?? maxAge;
+
+    return [l === minAge ? null : l, r === maxAge ? null : r];
+  }, [rule, minAge, maxAge]);
+
+  const marks = useMemo(() => {
+    const bins = 5;
+    const range = maxAge - minAge;
+    const step = range / (bins - 1);
+
+    return Array.from({ length: bins }, (_, i) => {
+      const value = Math.round(minAge + step * i);
+      return { value, label: value };
+    });
+  }, [minAge, maxAge]);
+
   if (!values) return null;
 
-  if (readOnly) {
+  if (constrainForBunnyV1 && !overrideConstrainForBunny) {
     return (
-      <RuleAgeSelectorReadOnly
-        to={to}
-        from={from}
-        minAge={minAge}
-        maxAge={maxAge}
-      />
+      <>
+        {title && <CustomH1>{title}</CustomH1>}
+
+        <SingleBoundSelector<number>
+          constraint={bunnyConstraint}
+          readOnly={readOnly}
+          anyLabel="Any age"
+          operatorLabelOverrides={operatorLabelOverrides}
+          onConstraintChange={(next) => {
+            setQueryBuilderJson(
+              updateById(queryBuilderJson, rule.id, (node) => {
+                const left =
+                  next[0] == null ? null : clamp(next[0], minAge, maxAge);
+                const right =
+                  next[1] == null ? null : clamp(next[1], minAge, maxAge);
+
+                if (isRuleLeaf(node)) {
+                  // store nullable bounds
+                  return {
+                    ...node,
+                    ageConstraint: [
+                      left != null && left > minAge ? left : null,
+                      right != null && right < maxAge ? right : null,
+                    ],
+                  };
+                }
+
+                if (isAgeFilter(node)) {
+                  // store a full range from single-sided bound
+                  if (left != null) return { ...node, value: [left, maxAge] };
+                  if (right != null) return { ...node, value: [minAge, right] };
+                  return { ...node, value: [minAge, maxAge] };
+                }
+
+                return node;
+              })
+            );
+          }}
+          renderPicker={({ value, onChange }) => (
+            <TextField
+              size="small"
+              type="number"
+              value={value ?? ""}
+              slotProps={{
+                htmlInput: { min: minAge, max: maxAge },
+              }}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              onChange={(e) => {
+                const raw = e.target.value;
+                if (raw === "") return onChange(null);
+
+                const n = Number(raw);
+                if (Number.isNaN(n)) return;
+
+                onChange(clamp(n, minAge, maxAge));
+              }}
+            />
+          )}
+          renderReadOnlyLabel={({ operator, value }) =>
+            value == null
+              ? "Any age"
+              : `Age ${
+                  operator === SingleSidedOperator.GREATER_THAN ? ">" : "<"
+                } ${value}`
+          }
+        />
+        {children}
+      </>
     );
   }
 
@@ -113,42 +213,34 @@ const RuleAgeSelector = ({
     <>
       {title && <CustomH1>{title}</CustomH1>}
       <Stack direction="column" spacing={2} alignItems="center" padding={2}>
-        {constrainForBunnyV1 ? (
-          <>hi</>
+        {readOnly ? (
+          <RuleAgeSelectorReadOnly
+            to={to}
+            from={from}
+            minAge={minAge}
+            maxAge={maxAge}
+          />
         ) : (
           <Slider
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-            onChangeCommitted={(_e) => {
-              handleCommitChange();
-            }}
-            value={age}
+            value={sliderValue}
             min={minAge}
             max={maxAge}
+            marks={marks}
             onChange={(_e, newValue, activeThumb) => {
-              if (uniDirectional) {
-                if (activeThumb === 0) {
-                  setAge([newValue[0], maxAge]);
-                } else {
-                  setAge([minAge, newValue[1]]);
-                }
-              } else {
-                setAge(newValue);
-              }
+              const next = newValue as number[];
+
+              const nextRange: [number, number] = uniDirectional
+                ? activeThumb === 0
+                  ? [next[0], maxAge]
+                  : [minAge, next[1]]
+                : [next[0], next[1]];
+
+              setDraftAge(nextRange);
             }}
-            valueLabelDisplay="auto"
+            onChangeCommitted={handleCommitChange}
           />
         )}
-        <RuleAgeSelectorReadOnly
-          to={to}
-          from={from}
-          minAge={minAge}
-          maxAge={maxAge}
-        />
       </Stack>
-      {children}
     </>
   );
 };
