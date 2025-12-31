@@ -67,7 +67,7 @@ export const Hierarchy = () => {
     [active, boardIndex, queryBuilderJson, setQueryBuilderJson]
   );
 
-  if (!hasMounted) return <SkeletonFull sx={{ minHeight: 1000 }} />;
+  if (!hasMounted) return <SkeletonFull sx={{ minHeight: 1000, mt: 1 }} />;
 
   return (
     <DndContext
