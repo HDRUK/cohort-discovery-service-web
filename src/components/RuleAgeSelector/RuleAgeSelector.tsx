@@ -107,15 +107,6 @@ const RuleAgeSelector = ({
     );
   };
 
-  const operatorLabelOverrides = useMemo(
-    () =>
-      new Map([
-        [SingleSidedOperator.GREATER_THAN, ">"],
-        [SingleSidedOperator.LESS_THAN, "<"],
-      ]),
-    []
-  );
-
   const bunnyConstraint: NullablePair<number> = useMemo(() => {
     if (isRuleLeaf(rule)) {
       return rule.ageConstraint ?? [null, null];
@@ -149,7 +140,6 @@ const RuleAgeSelector = ({
           constraint={bunnyConstraint}
           readOnly={readOnly}
           anyLabel="Any age"
-          operatorLabelOverrides={operatorLabelOverrides}
           onConstraintChange={(next) => {
             setQueryBuilderJson(
               updateById(queryBuilderJson, rule.id, (node) => {
