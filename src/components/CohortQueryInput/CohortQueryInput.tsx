@@ -101,7 +101,7 @@ const CohortQueryInput = () => {
         defaultValue=""
         rules={{ required: "Query is required" }}
         render={({ field, fieldState: { error } }) => (
-          <Tooltip title={error?.message}>
+          <Tooltip title={error?.message} variant="error">
             <SearchBox
               {...field}
               collapsible={false}

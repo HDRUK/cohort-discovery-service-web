@@ -232,19 +232,23 @@ export const themeOptions: ThemeOptions = {
       },
     },
     MuiTooltip: {
-      variants: [
-        {
-          props: { variant: "error" },
-          style: ({ theme }) => ({
-            [`& .${tooltipClasses.tooltip}`]: {
-              backgroundColor: theme.palette.error.main,
+      styleOverrides: {
+        popper: {
+          variants: [
+            {
+              props: { variant: "error" },
+              style: ({ theme }) => ({
+                [`& .${tooltipClasses.tooltip}`]: {
+                  backgroundColor: theme.palette.error.main,
+                },
+                [`& .${tooltipClasses.arrow}`]: {
+                  color: theme.palette.error.main,
+                },
+              }),
             },
-            [`& .${tooltipClasses.arrow}`]: {
-              color: theme.palette.error.main,
-            },
-          }),
+          ],
         },
-      ],
+      },
     },
   },
   transitions: {

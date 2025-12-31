@@ -7,6 +7,12 @@ import { DatasetErrors } from "@/utils/datasets";
 import FilterDatasetsSkeleton from "./FilterDatasetsSkeleton";
 import useHasMounted from "@/hooks/useHasMounted";
 
+export const filterDatasetChipSx = {
+  borderRadius: 10,
+  height: 30,
+  minWidth: 100,
+};
+
 const FilterDatasets = () => {
   const hasMounted = useHasMounted();
   const { selectedDatasets, open, setOpen } = useQueryBuilder((qb) => ({
@@ -23,7 +29,10 @@ const FilterDatasets = () => {
 
   return (
     <Title title="Filter" subTitle="Collections">
-      <Tooltip title={DatasetErrors.NO_DATASETS} variant="error">
+      <Tooltip
+        title={noDatasets ? DatasetErrors.NO_DATASETS : undefined}
+        variant="error"
+      >
         <Chip
           variant={noDatasets ? "outlined" : "filled"}
           color={noDatasets ? "error" : undefined}
@@ -31,8 +40,7 @@ const FilterDatasets = () => {
           sx={{
             bgcolor: open && !noDatasets ? "secondary.main" : "white",
             color: open && !noDatasets ? "secondary.contrastText" : "inherit",
-            borderRadius: 10,
-            height: 30,
+            ...filterDatasetChipSx,
           }}
           label={
             <Box

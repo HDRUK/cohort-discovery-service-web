@@ -18,11 +18,12 @@ import {
   restrictToWindowEdges,
 } from "@dnd-kit/modifiers";
 import { SortableContext } from "@dnd-kit/sortable";
-import { List, Skeleton } from "@mui/material";
+import { List } from "@mui/material";
 import { useCallback, useState } from "react";
 import HierarchyItem from "@/components/HierarchyItem";
 import { ID_REF_SUFFIX } from "@/config/defaults";
 import useHasMounted from "@/hooks/useHasMounted";
+import SkeletonFull from "@/components/SkeletonFull";
 
 export const Hierarchy = () => {
   const {
@@ -66,7 +67,7 @@ export const Hierarchy = () => {
     [active, boardIndex, queryBuilderJson, setQueryBuilderJson]
   );
 
-  if (!hasMounted) return <Skeleton />;
+  if (!hasMounted) return <SkeletonFull sx={{ minHeight: 1000 }} />;
 
   return (
     <DndContext

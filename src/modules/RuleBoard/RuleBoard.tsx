@@ -1,7 +1,6 @@
 "use client";
 
 import { Fragment } from "react";
-import { RuleBoardSkeleton } from "./RuleBoardSkeleton";
 
 import Rule from "@/modules/Rule";
 import {
@@ -22,6 +21,7 @@ import {
 } from "@dnd-kit/sortable";
 import useHasMounted from "@/hooks/useHasMounted";
 import RuleAgeFilter from "../RuleAgeFilter";
+import SkeletonFull from "@/components/SkeletonFull";
 
 interface RuleBoardProps extends BoxProps {
   ruleGroup: RuleGroupType;
@@ -49,7 +49,7 @@ const RuleBoard = ({ ruleGroup, children, ...rest }: RuleBoardProps) => {
   const hasMounted = useHasMounted();
 
   if (!hasMounted) {
-    return <RuleBoardSkeleton />;
+    return <SkeletonFull />;
   }
 
   return (

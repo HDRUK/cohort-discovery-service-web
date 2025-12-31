@@ -2,6 +2,7 @@
 
 import { Box, Skeleton } from "@mui/material";
 import Title from "../Title";
+import { filterDatasetChipSx } from "./FilterDatasets";
 
 const FilterDatasetsSkeleton = () => {
   return (
@@ -10,9 +11,7 @@ const FilterDatasetsSkeleton = () => {
         <Skeleton
           variant="rounded"
           sx={{
-            borderRadius: 10,
-            height: 30,
-            width: 100,
+            ...filterDatasetChipSx,
           }}
         />
       </Box>
