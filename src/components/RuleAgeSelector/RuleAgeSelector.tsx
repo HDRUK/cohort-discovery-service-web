@@ -152,7 +152,6 @@ const RuleAgeSelector = ({
                   next[1] == null ? null : clamp(next[1], minAge, maxAge);
 
                 if (isRuleLeaf(node)) {
-                  // store nullable bounds
                   return {
                     ...node,
                     ageConstraint: [
@@ -163,7 +162,6 @@ const RuleAgeSelector = ({
                 }
 
                 if (isAgeFilter(node)) {
-                  // store a full range from single-sided bound
                   if (left != null) return { ...node, value: [left, maxAge] };
                   if (right != null) return { ...node, value: [minAge, right] };
                   return { ...node, value: [minAge, maxAge] };
@@ -196,13 +194,14 @@ const RuleAgeSelector = ({
               }}
             />
           )}
-          renderReadOnlyLabel={({ operator, value }) =>
-            value == null
-              ? "Any age"
-              : `Age ${
-                  operator === SingleSidedOperator.GREATER_THAN ? ">" : "<"
-                } ${value}`
-          }
+          renderReadOnlyLabel={() => (
+            <RuleAgeSelectorReadOnly
+              to={to}
+              from={from}
+              minAge={minAge}
+              maxAge={maxAge}
+            />
+          )}
         />
         {children}
       </>
