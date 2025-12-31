@@ -1,8 +1,9 @@
 "use client";
 
 import useQueryBuilder from "@/store/useQueryBuilder";
-import { Chip, Box } from "@mui/material";
+import { Chip, Box, Tooltip, Typography } from "@mui/material";
 import Title from "../Title";
+import { DatasetErrors } from "@/utils/datasets";
 
 const FilterDatasets = () => {
   const { selectedDatasets, open, setOpen } = useQueryBuilder((qb) => ({
@@ -11,37 +12,60 @@ const FilterDatasets = () => {
     setOpen: qb.setOpenSelectDatasetsPanel,
   }));
 
+  const noDatasets = selectedDatasets.length === 0;
+
   return (
     <Title title="Filter" subTitle="Collections">
-      <Chip
-        onClick={() => setOpen(!open)}
-        sx={{
-          bgcolor: open ? "secondary.main" : "white",
-          color: open ? "secondary.contrastText" : "inherit",
-          borderRadius: 10,
-          height: 30,
+      <Tooltip
+        title={DatasetErrors.NO_DATASETS}
+        slotProps={{
+          tooltip: {
+            sx: {
+              bgcolor: "error.main",
+            },
+          },
         }}
-        label={
-          <Box
-            sx={{
-              width: "100%",
-              display: "flex",
-              alignItems: "baseline",
-              flexWrap: "nowrap",
-            }}
-          >
-            <Chip
-              label={selectedDatasets.length}
+      >
+        <Chip
+          variant={noDatasets ? "outlined" : "filled"}
+          color={noDatasets ? "error" : undefined}
+          onClick={() => setOpen(!open)}
+          sx={{
+            bgcolor: open && !noDatasets ? "secondary.main" : "white",
+            color: open && !noDatasets ? "secondary.contrastText" : "inherit",
+            borderRadius: 10,
+            height: 30,
+          }}
+          label={
+            <Box
               sx={{
-                bgcolor: "background.default",
-                borderRadius: 10,
-                mr: 1,
+                width: "100%",
+                display: "flex",
+                alignItems: "baseline",
+                flexWrap: "nowrap",
               }}
-            />
-            Selected
-          </Box>
-        }
-      />
+            >
+              <Chip
+                label={selectedDatasets.length}
+                sx={{
+                  bgcolor: noDatasets ? "error.main" : "background.default",
+                  color: noDatasets
+                    ? "error.contrastText"
+                    : "background.contrastText",
+                  borderRadius: 10,
+                  mr: 0.5,
+                }}
+              />
+              <Typography
+                variant="body1"
+                color={noDatasets ? "error" : "inherit"}
+              >
+                Selected
+              </Typography>
+            </Box>
+          }
+        />
+      </Tooltip>
     </Title>
   );
 };
