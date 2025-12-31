@@ -25,4 +25,8 @@ const removeFalseKeys = <T extends string | number>(
 const quantise = (n: number, step = 0.1) => {
   return Math.round(n / step) * step;
 };
-export { quantise, formatNumber, trueKeys, falseKeys, removeFalseKeys };
+
+const clamp = (n: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, n));
+
+export { quantise, formatNumber, trueKeys, falseKeys, removeFalseKeys, clamp };

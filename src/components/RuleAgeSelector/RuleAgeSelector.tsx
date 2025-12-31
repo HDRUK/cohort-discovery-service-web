@@ -13,6 +13,7 @@ import SingleBoundSelector, {
   NullablePair,
   SingleSidedOperator,
 } from "@/components/SingleBoundSelector";
+import { clamp } from "@/utils/numbers";
 
 export interface RuleAgeSelectorProps {
   children?: ReactNode;
@@ -46,11 +47,17 @@ export const RuleAgeSelectorReadOnly = ({
     label = `Age ${from} - ${to}`;
   }
 
-  return <Paper sx={{ border: 1, p: 1 }}>{label} </Paper>;
+  return (
+    <Paper
+      sx={{
+        border: 1,
+        p: 1,
+      }}
+    >
+      {label}
+    </Paper>
+  );
 };
-
-const clamp = (n: number, min: number, max: number) =>
-  Math.min(max, Math.max(min, n));
 
 const RuleAgeSelector = ({
   rule,
