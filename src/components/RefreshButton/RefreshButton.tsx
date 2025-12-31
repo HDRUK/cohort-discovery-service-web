@@ -12,11 +12,12 @@ import { revalidateAction } from "@/actions/revalidate";
 
 const isProd = process.env.NODE_ENV === "production";
 
-export interface RevalidateButtonProps
-  extends Omit<IconButtonProps, "onClick"> {
-  tag: string;
+export interface RefreshButtonProps extends Omit<IconButtonProps, "onClick"> {
+  tag?: string;
+  showTooltip?: boolean;
   label?: string;
   text?: string;
+  onClick?: () => void;
 }
 
 const TooltipWrapper = ({
@@ -31,16 +32,22 @@ const TooltipWrapper = ({
   return enabled ? <Tooltip title={title}>{children}</Tooltip> : children;
 };
 
-export const RevalidateButton = ({
+export const RefreshButton = ({
   tag,
   label,
   text,
+  onClick,
+  showTooltip = false,
   ...rest
-}: RevalidateButtonProps) => {
+}: RefreshButtonProps) => {
+  const title = label || tag;
   return (
-    <TooltipWrapper enabled={!isProd} title={label || tag}>
+    <TooltipWrapper enabled={(!isProd || showTooltip) && !!title} title={title}>
       <Box display="flex" alignItems="center" gap={1}>
-        <IconButton onClick={() => revalidateAction(tag)} {...rest}>
+        <IconButton
+          onClick={onClick ? onClick : () => tag && revalidateAction(tag)}
+          {...rest}
+        >
           <RefreshIcon fontSize={"small"} />
         </IconButton>
         {text && <Typography variant="body2">{text}</Typography>}

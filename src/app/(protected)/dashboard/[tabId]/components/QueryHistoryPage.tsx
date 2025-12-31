@@ -2,8 +2,8 @@
 
 import { Suspense } from "react";
 import getQueries from "@/actions/getQueries";
-import QueriesTable from "@/components/QueriesTable";
-import { QueriesTableSkeleton } from "@/components/QueriesTable";
+import QueriesTable from "@/modules/QueriesTable";
+import { QueriesTableSkeleton } from "@/modules/QueriesTable";
 import { Box } from "@mui/material";
 import Title from "@/components/Title";
 import { ApiSearchParams } from "@/types/api";
