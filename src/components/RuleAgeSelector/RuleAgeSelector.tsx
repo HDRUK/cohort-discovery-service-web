@@ -107,7 +107,7 @@ const RuleAgeSelector = ({
     );
   };
 
-  const bunnyConstraint: NullablePair<number> = useMemo(() => {
+  const ageConstraint: NullablePair<number> = useMemo(() => {
     if (isRuleLeaf(rule)) {
       return rule.ageConstraint ?? [null, null];
     }
@@ -137,7 +137,7 @@ const RuleAgeSelector = ({
         {title && <CustomH1>{title}</CustomH1>}
 
         <SingleBoundSelector<number>
-          constraint={bunnyConstraint}
+          constraint={ageConstraint}
           readOnly={readOnly}
           anyLabel="Any age"
           onConstraintChange={(next) => {
