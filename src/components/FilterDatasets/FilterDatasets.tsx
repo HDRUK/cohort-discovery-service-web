@@ -4,15 +4,22 @@ import useQueryBuilder from "@/store/useQueryBuilder";
 import { Chip, Box, Tooltip, Typography } from "@mui/material";
 import Title from "../Title";
 import { DatasetErrors } from "@/utils/datasets";
+import FilterDatasetsSkeleton from "./FilterDatasetsSkeleton";
+import useHasMounted from "@/hooks/useHasMounted";
 
 const FilterDatasets = () => {
+  const hasMounted = useHasMounted();
   const { selectedDatasets, open, setOpen } = useQueryBuilder((qb) => ({
     selectedDatasets: qb.selectedDatasets,
     open: qb.openSelectDatasetsPanel,
     setOpen: qb.setOpenSelectDatasetsPanel,
   }));
 
-  const noDatasets = selectedDatasets.length === 0;
+  const noDatasets = selectedDatasets?.length === 0;
+
+  if (!hasMounted) {
+    return <FilterDatasetsSkeleton />;
+  }
 
   return (
     <Title title="Filter" subTitle="Collections">
@@ -37,7 +44,7 @@ const FilterDatasets = () => {
               }}
             >
               <Chip
-                label={selectedDatasets.length}
+                label={selectedDatasets?.length ?? 0}
                 sx={{
                   bgcolor: noDatasets ? "error.main" : "background.default",
                   color: noDatasets
