@@ -156,7 +156,12 @@ const Guidance = () => {
   const makeAgeFilterComponents = (node: AgeFilterType) => ({
     ...baseComponents,
     RuleAgeSelector: (props: { title: string }) => (
-      <RuleAgeSelector rule={node} {...props} uniDirectional={false} />
+      <RuleAgeSelector
+        rule={node}
+        {...props}
+        uniDirectional={false}
+        overrideConstrainForBunny={true}
+      />
     ),
   });
 

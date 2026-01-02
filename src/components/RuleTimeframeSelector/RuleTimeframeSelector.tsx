@@ -1,7 +1,7 @@
 "use client";
 
-import { Paper, Stack, ToggleButton, ToggleButtonGroup } from "@mui/material";
-import { ReactNode, useMemo } from "react";
+import { Stack } from "@mui/material";
+import { ReactNode, useCallback, useMemo } from "react";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import { updateById } from "@/utils/rules";
 import { RuleLeafType } from "@/types/rules";
@@ -18,13 +18,15 @@ import useFeatures from "@/store/useFeatures";
 import { getDomainVerbs } from "@/utils/omop";
 import { capitaliseFirstLetter } from "@/utils/string";
 
+import SingleBoundSelector, {
+  SingleSidedOperator,
+} from "@/components/SingleBoundSelector";
+
 export interface RuleTimeframeSelectorProps extends DatePickerProps {
   children?: ReactNode;
   rule: RuleLeafType;
   title?: string;
 }
-
-type BunnyOperator = "gt" | "lt";
 
 const RuleTimeframeSelector = ({
   rule,
@@ -38,7 +40,6 @@ const RuleTimeframeSelector = ({
   ...props
 }: RuleTimeframeSelectorProps) => {
   const { queryBuilderJson, setQueryBuilderJson } = useQueryBuilder((qb) => ({
-    selected: qb.selected,
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
   }));
@@ -50,91 +51,29 @@ const RuleTimeframeSelector = ({
     return [start ? dayjs(start) : null, end ? dayjs(end) : null];
   }, [rule.timeConstraint]);
 
-  const { operator, singleDate } = useMemo<{
-    operator: BunnyOperator;
-    singleDate: Dayjs | null;
-  }>(() => {
-    const [start, end] = rule.timeConstraint ?? [null, null];
-
-    if (start && !end) {
-      return { operator: "gt", singleDate: dayjs(start) };
-    }
-
-    if (!start && end) {
-      return { operator: "lt", singleDate: dayjs(end) };
-    }
-
-    if (start) {
-      return { operator: "gt", singleDate: dayjs(start) };
-    }
-    if (end) {
-      return { operator: "lt", singleDate: dayjs(end) };
-    }
-
-    return { operator: "gt", singleDate: null };
-  }, [rule.timeConstraint]);
-
   const handleLeftChange = (value: PickerValue) => {
     setQueryBuilderJson(
-      updateById(queryBuilderJson, rule.id, (node) => {
-        return {
-          ...node,
-          timeConstraint: [
-            value?.toISOString() ?? null,
-            rightValue?.toISOString() ?? null,
-          ],
-        };
-      })
+      updateById(queryBuilderJson, rule.id, (node) => ({
+        ...node,
+        timeConstraint: [
+          value?.toISOString() ?? null,
+          rightValue?.toISOString() ?? null,
+        ],
+      }))
     );
   };
 
   const handleRightChange = (value: PickerValue) => {
     setQueryBuilderJson(
-      updateById(queryBuilderJson, rule.id, (node) => {
-        return {
-          ...node,
-          timeConstraint: [
-            leftValue?.toISOString() ?? null,
-            value?.toISOString() ?? null,
-          ],
-        };
-      })
+      updateById(queryBuilderJson, rule.id, (node) => ({
+        ...node,
+        timeConstraint: [
+          leftValue?.toISOString() ?? null,
+          value?.toISOString() ?? null,
+        ],
+      }))
     );
   };
-
-  const handlOperatorChange = (
-    _e: React.MouseEvent<HTMLElement>,
-    nextOperator: BunnyOperator | null
-  ) => {
-    if (!nextOperator) return;
-
-    setQueryBuilderJson(
-      updateById(queryBuilderJson, rule.id, (node) => {
-        const dateIso = singleDate?.toISOString() ?? null;
-
-        return {
-          ...node,
-          timeConstraint:
-            nextOperator === "gt" ? [dateIso, null] : [null, dateIso],
-        };
-      })
-    );
-  };
-
-  const handleSingleDateChange = (value: PickerValue) => {
-    setQueryBuilderJson(
-      updateById(queryBuilderJson, rule.id, (node) => {
-        const dateIso = value?.toISOString() ?? null;
-
-        return {
-          ...node,
-          timeConstraint: operator === "gt" ? [dateIso, null] : [null, dateIso],
-        };
-      })
-    );
-  };
-
-  if (!rule.timeConstraint) return null;
 
   const mergedSlotProps: DatePickerSlotProps<false> = {
     ...slotProps,
@@ -164,39 +103,53 @@ const RuleTimeframeSelector = ({
     ? getDomainVerbs(rule.rule.concept?.category)
     : { verb: "" };
 
+  const parseIsoToDayjs = useCallback(
+    (iso: string | null) => (iso ? dayjs(iso) : null),
+    []
+  );
+
+  const serialiseDayjsToIso = useCallback(
+    (d: Dayjs | null) => (d ? d.toISOString() : null),
+    []
+  );
+
+  if (!rule.timeConstraint) return null;
+
   if (constrainForBunnyV1) {
     return (
       <>
         {title && <CustomH1>{title}</CustomH1>}
-        <Stack direction="row" spacing={2} alignItems="center">
-          {readOnly ? (
-            <Paper sx={{ border: 1, p: 1 }}>
-              {singleDate
-                ? `${capitaliseFirstLetter(verb)} ${
-                    operator === "gt" ? "after" : "before"
-                  } ${singleDate.format("MM-YYYY")}`
-                : `${capitaliseFirstLetter(verb)} at any time`}
-            </Paper>
-          ) : (
-            <>
-              <ToggleButtonGroup
-                exclusive
-                size="small"
-                value={operator}
-                onChange={handlOperatorChange}
-                disabled={!!readOnly}
-              >
-                <ToggleButton value="gt">{">"}</ToggleButton>
-                <ToggleButton value="lt">{"<"}</ToggleButton>
-              </ToggleButtonGroup>
-              <DatePicker
-                {...commonPickerProps}
-                value={singleDate}
-                onChange={handleSingleDateChange}
-              />
-            </>
+        <SingleBoundSelector<string, Dayjs>
+          constraint={rule.timeConstraint}
+          onConstraintChange={(next) => {
+            setQueryBuilderJson(
+              updateById(queryBuilderJson, rule.id, (node) => ({
+                ...node,
+                timeConstraint: next,
+              }))
+            );
+          }}
+          parse={parseIsoToDayjs}
+          serialise={serialiseDayjsToIso}
+          readOnly={readOnly}
+          anyLabel={`${capitaliseFirstLetter(verb)} at any time`}
+          renderPicker={({ value, onChange }) => (
+            <DatePicker
+              {...commonPickerProps}
+              value={value}
+              onChange={(v) => onChange(v)}
+            />
           )}
-        </Stack>
+          renderReadOnlyLabel={({ operator, value }) =>
+            value
+              ? `${capitaliseFirstLetter(verb)} ${
+                  operator === SingleSidedOperator.GREATER_THAN
+                    ? "after"
+                    : "before"
+                } ${value.format("MM-YYYY")}`
+              : `${capitaliseFirstLetter(verb)} at any time`
+          }
+        />
         {children}
       </>
     );

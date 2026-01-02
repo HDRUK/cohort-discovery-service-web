@@ -25,7 +25,7 @@ const RuleAgeFilter = ({ rule, groupId, ...rest }: RuleProps) => {
       headerExtra={<Chip variant="outlined" label={"Age"} />}
       render={() => (
         <Box sx={{ mx: "auto" }}>
-          <RuleAgeSelector rule={rule} readOnly />
+          <RuleAgeSelector rule={rule} readOnly overrideConstrainForBunny />
         </Box>
       )}
       actions={actions}
