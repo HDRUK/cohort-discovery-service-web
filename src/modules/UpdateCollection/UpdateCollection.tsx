@@ -221,7 +221,17 @@ const UpdateCollection = ({
         onClose?.();
       }
     },
-    [collection, currentCustodian, isDirty, notify, updateCollection, onClose]
+    [
+      collection,
+      currentCustodian,
+      isDirty,
+      notify,
+      updateCollection,
+      updateCollectionAdmin,
+      onClose,
+      workgroups,
+      workgroupValues,
+    ]
   );
 
   const handleEnter = useCallback(
@@ -252,11 +262,22 @@ const UpdateCollection = ({
   });
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const updatedWorkgroupValues = workgroupValues;
-
-    updatedWorkgroupValues.set(event.target.name, event.target.checked);
-    setWorkgroupValues(updatedWorkgroupValues);
+    setWorkgroupValues((prev) => {
+      const updated = new Map(prev);
+      updated.set(event.target.name, event.target.checked);
+      return updated;
+    });
   };
+
+  useEffect(() => {
+    const selectedWorkgroups = Array.from(workgroupValues.entries())
+      .filter(([_, checked]) => checked)
+      .map(([name]) => name);
+    formMethods.setValue("workgroups", selectedWorkgroups, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  }, [workgroupValues, formMethods]);
 
   return (
     <FormProvider {...formMethods}>
@@ -307,7 +328,7 @@ const UpdateCollection = ({
                 const $result = transitionCollection(collection.id, {
                   state: CollectionFilterStatus.PENDING,
                 });
-                console.log("result", $result);
+
                 notify.success(
                   `Requested for collection "${collection.name}" to be made active`
                 );
@@ -353,23 +374,16 @@ const UpdateCollection = ({
           name="workgroups"
           disabled={!expandedRight}
           control={control}
-          render={({ field }) => {
+          render={() => {
             return (
-              <FormGroup {...field}>
+              <FormGroup>
                 <Box display="flex" flexDirection="column">
                   {workgroups?.map((w) => (
                     <FormControlLabel
                       disabled={!expandedRight}
                       control={
                         <Checkbox
-                          checked={
-                            //use .some
-                            (
-                              collection.workgroups?.filter(
-                                (cw) => cw.id === w.id
-                              ) || []
-                            ).length > 0
-                          }
+                          checked={Boolean(workgroupValues.get(w.name))}
                           key={`wg-checkbox-${w.name}`}
                           name={w.name}
                           onChange={handleChange}
