@@ -1,5 +1,11 @@
 "use client";
-import { CollectionWithHosts, CollectionHost, Paginated, CollectionsSearchParams } from "@/types/api";
+import {
+  CollectionWithHosts,
+  CollectionHost,
+  Paginated,
+  CollectionsSearchParams,
+  Workgroup,
+} from "@/types/api";
 import { Box, Skeleton } from "@mui/material";
 import Title from "@/components/Title";
 import ThreePaneSwimLaneLayout, {
@@ -17,10 +23,12 @@ const CollectionsCustodianAdmin = ({
   pid,
   collections,
   collectionHosts,
+  workgroups,
 }: {
   pid: string;
   collections: Paginated<CollectionWithHosts[]>;
   collectionHosts: CollectionHost[];
+  workgroups: Workgroup[];
 }) => {
   const custodian = useCustodianStore(
     (custodianData) => custodianData.currentCustodian
@@ -79,7 +87,9 @@ const CollectionsCustodianAdmin = ({
         middle={<CollectionsTable initialData={collections} />}
         right={
           <CollectionsRightPanel
+            //TODO: how do we pass the selected collection's workgroups?
             collectionHosts={collectionHosts}
+            workgroups={workgroups}
             expandedRight={expandedRight}
             expandedLeft={expandedLeft}
             onClose={() => toggleExpandRight()}

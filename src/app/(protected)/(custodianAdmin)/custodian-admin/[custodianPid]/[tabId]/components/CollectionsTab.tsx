@@ -1,3 +1,4 @@
+import getAdminWorkgroups from "@/actions/getAdminWorkgroups";
 import CollectionsCustodianAdmin from "./CollectionsCustodianAdmin";
 import getCustodianCollectionHosts from "@/actions/getCustodianCollectionHosts";
 import getCustodianCollections from "@/actions/getCustodianCollections";
@@ -21,17 +22,22 @@ const CollectionsTab = async ({
 }) => {
   const params = buildCollectionParams(searchParams);
 
-  const [{ data: collectionHosts }, { data: custodianCollections }] =
-    await Promise.all([
-      getCustodianCollectionHosts(custodianPid),
-      getCustodianCollections(custodianPid, { params }),
-    ]);
+  const [
+    { data: collectionHosts },
+    { data: custodianCollections },
+    { data: workgroups },
+  ] = await Promise.all([
+    getCustodianCollectionHosts(custodianPid),
+    getCustodianCollections(custodianPid, { params }),
+    getAdminWorkgroups(),
+  ]);
 
   return (
     <CollectionsCustodianAdmin
       pid={custodianPid}
       collectionHosts={collectionHosts}
       collections={custodianCollections}
+      workgroups={workgroups}
     />
   );
 };
