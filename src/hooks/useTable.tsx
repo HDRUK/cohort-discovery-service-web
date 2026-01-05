@@ -9,7 +9,7 @@ import { useMemo } from "react";
 import SquareCheckbox from "@/components/SquareCheckbox";
 import { Tooltip } from "@mui/material";
 
-const SELECT_COL_SIZE = 30;
+const SELECT_COL_SIZE = 60;
 
 export const useTable = <TData extends MRT_RowData>({
   columns,
