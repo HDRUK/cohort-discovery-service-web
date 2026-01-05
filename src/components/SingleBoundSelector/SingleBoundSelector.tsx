@@ -1,7 +1,8 @@
 "use client";
 
-import { Paper, Stack, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { Paper, Stack } from "@mui/material";
 import { ReactNode, useMemo } from "react";
+import OperatorToggle from "./OpperatorToggle";
 
 export enum SingleSidedOperator {
   GREATER_THAN = "gt",
@@ -113,7 +114,7 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
   };
 
   const greaterThanLabel =
-    operatorLabelOverrides?.get(SingleSidedOperator.GREATER_THAN) ?? ">";
+    operatorLabelOverrides?.get(SingleSidedOperator.GREATER_THAN) ?? "≥";
   const lessThanLabel =
     operatorLabelOverrides?.get(SingleSidedOperator.LESS_THAN) ?? "<";
 
@@ -143,28 +144,21 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
             return <Paper sx={{ border: 1, p: 1 }}>{defaultText}</Paper>;
           })()
         ) : (
-          <>
-            <ToggleButtonGroup
-              exclusive
-              size="small"
-              value={operator}
-              onChange={handleOperatorChange}
-              disabled={!!readOnly}
-            >
-              <ToggleButton value={SingleSidedOperator.GREATER_THAN}>
-                {greaterThanLabel}
-              </ToggleButton>
-              <ToggleButton value={SingleSidedOperator.LESS_THAN}>
-                {lessThanLabel}
-              </ToggleButton>
-            </ToggleButtonGroup>
+          <Stack direction={"row"} gap={1} alignItems={"center"}>
+            <OperatorToggle
+              operator={operator}
+              handleOperatorChange={handleOperatorChange}
+              readOnly={readOnly}
+              greaterThanLabel={greaterThanLabel}
+              lessThanLabel={lessThanLabel}
+            />
 
             {renderPicker({
               value,
               onChange: handleValueChange,
               readOnly,
             })}
-          </>
+          </Stack>
         )}
       </Stack>
       {children}
