@@ -325,7 +325,7 @@ const UpdateCollection = ({
             <AddButton
               label={"Request to make active"}
               action={() => {
-                const $result = transitionCollection(collection.id, {
+                transitionCollection(collection.id, {
                   state: CollectionFilterStatus.PENDING,
                 });
 

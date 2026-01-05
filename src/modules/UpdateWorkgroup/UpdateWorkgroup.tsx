@@ -13,7 +13,6 @@ import FormMultiSelect from "@/components/FormMultiSelect";
 import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
 import useAdminStore from "@/store/useAdminStore";
 import { TAG_CUSTODIAN_COLLECTION, TAG_WORKGROUP_ADMIN } from "@/config/tags";
-import addCollectionsToWorkgroup from "@/actions/addCollectionsToWorkgroup";
 export type UpdateWorkgroupProps = {
   collections: Collection[];
   expandedRight: boolean;
