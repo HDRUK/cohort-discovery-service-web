@@ -1,6 +1,12 @@
 "use client";
 
-import { Paper, Slider, Stack, TextField } from "@mui/material";
+import {
+  FormControlLabel,
+  Paper,
+  Slider,
+  Stack,
+  TextField,
+} from "@mui/material";
 import { ReactNode, useMemo, useState } from "react";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import { isAgeFilter, isRuleLeaf, updateById } from "@/utils/rules";
@@ -41,7 +47,7 @@ export const RuleAgeSelectorReadOnly = ({
   } else if (from === minAge) {
     label = `Age < ${to}`;
   } else if (to === maxAge) {
-    label = `Age > ${from}`;
+    label = `Age ≥ ${from}`;
   } else {
     label = `Age ${from} - ${to}`;
   }
@@ -168,26 +174,33 @@ const RuleAgeSelector = ({
             );
           }}
           renderPicker={({ value, onChange }) => (
-            <TextField
-              size="small"
-              type="number"
-              value={value ?? ""}
-              slotProps={{
-                htmlInput: { min: minAge, max: maxAge },
-              }}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-              }}
-              onChange={(e) => {
-                const raw = e.target.value;
-                if (raw === "") return onChange(null);
+            <FormControlLabel
+              sx={{ m: 0 }}
+              control={
+                <TextField
+                  size="small"
+                  type="number"
+                  value={value ?? ""}
+                  slotProps={{
+                    htmlInput: { min: minAge, max: maxAge },
+                  }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    if (raw === "") return onChange(null);
 
-                const n = Number(raw);
-                if (Number.isNaN(n)) return;
+                    const n = Number(raw);
+                    if (Number.isNaN(n)) return;
 
-                onChange(clamp(n, minAge, maxAge));
-              }}
+                    onChange(clamp(n, minAge, maxAge));
+                  }}
+                />
+              }
+              slotProps={{ typography: { sx: { mx: 1 } } }}
+              label="Years"
             />
           )}
           renderReadOnlyLabel={() => (
