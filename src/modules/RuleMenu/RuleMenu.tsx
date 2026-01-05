@@ -9,7 +9,7 @@ const isTest = process.env.NODE_ENV === "test";
 
 const Guidance = isTest
   ? () => null
-  : dynamic(() => import("../Guidance"), { ssr: false, loading: SkeletonFull });
+  : dynamic(() => import("../Guidance"), { ssr: false, loading: () => <SkeletonFull/> });
 
 const RuleMenu = () => {
   return <Guidance />;
