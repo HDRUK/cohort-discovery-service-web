@@ -24,8 +24,8 @@ const UpdateWorkgroup = ({
   expandedRight,
   onClose,
 }: UpdateWorkgroupProps) => {
-  const addCollectionToWorkgroup = useAdminStore(
-    (s) => s.addCollectionToWorkgroup
+  const addCollectionsToWorkgroup = useAdminStore(
+    (s) => s.addCollectionsToWorkgroup
   );
   const selectedWorkgroup = useAdminStore((s) => s.selectedWorkgroup);
 
@@ -61,13 +61,11 @@ const UpdateWorkgroup = ({
     const { id } = selectedWorkgroup;
 
     if (data.collections.length > 0) {
-      data.collections.map(async (collection) => {
-        await addCollectionToWorkgroup({
-          id: +collection.value,
-          workgroup_id: id,
-        });
-        notify.success(`Updated workgroup ${selectedWorkgroup?.name}`);
+      await addCollectionsToWorkgroup({
+        ids: data.collections.map((c) => +c.value),
+        workgroup_id: id,
       });
+      notify.success(`Updated workgroup ${selectedWorkgroup?.name}`);
 
       revalidateAction(TAG_CUSTODIAN_COLLECTION);
       revalidateAction(TAG_WORKGROUP_ADMIN);

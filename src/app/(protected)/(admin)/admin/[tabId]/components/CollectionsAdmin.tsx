@@ -5,6 +5,7 @@ import {
   Paginated,
   Custodian,
   CollectionsSearchParams,
+  Workgroup,
 } from "@/types/api";
 import { Box, Skeleton } from "@mui/material";
 import Title from "@/components/Title";
@@ -21,10 +22,12 @@ const CollectionAdmin = ({
   collections,
   collectionHosts,
   custodians,
+  workgroups,
 }: {
   collections: Paginated<CollectionWithHosts[]>;
   collectionHosts: CollectionHost[];
   custodians: Custodian[];
+  workgroups: Workgroup[];
 }) => {
   const [expandedSide, setExpandedSide] = useState<ExpandedSide | null>(null);
   const expandedLeft = expandedSide === ExpandedSide.LEFT;
@@ -69,6 +72,7 @@ const CollectionAdmin = ({
         right={
           <CollectionsRightPanel
             collectionHosts={collectionHosts}
+            workgroups={workgroups}
             expandedRight={expandedRight}
             expandedLeft={expandedLeft}
             onClose={() => toggleExpandRight()}

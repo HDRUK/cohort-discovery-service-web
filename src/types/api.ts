@@ -149,6 +149,7 @@ export interface CollectionConfig {
 export interface CollectionWithHosts extends Collection {
   host: CollectionHost[];
   config: CollectionConfig;
+  workgroups?: Workgroup[];
 }
 
 export interface Result extends WithTimestamps {
@@ -343,6 +344,10 @@ export interface UpdateCollectionPayload {
   query_context_type?: string;
 }
 
+export interface TransitionCollectionPut {
+  state: string;
+}
+
 export interface CreateCollectionConfigPost {
   collection_id: number;
   run_time_hour: number;
@@ -366,14 +371,24 @@ export interface CreateWorkgroupPost {
   active: boolean;
 }
 
-export interface AddCollectionToWorkgroupPost {
-  id: number;
+export interface AddCollectionsToWorkgroupPost {
+  ids: number[];
   workgroup_id: number;
+}
+
+export interface AddCollectionToWorkgroupsPost {
+  id: number;
+  workgroup_ids: number[];
 }
 
 export interface RemoveCollectionsFromWorkgroupPost {
   ids: number[];
   workgroup_id: number;
+}
+
+export interface RemoveCollectionFromWorkgroupsPost {
+  id: number;
+  workgroup_ids: number[];
 }
 
 export interface Concept {

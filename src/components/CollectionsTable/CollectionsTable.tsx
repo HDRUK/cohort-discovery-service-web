@@ -11,8 +11,7 @@ import {
   type MRT_ColumnDef,
 } from "material-react-table";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Box, Chip, Tooltip, Typography } from "@mui/material";
-import { getCollectionStatus } from "@/utils/colours";
+import { Box, Tooltip, Typography } from "@mui/material";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import Table from "@/components/Table";
 import CopyableVariable from "../CopyableVariable";
@@ -33,6 +32,7 @@ import useUserStore from "@/store/useUserStore";
 import { useNotify } from "@/providers/NotifyProvider";
 import { getTagCustodianCollection, TAG_COLLECTION_ADMIN } from "@/config/tags";
 import { buildCollectionParams } from "@/utils/params";
+import StatusChip from "@/components/StatusChip";
 
 export interface CollectionsTableProps {
   initialData: Paginated<CollectionWithHosts[]>;
@@ -61,8 +61,8 @@ const CollectionsTable = ({
   const deleteCollectionAdmin = useAdminStore((s) => s.deleteCollection);
   const deleteCollection = useCustodianStore((s) => s.deleteCollection);
   const currentCustodian = useCustodianStore((s) => s.currentCustodian);
-  const selectedCollection = useUserStore((s) => s.selectedCollection);
-  const setSelectedCollection = useUserStore((s) => s.setSelectedCollection);
+  const selectedCollections = useUserStore((s) => s.selectedCollections);
+  const setSelectedCollections = useUserStore((s) => s.setSelectedCollections);
 
   const notify = useNotify();
 
@@ -146,20 +146,16 @@ const CollectionsTable = ({
   );
 
   useEffect(() => {
-    const newSelectedCollection =
-      selectedCollectionIds.length > 0
-        ? collections.data.find(
-            (h) =>
-              String(h.id) ===
-              selectedCollectionIds[selectedCollectionIds.length - 1]
-          ) ?? null
-        : null;
-    setSelectedCollection(newSelectedCollection);
+    const newSelectedCollections = selectedCollectionIds
+      .map((id) => collections.data.find((c) => String(c.id) === id) || null)
+      .filter((c) => c !== null);
+
+    setSelectedCollections(newSelectedCollections);
   }, [
     collections.data,
-    selectedCollection,
+    selectedCollections,
     selectedCollectionIds,
-    setSelectedCollection,
+    setSelectedCollections,
   ]);
 
   const columns = useMemo<MRT_ColumnDef<Collection>[]>(
@@ -245,8 +241,7 @@ const CollectionsTable = ({
         accessorFn: (row) => row.model_state?.state_id,
         Cell: ({ cell }) => {
           const status = cell.getValue<CollectionStatus>();
-          const { label, color } = getCollectionStatus(status);
-          return <Chip label={label} color={color} />;
+          return <StatusChip state_id={status} />;
         },
         size: 20,
         minSize: 20,
@@ -305,7 +300,7 @@ const CollectionsTable = ({
     getSearchParam,
     rowSelection,
     setRowSelection,
-    setSelectedCollection,
+    setSelectedCollections,
     deleteCollection,
     deleteCollectionAdmin,
   });

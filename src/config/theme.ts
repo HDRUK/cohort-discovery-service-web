@@ -231,6 +231,13 @@ export const themeOptions: ThemeOptions = {
         }),
       },
     },
+    MuiChip: {
+      styleOverrides: {
+        root: () => ({
+          borderRadius: 20,
+        }),
+      },
+    },
     MuiTooltip: {
       styleOverrides: {
         popper: {

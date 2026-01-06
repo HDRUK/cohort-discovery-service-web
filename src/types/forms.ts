@@ -14,6 +14,7 @@ export interface CreateCollectionFormValues {
 export interface UpdateCollectionFormValues {
   collection: Partial<CreateCollectionPost>;
   config: Partial<CreateCollectionConfigPost>;
+  workgroups: string[];
 }
 
 export interface UpdateWorkgroupFormValues {
