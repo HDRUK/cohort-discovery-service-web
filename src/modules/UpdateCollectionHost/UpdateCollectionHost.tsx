@@ -1,8 +1,7 @@
 "use client";
-import { Typography, IconButton, TextField, Stack } from "@mui/material";
+import { Typography, IconButton, Stack } from "@mui/material";
 import LockOutlineIcon from "@mui/icons-material/LockOutline";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
-import ActionMenuSection from "@/components/ActionMenuSection";
 import CopyableVariable from "@/components/CopyableVariable";
 import { CollectionHost } from "@/types/api";
 import { Controller, FormProvider, useForm } from "react-hook-form";

@@ -4,13 +4,13 @@ import {
 } from "@mui/material";
 
 export interface FormLabelProps extends MuiFormLabelProps {
-  labelRegular?: boolean;
-  labelUnderlined?: boolean;
+  regular?: boolean;
+  underlined?: boolean;
 }
 
 const FormLabel = ({
-  labelRegular = true,
-  labelUnderlined = false,
+  regular = true,
+  underlined = false,
   sx,
   ...props
 }: FormLabelProps) => {
@@ -18,8 +18,8 @@ const FormLabel = ({
     <MuiFormLabel
       {...props}
       sx={{
-        ...(labelRegular ? { fontWeight: 400 } : null),
-        ...(labelUnderlined ? { borderBottom: 1, mb: 1 } : null),
+        ...(regular ? { fontWeight: 400 } : null),
+        ...(underlined ? { borderBottom: 1, mb: 1 } : null),
         ...sx,
       }}
     />

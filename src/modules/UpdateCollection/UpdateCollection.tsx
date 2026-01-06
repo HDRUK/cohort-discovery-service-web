@@ -313,7 +313,7 @@ const UpdateCollection = ({
         </IconButton>
       </Typography>
 
-      <FormLabel labelUnderlined>Collection Status</FormLabel>
+      <FormLabel underlined>Collection Status</FormLabel>
       {collection?.model_state?.state_id != CollectionStatus.DRAFT && (
         <Box sx={{ mb: 1 }}>
           <StatusChip state_id={collection?.model_state?.state_id} />
@@ -341,12 +341,20 @@ const UpdateCollection = ({
             collection?.model_state?.state_id == CollectionStatus.ACTIVE ||
             collection?.model_state?.state_id == CollectionStatus.REJECTED)} */}
 
-      <FormLabel labelUnderlined>Workgroup access</FormLabel>
+      <FormLabel underlined>Workgroup access</FormLabel>
 
-      <Box>
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 1,
+          alignItems: "center",
+        }}
+      >
         {collection.workgroups?.map((w) => (
           <Chip color="secondary" label={w.name} key={`wg-chip-${w.name}`} />
-        )) ?? "No workgroups set"}
+        )) ??
+          (!expandedRight && "No workgroups set")}
       </Box>
       {/* note to self - we should rework table row selection so only clicking the checkbox 
         will add to the multi-select, perhaps along with a shift-click anywhere on the row. 
@@ -429,7 +437,7 @@ const UpdateCollection = ({
         />
 
         <Stack>
-          <FormLabel labelUnderlined>Collection Connection</FormLabel>
+          <FormLabel underlined>Collection Connection</FormLabel>
           <Controller
             name="collection.host_id"
             control={control}
@@ -462,7 +470,7 @@ const UpdateCollection = ({
         </Stack>
 
         <Stack>
-          <FormLabel labelUnderlined>Host Credentials</FormLabel>
+          <FormLabel underlined>Host Credentials</FormLabel>
 
           <FormTextField
             copyable

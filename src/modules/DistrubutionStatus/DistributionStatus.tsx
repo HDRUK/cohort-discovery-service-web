@@ -37,7 +37,7 @@ const DistributionStatus = ({
 
   return (
     <Stack spacing={1} height={"100%"} justifyContent={"center"}>
-      <FormLabel labelUnderlined> Distribution Status</FormLabel>
+      <FormLabel underlined> Distribution Status</FormLabel>
       <Box>
         <Typography variant="body2" component={"div"}>
           Demographics:{" "}

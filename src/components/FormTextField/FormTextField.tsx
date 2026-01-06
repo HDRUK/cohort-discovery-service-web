@@ -48,8 +48,8 @@ const FormTextField = ({
         <FormLabel
           htmlFor={inputId}
           required={required}
-          labelRegular={labelRegular}
-          labelUnderlined={labelUnderlined}
+          regular={labelRegular}
+          underlined={labelUnderlined}
         >
           {label}
         </FormLabel>
