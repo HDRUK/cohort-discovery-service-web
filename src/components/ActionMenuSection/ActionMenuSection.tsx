@@ -33,6 +33,7 @@ export interface ActionMenuSectionProps
   scrollable?: boolean;
   collapseAt?: number;
   compact?: boolean;
+  gap?: number;
   accordionSummarySx?: BoxProps["sx"];
   children?:
     | React.ReactNode
@@ -56,6 +57,7 @@ const ActionMenuSection = ({
   accordionSummarySx,
   scrollable = false,
   collapseAt = 100,
+  gap = 0.5,
   compact: compactProp,
   ...rest
 }: ActionMenuSectionProps) => {
@@ -188,7 +190,7 @@ const ActionMenuSection = ({
             p: 0,
             display: "flex",
             flexDirection: "column",
-            gap: 0.5,
+            gap,
             ...(scrollable && {
               flex: 1,
               minHeight: 0,

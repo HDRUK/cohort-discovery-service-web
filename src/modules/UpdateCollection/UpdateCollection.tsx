@@ -5,7 +5,7 @@ import {
   Chip,
   Box,
   MenuItem,
-  Checkbox,
+  Stack,
   FormGroup,
   FormControlLabel,
 } from "@mui/material";
@@ -36,12 +36,19 @@ import {
   getTagCustodianCollection,
   TAG_CUSTODIAN_COLLECTION,
 } from "@/config/tags";
+import FormLabel from "@/components/FormLabel";
+import { maskClientTest } from "@/lib/maskClientTest";
 import StatusChip from "@/components/StatusChip";
 import transitionCollection from "@/actions/transitionCollection";
 import { CollectionFilterStatus } from "@/types/collections";
 import useAdminStore from "@/store/useAdminStore";
 import removeCollectionFromWorkgroups from "@/actions/removeCollectionFromWorkgroups";
 import addCollectionToWorkgroups from "@/actions/addCollectionToWorkgroups";
+import SquareCheckbox from "@/components/SquareCheckbox";
+
+const UpdateCollectionGuidance = maskClientTest(
+  () => import("./UpdateCollectionGuidance")
+);
 
 export type UpdateCollectionProps = {
   collection: CollectionWithHosts;
@@ -306,115 +313,210 @@ const UpdateCollection = ({
         </IconButton>
       </Typography>
 
-      <ActionMenuSection
-        title={"Collection Status"}
-        fixedExpanded
-        defaultExpanded
-        underline
-      >
-        {collection?.model_state?.state_id != CollectionStatus.DRAFT && (
-          <Box>
-            <StatusChip
-              state_id={collection?.model_state?.state_id}
-              sx={{ my: 1 }}
-            />
-          </Box>
-        )}
-        {collection?.model_state?.state_id == CollectionStatus.DRAFT &&
-          collection?.model_state?.state && (
-            <AddButton
-              label={"Request to make active"}
-              action={() => {
-                transitionCollection(collection.id, {
-                  state: CollectionFilterStatus.PENDING,
-                });
+      <FormLabel underlined>Collection Status</FormLabel>
+      {collection?.model_state?.state_id != CollectionStatus.DRAFT && (
+        <Box sx={{ mb: 1 }}>
+          <StatusChip state_id={collection?.model_state?.state_id} />
+        </Box>
+      )}
+      {collection?.model_state?.state_id == CollectionStatus.DRAFT &&
+        collection?.model_state?.state && (
+          <AddButton
+            disabled={!expandedRight}
+            label={"Request to make active"}
+            action={() => {
+              transitionCollection(collection.id, {
+                state: CollectionFilterStatus.PENDING,
+              });
 
-                notify.success(
-                  `Requested for collection "${collection.name}" to be made active`
-                );
-              }}
-            />
-          )}
-        {/* Handle the logic of when to display checkboxes for certain states - this needs the logic explained before implementation
+              notify.success(
+                `Requested for collection "${collection.name}" to be made active`
+              );
+            }}
+          />
+        )}
+      {/* Handle the logic of when to display checkboxes for certain states - this needs the logic explained before implementation
         {!currentCustodian &&
           (collection?.model_state?.state_id == CollectionStatus.DRAFT ||
             collection?.model_state?.state_id == CollectionStatus.ACTIVE ||
             collection?.model_state?.state_id == CollectionStatus.REJECTED)} */}
-      </ActionMenuSection>
 
-      <ActionMenuSection
-        title={"Status Guidance"}
-        fixedExpanded
-        defaultExpanded
-        underline
-      >
-        {/* to-do: implement in a future ticket */}
-        Lorem ipsum dolor sit amet,nconsectetur adipiscing elit.
-      </ActionMenuSection>
+      <FormLabel underlined>Workgroup access</FormLabel>
 
-      <ActionMenuSection
-        title={"Workgroup access"}
-        fixedExpanded
-        defaultExpanded
-        underline
-        accordionSummarySx={{
-          mb: 1,
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 1,
+          alignItems: "center",
         }}
       >
-        <Box>
-          {collection.workgroups?.map((w) => (
-            <Chip color="secondary" label={w.name} key={`wg-chip-${w.name}`} />
-          ))}
-        </Box>
-        {/* note to self - we should rework table row selection so only clicking the checkbox 
+        {collection.workgroups?.map((w) => (
+          <Chip color="secondary" label={w.name} key={`wg-chip-${w.name}`} />
+        )) ??
+          (!expandedRight && "No workgroups set")}
+      </Box>
+      {/* note to self - we should rework table row selection so only clicking the checkbox 
         will add to the multi-select, perhaps along with a shift-click anywhere on the row. 
         This will stop the annoyance of having to click twice on one row to deselect it ahead 
         of selecting the next one */}
+
+      {expandedRight && (
         <Controller
           name="workgroups"
-          disabled={!expandedRight}
           control={control}
-          render={() => {
-            return (
-              <FormGroup>
-                <Box display="flex" flexDirection="column">
-                  {workgroups?.map((w) => (
-                    <FormControlLabel
-                      disabled={!expandedRight}
-                      control={
-                        <Checkbox
-                          checked={Boolean(workgroupValues.get(w.name))}
-                          key={`wg-checkbox-${w.name}`}
-                          name={w.name}
-                          onChange={handleChange}
-                        />
-                      }
-                      label={w.name}
-                      key={`wg-checkbox-label-${w.name}`}
-                    />
-                  ))}
-                </Box>
-              </FormGroup>
-            );
-          }}
+          render={() => (
+            <FormGroup>
+              <Box display="flex" flexDirection="column">
+                {workgroups?.map((w) => (
+                  <FormControlLabel
+                    control={
+                      <SquareCheckbox
+                        checked={Boolean(workgroupValues.get(w.name))}
+                        key={`wg-checkbox-${w.name}`}
+                        name={w.name}
+                        onChange={handleChange}
+                      />
+                    }
+                    label={w.name}
+                    key={`wg-checkbox-label-${w.name}`}
+                  />
+                ))}
+              </Box>
+            </FormGroup>
+          )}
+        />
+      )}
+
+      <ActionMenuSection
+        gap={2}
+        title={"Collection Credentials"}
+        fixedExpanded
+        defaultExpanded
+        accordionSummarySx={{
+          mt: 2,
+        }}
+      >
+        {/* missing in the BE - ticket created
+        <FormTextField
+        value={collection.custodian.url}
+          copyable
+          label="Link to Custodian Page"
+          labelUnderlined
+        />
+        */}
+
+        <FormTextField
+          labelUnderlined
+          copyable
+          disabled
+          value={collection.pid}
+          label="Collection ID"
+        />
+
+        <Controller
+          disabled={!expandedRight}
+          name="collection.url"
+          control={control}
+          rules={{ required: "URL is required" }}
+          render={({ field, fieldState: { error } }) => (
+            <FormTextField
+              copyable
+              {...field}
+              label="Link to Associated Dataset"
+              labelUnderlined
+              error={error}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleEnter();
+                }
+              }}
+            />
+          )}
+        />
+
+        <Stack>
+          <FormLabel underlined>Collection Connection</FormLabel>
+          <Controller
+            name="collection.host_id"
+            control={control}
+            rules={{
+              required: "A collection host is required",
+              validate: (value) =>
+                Number(value) > 0 || "Please select a valid collection host",
+            }}
+            render={({ field, fieldState: { error } }) => (
+              <FormDropdown
+                {...field}
+                select
+                label="Host"
+                error={error}
+                fullWidth
+                required
+                placeHolderOption={
+                  <MenuItem value={0} disabled>
+                    Select a collection host
+                  </MenuItem>
+                }
+                options={collectionHosts.map((ch) => ({
+                  label: ch.name,
+                  value: ch.id,
+                }))}
+                chipColor="secondary"
+              />
+            )}
+          />
+        </Stack>
+
+        <Stack>
+          <FormLabel underlined>Host Credentials</FormLabel>
+
+          <FormTextField
+            copyable
+            disabled
+            value={collection.host?.[0]?.client_id}
+            label="Client ID"
+          />
+          <FormTextField
+            type="password"
+            copyable
+            disabled
+            value={collection.host?.[0]?.client_secret}
+            label="Client Secret"
+          />
+        </Stack>
+      </ActionMenuSection>
+
+      <ActionMenuSection
+        gap={2}
+        title={"Collection Distributions"}
+        fixedExpanded
+        defaultExpanded
+        accordionSummarySx={{
+          mt: 2,
+        }}
+      >
+        <DistributionStatus disabled={!expandedRight} collection={collection} />
+        <CollectionConfig<UpdateCollectionFormValues>
+          disabled={!expandedRight}
+          keepExpanded
+          frequencyFieldName={"config.frequency_mode"}
+          runTimeFrequencyFieldName={"config.run_time_frequency"}
+          runTimeHourFieldName={"config.run_time_hour"}
+          runTimeMinuteFieldName={"config.run_time_minute"}
         />
       </ActionMenuSection>
 
       <ActionMenuSection
+        gap={2}
         title={"Collection Info"}
         fixedExpanded
         defaultExpanded
-        underline
         accordionSummarySx={{
-          mb: 1,
+          mt: 2,
         }}
       >
-        <FormTextField
-          copyable
-          disabled
-          value={collection.pid}
-          label="Identifier"
-        />
         <Controller
           name="collection.name"
           disabled={!expandedRight}
@@ -426,6 +528,7 @@ const UpdateCollection = ({
               label="Name"
               error={error}
               fullWidth
+              labelUnderlined
               required
             />
           )}
@@ -441,90 +544,13 @@ const UpdateCollection = ({
               label="Description"
               error={error}
               fullWidth
+              labelUnderlined
               required
             />
           )}
         />
-        <Controller
-          disabled={!expandedRight}
-          name="collection.url"
-          control={control}
-          rules={{ required: "URL is required" }}
-          render={({ field, fieldState: { error } }) => (
-            <FormTextField
-              copyable
-              {...field}
-              label="Link to Associated Dataset"
-              error={error}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleEnter();
-                }
-              }}
-            />
-          )}
-        />
-        <Controller
-          name="collection.host_id"
-          control={control}
-          rules={{
-            required: "A collection host is required",
-            validate: (value) =>
-              Number(value) > 0 || "Please select a valid collection host",
-          }}
-          render={({ field, fieldState: { error } }) => (
-            <FormDropdown
-              {...field}
-              select
-              label="Collection Host"
-              error={error}
-              fullWidth
-              required
-              placeHolderOption={
-                <MenuItem value={0} disabled>
-                  Select a collection host
-                </MenuItem>
-              }
-              options={collectionHosts.map((ch) => ({
-                label: ch.name,
-                value: ch.id,
-              }))}
-              chipColor="secondary"
-            />
-          )}
-        />
-
-        <FormTextField
-          copyable
-          disabled
-          value={collection.host?.[0]?.client_id}
-          label="Client ID"
-        />
-        <FormTextField
-          type="password"
-          copyable
-          disabled
-          value={collection.host?.[0]?.client_secret}
-          label="Client Secret"
-        />
-      </ActionMenuSection>
-
-      <ActionMenuSection
-        title={"Collection Configuration"}
-        fixedExpanded
-        defaultExpanded
-        underline
-      >
-        <DistributionStatus disabled={!expandedRight} collection={collection} />
-        <CollectionConfig<UpdateCollectionFormValues>
-          disabled={!expandedRight}
-          keepExpanded
-          frequencyFieldName={"config.frequency_mode"}
-          runTimeFrequencyFieldName={"config.run_time_frequency"}
-          runTimeHourFieldName={"config.run_time_hour"}
-          runTimeMinuteFieldName={"config.run_time_minute"}
-        />
+        {/* supposed to also have supoprt contact / adminstractive contact */}
+        <UpdateCollectionGuidance />
       </ActionMenuSection>
     </FormProvider>
   );

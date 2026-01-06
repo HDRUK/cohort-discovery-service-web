@@ -14,6 +14,7 @@ import { FrequencyMode, frequencyMap } from "@/types/api";
 import FormRadioGroup from "@/components/FormRadioGroup";
 import { useEffect, useMemo, useState } from "react";
 import HourMinuteSelect from "../HourMinuteSelect";
+import FormLabel from "../FormLabel";
 
 interface BaseCollectionConfigProps {
   disabled?: boolean;
@@ -76,70 +77,80 @@ const CollectionConfig = <TFormValues extends FieldValues>({
   }, [runTimeFrequencyFieldName, frequencyField, setValue]);
 
   return (
-    <Stack spacing={2} width={300} height={"100%"}>
-      <Typography> Configuration Frequency</Typography>
-      <Box sx={{ display: "flex", gap: 2 }}>
-        <Chip
-          onClick={
-            keepExpanded
-              ? undefined
-              : () => setFrequencyExpanded((prev) => !prev)
-          }
-          color="secondary"
-          label={getEnumLabel(FrequencyMode, String(frequencyField))}
-        />
-        <Chip
-          color="secondary"
-          variant="outlined"
-          label={frequencyLabels[runTime]}
-        />
-      </Box>
-      {frequencyExpanded && !disabled && (
-        <>
-          <Controller
-            name={frequencyFieldName}
-            control={control}
-            rules={{ required: "Frequency Mode is required" }}
-            render={({ field, fieldState }) => (
-              <FormRadioGroup
-                {...field}
-                onChange={(_event, value) => field.onChange(Number(value))}
-                label="Frequency"
-                error={!!fieldState.error}
-                required
-                options={Object.entries(FrequencyMode).map(([key, value]) => ({
-                  value: Number(value),
-                  label: capitaliseFirstLetter(key.toLowerCase()),
-                }))}
-              />
-            )}
+    <Stack>
+      <FormLabel underlined> Configuration Frequency</FormLabel>
+      <Stack spacing={1} width={300} height={"100%"}>
+        <Box sx={{ display: "flex", gap: 2 }}>
+          <Chip
+            onClick={
+              keepExpanded
+                ? undefined
+                : () => setFrequencyExpanded((prev) => !prev)
+            }
+            color="secondary"
+            label={getEnumLabel(FrequencyMode, String(frequencyField))}
           />
+          <Chip
+            color="secondary"
+            variant="outlined"
+            label={frequencyLabels[runTime]}
+          />
+        </Box>
+        {frequencyExpanded && !disabled && (
+          <>
+            <Controller
+              name={frequencyFieldName}
+              control={control}
+              rules={{ required: "Frequency Mode is required" }}
+              render={({ field, fieldState }) => (
+                <FormRadioGroup
+                  {...field}
+                  onChange={(_event, value) => field.onChange(Number(value))}
+                  label="Frequency"
+                  error={!!fieldState.error}
+                  required
+                  options={Object.entries(FrequencyMode).map(
+                    ([key, value]) => ({
+                      value: Number(value),
+                      label: capitaliseFirstLetter(key.toLowerCase()),
+                    })
+                  )}
+                />
+              )}
+            />
 
-          <Controller
-            name={runTimeFrequencyFieldName}
-            control={control}
-            rules={{ required: "Run time frequency is required" }}
-            render={({ field, fieldState: { error } }) => (
-              <FormTextField {...field} error={error} select fullWidth required>
-                {options.map((opt) => (
-                  <MenuItem key={opt} value={opt}>
-                    {frequencyLabels[opt]}
-                  </MenuItem>
-                ))}
-              </FormTextField>
-            )}
-          />
-        </>
-      )}
-      {!hideSynchronisationTime && (
-        <Typography> Synchronisation Time</Typography>
-      )}
-      <HourMinuteSelect<TFormValues>
-        hourValueName={runTimeHourFieldName}
-        minuteValueName={runTimeMinuteFieldName}
-        control={control}
-        hidden={hideSynchronisationTime}
-      />
+            <Controller
+              name={runTimeFrequencyFieldName}
+              control={control}
+              rules={{ required: "Run time frequency is required" }}
+              render={({ field, fieldState: { error } }) => (
+                <FormTextField
+                  {...field}
+                  error={error}
+                  select
+                  fullWidth
+                  required
+                >
+                  {options.map((opt) => (
+                    <MenuItem key={opt} value={opt}>
+                      {frequencyLabels[opt]}
+                    </MenuItem>
+                  ))}
+                </FormTextField>
+              )}
+            />
+          </>
+        )}
+        {!hideSynchronisationTime && (
+          <Typography> Synchronisation Time</Typography>
+        )}
+        <HourMinuteSelect<TFormValues>
+          hourValueName={runTimeHourFieldName}
+          minuteValueName={runTimeMinuteFieldName}
+          control={control}
+          hidden={hideSynchronisationTime}
+        />
+      </Stack>
     </Stack>
   );
 };

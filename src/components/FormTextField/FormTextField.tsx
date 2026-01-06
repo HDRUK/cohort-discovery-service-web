@@ -2,12 +2,12 @@ import { useId } from "react";
 import {
   Box,
   FormControl,
-  FormLabel,
   IconButton,
   OutlinedTextFieldProps,
   Stack,
   TextField,
 } from "@mui/material";
+import FormLabel from "@/components/FormLabel";
 import { useNotify } from "@/providers/NotifyProvider";
 import { CopyAllOutlined } from "@mui/icons-material";
 import { FieldError } from "react-hook-form";
@@ -18,6 +18,8 @@ export interface FormTextFieldProps
   required?: boolean;
   copyable?: boolean;
   error?: FieldError;
+  labelRegular?: boolean;
+  labelUnderlined?: boolean;
 }
 
 const FormTextField = ({
@@ -27,6 +29,8 @@ const FormTextField = ({
   required = false,
   copyable = false,
   error,
+  labelRegular = true,
+  labelUnderlined = false,
   ...props
 }: FormTextFieldProps) => {
   const generatedId = useId();
@@ -41,7 +45,12 @@ const FormTextField = ({
   return (
     <FormControl fullWidth error={!!error} required={required}>
       {label && (
-        <FormLabel htmlFor={inputId} required={required}>
+        <FormLabel
+          htmlFor={inputId}
+          required={required}
+          regular={labelRegular}
+          underlined={labelUnderlined}
+        >
           {label}
         </FormLabel>
       )}
