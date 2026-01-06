@@ -18,8 +18,10 @@ import type {
   CreateCollectionConfigPost,
   CollectionWithHosts,
   DistributionType,
-  AddCollectionToWorkgroupPost,
+  AddCollectionsToWorkgroupPost,
   RemoveCollectionsFromWorkgroupPost,
+  AddCollectionToWorkgroupsPost,
+  RemoveCollectionFromWorkgroupsPost,
 } from "@/types/api";
 import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
 import type {
@@ -189,13 +191,18 @@ function makeDefaultStore(): DaphneStoreState {
         collections?: number[];
         active: boolean;
       }) => RESOLVE<Workgroup>(getMockWorkgroup()),
-      addCollectionToWorkgroup: (_payload: AddCollectionToWorkgroupPost) =>
-        RESOLVE<number>(1),
-      selectedWorkgroup: null,
-      setSelectedWorkgroup: NOOP,
+      addCollectionsToWorkgroup: (_payload: AddCollectionsToWorkgroupPost) =>
+        RESOLVE<number[]>([1]),
       removeCollectionsFromWorkgroup: (
         _payload: RemoveCollectionsFromWorkgroupPost
       ) => RESOLVE<void>(undefined),
+      addCollectionToWorkgroups: (_payload: AddCollectionToWorkgroupsPost) =>
+        RESOLVE<number[]>([1]),
+      removeCollectionFromWorkgroups: (
+        _payload: RemoveCollectionFromWorkgroupsPost
+      ) => RESOLVE<void>(undefined),
+      selectedWorkgroup: null,
+      setSelectedWorkgroup: NOOP,
     },
 
     featureFlags: {
