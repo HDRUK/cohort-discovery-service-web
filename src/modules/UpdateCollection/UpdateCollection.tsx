@@ -33,6 +33,11 @@ import {
   TAG_CUSTODIAN_COLLECTION,
 } from "@/config/tags";
 import FormLabel from "@/components/FormLabel";
+import { maskClientTest } from "@/lib/maskClientTest";
+
+const UpdateCollectionGuidance = maskClientTest(
+  () => import("./UpdateCollectionGuidance")
+);
 
 export type UpdateCollectionProps = {
   collection: CollectionWithHosts;
@@ -372,6 +377,8 @@ const UpdateCollection = ({
 
         {/* supposed to also have supoprt contact / adminstractive contact */}
       </ActionMenuSection>
+
+      <UpdateCollectionGuidance />
     </FormProvider>
   );
 };
