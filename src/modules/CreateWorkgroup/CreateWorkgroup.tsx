@@ -18,8 +18,8 @@ interface CreateCollectionProps {
 
 const CreateWorkgroup = ({ collections, onCancel }: CreateCollectionProps) => {
   const createWorkgroup = useAdminStore((s) => s.createWorkgroup);
-  const addCollectionToWorkgroup = useAdminStore(
-    (s) => s.addCollectionToWorkgroup
+  const addCollectionsToWorkgroup = useAdminStore(
+    (s) => s.addCollectionsToWorkgroup
   );
 
   const notify = useNotify();
@@ -45,11 +45,9 @@ const CreateWorkgroup = ({ collections, onCancel }: CreateCollectionProps) => {
     });
 
     if (data.collections.length > 0) {
-      data.collections.map(async (collection) => {
-        await addCollectionToWorkgroup({
-          id: +collection.value,
-          workgroup_id: createdWorkgroup.id,
-        });
+      await addCollectionsToWorkgroup({
+        ids: data.collections.map((c) => +c.value),
+        workgroup_id: createdWorkgroup.id,
       });
     }
 

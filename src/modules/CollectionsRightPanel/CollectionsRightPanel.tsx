@@ -12,10 +12,10 @@ const CollectionGuidance = maskClientTest<CollectionGuidanceProps>(
 type CollectionsRightPanelProps = Omit<UpdateCollectionProps, "collection">;
 
 const CollectionsRightPanel = ({ ...props }: CollectionsRightPanelProps) => {
-  const selectedCollection = useUserStore((u) => u.selectedCollection);
+  const selectedCollections = useUserStore((u) => u.selectedCollections);
 
-  if (selectedCollection) {
-    return <UpdateCollection collection={selectedCollection} {...props} />;
+  if (selectedCollections && selectedCollections.length === 1) {
+    return <UpdateCollection collection={selectedCollections[0]} {...props} />;
   }
   return <CollectionGuidance />;
 };

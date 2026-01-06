@@ -29,8 +29,10 @@ import {
   CollectionWithHosts,
   Workgroup,
   CreateWorkgroupPost,
-  AddCollectionToWorkgroupPost,
+  AddCollectionsToWorkgroupPost,
   RemoveCollectionsFromWorkgroupPost,
+  AddCollectionToWorkgroupsPost,
+  RemoveCollectionFromWorkgroupsPost,
 } from "@/types/api";
 import createCollection from "@/actions/createCollection";
 import deleteCollection from "@/actions/deleteCollection";
@@ -73,7 +75,7 @@ import createCustodianCollection from "@/actions/createCustodianCollection";
 import rerunTask from "@/actions/rerunTask";
 import rerunDistributions from "@/actions/rerunDistributions";
 import createWorkgroup from "@/actions/createWorkgroup";
-import addCollectionToWorkgroup from "@/actions/addCollectionToWorkgroup";
+import addCollectionsToWorkgroup from "@/actions/addCollectionsToWorkgroup";
 import removeCollectionsFromWorkgroup from "@/actions/removeCollectionsFromWorkgroup";
 import {
   getCollectionHostTag,
@@ -83,6 +85,8 @@ import {
   TAG_CONCEPT_SETS,
   TAG_WORKGROUP_ADMIN,
 } from "@/config/tags";
+import addCollectionToWorkgroups from "@/actions/addCollectionToWorkgroups";
+import removeCollectionFromWorkgroups from "@/actions/removeCollectionFromWorkgroups";
 
 export enum NodeKind {
   RULE = "RULE",
@@ -162,8 +166,8 @@ export interface DaphneStoreState {
     rerunTask: (id: string) => void;
     collections: Collection[];
     setCollections: (collections: Collection[]) => void;
-    selectedCollection: CollectionWithHosts | null;
-    setSelectedCollection: (collection: CollectionWithHosts | null) => void;
+    selectedCollections: CollectionWithHosts[] | [];
+    setSelectedCollections: (collections: CollectionWithHosts[] | []) => void;
     runDistributions: (
       collection: CollectionWithHosts,
       query_type: DistributionType
@@ -213,6 +217,8 @@ export interface DaphneStoreState {
       id: number | string,
       custodianPid: string
     ) => Promise<void>;
+    workgroups: Workgroup[];
+    setWorkgroups: (workgroups: Workgroup[]) => void;
   };
   adminData: {
     collections: Collection[];
@@ -223,15 +229,22 @@ export interface DaphneStoreState {
     ) => Promise<Collection>;
     updateCollection: (
       id: number,
-      payload: UpdateCollectionPayload
+      payload: UpdateCollectionPayload,
+      payloadConfig: Partial<CreateCollectionConfigPost>
     ) => Promise<Collection>;
     deleteCollection: (id: number | string) => Promise<void>;
     createWorkgroup: (payload: CreateWorkgroupPost) => Promise<Workgroup>;
-    addCollectionToWorkgroup: (
-      payload: AddCollectionToWorkgroupPost
-    ) => Promise<number>;
+    addCollectionsToWorkgroup: (
+      payload: AddCollectionsToWorkgroupPost
+    ) => Promise<number[]>;
     removeCollectionsFromWorkgroup: (
       payload: RemoveCollectionsFromWorkgroupPost
+    ) => Promise<void>;
+    addCollectionToWorkgroups: (
+      payload: AddCollectionToWorkgroupsPost
+    ) => Promise<number[]>;
+    removeCollectionFromWorkgroups: (
+      payload: RemoveCollectionFromWorkgroupsPost
     ) => Promise<void>;
     selectedWorkgroup: Workgroup | null;
     setSelectedWorkgroup: (workgroup: Workgroup | null) => void;
@@ -614,11 +627,11 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         ...state,
         userData: { ...state.userData, collections },
       })),
-    selectedCollection: null,
-    setSelectedCollection: (selectedCollection: CollectionWithHosts | null) =>
+    selectedCollections: [],
+    setSelectedCollections: (selectedCollections: CollectionWithHosts[]) =>
       set((state) => ({
         ...state,
-        userData: { ...state.userData, selectedCollection },
+        userData: { ...state.userData, selectedCollections },
       })),
     runDistributions: async (
       collection: CollectionWithHosts,
@@ -733,6 +746,12 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       await revalidateAction(getTagCustodianCollection(custodianPid));
       await revalidateAction(TAG_COLLECTION_ADMIN);
     },
+    workgroups: [],
+    setWorkgroups: (workgroups) =>
+      set((state) => ({
+        ...state,
+        custodianData: { ...state.custodianData, workgroups },
+      })),
   },
   adminData: {
     collections: [],
@@ -753,8 +772,10 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       await revalidateAction(TAG_COLLECTIONS);
       return data;
     },
-    updateCollection: async (id, payload) => {
+    updateCollection: async (id, payload, payloadConfig) => {
       const { data } = await updateCollection(id, payload);
+      const idConfig = data.config.id;
+      await updateCollectionConfig(idConfig, payloadConfig);
 
       await revalidateAction(getTagCustodianCollection(data.custodian.pid));
       await revalidateAction(TAG_COLLECTION_ADMIN);
@@ -771,14 +792,25 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       await revalidateAction(TAG_WORKGROUP_ADMIN);
       return data;
     },
-    addCollectionToWorkgroup: async (payload) => {
-      const { data } = await addCollectionToWorkgroup(payload);
+    addCollectionsToWorkgroup: async (payload) => {
+      const data = await addCollectionsToWorkgroup(payload);
       await revalidateAction(TAG_WORKGROUP_ADMIN);
       await revalidateAction(TAG_COLLECTION_ADMIN);
-      return data;
+      return data.map((d) => d.data);
     },
     removeCollectionsFromWorkgroup: async (payload) => {
       await removeCollectionsFromWorkgroup(payload);
+      await revalidateAction(TAG_COLLECTION_ADMIN);
+      await revalidateAction(TAG_WORKGROUP_ADMIN);
+    },
+    addCollectionToWorkgroups: async (payload) => {
+      const data = await addCollectionToWorkgroups(payload);
+      await revalidateAction(TAG_WORKGROUP_ADMIN);
+      await revalidateAction(TAG_COLLECTION_ADMIN);
+      return data.map((d) => d.data);
+    },
+    removeCollectionFromWorkgroups: async (payload) => {
+      await removeCollectionFromWorkgroups(payload);
       await revalidateAction(TAG_COLLECTION_ADMIN);
       await revalidateAction(TAG_WORKGROUP_ADMIN);
     },
