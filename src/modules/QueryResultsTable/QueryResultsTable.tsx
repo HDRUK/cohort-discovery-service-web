@@ -3,7 +3,7 @@
 import { Query, Task, Result } from "../../types/api";
 import { MRT_TableOptions, type MRT_ColumnDef } from "material-react-table";
 import { Box, CircularProgress, Link } from "@mui/material";
-import ErrorIcon from "@mui/icons-material/Error";
+import ErrorIcon from "@/components/ErrorIcon";
 import LaunchIcon from "@mui/icons-material/Launch";
 import { useEffect, useMemo } from "react";
 import { useTable } from "../../hooks/useTable";
@@ -55,7 +55,12 @@ const QueryResultsTable = ({
     refetchOnReconnect: false,
     refetchInterval: (query) => {
       const data = query.state.data;
+      const allFailed = data?.tasks?.every((t) => t.failed_at !== null);
+      if (allFailed) {
+        return false;
+      }
       const hasPending = data?.tasks?.some((t) => !t.result);
+
       return hasPending ? DEFAULT_INTERVAL : false;
     },
   });
@@ -117,11 +122,11 @@ const QueryResultsTable = ({
       accessorKey: "total",
       accessorFn: (row) => row.result,
       header: "Total",
-      Cell: ({ cell }) => {
+      Cell: ({ cell, row: { original } }) => {
         const result = cell.getValue<Result>();
         const { count, status } = result || {};
-        if (status === "error") {
-          return <ErrorIcon color="error" />;
+        if (status === "error" || original.failed_at) {
+          return <ErrorIcon message={original.latest_run?.error_message} />;
         }
 
         return count === undefined || count === null ? (
@@ -138,8 +143,11 @@ const QueryResultsTable = ({
       accessorKey: "status",
       accessorFn: (row) => row.result,
       header: "Status",
-      Cell: ({ cell }) => {
+      Cell: ({ cell, row: { original } }) => {
         const result = cell.getValue<Result>();
+        if (original.failed_at) {
+          return "Failed";
+        }
         const rawStatus = result?.status ?? "pending";
         const displayStatus = STATUS_LABELS[rawStatus] ?? rawStatus;
         return displayStatus;

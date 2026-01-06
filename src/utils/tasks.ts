@@ -38,8 +38,11 @@ export const getTasksStatus = (tasks: Task[] | Task): TaskStatus => {
 };
 
 export const getTotalAllTasks = (tasks: Task[]) => {
+  if (tasks.every((t) => t.failed_at !== null)) return "-";
+
   const count = tasks
     .filter((t) => t.completed_at !== null)
+    .filter((t) => t.failed_at === null)
     .filter((t) => !!t.result)
     .reduce((sum, t) => sum + (t.result?.count || 0), 0);
   return count;

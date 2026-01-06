@@ -1,5 +1,8 @@
-const formatNumber = (num: number) => {
-  return new Intl.NumberFormat("en-UK").format(num);
+const formatNumber = (value: unknown) => {
+  const num = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(num)
+    ? new Intl.NumberFormat("en-UK").format(num)
+    : "-";
 };
 
 const trueKeys = <T extends string | number>(obj: Record<T, boolean>): T[] => {

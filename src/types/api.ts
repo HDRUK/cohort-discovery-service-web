@@ -173,6 +173,12 @@ export interface CodeStat extends Code {
   collections_pct: number;
 }
 
+export interface TaskRun {
+  duration_ms: number;
+  error_class: string;
+  error_message: string;
+}
+
 export interface Task {
   id: number;
   pid: string;
@@ -186,6 +192,7 @@ export interface Task {
   task_type: string;
   collection: Collection;
   result?: Result;
+  latest_run?: TaskRun;
 }
 
 export interface Query {
