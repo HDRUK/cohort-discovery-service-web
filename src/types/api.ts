@@ -149,7 +149,7 @@ export interface CollectionConfig {
 export interface CollectionWithHosts extends Collection {
   host: CollectionHost[];
   config: CollectionConfig;
-  workgroups?: Workgroup[]; //not sure this is the nicest solution
+  workgroups?: Workgroup[];
 }
 
 export interface Result extends WithTimestamps {

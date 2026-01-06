@@ -87,7 +87,6 @@ const CollectionsCustodianAdmin = ({
         middle={<CollectionsTable initialData={collections} />}
         right={
           <CollectionsRightPanel
-            //TODO: how do we pass the selected collection's workgroups?
             collectionHosts={collectionHosts}
             workgroups={workgroups}
             expandedRight={expandedRight}
