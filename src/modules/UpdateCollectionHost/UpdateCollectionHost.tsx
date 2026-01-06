@@ -120,7 +120,7 @@ const UpdateCollectionHost = ({
       />
 
       <Stack sx={{ mt: 1 }}>
-        <FormLabel labelUnderlined> Host Credentials</FormLabel>
+        <FormLabel underlined> Host Credentials</FormLabel>
         Client ID
         <CopyableVariable value={selectedCollectionHost.client_id} />
         Client Secret

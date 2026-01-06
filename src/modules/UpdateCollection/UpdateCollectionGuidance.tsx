@@ -7,7 +7,7 @@ import FormLabel from "@/components/FormLabel";
 const UpdateCollectionGuidance = () => {
   return (
     <Stack>
-      <FormLabel labelUnderlined>Guidance</FormLabel>
+      <FormLabel underlined>Guidance</FormLabel>
       <UpdateCollectionMdx />
     </Stack>
   );
