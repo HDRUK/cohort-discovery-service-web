@@ -146,13 +146,11 @@ const CollectionsTable = ({
   );
 
   useEffect(() => {
-    console.log("selectedCollectionIds", selectedCollectionIds);
     const newSelectedCollections = selectedCollectionIds
       .map((id) => collections.data.find((c) => String(c.id) === id) || null)
       .filter((c) => c !== null);
 
     setSelectedCollections(newSelectedCollections);
-    console.log(selectedCollections.map((c) => c.name));
   }, [
     collections.data,
     selectedCollections,
