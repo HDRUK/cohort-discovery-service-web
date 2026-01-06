@@ -1,5 +1,10 @@
 import { OptionsType } from "@/components/FormMultiSelect/FormMultiSelect";
-import { CreateCollectionPost, CreateCollectionConfigPost } from "./api";
+import {
+  CreateCollectionPost,
+  CreateCollectionConfigPost,
+  Collection,
+  ModelState,
+} from "./api";
 
 export interface CollectionHostFormValues {
   name: string;
@@ -25,4 +30,10 @@ export interface CreateWorkgroupFormValues {
   name: string;
   collections: OptionsType[];
   active: boolean;
+}
+
+export interface UpdateMultipleCollectionsFormValues {
+  collections: Collection[];
+  status: ModelState;
+  workgroups: string[];
 }

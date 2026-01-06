@@ -1,6 +1,7 @@
 import UpdateCollection, {
   UpdateCollectionProps,
 } from "@/modules/UpdateCollection";
+import UpdateMultipleCollections from "../UpdateMultipleCollections";
 import { maskClientTest } from "@/lib/maskClientTest";
 import { CollectionGuidanceProps } from "./CollectionsGuidance";
 import useUserStore from "@/store/useUserStore";
@@ -16,6 +17,11 @@ const CollectionsRightPanel = ({ ...props }: CollectionsRightPanelProps) => {
 
   if (selectedCollections && selectedCollections.length === 1) {
     return <UpdateCollection collection={selectedCollections[0]} {...props} />;
+  }
+  if (selectedCollections && selectedCollections.length > 1) {
+    return (
+      <UpdateMultipleCollections collections={selectedCollections} {...props} />
+    );
   }
   return <CollectionGuidance />;
 };
