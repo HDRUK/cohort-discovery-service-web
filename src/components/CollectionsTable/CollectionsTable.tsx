@@ -185,6 +185,14 @@ const CollectionsTable = ({
         maxSize: 200,
       },
       {
+        id: "custodian",
+        header: "Custodian",
+        accessorFn: (row) => row.custodian.name,
+        size: 200,
+        minSize: 200,
+        maxSize: 200,
+      },
+      {
         id: "last_active",
         header: "Last Query",
         accessorFn: (row) =>
