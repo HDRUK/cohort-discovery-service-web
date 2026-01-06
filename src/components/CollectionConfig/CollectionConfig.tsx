@@ -14,6 +14,7 @@ import { FrequencyMode, frequencyMap } from "@/types/api";
 import FormRadioGroup from "@/components/FormRadioGroup";
 import { useEffect, useMemo, useState } from "react";
 import HourMinuteSelect from "../HourMinuteSelect";
+import FormLabel from "../FormLabel";
 
 interface BaseCollectionConfigProps {
   disabled?: boolean;
@@ -76,8 +77,8 @@ const CollectionConfig = <TFormValues extends FieldValues>({
   }, [runTimeFrequencyFieldName, frequencyField, setValue]);
 
   return (
-    <Stack spacing={2} width={300} height={"100%"}>
-      <Typography> Configuration Frequency</Typography>
+    <Stack spacing={1} width={300} height={"100%"}>
+      <FormLabel labelUnderlined> Configuration Frequency</FormLabel>
       <Box sx={{ display: "flex", gap: 2 }}>
         <Chip
           onClick={

@@ -1,6 +1,7 @@
 import { CollectionWithHosts, DistributionType } from "@/types/api";
 import { getDatetime } from "@/utils/date";
 import { Box, Chip, Stack, Typography } from "@mui/material";
+import FormLabel from "@/components/FormLabel";
 import { ReRunButton } from "./ReRunButton";
 import { useLogDependencyChanges } from "@/utils/deps";
 import useUserStore from "@/store/useUserStore";
@@ -36,8 +37,8 @@ const DistributionStatus = ({
 
   return (
     <Stack spacing={1} height={"100%"} justifyContent={"center"}>
-      <Typography> Distribution Status</Typography>
-      <Box sx={{ px: 1 }}>
+      <FormLabel labelUnderlined> Distribution Status</FormLabel>
+      <Box>
         <Typography variant="body2" component={"div"}>
           Demographics:{" "}
           <Chip
@@ -52,7 +53,7 @@ const DistributionStatus = ({
           )}
         </Typography>
       </Box>
-      <Box sx={{ px: 1 }}>
+      <Box>
         <Typography variant="body2" component={"div"}>
           Concepts:{" "}
           <Chip

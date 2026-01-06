@@ -217,7 +217,7 @@ const UpdateCollection = ({
         fixedExpanded
         defaultExpanded
         accordionSummarySx={{
-          my: 2,
+          mt: 2,
         }}
       >
         {/* missing in the BE - ticket created
@@ -316,9 +316,8 @@ const UpdateCollection = ({
         title={"Collection Distributions"}
         fixedExpanded
         defaultExpanded
-        underline
         accordionSummarySx={{
-          my: 2,
+          mt: 2,
         }}
       >
         <DistributionStatus disabled={!expandedRight} collection={collection} />
@@ -338,7 +337,7 @@ const UpdateCollection = ({
         fixedExpanded
         defaultExpanded
         accordionSummarySx={{
-          my: 2,
+          mt: 2,
         }}
       >
         <Controller
@@ -357,7 +356,6 @@ const UpdateCollection = ({
             />
           )}
         />
-
         <Controller
           name="collection.description"
           disabled={!expandedRight}
@@ -374,11 +372,9 @@ const UpdateCollection = ({
             />
           )}
         />
-
         {/* supposed to also have supoprt contact / adminstractive contact */}
+        <UpdateCollectionGuidance />
       </ActionMenuSection>
-
-      <UpdateCollectionGuidance />
     </FormProvider>
   );
 };
