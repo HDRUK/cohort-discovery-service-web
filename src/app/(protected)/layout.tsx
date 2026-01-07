@@ -45,7 +45,9 @@ export default async function ProtectedLayout({
   const hasAdminAccess =
     roles.includes(Roles.ADMIN) || roles.includes(Roles.SYSTEM_ADMIN);
 
-  if (!(hasGeneralAccess || hasAdminAccess)) {
+  const hasTeamAccess = user.cohort_admin_teams.length > 0;
+
+  if (!(hasGeneralAccess || hasAdminAccess || hasTeamAccess)) {
     forbidden();
   }
 
