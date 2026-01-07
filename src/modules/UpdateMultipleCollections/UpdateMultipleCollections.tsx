@@ -330,7 +330,7 @@ const UpdateMultipleCollections = ({
         )}
       </Box>
 
-      {collectionsHaveMatchingWorkgroups && (
+      {expandedRight && collectionsHaveMatchingWorkgroups && (
         <>
           <Controller
             name="workgroups"
