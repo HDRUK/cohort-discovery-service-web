@@ -4,7 +4,6 @@ import {
   IconButton,
   Chip,
   Box,
-  Checkbox,
   FormGroup,
   FormControlLabel,
 } from "@mui/material";
@@ -28,6 +27,7 @@ import {
   TAG_CUSTODIAN_COLLECTION,
 } from "@/config/tags";
 import StatusChip from "@/components/StatusChip";
+import SquareCheckbox from "@/components/SquareCheckbox";
 import transitionCollections from "@/actions/transitionCollections";
 import { CollectionFilterStatus } from "@/types/collections";
 import useAdminStore from "@/store/useAdminStore";
@@ -108,70 +108,77 @@ const UpdateMultipleCollections = ({
       collections[0].workgroups?.map((wg) => wg.id) || []
     ).sort();
 
-    setCollectionsHaveMatchingWorkgroups(
-      collections.every((c) => {
-        let thisWorkgroups = (c.workgroups?.map((wg) => wg.id) || []).sort();
-        if (JSON.stringify(thisWorkgroups) != JSON.stringify(firstWorkgroups)) {
-          return false;
-        }
-        return true;
-      })
-    );
+    const result = collections.every((c) => {
+      const thisWorkgroups = (c.workgroups?.map((wg) => wg.id) || []).sort();
+      if (JSON.stringify(thisWorkgroups) != JSON.stringify(firstWorkgroups)) {
+        return false;
+      }
+      return true;
+    });
+
+    setCollectionsHaveMatchingWorkgroups(result);
+    if (result) {
+      setWorkgroupValues(() => {
+        const map = new Map<string, boolean>();
+        workgroups.forEach((wg) => {
+          map.set(
+            wg.name,
+            (collections[0].workgroups?.filter((cw) => cw.id === wg.id) || [])
+              .length > 0
+          );
+        });
+        return map;
+      });
+    } else {
+      setWorkgroupValues(new Map<string, boolean>([]));
+    }
   }, [collections, reset]);
 
   const submitForm = useCallback(
     async (closeAfter = false) => {
       if (isDirty) {
-        if (collectionsHaveMatchingWorkgroups) {
-          // for each collection, compare to what's selected, and run the add/removes required
-          collections.forEach(async (c) => {
-            const newWorkgroups = workgroups
-              .filter((wg) => workgroupValues.get(wg.name))
-              .filter(
-                (wg) =>
-                  (
-                    collections[0].workgroups?.filter(
-                      (cw) => cw.name === wg.name
-                    ) || []
-                  ).length === 0
-              );
+        // for each collection, compare to what's selected, and run the add/removes required
+        collections.forEach(async (c) => {
+          const newWorkgroups = workgroups
+            .filter((wg) => workgroupValues.get(wg.name))
+            .filter(
+              (wg) =>
+                (c.workgroups?.filter((cw) => cw.name === wg.name) || [])
+                  .length === 0
+            );
 
-            if (newWorkgroups.length > 0) {
-              await addCollectionToWorkgroups({
-                id: c.id,
-                workgroup_ids: newWorkgroups.map((wg) => wg.id),
-              });
-              notify.success(
-                `Add collection ${c.id} to workgroup${
-                  newWorkgroups.length > 1 ? "s" : ""
-                } ${newWorkgroups.map((wg) => wg.name).join(", ")}`
-              );
-            }
+          if (newWorkgroups.length > 0) {
+            await addCollectionToWorkgroups({
+              id: c.id,
+              workgroup_ids: newWorkgroups.map((wg) => wg.id),
+            });
+            notify.success(
+              `Add collection ${c.id} to workgroup${
+                newWorkgroups.length > 1 ? "s" : ""
+              } ${newWorkgroups.map((wg) => wg.name).join(", ")}`
+            );
+          }
 
-            const workgroupsToRemove = workgroups
-              .filter((wg) => !workgroupValues.get(wg.name))
-              .filter(
-                (wg) =>
-                  (
-                    collections[0].workgroups?.filter(
-                      (cw) => cw.name === wg.name
-                    ) || []
-                  ).length > 0
-              );
+          const workgroupsToRemove = workgroups
+            .filter((wg) => !workgroupValues.get(wg.name))
+            .filter(
+              (wg) =>
+                (c.workgroups?.filter((cw) => cw.name === wg.name) || [])
+                  .length > 0
+            );
 
-            if (workgroupsToRemove.length > 0) {
-              await removeCollectionFromWorkgroups({
-                id: c.id,
-                workgroup_ids: workgroupsToRemove.map((wg) => wg.id),
-              });
-              notify.success(
-                `Removed collection ${c.id} from workgroup${
-                  workgroupsToRemove.length > 1 ? "s" : ""
-                } ${workgroupsToRemove.map((wg) => wg.name).join(", ")}`
-              );
-            }
-          });
-        }
+          if (workgroupsToRemove.length > 0) {
+            await removeCollectionFromWorkgroups({
+              id: c.id,
+              workgroup_ids: workgroupsToRemove.map((wg) => wg.id),
+            });
+            notify.success(
+              `Removed collection ${c.id} from workgroup${
+                workgroupsToRemove.length > 1 ? "s" : ""
+              } ${workgroupsToRemove.map((wg) => wg.name).join(", ")}`
+            );
+          }
+        });
 
         revalidateAction(TAG_CUSTODIAN_COLLECTION);
         if (currentCustodian) {
@@ -266,16 +273,17 @@ const UpdateMultipleCollections = ({
           {expandedRight ? <LockOpenIcon /> : <LockOutlineIcon />}
         </IconButton>
       </Typography>
+
       <FormLabel underlined>Collection Status</FormLabel>
       {uniqueStates.length > 1 && (
-        <Box>
-          <StatusChip state_id={-1} sx={{ my: 1 }} />
+        <Box sx={{ mb: 1 }}>
+          <StatusChip state_id={-1} />
         </Box>
       )}
       {uniqueStates.length === 1 &&
         uniqueStates[0] !== CollectionStatus.DRAFT && (
-          <Box>
-            <StatusChip state_id={uniqueStates[0]} sx={{ my: 1 }} />
+          <Box sx={{ mb: 1 }}>
+            <StatusChip state_id={uniqueStates[0]} />
           </Box>
         )}
       {uniqueStates.length === 1 &&
@@ -311,7 +319,6 @@ const UpdateMultipleCollections = ({
           flexWrap: "wrap",
           gap: 1,
           alignItems: "center",
-          mb: 2,
         }}
       >
         {collectionsHaveMatchingWorkgroups && (
@@ -330,7 +337,7 @@ const UpdateMultipleCollections = ({
         )}
       </Box>
 
-      {expandedRight && collectionsHaveMatchingWorkgroups && (
+      {expandedRight && (
         <>
           <Controller
             name="workgroups"
@@ -344,7 +351,7 @@ const UpdateMultipleCollections = ({
                       <FormControlLabel
                         disabled={!expandedRight}
                         control={
-                          <Checkbox
+                          <SquareCheckbox
                             checked={Boolean(workgroupValues.get(w.name))}
                             key={`wg-checkbox-${w.name}`}
                             name={w.name}
