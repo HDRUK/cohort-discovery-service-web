@@ -103,7 +103,7 @@ const UpdateMultipleCollections = ({
     async (closeAfter = false) => {
       if (isDirty) {
         // for each collection, compare to what's selected, and run the add/removes required
-        collections.forEach(async (c) => {
+        for (const c of collections) {
           const newWorkgroups = workgroups
             .filter((wg) => workgroupValues.get(wg.name))
             .filter(
@@ -143,7 +143,7 @@ const UpdateMultipleCollections = ({
               } ${workgroupsToRemove.map((wg) => wg.name).join(", ")}`
             );
           }
-        });
+        }
 
         revalidateAction(TAG_CUSTODIAN_COLLECTION);
         if (currentCustodian) {
@@ -207,7 +207,7 @@ const UpdateMultipleCollections = ({
       shouldDirty: true,
       shouldTouch: true,
     });
-  }, [workgroupValues, collections, formMethods]);
+  }, [workgroupValues, formMethods.setValue]);
 
   return (
     <FormProvider {...formMethods}>
