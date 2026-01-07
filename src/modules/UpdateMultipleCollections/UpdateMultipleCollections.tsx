@@ -30,7 +30,6 @@ import StatusChip from "@/components/StatusChip";
 import SquareCheckbox from "@/components/SquareCheckbox";
 import transitionCollections from "@/actions/transitionCollections";
 import { CollectionFilterStatus } from "@/types/collections";
-import useAdminStore from "@/store/useAdminStore";
 import removeCollectionFromWorkgroups from "@/actions/removeCollectionFromWorkgroups";
 import addCollectionToWorkgroups from "@/actions/addCollectionToWorkgroups";
 import FormLabel from "@/components/FormLabel";
@@ -52,74 +51,42 @@ const UpdateMultipleCollections = ({
   expandedRight,
   onClose,
 }: UpdateMultipleCollectionProps) => {
-  const { currentCustodian, updateCollection } = useCustodianStore(
-    (custodianData) => ({
-      currentCustodian: custodianData.currentCustodian,
-      updateCollection: custodianData.updateCollection,
-    })
-  );
-
-  const { updateCollection: updateCollectionAdmin } = useAdminStore(
-    (adminData) => ({
-      updateCollection: adminData.updateCollection,
-    })
-  );
+  const { currentCustodian } = useCustodianStore((custodianData) => ({
+    currentCustodian: custodianData.currentCustodian,
+  }));
 
   const notify = useNotify();
-
-  const [workgroupValues, setWorkgroupValues] = useState<Map<string, boolean>>(
-    () => {
-      const map = new Map<string, boolean>();
-      workgroups.forEach((wg) => {
-        map.set(
-          wg.name,
-          (collections[0].workgroups?.filter((cw) => cw.id === wg.id) || [])
-            .length > 0
-        );
-      });
-      return map;
-    }
-  );
-
-  const [uniqueStates, setUniqueStates] = useState<(number | undefined)[]>([]);
-  const [
-    collectionsHaveMatchingWorkgroups,
-    setCollectionsHaveMatchingWorkgroups,
-  ] = useState<boolean>(false);
 
   const formMethods = useForm();
 
   const {
     control,
     handleSubmit,
-    reset,
     formState: { isDirty },
   } = formMethods;
 
-  useEffect(() => {
-    if (!collections) return;
+  const uniqueStates = [
+    ...new Set(collections.map((c) => c?.model_state?.state_id)),
+  ];
 
-    setUniqueStates([
-      ...new Set(collections.map((c) => c?.model_state?.state_id)),
-    ]);
+  // Check that all collections have the same workgroups
+  const firstWorkgroups = (
+    collections[0].workgroups?.map((wg) => wg.id) || []
+  ).sort();
 
-    // Check that all collections have the same workgroups
-    const firstWorkgroups = (
-      collections[0].workgroups?.map((wg) => wg.id) || []
-    ).sort();
+  const collectionsHaveMatchingWorkgroups = collections.every((c) => {
+    const thisWorkgroups = (c.workgroups?.map((wg) => wg.id) || []).sort();
+    if (JSON.stringify(thisWorkgroups) != JSON.stringify(firstWorkgroups)) {
+      return false;
+    }
+    return true;
+  });
 
-    const result = collections.every((c) => {
-      const thisWorkgroups = (c.workgroups?.map((wg) => wg.id) || []).sort();
-      if (JSON.stringify(thisWorkgroups) != JSON.stringify(firstWorkgroups)) {
-        return false;
-      }
-      return true;
-    });
+  const [workgroupValues, setWorkgroupValues] = useState<Map<string, boolean>>(
+    () => {
+      const map = new Map<string, boolean>();
 
-    setCollectionsHaveMatchingWorkgroups(result);
-    if (result) {
-      setWorkgroupValues(() => {
-        const map = new Map<string, boolean>();
+      if (collectionsHaveMatchingWorkgroups) {
         workgroups.forEach((wg) => {
           map.set(
             wg.name,
@@ -127,12 +94,10 @@ const UpdateMultipleCollections = ({
               .length > 0
           );
         });
-        return map;
-      });
-    } else {
-      setWorkgroupValues(new Map<string, boolean>([]));
+      }
+      return map;
     }
-  }, [collections, reset]);
+  );
 
   const submitForm = useCallback(
     async (closeAfter = false) => {
@@ -195,8 +160,6 @@ const UpdateMultipleCollections = ({
       currentCustodian,
       isDirty,
       notify,
-      updateCollection,
-      updateCollectionAdmin,
       onClose,
       workgroups,
       workgroupValues,
@@ -222,7 +185,6 @@ const UpdateMultipleCollections = ({
     collectionHosts,
     ...formMethods,
     currentCustodian,
-    updateCollection,
     handleEnter,
     handleLockClick,
     handleUnlockClick,

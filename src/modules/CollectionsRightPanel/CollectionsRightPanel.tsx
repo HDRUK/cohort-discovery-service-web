@@ -20,7 +20,11 @@ const CollectionsRightPanel = ({ ...props }: CollectionsRightPanelProps) => {
   }
   if (selectedCollections && selectedCollections.length > 1) {
     return (
-      <UpdateMultipleCollections collections={selectedCollections} {...props} />
+      <UpdateMultipleCollections
+        collections={selectedCollections}
+        key={JSON.stringify(selectedCollections.map((c) => c.id))}
+        {...props}
+      />
     );
   }
   return <CollectionGuidance />;
