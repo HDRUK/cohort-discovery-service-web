@@ -239,7 +239,7 @@ const UpdateMultipleCollections = ({
       <FormLabel underlined>Collection Status</FormLabel>
       {uniqueStates.length > 1 && (
         <Box sx={{ mb: 1 }}>
-          <StatusChip state_id={-1} />
+          <Chip label={"MIXED"} />
         </Box>
       )}
       {uniqueStates.length === 1 &&
