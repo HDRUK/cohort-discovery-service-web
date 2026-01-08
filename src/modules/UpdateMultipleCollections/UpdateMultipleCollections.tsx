@@ -173,8 +173,8 @@ const UpdateMultipleCollections = ({
     onClose?.();
   }, [onClose]);
 
-  const handleAction = useCallback(() => {
-    transitionCollections(
+  const handleAction = useCallback(async () => {
+    await transitionCollections(
       collections.map((c) => c.id),
       {
         state: CollectionFilterStatus.PENDING,
@@ -186,7 +186,7 @@ const UpdateMultipleCollections = ({
         .map((c) => c.name)
         .join(", ")}" to be made active`
     );
-  }, [transitionCollections, collections, notify]);
+  }, [collections, notify]);
 
   useLogDependencyChanges("UpdateMultipleCollections", {
     collections,

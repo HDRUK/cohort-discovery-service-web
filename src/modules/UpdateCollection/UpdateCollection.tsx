@@ -320,8 +320,8 @@ const UpdateCollection = ({
           <AddButton
             disabled={!expandedRight}
             label={"Request to make active"}
-            action={() => {
-              transitionCollection(collection.id, {
+            action={async () => {
+              await transitionCollection(collection.id, {
                 state: CollectionFilterStatus.PENDING,
               });
 
