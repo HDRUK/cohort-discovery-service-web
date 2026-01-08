@@ -180,6 +180,21 @@ const UpdateMultipleCollections = ({
     onClose?.();
   }, [onClose]);
 
+  const handleAction = useCallback(() => {
+    transitionCollections(
+      collections.map((c) => c.id),
+      {
+        state: CollectionFilterStatus.PENDING,
+      }
+    );
+
+    notify.success(
+      `Requested for collections "${collections
+        .map((c) => c.name)
+        .join(", ")}" to be made active`
+    );
+  }, [transitionCollections, collections, notify]);
+
   useLogDependencyChanges("UpdateMultipleCollections", {
     collections,
     collectionHosts,
@@ -255,20 +270,7 @@ const UpdateMultipleCollections = ({
           <AddButton
             label={"Request to make active"}
             disabled={!expandedRight}
-            action={() => {
-              transitionCollections(
-                collections.map((c) => c.id),
-                {
-                  state: CollectionFilterStatus.PENDING,
-                }
-              );
-
-              notify.success(
-                `Requested for collections "${collections
-                  .map((c) => c.name)
-                  .join(", ")}" to be made active`
-              );
-            }}
+            action={handleAction}
           />
         )}
       {/* Handle the logic of when to display checkboxes for certain states - this needs the logic explained before implementation
