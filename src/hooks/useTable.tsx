@@ -102,8 +102,33 @@ export const useTable = <TData extends MRT_RowData>({
       },
     },
     muiTableBodyRowProps: ({ row, staticRowIndex, table }) => ({
-      onClick: (event) =>
-        getMRT_RowSelectionHandler({ row, staticRowIndex, table })(event), //import this helper function from material-react-table
+      onClick: (event) => {
+        // select only this row (clear any other selection)
+        // don't override native controls (inputs, buttons) clicks
+        const target = event.target as HTMLElement | null;
+        if (
+          target &&
+          (target.closest("input") ||
+            target.closest("button") ||
+            target.closest("a") ||
+            target.closest("svg"))
+        ) {
+          return;
+        }
+
+        if (!row.getCanSelect?.() && !row.getCanSelect) return;
+
+        // set selection to only this row
+        // `table.setRowSelection` is provided by material-react-table table instance
+        try {
+          // prefer row.id if available, otherwise fall back to staticRowIndex
+          const rowId = (row as any).id ?? String(staticRowIndex);
+          table.setRowSelection({ [rowId]: true });
+        } catch (e) {
+          // toggle this row only using the helper
+          getMRT_RowSelectionHandler({ row, staticRowIndex, table })(event);
+        }
+      },
       sx: { backgroundColor: "transparent !important", cursor: "pointer" },
     }),
     muiTableBodyCellProps: ({ column }) => ({
