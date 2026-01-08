@@ -199,15 +199,17 @@ const UpdateMultipleCollections = ({
     });
   };
 
+  const { setValue } = formMethods;
+
   useEffect(() => {
     const selectedWorkgroups = Array.from(workgroupValues.entries())
       .filter(([_, checked]) => checked)
       .map(([name]) => name);
-    formMethods.setValue("workgroups", selectedWorkgroups, {
+    setValue("workgroups", selectedWorkgroups, {
       shouldDirty: true,
       shouldTouch: true,
     });
-  }, [workgroupValues, formMethods.setValue]);
+  }, [workgroupValues, setValue]);
 
   return (
     <FormProvider {...formMethods}>
@@ -283,17 +285,10 @@ const UpdateMultipleCollections = ({
           alignItems: "center",
         }}
       >
-        {collectionsHaveMatchingWorkgroups && (
-          <>
-            {collections[0].workgroups?.map((w) => (
-              <Chip
-                color="secondary"
-                label={w.name}
-                key={`wg-chip-${w.name}`}
-              />
-            ))}
-          </>
-        )}
+        {collectionsHaveMatchingWorkgroups &&
+          collections[0].workgroups?.map((w) => (
+            <Chip color="secondary" label={w.name} key={`wg-chip-${w.name}`} />
+          ))}
         {!collectionsHaveMatchingWorkgroups && (
           <Box>{<Chip label={"MIXED"} key={"wg-chip-mixed"} />}</Box>
         )}
@@ -305,29 +300,26 @@ const UpdateMultipleCollections = ({
             name="workgroups"
             disabled={!expandedRight}
             control={control}
-            render={() => {
-              return (
-                <FormGroup>
-                  <Box display="flex" flexDirection="column">
-                    {workgroups?.map((w) => (
-                      <FormControlLabel
-                        disabled={!expandedRight}
-                        control={
-                          <SquareCheckbox
-                            checked={Boolean(workgroupValues.get(w.name))}
-                            key={`wg-checkbox-${w.name}`}
-                            name={w.name}
-                            onChange={handleChange}
-                          />
-                        }
-                        label={w.name}
-                        key={`wg-checkbox-label-${w.name}`}
-                      />
-                    ))}
-                  </Box>
-                </FormGroup>
-              );
-            }}
+            render={() => (
+              <FormGroup>
+                <Box display="flex" flexDirection="column">
+                  {workgroups?.map((w) => (
+                    <FormControlLabel
+                      control={
+                        <SquareCheckbox
+                          checked={Boolean(workgroupValues.get(w.name))}
+                          key={`wg-checkbox-${w.name}`}
+                          name={w.name}
+                          onChange={handleChange}
+                        />
+                      }
+                      label={w.name}
+                      key={`wg-checkbox-label-${w.name}`}
+                    />
+                  ))}
+                </Box>
+              </FormGroup>
+            )}
           />
           <UpdateMultipleCollectionsGuidance />
         </>
