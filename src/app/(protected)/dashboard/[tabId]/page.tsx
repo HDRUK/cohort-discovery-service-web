@@ -1,0 +1,68 @@
+import { notFound } from "next/navigation";
+import NewQueryPage from "./components/NewQueryPage";
+import QueryResultsPage from "./components/QueryResultsPage";
+import { routes } from "@/config/routes";
+import TabsShell from "@/components/TabsShell";
+import { ACCESS_TOKEN_NAME } from "@/config/internals";
+import { cookies } from "next/headers";
+import getQuery from "@/actions/getQuery";
+import { capVarChar } from "@/utils/string";
+import { SearchParams } from "@/types/api";
+import QueryHistoryPage from "./components/QueryHistoryPage";
+import { getQueryName } from "@/utils/query";
+
+type Params = Promise<{ tabId: string }>;
+
+const DashboardTabPage = async (props: {
+  params: Params;
+  searchParams: Promise<SearchParams>;
+}) => {
+  const { params, searchParams } = props;
+  const { tabId } = await params;
+  const { query } = await searchParams;
+
+  let queryName: string | undefined;
+
+  if (query && query !== "undefined") {
+    const { data } = await getQuery(query as string);
+
+    if (data) {
+      queryName = capVarChar(getQueryName(data), 30, true);
+    }
+  }
+  const hasQuery = !!query;
+
+  const TABS = [
+    {
+      id: "new-query",
+      label: "New Query",
+      href: routes.dashboardNewQuery(),
+      page: <NewQueryPage query={query as string} />,
+    },
+    {
+      id: "query-result",
+      disabled: !hasQuery,
+      label: queryName ?? "Query Result",
+      href: routes.dashboardQueryResult(query as string),
+      onCloseHref: routes.dashboardNewQuery(),
+      page: <QueryResultsPage {...props} />,
+    },
+    {
+      id: "query-history",
+      label: "Query History",
+      href: routes.dashboardHistory,
+      page: <QueryHistoryPage {...props} />,
+    },
+  ];
+
+  const isValidTabId = (tabId: string) => TABS.some((t) => t.id === tabId);
+
+  const cookieStore = await cookies();
+  const token = cookieStore.get(ACCESS_TOKEN_NAME)?.value;
+
+  if (!isValidTabId(tabId)) return notFound();
+
+  return token && <TabsShell value={tabId} tabs={TABS} />;
+};
+
+export default DashboardTabPage;

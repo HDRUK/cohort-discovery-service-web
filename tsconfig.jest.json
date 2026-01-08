@@ -1,0 +1,15 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+      "moduleResolution": "node",
+      "jsx": "react-jsx", 
+      "noEmit": true,
+      "allowJs": true,
+      "baseUrl": "src/app",
+      "paths": {
+          "@/*": ["./*"]
+       }
+    },
+    "include": ["**/*.ts", "**/*.tsx","jest.setup.ts"]
+  }
+  

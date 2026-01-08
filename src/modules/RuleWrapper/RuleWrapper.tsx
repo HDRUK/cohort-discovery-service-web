@@ -1,0 +1,327 @@
+import {
+  Box,
+  BoxProps,
+  IconButton,
+  Skeleton,
+  Card,
+  CardHeader,
+  Chip,
+  CardContent,
+  CardProps,
+  Collapse,
+  CardActions,
+} from "@mui/material";
+import { ReactNode, RefObject, useCallback, useMemo, useState } from "react";
+import useSortable from "@/hooks/useSortable";
+import { DragIndicator } from "@mui/icons-material";
+import useQueryBuilder from "@/store/useQueryBuilder";
+
+import {
+  containerSx,
+  dragButtonSx,
+  dragIconSx,
+  skeletonSx,
+  cardSx,
+  cardHeaderSx,
+  cardActionsSx,
+  chipSx,
+  selectedCaptionSx,
+  headerRowSx,
+} from "./RuleWrapper.styles";
+import { RuleNodeType } from "@/types/rules";
+import EditableText from "@/components/EditableText";
+import { useLogDependencyChanges } from "@/utils/deps";
+import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
+import InvalidRule from "@/components/InvalidRule";
+import Title from "@/components/Title";
+import useRightClickMenu from "@/hooks/useRightClickMenu";
+import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
+import { mergeSx } from "@/utils/helpers";
+import RuleAgeSelector from "@/components/RuleAgeSelector";
+import { isAgeFilter, isRuleLeaf } from "@/utils/rules";
+import useFeatures from "@/store/useFeatures";
+
+interface Action {
+  action: () => void;
+  label: string;
+}
+
+export interface RuleWrapperProps extends BoxProps {
+  node: RuleNodeType;
+  type: "Rule" | "Group" | "Operator";
+  headerExtra?: ReactNode;
+  hideHeader?: boolean;
+  renderInHeader?: boolean;
+  groupId?: string;
+  sortable?: boolean;
+  cardProps?: CardProps;
+  containerProps?: BoxProps;
+  render: (
+    rule: RuleNodeType,
+    ref?: RefObject<HTMLDivElement | HTMLLIElement | null>
+  ) => ReactNode;
+  actions?: Action[];
+  forceShowHandle?: boolean;
+  useLeftDragPlaceHolder?: boolean;
+}
+
+const RuleWrapper = ({
+  node,
+  type,
+  groupId,
+  headerExtra,
+  hideHeader = false,
+  renderInHeader = false,
+  sortable = true,
+  cardProps: { sx: cardPropsSx, ...cardProps } = {},
+  containerProps = undefined,
+  render,
+  actions,
+  forceShowHandle = false,
+  useLeftDragPlaceHolder = false,
+}: RuleWrapperProps) => {
+  const { id, valid = true, invalidReason } = node;
+
+  let exclude;
+  if (!isAgeFilter(node)) {
+    exclude = !!node.exclude;
+  }
+
+  const { isSelected, toggleSelected, getNodeName, setNodeName } =
+    useQueryBuilder((qb) => ({
+      isSelected: !!qb.selected[id],
+      toggleSelected: qb.toggleSelected,
+      getNodeName: qb.getNodeName,
+      setNodeName: qb.setNodeName,
+    }));
+
+  const { constrainForBunnyV1 } = useFeatures();
+
+  const {
+    setNodeRef,
+    style,
+    anchorRef,
+    anchorSize,
+    isDragging,
+    attributes,
+    listeners,
+  } = useSortable({
+    id,
+    data: {
+      id,
+      type,
+      groupId,
+    },
+  });
+
+  const [showHandle, setShowHandle] = useState(false);
+
+  const handleOnSelect = useCallback(
+    (e: React.MouseEvent) => {
+      toggleSelected(id);
+      e.stopPropagation();
+    },
+    [id, toggleSelected]
+  );
+
+  const onMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    setShowHandle(true);
+  };
+
+  const onMouseLeave = useCallback(() => {
+    if (showHandle && !isDragging && !isSelected) {
+      setShowHandle(false);
+    }
+  }, [showHandle, isDragging, isSelected, setShowHandle]);
+
+  const { handleContextMenu, ...rightClickMenuMethods } = useRightClickMenu();
+
+  const nodeName = useMemo(() => getNodeName(node), [node, getNodeName]);
+
+  useLogDependencyChanges("wrapper " + node.id, {
+    isSelected,
+    node,
+    groupId,
+    exclude,
+    valid,
+    handleContextMenu,
+    onMouseLeave,
+    onMouseEnter,
+    handleOnSelect,
+    showHandle,
+    setNodeRef,
+    style,
+    anchorRef,
+    anchorSize,
+    isDragging,
+    attributes,
+    listeners,
+    containerProps,
+    cardHeaderSx,
+    cardProps,
+    headerRowSx,
+  });
+
+  return (
+    <Box
+      data-testid="sortable-rule"
+      ref={setNodeRef}
+      style={sortable ? style : {}}
+      {...containerProps}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      sx={containerSx(isSelected, containerProps?.sx)}
+    >
+      <Box sx={headerRowSx}>
+        <Collapse
+          in={showHandle || forceShowHandle || isDragging}
+          orientation="horizontal"
+          collapsedSize={0}
+          unmountOnExit
+          sx={{ display: "flex", alignItems: "center" }}
+        >
+          <IconButton
+            aria-label="Drag"
+            size="small"
+            {...(sortable ? attributes : {})}
+            {...(sortable ? listeners : {})}
+            sx={dragButtonSx}
+          >
+            <DragIndicator fontSize="small" sx={dragIconSx(isDragging)} />
+          </IconButton>
+        </Collapse>
+        {isDragging ? (
+          <Skeleton
+            variant="rectangular"
+            animation="wave"
+            sx={skeletonSx(anchorSize.width, anchorSize.height)}
+          />
+        ) : (
+          <Card
+            ref={anchorRef}
+            data-id={id}
+            data-selectable="true"
+            data-draggable="true"
+            component="div"
+            data-testid="clickable-card"
+            sx={mergeSx(cardSx(isSelected, valid), cardPropsSx)}
+            onContextMenu={handleContextMenu}
+            onClick={handleOnSelect}
+            {...cardProps}
+          >
+            {!hideHeader && (
+              <CardHeader
+                sx={cardHeaderSx}
+                slotProps={{
+                  title: {
+                    component: "h2",
+                    variant: "h5",
+                  },
+                }}
+                title={
+                  <>
+                    <Box
+                      width={"100%"}
+                      display={"flex"}
+                      justifyContent={"space-between"}
+                    >
+                      <Box display={"flex"}>
+                        {exclude !== undefined && (
+                          <Chip
+                            color={exclude == true ? "error" : "primary"}
+                            sx={chipSx}
+                            variant="outlined"
+                            label={exclude == true ? "Exclude" : "Include"}
+                          />
+                        )}
+                        {!valid && (
+                          <InvalidRule reasons={invalidReason ?? []} />
+                        )}
+                      </Box>
+                      <Title
+                        size={"small"}
+                        title={type}
+                        subTitle={headerExtra}
+                      />
+                    </Box>
+                    {renderInHeader && render(node)}
+                  </>
+                }
+              />
+            )}
+
+            {!renderInHeader && (
+              <CardContent>{render(node, anchorRef)}</CardContent>
+            )}
+
+            {isRuleLeaf(node) &&
+              (node.timeConstraint || node.ageConstraint) && (
+                <CardActions sx={cardActionsSx}>
+                  {node.timeConstraint && (
+                    <RuleTimeframeSelector rule={node} readOnly />
+                  )}
+                  {node.ageConstraint && (
+                    <RuleAgeSelector
+                      rule={node}
+                      readOnly
+                      uniDirectional={constrainForBunnyV1}
+                    />
+                  )}
+                </CardActions>
+              )}
+
+            <RightClickMenu {...rightClickMenuMethods} actions={actions} />
+          </Card>
+        )}
+
+        {useLeftDragPlaceHolder && (
+          <Collapse
+            in={showHandle || forceShowHandle || isDragging}
+            orientation="horizontal"
+            collapsedSize={0}
+            unmountOnExit
+            sx={{ display: "flex", alignItems: "center" }}
+          >
+            <IconButton aria-label="Drag" size="small" sx={{ opacity: 0 }}>
+              <DragIndicator fontSize="small" sx={dragIconSx(isDragging)} />
+            </IconButton>
+          </Collapse>
+        )}
+      </Box>
+      {isSelected && (
+        <EditableText
+          value={nodeName}
+          onCommit={(name) => setNodeName(node, name)}
+          typographyProps={{
+            component: "span",
+            variant: "caption",
+            sx: selectedCaptionSx,
+          }}
+          textFieldProps={{
+            variant: "standard",
+            size: "small",
+            margin: "dense",
+            InputProps: { disableUnderline: true },
+            sx: {
+              p: 0,
+              m: 0,
+              "& .MuiInputBase-root": {
+                fontSize: "inherit",
+                lineHeight: "inherit",
+              },
+              "& .MuiInputBase-input": {
+                fontSize: "inherit",
+                lineHeight: "inherit",
+                paddingTop: 0,
+                paddingBottom: 0,
+              },
+            },
+          }}
+        />
+      )}
+    </Box>
+  );
+};
+
+export default RuleWrapper;
