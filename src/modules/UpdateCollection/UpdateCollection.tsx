@@ -183,13 +183,13 @@ const UpdateCollection = ({
           revalidateAction(getTagCustodianCollection(currentCustodian.pid));
         }
 
-        const newWorkgroups = workgroups
-          .filter((wg) => workgroupValues.get(wg.name))
-          .filter(
-            (wg) =>
-              (collection.workgroups?.filter((cw) => cw.name === wg.name) || [])
-                .length === 0
-          );
+        const cwNames = new Set(
+          (collection.workgroups ?? []).map((w) => w.name)
+        );
+
+        const newWorkgroups = workgroups.filter(
+          (wg) => workgroupValues.get(wg.name) && !cwNames.has(wg.name)
+        );
 
         if (newWorkgroups.length > 0) {
           await addCollectionToWorkgroups({
@@ -203,13 +203,9 @@ const UpdateCollection = ({
           );
         }
 
-        const workgroupsToRemove = workgroups
-          .filter((wg) => !workgroupValues.get(wg.name))
-          .filter(
-            (wg) =>
-              (collection.workgroups?.filter((cw) => cw.name === wg.name) || [])
-                .length > 0
-          );
+        const workgroupsToRemove = workgroups.filter(
+          (wg) => !workgroupValues.get(wg.name) && cwNames.has(wg.name)
+        );
 
         if (workgroupsToRemove.length > 0) {
           await removeCollectionFromWorkgroups({
@@ -324,8 +320,8 @@ const UpdateCollection = ({
           <AddButton
             disabled={!expandedRight}
             label={"Request to make active"}
-            action={() => {
-              transitionCollection(collection.id, {
+            action={async () => {
+              await transitionCollection(collection.id, {
                 state: CollectionFilterStatus.PENDING,
               });
 
