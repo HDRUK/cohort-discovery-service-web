@@ -118,12 +118,18 @@ export const useTable = <TData extends MRT_RowData>({
 
         if (!row.getCanSelect?.() && !row.getCanSelect) return;
 
-        // set selection to only this row
+        // set selection to only this row, or add to selection when shift is held
         // `table.setRowSelection` is provided by material-react-table table instance
         try {
           // prefer row.id if available, otherwise fall back to staticRowIndex
           const rowId = (row as any).id ?? String(staticRowIndex);
-          table.setRowSelection({ [rowId]: true });
+
+          if (event.shiftKey) {
+            const current = table.getState().rowSelection ?? {};
+            table.setRowSelection({ ...current, [rowId]: true });
+          } else {
+            table.setRowSelection({ [rowId]: true });
+          }
         } catch (e) {
           // toggle this row only using the helper
           getMRT_RowSelectionHandler({ row, staticRowIndex, table })(event);
