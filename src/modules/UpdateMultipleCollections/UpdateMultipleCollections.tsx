@@ -104,13 +104,10 @@ const UpdateMultipleCollections = ({
       if (isDirty) {
         // for each collection, compare to what's selected, and run the add/removes required
         for (const c of collections) {
-          const newWorkgroups = workgroups
-            .filter((wg) => workgroupValues.get(wg.name))
-            .filter(
-              (wg) =>
-                (c.workgroups?.filter((cw) => cw.name === wg.name) || [])
-                  .length === 0
-            );
+          const cwNames = new Set((c.workgroups ?? []).map((w) => w.name));
+          const newWorkgroups = workgroups.filter(
+            (wg) => workgroupValues.get(wg.name) && !cwNames.has(wg.name)
+          );
 
           if (newWorkgroups.length > 0) {
             await addCollectionToWorkgroups({
@@ -124,13 +121,9 @@ const UpdateMultipleCollections = ({
             );
           }
 
-          const workgroupsToRemove = workgroups
-            .filter((wg) => !workgroupValues.get(wg.name))
-            .filter(
-              (wg) =>
-                (c.workgroups?.filter((cw) => cw.name === wg.name) || [])
-                  .length > 0
-            );
+          const workgroupsToRemove = workgroups.filter(
+            (wg) => !workgroupValues.get(wg.name) && cwNames.has(wg.name)
+          );
 
           if (workgroupsToRemove.length > 0) {
             await removeCollectionFromWorkgroups({
