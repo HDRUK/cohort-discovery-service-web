@@ -103,7 +103,6 @@ export const useTable = <TData extends MRT_RowData>({
     },
     muiTableBodyRowProps: ({ row, staticRowIndex, table }) => ({
       onClick: (event) => {
-        // select only this row (clear any other selection)
         // don't override native controls (inputs, buttons) clicks
         const target = event.target as HTMLElement | null;
         if (
@@ -118,17 +117,36 @@ export const useTable = <TData extends MRT_RowData>({
 
         if (!row.getCanSelect?.() && !row.getCanSelect) return;
 
-        // set selection to only this row, or add to selection when shift is held
-        // `table.setRowSelection` is provided by material-react-table table instance
         try {
           // prefer row.id if available, otherwise fall back to staticRowIndex
           const rowId = row.id ?? String(staticRowIndex);
+          const visibleRowIds = table.getRowModel().rows.map((r) => r.id);
 
+          const cleanSelection = (sel: Record<string, boolean>) =>
+            Object.fromEntries(
+              Object.entries(sel).filter(
+                ([k, v]) => v && visibleRowIds.includes(k)
+              )
+            ) as Record<string, boolean>;
+
+          const current = table.getState().rowSelection ?? {};
           if (event.metaKey) {
-            const current = table.getState().rowSelection ?? {};
-            table.setRowSelection({ ...current, [rowId]: true });
+            if (!current[rowId]) {
+              // add key when meta-selecting
+              current[rowId] = true;
+            } else {
+              // remove the key entirely when meta-unselecting
+              delete current[rowId];
+            }
+            table.setRowSelection(cleanSelection(current));
           } else {
-            table.setRowSelection({ [rowId]: true });
+            // deselect this row if clicking and it's the only selected row
+            if (current[rowId] && Object.keys(current).length === 1) {
+              table.setRowSelection(cleanSelection({}));
+            } else {
+              // select only this row
+              table.setRowSelection(cleanSelection({ [rowId]: true }));
+            }
           }
         } catch (_) {
           // toggle this row only using the helper
