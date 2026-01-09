@@ -124,7 +124,7 @@ export const useTable = <TData extends MRT_RowData>({
           // prefer row.id if available, otherwise fall back to staticRowIndex
           const rowId = (row as any).id ?? String(staticRowIndex);
 
-          if (event.shiftKey) {
+          if (event.metaKey) {
             const current = table.getState().rowSelection ?? {};
             table.setRowSelection({ ...current, [rowId]: true });
           } else {
