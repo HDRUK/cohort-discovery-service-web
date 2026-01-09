@@ -25,7 +25,7 @@ import AddButton from "@/components/AddButton";
 import FormTextField from "@/components/FormTextField";
 import CollectionConfig from "@/components/CollectionConfig";
 import { UpdateCollectionFormValues } from "@/types/forms";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { revalidateAction } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
 import FormDropdown from "@/components/FormDropdown";
@@ -104,6 +104,7 @@ const getDefaultValues = (collection: CollectionWithHosts | null) => {
       run_time_hour: config.run_time_hour ?? 0,
       run_time_minute: config.run_time_minute ?? 0,
     },
+    workgroups: workgroups?.map((wg) => wg.name).sort(),
   };
 };
 
@@ -126,6 +127,7 @@ const UpdateCollection = ({
       updateCollection: adminData.updateCollection,
     })
   );
+  const firstUpdate = useRef(true);
 
   const notify = useNotify();
 
@@ -247,6 +249,8 @@ const UpdateCollection = ({
     [handleSubmit, submitForm]
   );
 
+  const { setValue } = formMethods;
+
   const handleUnlockClick = useCallback(() => {
     onClose?.();
   }, [onClose]);
@@ -276,11 +280,12 @@ const UpdateCollection = ({
     const selectedWorkgroups = Array.from(workgroupValues.entries())
       .filter(([_, checked]) => checked)
       .map(([name]) => name);
-    formMethods.setValue("workgroups", selectedWorkgroups, {
-      shouldDirty: true,
-      shouldTouch: true,
+    setValue("workgroups", selectedWorkgroups.sort(), {
+      shouldDirty: !firstUpdate.current,
+      shouldTouch: !firstUpdate.current,
     });
-  }, [workgroupValues, formMethods]);
+    firstUpdate.current = false;
+  }, [workgroupValues, setValue]);
 
   return (
     <FormProvider {...formMethods}>
