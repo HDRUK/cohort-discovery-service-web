@@ -1,3 +1,11 @@
+## [1.0.1](https://github.com/HDRUK/project-daphne-web/compare/v1.0.0...v1.0.1) (2026-01-09)
+
+### 🐛 Bug Fixes
+
+* **DP-1234:** pipeline errors ([af23118](https://github.com/HDRUK/project-daphne-web/commit/af231182498d06afcd710ac1a0d165e1ca49e360)), closes [DP-1234](DP-1234)
+* **DP-1234:** pipeline errors ([ed3f043](https://github.com/HDRUK/project-daphne-web/commit/ed3f043344370588006f81adf5a7e6b1aa471707)), closes [DP-1234](DP-1234)
+* pipeline errors ([f956945](https://github.com/HDRUK/project-daphne-web/commit/f956945fbbf7841c29ef04927f80a18e9a0c7192))
+
 ## 1.0.0 (2026-01-08)
 
 ### ✨ Features
