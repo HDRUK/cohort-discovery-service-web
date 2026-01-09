@@ -122,7 +122,7 @@ export const useTable = <TData extends MRT_RowData>({
         // `table.setRowSelection` is provided by material-react-table table instance
         try {
           // prefer row.id if available, otherwise fall back to staticRowIndex
-          const rowId = (row as any).id ?? String(staticRowIndex);
+          const rowId = row.id ?? String(staticRowIndex);
 
           if (event.metaKey) {
             const current = table.getState().rowSelection ?? {};
@@ -130,7 +130,7 @@ export const useTable = <TData extends MRT_RowData>({
           } else {
             table.setRowSelection({ [rowId]: true });
           }
-        } catch (e) {
+        } catch (_) {
           // toggle this row only using the helper
           getMRT_RowSelectionHandler({ row, staticRowIndex, table })(event);
         }
