@@ -115,7 +115,7 @@ export const useTable = <TData extends MRT_RowData>({
           return;
         }
 
-        if (!row.getCanSelect?.() && !row.getCanSelect) return;
+        if (!row.getCanSelect()) return;
 
         try {
           // prefer row.id if available, otherwise fall back to staticRowIndex
@@ -129,7 +129,7 @@ export const useTable = <TData extends MRT_RowData>({
               )
             ) as Record<string, boolean>;
 
-          const current = table.getState().rowSelection ?? {};
+          const current = { ...(table.getState().rowSelection ?? {}) };
           if (event.metaKey) {
             if (!current[rowId]) {
               // add key when meta-selecting
