@@ -13,6 +13,8 @@ import { SearchParams } from "@/types/api";
 
 type Params = Promise<{ tabId: string }>;
 
+const applicationMode = process.env.APPLICATION_MODE;
+
 const CustodianAdminPage = async ({
   params,
   searchParams,
@@ -24,16 +26,20 @@ const CustodianAdminPage = async ({
   const apiSearchParams = await searchParams;
 
   const TABS = [
-    {
-      id: "users",
-      label: "Users",
-      href: routes.adminUsers,
-      page: (
-        <Suspense fallback={<UsersSkeleton />}>
-          <UsersTab />
-        </Suspense>
-      ),
-    },
+    ...(applicationMode === "standalone"
+      ? [
+          {
+            id: "users",
+            label: "Users",
+            href: routes.adminUsers,
+            page: (
+              <Suspense fallback={<UsersSkeleton />}>
+                <UsersTab />
+              </Suspense>
+            ),
+          },
+        ]
+      : []),
     {
       id: "workgroups",
       label: "Workgroups",

@@ -2,7 +2,7 @@
 
 import useCustodianStore from "@/store/useCustodianStore";
 import useUserStore from "@/store/useUserStore";
-import { isAdmin } from "@/utils/token";
+import { checkIsAdmin } from "@/utils/user";
 import { forbidden } from "next/navigation";
 import { useEffect } from "react";
 
@@ -14,10 +14,9 @@ const AdminPage = ({ children }: { children: React.ReactNode }) => {
     setCurrentCustodian(null);
   }, [setCurrentCustodian]);
 
-  const { token_user } = user || {};
-  const is_admin = isAdmin(token_user);
+  const isAdmin = checkIsAdmin(user);
 
-  if (user && !is_admin) forbidden();
+  if (user && !isAdmin) forbidden();
 
   return children;
 };

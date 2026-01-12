@@ -1,6 +1,5 @@
-import { Roles, TokenUser } from "@/types/api";
+import { TokenUser } from "@/types/api";
+import { RoleName } from "@/types/roles";
 
-export const isAdmin = (token_user: TokenUser | undefined | null) =>
-  token_user?.cohort_discovery_roles.includes(Roles.ADMIN) ||
-  token_user?.cohort_discovery_roles.includes(Roles.SYSTEM_ADMIN) ||
-  false;
+export const checkIsAdmin = (token_user: TokenUser | undefined | null) =>
+  token_user?.cohort_discovery_roles.includes(RoleName.ADMIN) || false;

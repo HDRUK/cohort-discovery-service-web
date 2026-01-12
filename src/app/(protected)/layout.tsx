@@ -2,7 +2,8 @@ import { cookies, headers } from "next/headers";
 import { forbidden, redirect } from "next/navigation";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
-import { TokenUser, CombinedUser, Roles } from "@/types/api";
+import { TokenUser, CombinedUser } from "@/types/api";
+import { RoleName } from "@/types/roles";
 import ProtectedPage from "./components/ProtectedPage";
 import getMe from "@/actions/getMe";
 import getCustodians from "@/actions/getCustodians";
@@ -36,24 +37,21 @@ export default async function ProtectedLayout({
 
   const user = decoded.user as TokenUser;
 
-  const hasGeneralAccess = user?.cohort_discovery_roles?.includes(
-    Roles.GENERAL_ACCESS
-  );
-
-  const roles = user?.cohort_discovery_roles || [];
-
-  const hasAdminAccess =
-    roles.includes(Roles.ADMIN) || roles.includes(Roles.SYSTEM_ADMIN);
-
-  if (!(hasGeneralAccess || hasAdminAccess)) {
-    forbidden();
-  }
-
   let me;
   try {
     const { data } = await getMe();
     me = data;
   } catch {
+    forbidden();
+  }
+
+  const roles = me.roles.map((r) => r.name) ?? [];
+
+  const hasGeneralAccess = roles?.includes(RoleName.USER);
+  const hasAdminAccess = roles.includes(RoleName.ADMIN);
+  const hasTeamAccess = me.custodians.length > 0;
+
+  if (!(hasGeneralAccess || hasAdminAccess || hasTeamAccess)) {
     forbidden();
   }
 
