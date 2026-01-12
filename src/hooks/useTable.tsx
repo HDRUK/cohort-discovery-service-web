@@ -102,8 +102,57 @@ export const useTable = <TData extends MRT_RowData>({
       },
     },
     muiTableBodyRowProps: ({ row, staticRowIndex, table }) => ({
-      onClick: (event) =>
-        getMRT_RowSelectionHandler({ row, staticRowIndex, table })(event), //import this helper function from material-react-table
+      onClick: (event) => {
+        // don't override native controls (inputs, buttons) clicks
+        const target = event.target as HTMLElement | null;
+        if (
+          target &&
+          (target.closest("input") ||
+            target.closest("button") ||
+            target.closest("a") ||
+            target.closest("svg"))
+        ) {
+          return;
+        }
+
+        if (!row.getCanSelect()) return;
+
+        try {
+          // prefer row.id if available, otherwise fall back to staticRowIndex
+          const rowId = row.id ?? String(staticRowIndex);
+          const visibleRowIds = table.getRowModel().rows.map((r) => r.id);
+
+          const cleanSelection = (sel: Record<string, boolean>) =>
+            Object.fromEntries(
+              Object.entries(sel).filter(
+                ([k, v]) => v && visibleRowIds.includes(k)
+              )
+            ) as Record<string, boolean>;
+
+          const current = { ...(table.getState().rowSelection ?? {}) };
+          if (event.metaKey) {
+            if (!current[rowId]) {
+              // add key when meta-selecting
+              current[rowId] = true;
+            } else {
+              // remove the key entirely when meta-unselecting
+              delete current[rowId];
+            }
+            table.setRowSelection(cleanSelection(current));
+          } else {
+            // deselect this row if clicking and it's the only selected row
+            if (current[rowId] && Object.keys(current).length === 1) {
+              table.setRowSelection(cleanSelection({}));
+            } else {
+              // select only this row
+              table.setRowSelection(cleanSelection({ [rowId]: true }));
+            }
+          }
+        } catch (_) {
+          // toggle this row only using the helper
+          getMRT_RowSelectionHandler({ row, staticRowIndex, table })(event);
+        }
+      },
       sx: { backgroundColor: "transparent !important", cursor: "pointer" },
     }),
     muiTableBodyCellProps: ({ column }) => ({

@@ -352,10 +352,6 @@ const UpdateCollection = ({
         )) ??
           (!expandedRight && "No workgroups set")}
       </Box>
-      {/* note to self - we should rework table row selection so only clicking the checkbox 
-        will add to the multi-select, perhaps along with a shift-click anywhere on the row. 
-        This will stop the annoyance of having to click twice on one row to deselect it ahead 
-        of selecting the next one */}
 
       {expandedRight && (
         <Controller
