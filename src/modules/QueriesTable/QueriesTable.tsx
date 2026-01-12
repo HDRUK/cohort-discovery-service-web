@@ -216,7 +216,7 @@ const QueriesTable = ({
               </Grid>
             ),
             rightAction: {
-              refreshProps: {
+              reRunProps: {
                 label: "Re-run query",
                 onClick: async () => {
                   const { data } = await rerunQuery(row.original.pid);

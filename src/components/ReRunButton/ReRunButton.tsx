@@ -7,31 +7,32 @@ import {
   IconButtonProps,
   Tooltip,
 } from "@mui/material";
-import RefreshIcon from "@mui/icons-material/Refresh";
-import { revalidateAction } from "@/actions/revalidate";
+import CachedIcon from "@mui/icons-material/Cached";
 
 const isProd = process.env.NODE_ENV === "production";
 
-export interface RefreshButtonProps extends Omit<IconButtonProps, "onClick"> {
-  tag: string;
+export interface ReRunButtonProps extends Omit<IconButtonProps, "onClick"> {
+  tag?: string;
   showTooltip?: boolean;
   label?: string;
   text?: string;
+  onClick: () => void;
 }
 
-const RefreshButton = ({
+const ReRunButton = ({
   tag,
   label,
   text,
+  onClick,
   showTooltip = false,
   ...rest
-}: RefreshButtonProps) => {
-  const title = !isProd || showTooltip ? label ?? tag : null;
+}: ReRunButtonProps) => {
+  const title = !isProd || showTooltip ? label : null;
   return (
     <Tooltip title={title}>
       <Box display="flex" alignItems="center" gap={1}>
-        <IconButton onClick={() => revalidateAction(tag)} {...rest}>
-          <RefreshIcon fontSize={"small"} />
+        <IconButton onClick={onClick} {...rest}>
+          <CachedIcon fontSize={"small"} />
         </IconButton>
         {text && <Typography variant="body2">{text}</Typography>}
       </Box>
@@ -39,4 +40,4 @@ const RefreshButton = ({
   );
 };
 
-export default RefreshButton;
+export default ReRunButton;
