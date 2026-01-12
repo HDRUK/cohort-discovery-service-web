@@ -337,6 +337,7 @@ export interface CreateCollectionPost {
   custodian_id: string;
   status?: boolean;
   pid: string;
+  model_state?: ModelState;
 }
 
 export interface UpdateCollectionPayload {
