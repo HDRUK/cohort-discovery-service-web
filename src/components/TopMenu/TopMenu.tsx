@@ -7,7 +7,7 @@ import TabsShell from "@/components/TabsShell";
 import { routes } from "../../config/routes";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { TabType } from "../TabsShell/TabsShell";
-import { isAdmin } from "@/utils/token";
+import { checkIsAdmin } from "@/utils/token";
 
 export default function TopMenu() {
   const pathname = usePathname();
@@ -55,7 +55,7 @@ export default function TopMenu() {
             },
           ]
         : []),
-      ...(isAdmin(user?.token_user)
+      ...(checkIsAdmin(user?.token_user)
         ? [
             {
               id: routes.admin,

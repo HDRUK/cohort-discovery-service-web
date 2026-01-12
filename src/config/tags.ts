@@ -1,6 +1,7 @@
 export const TAG_COLLECTION_ADMIN = "collection-admin";
 export const TAG_CUSTODIAN_COLLECTION = "custodian-collection";
 export const TAG_COLLECTIONS = "collections";
+export const TAG_COLLECTIONS_USER = "collections-user";
 
 export const TAG_COLLECTION_HOSTS = "collection-hosts";
 

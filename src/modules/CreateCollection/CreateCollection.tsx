@@ -94,13 +94,14 @@ const CreateCollection = ({
           mb: 5,
         }}
       >
-        <ActionMenuSection
-          title={"New Collection"}
-          fixedExpanded
-          defaultExpanded
-          underline
-        >
-          <Stack spacing={2} width={"70%"} height={"100%"}>
+        <Stack spacing={2} width={"70%"} height={"100%"}>
+          <ActionMenuSection
+            title={"New Collection"}
+            fixedExpanded
+            defaultExpanded
+            underline
+            accordionSummarySx={{ mb: 2 }}
+          >
             {!currentCustodian && !!custodians && (
               <Controller
                 name="collection.custodian_id"
@@ -219,23 +220,22 @@ const CreateCollection = ({
                 />
               )}
             />
-          </Stack>
-        </ActionMenuSection>
+          </ActionMenuSection>
 
-        <ActionMenuSection
-          title={"Collection Configuration"}
-          fixedExpanded
-          defaultExpanded
-          underline
-        >
-          <CollectionConfig<CreateCollectionFormValues>
-            keepExpanded
-            frequencyFieldName={"config.frequency_mode"}
-            runTimeFrequencyFieldName={"config.run_time_frequency"}
-            runTimeHourFieldName={"config.run_time_hour"}
-            runTimeMinuteFieldName={"config.run_time_minute"}
-          />
-        </ActionMenuSection>
+          <ActionMenuSection
+            title={"Collection Configuration"}
+            fixedExpanded
+            defaultExpanded
+          >
+            <CollectionConfig<CreateCollectionFormValues>
+              keepExpanded
+              frequencyFieldName={"config.frequency_mode"}
+              runTimeFrequencyFieldName={"config.run_time_frequency"}
+              runTimeHourFieldName={"config.run_time_hour"}
+              runTimeMinuteFieldName={"config.run_time_minute"}
+            />
+          </ActionMenuSection>
+        </Stack>
 
         <Stack direction="row" spacing={1} justifyContent="flex-end">
           <Button
