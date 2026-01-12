@@ -11,21 +11,27 @@ import { UpdateCollectionFormValues } from "@/types/forms";
 import { getCollectionStatus } from "@/utils/colours";
 import { Box, Chip } from "@mui/material";
 import { useEffect, useState } from "react";
-import { Control, Controller, UseFormSetValue } from "react-hook-form";
+import {
+  Control,
+  Controller,
+  FieldValues,
+  Path,
+  UseFormSetValue,
+} from "react-hook-form";
 
-type ManageCollectionStatusProps = {
+interface ManageCollectionStatusProps<TFieldValues extends FieldValues> {
   collection: Collection;
   expandedRight: boolean;
-  control: Control<UpdateCollectionFormValues, any, UpdateCollectionFormValues>;
+  control: Control<TFieldValues>;
   setValue: UseFormSetValue<UpdateCollectionFormValues>;
-};
+}
 
-const ManageCollectionStatus = ({
+const ManageCollectionStatus = <TFieldValues extends FieldValues>({
   collection,
   expandedRight,
   control,
   setValue,
-}: ManageCollectionStatusProps) => {
+}: ManageCollectionStatusProps<TFieldValues>) => {
   const { currentCustodian } = useCustodianStore((custodianData) => ({
     currentCustodian: custodianData.currentCustodian,
   }));
@@ -92,7 +98,7 @@ const ManageCollectionStatus = ({
 
       {expandedRight && (
         <Controller
-          name="collection.model_state.state_id"
+          name={"collection.model_state.state_id" as Path<TFieldValues>}
           control={control}
           render={() => (
             <FormRadioGroup
