@@ -49,8 +49,7 @@ export default async function ProtectedLayout({
 
   const hasGeneralAccess = roles?.includes(RoleName.USER);
 
-  const hasAdminAccess =
-    roles.includes(RoleName.ADMIN) || roles.includes(RoleName.ADMIN);
+  const hasAdminAccess = roles.includes(RoleName.ADMIN);
 
   const hasTeamAccess = me.custodians.length > 0;
 
