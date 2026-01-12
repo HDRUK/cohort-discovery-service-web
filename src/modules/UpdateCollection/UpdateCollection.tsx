@@ -168,11 +168,7 @@ const UpdateCollection = ({
   const submitForm = useCallback(
     async (data: UpdateCollectionFormValues, closeAfter = false) => {
       if (!collection?.id) return;
-      console.log(
-        "control",
-        control.getFieldState("collection.model_state"),
-        control._formValues
-      );
+
       const { id } = collection;
       if (isDirty) {
         if (currentCustodian) {
