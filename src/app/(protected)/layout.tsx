@@ -48,9 +48,7 @@ export default async function ProtectedLayout({
   const roles = me.roles.map((r) => r.name) ?? [];
 
   const hasGeneralAccess = roles?.includes(RoleName.USER);
-
   const hasAdminAccess = roles.includes(RoleName.ADMIN);
-
   const hasTeamAccess = me.custodians.length > 0;
 
   if (!(hasGeneralAccess || hasAdminAccess || hasTeamAccess)) {
