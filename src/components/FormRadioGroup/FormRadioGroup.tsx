@@ -1,4 +1,4 @@
-import { useId, ReactNode } from "react";
+import { useId, ReactNode, ReactElement } from "react";
 import {
   FormControl,
   FormControlLabel,
@@ -19,6 +19,7 @@ interface FormRadioGroupProps extends Omit<RadioGroupProps, "children"> {
   required?: boolean;
   options: RadioOption[];
   error?: boolean;
+  control?: ReactElement;
 }
 
 const FormRadioGroup = ({
@@ -28,6 +29,7 @@ const FormRadioGroup = ({
   required = false,
   options,
   error,
+  control,
   ...radioGroupProps
 }: FormRadioGroupProps) => {
   const generatedId = useId();
@@ -49,7 +51,7 @@ const FormRadioGroup = ({
           <FormControlLabel
             key={option.value || ""}
             value={option.value}
-            control={<Radio />}
+            control={control || <Radio />}
             label={option.label}
             disabled={option.disabled}
           />

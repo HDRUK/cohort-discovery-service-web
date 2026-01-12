@@ -45,6 +45,7 @@ import useAdminStore from "@/store/useAdminStore";
 import removeCollectionFromWorkgroups from "@/actions/removeCollectionFromWorkgroups";
 import addCollectionToWorkgroups from "@/actions/addCollectionToWorkgroups";
 import SquareCheckbox from "@/components/SquareCheckbox";
+import ManageCollectionStatus from "../ManageCollectionStatus";
 
 const UpdateCollectionGuidance = maskClientTest(
   () => import("./UpdateCollectionGuidance")
@@ -315,7 +316,7 @@ const UpdateCollection = ({
       </Typography>
 
       <FormLabel underlined>Collection Status</FormLabel>
-      {collection?.model_state?.state_id != CollectionStatus.DRAFT && (
+      {/* {collection?.model_state?.state_id != CollectionStatus.DRAFT && (
         <Box sx={{ mb: 1 }}>
           <StatusChip state_id={collection?.model_state?.state_id} />
         </Box>
@@ -335,7 +336,13 @@ const UpdateCollection = ({
               );
             }}
           />
-        )}
+        )} */}
+      <ManageCollectionStatus
+        collection={collection}
+        expandedRight={expandedRight}
+        key={collection.id}
+        // control={control}
+      />
       {/* Handle the logic of when to display checkboxes for certain states - this needs the logic explained before implementation
         {!currentCustodian &&
           (collection?.model_state?.state_id == CollectionStatus.DRAFT ||
