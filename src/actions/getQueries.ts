@@ -1,6 +1,6 @@
 "use server";
 
-import { getTagQueries } from "@/config/tags";
+import { getUserQueryTag, TAG_QUERIES } from "@/config/tags";
 import { apiGet, CachedGetArgs } from "../lib/apiClient";
 import { API_ROUTES } from "../lib/apiRoutes";
 import { Query, ApiResponse, Paginated, WithIncomplete } from "../types/api";
@@ -15,9 +15,11 @@ const getQueries = async (
 
   const { data, message } = await apiGet<ApiResponse<Paginated<Query[]>>>({
     url: API_ROUTES.queries,
-    tags: getTagQueries(userId),
+    tags: [TAG_QUERIES, getUserQueryTag(userId)],
     ...args,
   });
+
+  console.log(data.total);
 
   const incompleteQueries = data.data.filter((q) =>
     q.tasks.some((t) => !t.completed_at)

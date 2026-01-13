@@ -2,7 +2,7 @@
 
 import useQueryBuilder from "@/store/useQueryBuilder";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Query, Paginated } from "@/types/api";
 import {
   MRT_ExpandedState,
@@ -21,7 +21,7 @@ import { getTasksStatus, getTotalAllTasks } from "@/utils/tasks";
 import QueryResultsTable from "@/modules/QueryResultsTable";
 import { queryToText } from "@/utils/queryBuilder";
 import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import getQueries from "@/actions/getQueries";
 import { DEFAULT_INTERVAL } from "@/config/defaults";
 import { getQueryName } from "@/utils/query";
@@ -29,6 +29,8 @@ import useSearchParams from "@/hooks/useSearchParams";
 import { buildQueryHistoryParams } from "@/utils/params";
 import { AvailableFormats } from "@/components/DownloadButton/DownloadButton";
 import rerunQuery from "@/actions/rerunQuery";
+import useUserStore from "@/store/useUserStore";
+import { getUserQueryTag, TAG_QUERIES } from "@/config/tags";
 
 interface QueriesTableProps {
   initialData: Paginated<Query[]>;
@@ -49,8 +51,16 @@ const QueriesTable = ({
       setQueryName: qb.setQueryName,
     }));
 
+  const user = useUserStore((store) => store.user);
+  const deleteQueries = useUserStore((store) => store.deleteQueries);
+
+  const qc = useQueryClient();
+  const queryKey = useMemo(
+    () => [`queries-${searchParams.toString()}`],
+    [searchParams]
+  );
   const { data: queries } = useQuery<Paginated<Query[]>>({
-    queryKey: [`queries-${searchParams.toString()}`],
+    queryKey,
     queryFn: async () => {
       const searchParamsObject = buildQueryHistoryParams({
         page: Number(searchParams.get("page")) ?? initialData.current_page,
@@ -78,6 +88,9 @@ const QueriesTable = ({
       return hasIncomplete ? DEFAULT_INTERVAL : false;
     },
   });
+  useEffect(() => {
+    qc.setQueryData(queryKey, initialData);
+  }, [qc, queryKey, initialData]);
 
   const columns: MRT_ColumnDef<Query>[] = [
     {
@@ -216,6 +229,11 @@ const QueriesTable = ({
               </Grid>
             ),
             rightAction: {
+              deleteProps: {
+                onClick: () => {
+                  deleteQueries([row.original.pid]);
+                },
+              },
               refreshProps: {
                 label: "Re-run query",
                 onClick: async () => {
@@ -258,8 +276,16 @@ const QueriesTable = ({
         },
       }}
       rightAction={{
-        refreshProps: { tag: "queries", label: "Refresh Queries" },
+        refreshProps: {
+          tag: user ? getUserQueryTag(user.id) : TAG_QUERIES,
+          label: "Refresh Queries",
+        },
         sortProps: { field: "name" },
+        deleteProps: {
+          onClick: (selectedRows) => {
+            deleteQueries(selectedRows);
+          },
+        },
       }}
     />
   );
