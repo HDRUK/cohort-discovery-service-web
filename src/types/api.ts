@@ -1,4 +1,5 @@
 import { QueryContext } from "./context";
+import { Role, RoleName } from "./roles";
 import { RuleGroupType } from "./rules";
 
 export type SearchParamValue =
@@ -216,12 +217,6 @@ export enum Rquestroles {
   GENERAL_ACCESS = "GENERAL_ACCESS",
 }
 
-export enum Roles {
-  GENERAL_ACCESS = "GENERAL_ACCESS",
-  SYSTEM_ADMIN = "SYSTEM_ADMIN",
-  ADMIN = "admin",
-}
-
 export enum FrequencyMode {
   WEEKLY = "1",
   MONTHLY = "2",
@@ -265,6 +260,8 @@ export interface User extends WithTimestamps {
   name: string;
   email_verified_at: string | null;
   new_user_status?: number;
+  roles: Role[];
+  custodians: Custodian[];
 }
 
 export interface ExternalCustodian {
@@ -284,7 +281,7 @@ export interface TokenUser {
   organisation: string;
   provider: string;
   workgroups: Workgroup[];
-  cohort_discovery_roles: Roles[];
+  cohort_discovery_roles: RoleName[];
   cohort_admin_teams: ExternalCustodian[];
 }
 

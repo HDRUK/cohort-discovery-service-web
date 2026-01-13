@@ -10,8 +10,11 @@ import CollectionsTab, {
 import UsersTab, { UsersSkeleton } from "./components/UsersTab";
 import WorkgroupsTab, { WorkgroupsSkeleton } from "./components/WorkgroupsTab";
 import { SearchParams } from "@/types/api";
+import { isStandalone } from "@/utils/modes";
 
 type Params = Promise<{ tabId: string }>;
+
+const applicationMode = process.env.APPLICATION_MODE;
 
 const CustodianAdminPage = async ({
   params,
@@ -24,16 +27,20 @@ const CustodianAdminPage = async ({
   const apiSearchParams = await searchParams;
 
   const TABS = [
-    {
-      id: "users",
-      label: "Users",
-      href: routes.adminUsers,
-      page: (
-        <Suspense fallback={<UsersSkeleton />}>
-          <UsersTab />
-        </Suspense>
-      ),
-    },
+    ...(isStandalone(applicationMode)
+      ? [
+          {
+            id: "users",
+            label: "Users",
+            href: routes.adminUsers,
+            page: (
+              <Suspense fallback={<UsersSkeleton />}>
+                <UsersTab />
+              </Suspense>
+            ),
+          },
+        ]
+      : []),
     {
       id: "workgroups",
       label: "Workgroups",

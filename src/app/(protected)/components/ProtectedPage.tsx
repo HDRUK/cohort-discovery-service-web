@@ -11,7 +11,12 @@ interface ProtectedPageProps {
   children: ReactNode;
 }
 
-const ProtectedPage = ({ user, custodians, featureFlags, children }: ProtectedPageProps) => {
+const ProtectedPage = ({
+  user,
+  custodians,
+  featureFlags,
+  children,
+}: ProtectedPageProps) => {
   const {
     userData: { setUser },
     custodianData: { setCustodians },

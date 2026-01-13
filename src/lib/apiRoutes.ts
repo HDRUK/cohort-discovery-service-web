@@ -26,6 +26,7 @@ export const API_ROUTES = {
   custodianCollections: (pid: string) =>
     `${API_URL}/custodians/${pid}/collections`,
   adminCollections: `${API_URL}/admin/collections`,
+  userCollections: `${API_URL}/user/collections`,
   collectionConfig: `${API_URL}/collection_config`,
   rerunDistributions: (pid: string) =>
     `${API_URL}/collection/${pid}/distributions/run-manually`,
