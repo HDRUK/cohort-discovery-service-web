@@ -42,7 +42,7 @@ import useAdminStore from "@/store/useAdminStore";
 import removeCollectionFromWorkgroups from "@/actions/removeCollectionFromWorkgroups";
 import addCollectionToWorkgroups from "@/actions/addCollectionToWorkgroups";
 import SquareCheckbox from "@/components/SquareCheckbox";
-import ManageCollectionStatus from "../ManageCollectionStatus";
+import ManageCollectionStatus from "@/modules/ManageCollectionStatus";
 
 const UpdateCollectionGuidance = maskClientTest(
   () => import("./UpdateCollectionGuidance")

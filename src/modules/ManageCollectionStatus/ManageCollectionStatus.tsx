@@ -42,7 +42,7 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
     collection.model_state?.state_id ?? CollectionStatus.DRAFT
   );
 
-  const possibleOptions = {
+  const destinationOptions = {
     [CollectionStatus.DRAFT]: [] as CollectionStatus[],
     [CollectionStatus.PENDING]: currentCustodian
       ? ([] as CollectionStatus[])
@@ -52,7 +52,7 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
     [CollectionStatus.SUSPENDED]: [] as CollectionStatus[],
   };
   const options = (
-    possibleOptions[initialStatusId as CollectionStatus] || []
+    destinationOptions[initialStatusId as CollectionStatus] || []
   ).concat([initialStatusId as CollectionStatus]);
 
   useEffect(() => {
