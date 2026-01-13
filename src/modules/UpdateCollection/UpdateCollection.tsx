@@ -169,7 +169,7 @@ const UpdateCollection = ({
     async (data: UpdateCollectionFormValues, closeAfter = false) => {
       if (!collection?.id) return;
 
-      const { id } = collection;
+      const { id, name } = collection;
       if (isDirty) {
         if (currentCustodian) {
           await updateCollection(id, data.collection, data.config);
@@ -197,7 +197,7 @@ const UpdateCollection = ({
             workgroup_ids: newWorkgroups.map((wg) => wg.id),
           });
           notify.success(
-            `Add collection ${id} to workgroup${
+            `Add collection "${name}" to workgroup${
               newWorkgroups.length > 1 ? "s" : ""
             } ${newWorkgroups.map((wg) => wg.name).join(", ")}`
           );
@@ -213,7 +213,7 @@ const UpdateCollection = ({
             workgroup_ids: workgroupsToRemove.map((wg) => wg.id),
           });
           notify.success(
-            `Removed collection ${id} from workgroup${
+            `Removed collection "${name}" from workgroup${
               workgroupsToRemove.length > 1 ? "s" : ""
             } ${workgroupsToRemove.map((wg) => wg.name).join(", ")}`
           );
@@ -231,7 +231,7 @@ const UpdateCollection = ({
               ].toLowerCase(),
           });
           notify.success(
-            `Transitioned collection ${id} to status ${
+            `Transitioned collection "${name}" to status ${
               CollectionStatus[
                 data.collection.model_state.state.id as CollectionStatus
               ]
