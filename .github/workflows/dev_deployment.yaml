@@ -58,9 +58,11 @@ jobs:
           INT_GAR_NAME: ${{ secrets.INT_GAR_NAME }}
 
         run: |-
+          # This build the standalone version of the web
           docker build -f Dockerfile -t '${{ env.GAR_LOCATION }}'-docker.pkg.dev/'${{ env.PROJECT_ID }}'/'${{ env.GAR_NAME }}'/${{ steps.getversion.outputs.version }}:${{ github.sha }} -t '${{ env.GAR_LOCATION }}'-docker.pkg.dev/'${{ env.PROJECT_ID }}'/'${{ env.GAR_NAME }}'/${{ steps.getversion.outputs.version }}:latest --build-arg API_BASE_URL=${{ vars.API_BASE_URL }} --build-arg NEXT_PUBLIC_LOGIN_URL=${{ vars.NEXT_PUBLIC_LOGIN_URL }} --build-arg APPLICATION_MODE=${{ vars.APPLICATION_MODE }} ./
           docker push --all-tags '${{ env.GAR_LOCATION }}'-docker.pkg.dev/'${{ env.PROJECT_ID }}'/'${{ env.GAR_NAME }}'/${{ steps.getversion.outputs.version }}
           
+          # This build the standalone version of the web with different build variables
           docker build -f Dockerfile -t '${{ env.GAR_LOCATION }}'-docker.pkg.dev/'${{ env.PROJECT_ID }}'/'${{ env.INT_GAR_NAME }}'/${{ steps.getversion.outputs.version }}:${{ github.sha }} -t '${{ env.GAR_LOCATION }}'-docker.pkg.dev/'${{ env.PROJECT_ID }}'/'${{ env.INT_GAR_NAME }}'/${{ steps.getversion.outputs.version }}:latest --build-arg API_BASE_URL=${{ vars.INT_API_BASE_URL }} --build-arg NEXT_PUBLIC_LOGIN_URL=${{ vars.INT_NEXT_PUBLIC_LOGIN_URL }} --build-arg APPLICATION_MODE=${{ vars.INT_APPLICATION_MODE }} ./
           docker push --all-tags '${{ env.GAR_LOCATION }}'-docker.pkg.dev/'${{ env.PROJECT_ID }}'/'${{ env.INT_GAR_NAME }}'/${{ steps.getversion.outputs.version }}
 
