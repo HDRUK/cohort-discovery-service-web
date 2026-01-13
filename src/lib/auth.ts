@@ -3,6 +3,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import { TokenUser } from "@/types/api";
 import { redirect } from "next/navigation";
+import { isStandalone } from "@/utils/modes";
 
 const applicationMode = process.env.APPLICATION_MODE;
 
@@ -15,7 +16,7 @@ export async function getTokenUser(): Promise<{
   const decoded = token ? (jwt.decode(token) as JwtPayload) : undefined;
 
   const user = decoded?.user as TokenUser;
-  if (!user && applicationMode === "standalone") {
+  if (!user && isStandalone(applicationMode)) {
     redirect("/login");
   }
 
