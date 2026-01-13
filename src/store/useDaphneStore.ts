@@ -41,6 +41,8 @@ import getConcepts from "@/actions/getConcepts";
 import attachConcepts from "@/actions/attachConcepts";
 import detachConcepts from "@/actions/detachConcepts";
 import deleteConceptSet from "@/actions/deleteConceptSet";
+import deleteQueries from "@/actions/deleteQueries";
+
 import { queryToText } from "@/utils/queryBuilder";
 
 import {
@@ -80,6 +82,7 @@ import removeCollectionsFromWorkgroup from "@/actions/removeCollectionsFromWorkg
 import {
   getCollectionHostTag,
   getTagCustodianCollection,
+  getUserQueryTag,
   TAG_COLLECTION_ADMIN,
   TAG_COLLECTIONS,
   TAG_CONCEPT_SETS,
@@ -188,6 +191,7 @@ export interface DaphneStoreState {
       conceptIds: number[]
     ) => Promise<void>;
     removeConceptSet: (conceptSetId: number) => Promise<void>;
+    deleteQueries: (pids: string[]) => void;
   };
   custodianData: {
     currentCustodian: Custodian | null;
@@ -678,8 +682,14 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       await deleteConceptSet(conceptSetId);
       await revalidateUserAction(TAG_CONCEPT_SETS);
     },
+    deleteQueries: async (pids) => {
+      await deleteQueries(pids);
+      const user = get().userData.user;
+      if (user) {
+        await revalidateAction(getUserQueryTag(user.id));
+      }
+    },
   },
-
   custodianData: {
     currentCustodian: null,
     setCurrentCustodian: (custodian: Custodian | null) =>

@@ -143,6 +143,7 @@ function makeDefaultStore(): DaphneStoreState {
         RESOLVE<void>(undefined),
 
       removeConceptSet: (_conceptSetId: number) => RESOLVE<void>(undefined),
+      deleteQueries: (_pids: string[]) => RESOLVE<void>(undefined),
     },
 
     custodianData: {

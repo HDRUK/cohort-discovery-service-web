@@ -8,6 +8,7 @@ import ProtectedPage from "./components/ProtectedPage";
 import getMe from "@/actions/getMe";
 import getCustodians from "@/actions/getCustodians";
 import getFeatureFlags from "@/actions/getFeatureFlags";
+import { isStandalone } from "@/utils/modes";
 
 const applicationMode = process.env.APPLICATION_MODE;
 
@@ -20,7 +21,7 @@ export default async function ProtectedLayout({
   const token = cookieStore.get(ACCESS_TOKEN_NAME)?.value;
   const decoded = token ? (jwt.decode(token) as JwtPayload) : undefined;
   if (!token || !decoded) {
-    if (applicationMode === "standalone") {
+    if (isStandalone(applicationMode)) {
       // No token — render the client SignIn component so users can sign in.
       redirect("/login");
     } else {
