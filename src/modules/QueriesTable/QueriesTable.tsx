@@ -282,9 +282,7 @@ const QueriesTable = ({
         },
         sortProps: { field: "name" },
         deleteProps: {
-          onClick: (selectedRows) => {
-            deleteQueries(selectedRows);
-          },
+          onClick: deleteQueries,
         },
       }}
     />
