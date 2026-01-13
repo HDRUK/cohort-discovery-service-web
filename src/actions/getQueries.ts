@@ -19,8 +19,6 @@ const getQueries = async (
     ...args,
   });
 
-  console.log(data.total);
-
   const incompleteQueries = data.data.filter((q) =>
     q.tasks.some((t) => !t.completed_at)
   );
