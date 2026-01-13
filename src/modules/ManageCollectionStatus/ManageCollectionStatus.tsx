@@ -1,12 +1,10 @@
 import transitionCollection from "@/actions/transitionCollection";
 import AddButton from "@/components/AddButton";
 import FormRadioGroup from "@/components/FormRadioGroup";
-import SquareRadio from "@/components/SquareRadio";
 import StatusChip from "@/components/StatusChip";
 import { useNotify } from "@/providers/NotifyProvider";
 import useCustodianStore from "@/store/useCustodianStore";
 import { Collection, CollectionStatus } from "@/types/api";
-import { CollectionFilterStatus } from "@/types/collections";
 import { UpdateCollectionFormValues } from "@/types/forms";
 import { getCollectionStatus } from "@/utils/colours";
 import { Box, Chip } from "@mui/material";
@@ -102,7 +100,6 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
           control={control}
           render={() => (
             <FormRadioGroup
-              control={<SquareRadio />}
               label=""
               options={options
                 .filter((o) => o !== selectedStatusId) // don't show currently selected status as an option

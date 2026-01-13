@@ -1,12 +1,12 @@
-import { useId, ReactNode, ReactElement } from "react";
+import { useId, ReactNode } from "react";
 import {
   FormControl,
   FormControlLabel,
   FormLabel,
-  Radio,
   RadioGroup,
   RadioGroupProps,
 } from "@mui/material";
+import SquareRadio from "../SquareRadio";
 
 type RadioOption = {
   label: ReactNode;
@@ -19,7 +19,6 @@ interface FormRadioGroupProps extends Omit<RadioGroupProps, "children"> {
   required?: boolean;
   options: RadioOption[];
   error?: boolean;
-  control?: ReactElement;
 }
 
 const FormRadioGroup = ({
@@ -29,7 +28,6 @@ const FormRadioGroup = ({
   required = false,
   options,
   error,
-  control,
   ...radioGroupProps
 }: FormRadioGroupProps) => {
   const generatedId = useId();
@@ -51,7 +49,7 @@ const FormRadioGroup = ({
           <FormControlLabel
             key={option.value || ""}
             value={option.value}
-            control={control || <Radio />}
+            control={<SquareRadio />}
             label={option.label}
             disabled={option.disabled}
           />
