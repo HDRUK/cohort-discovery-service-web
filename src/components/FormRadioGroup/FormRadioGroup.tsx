@@ -3,10 +3,10 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
-  Radio,
   RadioGroup,
   RadioGroupProps,
 } from "@mui/material";
+import SquareRadio from "../SquareRadio";
 
 type RadioOption = {
   label: ReactNode;
@@ -49,7 +49,7 @@ const FormRadioGroup = ({
           <FormControlLabel
             key={option.value || ""}
             value={option.value}
-            control={<Radio />}
+            control={<SquareRadio />}
             label={option.label}
             disabled={option.disabled}
           />
