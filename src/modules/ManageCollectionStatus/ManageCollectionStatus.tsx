@@ -39,7 +39,7 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
 
   const initialStatusId = collection.model_state?.state_id;
   const [selectedStatusId, setSelectedStatusId] = useState<number>(
-    collection.model_state?.state_id ?? CollectionStatus.DRAFT
+    collection.model_state?.state_id ?? -1
   );
 
   const destinationOptions = {
@@ -71,9 +71,9 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
             label={"Request to make active"}
             action={async () => {
               await transitionCollection(collection.id, {
-                state: CollectionFilterStatus.PENDING,
+                state: "pending",
               });
-
+              setSelectedStatusId(CollectionStatus.PENDING);
               notify.success(
                 `Requested for collection "${collection.name}" to be made active`
               );
@@ -96,7 +96,7 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
         </Box>
       )}
 
-      {expandedRight && (
+      {expandedRight && initialStatusId !== CollectionStatus.DRAFT && (
         <Controller
           name={"collection.model_state.state_id" as Path<TFieldValues>}
           control={control}
