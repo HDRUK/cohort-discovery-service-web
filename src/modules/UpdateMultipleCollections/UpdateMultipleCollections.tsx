@@ -16,7 +16,6 @@ import {
   Workgroup,
 } from "@/types/api";
 import { Controller, FormProvider, useForm } from "react-hook-form";
-import AddButton from "@/components/AddButton";
 import { useCallback, useEffect, useState } from "react";
 import { revalidateAction } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
@@ -26,14 +25,14 @@ import {
   getTagCustodianCollection,
   TAG_CUSTODIAN_COLLECTION,
 } from "@/config/tags";
-import StatusChip from "@/components/StatusChip";
 import SquareCheckbox from "@/components/SquareCheckbox";
-import transitionCollections from "@/actions/transitionCollections";
-import { CollectionFilterStatus } from "@/types/collections";
 import removeCollectionFromWorkgroups from "@/actions/removeCollectionFromWorkgroups";
 import addCollectionToWorkgroups from "@/actions/addCollectionToWorkgroups";
 import FormLabel from "@/components/FormLabel";
+import ManageMultipleCollectionsStatus from "@/modules/ManageMultipleCollectionsStatus";
 import UpdateMultipleCollectionsGuidance from "./UpdateMultipleCollectionsGuidance";
+import { UpdateCollectionFormValues } from "@/types/forms";
+import transitionCollections from "@/actions/transitionCollections";
 
 export type UpdateMultipleCollectionProps = {
   collections: CollectionWithHosts[];
@@ -64,10 +63,6 @@ const UpdateMultipleCollections = ({
     handleSubmit,
     formState: { isDirty },
   } = formMethods;
-
-  const uniqueStates = [
-    ...new Set(collections.map((c) => c?.model_state?.state_id)),
-  ];
 
   // Check that all collections have the same workgroups
   const firstWorkgroups = (
@@ -100,7 +95,7 @@ const UpdateMultipleCollections = ({
   );
 
   const submitForm = useCallback(
-    async (closeAfter = false) => {
+    async (data: UpdateCollectionFormValues, closeAfter = false) => {
       if (isDirty) {
         // for each collection, compare to what's selected, and run the add/removes required
         for (const c of collections) {
@@ -138,6 +133,31 @@ const UpdateMultipleCollections = ({
           }
         }
 
+        if (
+          data.collection.model_state?.state.id &&
+          collections[0].model_state?.state_id !==
+            data.collection.model_state?.state.id
+        ) {
+          await transitionCollections(
+            collections.map((c) => c.id),
+            {
+              state:
+                CollectionStatus[
+                  data.collection.model_state.state.id
+                ].toLowerCase(),
+            }
+          );
+          notify.success(
+            `Transitioned collections (${collections
+              .map((c) => c.name)
+              .join(", ")}) to status ${
+              CollectionStatus[
+                data.collection.model_state.state.id as CollectionStatus
+              ]
+            }`
+          );
+        }
+
         revalidateAction(TAG_CUSTODIAN_COLLECTION);
         if (currentCustodian) {
           revalidateAction(getTagCustodianCollection(currentCustodian.pid));
@@ -160,33 +180,18 @@ const UpdateMultipleCollections = ({
   );
 
   const handleEnter = useCallback(
-    () => handleSubmit(() => submitForm(false))(),
+    () => handleSubmit((values) => submitForm(values, false))(),
     [handleSubmit, submitForm]
   );
 
   const handleLockClick = useCallback(
-    () => handleSubmit(() => submitForm(true))(),
+    () => handleSubmit((values) => submitForm(values, true))(),
     [handleSubmit, submitForm]
   );
 
   const handleUnlockClick = useCallback(() => {
     onClose?.();
   }, [onClose]);
-
-  const handleAction = useCallback(async () => {
-    await transitionCollections(
-      collections.map((c) => c.id),
-      {
-        state: CollectionFilterStatus.PENDING,
-      }
-    );
-
-    notify.success(
-      `Requested for collections "${collections
-        .map((c) => c.name)
-        .join(", ")}" to be made active`
-    );
-  }, [collections, notify]);
 
   useLogDependencyChanges("UpdateMultipleCollections", {
     collections,
@@ -247,30 +252,18 @@ const UpdateMultipleCollections = ({
       </Typography>
 
       <FormLabel underlined>Collection Status</FormLabel>
-      {uniqueStates.length > 1 && (
-        <Box sx={{ mb: 1 }}>
-          <Chip label={"MIXED"} />
-        </Box>
-      )}
-      {uniqueStates.length === 1 &&
-        uniqueStates[0] !== CollectionStatus.DRAFT && (
-          <Box sx={{ mb: 1 }}>
-            <StatusChip state_id={uniqueStates[0]} />
-          </Box>
-        )}
-      {uniqueStates.length === 1 &&
-        uniqueStates[0] === CollectionStatus.DRAFT && (
-          <AddButton
-            label={"Request to make active"}
-            disabled={!expandedRight}
-            action={handleAction}
-          />
-        )}
-      {/* Handle the logic of when to display checkboxes for certain states - this needs the logic explained before implementation
-        {!currentCustodian &&
-          (collection?.model_state?.state_id == CollectionStatus.DRAFT ||
-            collection?.model_state?.state_id == CollectionStatus.ACTIVE ||
-            collection?.model_state?.state_id == CollectionStatus.REJECTED)} */}
+
+      <ManageMultipleCollectionsStatus
+        collections={collections}
+        expandedRight={expandedRight}
+        key={`manage-multiple-colls-status-${collections
+          .map((c) => c.id)
+          .sort()
+          .join("-")}`}
+        control={control}
+        setValue={setValue}
+      />
+
       <FormLabel underlined>Workgroup access</FormLabel>
       <Box
         sx={{
