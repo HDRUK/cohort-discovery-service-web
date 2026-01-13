@@ -362,6 +362,7 @@ const CollectionsTable = ({
               currentCustodian?.pid && !admin
                 ? getTagCustodianCollection(currentCustodian.pid)
                 : TAG_COLLECTION_ADMIN,
+            label: "Refresh Collections",
           },
         }}
       />

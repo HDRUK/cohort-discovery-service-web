@@ -284,7 +284,7 @@ const UpdateMultipleCollections = ({
           collections[0].workgroups?.map((w) => (
             <Chip color="secondary" label={w.name} key={`wg-chip-${w.name}`} />
           ))}
-        {!collectionsHaveMatchingWorkgroups && (
+        {!collectionsHaveMatchingWorkgroups && !!collections && (
           <Box>{<Chip label={"MIXED"} key={"wg-chip-mixed"} />}</Box>
         )}
       </Box>
