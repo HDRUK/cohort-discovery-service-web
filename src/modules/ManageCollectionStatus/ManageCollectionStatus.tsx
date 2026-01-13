@@ -55,8 +55,8 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
 
   useEffect(() => {
     setValue("collection.model_state.state.id", selectedStatusId, {
-      shouldDirty: true,
-      shouldTouch: true,
+      shouldDirty: selectedStatusId !== initialStatusId,
+      shouldTouch: selectedStatusId !== initialStatusId,
     });
   }, [selectedStatusId, setValue]);
 
