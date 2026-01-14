@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
-import ManageCollectionStatus from "./ManageCollectionStatus";
+import ManageMultipleCollectionsStatus from "./ManageMultipleCollectionsStatus";
 import {
   Collection,
   CollectionStatus,
@@ -11,7 +11,7 @@ import { NotifyProvider } from "@/providers/NotifyProvider";
 import { useForm } from "react-hook-form";
 import { UpdateCollectionFormValues } from "@/types/forms";
 
-function TestHarness({ mockCollection }: { mockCollection: Collection }) {
+function TestHarness({ mockCollections }: { mockCollections: Collection[] }) {
   const formMethods = useForm<UpdateCollectionFormValues>({
     defaultValues: {
       collection: {
@@ -34,8 +34,8 @@ function TestHarness({ mockCollection }: { mockCollection: Collection }) {
 
   return (
     <NotifyProvider>
-      <ManageCollectionStatus
-        collection={mockCollection}
+      <ManageMultipleCollectionsStatus
+        collections={mockCollections}
         expandedRight={true}
         control={control}
         setValue={jest.fn()}
@@ -45,32 +45,30 @@ function TestHarness({ mockCollection }: { mockCollection: Collection }) {
 }
 
 describe("ManageCollectionStatus", () => {
-  function mockCollection(initialStatus: CollectionStatus) {
-    console.log(initialStatus);
-
-    console.log(CollectionStatus[initialStatus]);
-    return {
-      id: 1,
-      title: "Test Collection",
-      model_state: {
-        id: initialStatus,
-        state_id: initialStatus,
-        state: {
+  function mockCollections(initialStatuses: CollectionStatus[]) {
+    return initialStatuses.map((initialStatus, index) => {
+      return {
+        id: index + 1,
+        title: "Test Collection",
+        model_state: {
           id: initialStatus,
-          name: CollectionStatus[initialStatus],
-          slug: CollectionStatus[initialStatus].toLowerCase(),
+          state_id: initialStatus,
+          state: {
+            id: initialStatus,
+            name: CollectionStatus[initialStatus],
+            slug: CollectionStatus[initialStatus].toLowerCase(),
+          },
         },
-      },
-      // Add other necessary fields with mock data
-    };
+      } as unknown as Collection;
+    });
   }
 
-  const renderComponent = (initialStatus: CollectionStatus) => {
-    render(<TestHarness mockCollection={mockCollection(initialStatus)} />);
+  const renderComponent = (initialStatuses: CollectionStatus[]) => {
+    render(<TestHarness mockCollections={mockCollections(initialStatuses)} />);
   };
 
   it("renders the component in draft with correct initial status", () => {
-    renderComponent(CollectionStatus.DRAFT);
+    renderComponent([CollectionStatus.DRAFT, CollectionStatus.DRAFT]);
     expect(screen.queryByText(/Draft/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Pending/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Active/)).not.toBeInTheDocument();
@@ -80,7 +78,7 @@ describe("ManageCollectionStatus", () => {
   });
 
   it("renders the component in pending with correct initial status", () => {
-    renderComponent(CollectionStatus.PENDING);
+    renderComponent([CollectionStatus.PENDING, CollectionStatus.PENDING]);
     expect(screen.queryByText(/Draft/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Pending/i)).toBeInTheDocument();
     expect(screen.queryByText(/Active/i)).toBeInTheDocument();
@@ -92,7 +90,7 @@ describe("ManageCollectionStatus", () => {
   });
 
   it("renders the component in active with correct initial status", () => {
-    renderComponent(CollectionStatus.ACTIVE);
+    renderComponent([CollectionStatus.ACTIVE, CollectionStatus.ACTIVE]);
     expect(screen.queryByText(/Draft/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Pending/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Active/)).toBeInTheDocument();
@@ -105,7 +103,7 @@ describe("ManageCollectionStatus", () => {
   });
 
   it("renders the component in REJECTED with correct initial status", () => {
-    renderComponent(CollectionStatus.REJECTED);
+    renderComponent([CollectionStatus.REJECTED, CollectionStatus.REJECTED]);
     expect(screen.queryByText(/Draft/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Pending/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Active/i)).not.toBeInTheDocument();
@@ -118,13 +116,27 @@ describe("ManageCollectionStatus", () => {
   });
 
   it("renders the component in SUSPENDED with correct initial status", () => {
-    renderComponent(CollectionStatus.SUSPENDED);
+    renderComponent([CollectionStatus.SUSPENDED, CollectionStatus.SUSPENDED]);
     expect(screen.queryByText(/Draft/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Pending/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Active/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Inactive/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Rejected/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Suspended/i)).toBeInTheDocument();
+    expect(
+      screen.queryByText("Request to make active")
+    ).not.toBeInTheDocument();
+  });
+
+  it("renders the component in a mixed status with correct initial status", () => {
+    renderComponent([CollectionStatus.ACTIVE, CollectionStatus.REJECTED]);
+    expect(screen.queryByText(/Draft/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Pending/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Active/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Inactive/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Rejected/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Suspended/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Mixed/i)).toBeInTheDocument();
     expect(
       screen.queryByText("Request to make active")
     ).not.toBeInTheDocument();
