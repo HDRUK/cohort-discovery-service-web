@@ -6,13 +6,14 @@ import {
 } from "material-react-table";
 import React, { useMemo } from "react";
 import { trueKeys } from "@/utils/numbers";
-import RefreshButton from "@/components/RefreshButton";
-import DownloadButton from "../DownloadButton";
-import { DownloadButtonProps } from "../DownloadButton/DownloadButton";
-import SortButton, { SortButtonProps } from "../SortButton/SortButton";
-import EditButton, { EditButtonProps } from "../EditButton";
-import { RefreshButtonProps } from "../RefreshButton/RefreshButton";
-import DeleteButton, { DeleteButtonProps } from "../DeleteButton";
+import RefreshButton, { RefreshButtonProps } from "@/components/RefreshButton";
+import ReRunButton, { ReRunButtonProps } from "../ReRunButton/ReRunButton";
+import DownloadButton, {
+  DownloadButtonProps,
+} from "@/components/DownloadButton";
+import SortButton, { SortButtonProps } from "@/components/SortButton";
+import EditButton, { EditButtonProps } from "@/components/EditButton";
+import DeleteButton, { DeleteButtonProps } from "@/components/DeleteButton";
 import Title, { TitleProps } from "@/components/Title";
 import ControlledSearchBox, {
   ControlledSearchBoxProps,
@@ -25,6 +26,7 @@ export interface TableProps {
   };
   rightAction?: {
     refreshProps?: RefreshButtonProps;
+    reRunProps?: ReRunButtonProps;
     deleteProps?: Omit<DeleteButtonProps, "onClick"> & {
       onClick?: (selectedRowIds: string[]) => void;
     };
@@ -54,8 +56,14 @@ const Table = <TData extends MRT_RowData>({
   const selectedRows = useMemo(() => trueKeys(rowSelection), [rowSelection]);
 
   const { titleProps, searchProps } = leftAction || {};
-  const { sortProps, editProps, refreshProps, deleteProps, downloadProps } =
-    rightAction || {};
+  const {
+    sortProps,
+    editProps,
+    refreshProps,
+    reRunProps,
+    deleteProps,
+    downloadProps,
+  } = rightAction || {};
 
   const { onClick: onDeleteClick, ...restDeleteProps } = deleteProps ?? {};
   const { onClick: onDownloadClick, ...restDownloadProps } =
@@ -92,6 +100,8 @@ const Table = <TData extends MRT_RowData>({
                 {sortProps && <SortButton {...sortProps} />}
 
                 {refreshProps && <RefreshButton {...refreshProps} />}
+
+                {reRunProps && <ReRunButton {...reRunProps} />}
 
                 {editProps && (
                   <EditButton
