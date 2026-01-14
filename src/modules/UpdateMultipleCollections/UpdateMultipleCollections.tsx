@@ -38,6 +38,7 @@ import FormLabel from "@/components/FormLabel";
 import ManageMultipleCollectionsStatus from "@/modules/ManageMultipleCollectionsStatus";
 import UpdateMultipleCollectionsGuidance from "./UpdateMultipleCollectionsGuidance";
 import transitionCollections from "@/actions/transitionCollections";
+import { UpdateCollectionFormValues } from "@/types/forms";
 
 export type UpdateMultipleCollectionProps = {
   collections: CollectionWithHosts[];
@@ -61,7 +62,7 @@ const UpdateMultipleCollections = ({
 
   const notify = useNotify();
 
-  const formMethods = useForm();
+  const formMethods = useForm<UpdateCollectionFormValues>();
 
   const {
     control,
@@ -266,8 +267,6 @@ const UpdateMultipleCollections = ({
           .map((c) => c.id)
           .sort()
           .join("-")}`}
-        control={control}
-        setValue={setValue}
       />
 
       <FormLabel underlined>Workgroup access</FormLabel>

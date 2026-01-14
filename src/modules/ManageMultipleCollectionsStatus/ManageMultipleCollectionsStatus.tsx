@@ -5,32 +5,23 @@ import StatusChip from "@/components/StatusChip";
 import { useNotify } from "@/providers/NotifyProvider";
 import useCustodianStore from "@/store/useCustodianStore";
 import { Collection, CollectionStatus } from "@/types/api";
+import { UpdateCollectionFormValues } from "@/types/forms";
 import { getCollectionStatus } from "@/utils/colours";
 import { Box, Chip } from "@mui/material";
 import { useEffect, useState } from "react";
-import {
-  Control,
-  Controller,
-  FieldValues,
-  Path,
-  UseFormSetValue,
-} from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 
-interface ManageMultipleCollectionsStatusProps<
-  TFieldValues extends FieldValues
-> {
+interface ManageMultipleCollectionsStatusProps {
   collections: Collection[];
   expandedRight: boolean;
-  control: Control<TFieldValues>;
-  setValue: UseFormSetValue<FieldValues>;
 }
 
-const ManageMultipleCollectionsStatus = <TFieldValues extends FieldValues>({
+const ManageMultipleCollectionsStatus = ({
   collections,
   expandedRight,
-  control,
-  setValue,
-}: ManageMultipleCollectionsStatusProps<TFieldValues>) => {
+}: ManageMultipleCollectionsStatusProps) => {
+  const { control, setValue } = useFormContext<UpdateCollectionFormValues>();
+
   const { currentCustodian } = useCustodianStore((custodianData) => ({
     currentCustodian: custodianData.currentCustodian,
   }));
@@ -115,7 +106,7 @@ const ManageMultipleCollectionsStatus = <TFieldValues extends FieldValues>({
 
       {expandedRight && initialStatusId !== CollectionStatus.DRAFT && (
         <Controller
-          name={"collection.model_state.state_id" as Path<TFieldValues>}
+          name={"collection.model_state.state_id"}
           control={control}
           render={() => (
             <FormRadioGroup
