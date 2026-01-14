@@ -21,7 +21,6 @@ import {
   Workgroup,
 } from "@/types/api";
 import { Controller, FormProvider, useForm } from "react-hook-form";
-import AddButton from "@/components/AddButton";
 import FormTextField from "@/components/FormTextField";
 import CollectionConfig from "@/components/CollectionConfig";
 import { UpdateCollectionFormValues } from "@/types/forms";
@@ -38,13 +37,12 @@ import {
 } from "@/config/tags";
 import FormLabel from "@/components/FormLabel";
 import { maskClientTest } from "@/lib/maskClientTest";
-import StatusChip from "@/components/StatusChip";
 import transitionCollection from "@/actions/transitionCollection";
-import { CollectionFilterStatus } from "@/types/collections";
 import useAdminStore from "@/store/useAdminStore";
 import removeCollectionFromWorkgroups from "@/actions/removeCollectionFromWorkgroups";
 import addCollectionToWorkgroups from "@/actions/addCollectionToWorkgroups";
 import SquareCheckbox from "@/components/SquareCheckbox";
+import ManageCollectionStatus from "@/modules/ManageCollectionStatus";
 
 const UpdateCollectionGuidance = maskClientTest(
   () => import("./UpdateCollectionGuidance")
@@ -220,6 +218,26 @@ const UpdateCollection = ({
             } ${workgroupsToRemove.map((wg) => wg.name).join(", ")}`
           );
         }
+
+        if (
+          data.collection.model_state?.state.id &&
+          collection.model_state?.state_id !==
+            data.collection.model_state?.state.id
+        ) {
+          await transitionCollection(id, {
+            state:
+              CollectionStatus[
+                data.collection.model_state.state.id
+              ].toLowerCase(),
+          });
+          notify.success(
+            `Transitioned collection ${id} to status ${
+              CollectionStatus[
+                data.collection.model_state.state.id as CollectionStatus
+              ]
+            }`
+          );
+        }
       }
 
       if (closeAfter) {
@@ -315,32 +333,14 @@ const UpdateCollection = ({
       </Typography>
 
       <FormLabel underlined>Collection Status</FormLabel>
-      {collection?.model_state?.state_id != CollectionStatus.DRAFT && (
-        <Box sx={{ mb: 1 }}>
-          <StatusChip state_id={collection?.model_state?.state_id} />
-        </Box>
-      )}
-      {collection?.model_state?.state_id == CollectionStatus.DRAFT &&
-        collection?.model_state?.state && (
-          <AddButton
-            disabled={!expandedRight}
-            label={"Request to make active"}
-            action={async () => {
-              await transitionCollection(collection.id, {
-                state: CollectionFilterStatus.PENDING,
-              });
 
-              notify.success(
-                `Requested for collection "${collection.name}" to be made active`
-              );
-            }}
-          />
-        )}
-      {/* Handle the logic of when to display checkboxes for certain states - this needs the logic explained before implementation
-        {!currentCustodian &&
-          (collection?.model_state?.state_id == CollectionStatus.DRAFT ||
-            collection?.model_state?.state_id == CollectionStatus.ACTIVE ||
-            collection?.model_state?.state_id == CollectionStatus.REJECTED)} */}
+      <ManageCollectionStatus
+        collection={collection}
+        expandedRight={expandedRight}
+        key={collection.id}
+        control={control}
+        setValue={setValue}
+      />
 
       <FormLabel underlined>Workgroup access</FormLabel>
 
