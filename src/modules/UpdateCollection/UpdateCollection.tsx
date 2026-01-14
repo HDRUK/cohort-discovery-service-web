@@ -33,6 +33,7 @@ import useCustodianStore from "@/store/useCustodianStore";
 import { useLogDependencyChanges } from "@/utils/deps";
 import {
   getTagCustodianCollection,
+  TAG_COLLECTION_ADMIN,
   TAG_CUSTODIAN_COLLECTION,
 } from "@/config/tags";
 import FormLabel from "@/components/FormLabel";
@@ -169,7 +170,7 @@ const UpdateCollection = ({
     async (data: UpdateCollectionFormValues, closeAfter = false) => {
       if (!collection?.id) return;
 
-      const { id } = collection;
+      const { id, name } = collection;
       if (isDirty) {
         if (currentCustodian) {
           await updateCollection(id, data.collection, data.config);
@@ -177,11 +178,6 @@ const UpdateCollection = ({
           await updateCollectionAdmin(id, data.collection, data.config);
         }
         notify.success(`Updated collection ${data.collection.name}`);
-
-        revalidateAction(TAG_CUSTODIAN_COLLECTION);
-        if (currentCustodian) {
-          revalidateAction(getTagCustodianCollection(currentCustodian.pid));
-        }
 
         const cwNames = new Set(
           (collection.workgroups ?? []).map((w) => w.name)
@@ -197,7 +193,7 @@ const UpdateCollection = ({
             workgroup_ids: newWorkgroups.map((wg) => wg.id),
           });
           notify.success(
-            `Add collection ${id} to workgroup${
+            `Add collection "${name}" to workgroup${
               newWorkgroups.length > 1 ? "s" : ""
             } ${newWorkgroups.map((wg) => wg.name).join(", ")}`
           );
@@ -213,7 +209,7 @@ const UpdateCollection = ({
             workgroup_ids: workgroupsToRemove.map((wg) => wg.id),
           });
           notify.success(
-            `Removed collection ${id} from workgroup${
+            `Removed collection "${name}" from workgroup${
               workgroupsToRemove.length > 1 ? "s" : ""
             } ${workgroupsToRemove.map((wg) => wg.name).join(", ")}`
           );
@@ -231,12 +227,17 @@ const UpdateCollection = ({
               ].toLowerCase(),
           });
           notify.success(
-            `Transitioned collection ${id} to status ${
+            `Transitioned collection "${name}" to status ${
               CollectionStatus[
                 data.collection.model_state.state.id as CollectionStatus
               ]
             }`
           );
+        }
+        revalidateAction(TAG_CUSTODIAN_COLLECTION);
+        revalidateAction(TAG_COLLECTION_ADMIN);
+        if (currentCustodian) {
+          revalidateAction(getTagCustodianCollection(currentCustodian.pid));
         }
       }
 

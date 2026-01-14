@@ -16,7 +16,13 @@ const CollectionsRightPanel = ({ ...props }: CollectionsRightPanelProps) => {
   const selectedCollections = useUserStore((u) => u.selectedCollections);
 
   if (selectedCollections && selectedCollections.length === 1) {
-    return <UpdateCollection collection={selectedCollections[0]} {...props} />;
+    return (
+      <UpdateCollection
+        collection={selectedCollections[0]}
+        key={`update-coll-${selectedCollections[0].id}`}
+        {...props}
+      />
+    );
   }
   if (selectedCollections && selectedCollections.length > 1) {
     return (
