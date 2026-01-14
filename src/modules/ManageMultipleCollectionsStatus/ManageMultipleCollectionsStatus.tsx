@@ -30,7 +30,6 @@ const ManageMultipleCollectionsStatus = ({
   const uniqueStates = [
     ...new Set((collections || []).map((c) => c?.model_state?.state_id)),
   ];
-  console.log("collections", collections);
 
   const initialStatusId = collections[0].model_state?.state_id;
   const [selectedStatusId, setSelectedStatusId] = useState<number>(
