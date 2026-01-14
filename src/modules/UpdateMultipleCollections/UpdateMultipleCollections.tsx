@@ -23,6 +23,7 @@ import useCustodianStore from "@/store/useCustodianStore";
 import { useLogDependencyChanges } from "@/utils/deps";
 import {
   getTagCustodianCollection,
+  TAG_COLLECTION_ADMIN,
   TAG_CUSTODIAN_COLLECTION,
 } from "@/config/tags";
 import SquareCheckbox from "@/components/SquareCheckbox";
@@ -159,6 +160,7 @@ const UpdateMultipleCollections = ({
         }
 
         revalidateAction(TAG_CUSTODIAN_COLLECTION);
+        revalidateAction(TAG_COLLECTION_ADMIN);
         if (currentCustodian) {
           revalidateAction(getTagCustodianCollection(currentCustodian.pid));
         }

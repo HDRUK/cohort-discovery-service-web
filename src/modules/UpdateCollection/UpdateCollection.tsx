@@ -33,6 +33,7 @@ import useCustodianStore from "@/store/useCustodianStore";
 import { useLogDependencyChanges } from "@/utils/deps";
 import {
   getTagCustodianCollection,
+  TAG_COLLECTION_ADMIN,
   TAG_CUSTODIAN_COLLECTION,
 } from "@/config/tags";
 import FormLabel from "@/components/FormLabel";
@@ -178,11 +179,6 @@ const UpdateCollection = ({
         }
         notify.success(`Updated collection ${data.collection.name}`);
 
-        revalidateAction(TAG_CUSTODIAN_COLLECTION);
-        if (currentCustodian) {
-          revalidateAction(getTagCustodianCollection(currentCustodian.pid));
-        }
-
         const cwNames = new Set(
           (collection.workgroups ?? []).map((w) => w.name)
         );
@@ -237,6 +233,11 @@ const UpdateCollection = ({
               ]
             }`
           );
+        }
+        revalidateAction(TAG_CUSTODIAN_COLLECTION);
+        revalidateAction(TAG_COLLECTION_ADMIN);
+        if (currentCustodian) {
+          revalidateAction(getTagCustodianCollection(currentCustodian.pid));
         }
       }
 
