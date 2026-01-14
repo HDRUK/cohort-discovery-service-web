@@ -5,7 +5,6 @@ import StatusChip from "@/components/StatusChip";
 import { useNotify } from "@/providers/NotifyProvider";
 import useCustodianStore from "@/store/useCustodianStore";
 import { Collection, CollectionStatus } from "@/types/api";
-import { UpdateCollectionFormValues } from "@/types/forms";
 import { getCollectionStatus } from "@/utils/colours";
 import { Box, Chip } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -23,7 +22,7 @@ interface ManageMultipleCollectionsStatusProps<
   collections: Collection[];
   expandedRight: boolean;
   control: Control<TFieldValues>;
-  setValue: UseFormSetValue<UpdateCollectionFormValues>;
+  setValue: UseFormSetValue<FieldValues>;
 }
 
 const ManageMultipleCollectionsStatus = <TFieldValues extends FieldValues>({

@@ -15,7 +15,12 @@ import {
   CollectionWithHosts,
   Workgroup,
 } from "@/types/api";
-import { Controller, FormProvider, useForm } from "react-hook-form";
+import {
+  Controller,
+  FieldValues,
+  FormProvider,
+  useForm,
+} from "react-hook-form";
 import { useCallback, useEffect, useState } from "react";
 import { revalidateAction } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
@@ -32,7 +37,6 @@ import addCollectionToWorkgroups from "@/actions/addCollectionToWorkgroups";
 import FormLabel from "@/components/FormLabel";
 import ManageMultipleCollectionsStatus from "@/modules/ManageMultipleCollectionsStatus";
 import UpdateMultipleCollectionsGuidance from "./UpdateMultipleCollectionsGuidance";
-import { UpdateCollectionFormValues } from "@/types/forms";
 import transitionCollections from "@/actions/transitionCollections";
 
 export type UpdateMultipleCollectionProps = {
@@ -96,7 +100,7 @@ const UpdateMultipleCollections = ({
   );
 
   const submitForm = useCallback(
-    async (data: UpdateCollectionFormValues, closeAfter = false) => {
+    async (data: FieldValues, closeAfter = false) => {
       if (isDirty) {
         // for each collection, compare to what's selected, and run the add/removes required
         for (const c of collections) {
