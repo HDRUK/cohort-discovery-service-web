@@ -65,11 +65,7 @@ const ManageMultipleCollectionsStatus = <TFieldValues extends FieldValues>({
       shouldDirty: selectedStatusId !== initialStatusId,
       shouldTouch: selectedStatusId !== initialStatusId,
     });
-  }, [selectedStatusId, setValue]);
-
-  console.log("selectedStatusId", selectedStatusId);
-  console.log("initialStatusId", initialStatusId);
-  console.log("options", options);
+  }, [initialStatusId, selectedStatusId, setValue]);
 
   if (uniqueStates.length > 1) {
     return (

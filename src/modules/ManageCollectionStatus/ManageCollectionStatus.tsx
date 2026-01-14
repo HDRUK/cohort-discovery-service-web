@@ -58,7 +58,7 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
       shouldDirty: selectedStatusId !== initialStatusId,
       shouldTouch: selectedStatusId !== initialStatusId,
     });
-  }, [selectedStatusId, setValue]);
+  }, [initialStatusId, selectedStatusId, setValue]);
 
   return (
     <>
