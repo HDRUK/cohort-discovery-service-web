@@ -103,7 +103,6 @@ const Table = <TData extends MRT_RowData>({
                 {deleteProps && (
                   <DeleteButton
                     {...restDeleteProps}
-                    disabled={!selectedRows.length}
                     onClick={() => onDeleteClick?.(selectedRows)}
                   />
                 )}

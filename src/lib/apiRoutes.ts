@@ -6,6 +6,7 @@ export const API_ROUTES = {
   rerunTask: (id: string) => `${API_URL}/task/re-run/${id}`,
   tasks: `${API_URL}/tasks`,
   queries: `${API_URL}/queries`,
+  deleteQueriesBulk: `${API_URL}/queries/delete/bulk`,
   rerunQuery: (id: string) => `${API_URL}/query/re-run/${id}`,
   parseQuery: `${API_URL}/parse-query`,
   collections: `${API_URL}/collections`,
