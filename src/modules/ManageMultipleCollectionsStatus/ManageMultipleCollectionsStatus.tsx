@@ -64,6 +64,21 @@ const ManageMultipleCollectionsStatus = ({
     );
   }
 
+  const handleAction = async () => {
+    await transitionCollections(
+      collections.map((c) => c.id),
+      {
+        state: "pending",
+      }
+    );
+    setSelectedStatusId(CollectionStatus.PENDING);
+    notify.success(
+      `Requested for collections (${collections
+        .map((c) => c.name)
+        .join(", ")}) to be made active`
+    );
+  };
+
   return (
     <>
       {collections[0]?.model_state?.state_id == CollectionStatus.DRAFT &&
@@ -71,20 +86,7 @@ const ManageMultipleCollectionsStatus = ({
           <AddButton
             disabled={!expandedRight}
             label={"Request to make active"}
-            action={async () => {
-              await transitionCollections(
-                collections.map((c) => c.id),
-                {
-                  state: "pending",
-                }
-              );
-              setSelectedStatusId(CollectionStatus.PENDING);
-              notify.success(
-                `Requested for collections (${collections
-                  .map((c) => c.name)
-                  .join(", ")}) to be made active`
-              );
-            }}
+            action={handleAction}
           />
         )}
       {/* Only show a chip if initial status is not DRAFT */}
