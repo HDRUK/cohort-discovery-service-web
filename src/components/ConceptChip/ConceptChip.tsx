@@ -52,15 +52,15 @@ export const ConceptChip = ({
   children?: React.ReactNode;
 }) => {
   const isParent = (concept?.children?.length ?? 0) > 0;
+  const clickable = Boolean(onClick);
 
   return (
     <Box
+      role={clickable ? "button" : undefined}
       sx={{
         display: "flex",
         alignItems: "center",
-        cursor: onClick ? "pointer" : "default",
       }}
-      onClick={onClick && onClick}
     >
       {draggable && (
         <IconButton>
@@ -77,8 +77,16 @@ export const ConceptChip = ({
                 : "inherit",
             p: 2,
             borderRadius: 10,
+            ...(clickable && {
+              "&:hover": {
+                boxShadow: 2,
+                backgroundColor: "action.hover",
+              },
+            }),
+            cursor: onClick ? "pointer" : "default",
             ...chipSx,
           }}
+          onClick={onClick && onClick}
           label={concept?.description}
           variant="outlined"
         />

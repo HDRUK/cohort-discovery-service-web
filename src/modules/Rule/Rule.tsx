@@ -139,12 +139,14 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
                     indicateIfParent={showDescendants}
                     concept={concept}
                     onDelete={() => clearConcept()}
-                    onClick={(e: React.MouseEvent) => {
-                      if (concept?.children && concept.children.length > 0) {
-                        e.stopPropagation();
-                        toggleShowDescendants();
-                      }
-                    }}
+                    onClick={
+                      (concept?.children?.length ?? 0) > 0
+                        ? (e: React.MouseEvent) => {
+                            e.stopPropagation();
+                            toggleShowDescendants();
+                          }
+                        : undefined
+                    }
                   />
                   {showDescendants &&
                     concept?.children?.map((childConcept) => (
@@ -162,9 +164,6 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
               {isMultipleConcept(concept) && (
                 <>
                   <ConceptChip
-                    chipSx={{
-                      borderColor: "warning.main",
-                    }}
                     indicateIfParent={showDescendants}
                     concept={concept}
                     onDelete={() => {
@@ -177,20 +176,16 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
                       }
                     }}
                     onClick={(e: React.MouseEvent) => {
-                      if (concept?.children && concept.children.length > 0) {
-                        e.stopPropagation();
-                        toggleShowDescendants();
-                      }
+                      e.stopPropagation();
+                      setConcept({ ...concept, alternatives: [] });
                     }}
-                  >
-                    <InvalidRule reasons={[]} />
-                  </ConceptChip>
+                  />
 
                   {concept?.alternatives &&
                     concept?.alternatives?.map((childConcept) => (
                       <ConceptChip
                         chipSx={{
-                          borderColor: "warning.main",
+                          borderColor: "error.main",
                         }}
                         draggable={false}
                         key={childConcept.concept_id}
