@@ -83,7 +83,7 @@ const CohortQueryInput = () => {
               onSubmit={handleSubmit(onSubmit)}
               loading={isLoading}
               warning={warnings.length > 0}
-              disabled={field.value.length < 3}
+              disabled={isLoading || field.value.length < 3}
               actions={actions}
             />
           </Stack>
