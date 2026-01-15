@@ -1,6 +1,7 @@
 "use client";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import HostGuidance from "@/content/guidance/custodianAdmin/host.mdx";
+import CreateHostGuidance from "@/content/guidance/custodianAdmin/createHost.mdx";
 import { baseComponents } from "@/modules/Guidance/Guidance";
 
 export interface CollectionHostGuidanceProps {
@@ -10,7 +11,11 @@ export interface CollectionHostGuidanceProps {
 const CollectionHostGuidance = ({ creating }: CollectionHostGuidanceProps) => {
   return (
     <ActionMenuSection title="Host Guidance" fixedExpanded scrollable>
-      <HostGuidance creating={creating} components={baseComponents} />
+      {creating ? (
+        <CreateHostGuidance components={baseComponents} />
+      ) : (
+        <HostGuidance components={baseComponents} />
+      )}
     </ActionMenuSection>
   );
 };

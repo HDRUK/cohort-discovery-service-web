@@ -1,18 +1,4 @@
 
-{/**
-  * @typedef Props
-  * @property {boolean} creating
-  *  flag if is creating
-  */}
+Select a Host from the middle panel to view its details here.
 
-
-{props.creating ? (
-  <>
-  A host is a connection point that allows the system to access and manage your collections. When a host is created, the system automatically generates a Client ID and Client Secret to securely authenticate with the service. You will need this host whenever you create a collection, as it connects the collection to its source. 
-  </>
-  ):(
-    <>
-    Collection hosts information  
-    will appear here when you select one in the middle panel...
-    </>) 
-}
+Once selected, you can copy the Host's Client ID and Client Secret for your BUNNY configuration. Documentation: [Hutch bunny config](https://hutch.health/bunny/config).
