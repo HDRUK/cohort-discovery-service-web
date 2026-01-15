@@ -9,7 +9,7 @@ import CollectionHostsTab, {
 } from "./components/CollectionHostTab";
 import CollectionsTab, {
   CollectionsSkeleton,
-} from "./components/CollectionsTab";
+} from "@/modules/CollectionsTab/CollectionsTab";
 import { SearchParams } from "@/types/api";
 
 type Params = Promise<{ custodianPid: string; tabId: string }>;

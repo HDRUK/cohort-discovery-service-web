@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 import { routes } from "@/config/routes";
 import CollectionsTab, {
   CollectionsSkeleton,
-} from "./components/CollectionsTab";
+} from "@/modules/CollectionsTab/CollectionsTab";
 import UsersTab, { UsersSkeleton } from "./components/UsersTab";
 import WorkgroupsTab, { WorkgroupsSkeleton } from "./components/WorkgroupsTab";
 import { SearchParams } from "@/types/api";

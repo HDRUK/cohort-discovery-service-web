@@ -1,4 +1,4 @@
-import transitionCollection from "@/actions/transitionCollection";
+import transitionCollections from "@/actions/transitionCollections";
 import AddButton from "@/components/AddButton";
 import FormRadioGroup from "@/components/FormRadioGroup";
 import StatusChip from "@/components/StatusChip";
@@ -9,35 +9,31 @@ import { UpdateCollectionFormValues } from "@/types/forms";
 import { getCollectionStatus } from "@/utils/colours";
 import { Box, Chip } from "@mui/material";
 import { useEffect, useState } from "react";
-import {
-  Control,
-  Controller,
-  FieldValues,
-  Path,
-  UseFormSetValue,
-} from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 
-interface ManageCollectionStatusProps<TFieldValues extends FieldValues> {
-  collection: Collection;
+interface ManageMultipleCollectionsStatusProps {
+  collections: Collection[];
   expandedRight: boolean;
-  control: Control<TFieldValues>;
-  setValue: UseFormSetValue<UpdateCollectionFormValues>;
 }
 
-const ManageCollectionStatus = <TFieldValues extends FieldValues>({
-  collection,
+const ManageMultipleCollectionsStatus = ({
+  collections,
   expandedRight,
-  control,
-  setValue,
-}: ManageCollectionStatusProps<TFieldValues>) => {
+}: ManageMultipleCollectionsStatusProps) => {
+  const { control, setValue } = useFormContext<UpdateCollectionFormValues>();
+
   const { currentCustodian } = useCustodianStore((custodianData) => ({
     currentCustodian: custodianData.currentCustodian,
   }));
   const notify = useNotify();
 
-  const initialStatusId = collection.model_state?.state_id;
+  const uniqueStates = [
+    ...new Set((collections || []).map((c) => c?.model_state?.state_id)),
+  ];
+
+  const initialStatusId = collections[0].model_state?.state_id;
   const [selectedStatusId, setSelectedStatusId] = useState<number>(
-    collection.model_state?.state_id ?? -1
+    collections[0].model_state?.state_id ?? -1
   );
 
   const destinationOptions = {
@@ -60,22 +56,37 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
     });
   }, [initialStatusId, selectedStatusId, setValue]);
 
+  if (uniqueStates.length > 1) {
+    return (
+      <Box sx={{ mb: 1 }}>
+        <Chip label={"MIXED"} />
+      </Box>
+    );
+  }
+
+  const handleAction = async () => {
+    await transitionCollections(
+      collections.map((c) => c.id),
+      {
+        state: "pending",
+      }
+    );
+    setSelectedStatusId(CollectionStatus.PENDING);
+    notify.success(
+      `Requested for collections (${collections
+        .map((c) => c.name)
+        .join(", ")}) to be made active`
+    );
+  };
+
   return (
     <>
-      {collection?.model_state?.state_id == CollectionStatus.DRAFT &&
-        collection?.model_state?.state && (
+      {collections[0]?.model_state?.state_id == CollectionStatus.DRAFT &&
+        collections[0]?.model_state?.state && (
           <AddButton
             disabled={!expandedRight}
             label={"Request to make active"}
-            action={async () => {
-              await transitionCollection(collection.id, {
-                state: "pending",
-              });
-              setSelectedStatusId(CollectionStatus.PENDING);
-              notify.success(
-                `Requested for collection "${collection.name}" to be made active`
-              );
-            }}
+            action={handleAction}
           />
         )}
       {/* Only show a chip if initial status is not DRAFT */}
@@ -96,7 +107,7 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
 
       {expandedRight && initialStatusId !== CollectionStatus.DRAFT && (
         <Controller
-          name={"collection.model_state.state_id" as Path<TFieldValues>}
+          name={"collection.model_state.state_id"}
           control={control}
           render={() => (
             <FormRadioGroup
@@ -125,4 +136,4 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
   );
 };
 
-export default ManageCollectionStatus;
+export default ManageMultipleCollectionsStatus;
