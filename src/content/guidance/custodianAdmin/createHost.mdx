@@ -1,12 +1,12 @@
 
-**A Host** is the credentialed connection to your data source. After you create a Host, the system generates a **Client ID** and **Client Secret** (sometimes referred to as the “Host ID” and “Host Secret”).
+**A Host** is the credentialed connection to your data source. After you create a Host, the system generates a **Client ID** and **Client Secret**
 
 
 You will use these credentials when configuring BUNNYs. Specifically, copy the Host's Client ID and Client Secret into the following environment variables:
 
 ```dotenv
-  TASK_API_USERNAME=HOST_CLIENT_ID  
-  TASK_API_PASSWORD=HOST_CLIENT_SECRET
+  TASK_API_USERNAME=<HOST_CLIENT_ID>  
+  TASK_API_PASSWORD=<HOST_CLIENT_SECRET>
 ```
 
 For detailed setup instructions, see [Hutch bunny config](https://hutch.health/bunny/config).

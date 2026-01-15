@@ -30,9 +30,9 @@ const getPanelSizes = (
 ) => {
   if (expanded === ExpandedSide.LEFT) {
     return {
-      left: totalWidth - panelWidth,
+      left: totalWidth - 2 * panelWidth,
       middle: 0,
-      right: panelWidth,
+      right: 2 * panelWidth,
     };
   }
 
