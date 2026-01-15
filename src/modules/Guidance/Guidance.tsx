@@ -6,7 +6,7 @@ import OperatorGuidance from "@/content/guidance/queryBuilder/operator.mdx";
 import GroupGuidance from "@/content/guidance/queryBuilder/group.mdx";
 import AgeFilterGuidance from "@/content/guidance/queryBuilder/ageFilter.mdx";
 import EmptyRuleGuidance from "@/content/guidance/queryBuilder/emptyRule.mdx";
-import { Box, BoxProps, Link } from "@mui/material";
+import { Box, BoxProps, Link, LinkProps } from "@mui/material";
 import { useCallback, useMemo } from "react";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import ActionMenuSection from "@/components/ActionMenuSection";
@@ -45,7 +45,7 @@ import DeleteAgeButton from "@/components/DeleteAgeButton";
 import useFeatures from "@/store/useFeatures";
 
 export const baseComponents = {
-  a: ({ href, children }) => (
+  a: ({ href, children }: LinkProps) => (
     <Link
       sx={{ color: "link.main" }}
       href={href}
