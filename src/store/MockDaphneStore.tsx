@@ -100,6 +100,8 @@ function makeDefaultStore(): DaphneStoreState {
       showDescendants: {},
       setShowDescendants: NOOP,
       validateRules: (_root: RuleGroupType) => _root,
+      errors: [],
+      setErrors: (_rules: RuleGroupType, _pids: UniqueIdentifier[]) => NOOP,
     },
 
     userData: {
