@@ -29,7 +29,6 @@ export const getTextFieldSx = (
   inputBgColor: string,
   hasWarning: boolean = false
 ): SxProps<Theme> => ({
-  // Base input container
   "& .MuiOutlinedInput-root": {
     borderRadius: 20,
     boxShadow: "0px 2px 2px rgba(0, 0, 0, 0.23)",
@@ -38,7 +37,6 @@ export const getTextFieldSx = (
     py: 0.5,
   },
 
-  // Default outline hidden (except when collapsed + you want it visible)
   "& .MuiOutlinedInput-notchedOutline": {
     zIndex: 0,
     border: 0,
@@ -47,7 +45,6 @@ export const getTextFieldSx = (
     display: collapsible ? (expanded ? "none" : "inherit") : "inherit",
   },
 
-  // WARNING border when not focused + not error
   ...(hasWarning
     ? {
         "& .MuiOutlinedInput-root:not(.Mui-focused):not(.Mui-error) .MuiOutlinedInput-notchedOutline":
@@ -62,14 +59,12 @@ export const getTextFieldSx = (
       }
     : null),
 
-  // Focus ring is ALWAYS success
   "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
     border: (t: Theme) => `2px solid ${t.palette.success.main}`,
     opacity: 1,
     display: "inherit",
   },
 
-  // Label colors
   "& .MuiInputLabel-root": {
     color: (t: Theme) => t.palette.text.secondary,
     zIndex: 1,
@@ -78,10 +73,8 @@ export const getTextFieldSx = (
     color: (t: Theme) => t.palette.success.main,
   },
 
-  // Keep adornment above outline
   "& .MuiInputAdornment-root": { position: "relative", zIndex: 2 },
 
-  // ERROR always wins
   "& .MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline": {
     border: (t: Theme) => `2px solid ${t.palette.error.main}`,
     opacity: 1,
