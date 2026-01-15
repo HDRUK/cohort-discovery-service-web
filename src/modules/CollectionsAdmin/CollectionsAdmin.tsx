@@ -5,6 +5,7 @@ import {
   Paginated,
   CollectionsSearchParams,
   Workgroup,
+  Custodian,
 } from "@/types/api";
 import { Box, Skeleton } from "@mui/material";
 import Title from "@/components/Title";
@@ -12,20 +13,22 @@ import ThreePaneSwimLaneLayout, {
   ExpandedSide,
 } from "@/modules/ThreePaneSwimLaneLayout";
 import { useCallback, useState } from "react";
-import CollectionsLeftPanel from "./CollectionsLeftPanel";
 import CollectionsTable from "@/components/CollectionsTable";
 import ControlledSearchBox from "@/modules/ControlledSearchBox";
+import CollectionsLeftPanel from "@/modules/CollectionsLeftPanel";
 import CollectionsRightPanel from "@/modules/CollectionsRightPanel";
 import { useLogDependencyChanges } from "@/utils/deps";
 import useCustodianStore from "@/store/useCustodianStore";
 
-const CollectionsCustodianAdmin = ({
-  pid,
+const CollectionsAdmin = ({
+  admin = false,
+  custodians = undefined,
   collections,
   collectionHosts,
   workgroups,
 }: {
-  pid: string;
+  admin?: boolean;
+  custodians?: Custodian[] | undefined;
   collections: Paginated<CollectionWithHosts[]>;
   collectionHosts: CollectionHost[];
   workgroups: Workgroup[];
@@ -50,8 +53,7 @@ const CollectionsCustodianAdmin = ({
     );
   }, [setExpandedSide]);
 
-  useLogDependencyChanges("CollectionsCustodianAdmin", {
-    pid,
+  useLogDependencyChanges("CollectionsAdmin", {
     custodian,
     collections,
     collectionHosts,
@@ -62,7 +64,7 @@ const CollectionsCustodianAdmin = ({
     toggleExpandLeft,
   });
 
-  if (!custodian) return <Skeleton height={"100%"} />;
+  if (!admin && !custodian) return <Skeleton height={"100%"} />;
 
   return (
     <Box
@@ -80,11 +82,12 @@ const CollectionsCustodianAdmin = ({
           <CollectionsLeftPanel
             expandedLeft={expandedLeft}
             collectionHosts={collectionHosts}
+            custodians={custodians}
             onCreate={toggleExpandLeft}
             onCancelCreate={toggleExpandLeft}
           />
         }
-        middle={<CollectionsTable initialData={collections} />}
+        middle={<CollectionsTable admin={admin} initialData={collections} />}
         right={
           <CollectionsRightPanel
             collectionHosts={collectionHosts}
@@ -99,4 +102,4 @@ const CollectionsCustodianAdmin = ({
   );
 };
 
-export default CollectionsCustodianAdmin;
+export default CollectionsAdmin;

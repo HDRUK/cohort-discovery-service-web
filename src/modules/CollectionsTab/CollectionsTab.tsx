@@ -1,4 +1,4 @@
-import CollectionsAdmin from "./CollectionsAdmin";
+import CollectionsAdmin from "@/modules/CollectionsAdmin/CollectionsAdmin";
 import getCollectionHosts from "@/actions/getCollectionHosts";
 import getAdminCollections from "@/actions/getAdminCollections";
 import { CollectionsSearchParams } from "@/types/api";
@@ -16,10 +16,14 @@ export const CollectionsSkeleton = () => (
 
 const CollectionsTab = async ({
   searchParams,
+  custodianPid,
 }: {
   searchParams: CollectionsSearchParams;
+  custodianPid?: string;
 }) => {
   const params = buildCollectionParams(searchParams);
+
+  const isAdmin = !custodianPid;
 
   const [
     { data: collectionHosts },
@@ -29,12 +33,13 @@ const CollectionsTab = async ({
   ] = await Promise.all([
     getCollectionHosts(),
     getAdminCollections({ params }),
-    getCustodians(),
+    isAdmin ? getCustodians() : Promise.resolve({ data: undefined }),
     getAdminWorkgroups(),
   ]);
 
   return (
     <CollectionsAdmin
+      admin={isAdmin}
       collectionHosts={collectionHosts}
       collections={custodianCollections}
       custodians={custodians}
