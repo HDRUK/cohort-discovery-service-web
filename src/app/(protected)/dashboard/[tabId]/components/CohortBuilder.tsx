@@ -52,7 +52,13 @@ const CohortBuilder = async (props: { query?: string }) => {
           collections={collections.data}
         />
 
-        <Stack direction="row" alignItems="flex-start" spacing={2}>
+        <Stack
+          direction="row"
+          alignItems="flex-start"
+          spacing={2}
+          display={"flex"}
+          overflow={"hidden"}
+        >
           <Title
             marginTop={1.5}
             title="Cohort Builder"
