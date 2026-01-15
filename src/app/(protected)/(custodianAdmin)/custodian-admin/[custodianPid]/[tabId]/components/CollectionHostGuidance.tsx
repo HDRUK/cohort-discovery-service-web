@@ -1,6 +1,6 @@
 "use client";
 import ActionMenuSection from "@/components/ActionMenuSection";
-import HostGuidance from "@/content/guidance/host.mdx";
+import HostGuidance from "@/content/guidance/custodianAdmin/host.mdx";
 import { baseComponents } from "@/modules/Guidance/Guidance";
 
 export interface CollectionHostGuidanceProps {
