@@ -13,6 +13,7 @@ import { cookies } from "next/headers";
 import { QUERY_BUILDER_GUIDANCE_COOKIE } from "@/config/internals";
 import QueryBuilderGuidanceWrapper from "./QueryBuilderGuidanceWrapper";
 import ShowJsonButton from "@/components/ShowJsonButton";
+import CohortErrors from "@/components/CohortErrors";
 
 const NODE_ENV = process.env?.NODE_ENV;
 
@@ -51,13 +52,18 @@ const CohortBuilder = async (props: { query?: string }) => {
           collections={collections.data}
         />
 
-        <Title
-          title="Cohort Builder"
-          subTitle="Natural Language"
-          marginY={"auto"}
-        >
-          <CohortQueryInput />
-        </Title>
+        <Stack direction="row" alignItems="flex-start" spacing={2}>
+          <Title
+            marginTop={1.5}
+            title="Cohort Builder"
+            subTitle="Natural Language"
+          />
+
+          <Stack direction="column" spacing={1} sx={{ flex: 1, minWidth: 0 }}>
+            <CohortQueryInput />
+            <CohortErrors />
+          </Stack>
+        </Stack>
 
         <Box sx={{ overflow: "hidden" }}>
           <Divider />

@@ -45,7 +45,7 @@ export const cardSx = (
 ): SxProps<Theme> => ({
   p: 2,
   border: 1,
-  borderColor: valid ? "black" : "warning.main",
+  borderColor: valid ? "black" : "error.main",
   width: "100%",
   bgcolor: isSelected ? "background.default" : "white",
   "&:hover": {

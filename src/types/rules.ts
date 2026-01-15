@@ -18,6 +18,7 @@ type Node = {
   exclude?: boolean;
   valid?: boolean;
   invalidReason?: string[];
+  warnings?: string[];
   name?: string;
   timeConstraint?: [string | null, string | null];
   ageConstraint?: [number | null, number | null];

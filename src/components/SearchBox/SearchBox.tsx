@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useState, useRef, ReactNode } from "react";
+import { useState, useRef } from "react";
 import {
   TextField,
   InputAdornment,
@@ -21,27 +21,27 @@ import {
   iconButtonSx,
 } from "./SearchBox.styles";
 
-export type SearchBoxProps = Omit<TextFieldProps, "onSubmit"> & {
+export type SearchBoxProps = Omit<TextFieldProps, "onSubmit" | "errors"> & {
   loading?: boolean;
+  warning?: boolean;
   onSubmit?: () => void | Promise<void>;
   collapsible?: boolean;
   defaultExpanded?: boolean;
   collapsedWidth?: number | string;
   expandedWidth?: number | string;
   inputBgColor?: string;
-  actionIcon?: ReactNode;
   actions?: React.ReactNode[];
 };
 
 const SearchBox = ({
   onSubmit,
   loading = false,
+  warning = false,
   collapsible = true,
   defaultExpanded = true,
   collapsedWidth = 0,
   expandedWidth = "100%",
   inputBgColor = "#fff",
-  actionIcon,
   actions,
   disabled,
   ...rest
@@ -70,7 +70,6 @@ const SearchBox = ({
 
   const actionChildren = React.Children.toArray(actions);
   const nActions = actionChildren.length;
-  const actionsCols = Math.min(2, nActions * 0.5);
 
   const STABLE_ID = "search-box";
 
@@ -86,12 +85,12 @@ const SearchBox = ({
         columnSpacing={2}
         alignItems="center"
       >
-        <Grid size={12 - actionsCols}>
+        <Grid size={"grow"}>
           <TextField
             id={STABLE_ID}
             inputRef={inputRef}
             type="search"
-            sx={getTextFieldSx(collapsible, expanded, inputBgColor)}
+            sx={getTextFieldSx(collapsible, expanded, inputBgColor, warning)}
             slotProps={{
               htmlInput: {
                 sx: getHtmlInputSx(collapsible, expanded),
@@ -114,10 +113,8 @@ const SearchBox = ({
                     >
                       {loading ? (
                         <CircularProgress size={24} color="inherit" />
-                      ) : actionIcon ? (
-                        <>{actionIcon}</>
                       ) : (
-                        <SearchIcon fontSize="large" />
+                        <SearchIcon fontSize="small" />
                       )}
                     </IconButton>
                   </InputAdornment>
@@ -139,8 +136,8 @@ const SearchBox = ({
             {...rest}
           />
         </Grid>
-        {actionsCols > 0 && (
-          <Grid size={actionsCols}>{actionChildren.map((child) => child)}</Grid>
+        {nActions > 0 && (
+          <Grid size={"auto"}>{actionChildren.map((child) => child)}</Grid>
         )}
       </Grid>
     </Box>

@@ -90,6 +90,7 @@ import {
 } from "@/config/tags";
 import addCollectionToWorkgroups from "@/actions/addCollectionToWorkgroups";
 import removeCollectionFromWorkgroups from "@/actions/removeCollectionFromWorkgroups";
+import { DatasetErrors } from "@/utils/datasets";
 
 export enum NodeKind {
   RULE = "RULE",
@@ -121,6 +122,8 @@ export interface DaphneStoreState {
     queryBuilderJson: RuleGroupType;
     setQueryBuilderJson: (query: RuleGroupType) => void;
     resetQueryBuilderJson: () => void;
+    errors: string[];
+    setErrors: (rules: RuleGroupType, pids: UniqueIdentifier[]) => void;
     getNodeName: (node: RuleNodeType) => string;
     setNodeName: (node: RuleNodeType, name: string) => void;
     boardIndex: BoardIndex;
@@ -297,6 +300,20 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         };
       });
     },
+    errors: [],
+    setErrors: (queryBuilderJson, selectedDatasets) => {
+      const datasetsAreSelected = selectedDatasets.length > 0;
+      const datasetReasons = datasetsAreSelected
+        ? []
+        : [DatasetErrors.NO_DATASETS];
+      const qbReasons = queryBuilderJson.invalidReason ?? [];
+      const errors = [...datasetReasons, ...qbReasons];
+
+      set((state) => ({
+        ...state,
+        queryBuilder: { ...state.queryBuilder, errors },
+      }));
+    },
     boardIndex: buildIndexFromModel(DEFAULT_QUERY),
     sizeCache: {},
     setSizeCache: (id, width, height) =>
@@ -466,6 +483,11 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
           queryAsText: text,
         },
       }));
+
+      get().queryBuilder.setErrors(
+        updatedQuery,
+        get().queryBuilder.selectedDatasets
+      );
     },
     getNodeName: (node: RuleNodeType) => {
       if (node.name) return node.name;
@@ -501,11 +523,16 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         queryBuilder: { ...state.queryBuilder, queryName: name },
       })),
     selectedDatasets: [],
-    setSelectedDatasets: (pids) =>
+    setSelectedDatasets: (pids) => {
       set((state) => ({
         ...state,
-        queryBuilder: { ...state.queryBuilder, selectedDatasets: pids },
-      })),
+        queryBuilder: {
+          ...state.queryBuilder,
+          selectedDatasets: pids,
+        },
+      }));
+      get().queryBuilder.setErrors(get().queryBuilder.queryBuilderJson, pids);
+    },
     openSelectDatasetsPanel: false,
     setOpenSelectDatasetsPanel: (value) =>
       set((state) => ({
@@ -547,7 +574,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     getQueryFromText: async (input: string) => {
       const cleanQuery = (queryString: string) => {
         const query = JSON.parse(queryString) as RuleGroupType;
-
+        console.log(query);
         //enforce no unnecessary group within group
         if (query.rules.length === 1 && isRuleGroup(query.rules[0])) {
           return { ...query, rules: groupToRules(query.rules[0]) };
@@ -563,14 +590,10 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       const { data: newQueryString } = await parseQuery(input);
       const newQuery = cleanQuery(newQueryString);
 
+      get().queryBuilder.setQueryBuilderJson(newQuery);
+
       set((state) => ({
         ...state,
-        queryBuilder: {
-          ...state.queryBuilder,
-          queryBuilderJson: get().queryBuilder.validateRules(newQuery),
-          boardIndex: buildIndexFromModel(newQuery),
-          queryAsText: queryToText(newQuery),
-        },
         stateManagement: { ...state.stateManagement, isLoading: false },
       }));
     },

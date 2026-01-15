@@ -26,42 +26,66 @@ export const getContainerSx =
 export const getTextFieldSx = (
   collapsible: boolean,
   expanded: boolean,
-  inputBgColor: string
+  inputBgColor: string,
+  hasWarning: boolean = false
 ): SxProps<Theme> => ({
+  // Base input container
   "& .MuiOutlinedInput-root": {
-    borderRadius: 100,
-    boxShadow: "0px 2px 0px rgba(0, 0, 0, 0.23)",
+    borderRadius: 20,
+    boxShadow: "0px 2px 2px rgba(0, 0, 0, 0.23)",
     backgroundColor: inputBgColor,
-    p: 0,
+    px: 0,
+    py: 0.5,
   },
+
+  // Default outline hidden (except when collapsed + you want it visible)
   "& .MuiOutlinedInput-notchedOutline": {
     zIndex: 0,
-    borderTop: "none",
-    borderLeftColor: "rgba(0,0,0,0.1)",
-    borderRightColor: "rgba(0,0,0,0.1)",
-    borderBottomColor: "rgba(0,0,0,0.23)",
+    border: 0,
     opacity: collapsible ? (expanded ? 1 : 0) : 1,
     transition: collapsible ? "opacity 150ms" : "none",
     display: collapsible ? (expanded ? "none" : "inherit") : "inherit",
   },
-  "& .MuiInputAdornment-root": { position: "relative", zIndex: 2 },
-  "& .MuiFormLabel-root": {
+
+  // WARNING border when not focused + not error
+  ...(hasWarning
+    ? {
+        "& .MuiOutlinedInput-root:not(.Mui-focused):not(.Mui-error) .MuiOutlinedInput-notchedOutline":
+          {
+            border: (t: Theme) => `2px solid ${t.palette.warning.main}`,
+            opacity: 1,
+            display: "inherit",
+          },
+        "& .MuiInputLabel-root:not(.Mui-focused):not(.Mui-error)": {
+          color: (t: Theme) => t.palette.warning.main,
+        },
+      }
+    : null),
+
+  // Focus ring is ALWAYS success
+  "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+    border: (t: Theme) => `2px solid ${t.palette.success.main}`,
+    opacity: 1,
+    display: "inherit",
+  },
+
+  // Label colors
+  "& .MuiInputLabel-root": {
+    color: (t: Theme) => t.palette.text.secondary,
     zIndex: 1,
   },
-  "& .MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline": {
-    display: "inherit",
-    opacity: 1,
-    borderColor: (t: Theme) => t.palette.error.main,
-  },
-  "& .MuiOutlinedInput-root.Mui-error.Mui-disabled .MuiOutlinedInput-notchedOutline":
-    {
-      borderColor: (t: Theme) => t.palette.error.main,
-    },
-  "& .MuiInputLabel-root": {
-    color: "text.secondary",
-  },
   "& .MuiInputLabel-root.Mui-focused": {
-    color: "text.secondary",
+    color: (t: Theme) => t.palette.success.main,
+  },
+
+  // Keep adornment above outline
+  "& .MuiInputAdornment-root": { position: "relative", zIndex: 2 },
+
+  // ERROR always wins
+  "& .MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline": {
+    border: (t: Theme) => `2px solid ${t.palette.error.main}`,
+    opacity: 1,
+    display: "inherit",
   },
   "& .MuiInputLabel-root.Mui-error": {
     color: (t: Theme) => t.palette.error.main,

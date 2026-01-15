@@ -1,29 +1,30 @@
 "use client";
 
 import { useForm, Controller } from "react-hook-form";
-import { Box, Tooltip } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import { useDaphneStore } from "@/store/useDaphneStore";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import SearchBox from "../SearchBox";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import SubmitQueryButton from "../SubmitQueryButton";
-import { RuleErrors } from "@/utils/rules";
 import { MAX_INVALID_REASONS } from "@/config/defaults";
-import { DatasetErrors } from "@/utils/datasets";
-
 type FormValues = {
   cohortQueryInput: string;
   queryName: string;
 };
 
 const CohortQueryInput = () => {
-  const { queryAsText, queryBuilderJson, getQueryFromText, selectedDatasets } =
-    useQueryBuilder((qb) => ({
-      queryAsText: qb.queryAsText,
-      queryBuilderJson: qb.queryBuilderJson,
-      getQueryFromText: qb.getQueryFromText,
-      selectedDatasets: qb.selectedDatasets,
-    }));
+  const {
+    queryAsText,
+    getQueryFromText,
+    errors = [],
+    warnings = [],
+  } = useQueryBuilder((qb) => ({
+    queryAsText: qb.queryAsText,
+    getQueryFromText: qb.getQueryFromText,
+    errors: qb.errors,
+    warnings: qb.queryBuilderJson.warnings,
+  }));
 
   const isLoading = useDaphneStore((s) => s.stateManagement.isLoading);
 
@@ -39,51 +40,20 @@ const CohortQueryInput = () => {
     getQueryFromText(data.cohortQueryInput);
   };
 
-  const datasetsAreSelected = selectedDatasets.length > 0;
-
-  const allErrors = useMemo(() => {
-    const datasetReasons = datasetsAreSelected
-      ? []
-      : [DatasetErrors.NO_DATASETS];
-
-    const qbReasons = queryBuilderJson.invalidReason ?? [];
-
-    return {
-      valid: queryBuilderJson.valid && datasetsAreSelected,
-      invalidReason: [...datasetReasons, ...qbReasons],
-    };
-  }, [
-    queryBuilderJson.valid,
-    queryBuilderJson.invalidReason,
-    datasetsAreSelected,
-  ]);
-
   useEffect(() => {
     clearErrors();
 
-    if (!allErrors.valid) {
-      const maskInitialError =
-        allErrors?.invalidReason?.length === 1 &&
-        allErrors?.invalidReason[0] === RuleErrors.EMPTY_RULE;
-
-      if (!maskInitialError) {
-        setError("cohortQueryInput", {
-          message:
-            allErrors?.invalidReason?.slice(0, MAX_INVALID_REASONS).join(" ") ||
-            "This query is invalid...",
-        });
-      }
-      return;
+    if (errors.length > 0) {
+      setError("cohortQueryInput", {
+        message:
+          errors?.slice(0, MAX_INVALID_REASONS).join(" ") ||
+          "This query is invalid...",
+      });
     }
     setValue("cohortQueryInput", queryAsText);
-  }, [
-    queryAsText,
-    allErrors.valid,
-    allErrors.invalidReason,
-    setValue,
-    setError,
-    clearErrors,
-  ]);
+  }, [queryAsText, errors, setValue, setError, clearErrors]);
+
+  const actions = [<SubmitQueryButton key="submitQueryButton" />];
 
   return (
     <Box
@@ -101,7 +71,7 @@ const CohortQueryInput = () => {
         defaultValue=""
         rules={{ required: "Query is required" }}
         render={({ field, fieldState: { error } }) => (
-          <Tooltip title={error?.message} variant="error">
+          <Stack gap={1}>
             <SearchBox
               {...field}
               collapsible={false}
@@ -112,10 +82,11 @@ const CohortQueryInput = () => {
               variant="outlined"
               onSubmit={handleSubmit(onSubmit)}
               loading={isLoading}
-              disabled={isLoading || !allErrors.valid}
-              actionIcon={<SubmitQueryButton />}
+              warning={warnings.length > 0}
+              disabled={isLoading || !error}
+              actions={actions}
             />
-          </Tooltip>
+          </Stack>
         )}
       />
     </Box>

@@ -1,10 +1,10 @@
 "use client";
 
-import { IconButton } from "@mui/material";
+import { Button } from "@mui/material";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import { useRouter } from "next/navigation";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+
 import { routes } from "@/config/routes";
 
 const SubmitQueryButton = () => {
@@ -31,18 +31,47 @@ const SubmitQueryButton = () => {
     });
   };
 
+  const disabled = selectedDatasets.length === 0 || !valid || isLoading;
+
   return (
-    <IconButton
+    <Button
       component="span"
-      disabled={selectedDatasets.length === 0 || !valid || isLoading}
+      variant="outlined"
+      disabled={disabled}
+      sx={(theme) => ({
+        borderRadius: 20,
+        borderWidth: 1,
+
+        borderColor: theme.palette.text.secondary,
+        backgroundColor: !disabled
+          ? theme.palette.common.white
+          : theme.palette.background.default,
+        color: theme.palette.text.primary,
+
+        fontWeight: 500,
+        fontSize: 15,
+
+        "&:hover": {
+          borderWidth: 1,
+          borderColor: "transparent",
+          backgroundColor: theme.palette.action.hover,
+        },
+
+        "&.Mui-disabled": {
+          borderWidth: 1,
+          borderColor: theme.palette.action.disabledBackground,
+          color: theme.palette.text.disabled,
+          backgroundColor: "transparent",
+        },
+      })}
       onClick={(event) => {
         event.stopPropagation();
         event.preventDefault();
         handleClick();
       }}
     >
-      <ArrowForwardIcon sx={{ color: "white" }} />
-    </IconButton>
+      Run Query
+    </Button>
   );
 };
 
