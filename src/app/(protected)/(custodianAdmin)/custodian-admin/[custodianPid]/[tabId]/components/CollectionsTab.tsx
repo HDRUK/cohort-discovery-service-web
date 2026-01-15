@@ -1,5 +1,5 @@
 import getAdminWorkgroups from "@/actions/getAdminWorkgroups";
-import CollectionsCustodianAdmin from "@/modules/CollectionsAdmin/CollectionsAdmin";
+import CollectionsAdmin from "@/modules/CollectionsAdmin/CollectionsAdmin";
 import getCustodianCollectionHosts from "@/actions/getCustodianCollectionHosts";
 import getCustodianCollections from "@/actions/getCustodianCollections";
 import { CollectionsSearchParams } from "@/types/api";
