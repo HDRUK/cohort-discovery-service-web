@@ -1,4 +1,4 @@
-import CollectionsAdmin from "./CollectionsAdmin";
+import CollectionsAdmin from "@/modules/CollectionsAdmin/CollectionsAdmin";
 import getCollectionHosts from "@/actions/getCollectionHosts";
 import getAdminCollections from "@/actions/getAdminCollections";
 import { CollectionsSearchParams } from "@/types/api";
@@ -35,6 +35,7 @@ const CollectionsTab = async ({
 
   return (
     <CollectionsAdmin
+      admin
       collectionHosts={collectionHosts}
       collections={custodianCollections}
       custodians={custodians}

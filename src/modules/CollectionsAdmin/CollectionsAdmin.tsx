@@ -3,49 +3,68 @@ import {
   CollectionWithHosts,
   CollectionHost,
   Paginated,
-  Custodian,
   CollectionsSearchParams,
   Workgroup,
+  Custodian,
 } from "@/types/api";
 import { Box, Skeleton } from "@mui/material";
 import Title from "@/components/Title";
 import ThreePaneSwimLaneLayout, {
   ExpandedSide,
 } from "@/modules/ThreePaneSwimLaneLayout";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import CollectionsTable from "@/components/CollectionsTable";
 import ControlledSearchBox from "@/modules/ControlledSearchBox";
 import CollectionsLeftPanel from "@/modules/CollectionsLeftPanel";
 import CollectionsRightPanel from "@/modules/CollectionsRightPanel";
+import { useLogDependencyChanges } from "@/utils/deps";
+import useCustodianStore from "@/store/useCustodianStore";
 
-const CollectionAdmin = ({
+const CollectionsAdmin = ({
+  admin = false,
+  custodians = undefined,
   collections,
   collectionHosts,
-  custodians,
   workgroups,
 }: {
+  admin?: boolean;
+  custodians?: Custodian[] | undefined;
   collections: Paginated<CollectionWithHosts[]>;
   collectionHosts: CollectionHost[];
-  custodians: Custodian[];
   workgroups: Workgroup[];
 }) => {
+  const custodian = useCustodianStore(
+    (custodianData) => custodianData.currentCustodian
+  );
+
   const [expandedSide, setExpandedSide] = useState<ExpandedSide | null>(null);
   const expandedLeft = expandedSide === ExpandedSide.LEFT;
   const expandedRight = expandedSide === ExpandedSide.RIGHT;
 
-  const toggleExpandLeft = () => {
+  const toggleExpandLeft = useCallback(() => {
     setExpandedSide((prev) =>
       prev === ExpandedSide.LEFT ? null : ExpandedSide.LEFT
     );
-  };
+  }, [setExpandedSide]);
 
-  const toggleExpandRight = () => {
+  const toggleExpandRight = useCallback(() => {
     setExpandedSide((prev) =>
       prev === ExpandedSide.RIGHT ? null : ExpandedSide.RIGHT
     );
-  };
+  }, [setExpandedSide]);
 
-  if (!collections) return <Skeleton height={"100%"} />;
+  useLogDependencyChanges("CollectionsAdmin", {
+    custodian,
+    collections,
+    collectionHosts,
+    expandedSide,
+    expandedLeft,
+    expandedRight,
+    toggleExpandRight,
+    toggleExpandLeft,
+  });
+
+  if (!admin && !custodian) return <Skeleton height={"100%"} />;
 
   return (
     <Box
@@ -68,7 +87,7 @@ const CollectionAdmin = ({
             onCancelCreate={toggleExpandLeft}
           />
         }
-        middle={<CollectionsTable admin initialData={collections} />}
+        middle={<CollectionsTable admin={admin} initialData={collections} />}
         right={
           <CollectionsRightPanel
             collectionHosts={collectionHosts}
@@ -83,4 +102,4 @@ const CollectionAdmin = ({
   );
 };
 
-export default CollectionAdmin;
+export default CollectionsAdmin;

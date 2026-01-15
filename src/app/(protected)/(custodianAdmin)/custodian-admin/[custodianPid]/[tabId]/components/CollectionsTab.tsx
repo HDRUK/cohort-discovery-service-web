@@ -1,5 +1,5 @@
 import getAdminWorkgroups from "@/actions/getAdminWorkgroups";
-import CollectionsCustodianAdmin from "./CollectionsCustodianAdmin";
+import CollectionsCustodianAdmin from "@/modules/CollectionsAdmin/CollectionsAdmin";
 import getCustodianCollectionHosts from "@/actions/getCustodianCollectionHosts";
 import getCustodianCollections from "@/actions/getCustodianCollections";
 import { CollectionsSearchParams } from "@/types/api";
@@ -33,8 +33,7 @@ const CollectionsTab = async ({
   ]);
 
   return (
-    <CollectionsCustodianAdmin
-      pid={custodianPid}
+    <CollectionsAdmin
       collectionHosts={collectionHosts}
       collections={custodianCollections}
       workgroups={workgroups}
