@@ -110,7 +110,7 @@ describe("QueryBuilder", () => {
       const ruleCard = heading.closest('[data-testid="clickable-card"]');
       const scope = within(ruleCard as HTMLElement);
       expect(scope.getByText(expectedTexts[i])).toBeInTheDocument();
-      expect(scope.queryByTestId("WarningAmberIcon")).toBeInTheDocument();
+      expect(scope.queryByTestId("ErrorIcon")).toBeInTheDocument();
     });
   });
 });

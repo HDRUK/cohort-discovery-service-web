@@ -58,7 +58,7 @@ describe("Rule", () => {
     expect(screen.getByText("Rule 1234")).toBeInTheDocument();
     expect(screen.getByText("Include")).toBeInTheDocument();
     expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("WarningAmberIcon")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("ErrorIcon")).not.toBeInTheDocument();
   });
 
   it("renders the Rule card correctly when it is an exclusion", () => {
@@ -69,7 +69,7 @@ describe("Rule", () => {
 
   it("renders the Rule card correctly when not valid", () => {
     renderComponent({ valid: false });
-    expect(screen.queryByTestId("WarningAmberIcon")).toBeInTheDocument();
+    expect(screen.queryByTestId("ErrorIcon")).toBeInTheDocument();
   });
 
   it("renders the Rule card correctly when concept is blank", async () => {

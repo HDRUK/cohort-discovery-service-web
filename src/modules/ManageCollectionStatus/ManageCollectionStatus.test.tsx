@@ -46,9 +46,6 @@ function TestHarness({ mockCollection }: { mockCollection: Collection }) {
 
 describe("ManageCollectionStatus", () => {
   function mockCollection(initialStatus: CollectionStatus) {
-    console.log(initialStatus);
-
-    console.log(CollectionStatus[initialStatus]);
     return {
       id: 1,
       title: "Test Collection",

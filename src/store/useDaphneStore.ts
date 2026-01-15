@@ -574,7 +574,6 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     getQueryFromText: async (input: string) => {
       const cleanQuery = (queryString: string) => {
         const query = JSON.parse(queryString) as RuleGroupType;
-        console.log(query);
         //enforce no unnecessary group within group
         if (query.rules.length === 1 && isRuleGroup(query.rules[0])) {
           return { ...query, rules: groupToRules(query.rules[0]) };
