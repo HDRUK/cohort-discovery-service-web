@@ -12,9 +12,9 @@ import ThreePaneSwimLaneLayout, {
   ExpandedSide,
 } from "@/modules/ThreePaneSwimLaneLayout";
 import { useCallback, useState } from "react";
-import CollectionsLeftPanel from "./CollectionsLeftPanel";
 import CollectionsTable from "@/components/CollectionsTable";
 import ControlledSearchBox from "@/modules/ControlledSearchBox";
+import CollectionsLeftPanel from "@/modules/CollectionsLeftPanel";
 import CollectionsRightPanel from "@/modules/CollectionsRightPanel";
 import { useLogDependencyChanges } from "@/utils/deps";
 import useCustodianStore from "@/store/useCustodianStore";
