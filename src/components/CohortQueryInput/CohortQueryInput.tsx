@@ -28,7 +28,7 @@ const CohortQueryInput = () => {
 
   const isLoading = useDaphneStore((s) => s.stateManagement.isLoading);
 
-  const { handleSubmit, control, setValue, setError, clearErrors } =
+  const { handleSubmit, control, setValue, setError, clearErrors, watch } =
     useForm<FormValues>({
       defaultValues: {
         cohortQueryInput: queryAsText,
@@ -70,12 +70,12 @@ const CohortQueryInput = () => {
         control={control}
         defaultValue=""
         rules={{ required: "Query is required" }}
-        render={({ field, fieldState: { error } }) => (
+        render={({ field, fieldState: { error, isDirty } }) => (
           <Stack gap={1}>
             <SearchBox
               {...field}
               collapsible={false}
-              error={!!error}
+              error={isDirty ? false : !!error}
               type="search"
               placeholder="Search for a cohort e.g. females above 50 with diabetes type-ii"
               fullWidth

@@ -1,11 +1,11 @@
 "use client";
 
 import ToolGuidance from "@/content/guidance/tool.mdx";
-import RuleGuidance from "@/content/guidance/rule.mdx";
-import OperatorGuidance from "@/content/guidance/operator.mdx";
-import GroupGuidance from "@/content/guidance/group.mdx";
-import AgeFilterGuidance from "@/content/guidance/ageFilter.mdx";
-import BuildGuidance from "@/content/guidance/build.mdx";
+import RuleGuidance from "@/content/guidance/queryBuilder/rule.mdx";
+import OperatorGuidance from "@/content/guidance/queryBuilder/operator.mdx";
+import GroupGuidance from "@/content/guidance/queryBuilder/group.mdx";
+import AgeFilterGuidance from "@/content/guidance/queryBuilder/ageFilter.mdx";
+import EmptyRuleGuidance from "@/content/guidance/queryBuilder/emptyRule.mdx";
 import { Box, BoxProps } from "@mui/material";
 import { useCallback, useMemo } from "react";
 import useQueryBuilder from "@/store/useQueryBuilder";
@@ -176,7 +176,7 @@ const Guidance = () => {
       if (isEmptyRule(selectedNode)) {
         return (
           <ActionMenuSection title={"Build Guidance"} fixedExpanded scrollable>
-            <BuildGuidance components={baseComponents} />
+            <EmptyRuleGuidance components={baseComponents} />
           </ActionMenuSection>
         );
       }
