@@ -15,7 +15,7 @@ import { v4 as uuidv4 } from "uuid";
 export enum RuleErrors {
   EMPTY_RULE = "A rule cannot be empty.",
   NO_NESTED_GROUPS = "Nested groups are not supported yet.",
-  GROUP_OPERATORS_ARE_THE_SAME = "All operators within a group must be the same for now.",
+  GROUP_OPERATORS_ARE_THE_SAME = "All operators within a group must be the same.",
   GROUP_CANNOT_START_WITH_AN_OPERATOR = "A group cannot start with an operator.",
   GROUP_CANNOT_END_WITH_AN_OPERATOR = "A group cannot end with an operator.",
   RULE_NEEDS_OPERATOR = "Two rule conditions cannot be adjacent without an operator between them.",
@@ -26,7 +26,8 @@ export enum RuleErrors {
   TIME_CONSTRAINT_IS_UNIDIRECTIONAL = "Time constraints needs to be unidirectional.",
   AGE_CONSTRAINT_IS_UNIDIRECTIONAL = "Age constraints needs to be unidirectional.",
   CANNOT_CONSTRAIN_AGE_AND_TIME = "A rule can only be constrained by either age OR time currently.",
-  HAS_ALTERNATIVES = "A rule has alternatives, please choose the intended concept.",
+  HAS_ALTERNATIVES = "The term has alternatives, please select the intended concept in the rule block(s) below.",
+  NO_QUERY_FOUND = "No valid query could be found for your search term.",
 }
 
 export const createRule = (
@@ -612,7 +613,7 @@ export function validateRuleTree(
   };
 
   if (root.rules.length === 0) {
-    return validateNode(root) as RuleGroupType;
+    return { ...validateNode(root), valid: false } as RuleGroupType;
   }
 
   const validatedRoot = validateGroup(root);

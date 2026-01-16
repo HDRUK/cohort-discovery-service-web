@@ -1,64 +1,129 @@
 "use client";
 
-import { useForm, Controller } from "react-hook-form";
-import { Box, Stack } from "@mui/material";
+import { useForm, Controller, useWatch } from "react-hook-form";
+import { Box } from "@mui/material";
 import { useDaphneStore } from "@/store/useDaphneStore";
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import SearchBox from "../SearchBox";
 import useQueryBuilder from "@/store/useQueryBuilder";
-import SubmitQueryButton from "../SubmitQueryButton";
 import { MAX_INVALID_REASONS } from "@/config/defaults";
+import { useDebounce } from "@/hooks/useDebounce";
+import useSubmitQuery from "@/hooks/useSubmitQuery";
+import { ArrowForward } from "@mui/icons-material";
+import { RuleErrors } from "@/utils/rules";
+
 type FormValues = {
   cohortQueryInput: string;
-  queryName: string;
 };
 
 const CohortQueryInput = () => {
   const {
     queryAsText,
     getQueryFromText,
+    resetQueryBuilderJson,
+    appendError,
     errors = [],
     warnings = [],
   } = useQueryBuilder((qb) => ({
     queryAsText: qb.queryAsText,
     getQueryFromText: qb.getQueryFromText,
+    resetQueryBuilderJson: qb.resetQueryBuilderJson,
+    appendError: qb.appendError,
     errors: qb.errors,
     warnings: qb.queryBuilderJson.warnings,
   }));
 
+  const { submit: submitQuery, disabled } = useSubmitQuery();
+
   const isLoading = useDaphneStore((s) => s.stateManagement.isLoading);
+  const setIsLoading = useDaphneStore((s) => s.stateManagement.setIsLoading);
+  const lastCommittedRef = useRef<string>(queryAsText);
 
-  const { handleSubmit, control, setValue, setError, clearErrors, watch } =
-    useForm<FormValues>({
-      defaultValues: {
-        cohortQueryInput: queryAsText,
-        queryName: "",
-      },
+  const {
+    handleSubmit: handleSubmitSearch,
+    control,
+    resetField,
+    setError: setFormError,
+    clearErrors: clearFormErrors,
+    formState: { isDirty, isLoading: isLoadingForm, isSubmitting },
+  } = useForm<FormValues>({
+    defaultValues: {
+      cohortQueryInput: queryAsText,
+    },
+  });
+
+  const onSubmitSearch = useCallback(
+    async ({ cohortQueryInput }: FormValues) => {
+      const valid = await getQueryFromText(cohortQueryInput);
+      if (!valid) {
+        appendError(RuleErrors.NO_QUERY_FOUND);
+      }
+    },
+    [getQueryFromText, appendError]
+  );
+
+  const liveQuery = useWatch({ control, name: "cohortQueryInput" }) ?? "";
+  const debouncedQuery = useDebounce(liveQuery, 1000);
+  const debouncedQueryRef = useRef(debouncedQuery);
+
+  const resetQuery = useCallback(() => {
+    clearFormErrors();
+    resetQueryBuilderJson();
+    resetField("cohortQueryInput", {
+      defaultValue: queryAsText,
+      keepTouched: true,
+      keepError: true,
     });
-
-  const onSubmit = (data: FormValues) => {
-    getQueryFromText(data.cohortQueryInput);
-  };
+  }, [queryAsText, resetQueryBuilderJson, clearFormErrors, resetField]);
 
   useEffect(() => {
-    clearErrors();
+    debouncedQueryRef.current = debouncedQuery;
+  }, [debouncedQuery]);
+
+  useEffect(() => {
+    clearFormErrors();
+
+    resetField("cohortQueryInput", {
+      defaultValue: errors.length > 0 ? debouncedQueryRef.current : queryAsText,
+      keepTouched: true,
+      keepError: true,
+    });
 
     if (errors.length > 0) {
-      setError("cohortQueryInput", {
+      setFormError("cohortQueryInput", {
         message:
           errors?.slice(0, MAX_INVALID_REASONS).join(" ") ||
           "This query is invalid...",
       });
     }
-    setValue("cohortQueryInput", queryAsText);
-  }, [queryAsText, errors, setValue, setError, clearErrors]);
+  }, [queryAsText, errors, resetField, setFormError, clearFormErrors]);
 
-  const actions = [<SubmitQueryButton key="submitQueryButton" />];
+  useEffect(() => {
+    if (isDirty || isLoadingForm || isSubmitting) setIsLoading(true);
+    else setIsLoading(false);
+  }, [setIsLoading, isDirty, isLoadingForm, isSubmitting]);
+
+  useEffect(() => {
+    const q = (debouncedQuery ?? "").trim();
+    if (q === lastCommittedRef.current) return;
+    lastCommittedRef.current = q;
+    if (q === queryAsText) {
+      if (q === "") resetQuery();
+      return;
+    }
+    handleSubmitSearch(onSubmitSearch, resetQuery)();
+  }, [
+    queryAsText,
+    debouncedQuery,
+    handleSubmitSearch,
+    onSubmitSearch,
+    resetQuery,
+  ]);
 
   return (
     <Box
       component="form"
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleSubmitSearch(onSubmitSearch, resetQuery)}
       sx={{
         width: "95%",
         overflow: "hidden",
@@ -69,24 +134,28 @@ const CohortQueryInput = () => {
         name="cohortQueryInput"
         control={control}
         defaultValue=""
-        rules={{ required: "Query is required" }}
+        rules={{
+          required: "A Query string is required",
+          minLength: {
+            value: 3,
+            message: "Query must be at least 3 characters",
+          },
+        }}
         render={({ field, fieldState: { error, isDirty } }) => (
-          <Stack gap={1}>
-            <SearchBox
-              {...field}
-              collapsible={false}
-              error={isDirty ? false : !!error}
-              type="search"
-              placeholder="Search for a cohort e.g. females above 50 with diabetes type-ii"
-              fullWidth
-              variant="outlined"
-              onSubmit={handleSubmit(onSubmit)}
-              loading={isLoading}
-              warning={warnings.length > 0}
-              disabled={isLoading || field.value.length < 3}
-              actions={actions}
-            />
-          </Stack>
+          <SearchBox
+            {...field}
+            collapsible={false}
+            error={isDirty ? false : !!error}
+            type="search"
+            placeholder="Search for a cohort e.g. females above 50 with diabetes type-ii"
+            fullWidth
+            variant="outlined"
+            onClickEndAornment={submitQuery}
+            loading={isLoading}
+            warning={warnings.length > 0}
+            disabled={disabled || !!error}
+            endIcon={<ArrowForward />}
+          />
         )}
       />
     </Box>
