@@ -353,10 +353,12 @@ const UpdateCollection = ({
           alignItems: "center",
         }}
       >
-        {collection.workgroups?.map((w) => (
-          <Chip color="secondary" label={w.name} key={`wg-chip-${w.name}`} />
-        )) ??
-          (!expandedRight && "No workgroups set")}
+        {Array.from(workgroupValues.entries()).map(
+          ([name, checked]) =>
+            checked && (
+              <Chip color="secondary" label={name} key={`wg-chip-${name}`} />
+            )
+        )}
       </Box>
 
       {expandedRight && (
