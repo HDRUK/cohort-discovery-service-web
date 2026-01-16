@@ -1,4 +1,6 @@
+import { EditIcon } from "@/icons/EditIcon";
 import {
+  Box,
   TextField,
   Typography,
   type TextFieldProps,
@@ -15,6 +17,7 @@ export type EditableTextProps = {
   autoSelect?: boolean;
   trim?: boolean;
   placeholder?: string;
+  showIcon?: boolean;
 };
 
 const EditableText = ({
@@ -26,8 +29,10 @@ const EditableText = ({
   autoSelect = false,
   trim = true,
   placeholder,
+  showIcon = false,
 }: EditableTextProps) => {
   const [editing, setEditing] = useState(!value);
+  const [hovering, setHovering] = useState(false);
   const [draft, setDraft] = useState(value);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -84,6 +89,8 @@ const EditableText = ({
     <Typography
       {...typographyProps}
       onClick={handleClick}
+      onMouseOver={() => setHovering(true)}
+      onMouseOut={() => setHovering(false)}
       sx={{
         ...(typographyProps?.sx || {}),
         ...(value
@@ -91,7 +98,7 @@ const EditableText = ({
           : placeholder
           ? { opacity: 0.6, fontStyle: "italic" }
           : {}),
-        cursor: editing ? "text" : undefined,
+        cursor: editing ? "text" : "pointer",
       }}
     >
       {editing ? (
@@ -125,7 +132,15 @@ const EditableText = ({
           }}
         />
       ) : (
-        <>{displayText}</>
+        <Box
+          display="flex"
+          flexDirection="row"
+          alignItems="center"
+          gap={0.5}
+          sx={{ mb: 0.5 }}
+        >
+          {displayText} {showIcon && hovering ? <EditIcon /> : null}
+        </Box>
       )}
     </Typography>
   );
