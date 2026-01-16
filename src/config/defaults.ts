@@ -8,6 +8,7 @@ export const ID_REF_SUFFIX = "hierarchyMenuItem";
 export const DEFAULT_INTERVAL = 1000;
 export const DEFAULT_REVALIDATE = 300;
 export const MAX_INVALID_REASONS = 4;
+export const DEFAULT_SEARCH_WAIT_TIME = 1000;
 
 export const STATUS_LABELS: Record<string, string> = {
   ok: "Successful",

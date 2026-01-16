@@ -6,7 +6,10 @@ import { useDaphneStore } from "@/store/useDaphneStore";
 import { useCallback, useEffect, useRef } from "react";
 import SearchBox from "../SearchBox";
 import useQueryBuilder from "@/store/useQueryBuilder";
-import { MAX_INVALID_REASONS } from "@/config/defaults";
+import {
+  DEFAULT_SEARCH_WAIT_TIME,
+  MAX_INVALID_REASONS,
+} from "@/config/defaults";
 import { useDebounce } from "@/hooks/useDebounce";
 import useSubmitQuery from "@/hooks/useSubmitQuery";
 import { ArrowForward } from "@mui/icons-material";
@@ -63,7 +66,11 @@ const CohortQueryInput = () => {
   );
 
   const liveQuery = useWatch({ control, name: "cohortQueryInput" }) ?? "";
-  const debouncedQuery = useDebounce(liveQuery, 1000);
+  const debouncedQuery = useDebounce(
+    liveQuery,
+    DEFAULT_SEARCH_WAIT_TIME,
+    (v) => v.trim() === ""
+  );
   const debouncedQueryRef = useRef(debouncedQuery);
 
   const resetQuery = useCallback(() => {
