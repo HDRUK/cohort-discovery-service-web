@@ -86,7 +86,7 @@ function makeDefaultStore(): DaphneStoreState {
 
       setQueryBuilderJson: (DEFAULT_QUERY) => validateRuleTree(DEFAULT_QUERY),
       resetQueryBuilderJson: NOOP,
-      getQueryFromText: (_input: string) => RESOLVE(true),
+      getQueryFromText: (_input: string) => RESOLVE(DEFAULT_QUERY),
 
       selectedDatasets: [],
       setSelectedDatasets: NOOP,
