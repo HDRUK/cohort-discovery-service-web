@@ -21,5 +21,5 @@ export const useDebounce = <T>(
     return () => globalThis.clearTimeout(id);
   }, [value, delay, shouldFlush]);
 
-  return shouldFlush ? value : debounced;
+  return debounced;
 };

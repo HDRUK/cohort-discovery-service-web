@@ -149,7 +149,7 @@ export interface DaphneStoreState {
     createNewOperator: (above?: boolean) => void;
     createNewAgeFilter: (above?: boolean) => void;
     queryAsText: string;
-    getQueryFromText: (input: string) => Promise<boolean>;
+    getQueryFromText: (input: string) => Promise<RuleGroupType>;
     selectedDatasets: string[];
     setSelectedDatasets: (pids: string[]) => void;
     openSelectDatasetsPanel: boolean;
@@ -594,7 +594,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       const { data: newQueryString } = await parseQuery(input);
       const newQuery = cleanQuery(newQueryString);
       const cleanedQuery = get().queryBuilder.setQueryBuilderJson(newQuery);
-      return cleanedQuery.valid ?? false;
+      return cleanedQuery;
     },
     validateRules: (root: RuleGroupType) => {
       const featureFlags = get().featureFlags.flags;
