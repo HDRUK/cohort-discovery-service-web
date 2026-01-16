@@ -20,10 +20,10 @@ const queryToText = (node: RuleGroupType) => {
       case "Drug":
         return "received";
       case "Observation":
-        return "observed with";
+        return "were observed with";
       case "Measurement":
       case "Measured":
-        return "measured with";
+        return "were measured with";
       case "Condition":
         return "were diagnosed with";
       case "Race":
