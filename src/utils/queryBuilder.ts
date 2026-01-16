@@ -1,5 +1,6 @@
 import { ConceptOperator, RuleGroupType, RuleNodeType } from "@/types/rules";
 import {
+  isAgeFilter,
   isMultipleConcept,
   isOperator,
   isRuleGroup,
@@ -7,6 +8,7 @@ import {
   isSingleConcept,
 } from "@/utils/rules";
 import { mapDomain } from "./domains";
+import { MAX_AGE_FILTER, MIN_AGE_FILTER } from "@/config/rules";
 
 type Piece = { verb?: string | null; text: string };
 
@@ -81,6 +83,21 @@ const queryToText = (node: RuleGroupType) => {
     if (isOperator(n)) {
       const text = (n.combinator || "").toLowerCase() === "or" ? "or" : "and";
       return [{ text }];
+    }
+
+    if (isAgeFilter(n)) {
+      if (n.value[0] === MIN_AGE_FILTER && n.value[1] === MAX_AGE_FILTER) {
+        return [{ text: "are of any age" }];
+      }
+      if (n.value[0] > MIN_AGE_FILTER && n.value[1] === MAX_AGE_FILTER) {
+        return [{ text: `are older than ${n.value[0]} years` }];
+      }
+      if (n.value[0] === MIN_AGE_FILTER && n.value[1] < MAX_AGE_FILTER) {
+        return [{ text: `are younger than ${n.value[1]} years` }];
+      }
+      return [
+        { text: `are between ${n.value[0]} and ${n.value[1]} years old` },
+      ];
     }
 
     if (isRuleLeaf(n)) {
