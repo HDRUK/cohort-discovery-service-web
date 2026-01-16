@@ -57,8 +57,8 @@ const CohortQueryInput = () => {
 
   const onSubmitSearch = useCallback(
     async ({ cohortQueryInput }: FormValues) => {
-      const valid = await getQueryFromText(cohortQueryInput);
-      if (!valid) {
+      const { rules } = await getQueryFromText(cohortQueryInput);
+      if (rules.length === 0) {
         appendError(RuleErrors.NO_QUERY_FOUND);
       }
     },
@@ -89,7 +89,6 @@ const CohortQueryInput = () => {
 
   useEffect(() => {
     clearFormErrors();
-
     resetField("cohortQueryInput", {
       defaultValue: errors.length > 0 ? debouncedQueryRef.current : queryAsText,
       keepTouched: true,
