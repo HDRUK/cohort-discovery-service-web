@@ -22,6 +22,7 @@ const CohortQueryTitle = () => {
             setQueryName(name);
             notify.success("Query name saved");
           }}
+          showIcon
           typographyProps={{
             component: "span",
             variant: "h5",
