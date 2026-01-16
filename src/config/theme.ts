@@ -17,6 +17,7 @@ export const themeOptions: ThemeOptions = {
     },
     text: {
       primary: "#4D5B59",
+      secondary: "#878E95",
     },
     background: {
       default: "#F2F2F2",
@@ -39,7 +40,6 @@ export const themeOptions: ThemeOptions = {
     h3: {
       fontSize: "1.8rem",
       fontWeight: 400,
-      color: "rgba(0, 0, 0, 0.4)",
     },
     h4: {
       fontSize: "20px",
@@ -49,12 +49,10 @@ export const themeOptions: ThemeOptions = {
     h5: {
       fontSize: "20px",
       fontWeight: 400,
-      color: "rgba(0, 0, 0, 0.4)",
     },
     h6: {
       fontSize: "15px",
       fontWeight: 200,
-      color: "rgba(0, 0, 0, 0.4)",
     },
     body1: {
       fontSize: "15px",
@@ -219,6 +217,17 @@ export const themeOptions: ThemeOptions = {
           guidance1: "h1",
           guidance2: "h2",
         },
+      },
+      styleOverrides: {
+        h3: ({ theme }) => ({
+          color: theme.palette.text.secondary,
+        }),
+        h5: ({ theme }) => ({
+          color: theme.palette.text.secondary,
+        }),
+        h6: ({ theme }) => ({
+          color: theme.palette.text.secondary,
+        }),
       },
     },
     MuiCardContent: {

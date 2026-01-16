@@ -100,9 +100,7 @@ describe("Rule", () => {
     const headerEl = groupHeading.closest(".MuiCardHeader-root") as HTMLElement;
     expect(headerEl).toBeInTheDocument();
 
-    expect(
-      within(headerEl).queryByTestId("WarningAmberIcon")
-    ).toBeInTheDocument();
+    expect(within(headerEl).queryByTestId("ErrorIcon")).toBeInTheDocument();
   });
 
   it("calls setQueryBuilderJson with updated state when actions are triggered", async () => {

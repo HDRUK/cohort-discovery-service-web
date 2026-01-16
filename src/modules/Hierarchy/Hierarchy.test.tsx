@@ -105,7 +105,7 @@ describe("QueryBuilder", () => {
         .find((li) => within(li).queryByText(id));
 
       expect(row).toBeTruthy();
-      const icon = within(row!).queryByTestId("WarningAmberIcon");
+      const icon = within(row!).queryByTestId("ErrorIcon");
       expect(icon).toBeInTheDocument();
     });
   });

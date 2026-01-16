@@ -22,6 +22,7 @@ import {
 import useHasMounted from "@/hooks/useHasMounted";
 import RuleAgeFilter from "../RuleAgeFilter";
 import SkeletonFull from "@/components/SkeletonFull";
+import { useDaphneStore } from "@/store/useDaphneStore";
 
 interface RuleBoardProps extends BoxProps {
   ruleGroup: RuleGroupType;
@@ -45,10 +46,10 @@ const RuleBoard = ({ ruleGroup, children, ...rest }: RuleBoardProps) => {
     id,
     data: { type: "container", containerId: id },
   });
-
+  const isLoading = useDaphneStore((s) => s.stateManagement.isLoading);
   const hasMounted = useHasMounted();
 
-  if (!hasMounted) {
+  if (!hasMounted || isLoading) {
     return <SkeletonFull />;
   }
 

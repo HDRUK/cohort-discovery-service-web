@@ -84,9 +84,9 @@ function makeDefaultStore(): DaphneStoreState {
       createNewOperator: (_above: boolean = true) => {},
       createNewAgeFilter: (_above: boolean = true) => {},
 
-      setQueryBuilderJson: NOOP,
+      setQueryBuilderJson: (DEFAULT_QUERY) => validateRuleTree(DEFAULT_QUERY),
       resetQueryBuilderJson: NOOP,
-      getQueryFromText: (_input: string) => {},
+      getQueryFromText: (_input: string) => RESOLVE(true),
 
       selectedDatasets: [],
       setSelectedDatasets: NOOP,
@@ -100,6 +100,9 @@ function makeDefaultStore(): DaphneStoreState {
       showDescendants: {},
       setShowDescendants: NOOP,
       validateRules: (_root: RuleGroupType) => _root,
+      errors: [],
+      setErrors: (_rules: RuleGroupType, _pids: UniqueIdentifier[]) => NOOP,
+      appendError: (_error: string) => NOOP,
     },
 
     userData: {
