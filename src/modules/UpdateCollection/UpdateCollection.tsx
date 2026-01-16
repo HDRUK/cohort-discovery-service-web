@@ -358,8 +358,7 @@ const UpdateCollection = ({
             checked && (
               <Chip color="secondary" label={name} key={`wg-chip-${name}`} />
             )
-        ) ??
-          (!expandedRight && "No workgroups set")}
+        )}
       </Box>
 
       {expandedRight && (
