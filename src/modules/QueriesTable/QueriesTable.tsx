@@ -238,16 +238,16 @@ const QueriesTable = ({
                 label: "Re-run query",
                 onClick: async () => {
                   const { data } = await rerunQuery(row.original.pid);
-                  const open_queries = JSON.parse(
-                    searchParams.get("open_queries") || "[]"
-                  );
+                  const open_queries = (searchParams.get("open_queries") || "")
+                    .split(",")
+                    .filter((q) => q);
                   open_queries.indexOf(data.query_pid) === -1
                     ? open_queries.push(data.query_pid)
                     : null;
                   router.push(
                     routes.dashboardQueryResult(
                       data.query_pid,
-                      `open_queries=${JSON.stringify(open_queries)}`
+                      `open_queries=${open_queries.join(",")}`
                     )
                   );
                 },

@@ -1,4 +1,4 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import NewQueryPage from "./components/NewQueryPage";
 import QueryResultsPage from "./components/QueryResultsPage";
 import { routes } from "@/config/routes";
@@ -20,7 +20,7 @@ const DashboardTabPage = async (props: {
   const { params, searchParams } = props;
   const { tabId } = await params;
   const { query, open_queries } = await searchParams;
-
+  const array_open_queries = ((open_queries as string) ?? "").split(",");
   let queryName: string | undefined;
 
   if (query && query !== "undefined") {
@@ -32,35 +32,20 @@ const DashboardTabPage = async (props: {
   }
 
   const results_tabs = open_queries
-    ? (JSON.parse(open_queries || "[]") as string[]).map((tabId) => {
+    ? array_open_queries.map((tabId) => {
         return {
           id: `query-result-${tabId}`,
           label: `Result: ${tabId.slice(0, 8)}`,
           href: routes.dashboardQueryResult(
             tabId as string,
-            `open_queries=${(open_queries ?? "").toString()}`
+            `open_queries=${(array_open_queries ?? []).join(",")}`
           ),
           onCloseHref: routes.dashboardNewQuery(
-            `open_queries=${(open_queries ?? "").toString()}`
+            `open_queries=${(
+              array_open_queries.filter((val) => val !== tabId) ?? []
+            ).join(",")}`
           ),
-          handleClose: async () => {
-            "use server";
-            const new_open_queries = (
-              JSON.parse(open_queries || "[]") as string[]
-            ).filter((val) => val !== tabId);
-            redirect(
-              routes.dashboardNewQuery(
-                `open_queries=${(new_open_queries ?? "").toString()}`
-              )
-            );
-          },
-          page: (
-            <QueryResultsPage
-              query={tabId}
-              open_queries={open_queries}
-              {...props}
-            />
-          ),
+          page: <QueryResultsPage {...props} />,
         };
       })
     : [];
@@ -85,9 +70,7 @@ const DashboardTabPage = async (props: {
       href: routes.dashboardHistory(
         `open_queries=${(open_queries ?? "").toString()}`
       ),
-      page: (
-        <QueryHistoryPage query={""} open_queries={open_queries} {...props} />
-      ),
+      page: <QueryHistoryPage {...props} />,
     },
   ].concat(results_tabs);
 

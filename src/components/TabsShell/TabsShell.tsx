@@ -72,10 +72,7 @@ export default function TabsShell({
             sx={tabListSx}
           >
             {tabs.map(
-              (
-                { id, label, href, onCloseHref, handleClose, disabled = false },
-                i
-              ) => {
+              ({ id, label, href, onCloseHref, disabled = false }, i) => {
                 return (
                   <Tab
                     disabled={disabled}
@@ -94,7 +91,6 @@ export default function TabsShell({
                             onClick={async (e) => {
                               e.preventDefault();
                               e.stopPropagation();
-                              handleClose ? handleClose() : null;
                               router.replace(onCloseHref);
                             }}
                           >
