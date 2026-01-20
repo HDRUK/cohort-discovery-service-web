@@ -28,6 +28,7 @@ const CohortQueryTitle = () => {
             variant: "h5",
           }}
           textFieldProps={{
+            placeholder: "Type query name here",
             variant: "standard",
             size: "small",
             slotProps: {
