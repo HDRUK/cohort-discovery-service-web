@@ -96,8 +96,8 @@ const EditableText = ({
         ...(value
           ? {}
           : placeholder
-            ? { opacity: 0.6, fontStyle: "italic" }
-            : {}),
+          ? { opacity: 0.6, fontStyle: "italic" }
+          : {}),
         cursor: editing ? "text" : "pointer",
       }}
     >
