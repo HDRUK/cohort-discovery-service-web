@@ -28,15 +28,13 @@ const CustodianPage = ({
     if (!custodians.map((c) => c.pid).includes(custodian.pid)) {
       forbidden();
     }
-  } else {
-    return (
-      <Paper sx={{ display: "flex", height: "100%" }}>
-        <SkeletonFull />
-      </Paper>
-    );
+    return children;
   }
-
-  return children;
+  return (
+    <Paper sx={{ display: "flex", height: "100%" }}>
+      <SkeletonFull />
+    </Paper>
+  );
 };
 
 export default CustodianPage;
