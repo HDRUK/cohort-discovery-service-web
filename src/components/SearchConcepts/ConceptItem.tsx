@@ -2,6 +2,11 @@ import { Concept } from "@/types/api";
 import { Paper, FormControlLabel, Checkbox, PaperProps } from "@mui/material";
 import Title from "../Title";
 import { mapDomain } from "@/utils/domains";
+import { ChangeEvent, MouseEvent } from "react";
+
+type ConceptSelectEvent =
+  | ChangeEvent<HTMLInputElement>
+  | MouseEvent<HTMLDivElement>;
 
 export interface ConceptItemProps {
   concept: Concept;
@@ -9,7 +14,7 @@ export interface ConceptItemProps {
   showDomain?: boolean;
   multiple?: boolean;
   showCode?: boolean;
-  handleClick: (id: number) => void;
+  handleClick: (id: number, e: ConceptSelectEvent) => void;
 }
 
 const rowSx: PaperProps["sx"] = {
@@ -30,7 +35,7 @@ const ConceptWrapper = ({
   children,
 }: {
   isSelected: boolean;
-  onClick?: () => void;
+  onClick?: (e: ConceptSelectEvent) => void;
   children: React.ReactNode;
 }) => (
   <Paper
@@ -73,7 +78,7 @@ export const ConceptItem = ({
   return (
     <ConceptWrapper
       isSelected={isSelected}
-      onClick={!multiple ? () => handleClick(id) : undefined}
+      onClick={!multiple ? (e) => handleClick(id, e) : undefined}
     >
       {multiple ? (
         <FormControlLabel
@@ -81,8 +86,11 @@ export const ConceptItem = ({
           control={
             <Checkbox
               checked={isSelected}
-              onChange={() => handleClick(id)}
-              onClick={(e) => e.stopPropagation()}
+              onChange={(e) => handleClick(id, e)}
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+              }}
             />
           }
           label={labelEl}

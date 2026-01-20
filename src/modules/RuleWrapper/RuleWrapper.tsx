@@ -58,7 +58,7 @@ export interface RuleWrapperProps extends BoxProps {
   containerProps?: BoxProps;
   render: (
     rule: RuleNodeType,
-    ref?: RefObject<HTMLDivElement | HTMLLIElement | null>
+    ref?: RefObject<HTMLDivElement | HTMLLIElement | null>,
   ) => ReactNode;
   actions?: Action[];
   forceShowHandle?: boolean;
@@ -121,7 +121,7 @@ const RuleWrapper = ({
       toggleSelected(id);
       e.stopPropagation();
     },
-    [id, toggleSelected]
+    [id, toggleSelected],
   );
 
   const onMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {

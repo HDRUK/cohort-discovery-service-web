@@ -79,7 +79,7 @@ const SearchConcepts = ({
         return;
       }
     },
-    [domain, searchForConcepts, setSelected]
+    [domain, searchForConcepts, setSelected],
   );
 
   const handleToggle = useCallback(
@@ -89,7 +89,7 @@ const SearchConcepts = ({
         [id]: !prev[id],
       }));
     },
-    [setSelected]
+    [setSelected],
   );
 
   return (
@@ -127,9 +127,11 @@ const SearchConcepts = ({
             key={c.concept_id}
             concept={c}
             isSelected={!!selected?.[c.concept_id]}
-            handleClick={(e) => {
-              handleToggle(e);
+            handleClick={(id, e) => {
               onClick?.(c);
+              handleToggle(id);
+              e.stopPropagation();
+              e.preventDefault();
             }}
           />
         ))}
