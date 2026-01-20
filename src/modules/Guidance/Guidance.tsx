@@ -1,6 +1,6 @@
 "use client";
 
-import ToolGuidance from "@/content/guidance/tool.mdx";
+import ToolGuidance from "@/content/guidance/queryBuilder/tool.mdx";
 import RuleGuidance from "@/content/guidance/queryBuilder/rule.mdx";
 import OperatorGuidance from "@/content/guidance/queryBuilder/operator.mdx";
 import GroupGuidance from "@/content/guidance/queryBuilder/group.mdx";
@@ -87,7 +87,7 @@ const Guidance = () => {
       selected: qb.selected,
       queryBuilderJson: qb.queryBuilderJson,
       setQueryBuilderJson: qb.setQueryBuilderJson,
-    })
+    }),
   );
 
   const selectedIds = useMemo(() => trueKeys(selected), [selected]);
@@ -105,10 +105,10 @@ const Guidance = () => {
         updateById(queryBuilderJson, id, (node) => ({
           ...node,
           rules: newRules,
-        }))
+        })),
       );
     },
-    [queryBuilderJson, setQueryBuilderJson]
+    [queryBuilderJson, setQueryBuilderJson],
   );
 
   const { constrainForBunnyV1 } = useFeatures();
