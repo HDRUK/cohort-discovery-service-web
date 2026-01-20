@@ -15,7 +15,12 @@ interface PageProps {
 
 const QueryHistoryPageContent = async ({ searchParams }: PageProps) => {
   const params = await searchParams;
-
+  console.log(
+    "QueryHistoryPageContent open_queries",
+    params.open_queries,
+    typeof params.open_queries,
+    JSON.parse(params.open_queries || "[]")
+  );
   const searchParamsObject = buildQueryHistoryParams(params);
 
   const queries = await getQueries({ params: searchParamsObject });

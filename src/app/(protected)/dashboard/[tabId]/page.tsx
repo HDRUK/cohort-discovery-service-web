@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import NewQueryPage from "./components/NewQueryPage";
 import QueryResultsPage from "./components/QueryResultsPage";
 import { routes } from "@/config/routes";
@@ -19,7 +19,7 @@ const DashboardTabPage = async (props: {
 }) => {
   const { params, searchParams } = props;
   const { tabId } = await params;
-  const { query } = await searchParams;
+  const { query, open_queries } = await searchParams;
 
   let queryName: string | undefined;
 
@@ -32,29 +32,102 @@ const DashboardTabPage = async (props: {
   }
   const hasQuery = !!query;
 
+  console.log(
+    "DashboardTabPage open_queries",
+    open_queries,
+    typeof open_queries,
+    JSON.parse(open_queries || "[]")
+  );
+
+  const results_tabs = open_queries
+    ? (JSON.parse(open_queries || "[]") as string[]).map((tabId) => {
+        // console.log(
+        //   "tabId",
+        //   tabId,
+        //   routes.dashboardQueryResult(
+        //     query as string,
+        //     `open_queries=${(open_queries ?? "").toString()}`
+        //   )
+        // );
+        return {
+          id: `query-result-${tabId}`,
+          // disabled: false,
+          label: `Result: ${tabId}`,
+          href: routes.dashboardQueryResult(
+            tabId as string,
+            `open_queries=${(open_queries ?? "").toString()}`
+          ),
+          onCloseHref: routes.dashboardNewQuery(
+            `open_queries=${(open_queries ?? "").toString()}`
+          ),
+          handleClose: async () => {
+            "use server";
+            console.log(
+              "handleClose called for tabId",
+              tabId,
+              "open_queries is currently",
+              open_queries,
+              typeof open_queries
+            );
+            const new_open_queries = (
+              JSON.parse(open_queries || "[]") as string[]
+            ).pop();
+            redirect(
+              routes.dashboardNewQuery(
+                `open_queries=${(new_open_queries ?? "").toString()}`
+              )
+            );
+          },
+          page: (
+            <QueryResultsPage
+              query={tabId}
+              open_queries={open_queries}
+              {...props}
+            />
+          ),
+        };
+      })
+    : [];
+
+  console.log("results_tabs", results_tabs);
+  console.log(`open_queries=${(open_queries ?? "").toString()}`);
   const TABS = [
     {
       id: "new-query",
       label: "New Query",
-      href: routes.dashboardNewQuery(),
-      page: <NewQueryPage query={query as string} />,
+      href: routes.dashboardNewQuery(
+        `open_queries=${(open_queries ?? "").toString()}`
+      ),
+      page: (
+        <NewQueryPage
+          query={query as string}
+          open_queries={(open_queries ?? "").toString()}
+        />
+      ),
     },
-    {
-      id: "query-result",
-      disabled: !hasQuery,
-      label: queryName ?? "Query Result",
-      href: routes.dashboardQueryResult(query as string),
-      onCloseHref: routes.dashboardNewQuery(),
-      page: <QueryResultsPage {...props} />,
-    },
+    // {
+    //   id: "query-result",
+    //   // disabled: !hasQuery,
+    //   label: queryName ?? "Query Result",
+    //   href: routes.dashboardQueryResult(
+    //     "f4e00209-66a1-4e8b-b945-5ea4a3461262" as string,
+    //     `open_queries=${(open_queries ?? "").toString()}`
+    //   ),
+    //   // onCloseHref: routes.dashboardNewQuery((open_queries ?? "").toString()),
+    //   page: <QueryResultsPage {...props} />,
+    // },
     {
       id: "query-history",
       label: "Query History",
-      href: routes.dashboardHistory,
-      page: <QueryHistoryPage {...props} />,
+      href: routes.dashboardHistory(
+        `open_queries=${(open_queries ?? "").toString()}`
+      ),
+      page: (
+        <QueryHistoryPage query={""} open_queries={open_queries} {...props} />
+      ),
     },
-  ];
-
+  ].concat(results_tabs);
+  console.log("TABS", TABS);
   const isValidTabId = (tabId: string) => TABS.some((t) => t.id === tabId);
 
   const cookieStore = await cookies();

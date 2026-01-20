@@ -27,6 +27,7 @@ export type TabType = {
   route?: string;
   onCloseHref?: string;
   disabled?: boolean;
+  handleClose?: () => void;
 };
 
 type TabsShellProps = {
@@ -57,8 +58,8 @@ export default function TabsShell({
     setInternalValue(newValue);
   };
 
+  console.log("TabsShell tabs", tabs);
   const pages = tabs.map((tab) => tab.page);
-
   const kids = React.Children.toArray(pages);
 
   return (
@@ -71,7 +72,10 @@ export default function TabsShell({
             sx={tabListSx}
           >
             {tabs.map(
-              ({ id, label, href, onCloseHref, disabled = false }, i) => {
+              (
+                { id, label, href, onCloseHref, handleClose, disabled = false },
+                i
+              ) => {
                 return (
                   <Tab
                     disabled={disabled}
@@ -90,6 +94,7 @@ export default function TabsShell({
                             onClick={async (e) => {
                               e.preventDefault();
                               e.stopPropagation();
+                              handleClose ? handleClose() : null;
                               router.replace(onCloseHref);
                             }}
                           >
