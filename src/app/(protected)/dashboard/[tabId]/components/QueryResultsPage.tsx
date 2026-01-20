@@ -23,7 +23,6 @@ const QueryResultsPageContent = async ({
   searchParams: PageSearchParams;
 }) => {
   const { query, ...rest } = await searchParams;
-  console.log("here QueryResultsPageContent", { query, ...rest });
   const searchParamsObject = buildQueryHistoryParams(rest);
 
   const queryData = await getQuery(query as string, {
@@ -62,15 +61,8 @@ const QueryResultsPageContent = async ({
 };
 
 const QueryResultsPage = async (props: PageProps) => {
-  console.log("QueryResultsPage props", props);
   const { searchParams } = props;
-  const { query, open_queries } = await searchParams;
-  console.log(
-    "QueryResultsPage open_queries",
-    open_queries,
-    typeof open_queries,
-    JSON.parse(open_queries || "[]")
-  );
+  const { query } = await searchParams;
   return (
     <Suspense fallback={<Skeleton height={600} />}>
       {query ? (

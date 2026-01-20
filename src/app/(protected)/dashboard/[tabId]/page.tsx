@@ -30,29 +30,12 @@ const DashboardTabPage = async (props: {
       queryName = capVarChar(getQueryName(data), 30, true);
     }
   }
-  const hasQuery = !!query;
-
-  console.log(
-    "DashboardTabPage open_queries",
-    open_queries,
-    typeof open_queries,
-    JSON.parse(open_queries || "[]")
-  );
 
   const results_tabs = open_queries
     ? (JSON.parse(open_queries || "[]") as string[]).map((tabId) => {
-        // console.log(
-        //   "tabId",
-        //   tabId,
-        //   routes.dashboardQueryResult(
-        //     query as string,
-        //     `open_queries=${(open_queries ?? "").toString()}`
-        //   )
-        // );
         return {
           id: `query-result-${tabId}`,
-          // disabled: false,
-          label: `Result: ${tabId}`,
+          label: `Result: ${tabId.slice(0, 8)}`,
           href: routes.dashboardQueryResult(
             tabId as string,
             `open_queries=${(open_queries ?? "").toString()}`
@@ -62,16 +45,9 @@ const DashboardTabPage = async (props: {
           ),
           handleClose: async () => {
             "use server";
-            console.log(
-              "handleClose called for tabId",
-              tabId,
-              "open_queries is currently",
-              open_queries,
-              typeof open_queries
-            );
             const new_open_queries = (
               JSON.parse(open_queries || "[]") as string[]
-            ).pop();
+            ).filter((val) => val !== tabId);
             redirect(
               routes.dashboardNewQuery(
                 `open_queries=${(new_open_queries ?? "").toString()}`
@@ -89,8 +65,6 @@ const DashboardTabPage = async (props: {
       })
     : [];
 
-  console.log("results_tabs", results_tabs);
-  console.log(`open_queries=${(open_queries ?? "").toString()}`);
   const TABS = [
     {
       id: "new-query",
@@ -105,17 +79,6 @@ const DashboardTabPage = async (props: {
         />
       ),
     },
-    // {
-    //   id: "query-result",
-    //   // disabled: !hasQuery,
-    //   label: queryName ?? "Query Result",
-    //   href: routes.dashboardQueryResult(
-    //     "f4e00209-66a1-4e8b-b945-5ea4a3461262" as string,
-    //     `open_queries=${(open_queries ?? "").toString()}`
-    //   ),
-    //   // onCloseHref: routes.dashboardNewQuery((open_queries ?? "").toString()),
-    //   page: <QueryResultsPage {...props} />,
-    // },
     {
       id: "query-history",
       label: "Query History",
@@ -127,7 +90,7 @@ const DashboardTabPage = async (props: {
       ),
     },
   ].concat(results_tabs);
-  console.log("TABS", TABS);
+
   const isValidTabId = (tabId: string) => TABS.some((t) => t.id === tabId);
 
   const cookieStore = await cookies();

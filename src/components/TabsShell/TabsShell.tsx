@@ -58,7 +58,6 @@ export default function TabsShell({
     setInternalValue(newValue);
   };
 
-  console.log("TabsShell tabs", tabs);
   const pages = tabs.map((tab) => tab.page);
   const kids = React.Children.toArray(pages);
 
