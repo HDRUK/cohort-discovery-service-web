@@ -1,12 +1,12 @@
 "use client";
 
-import ToolGuidance from "@/content/guidance/tool.mdx";
-import RuleGuidance from "@/content/guidance/rule.mdx";
-import OperatorGuidance from "@/content/guidance/operator.mdx";
-import GroupGuidance from "@/content/guidance/group.mdx";
-import AgeFilterGuidance from "@/content/guidance/ageFilter.mdx";
-import BuildGuidance from "@/content/guidance/build.mdx";
-import { Box, BoxProps } from "@mui/material";
+import ToolGuidance from "@/content/guidance/queryBuilder/tool.mdx";
+import RuleGuidance from "@/content/guidance/queryBuilder/rule.mdx";
+import OperatorGuidance from "@/content/guidance/queryBuilder/operator.mdx";
+import GroupGuidance from "@/content/guidance/queryBuilder/group.mdx";
+import AgeFilterGuidance from "@/content/guidance/queryBuilder/ageFilter.mdx";
+import EmptyRuleGuidance from "@/content/guidance/queryBuilder/emptyRule.mdx";
+import { Box, BoxProps, Link, LinkProps } from "@mui/material";
 import { useCallback, useMemo } from "react";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import ActionMenuSection from "@/components/ActionMenuSection";
@@ -45,6 +45,16 @@ import DeleteAgeButton from "@/components/DeleteAgeButton";
 import useFeatures from "@/store/useFeatures";
 
 export const baseComponents = {
+  a: ({ href, children }: LinkProps) => (
+    <Link
+      sx={{ color: "link.main" }}
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {children}
+    </Link>
+  ),
   h1: CustomH1,
   h2: CustomH2,
   ul: (props: BoxProps) => (
@@ -77,7 +87,7 @@ const Guidance = () => {
       selected: qb.selected,
       queryBuilderJson: qb.queryBuilderJson,
       setQueryBuilderJson: qb.setQueryBuilderJson,
-    })
+    }),
   );
 
   const selectedIds = useMemo(() => trueKeys(selected), [selected]);
@@ -95,10 +105,10 @@ const Guidance = () => {
         updateById(queryBuilderJson, id, (node) => ({
           ...node,
           rules: newRules,
-        }))
+        })),
       );
     },
-    [queryBuilderJson, setQueryBuilderJson]
+    [queryBuilderJson, setQueryBuilderJson],
   );
 
   const { constrainForBunnyV1 } = useFeatures();
@@ -176,7 +186,7 @@ const Guidance = () => {
       if (isEmptyRule(selectedNode)) {
         return (
           <ActionMenuSection title={"Build Guidance"} fixedExpanded scrollable>
-            <BuildGuidance components={baseComponents} />
+            <EmptyRuleGuidance components={baseComponents} />
           </ActionMenuSection>
         );
       }

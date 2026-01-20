@@ -6,7 +6,7 @@ import SwimLane from "@/components/SwimLane";
 import { SwimLaneProps } from "@/components/SwimLane/SwimLane";
 import SwimLaneContainer from "@/components/SwimLaneContainer";
 import Title, { TitleProps } from "@/components/Title";
-import QueryBuilderGuidanceMdx from "@/content/guidance/queryBuilder.mdx";
+import CohortDiscoveryGuidanceMdx from "@/content/guidance/cohortDiscovery.mdx";
 import { baseComponents } from "@/modules/Guidance/Guidance";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import CloseIcon from "@mui/icons-material/Close";
@@ -39,7 +39,7 @@ const QueryBuilderGuidance = ({ onClose }: { onClose: () => void }) => {
 
   return (
     <Paper sx={{ bgcolor: "white", p: 2, height: "100%" }}>
-      <QueryBuilderGuidanceMdx components={components} />
+      <CohortDiscoveryGuidanceMdx components={components} />
     </Paper>
   );
 };
