@@ -21,20 +21,20 @@ import {
   iconButtonSx,
 } from "./SearchBox.styles";
 
-export type SearchBoxProps = Omit<TextFieldProps, "onSubmit" | "errors"> & {
+export type SearchBoxProps = Omit<TextFieldProps, "errors"> & {
   loading?: boolean;
   warning?: boolean;
-  onSubmit?: () => void | Promise<void>;
   collapsible?: boolean;
   defaultExpanded?: boolean;
   collapsedWidth?: number | string;
   expandedWidth?: number | string;
   inputBgColor?: string;
   actions?: React.ReactNode[];
+  onClickEndAornment?: () => void;
+  endIcon?: React.ReactNode;
 };
 
 const SearchBox = ({
-  onSubmit,
   loading = false,
   warning = false,
   collapsible = true,
@@ -44,6 +44,8 @@ const SearchBox = ({
   inputBgColor = "#fff",
   actions,
   disabled,
+  onClickEndAornment,
+  endIcon,
   ...rest
 }: SearchBoxProps) => {
   const [expanded, setExpanded] = useState(
@@ -63,9 +65,11 @@ const SearchBox = ({
     });
   };
 
-  const handleIconClick = () => {
+  const handleIconClick = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (collapsible) toggle();
-    else void onSubmit?.();
+    onClickEndAornment?.();
   };
 
   const actionChildren = React.Children.toArray(actions);
@@ -99,39 +103,28 @@ const SearchBox = ({
               input: {
                 endAdornment: (
                   <InputAdornment position="end" sx={inputAdornmentSx}>
-                    <IconButton
-                      disabled={disabled}
-                      onClick={handleIconClick}
-                      aria-label={
-                        collapsible
-                          ? expanded
-                            ? "Collapse search"
-                            : "Expand search"
-                          : "Submit search"
-                      }
-                      sx={iconButtonSx(disabled)}
-                    >
-                      {loading ? (
-                        <CircularProgress size={24} color="inherit" />
-                      ) : (
-                        <SearchIcon fontSize="small" />
-                      )}
-                    </IconButton>
+                    {loading ? (
+                      <CircularProgress size={24} color="inherit" />
+                    ) : (
+                      <IconButton
+                        type="button"
+                        disabled={disabled}
+                        onClick={handleIconClick}
+                        aria-label={
+                          collapsible
+                            ? expanded
+                              ? "Collapse search"
+                              : "Expand search"
+                            : "Submit search"
+                        }
+                        sx={iconButtonSx(disabled)}
+                      >
+                        {endIcon ?? <SearchIcon fontSize="small" />}
+                      </IconButton>
+                    )}
                   </InputAdornment>
                 ),
               },
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                e.stopPropagation();
-                if (collapsible) {
-                  if (expanded) void onSubmit?.();
-                  else toggle();
-                } else {
-                  void onSubmit?.();
-                }
-              }
             }}
             {...rest}
           />

@@ -4,6 +4,7 @@ import { Stack, Typography } from "@mui/material";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import ErrorIcon from "@/components/ErrorIcon";
 import { Warning } from "@mui/icons-material";
+import { useDaphneStore } from "@/store/useDaphneStore";
 
 const CohortErrors = () => {
   const {
@@ -13,7 +14,8 @@ const CohortErrors = () => {
     queryBuilderJson: qb.queryBuilderJson,
     errors: qb.errors,
   }));
-
+  const isLoading = useDaphneStore((s) => s.stateManagement.isLoading);
+  if (isLoading) return null;
   return (
     <>
       {errors.length > 0 && (

@@ -171,7 +171,7 @@ const QueryResultsTable = ({
   const sortedTasks = useMemo(() => {
     if (!currentSortDirection) {
       return [...tasks].sort(
-        (a, b) => (b.result?.count ?? 0) - (a.result?.count ?? 0)
+        (a, b) => (b.result?.count ?? -1) - (a.result?.count ?? -1)
       );
     }
     return tasks;

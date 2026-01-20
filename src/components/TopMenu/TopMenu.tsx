@@ -13,20 +13,11 @@ export default function TopMenu() {
   const pathname = usePathname();
   const {
     userData: { user },
-    custodianData: { custodians },
   } = useDaphneStore();
 
-  const teamIds = useMemo(
-    () => user?.token_user?.cohort_admin_teams?.map((t) => String(t.id)) ?? [],
-    [user]
-  );
-
   const userCustodians = useMemo(
-    () =>
-      (custodians ?? []).filter((c) =>
-        teamIds.includes(String(c.external_custodian_id))
-      ),
-    [custodians, teamIds]
+    () => user?.custodians ?? [],
+    [user?.custodians],
   );
 
   const tabs = useMemo<TabType[]>(() => {

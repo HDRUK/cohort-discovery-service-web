@@ -20,6 +20,11 @@ Toggle <b>Excluding</b> to remove items that meet the selected criteria. Use thi
 
 <ShowDescendants/>
 
+# Guidance
+
+Concept refinements - start broad (parent concept) or narrow down to specific subtypes
+(child concepts).
+
 # Rule Parameters
 
 <AddTimeFrameButton label={`Add timeframe when ${props.category.toLowerCase()} was ${props.verb}`} />
@@ -32,12 +37,16 @@ Toggle <b>Excluding</b> to remove items that meet the selected criteria. Use thi
 <DeleteTimeFrameButton label={`Remove timeframe constraint for this ${props.category}`} />
 </RuleTimeframeSelector>
 
+# Timeframe Guidance
+
+Set the time frame for this rule — the window when the condition occurred/measurement was recorded/medication was prescribed.
+
 <RuleAgeSelector title={`Age of person when the ${props.category} was ${props.verb}`}>
 <DeleteAgeButton label={`Remove age of person constraint for this ${props.category}`} />
 </RuleAgeSelector>
 
+# Age at Diagnosis/ Procedure Occurrence/ at Time of Measurement/ Drug Intake Guidance
 
-# Guidance
+Define the patient’s age at diagnosis. Age may be rounded ±1 year in some datasets, to either protect patient data or as specific day or month was not recorded, so consider this when setting the range for your research question.
 
-Concept refinements - start broad (parent concept) or narrow down to specific subtypes
-(child concepts).
+

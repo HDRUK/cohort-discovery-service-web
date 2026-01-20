@@ -167,13 +167,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
                     indicateIfParent={showDescendants}
                     concept={concept}
                     onDelete={() => {
-                      if (concept?.alternatives[0]) {
-                        const [alternative, ...alternatives] =
-                          concept?.alternatives;
-                        setConcept({ ...alternative, alternatives });
-                      } else {
-                        clearConcept();
-                      }
+                      clearConcept();
                     }}
                     onClick={(e: React.MouseEvent) => {
                       e.stopPropagation();
