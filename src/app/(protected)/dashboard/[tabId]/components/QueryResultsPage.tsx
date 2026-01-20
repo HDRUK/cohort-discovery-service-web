@@ -23,6 +23,7 @@ const QueryResultsPageContent = async ({
   searchParams: PageSearchParams;
 }) => {
   const { query, ...rest } = await searchParams;
+
   const searchParamsObject = buildQueryHistoryParams(rest);
 
   const queryData = await getQuery(query as string, {
@@ -63,6 +64,7 @@ const QueryResultsPageContent = async ({
 const QueryResultsPage = async (props: PageProps) => {
   const { searchParams } = props;
   const { query } = await searchParams;
+
   return (
     <Suspense fallback={<Skeleton height={600} />}>
       {query ? (

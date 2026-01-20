@@ -59,6 +59,7 @@ export default function TabsShell({
   };
 
   const pages = tabs.map((tab) => tab.page);
+
   const kids = React.Children.toArray(pages);
 
   return (

@@ -59,7 +59,6 @@ const QueriesTable = ({
     () => [`queries-${searchParams.toString()}`],
     [searchParams],
   );
-  console.log("<<<< here >>>>", searchParams.get("open_queries"));
   const { data: queries } = useQuery<Paginated<Query[]>>({
     queryKey,
     queryFn: async () => {
@@ -245,10 +244,6 @@ const QueriesTable = ({
                   open_queries.indexOf(data.query_pid) === -1
                     ? open_queries.push(data.query_pid)
                     : null;
-                  console.log(
-                    "QueriesTable.reRun.onClick open_queries",
-                    open_queries
-                  );
                   router.push(
                     routes.dashboardQueryResult(
                       data.query_pid,

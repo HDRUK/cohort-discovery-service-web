@@ -12,20 +12,12 @@ export const routes = {
   dashboard: dashboardPath(),
   dashboardNewQuery: (queryParams?: string) =>
     dashboardPath("new-query", queryParams),
-  dashboardQueryResult: (pid: string, queryParams?: string) => {
-    console.log(
-      `${dashboardPath("query-result")}-${pid ? pid : ""}?query=${
-        pid ? pid : ""
-      }${queryParams ? `&${queryParams}` : ""}`
-    );
-    return `${dashboardPath("query-result")}-${pid ? pid : ""}?query=${
+  dashboardQueryResult: (pid: string, queryParams?: string) =>
+    `${dashboardPath("query-result")}-${pid ? pid : ""}?query=${
       pid ? pid : ""
-    }${queryParams ? `&${queryParams}` : ""}`;
-  },
-  dashboardHistory: (queryParams?: string) => {
-    console.log(`${dashboardPath("query-history")}?${queryParams}`);
-    return `${dashboardPath("query-history")}?${queryParams}`;
-  },
+    }${queryParams ? `&${queryParams}` : ""}`,
+  dashboardHistory: (queryParams?: string) =>
+    `${dashboardPath("query-history")}?${queryParams}`,
   dashboardCollections: dashboardPath("collections"),
   dashboardCodes: dashboardPath("codes"),
   profile: "/profile",
