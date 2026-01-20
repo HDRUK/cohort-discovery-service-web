@@ -101,6 +101,8 @@ const QueryResultsTable = ({
         return (
           <Link
             component="a"
+            rel="noopener noreferrer"
+            target="_blank"
             href={url}
             sx={{
               display: "inline-flex",
