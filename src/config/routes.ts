@@ -10,8 +10,13 @@ const adminPath = (subpath?: string) => `/admin${subpath ? `/${subpath}` : ""}`;
 
 export const routes = {
   dashboard: dashboardPath(),
-  dashboardNewQuery: (queryParams?: string) =>
-    dashboardPath("new-query", queryParams),
+  dashboardNewQuery: (openQueries?: string[], queryParams?: string) =>
+    dashboardPath(
+      "new-query",
+      `${openQueries ? `open_queries=${openQueries.join(",")}` : ""}${
+        queryParams ? `&${queryParams}` : ""
+      }`
+    ),
   dashboardQueryResult: (
     pid: string,
     openQueries?: string[],

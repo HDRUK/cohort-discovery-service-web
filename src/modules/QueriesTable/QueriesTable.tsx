@@ -105,7 +105,7 @@ const QueriesTable = ({
           <MuiLink
             component={Link}
             href={{
-              pathname: routes.dashboardNewQuery(pid),
+              pathname: routes.dashboardNewQuery(undefined, pid),
               query: { query: pid },
             }}
             onClick={() => {
@@ -271,11 +271,13 @@ const QueriesTable = ({
                   setQueryName("");
 
                   setQueryBuilderJson(row.original.definition);
+                  const open_queries = (searchParams.get("open_queries") || "")
+                    .split(",")
+                    .filter((q) => q);
                   router.push(
                     routes.dashboardNewQuery(
-                      `query=${row.original.pid}&open_queries=${(
-                        searchParams.get("open_queries") || ""
-                      ).toString()}`
+                      open_queries,
+                      `query=${row.original.pid}`
                     )
                   );
                 },

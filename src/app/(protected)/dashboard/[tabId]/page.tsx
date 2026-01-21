@@ -41,9 +41,7 @@ const DashboardTabPage = async (props: {
             array_open_queries ?? []
           ),
           onCloseHref: routes.dashboardNewQuery(
-            `open_queries=${(
-              array_open_queries.filter((val) => val !== tabId) ?? []
-            ).join(",")}`
+            array_open_queries.filter((val) => val !== tabId) ?? []
           ),
           page: <QueryResultsPage {...props} />,
         };
@@ -54,9 +52,7 @@ const DashboardTabPage = async (props: {
     {
       id: "new-query",
       label: "New Query",
-      href: routes.dashboardNewQuery(
-        `open_queries=${(open_queries ?? "").toString()}`
-      ),
+      href: routes.dashboardNewQuery(array_open_queries),
       page: (
         <NewQueryPage
           query={query as string}
