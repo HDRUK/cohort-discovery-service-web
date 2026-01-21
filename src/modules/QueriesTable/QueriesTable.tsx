@@ -245,9 +245,9 @@ const QueriesTable = ({
                   const open_queries = (searchParams.get("open_queries") || "")
                     .split(",")
                     .filter((q) => q);
-                  open_queries.indexOf(data.query_pid) === -1
-                    ? open_queries.push(data.query_pid)
-                    : null;
+                  if (open_queries.indexOf(data.query_pid) === -1) {
+                    open_queries.push(data.query_pid);
+                  }
                   router.push(
                     routes.dashboardQueryResult(data.query_pid, open_queries),
                   );
