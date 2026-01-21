@@ -9,7 +9,7 @@ import { TAG_ADMIN_USERS } from "@/config/tags";
 
 const getUsersList = async (
   page = 1,
-  per_page = DEFAULT_USERS_PER_PAGE
+  per_page = DEFAULT_USERS_PER_PAGE,
 ): Promise<ApiResponse<Paginated<User[]>>> => {
   const params = new URLSearchParams({
     page: String(page),

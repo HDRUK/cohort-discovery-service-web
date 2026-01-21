@@ -30,7 +30,7 @@ const AddAgeButton = ({ rule, ...props }: AddAgeButtonProps) => {
           ...node,
           timeConstraint: [null, null],
         };
-      })
+      }),
     );
   };
 

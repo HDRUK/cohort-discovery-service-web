@@ -6,7 +6,7 @@ import { WorkgroupGuidanceProps } from "./WorkgroupsGuidance";
 import useAdminStore from "@/store/useAdminStore";
 
 const WorkgroupGuidance = maskClientTest<WorkgroupGuidanceProps>(
-  () => import("./WorkgroupsGuidance")
+  () => import("./WorkgroupsGuidance"),
 );
 
 const WorkgroupsRightPanel = ({ ...props }: UpdateWorkgroupProps) => {

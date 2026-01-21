@@ -25,13 +25,13 @@ const SelectNetworkDatasets = ({
 
   // All collections in this network (across all custodians)
   const allCollections = networkCollections.custodians.flatMap(
-    (gc) => gc.items
+    (gc) => gc.items,
   );
   const allPids = allCollections.map((c) => c.pid);
 
   const nTotal = allCollections.length;
   const nSelected = selectedDatasets.filter((pid) =>
-    allPids.includes(pid)
+    allPids.includes(pid),
   ).length;
 
   const handleSelectNetwork = () => {

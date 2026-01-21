@@ -6,11 +6,11 @@ import { Collection, CreateCollectionPost, ApiResponse } from "../types/api";
 
 const createCustodianCollection = async (
   custodianPid: string,
-  payload: CreateCollectionPost
+  payload: CreateCollectionPost,
 ): Promise<ApiResponse<Collection>> => {
   return await apiPost<ApiResponse<Collection>, CreateCollectionPost>(
     API_ROUTES.custodianCollections(custodianPid),
-    payload
+    payload,
   );
 };
 

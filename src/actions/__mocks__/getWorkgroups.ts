@@ -4,7 +4,7 @@ import { getMockCollections } from "./getCollections";
 
 export const getMockWorkgroup = (
   rest?: Partial<Workgroup>,
-  count: number = 1213
+  count: number = 1213,
 ): Workgroup => ({
   id: 1,
   name: "Test Workgroup #1",
@@ -19,7 +19,7 @@ export const getMockWorkgroups = (n: number = 2): Workgroup[] =>
       id,
       name: `Test Workgroup #${id + 1}`,
       collections: getMockCollections(1),
-    })
+    }),
   );
 
 const getWorkgroups = async (): Promise<ApiResponse<Workgroup[]>> => {

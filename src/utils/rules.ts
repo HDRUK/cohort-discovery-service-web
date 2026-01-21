@@ -32,7 +32,7 @@ export enum RuleErrors {
 
 export const createRule = (
   rule: ConceptOperator = { concept: null },
-  exclude = false
+  exclude = false,
 ): RuleLeafType => ({
   id: uuidv4(),
   exclude,
@@ -41,7 +41,7 @@ export const createRule = (
 
 export const createRuleGroup = (
   rules: Array<RuleNodeType> = [createRule(), createOperator(), createRule()],
-  exclude = false
+  exclude = false,
 ): RuleGroupType => ({
   id: uuidv4(),
   exclude,
@@ -49,7 +49,7 @@ export const createRuleGroup = (
 });
 
 export const createOperator = (
-  combinator: CombinatorType = CombinatorType.AND
+  combinator: CombinatorType = CombinatorType.AND,
 ): OperatorType => ({
   id: uuidv4(),
   combinator,
@@ -68,7 +68,7 @@ export function ruleToGroup(
     groupExclude?: boolean;
     childCombinator?: CombinatorType;
     childExclude?: boolean;
-  }
+  },
 ): RuleGroupType {
   const groupCombinator = opts?.groupCombinator ?? CombinatorType.AND;
 
@@ -85,7 +85,7 @@ export function ruleToGroup(
 
 export function groupToRules(
   group: RuleGroupType,
-  opts?: { normaliseExclude?: boolean }
+  opts?: { normaliseExclude?: boolean },
 ): RuleNodeType[] {
   const normaliseExclude = opts?.normaliseExclude ?? true;
 
@@ -128,12 +128,12 @@ export const isEmptyRule = (rule: RuleLeafType): boolean =>
   rule.rule.concept === null;
 
 export const isSingleConcept = (
-  concept: Concept | null
+  concept: Concept | null,
 ): concept is Concept & { alternatives: undefined } =>
   concept != null && !isMultipleConcept(concept);
 
 export const isMultipleConcept = (
-  concept: Concept | null
+  concept: Concept | null,
 ): concept is Concept & { alternatives: Concept[] } =>
   concept != null &&
   Array.isArray(concept?.alternatives) &&
@@ -151,7 +151,7 @@ export const isOperator = (n: RuleNodeType): n is OperatorType =>
 
 export const findById = (
   root: RuleNodeType,
-  id: string
+  id: string,
 ): RuleNodeType | undefined => {
   if (root.id === id) return root;
 
@@ -166,7 +166,7 @@ export const findById = (
 
 export const findByIdWithNeighbors = (
   root: RuleNodeType,
-  id: string
+  id: string,
 ): {
   above?: RuleNodeType;
   found?: RuleNodeType;
@@ -202,7 +202,7 @@ export const updateById = <T extends RuleNodeType>(
   insert?: {
     node: RuleNodeType | RuleNodeType[];
     position?: "before" | "after";
-  }
+  },
 ): T => {
   // If the target IS the root, we can only update it—no before/after insertion without parent context.
   if (root.id === id) {
@@ -254,7 +254,7 @@ export const insertIntoGroup = <T extends RuleNodeType>(
   groupId: string,
   node: RuleNodeType,
   index?: number,
-  opts?: { combinator?: CombinatorType; exclude?: boolean }
+  opts?: { combinator?: CombinatorType; exclude?: boolean },
 ): T => {
   return updateById(root, groupId, (target) => {
     if (!isRuleGroup(target)) {
@@ -265,8 +265,8 @@ export const insertIntoGroup = <T extends RuleNodeType>(
       0,
       Math.min(
         typeof index === "number" ? index : target.rules.length,
-        target.rules.length
-      )
+        target.rules.length,
+      ),
     );
 
     const nextRules = [
@@ -293,7 +293,7 @@ export function moveItemIntoGroup(
   root: RuleGroupType,
   itemId: string,
   to: string,
-  toIndex: number | "end"
+  toIndex: number | "end",
 ): RuleGroupType {
   const { root: newRoot, removed } = removeByIdWithNode(root, itemId);
   if (!removed) return root;
@@ -307,7 +307,7 @@ type RemoveResult<T> = { root: T; removed: RuleNodeType | null };
 
 export const removeByIdWithNode = <T extends RuleNodeType>(
   root: T,
-  id: string
+  id: string,
 ): RemoveResult<T> => {
   if (root.id === id) {
     return { root, removed: root };
@@ -379,7 +379,7 @@ export function validateRuleTree(
   root: RuleGroupType,
   options?: {
     constrainForBunnyV1: boolean;
-  }
+  },
 ): RuleGroupType {
   const constrainForBunnyV1 = options?.constrainForBunnyV1 ?? false;
 
@@ -429,7 +429,7 @@ export function validateRuleTree(
           if (left && right) {
             leaf = invalidateNode(
               leaf,
-              RuleErrors.TIME_CONSTRAINT_IS_UNIDIRECTIONAL
+              RuleErrors.TIME_CONSTRAINT_IS_UNIDIRECTIONAL,
             );
           }
         }
@@ -444,7 +444,7 @@ export function validateRuleTree(
           if (left && right) {
             leaf = invalidateNode(
               leaf,
-              RuleErrors.AGE_CONSTRAINT_IS_UNIDIRECTIONAL
+              RuleErrors.AGE_CONSTRAINT_IS_UNIDIRECTIONAL,
             );
           }
         }
@@ -479,7 +479,7 @@ export function validateRuleTree(
   const validateGroup = (
     group: RuleGroupType,
     minChildren = 1,
-    depth = 0
+    depth = 0,
   ): RuleGroupType => {
     const groupReasons: string[] = [];
     const addGroupReason = (msg: string) => {
@@ -529,7 +529,7 @@ export function validateRuleTree(
     if (n > 0 && !isContent(children[0])) {
       children[0] = invalidateNode(
         children[0],
-        RuleErrors.GROUP_CANNOT_START_WITH_AN_OPERATOR
+        RuleErrors.GROUP_CANNOT_START_WITH_AN_OPERATOR,
       );
     }
 
@@ -537,7 +537,7 @@ export function validateRuleTree(
     if (n > 0 && !isContent(children[n - 1])) {
       children[n - 1] = invalidateNode(
         children[n - 1],
-        RuleErrors.GROUP_CANNOT_END_WITH_AN_OPERATOR
+        RuleErrors.GROUP_CANNOT_END_WITH_AN_OPERATOR,
       );
     }
 
@@ -584,7 +584,7 @@ export function validateRuleTree(
       addGroupReason(
         `A group must contain at least ${minChildren} element${
           minChildren === 1 ? "" : "s"
-        }.`
+        }.`,
       );
     }
 

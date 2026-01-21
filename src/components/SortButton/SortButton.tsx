@@ -23,10 +23,10 @@ const SortButton = ({ field, searchParamName = "sort" }: SortButtonProps) => {
   const handleSort = useCallback(
     (direction: SortDirection) => {
       setSearchParam(
-        direction !== currentSortDirection ? `${field}:${direction}` : null
+        direction !== currentSortDirection ? `${field}:${direction}` : null,
       );
     },
-    [field, currentSortDirection, setSearchParam]
+    [field, currentSortDirection, setSearchParam],
   );
 
   const items: PositionedMenuItem[] = [

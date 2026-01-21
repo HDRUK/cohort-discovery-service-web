@@ -28,7 +28,7 @@ const SelectDatasets = ({
       selectedDatasets: qb.selectedDatasets,
       setSelectedDatasets: qb.setSelectedDatasets,
       open: qb.openSelectDatasetsPanel,
-    })
+    }),
   );
 
   const mountedRef = useRef(false);
@@ -45,7 +45,7 @@ const SelectDatasets = ({
       const { custodian } = c;
       (acc[custodian.id] ??= { custodian, items: [] }).items.push(c);
       return acc;
-    }, {})
+    }, {}),
   );
 
   const networkGroups: NetworkGroupedCollections[] = Object.values(
@@ -61,8 +61,8 @@ const SelectDatasets = ({
         acc[key].custodians.push(gc);
         return acc;
       },
-      {}
-    )
+      {},
+    ),
   );
 
   const nTotal = collections.length;

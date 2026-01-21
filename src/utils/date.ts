@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 const getDatetime = (
   date?: string,
   format = "DD/MM/YYYY HH:mm:ss",
-  emptyFallback = "--/--/----"
+  emptyFallback = "--/--/----",
 ) => {
   if (!date) return emptyFallback;
 

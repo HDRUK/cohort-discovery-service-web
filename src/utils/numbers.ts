@@ -18,7 +18,7 @@ const falseKeys = <T extends string | number>(obj: Record<T, boolean>): T[] => {
 };
 
 const removeFalseKeys = <T extends string | number>(
-  obj: Record<T, boolean>
+  obj: Record<T, boolean>,
 ): Record<T, boolean> =>
   (Object.entries(obj) as [T, boolean][]).reduce((acc, [key, value]) => {
     if (value) acc[key] = true;

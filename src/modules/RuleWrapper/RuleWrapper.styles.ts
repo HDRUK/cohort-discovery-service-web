@@ -3,7 +3,7 @@ import { SxProps } from "@mui/system";
 
 export const containerSx = (
   isSelected: boolean,
-  rest?: SxProps<Theme>
+  rest?: SxProps<Theme>,
 ): SxProps<Theme> => ({
   border: 1,
   borderColor: isSelected ? "blue" : "transparent",
@@ -32,7 +32,7 @@ export const dragIconSx = (isDragging: boolean): SxProps<Theme> => ({
 
 export const skeletonSx = (
   width: number | string = "100%",
-  height: number | string = "100%"
+  height: number | string = "100%",
 ): SxProps<Theme> => ({
   mx: "auto",
   width,
@@ -41,7 +41,7 @@ export const skeletonSx = (
 
 export const cardSx = (
   isSelected: boolean,
-  valid: boolean
+  valid: boolean,
 ): SxProps<Theme> => ({
   p: 2,
   border: 1,

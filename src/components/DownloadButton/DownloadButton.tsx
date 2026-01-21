@@ -30,9 +30,9 @@ const DownloadButton = ({
     if (disabled || !id || !entity) return;
 
     const url = `/api/download/${encodeURIComponent(
-      id
+      id,
     )}?entity=${encodeURIComponent(entity)}&format=${encodeURIComponent(
-      format
+      format,
     )}`;
     const a = document.createElement("a");
     a.href = url;

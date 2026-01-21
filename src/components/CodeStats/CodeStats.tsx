@@ -58,7 +58,7 @@ const CodeStats = ({ codes }: { codes: Paginated<CodeStat[]> }) => {
         Cell: ({ cell }) => <> {cell.getValue<number>()} %</>,
       },
     ],
-    []
+    [],
   );
 
   const table = usePaginatedTable<CodeStat>({

@@ -10,7 +10,7 @@ describe("CollectionsTable", () => {
     render(
       <MockDaphneStore>
         <CollectionsTable {...props} />
-      </MockDaphneStore>
+      </MockDaphneStore>,
     );
 
   it("renders the correct column headers", async () => {
@@ -27,7 +27,7 @@ describe("CollectionsTable", () => {
     ];
     for (const column of columns) {
       expect(
-        screen.getByRole("columnheader", { name: column })
+        screen.getByRole("columnheader", { name: column }),
       ).toBeInTheDocument();
     }
   });

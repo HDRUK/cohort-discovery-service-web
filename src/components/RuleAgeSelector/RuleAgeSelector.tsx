@@ -108,7 +108,7 @@ const RuleAgeSelector = ({
           return { ...node, value: [l, r] };
         }
         return node;
-      })
+      }),
     );
   };
 
@@ -170,7 +170,7 @@ const RuleAgeSelector = ({
                 }
 
                 return node;
-              })
+              }),
             );
           }}
           renderPicker={({ value, onChange }) => (

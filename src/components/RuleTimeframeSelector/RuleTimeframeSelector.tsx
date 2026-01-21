@@ -59,7 +59,7 @@ const RuleTimeframeSelector = ({
           value?.toISOString() ?? null,
           rightValue?.toISOString() ?? null,
         ],
-      }))
+      })),
     );
   };
 
@@ -71,7 +71,7 @@ const RuleTimeframeSelector = ({
           leftValue?.toISOString() ?? null,
           value?.toISOString() ?? null,
         ],
-      }))
+      })),
     );
   };
 
@@ -105,12 +105,12 @@ const RuleTimeframeSelector = ({
 
   const parseIsoToDayjs = useCallback(
     (iso: string | null) => (iso ? dayjs(iso) : null),
-    []
+    [],
   );
 
   const serialiseDayjsToIso = useCallback(
     (d: Dayjs | null) => (d ? d.toISOString() : null),
-    []
+    [],
   );
 
   if (!rule.timeConstraint) return null;
@@ -126,7 +126,7 @@ const RuleTimeframeSelector = ({
               updateById(queryBuilderJson, rule.id, (node) => ({
                 ...node,
                 timeConstraint: next,
-              }))
+              })),
             );
           }}
           parse={parseIsoToDayjs}

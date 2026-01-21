@@ -32,7 +32,7 @@ const useNodeActions = (node: RuleNodeType) => {
         if (!isRuleLeaf(node)) return node;
         const newGroup = ruleToGroup(node);
         return newGroup;
-      })
+      }),
     );
   }, [id, queryBuilderJson, setQueryBuilderJson]);
 
@@ -49,7 +49,7 @@ const useNodeActions = (node: RuleNodeType) => {
           };
         }
         return node;
-      })
+      }),
     );
   }, [id, queryBuilderJson, setQueryBuilderJson]);
 
@@ -59,7 +59,7 @@ const useNodeActions = (node: RuleNodeType) => {
         if (!isRuleGroup(node)) return node;
         const newGroup = groupToRules(node);
         return newGroup;
-      })
+      }),
     );
   }, [id, queryBuilderJson, setQueryBuilderJson]);
 
@@ -72,7 +72,7 @@ const useNodeActions = (node: RuleNodeType) => {
       updateById(queryBuilderJson, id, (node) => ({
         ...node,
         rules: newRules,
-      }))
+      })),
     );
   }, [id, rules, queryBuilderJson, setQueryBuilderJson]);
 

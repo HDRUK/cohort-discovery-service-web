@@ -12,7 +12,7 @@ export default async function CustodianAdmin({
   const { data: custodians } = await getCustodians();
 
   const custodian = custodians.find(
-    (c) => c.external_custodian_id === externalId
+    (c) => c.external_custodian_id === externalId,
   );
 
   const { pid } = custodian || {};

@@ -35,7 +35,7 @@ const LeftSidebarMenuItem = ({ item, depth = 0 }: Props) => {
     () =>
       !!item.path &&
       (pathname === item.path || pathname.startsWith(item.path + "/")),
-    [pathname, item.path]
+    [pathname, item.path],
   );
 
   const onToggle = () => setOpen(!open);

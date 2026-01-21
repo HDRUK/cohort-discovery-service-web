@@ -18,7 +18,7 @@ const ToggleOperator = ({ operator }: ToggleOperatorProps) => {
 
   const handleToggleExclusion = (newNode: OperatorType) => {
     setQueryBuilderJson(
-      updateById(queryBuilderJson, newNode.id, () => newNode)
+      updateById(queryBuilderJson, newNode.id, () => newNode),
     );
   };
 

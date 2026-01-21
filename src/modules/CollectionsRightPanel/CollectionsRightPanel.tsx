@@ -7,7 +7,7 @@ import { CollectionGuidanceProps } from "./CollectionsGuidance";
 import useUserStore from "@/store/useUserStore";
 
 const CollectionGuidance = maskClientTest<CollectionGuidanceProps>(
-  () => import("./CollectionsGuidance")
+  () => import("./CollectionsGuidance"),
 );
 
 type CollectionsRightPanelProps = Omit<UpdateCollectionProps, "collection">;

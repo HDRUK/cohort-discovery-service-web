@@ -33,7 +33,7 @@ const ManageMultipleCollectionsStatus = ({
 
   const initialStatusId = collections[0].model_state?.state_id;
   const [selectedStatusId, setSelectedStatusId] = useState<number>(
-    collections[0].model_state?.state_id ?? -1
+    collections[0].model_state?.state_id ?? -1,
   );
 
   const destinationOptions = {
@@ -69,13 +69,13 @@ const ManageMultipleCollectionsStatus = ({
       collections.map((c) => c.id),
       {
         state: "pending",
-      }
+      },
     );
     setSelectedStatusId(CollectionStatus.PENDING);
     notify.success(
       `Requested for collections (${collections
         .map((c) => c.name)
-        .join(", ")}) to be made active`
+        .join(", ")}) to be made active`,
     );
   };
 

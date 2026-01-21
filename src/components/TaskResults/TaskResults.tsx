@@ -126,7 +126,7 @@ const TaskResults = ({ tasks }: TaskResultsProps) => {
         size: 160,
       },
     ],
-    []
+    [],
   );
 
   const table = useTable({

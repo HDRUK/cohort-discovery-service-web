@@ -18,7 +18,7 @@ const ToggleExclusion = ({ node }: ToggleExclusionProps) => {
 
   const handleToggleExclusion = (newNode: RuleLeafType) => {
     setQueryBuilderJson(
-      updateById(queryBuilderJson, newNode.id, () => newNode)
+      updateById(queryBuilderJson, newNode.id, () => newNode),
     );
   };
 

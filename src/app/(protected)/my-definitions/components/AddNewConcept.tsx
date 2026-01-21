@@ -19,21 +19,21 @@ const AddNewConcept = ({ conceptSet }: { conceptSet: ConceptSet }) => {
 
   const originalIds = useMemo(
     () => new Set(concepts?.map((c) => c.concept_id) ?? []),
-    [concepts]
+    [concepts],
   );
 
   const [selected, setSelected] = useState<Record<number, boolean>>(
     concepts?.reduce<Record<number, boolean>>((acc, c) => {
       acc[c.concept_id] = true;
       return acc;
-    }, {}) || {}
+    }, {}) || {},
   );
 
   const selectedIds = useMemo(() => trueKeys(selected), [selected]);
   const idsToBeRemoved = useMemo(() => falseKeys(selected), [selected]);
   const idsToAdd = useMemo(
     () => selectedIds.filter((id) => !originalIds.has(id)),
-    [selectedIds, originalIds]
+    [selectedIds, originalIds],
   );
 
   const onSave = async () => {
@@ -47,7 +47,7 @@ const AddNewConcept = ({ conceptSet }: { conceptSet: ConceptSet }) => {
     notify.success(
       `Added ${idsToAdd.length} new concepts to your set${
         idsToBeRemoved.length ? ` and removed ${idsToBeRemoved.length}` : ""
-      }`
+      }`,
     );
   };
 

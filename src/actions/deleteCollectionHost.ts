@@ -5,10 +5,10 @@ import { API_ROUTES } from "../lib/apiRoutes";
 import { CollectionHost, ApiResponse } from "../types/api";
 
 const deleteCollectionHost = async (
-  hostId: number
+  hostId: number,
 ): Promise<ApiResponse<CollectionHost>> => {
   return await apiDelete<ApiResponse<CollectionHost>>(
-    API_ROUTES.collectionHost(hostId)
+    API_ROUTES.collectionHost(hostId),
   );
 };
 

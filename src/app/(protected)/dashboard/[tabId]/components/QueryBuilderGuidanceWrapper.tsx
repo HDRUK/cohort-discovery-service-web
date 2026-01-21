@@ -4,7 +4,7 @@ import { maskClientTest } from "@/lib/maskClientTest";
 import { ReactNode, useState } from "react";
 
 const QueryBuilderGuidance = maskClientTest(
-  () => import("./QueryBuilderGuidance")
+  () => import("./QueryBuilderGuidance"),
 );
 
 interface QueryBuilderGuidanceWrapperProps {

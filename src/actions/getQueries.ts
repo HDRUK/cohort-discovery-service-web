@@ -7,7 +7,7 @@ import { Query, ApiResponse, Paginated, WithIncomplete } from "../types/api";
 import { getTokenUser } from "@/lib/auth";
 
 const getQueries = async (
-  args?: Omit<CachedGetArgs, "url">
+  args?: Omit<CachedGetArgs, "url">,
 ): Promise<WithIncomplete<ApiResponse<Paginated<Query[]>>>> => {
   const {
     user: { id: userId },
@@ -20,7 +20,7 @@ const getQueries = async (
   });
 
   const incompleteQueries = data.data.filter((q) =>
-    q.tasks.some((t) => !t.completed_at)
+    q.tasks.some((t) => !t.completed_at),
   );
 
   return {

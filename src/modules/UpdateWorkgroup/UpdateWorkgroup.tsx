@@ -25,7 +25,7 @@ const UpdateWorkgroup = ({
   onClose,
 }: UpdateWorkgroupProps) => {
   const addCollectionsToWorkgroup = useAdminStore(
-    (s) => s.addCollectionsToWorkgroup
+    (s) => s.addCollectionsToWorkgroup,
   );
   const selectedWorkgroup = useAdminStore((s) => s.selectedWorkgroup);
 
@@ -54,7 +54,7 @@ const UpdateWorkgroup = ({
 
   const submitForm = async (
     data: UpdateWorkgroupFormValues,
-    closeAfter = false
+    closeAfter = false,
   ) => {
     if (!selectedWorkgroup?.id) return;
 

@@ -132,13 +132,13 @@ export interface DaphneStoreState {
     setSizeCache: (
       id: UniqueIdentifier,
       width: number | string,
-      height: number | string
+      height: number | string,
     ) => void;
     selected: Record<UniqueIdentifier, boolean>;
     setSelected: (
       id: UniqueIdentifier | UniqueIdentifier[],
       next?: boolean,
-      reset?: boolean
+      reset?: boolean,
     ) => void;
     select: (id: UniqueIdentifier | UniqueIdentifier[]) => void;
     deselect: (id: UniqueIdentifier | UniqueIdentifier[]) => void;
@@ -157,7 +157,7 @@ export interface DaphneStoreState {
     showDescendants: Record<UniqueIdentifier, boolean>;
     setShowDescendants: (
       id: UniqueIdentifier | UniqueIdentifier[],
-      next?: boolean
+      next?: boolean,
     ) => void;
     validateRules: (root: RuleGroupType) => RuleGroupType;
   };
@@ -168,7 +168,7 @@ export interface DaphneStoreState {
     setQueries: (queries: Query[]) => void;
     fetchResults: (
       queryName?: string,
-      reset?: boolean
+      reset?: boolean,
     ) => Promise<ApiResponse<CreateQuery>>;
     rerunTask: (id: string) => void;
     collections: Collection[];
@@ -177,22 +177,22 @@ export interface DaphneStoreState {
     setSelectedCollections: (collections: CollectionWithHosts[] | []) => void;
     runDistributions: (
       collection: CollectionWithHosts,
-      query_type: DistributionType
+      query_type: DistributionType,
     ) => Promise<Query>;
     conceptSets: ConceptSet[];
     setConceptSets: (conceptSets: ConceptSet[]) => void;
     createConceptSet: (payload: CreateConceptSetPost) => Promise<void>;
     searchForConcepts: (
       searchTerm: string,
-      domain?: string
+      domain?: string,
     ) => Promise<Paginated<Partial<Concept>[]>>;
     addConceptsToSet: (
       conceptSetId: number,
-      conceptIds: number[]
+      conceptIds: number[],
     ) => Promise<void>;
     removeConceptsFromSet: (
       conceptSetId: number,
-      conceptIds: number[]
+      conceptIds: number[],
     ) => Promise<void>;
     removeConceptSet: (conceptSetId: number) => Promise<void>;
     deleteQueries: (pids: string[]) => void;
@@ -204,26 +204,26 @@ export interface DaphneStoreState {
     setCustodians: (custodians: Custodian[]) => void;
     createCollectionHost: (
       custodianId: number,
-      payload: { name: string; context: string }
+      payload: { name: string; context: string },
     ) => Promise<void>;
     updateCollectionHost: (
       id: number,
-      payload: UpdateCollectionHostPayload
+      payload: UpdateCollectionHostPayload,
     ) => Promise<void>;
     deleteCollectionHost: (id: number) => Promise<void>;
     createCollection: (
       custodianPid: string,
       payload: CreateCollectionPost,
-      payloadConfig: Omit<CreateCollectionConfigPost, "collection_id">
+      payloadConfig: Omit<CreateCollectionConfigPost, "collection_id">,
     ) => Promise<Collection>;
     updateCollection: (
       id: number,
       payload: Partial<CreateCollectionPost>,
-      payloadConfig: Partial<CreateCollectionConfigPost>
+      payloadConfig: Partial<CreateCollectionConfigPost>,
     ) => Promise<Collection>;
     deleteCollection: (
       id: number | string,
-      custodianPid: string
+      custodianPid: string,
     ) => Promise<void>;
     workgroups: Workgroup[];
     setWorkgroups: (workgroups: Workgroup[]) => void;
@@ -233,26 +233,26 @@ export interface DaphneStoreState {
     setCollections: (collections: Collection[]) => void;
     createCollection: (
       payload: CreateCollectionPost,
-      payloadConfig: Omit<CreateCollectionConfigPost, "collection_id">
+      payloadConfig: Omit<CreateCollectionConfigPost, "collection_id">,
     ) => Promise<Collection>;
     updateCollection: (
       id: number,
       payload: UpdateCollectionPayload,
-      payloadConfig: Partial<CreateCollectionConfigPost>
+      payloadConfig: Partial<CreateCollectionConfigPost>,
     ) => Promise<Collection>;
     deleteCollection: (id: number | string) => Promise<void>;
     createWorkgroup: (payload: CreateWorkgroupPost) => Promise<Workgroup>;
     addCollectionsToWorkgroup: (
-      payload: AddCollectionsToWorkgroupPost
+      payload: AddCollectionsToWorkgroupPost,
     ) => Promise<number[]>;
     removeCollectionsFromWorkgroup: (
-      payload: RemoveCollectionsFromWorkgroupPost
+      payload: RemoveCollectionsFromWorkgroupPost,
     ) => Promise<void>;
     addCollectionToWorkgroups: (
-      payload: AddCollectionToWorkgroupsPost
+      payload: AddCollectionToWorkgroupsPost,
     ) => Promise<number[]>;
     removeCollectionFromWorkgroups: (
-      payload: RemoveCollectionFromWorkgroupsPost
+      payload: RemoveCollectionFromWorkgroupsPost,
     ) => Promise<void>;
     selectedWorkgroup: Workgroup | null;
     setSelectedWorkgroup: (workgroup: Workgroup | null) => void;
@@ -297,6 +297,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
           queryBuilder: {
             ...state.queryBuilder,
             selected: {},
+            queryName: "",
           },
         };
       });
@@ -340,13 +341,13 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     setSelected: async (
       id: UniqueIdentifier | UniqueIdentifier[],
       nextValue: boolean = true,
-      reset: boolean = false
+      reset: boolean = false,
     ) => {
       const ids = Array.isArray(id) ? id : [id];
       const uniqueIds = Array.from(new Set(ids));
 
       set((state) => {
-        const curr = reset ? {} : state.queryBuilder.selected ?? {};
+        const curr = reset ? {} : (state.queryBuilder.selected ?? {});
         let changed = false;
 
         const nextSelected = { ...curr };
@@ -409,15 +410,15 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
 
       const idsToAddTo = trueKeys(selected);
       const allIds = Object.entries(boardIndex.itemsByGroup).flatMap(
-        ([k, v]) => [k, ...v]
+        ([k, v]) => [k, ...v],
       );
       const allSet = new Set(allIds);
       const validIdsToAddTo = idsToAddTo.filter((id) =>
-        allSet.has(id as string)
+        allSet.has(id as string),
       );
 
       const normaliseAdditions = (
-        belowNeighbor?: RuleNodeType
+        belowNeighbor?: RuleNodeType,
       ): RuleNodeType[] => {
         const produced = fn();
         const additions = Array.isArray(produced) ? produced : [produced];
@@ -465,7 +466,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       setSelected(
         toAppend.slice(0, 1).map((r) => r.id),
         true,
-        true
+        true,
       );
       setQueryBuilderJson(updatedQuery);
     },
@@ -495,7 +496,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
 
       get().queryBuilder.setErrors(
         updatedQuery,
-        get().queryBuilder.selectedDatasets
+        get().queryBuilder.selectedDatasets,
       );
       return updatedQuery;
     },
@@ -523,7 +524,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
         updateById(get().queryBuilder.queryBuilderJson, node.id, (target) => ({
           ...target,
           name,
-        }))
+        })),
       );
     },
     queryName: "",
@@ -552,7 +553,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     showDescendants: {},
     setShowDescendants: async (
       id: UniqueIdentifier | UniqueIdentifier[],
-      nextValue: boolean = true
+      nextValue: boolean = true,
     ) => {
       const ids = Array.isArray(id) ? id : [id];
       const uniqueIds = Array.from(new Set(ids));
@@ -619,7 +620,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       const res = await submitQuery(
         queryBuilderJson,
         queryName,
-        selectedDatasets
+        selectedDatasets,
       );
 
       await revalidateUserAction("queries");
@@ -655,7 +656,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       })),
     runDistributions: async (
       collection: CollectionWithHosts,
-      query_type: DistributionType
+      query_type: DistributionType,
     ) => {
       const { pid, custodian } = collection;
       const res = await rerunDistributions(pid, { query_type });
@@ -689,7 +690,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     },
     removeConceptsFromSet: async (
       conceptSetId: number,
-      conceptIds: number[]
+      conceptIds: number[],
     ) => {
       await detachConcepts(conceptSetId, conceptIds);
       await revalidateUserAction(TAG_CONCEPT_SETS);

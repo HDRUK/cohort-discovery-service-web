@@ -23,7 +23,7 @@ const MyDefinitions = ({ conceptSets }: { conceptSets: ConceptSet[] }) => {
 
   const onDelete = useCallback(
     async (id: number) => removeConceptSet(id),
-    [removeConceptSet]
+    [removeConceptSet],
   );
 
   const columns = useMemo<MRT_ColumnDef<ConceptSet>[]>(
@@ -73,7 +73,7 @@ const MyDefinitions = ({ conceptSets }: { conceptSets: ConceptSet[] }) => {
         size: 20,
       },
     ],
-    [onDelete]
+    [onDelete],
   );
 
   const table = useTable({

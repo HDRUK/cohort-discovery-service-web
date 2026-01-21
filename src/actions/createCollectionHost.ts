@@ -11,7 +11,7 @@ import { CollectionHostFormValues } from "@/types/forms";
 
 const createCollectionHost = async (
   custodian_id: number,
-  { name, context }: CollectionHostFormValues
+  { name, context }: CollectionHostFormValues,
 ): Promise<ApiResponse<CollectionHost>> => {
   return await apiPost<ApiResponse<CollectionHost>, CreateCollectionHostPost>(
     API_ROUTES.collectionHosts,
@@ -19,7 +19,7 @@ const createCollectionHost = async (
       name,
       query_context_type: context,
       custodian_id,
-    }
+    },
   );
 };
 

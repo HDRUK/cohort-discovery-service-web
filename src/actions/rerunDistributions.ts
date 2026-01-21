@@ -10,11 +10,11 @@ interface CreateDistributionPost {
 
 const rerunDistributions = async (
   pid: string,
-  payload: CreateDistributionPost
+  payload: CreateDistributionPost,
 ): Promise<ApiResponse<Query>> => {
   return await apiPost<ApiResponse<Query>, CreateDistributionPost>(
     API_ROUTES.rerunDistributions(pid),
-    payload
+    payload,
   );
 };
 

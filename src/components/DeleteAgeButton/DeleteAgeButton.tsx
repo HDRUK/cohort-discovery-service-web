@@ -29,7 +29,7 @@ const DeleteAgeButton = ({ rule, ...props }: DeleteAgeButtonProps) => {
           ...node,
           ageConstraint: undefined,
         };
-      })
+      }),
     );
   };
 

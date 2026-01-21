@@ -68,7 +68,7 @@ export function NotifyProvider({ children }: { children: React.ReactNode }) {
             autoHideDuration: dur,
           }),
       }),
-    [notifyBase]
+    [notifyBase],
   );
 
   return (

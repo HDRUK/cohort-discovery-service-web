@@ -13,7 +13,7 @@ const deleteQueries = async (pids: string[]): Promise<ApiResponse<Query>> => {
     API_ROUTES.deleteQueriesBulk,
     {
       keys: pids,
-    }
+    },
   );
 };
 

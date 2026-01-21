@@ -15,7 +15,7 @@ const CollectionHostsTab = async ({
   custodianPid: string;
 }) => {
   const { data: collectionHosts } = await getCustodianCollectionHosts(
-    custodianPid
+    custodianPid,
   );
 
   return (

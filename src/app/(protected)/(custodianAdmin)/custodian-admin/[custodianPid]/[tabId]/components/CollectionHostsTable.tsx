@@ -25,7 +25,7 @@ const CollectionHostsTable = ({
         header: "Name",
       },
     ],
-    []
+    [],
   );
 
   const table = useTable<CollectionHost>({

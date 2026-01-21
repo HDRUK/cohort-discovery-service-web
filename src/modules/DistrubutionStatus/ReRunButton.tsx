@@ -33,7 +33,7 @@ export const ReRunButton = ({
       submittedTask?.id && task?.id && submittedTask?.id === task?.id
         ? !!task.failed_at
         : false,
-    [task, submittedTask]
+    [task, submittedTask],
   );
 
   const isLoading =

@@ -6,7 +6,7 @@ import { API_ROUTES } from "../lib/apiRoutes";
 import { ApiResponse, CollectionHost } from "../types/api";
 
 const getCustodianCollectionHosts = async (
-  custodianPid: string
+  custodianPid: string,
 ): Promise<ApiResponse<CollectionHost[]>> => {
   return await apiGet<ApiResponse<CollectionHost[]>>({
     url: API_ROUTES.custodianCollectionHosts(custodianPid),

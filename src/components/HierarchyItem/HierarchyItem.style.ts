@@ -10,7 +10,7 @@ export const listItemButtonSx =
     isDragging: boolean,
     isOver: boolean,
     isAbove: boolean,
-    depth: number
+    depth: number,
   ): SxProps<Theme> =>
   (theme) => ({
     color: theme.palette.text.primary,

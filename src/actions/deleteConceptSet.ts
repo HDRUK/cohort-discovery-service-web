@@ -9,7 +9,7 @@ const deleteConceptSet = async (conceptSetId: number): Promise<void> => {
     API_ROUTES.getConceptSet(conceptSetId),
     {
       cache: "no-store",
-    }
+    },
   );
 };
 

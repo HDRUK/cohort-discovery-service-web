@@ -34,7 +34,7 @@ const CollectionsLeftPanel = ({
       }
       setSearchParam(status);
     },
-    [setSearchParam]
+    [setSearchParam],
   );
 
   return (

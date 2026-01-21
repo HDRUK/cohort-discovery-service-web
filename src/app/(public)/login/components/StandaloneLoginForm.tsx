@@ -39,7 +39,7 @@ const StandaloneLoginForm = ({
     if (!result) {
       const fields: (keyof LoginFormValues)[] = ["email", "password"];
       fields.forEach((item) =>
-        setError(item, { message: "Incorrect credentials" })
+        setError(item, { message: "Incorrect credentials" }),
       );
       return;
     }

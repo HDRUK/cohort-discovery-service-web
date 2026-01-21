@@ -70,7 +70,7 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
-    useSensor(KeyboardSensor)
+    useSensor(KeyboardSensor),
   );
 
   const [active, setActive] = useState<Active | null>(null);
@@ -124,11 +124,11 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
           queryBuilderJson,
           activeData?.id as string,
           overGroupId,
-          targetIndex
-        )
+          targetIndex,
+        ),
       );
     },
-    [active, queryBuilderJson, boardIndex, setQueryBuilderJson]
+    [active, queryBuilderJson, boardIndex, setQueryBuilderJson],
   );
 
   const onDragEnd = useCallback(
@@ -167,14 +167,14 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
           queryBuilderJson,
           activeData.id,
           overGroupId,
-          targetIndex
-        )
+          targetIndex,
+        ),
       );
 
       setActiveNode(null);
       setActive(null);
     },
-    [active, queryBuilderJson, boardIndex, setQueryBuilderJson]
+    [active, queryBuilderJson, boardIndex, setQueryBuilderJson],
   );
 
   const onChangeSelection = useCallback(
@@ -182,7 +182,7 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
       select(ids);
       deselect(deselectedIds);
     },
-    [deselect, select]
+    [deselect, select],
   );
 
   const boardRef = useRef<HTMLDivElement>(null);

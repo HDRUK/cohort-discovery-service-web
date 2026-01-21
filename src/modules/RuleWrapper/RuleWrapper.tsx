@@ -58,7 +58,7 @@ export interface RuleWrapperProps extends BoxProps {
   containerProps?: BoxProps;
   render: (
     rule: RuleNodeType,
-    ref?: RefObject<HTMLDivElement | HTMLLIElement | null>
+    ref?: RefObject<HTMLDivElement | HTMLLIElement | null>,
   ) => ReactNode;
   actions?: Action[];
   forceShowHandle?: boolean;
@@ -121,7 +121,7 @@ const RuleWrapper = ({
       toggleSelected(id);
       e.stopPropagation();
     },
-    [id, toggleSelected]
+    [id, toggleSelected],
   );
 
   const onMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -291,7 +291,7 @@ const RuleWrapper = ({
       </Box>
       {isSelected && (
         <EditableText
-          value={nodeName}
+          defaultValue={nodeName}
           onCommit={(name) => setNodeName(node, name)}
           typographyProps={{
             component: "span",

@@ -13,10 +13,10 @@ function getTokenKey(token: string) {
 const getEnumLabel = <T extends Record<string, string | number>>(
   enumObj: T,
   value: string | number,
-  fixCase: boolean = true
+  fixCase: boolean = true,
 ): string => {
   const entries = Object.entries(enumObj).filter(([key]) =>
-    Number.isNaN(Number(key))
+    Number.isNaN(Number(key)),
   );
 
   const entry = entries.find(([, v]) => v === value);

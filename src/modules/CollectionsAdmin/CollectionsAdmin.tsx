@@ -34,7 +34,7 @@ const CollectionsAdmin = ({
   workgroups: Workgroup[];
 }) => {
   const custodian = useCustodianStore(
-    (custodianData) => custodianData.currentCustodian
+    (custodianData) => custodianData.currentCustodian,
   );
 
   const [expandedSide, setExpandedSide] = useState<ExpandedSide | null>(null);
@@ -43,13 +43,13 @@ const CollectionsAdmin = ({
 
   const toggleExpandLeft = useCallback(() => {
     setExpandedSide((prev) =>
-      prev === ExpandedSide.LEFT ? null : ExpandedSide.LEFT
+      prev === ExpandedSide.LEFT ? null : ExpandedSide.LEFT,
     );
   }, [setExpandedSide]);
 
   const toggleExpandRight = useCallback(() => {
     setExpandedSide((prev) =>
-      prev === ExpandedSide.RIGHT ? null : ExpandedSide.RIGHT
+      prev === ExpandedSide.RIGHT ? null : ExpandedSide.RIGHT,
     );
   }, [setExpandedSide]);
 

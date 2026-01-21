@@ -7,7 +7,7 @@ import { Query, ApiResponse } from "../types/api";
 
 const getQuery = async (
   pid: string,
-  args?: Omit<CachedGetArgs, "url">
+  args?: Omit<CachedGetArgs, "url">,
 ): Promise<ApiResponse<Query>> => {
   return await apiGet<ApiResponse<Query>>({
     url: API_ROUTES.getQuery(pid),

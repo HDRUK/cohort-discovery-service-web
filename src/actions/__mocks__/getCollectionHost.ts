@@ -3,7 +3,7 @@ import { QueryContext } from "@/types/context";
 import { v4 as uuidv4 } from "uuid";
 
 export const getCollectionHost = (
-  rest?: Partial<CollectionHost>
+  rest?: Partial<CollectionHost>,
 ): CollectionHost => ({
   id: 1,
   name: "Test Custodian Host",

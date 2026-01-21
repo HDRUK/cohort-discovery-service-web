@@ -20,7 +20,7 @@ const setQueryBuilderJson = jest.fn();
 describe("Rule", () => {
   const renderComponent = (
     opArgs: Partial<RuleLeafType> = {},
-    rest?: Partial<RuleProps>
+    rest?: Partial<RuleProps>,
   ) => {
     const rule = {
       id: "rule-1",
@@ -45,7 +45,7 @@ describe("Rule", () => {
         }}
       >
         <Rule {...rest} rule={rule} groupId="group-1" />
-      </MockDaphneStore>
+      </MockDaphneStore>,
     );
     return {
       query,
@@ -107,7 +107,7 @@ describe("Rule", () => {
     expect(updateById).toHaveBeenCalledWith(
       query,
       "rule-1",
-      expect.any(Function)
+      expect.any(Function),
     );
     expect(setQueryBuilderJson).toHaveBeenCalled();
   });

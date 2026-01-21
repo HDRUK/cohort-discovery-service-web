@@ -11,7 +11,7 @@ interface ElementSizeProps {
 export function useElementSize<T extends HTMLElement>(
   id: UniqueIdentifier,
   { minHeight = 100, minWidth = "100%" }: ElementSizeProps = {},
-  delay: number = 100
+  delay: number = 100,
 ): [
   React.RefObject<T | null>,
   { width: number | string; height: number | string }
@@ -25,7 +25,7 @@ export function useElementSize<T extends HTMLElement>(
 
   const size = useMemo(
     () => sizeCache[id] ?? { height: minHeight, width: minWidth },
-    [id, sizeCache, minHeight, minWidth]
+    [id, sizeCache, minHeight, minWidth],
   );
 
   const ref = useRef<T>(null);

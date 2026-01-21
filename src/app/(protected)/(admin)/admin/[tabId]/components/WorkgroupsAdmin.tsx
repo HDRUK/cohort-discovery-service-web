@@ -32,13 +32,13 @@ const WorkgroupsAdmin = ({
 
   const toggleExpandLeft = () => {
     setExpandedSide((prev) =>
-      prev === ExpandedSide.LEFT ? null : ExpandedSide.LEFT
+      prev === ExpandedSide.LEFT ? null : ExpandedSide.LEFT,
     );
   };
 
   const toggleExpandRight = () => {
     setExpandedSide((prev) =>
-      prev === ExpandedSide.RIGHT ? null : ExpandedSide.RIGHT
+      prev === ExpandedSide.RIGHT ? null : ExpandedSide.RIGHT,
     );
   };
 

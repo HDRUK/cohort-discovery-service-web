@@ -37,7 +37,7 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
 
   const initialStatusId = collection.model_state?.state_id;
   const [selectedStatusId, setSelectedStatusId] = useState<number>(
-    collection.model_state?.state_id ?? -1
+    collection.model_state?.state_id ?? -1,
   );
 
   const destinationOptions = {
@@ -73,7 +73,7 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
               });
               setSelectedStatusId(CollectionStatus.PENDING);
               notify.success(
-                `Requested for collection "${collection.name}" to be made active`
+                `Requested for collection "${collection.name}" to be made active`,
               );
             }}
           />

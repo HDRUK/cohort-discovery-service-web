@@ -73,7 +73,7 @@ function makeDefaultStore(): DaphneStoreState {
       setSizeCache: (
         _id: UniqueIdentifier,
         _w: number | string,
-        _h: number | string
+        _h: number | string,
       ) => {},
       selected: {},
       toggleSelected: (_id: UniqueIdentifier) => {},
@@ -125,7 +125,7 @@ function makeDefaultStore(): DaphneStoreState {
       setSelectedCollections: NOOP,
       runDistributions: (
         _collection: CollectionWithHosts,
-        _query_type: DistributionType
+        _query_type: DistributionType,
       ) => RESOLVE<Query>(getMockQuery()),
 
       conceptSets: [] as ConceptSet[],
@@ -157,22 +157,22 @@ function makeDefaultStore(): DaphneStoreState {
 
       createCollectionHost: (
         _custodianId: number,
-        _payload: { name: string; context: string }
+        _payload: { name: string; context: string },
       ) => RESOLVE<void>(undefined),
       updateCollectionHost: (
         _id: number,
-        _payload: UpdateCollectionHostPayload
+        _payload: UpdateCollectionHostPayload,
       ) => RESOLVE<void>(undefined),
       deleteCollectionHost: (_id: number) => RESOLVE<void>(undefined),
       createCollection: (
         _custodianPid: string,
         _payload: CreateCollectionPost,
-        _payloadConfig: Omit<CreateCollectionConfigPost, "collection_id">
+        _payloadConfig: Omit<CreateCollectionConfigPost, "collection_id">,
       ) => RESOLVE<Collection>(getMockCollection()),
       updateCollection: (
         _id: number,
         _payload: Partial<CreateCollectionPost>,
-        _payloadConfig: Partial<CreateCollectionConfigPost>
+        _payloadConfig: Partial<CreateCollectionConfigPost>,
       ) => RESOLVE<Collection>(getMockCollection()),
       deleteCollection: (_id: number | string, _custodianPid: string) =>
         RESOLVE<void>(undefined),
@@ -187,7 +187,7 @@ function makeDefaultStore(): DaphneStoreState {
         RESOLVE<Collection>(getMockCollection()),
       updateCollection: (
         _id: number,
-        _payload: Partial<CreateCollectionPost>
+        _payload: Partial<CreateCollectionPost>,
       ) => RESOLVE<Collection>(getMockCollection()),
       deleteCollection: (_id: number | string) => RESOLVE<void>(undefined),
       createWorkgroup: (_payload: {
@@ -198,12 +198,12 @@ function makeDefaultStore(): DaphneStoreState {
       addCollectionsToWorkgroup: (_payload: AddCollectionsToWorkgroupPost) =>
         RESOLVE<number[]>([1]),
       removeCollectionsFromWorkgroup: (
-        _payload: RemoveCollectionsFromWorkgroupPost
+        _payload: RemoveCollectionsFromWorkgroupPost,
       ) => RESOLVE<void>(undefined),
       addCollectionToWorkgroups: (_payload: AddCollectionToWorkgroupsPost) =>
         RESOLVE<number[]>([1]),
       removeCollectionFromWorkgroups: (
-        _payload: RemoveCollectionFromWorkgroupsPost
+        _payload: RemoveCollectionFromWorkgroupsPost,
       ) => RESOLVE<void>(undefined),
       selectedWorkgroup: null,
       setSelectedWorkgroup: NOOP,
