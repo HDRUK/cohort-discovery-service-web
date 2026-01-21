@@ -21,31 +21,28 @@ const DashboardTabPage = async (props: {
   const { tabId } = await params;
   const { query, open_queries } = await searchParams;
   const array_open_queries = ((open_queries as string) ?? "").split(",");
-  let queryName: string | undefined;
-
-  if (query && query !== "undefined") {
-    const { data } = await getQuery(query as string);
-
-    if (data) {
-      queryName = capVarChar(getQueryName(data), 30, true);
-    }
-  }
 
   const results_tabs = open_queries
-    ? array_open_queries.map((tabId) => {
-        return {
-          id: `query-result-${tabId}`,
-          label: `Result: ${tabId.slice(0, 8)}`,
-          href: routes.dashboardQueryResult(
-            tabId as string,
-            array_open_queries ?? [],
-          ),
-          onCloseHref: routes.dashboardNewQuery(
-            array_open_queries.filter((val) => val !== tabId) ?? [],
-          ),
-          page: <QueryResultsPage {...props} />,
-        };
-      })
+    ? await Promise.all(
+        array_open_queries.map(async (tabId) => {
+          const { data: data2 } = await getQuery(tabId as string);
+
+          return {
+            id: `query-result-${tabId}`,
+            label: `Result: ${
+              data2 ? capVarChar(getQueryName(data2), 20, true) : tabId
+            }`,
+            href: routes.dashboardQueryResult(
+              tabId as string,
+              array_open_queries ?? []
+            ),
+            onCloseHref: routes.dashboardNewQuery(
+              array_open_queries.filter((val) => val !== tabId) ?? []
+            ),
+            page: <QueryResultsPage {...props} />,
+          };
+        })
+      )
     : [];
 
   const TABS = [
