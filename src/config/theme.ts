@@ -28,6 +28,9 @@ export const themeOptions: ThemeOptions = {
       light: "#90caf9",
       dark: "#0d47a1",
     },
+    action: {
+      disabledBackground: "#F0F0F0",
+    },
   },
   zIndex: {
     drawer: 2,
@@ -135,10 +138,6 @@ export const themeOptions: ThemeOptions = {
 
           "&.Mui-disabled": {
             backgroundColor: theme.palette.action.disabledBackground,
-          },
-
-          "&.MuiInputBase-readOnly": {
-            backgroundColor: "#f0f0f0",
           },
         }),
       },

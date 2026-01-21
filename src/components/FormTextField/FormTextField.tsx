@@ -12,25 +12,30 @@ import { useNotify } from "@/providers/NotifyProvider";
 import { CopyAllOutlined } from "@mui/icons-material";
 import { FieldError } from "react-hook-form";
 
-export interface FormTextFieldProps
-  extends Omit<OutlinedTextFieldProps, "variant" | "error"> {
+export interface FormTextFieldProps extends Omit<
+  OutlinedTextFieldProps,
+  "variant" | "error"
+> {
   label?: string;
   required?: boolean;
   copyable?: boolean;
   error?: FieldError;
   labelRegular?: boolean;
   labelUnderlined?: boolean;
+  readOnly?: boolean;
 }
 
 const FormTextField = ({
   label,
   sx,
   id,
+  readOnly = false,
   required = false,
   copyable = false,
   error,
   labelRegular = true,
   labelUnderlined = false,
+  slotProps,
   ...props
 }: FormTextFieldProps) => {
   const generatedId = useId();
@@ -73,6 +78,13 @@ const FormTextField = ({
           helperText={error?.message}
           {...props}
           variant="outlined"
+          slotProps={{
+            ...slotProps,
+            input: {
+              ...(slotProps?.input ?? {}),
+              readOnly,
+            },
+          }}
         />
         {copyable && (
           <Box sx={{ display: "flex", justifyContent: "center" }}>

@@ -44,6 +44,7 @@ import removeCollectionFromWorkgroups from "@/actions/removeCollectionFromWorkgr
 import addCollectionToWorkgroups from "@/actions/addCollectionToWorkgroups";
 import SquareCheckbox from "@/components/SquareCheckbox";
 import ManageCollectionStatus from "@/modules/ManageCollectionStatus";
+import CopyableVariable from "@/components/CopyableVariable";
 
 const UpdateCollectionGuidance = maskClientTest(
   () => import("./UpdateCollectionGuidance"),
@@ -56,6 +57,7 @@ export type UpdateCollectionProps = {
   expandedRight: boolean;
   expandedLeft: boolean;
   onClose?: () => void;
+  isAdmin?: boolean;
 };
 
 const getDefaultValues = (collection: CollectionWithHosts | null) => {
@@ -112,6 +114,7 @@ const UpdateCollection = ({
   collectionHosts,
   workgroups,
   expandedRight,
+  isAdmin = false,
   onClose,
 }: UpdateCollectionProps) => {
   const { currentCustodian, updateCollection } = useCustodianStore(
@@ -409,7 +412,8 @@ const UpdateCollection = ({
         <FormTextField
           labelUnderlined
           copyable
-          disabled
+          disabled={!expandedRight}
+          readOnly={expandedRight}
           value={collection.pid}
           label="Collection ID"
         />
@@ -440,6 +444,7 @@ const UpdateCollection = ({
           <FormLabel underlined>Collection Connection</FormLabel>
           <Controller
             name="collection.host_id"
+            disabled={!expandedRight}
             control={control}
             rules={{
               required: "A collection host is required",
@@ -469,23 +474,18 @@ const UpdateCollection = ({
           />
         </Stack>
 
-        <Stack>
-          <FormLabel underlined>Host Credentials</FormLabel>
-
-          <FormTextField
-            copyable
-            disabled
-            value={collection.host?.[0]?.client_id}
-            label="Client ID"
-          />
-          <FormTextField
-            type="password"
-            copyable
-            disabled
-            value={collection.host?.[0]?.client_secret}
-            label="Client Secret"
-          />
-        </Stack>
+        {!isAdmin && (
+          <Stack>
+            <FormLabel underlined>Host Credentials</FormLabel>
+            Client ID
+            <CopyableVariable value={collection.host?.[0]?.client_id} />
+            Client Secret
+            <CopyableVariable
+              hidden
+              value={collection.host?.[0]?.client_secret}
+            />
+          </Stack>
+        )}
       </ActionMenuSection>
 
       <ActionMenuSection

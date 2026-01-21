@@ -140,6 +140,7 @@ const CreateCollection = ({
                 validate: (value) =>
                   Number(value) > 0 || "Please select a valid collection host",
               }}
+              disabled={!selectedCustodianPid}
               render={({ field, fieldState: { error } }) => (
                 <FormDropdown
                   {...field}
@@ -163,10 +164,10 @@ const CreateCollection = ({
             />
 
             <Controller
-              disabled={!selectedHostId}
               name="collection.name"
               control={control}
               rules={{ required: "Name is required" }}
+              disabled={!selectedHostId}
               render={({ field, fieldState: { error } }) => (
                 <FormTextField
                   {...field}
@@ -178,10 +179,10 @@ const CreateCollection = ({
               )}
             />
             <Controller
-              disabled={!selectedHostId}
               name="collection.description"
               control={control}
               rules={{ required: "A description is required" }}
+              disabled={!selectedHostId}
               render={({ field, fieldState: { error } }) => (
                 <FormTextField
                   {...field}
@@ -193,7 +194,6 @@ const CreateCollection = ({
               )}
             />
             <Controller
-              disabled={!selectedHostId}
               name="collection.url"
               control={control}
               rules={{
@@ -203,6 +203,7 @@ const CreateCollection = ({
                   message: "Enter a valid URL (including http(s):// )",
                 },
               }}
+              disabled={!selectedHostId}
               render={({ field, fieldState: { error } }) => (
                 <FormTextField
                   {...field}
@@ -213,11 +214,12 @@ const CreateCollection = ({
                 />
               )}
             />
+            {/* // component disabled anyway, it should not be shown
             <Controller
-              disabled={!selectedHostId}
               name="collection.type"
               control={control}
               rules={{ required: "Query context type is required" }}
+              disabled={!selectedHostId}
               render={({ field, fieldState: { error } }) => (
                 <FormDropdown
                   {...field}
@@ -233,7 +235,7 @@ const CreateCollection = ({
                   }))}
                 />
               )}
-            />
+            />*/}
           </ActionMenuSection>
 
           <ActionMenuSection
@@ -243,11 +245,11 @@ const CreateCollection = ({
           >
             <CollectionConfig<CreateCollectionFormValues>
               keepExpanded
-              disabled={!selectedHostId}
               frequencyFieldName={"config.frequency_mode"}
               runTimeFrequencyFieldName={"config.run_time_frequency"}
               runTimeHourFieldName={"config.run_time_hour"}
               runTimeMinuteFieldName={"config.run_time_minute"}
+              disabled={!selectedHostId}
             />
           </ActionMenuSection>
         </Stack>
