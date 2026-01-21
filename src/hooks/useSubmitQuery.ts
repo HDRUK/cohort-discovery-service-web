@@ -38,8 +38,8 @@ const useSubmitQuery = () => {
       router.push(
         routes.dashboardQueryResult(
           newPid,
-          array_open_queries.filter((q) => q) ?? []
-        )
+          array_open_queries.filter((q) => q) ?? [],
+        ),
       );
     } catch (e) {
       setIsLoading(false);

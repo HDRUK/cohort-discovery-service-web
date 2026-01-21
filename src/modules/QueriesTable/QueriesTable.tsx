@@ -57,7 +57,7 @@ const QueriesTable = ({
   const qc = useQueryClient();
   const queryKey = useMemo(
     () => [`queries-${searchParams.toString()}`],
-    [searchParams]
+    [searchParams],
   );
   const { data: queries } = useQuery<Paginated<Query[]>>({
     queryKey,
@@ -110,7 +110,7 @@ const QueriesTable = ({
             }}
             onClick={() => {
               setSelectedDatasets(
-                row.original.tasks.map((t) => t.collection.pid)
+                row.original.tasks.map((t) => t.collection.pid),
               );
             }}
           >
@@ -222,7 +222,7 @@ const QueriesTable = ({
                 <Grid size={1}>
                   <Typography>
                     {dayjs(row.original.created_at).format(
-                      "DD/MM/YYYY, HH:MM:ss"
+                      "DD/MM/YYYY, HH:MM:ss",
                     )}
                   </Typography>
                 </Grid>
@@ -249,7 +249,7 @@ const QueriesTable = ({
                     ? open_queries.push(data.query_pid)
                     : null;
                   router.push(
-                    routes.dashboardQueryResult(data.query_pid, open_queries)
+                    routes.dashboardQueryResult(data.query_pid, open_queries),
                   );
                 },
               },
@@ -261,7 +261,7 @@ const QueriesTable = ({
               editProps: {
                 onClick: () => {
                   const ranCollectionPids = row.original.tasks.map(
-                    (t) => t.collection.pid
+                    (t) => t.collection.pid,
                   );
                   setSelectedDatasets(ranCollectionPids);
                   setQueryName("");
@@ -273,8 +273,8 @@ const QueriesTable = ({
                   router.push(
                     routes.dashboardNewQuery(
                       open_queries,
-                      `query=${row.original.pid}`
-                    )
+                      `query=${row.original.pid}`,
+                    ),
                   );
                 },
               },

@@ -15,12 +15,12 @@ export const routes = {
       "new-query",
       `${openQueries ? `open_queries=${openQueries.join(",")}` : ""}${
         queryParams ? `&${queryParams}` : ""
-      }`
+      }`,
     ),
   dashboardQueryResult: (
     pid: string,
     openQueries?: string[],
-    queryParams?: string
+    queryParams?: string,
   ) =>
     `${dashboardPath("query-result")}-${pid ? pid : ""}?query=${
       pid ? pid : ""

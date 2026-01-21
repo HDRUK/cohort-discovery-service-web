@@ -38,10 +38,10 @@ const DashboardTabPage = async (props: {
           label: `Result: ${tabId.slice(0, 8)}`,
           href: routes.dashboardQueryResult(
             tabId as string,
-            array_open_queries ?? []
+            array_open_queries ?? [],
           ),
           onCloseHref: routes.dashboardNewQuery(
-            array_open_queries.filter((val) => val !== tabId) ?? []
+            array_open_queries.filter((val) => val !== tabId) ?? [],
           ),
           page: <QueryResultsPage {...props} />,
         };
