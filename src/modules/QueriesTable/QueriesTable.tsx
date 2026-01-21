@@ -57,7 +57,7 @@ const QueriesTable = ({
   const qc = useQueryClient();
   const queryKey = useMemo(
     () => [`queries-${searchParams.toString()}`],
-    [searchParams],
+    [searchParams]
   );
   const { data: queries } = useQuery<Paginated<Query[]>>({
     queryKey,
@@ -110,7 +110,7 @@ const QueriesTable = ({
             }}
             onClick={() => {
               setSelectedDatasets(
-                row.original.tasks.map((t) => t.collection.pid),
+                row.original.tasks.map((t) => t.collection.pid)
               );
             }}
           >
@@ -222,7 +222,7 @@ const QueriesTable = ({
                 <Grid size={1}>
                   <Typography>
                     {dayjs(row.original.created_at).format(
-                      "DD/MM/YYYY, HH:MM:ss",
+                      "DD/MM/YYYY, HH:MM:ss"
                     )}
                   </Typography>
                 </Grid>
@@ -232,6 +232,14 @@ const QueriesTable = ({
               deleteProps: {
                 onClick: () => {
                   deleteQueries([row.original.pid]);
+                  const open_queries = (searchParams.get("open_queries") || "")
+                    .split(",")
+                    .filter((q) => q && q !== row.original.pid);
+                  router.push(
+                    routes.dashboardHistory(
+                      `open_queries=${(open_queries ?? "").toString()}`
+                    )
+                  );
                 },
               },
               reRunProps: {
@@ -260,14 +268,18 @@ const QueriesTable = ({
               editProps: {
                 onClick: () => {
                   const ranCollectionPids = row.original.tasks.map(
-                    (t) => t.collection.pid,
+                    (t) => t.collection.pid
                   );
                   setSelectedDatasets(ranCollectionPids);
                   setQueryName("");
 
                   setQueryBuilderJson(row.original.definition);
                   router.push(
-                    routes.dashboardNewQuery(`query=${row.original.pid}`),
+                    routes.dashboardNewQuery(
+                      `query=${row.original.pid}&open_queries=${(
+                        searchParams.get("open_queries") || ""
+                      ).toString()}`
+                    )
                   );
                 },
               },
