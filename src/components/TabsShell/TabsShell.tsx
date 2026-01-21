@@ -70,6 +70,8 @@ export default function TabsShell({
             onChange={handleChange}
             allowScrollButtonsMobile
             sx={tabListSx}
+            variant="scrollable"
+            scrollButtons="auto"
           >
             {tabs.map(
               ({ id, label, href, onCloseHref, disabled = false }, i) => {
