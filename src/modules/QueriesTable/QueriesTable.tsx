@@ -253,10 +253,7 @@ const QueriesTable = ({
                     ? open_queries.push(data.query_pid)
                     : null;
                   router.push(
-                    routes.dashboardQueryResult(
-                      data.query_pid,
-                      `open_queries=${open_queries.join(",")}`
-                    )
+                    routes.dashboardQueryResult(data.query_pid, open_queries)
                   );
                 },
               },

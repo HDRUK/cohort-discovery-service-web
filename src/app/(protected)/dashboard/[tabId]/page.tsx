@@ -38,7 +38,7 @@ const DashboardTabPage = async (props: {
           label: `Result: ${tabId.slice(0, 8)}`,
           href: routes.dashboardQueryResult(
             tabId as string,
-            `open_queries=${(array_open_queries ?? []).join(",")}`
+            array_open_queries ?? []
           ),
           onCloseHref: routes.dashboardNewQuery(
             `open_queries=${(

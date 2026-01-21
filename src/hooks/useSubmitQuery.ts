@@ -38,9 +38,7 @@ const useSubmitQuery = () => {
       router.push(
         routes.dashboardQueryResult(
           newPid,
-          `open_queries=${(array_open_queries.filter((q) => q) ?? []).join(
-            ","
-          )}`
+          array_open_queries.filter((q) => q) ?? []
         )
       );
     } catch (e) {

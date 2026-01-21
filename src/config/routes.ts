@@ -12,10 +12,16 @@ export const routes = {
   dashboard: dashboardPath(),
   dashboardNewQuery: (queryParams?: string) =>
     dashboardPath("new-query", queryParams),
-  dashboardQueryResult: (pid: string, queryParams?: string) =>
+  dashboardQueryResult: (
+    pid: string,
+    openQueries?: string[],
+    queryParams?: string
+  ) =>
     `${dashboardPath("query-result")}-${pid ? pid : ""}?query=${
       pid ? pid : ""
-    }${queryParams ? `&${queryParams}` : ""}`,
+    }${openQueries ? `&open_queries=${openQueries.join(",")}` : ""}${
+      queryParams ? `&${queryParams}` : ""
+    }`,
   dashboardHistory: (queryParams?: string) =>
     `${dashboardPath("query-history")}?${queryParams}`,
   dashboardCollections: dashboardPath("collections"),
