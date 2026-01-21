@@ -12,33 +12,40 @@ const CollectionGuidance = maskClientTest<CollectionGuidanceProps>(
 
 type CollectionsRightPanelProps = Omit<UpdateCollectionProps, "collection">;
 
-const CollectionsRightPanel = ({
+export default function CollectionsRightPanel({
   expandedLeft,
   ...props
-}: CollectionsRightPanelProps) => {
+}: CollectionsRightPanelProps) {
   const selectedCollections = useUserStore((u) => u.selectedCollections);
+  const count = selectedCollections?.length ?? 0;
 
-  if (selectedCollections && selectedCollections.length === 1) {
+  if (expandedLeft) {
+    return <CollectionGuidance creating />;
+  }
+
+  if (count === 1) {
+    const [collection] = selectedCollections!;
     return (
       <UpdateCollection
-        collection={selectedCollections[0]}
-        key={`update-coll-${selectedCollections[0].id}`}
+        collection={collection}
+        key={`update-coll-${collection.id}`}
         expandedLeft={expandedLeft}
         {...props}
       />
     );
   }
-  if (selectedCollections && selectedCollections.length > 1) {
+
+  if (count > 1) {
+    const idsKey = selectedCollections!.map((c) => c.id).join(",");
     return (
       <UpdateMultipleCollections
-        collections={selectedCollections}
-        key={JSON.stringify(selectedCollections.map((c) => c.id))}
+        collections={selectedCollections!}
+        key={idsKey}
         expandedLeft={expandedLeft}
         {...props}
       />
     );
   }
-  return <CollectionGuidance creating={expandedLeft} />;
-};
 
-export default CollectionsRightPanel;
+  return <CollectionGuidance creating={false} />;
+}

@@ -130,13 +130,17 @@ export const themeOptions: ThemeOptions = {
     },
     MuiInputBase: {
       styleOverrides: {
-        root: {
+        root: ({ theme }) => ({
           backgroundColor: "#ffffff",
-          "&.Mui-readOnly": {
-            color: "gray",
+
+          "&.Mui-disabled": {
+            backgroundColor: theme.palette.action.disabledBackground,
+          },
+
+          "&.MuiInputBase-readOnly": {
             backgroundColor: "#f0f0f0",
           },
-        },
+        }),
       },
     },
     MuiButton: {
