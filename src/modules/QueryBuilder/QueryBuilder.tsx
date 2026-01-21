@@ -16,12 +16,12 @@ import {
   DragStartEvent,
   closestCorners,
   Active,
-  MeasuringStrategy,
+  MeasuringStrategy
 } from "@dnd-kit/core";
 
 import {
   restrictToVerticalAxis,
-  restrictToWindowEdges,
+  restrictToWindowEdges
 } from "@dnd-kit/modifiers";
 
 import RuleBoard from "@/modules/RuleBoard";
@@ -45,7 +45,7 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
     deselect,
     createNewGroup,
     createNewRule,
-    createNewAgeFilter,
+    createNewAgeFilter
   } = useQueryBuilder((qb) => ({
     resetQueryBuilderJson: qb.resetQueryBuilderJson,
     queryBuilderJson: qb.queryBuilderJson,
@@ -55,7 +55,7 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
     deselect: qb.deselect,
     createNewGroup: qb.createNewGroup,
     createNewRule: qb.createNewRule,
-    createNewAgeFilter: qb.createNewAgeFilter,
+    createNewAgeFilter: qb.createNewAgeFilter
   }));
 
   useEffect(() => {
@@ -70,7 +70,7 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
-    useSensor(KeyboardSensor),
+    useSensor(KeyboardSensor)
   );
 
   const [active, setActive] = useState<Active | null>(null);
@@ -124,11 +124,11 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
           queryBuilderJson,
           activeData?.id as string,
           overGroupId,
-          targetIndex,
-        ),
+          targetIndex
+        )
       );
     },
-    [active, queryBuilderJson, boardIndex, setQueryBuilderJson],
+    [active, queryBuilderJson, boardIndex, setQueryBuilderJson]
   );
 
   const onDragEnd = useCallback(
@@ -167,14 +167,14 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
           queryBuilderJson,
           activeData.id,
           overGroupId,
-          targetIndex,
-        ),
+          targetIndex
+        )
       );
 
       setActiveNode(null);
       setActive(null);
     },
-    [active, queryBuilderJson, boardIndex, setQueryBuilderJson],
+    [active, queryBuilderJson, boardIndex, setQueryBuilderJson]
   );
 
   const onChangeSelection = useCallback(
@@ -182,7 +182,7 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
       select(ids);
       deselect(deselectedIds);
     },
-    [deselect, select],
+    [deselect, select]
   );
 
   const boardRef = useRef<HTMLDivElement>(null);
@@ -191,7 +191,7 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
   const actions = [
     { action: createNewAgeFilter, label: "Add Age Filter" },
     { action: createNewRule, label: "Add Rule" },
-    { action: createNewGroup, label: "Add Group" },
+    { action: createNewGroup, label: "Add Group" }
   ];
 
   return (
