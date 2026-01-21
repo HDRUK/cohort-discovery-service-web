@@ -63,9 +63,7 @@ const DashboardTabPage = async (props: {
     {
       id: "query-history",
       label: "Query History",
-      href: routes.dashboardHistory(
-        `open_queries=${(open_queries ?? "").toString()}`
-      ),
+      href: routes.dashboardHistory(array_open_queries),
       page: <QueryHistoryPage {...props} />,
     },
   ].concat(results_tabs);

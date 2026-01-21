@@ -235,11 +235,7 @@ const QueriesTable = ({
                   const open_queries = (searchParams.get("open_queries") || "")
                     .split(",")
                     .filter((q) => q && q !== row.original.pid);
-                  router.push(
-                    routes.dashboardHistory(
-                      `open_queries=${(open_queries ?? "").toString()}`
-                    )
-                  );
+                  router.push(routes.dashboardHistory(open_queries));
                 },
               },
               reRunProps: {

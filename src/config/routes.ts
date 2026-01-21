@@ -27,8 +27,10 @@ export const routes = {
     }${openQueries ? `&open_queries=${openQueries.join(",")}` : ""}${
       queryParams ? `&${queryParams}` : ""
     }`,
-  dashboardHistory: (queryParams?: string) =>
-    `${dashboardPath("query-history")}?${queryParams}`,
+  dashboardHistory: (openQueries?: string[], queryParams?: string) =>
+    `${dashboardPath("query-history")}?${
+      openQueries ? `open_queries=${openQueries.join(",")}` : ""
+    }${queryParams ? `&${queryParams}` : ""}`,
   dashboardCollections: dashboardPath("collections"),
   dashboardCodes: dashboardPath("codes"),
   profile: "/profile",
