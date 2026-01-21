@@ -17,7 +17,7 @@ const CohortQueryTitle = () => {
       title={"New Query"}
       subTitle={
         <EditableText
-          value={queryName || ""}
+          defaultValue={queryName || ""}
           onCommit={(name) => {
             setQueryName(name);
             notify.success("Query name saved");

@@ -99,7 +99,7 @@ export const HierarchyItem = ({
       <ListItemText
         primary={
           <EditableText
-            value={nodeName}
+            defaultValue={nodeName}
             onCommit={(name) => setNodeName(node, name)}
             typographyProps={{
               component: "span",
@@ -129,7 +129,7 @@ export const HierarchyItem = ({
   const groupIds = node.rules.map((rule) => rule.id);
   const selectedIds = trueKeys(selected);
   const hasAnySelectedInGroup = selectedIds.some((id) =>
-    groupIds.includes(id as string)
+    groupIds.includes(id as string),
   );
 
   return (

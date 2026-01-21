@@ -291,7 +291,7 @@ const RuleWrapper = ({
       </Box>
       {isSelected && (
         <EditableText
-          value={nodeName}
+          defaultValue={nodeName}
           onCommit={(name) => setNodeName(node, name)}
           typographyProps={{
             component: "span",
