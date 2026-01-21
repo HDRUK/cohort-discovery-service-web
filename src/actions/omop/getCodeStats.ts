@@ -8,7 +8,7 @@ import { getTagCodeStats } from "@/config/tags";
 
 const getCodeStats = async (
   page = 1,
-  per_page = DEFAULT_CODES_PER_PAGE
+  per_page = DEFAULT_CODES_PER_PAGE,
 ): Promise<ApiResponse<Paginated<CodeStat[]>>> => {
   const params = new URLSearchParams({
     page: String(page),

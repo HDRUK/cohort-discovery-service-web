@@ -27,7 +27,7 @@ const getQueries = async (): Promise<
   WithIncomplete<ApiResponse<Paginated<Query[]>>>
 > => {
   const incompleteQueries = mockQueries.filter((q) =>
-    q.tasks.some((t) => !t.completed_at)
+    q.tasks.some((t) => !t.completed_at),
   );
 
   return {

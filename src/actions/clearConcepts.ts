@@ -7,7 +7,7 @@ import { ApiResponse, Concept } from "../types/api";
 const clearConcepts = async (conceptSetId: number): Promise<void> => {
   await apiDelete<ApiResponse<Concept>>(
     API_ROUTES.clearConceptSet(conceptSetId),
-    { cache: "no-store" }
+    { cache: "no-store" },
   );
 };
 

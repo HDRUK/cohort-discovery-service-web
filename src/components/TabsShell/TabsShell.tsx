@@ -50,7 +50,7 @@ export default function TabsShell({
 }: TabsShellProps) {
   const router = useRouter();
   const [internalValue, setInternalValue] = React.useState(
-    value ? value : tabs[0]?.id || 0
+    value ? value : tabs[0]?.id || 0,
   );
   const handleChange = (_: React.SyntheticEvent, newValue: string) => {
     if (value && value === internalValue) return;
@@ -103,14 +103,14 @@ export default function TabsShell({
                     sx={mergeSx(
                       defaultTabSx,
                       tabSx,
-                      disabled ? { display: "none" } : {}
+                      disabled ? { display: "none" } : {},
                     )}
                     onClick={(e) => {
                       if (!href) e.preventDefault();
                     }}
                   />
                 );
-              }
+              },
             )}
           </TabList>
         </Box>

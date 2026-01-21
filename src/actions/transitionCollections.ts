@@ -6,14 +6,14 @@ import { Collection, TransitionCollectionPut, ApiResponse } from "../types/api";
 
 const transitionCollections = async (
   ids: number[],
-  payload: TransitionCollectionPut
+  payload: TransitionCollectionPut,
 ): Promise<ApiResponse<Collection>[]> =>
   await Promise.all(
     ids.map((id) =>
       apiPut<ApiResponse<Collection>, TransitionCollectionPut>(
         `${API_ROUTES.collection(id)}/transition_to`,
-        payload
-      )
-    )
+        payload,
+      ),
+    ),
   );
 export default transitionCollections;

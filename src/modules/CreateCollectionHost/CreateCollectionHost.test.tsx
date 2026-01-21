@@ -21,7 +21,7 @@ jest.mock("@/store/useDaphneStore", () => ({
 let custodian: Custodian;
 
 const renderCreateColllectionHost = (
-  overrides: Partial<React.ComponentProps<typeof CreateCollectionHost>> = {}
+  overrides: Partial<React.ComponentProps<typeof CreateCollectionHost>> = {},
 ) =>
   render(
     <NotifyProvider>
@@ -30,7 +30,7 @@ const renderCreateColllectionHost = (
         onCancel={onCancel}
         {...overrides}
       />
-    </NotifyProvider>
+    </NotifyProvider>,
   );
 
 describe("CreateCollectionHost", () => {

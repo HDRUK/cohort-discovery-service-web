@@ -55,7 +55,7 @@ const queryToText = (node: RuleGroupType) => {
   };
 
   const leafText = (
-    rule: ConceptOperator
+    rule: ConceptOperator,
   ): { verb: string | null; text: string | null } => {
     const c = rule.concept;
     if (!c) return { verb: null, text: null };

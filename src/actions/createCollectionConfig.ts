@@ -9,11 +9,11 @@ import {
 } from "../types/api";
 
 const createCollectionConfig = async (
-  payload: CreateCollectionConfigPost
+  payload: CreateCollectionConfigPost,
 ): Promise<ApiResponse<Collection>> => {
   return await apiPost<ApiResponse<Collection>, CreateCollectionConfigPost>(
     API_ROUTES.collectionConfig,
-    payload
+    payload,
   );
 };
 

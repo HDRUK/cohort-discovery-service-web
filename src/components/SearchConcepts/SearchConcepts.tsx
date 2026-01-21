@@ -9,7 +9,7 @@ import {
   FormControlLabel,
   FormGroup,
   Box,
-  Divider
+  Divider,
 } from "@mui/material";
 import { useCallback, useRef } from "react";
 import { ConceptItem, ConceptItemProps } from "./ConceptItem";
@@ -33,10 +33,10 @@ const SearchConcepts = ({
   setSelected,
   onClick,
   slotProps,
-  multiple = false
+  multiple = false,
 }: SearchConceptsProps) => {
   const {
-    userData: { searchForConcepts }
+    userData: { searchForConcepts },
   } = useDaphneStore();
 
   const lastQueryRef = useRef<string>("");
@@ -79,17 +79,17 @@ const SearchConcepts = ({
         return;
       }
     },
-    [domain, searchForConcepts, setSelected]
+    [domain, searchForConcepts, setSelected],
   );
 
   const handleToggle = useCallback(
     (id: number) => {
       setSelected?.((prev) => ({
         ...prev,
-        [id]: !prev[id]
+        [id]: !prev[id],
       }));
     },
-    [setSelected]
+    [setSelected],
   );
 
   return (

@@ -49,7 +49,7 @@ const SearchBox = ({
   ...rest
 }: SearchBoxProps) => {
   const [expanded, setExpanded] = useState(
-    collapsible ? defaultExpanded : true
+    collapsible ? defaultExpanded : true,
   );
   const inputRef = useRef<HTMLInputElement | null>(null);
 

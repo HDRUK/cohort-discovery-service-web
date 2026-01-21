@@ -83,7 +83,7 @@ describe("ManageCollectionStatus", () => {
     expect(screen.queryByText(/Rejected/i)).toBeInTheDocument();
     expect(screen.queryByText(/Suspended/i)).not.toBeInTheDocument();
     expect(
-      screen.queryByText("Request to make active")
+      screen.queryByText("Request to make active"),
     ).not.toBeInTheDocument();
   });
 
@@ -96,7 +96,7 @@ describe("ManageCollectionStatus", () => {
     expect(screen.queryByText(/Rejected/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Suspended/i)).not.toBeInTheDocument();
     expect(
-      screen.queryByText("Request to make active")
+      screen.queryByText("Request to make active"),
     ).not.toBeInTheDocument();
   });
 
@@ -109,7 +109,7 @@ describe("ManageCollectionStatus", () => {
     expect(screen.queryByText(/Rejected/i)).toBeInTheDocument();
     expect(screen.queryByText(/Suspended/i)).not.toBeInTheDocument();
     expect(
-      screen.queryByText("Request to make active")
+      screen.queryByText("Request to make active"),
     ).not.toBeInTheDocument();
   });
 
@@ -122,7 +122,7 @@ describe("ManageCollectionStatus", () => {
     expect(screen.queryByText(/Rejected/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Suspended/i)).toBeInTheDocument();
     expect(
-      screen.queryByText("Request to make active")
+      screen.queryByText("Request to make active"),
     ).not.toBeInTheDocument();
   });
 
@@ -136,7 +136,7 @@ describe("ManageCollectionStatus", () => {
     expect(screen.queryByText(/Suspended/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Mixed/i)).toBeInTheDocument();
     expect(
-      screen.queryByText("Request to make active")
+      screen.queryByText("Request to make active"),
     ).not.toBeInTheDocument();
   });
 });

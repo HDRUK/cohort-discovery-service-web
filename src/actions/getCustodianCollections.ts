@@ -8,7 +8,7 @@ import { getTagCustodianCollection } from "@/config/tags";
 
 const getCustodianCollections = async (
   custodianPid: string,
-  args?: Omit<CachedGetArgs, "url">
+  args?: Omit<CachedGetArgs, "url">,
 ): Promise<ApiResponse<Paginated<CollectionWithHosts[]>>> => {
   const tag = getTagCustodianCollection(custodianPid);
   const url = API_ROUTES.custodianCollections(custodianPid);

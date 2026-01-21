@@ -4,7 +4,7 @@ import { paginateData } from "@/utils/mock";
 import getCollectionHost from "./getCollectionHost";
 
 const getCustodianCollections = async (
-  _custodianPid: string
+  _custodianPid: string,
 ): Promise<ApiResponse<Paginated<CollectionWithHosts[]>>> => {
   const collectionWithHost = getMockCollections().map((c) => ({
     ...c,

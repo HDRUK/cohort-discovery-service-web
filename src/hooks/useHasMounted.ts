@@ -3,7 +3,7 @@ const isTest = process.env.NODE_ENV === "test";
 
 const useHasMounted = () => {
   const [hasMounted, setHasMounted] = useState(
-    isTest ? typeof window !== "undefined" : false
+    isTest ? typeof window !== "undefined" : false,
   );
 
   useEffect(() => {

@@ -6,7 +6,7 @@ import { API_ROUTES } from "../lib/apiRoutes";
 import { ApiResponse, CollectionHost } from "../types/api";
 
 const getCollectionHosts = async (
-  args?: Omit<CachedGetArgs, "url">
+  args?: Omit<CachedGetArgs, "url">,
 ): Promise<ApiResponse<CollectionHost[]>> => {
   return await apiGet<ApiResponse<CollectionHost[]>>({
     url: API_ROUTES.collectionHosts,

@@ -70,7 +70,7 @@ describe("Table", () => {
     const columns = ["Name", "Description"];
     for (const column of columns) {
       expect(
-        screen.getByRole("columnheader", { name: column })
+        screen.getByRole("columnheader", { name: column }),
       ).toBeInTheDocument();
     }
   });
@@ -168,7 +168,7 @@ describe("Table", () => {
     expect(createdAnchor).not.toBeNull();
 
     expect(createdAnchor!.getAttribute("href")).toBe(
-      "/api/download/download-id?entity=test-entity&format=json"
+      "/api/download/download-id?entity=test-entity&format=json",
     );
     createElementSpy.mockRestore();
   });

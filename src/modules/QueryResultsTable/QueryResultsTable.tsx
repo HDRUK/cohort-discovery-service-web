@@ -41,7 +41,7 @@ const QueryResultsTable = ({
       initialData.pid,
       `${initialData.pid}-${initialSearchParams.toString()}`,
     ],
-    [initialSearchParams, initialData.pid]
+    [initialSearchParams, initialData.pid],
   );
   const qc = useQueryClient();
   const { data: query } = useQuery<Query>({
@@ -173,7 +173,7 @@ const QueryResultsTable = ({
   const sortedTasks = useMemo(() => {
     if (!currentSortDirection) {
       return [...tasks].sort(
-        (a, b) => (b.result?.count ?? -1) - (a.result?.count ?? -1)
+        (a, b) => (b.result?.count ?? -1) - (a.result?.count ?? -1),
       );
     }
     return tasks;

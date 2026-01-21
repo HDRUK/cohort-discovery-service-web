@@ -28,7 +28,7 @@ const useSortable = (args: UseSortableArguments): UseSortablePlusReturn => {
 
   const isOver = useMemo(
     () => over?.id !== active?.id && over?.id === args.id,
-    [over, active, args.id]
+    [over, active, args.id],
   );
 
   const isAbove = useMemo(() => {
@@ -64,12 +64,12 @@ const useSortable = (args: UseSortableArguments): UseSortablePlusReturn => {
       opacity: params.isDragging ? 0.6 : 1,
       willChange: "transform",
     }),
-    [params.isDragging, params.transition, transform]
+    [params.isDragging, params.transition, transform],
   );
 
   const isLast = useMemo(
     () => params.newIndex === params.items.length - 2,
-    [params.newIndex, params.items]
+    [params.newIndex, params.items],
   );
 
   const [anchorRef, anchorSize] = useElementSize<

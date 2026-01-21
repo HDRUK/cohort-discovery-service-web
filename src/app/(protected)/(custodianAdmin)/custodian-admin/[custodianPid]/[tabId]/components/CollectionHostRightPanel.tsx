@@ -6,7 +6,7 @@ import { CollectionHostGuidanceProps } from "./CollectionHostGuidance";
 import { CollectionHost } from "@/types/api";
 
 const CollectionHostGuidance = maskClientTest<CollectionHostGuidanceProps>(
-  () => import("./CollectionHostGuidance")
+  () => import("./CollectionHostGuidance"),
 );
 
 interface CollectionHostRightPanelProps

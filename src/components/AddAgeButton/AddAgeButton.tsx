@@ -30,7 +30,7 @@ const AddTimeFrameButton = ({ rule, ...props }: AddTimeFrameButtonProps) => {
           ...node,
           ageConstraint: [null, null],
         };
-      })
+      }),
     );
   };
 

@@ -68,7 +68,7 @@ const buildCachedRequest = async ({
 async function request<TResponse, TBody = undefined>(
   method: HttpMethod,
   url: string,
-  options: RequestOptions<TBody> = {}
+  options: RequestOptions<TBody> = {},
 ): Promise<TResponse | never> {
   const fullUrl = url.startsWith("http") ? url : `${baseURL}${url}`;
   const { headers = {}, body, signal, cache, next } = options;
@@ -128,7 +128,7 @@ async function handleApiError(error: unknown): Promise<never> {
 }
 
 export async function apiGet<TResponse>(
-  args: CachedGetArgs & { options?: RequestOptions<undefined> }
+  args: CachedGetArgs & { options?: RequestOptions<undefined> },
 ) {
   const { finalUrl, init } = await buildCachedRequest(args);
   return request<TResponse>("GET", finalUrl, {
@@ -140,7 +140,7 @@ export async function apiGet<TResponse>(
 export async function apiPost<TResponse, TBody>(
   url: string,
   body?: TBody,
-  options?: RequestOptions<TBody>
+  options?: RequestOptions<TBody>,
 ) {
   return request<TResponse, TBody>("POST", url, { ...options, body });
 }
@@ -148,14 +148,14 @@ export async function apiPost<TResponse, TBody>(
 export async function apiPut<TResponse, TBody>(
   url: string,
   body: TBody,
-  options?: RequestOptions<TBody>
+  options?: RequestOptions<TBody>,
 ) {
   return request<TResponse, TBody>("PUT", url, { ...options, body });
 }
 
 export async function apiDelete<TResponse>(
   url: string,
-  options?: RequestOptions<undefined>
+  options?: RequestOptions<undefined>,
 ) {
   return request<TResponse>("DELETE", url, options);
 }

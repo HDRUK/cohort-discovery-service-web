@@ -18,7 +18,7 @@ const addCollectionToWorkgroup = jest.fn();
 let collections: Collection[];
 
 const renderCreateWorkgroup = (
-  overrides: Partial<Parameters<typeof CreateWorkgroup>[0]> = {}
+  overrides: Partial<Parameters<typeof CreateWorkgroup>[0]> = {},
 ) => {
   return render(
     <MockDaphneStore
@@ -30,7 +30,7 @@ const renderCreateWorkgroup = (
       }}
     >
       <CreateWorkgroup collections={collections} {...overrides} />
-    </MockDaphneStore>
+    </MockDaphneStore>,
   );
 };
 

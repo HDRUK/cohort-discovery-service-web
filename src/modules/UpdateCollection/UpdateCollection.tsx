@@ -46,7 +46,7 @@ import SquareCheckbox from "@/components/SquareCheckbox";
 import ManageCollectionStatus from "@/modules/ManageCollectionStatus";
 
 const UpdateCollectionGuidance = maskClientTest(
-  () => import("./UpdateCollectionGuidance")
+  () => import("./UpdateCollectionGuidance"),
 );
 
 export type UpdateCollectionProps = {
@@ -118,13 +118,13 @@ const UpdateCollection = ({
     (custodianData) => ({
       currentCustodian: custodianData.currentCustodian,
       updateCollection: custodianData.updateCollection,
-    })
+    }),
   );
 
   const { updateCollection: updateCollectionAdmin } = useAdminStore(
     (adminData) => ({
       updateCollection: adminData.updateCollection,
-    })
+    }),
   );
   const firstUpdate = useRef(true);
 
@@ -137,11 +137,11 @@ const UpdateCollection = ({
         map.set(
           wg.name,
           (collection.workgroups?.filter((cw) => cw.id === wg.id) || [])
-            .length > 0
+            .length > 0,
         );
       });
       return map;
-    }
+    },
   );
 
   const formMethods = useForm<UpdateCollectionFormValues>({
@@ -180,11 +180,11 @@ const UpdateCollection = ({
         notify.success(`Updated collection ${data.collection.name}`);
 
         const cwNames = new Set(
-          (collection.workgroups ?? []).map((w) => w.name)
+          (collection.workgroups ?? []).map((w) => w.name),
         );
 
         const newWorkgroups = workgroups.filter(
-          (wg) => workgroupValues.get(wg.name) && !cwNames.has(wg.name)
+          (wg) => workgroupValues.get(wg.name) && !cwNames.has(wg.name),
         );
 
         if (newWorkgroups.length > 0) {
@@ -195,12 +195,12 @@ const UpdateCollection = ({
           notify.success(
             `Add collection "${name}" to workgroup${
               newWorkgroups.length > 1 ? "s" : ""
-            } ${newWorkgroups.map((wg) => wg.name).join(", ")}`
+            } ${newWorkgroups.map((wg) => wg.name).join(", ")}`,
           );
         }
 
         const workgroupsToRemove = workgroups.filter(
-          (wg) => !workgroupValues.get(wg.name) && cwNames.has(wg.name)
+          (wg) => !workgroupValues.get(wg.name) && cwNames.has(wg.name),
         );
 
         if (workgroupsToRemove.length > 0) {
@@ -211,7 +211,7 @@ const UpdateCollection = ({
           notify.success(
             `Removed collection "${name}" from workgroup${
               workgroupsToRemove.length > 1 ? "s" : ""
-            } ${workgroupsToRemove.map((wg) => wg.name).join(", ")}`
+            } ${workgroupsToRemove.map((wg) => wg.name).join(", ")}`,
           );
         }
 
@@ -231,7 +231,7 @@ const UpdateCollection = ({
               CollectionStatus[
                 data.collection.model_state.state.id as CollectionStatus
               ]
-            }`
+            }`,
           );
         }
         revalidateAction(TAG_CUSTODIAN_COLLECTION);
@@ -255,17 +255,17 @@ const UpdateCollection = ({
       onClose,
       workgroups,
       workgroupValues,
-    ]
+    ],
   );
 
   const handleEnter = useCallback(
     () => handleSubmit((values) => submitForm(values, false))(),
-    [handleSubmit, submitForm]
+    [handleSubmit, submitForm],
   );
 
   const handleLockClick = useCallback(
     () => handleSubmit((values) => submitForm(values, true))(),
-    [handleSubmit, submitForm]
+    [handleSubmit, submitForm],
   );
 
   const { setValue } = formMethods;
@@ -357,7 +357,7 @@ const UpdateCollection = ({
           ([name, checked]) =>
             checked && (
               <Chip color="secondary" label={name} key={`wg-chip-${name}`} />
-            )
+            ),
         )}
       </Box>
 

@@ -34,7 +34,7 @@ describe("QueryBuilder", () => {
           },
         },
       },
-    ]
+    ],
   ) => {
     const group = validateRuleTree({
       id: "group-1",
@@ -50,7 +50,7 @@ describe("QueryBuilder", () => {
         }}
       >
         <Hierarchy />
-      </MockDaphneStore>
+      </MockDaphneStore>,
     );
     return rendered;
   };

@@ -72,7 +72,7 @@ const CollectionsTable = ({
         currentCustodian?.pid ? currentCustodian.pid : "admin"
       }-${searchParams.toString()}`,
     ],
-    [searchParams, currentCustodian]
+    [searchParams, currentCustodian],
   );
   const qc = useQueryClient();
   const { data: collections } = useQuery<Paginated<CollectionWithHosts[]>>({
@@ -127,8 +127,8 @@ const CollectionsTable = ({
           (c) =>
             !isEqualTask(
               c?.latest_demographic_task,
-              c.latest_demographic?.task
-            ) || !isEqualTask(c?.latest_concept_task, c.latest_concept?.task)
+              c.latest_demographic?.task,
+            ) || !isEqualTask(c?.latest_concept_task, c.latest_concept?.task),
         ) ?? [];
 
       const hasIncomplete = runningCollections?.length > 0;
@@ -142,7 +142,7 @@ const CollectionsTable = ({
 
   const selectedCollectionIds = useMemo(
     () => trueKeys(rowSelection ?? {}),
-    [rowSelection]
+    [rowSelection],
   );
 
   useEffect(() => {
@@ -233,7 +233,7 @@ const CollectionsTable = ({
         maxSize: 50,
         Cell: ({ cell, row }) => {
           const counts = formatNumber(
-            row.original?.latest_demographic?.count ?? 0
+            row.original?.latest_demographic?.count ?? 0,
           );
           const date = cell.getValue<string>();
           return (
@@ -256,7 +256,7 @@ const CollectionsTable = ({
         maxSize: 20,
       },
     ],
-    [showPid]
+    [showPid],
   );
 
   const table = usePaginatedTable({
@@ -282,10 +282,10 @@ const CollectionsTable = ({
             } else {
               deleteCollectionAdmin(id);
             }
-          })
+          }),
         );
         notify.success(
-          `${ids.length} Collection${ids.length > 1 ? "s" : ""} deleted`
+          `${ids.length} Collection${ids.length > 1 ? "s" : ""} deleted`,
         );
       }
     },
@@ -295,7 +295,7 @@ const CollectionsTable = ({
       deleteCollectionAdmin,
       deleteOverride,
       notify,
-    ]
+    ],
   );
 
   useLogDependencyChanges("collectionsTable", {

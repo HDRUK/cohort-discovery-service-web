@@ -45,7 +45,7 @@ const WorkgroupsLeftPanel = ({
       }
       setSearchParam(String(id));
     },
-    [setSearchParam]
+    [setSearchParam],
   );
 
   return (

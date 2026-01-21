@@ -19,7 +19,7 @@ interface CreateCollectionProps {
 const CreateWorkgroup = ({ collections, onCancel }: CreateCollectionProps) => {
   const createWorkgroup = useAdminStore((s) => s.createWorkgroup);
   const addCollectionsToWorkgroup = useAdminStore(
-    (s) => s.addCollectionsToWorkgroup
+    (s) => s.addCollectionsToWorkgroup,
   );
 
   const notify = useNotify();

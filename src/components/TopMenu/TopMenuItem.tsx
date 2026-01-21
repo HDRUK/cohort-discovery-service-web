@@ -38,13 +38,13 @@ const TopMenuItem = ({ item }: Props) => {
     () =>
       !!item.path &&
       (pathname === item.path || pathname.startsWith(item.path + "/")),
-    [pathname, item.path]
+    [pathname, item.path],
   );
 
   const open = Boolean(anchorEl);
 
   const handleToggleMenu = (
-    event: MouseEvent<HTMLDivElement | HTMLButtonElement>
+    event: MouseEvent<HTMLDivElement | HTMLButtonElement>,
   ) => {
     if (!hasChildren) return;
     setAnchorEl((prev) => (prev ? null : (event.currentTarget as HTMLElement)));

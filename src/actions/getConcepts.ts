@@ -10,7 +10,7 @@ const getConcepts = async (
   searchTerm: string,
   domain?: string,
   page = 1,
-  per_page = DEFAULT_CODES_PER_PAGE
+  per_page = DEFAULT_CODES_PER_PAGE,
 ): Promise<ApiResponse<Paginated<Partial<Concept>[]>>> => {
   const params = new URLSearchParams({
     page: String(page),

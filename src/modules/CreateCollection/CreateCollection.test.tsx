@@ -28,7 +28,7 @@ let custodians: Custodian[];
 let collectionHosts: CollectionHost[];
 
 const renderCreateCollection = (
-  overrides: Partial<Parameters<typeof CreateCollection>[0]> = {}
+  overrides: Partial<Parameters<typeof CreateCollection>[0]> = {},
 ) => {
   return render(
     <MockDaphneStore
@@ -45,7 +45,7 @@ const renderCreateCollection = (
         collectionHosts={collectionHosts}
         {...overrides}
       />
-    </MockDaphneStore>
+    </MockDaphneStore>,
   );
 };
 
@@ -109,7 +109,7 @@ describe("CreateCollection", () => {
     await user.type(screen.getByLabelText(/description/i), "A test collection");
     await user.type(
       screen.getByLabelText(/link to associated datasets/i),
-      "http://example.com"
+      "http://example.com",
     );
 
     const label = screen.getByText(/collection host/i);
@@ -156,7 +156,7 @@ describe("CreateCollection", () => {
         run_time_hour: 0,
         run_time_minute: 0,
         type: TaskType.B,
-      }
+      },
     );
 
     expect(onCancel).toHaveBeenCalled();
@@ -179,7 +179,7 @@ describe("CreateCollection", () => {
     const custodianLabel = screen.getByText(/custodian/i);
     const custodianId = custodianLabel.getAttribute("for");
     const custodianSelect = document.getElementById(
-      custodianId!
+      custodianId!,
     ) as HTMLElement;
 
     await act(async () => {
@@ -189,7 +189,7 @@ describe("CreateCollection", () => {
     const custodianListbox = await screen.findByRole("listbox");
     const custodianOption = within(custodianListbox).getByText(
       custodians[0].name,
-      { exact: false }
+      { exact: false },
     );
     // note- having to use fireEvent - couldnt get this to work with user
     // with have to return to this one day?
@@ -201,7 +201,7 @@ describe("CreateCollection", () => {
     await user.type(screen.getByLabelText(/description/i), "A test collection");
     await user.type(
       screen.getByLabelText(/link to associated datasets/i),
-      "http://example.com"
+      "http://example.com",
     );
 
     const label = screen.getByText(/collection host/i);
@@ -247,7 +247,7 @@ describe("CreateCollection", () => {
         run_time_hour: 0,
         run_time_minute: 0,
         type: TaskType.B,
-      }
+      },
     );
   });
 
@@ -260,7 +260,7 @@ describe("CreateCollection", () => {
     const nameInput = screen.getByLabelText(/name/i) as HTMLInputElement;
     const descInput = screen.getByLabelText(/description/i) as HTMLInputElement;
     const urlInput = screen.getByLabelText(
-      /link to associated datasets/i
+      /link to associated datasets/i,
     ) as HTMLInputElement;
 
     await user.type(nameInput, "Temp Name");

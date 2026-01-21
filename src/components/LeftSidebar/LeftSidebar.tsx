@@ -25,15 +25,15 @@ export default function LeftSidebar() {
 
   const teamIds = useMemo(
     () => user?.token_user?.cohort_admin_teams?.map((t) => String(t.id)) ?? [],
-    [user]
+    [user],
   );
 
   const userCustodians = useMemo(
     () =>
       (custodians ?? []).filter((c) =>
-        teamIds.includes(String(c.external_custodian_id))
+        teamIds.includes(String(c.external_custodian_id)),
       ),
-    [custodians, teamIds]
+    [custodians, teamIds],
   );
 
   const custodianChildren: MenuItem[] = userCustodians.map((uc) => ({
@@ -67,7 +67,7 @@ export default function LeftSidebar() {
         : []),
       { label: "Profile", path: routes.profile },
     ],
-    [custodianChildren, isAdmin]
+    [custodianChildren, isAdmin],
   );
   return (
     <Box

@@ -51,7 +51,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
 
   const toggleShowDescendants = useCallback(
     () => setShowDescendants(id, !showDescendants),
-    [id, showDescendants, setShowDescendants]
+    [id, showDescendants, setShowDescendants],
   );
 
   const setConcept = useCallback(
@@ -65,10 +65,10 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
             };
           }
           return node;
-        })
+        }),
       );
     },
-    [id, setQueryBuilderJson, queryBuilderJson]
+    [id, setQueryBuilderJson, queryBuilderJson],
   );
 
   const clearConcept = useCallback(() => {
@@ -81,7 +81,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
           };
         }
         return node;
-      })
+      }),
     );
   }, [id, queryBuilderJson, setQueryBuilderJson]);
 
@@ -89,12 +89,12 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     (c: Concept) => {
       setConcept(c);
     },
-    [setConcept]
+    [setConcept],
   );
 
   const removeChild = useCallback((parent: Concept, child: Concept) => {
     const children = parent.children?.filter(
-      (c) => c.concept_id !== child.concept_id
+      (c) => c.concept_id !== child.concept_id,
     );
     const newConcept = {
       ...parent,
@@ -105,7 +105,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
 
   const removeAlternative = useCallback((parent: Concept, child: Concept) => {
     const alternatives = parent.alternatives?.filter(
-      (c) => c.concept_id !== child.concept_id
+      (c) => c.concept_id !== child.concept_id,
     );
     const newConcept = {
       ...parent,

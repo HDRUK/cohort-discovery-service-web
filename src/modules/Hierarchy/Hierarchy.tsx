@@ -36,7 +36,7 @@ export const Hierarchy = () => {
   const hasMounted = useHasMounted();
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } })
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
   );
 
   const onDragStart = ({ active }: DragStartEvent) => setActive(active);
@@ -59,12 +59,12 @@ export const Hierarchy = () => {
         board.indexOf(overId as string) + (currentIndex < 0 ? 1 : 0);
 
       setQueryBuilderJson(
-        moveItemIntoGroup(queryBuilderJson, activeId, overGroupId, targetIndex)
+        moveItemIntoGroup(queryBuilderJson, activeId, overGroupId, targetIndex),
       );
 
       setActive(null);
     },
-    [active, boardIndex, queryBuilderJson, setQueryBuilderJson]
+    [active, boardIndex, queryBuilderJson, setQueryBuilderJson],
   );
 
   if (!hasMounted) return <SkeletonFull sx={{ minHeight: 1000, mt: 1 }} />;

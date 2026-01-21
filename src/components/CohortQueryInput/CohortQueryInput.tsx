@@ -62,14 +62,14 @@ const CohortQueryInput = () => {
         appendError(RuleErrors.NO_QUERY_FOUND);
       }
     },
-    [getQueryFromText, appendError]
+    [getQueryFromText, appendError],
   );
 
   const liveQuery = useWatch({ control, name: "cohortQueryInput" }) ?? "";
   const debouncedQuery = useDebounce(
     liveQuery,
     DEFAULT_SEARCH_WAIT_TIME,
-    (v) => v.trim() === ""
+    (v) => v.trim() === "",
   );
   const debouncedQueryRef = useRef(debouncedQuery);
 

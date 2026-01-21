@@ -42,7 +42,7 @@ const CollectionConfig = <TFormValues extends FieldValues>({
   const { control, setValue } = useFormContext<TFormValues>();
 
   const [frequencyExpanded, setFrequencyExpanded] = useState(
-    keepExpanded ? true : false
+    keepExpanded ? true : false,
   );
 
   const {
@@ -66,13 +66,13 @@ const CollectionConfig = <TFormValues extends FieldValues>({
 
   const frequencyLabels = useMemo(
     () => frequencyMap[frequencyField] ?? [],
-    [frequencyField]
+    [frequencyField],
   );
 
   useEffect(() => {
     setValue(
       runTimeFrequencyFieldName,
-      0 as PathValue<TFormValues, typeof runTimeFrequencyFieldName>
+      0 as PathValue<TFormValues, typeof runTimeFrequencyFieldName>,
     );
   }, [runTimeFrequencyFieldName, frequencyField, setValue]);
 
@@ -113,7 +113,7 @@ const CollectionConfig = <TFormValues extends FieldValues>({
                     ([key, value]) => ({
                       value: Number(value),
                       label: capitaliseFirstLetter(key.toLowerCase()),
-                    })
+                    }),
                   )}
                 />
               )}

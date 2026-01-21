@@ -37,7 +37,7 @@ describe("QueriesTable", () => {
     render(
       <MockDaphneStore>
         <QueriesTable initialData={paginateData({ data: mockQueries })} />
-      </MockDaphneStore>
+      </MockDaphneStore>,
     );
 
     const row = screen.getByText("Test Query").closest("tr");

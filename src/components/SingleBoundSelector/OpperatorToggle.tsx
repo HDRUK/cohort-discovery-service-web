@@ -33,7 +33,7 @@ const OperatorToggle = ({
       event,
       operator === SingleSidedOperator.GREATER_THAN
         ? SingleSidedOperator.LESS_THAN
-        : SingleSidedOperator.GREATER_THAN
+        : SingleSidedOperator.GREATER_THAN,
     );
     setOpen(false);
   };

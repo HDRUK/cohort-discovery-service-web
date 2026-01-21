@@ -26,7 +26,7 @@ const SelectCustodianDatasets = ({
 
   const nTotal = custodianCollections.items.length;
   const nSelected = selectedDatasets.filter((pid) =>
-    custodianCollections.items.map((i) => i.pid).includes(pid)
+    custodianCollections.items.map((i) => i.pid).includes(pid),
   ).length;
 
   const handleSelectDataset = (pid: string) => {

@@ -26,7 +26,7 @@ const getPanelSizes = (
   expanded: ExpandedSide | null,
   rightDisabled: boolean,
   panelWidth: number,
-  totalWidth: number
+  totalWidth: number,
 ) => {
   if (expanded === ExpandedSide.LEFT) {
     return {
@@ -76,7 +76,7 @@ const ThreePaneSwimLaneLayout = ({
     expandedSide ?? null,
     rightDisabled,
     panelWidth,
-    totalWidth
+    totalWidth,
   );
 
   return (

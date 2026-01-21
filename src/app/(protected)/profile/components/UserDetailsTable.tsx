@@ -41,7 +41,7 @@ const UserDetailsTable = ({ user }: { user: CombinedUser }) => {
       value: user.email_verified_at ? (
         <Tooltip
           title={`Verified at ${dayjs(user.email_verified_at).format(
-            "MMM D, YYYY HH:mm"
+            "MMM D, YYYY HH:mm",
           )}`}
         >
           <CheckCircleIcon color="success" fontSize="small" />
@@ -126,7 +126,7 @@ const UserDetailsTable = ({ user }: { user: CombinedUser }) => {
         Cell: ({ cell }) => <>{cell.getValue<React.ReactNode>()}</>,
       },
     ],
-    []
+    [],
   );
 
   const table = useTable<KVRow>({

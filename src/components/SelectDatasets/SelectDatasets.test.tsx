@@ -29,7 +29,7 @@ describe("SelectDatasets", () => {
           collections={collections.data}
           initialSelection={initialSelection}
         />
-      </MockDaphneStore>
+      </MockDaphneStore>,
     );
 
     collections.data.forEach((collection) => {
@@ -54,7 +54,7 @@ describe("SelectDatasets", () => {
           collections={collections.data}
           initialSelection={initialSelection}
         />
-      </MockDaphneStore>
+      </MockDaphneStore>,
     );
     expect(setSelectedDatasets).toHaveBeenLastCalledWith(initialSelection);
 

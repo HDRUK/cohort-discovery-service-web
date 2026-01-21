@@ -19,7 +19,7 @@ const setQueryBuilderJson = jest.fn();
 describe("RuleOperator", () => {
   const renderComponent = (
     opArgs: Partial<OperatorType> = {},
-    rest?: Partial<RuleOperatorProps>
+    rest?: Partial<RuleOperatorProps>,
   ) => {
     const operator = {
       id: "op-1",
@@ -39,7 +39,7 @@ describe("RuleOperator", () => {
         }}
       >
         <RuleOperator {...rest} operator={operator} groupId="group-1" />
-      </MockDaphneStore>
+      </MockDaphneStore>,
     );
     return {
       query,

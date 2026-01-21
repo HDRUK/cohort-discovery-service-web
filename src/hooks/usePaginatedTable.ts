@@ -37,7 +37,7 @@ export function usePaginatedTable<TData extends { pid: string }>({
 
   const page = parseInt(searchParams.get("page") || "1");
   const perPage = parseInt(
-    searchParams.get("per_page") || perPageDefault.toString()
+    searchParams.get("per_page") || perPageDefault.toString(),
   );
 
   const [pagination, setPagination] = useState({

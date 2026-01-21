@@ -32,11 +32,11 @@ module.exports = {
 
             issuePrefixes: ["GAT", "TPD", "DP"], // Jira prefixes
 
-            issueUrlFormat: process.env.JIRA_URL + "{{prefix}}{{id}}"
+            issueUrlFormat: process.env.JIRA_URL + "{{prefix}}{{id}}",
 
-          }
+          },
 
-        }
+        },
 
       ],
 
@@ -48,7 +48,7 @@ module.exports = {
 
           changelogFile: "CHANGELOG.md",
 
-        }
+        },
 
       ],
 
@@ -62,7 +62,7 @@ module.exports = {
 
           failComment: false,
 
-        }
+        },
 
       ],
 
@@ -72,9 +72,9 @@ module.exports = {
 
         {
 
-          prepareCmd: "node updateVersions.js ${nextRelease.version} && git add chart/cohort-web/Chart.yaml package.json"
+          prepareCmd: "node updateVersions.js ${nextRelease.version} && git add chart/cohort-web/Chart.yaml package.json",
 
-        }
+        },
 
       ],
 
@@ -92,15 +92,15 @@ module.exports = {
 
             "CHANGELOG.md",
 
-            "chart/cohort-web/Chart.yaml"
+            "chart/cohort-web/Chart.yaml",
 
           ],
           message: "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}",
-          pushArgs: ["--force"]
-        }
+          pushArgs: ["--force"],
+        },
 
-      ]
+      ],
 
-    ]
+    ],
 
   };

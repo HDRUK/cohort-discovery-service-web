@@ -72,7 +72,7 @@ const CreateCollection = ({
       ? await createCollection(
           currentCustodian.pid,
           data.collection,
-          data.config
+          data.config,
         )
       : await createCollectionAdmin(data.collection, data.config);
 

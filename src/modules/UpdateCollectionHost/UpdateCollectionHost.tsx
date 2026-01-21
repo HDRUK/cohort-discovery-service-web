@@ -46,7 +46,7 @@ const UpdateCollectionHost = ({
 
   const submitHostForm = async (
     { hostName }: CollectionHostFormValues,
-    closeAfter = false
+    closeAfter = false,
   ) => {
     if (!selectedCollectionHost?.id) return;
     const { id } = selectedCollectionHost;
@@ -63,7 +63,7 @@ const UpdateCollectionHost = ({
 
   const handleEnter = handleSubmit((values) => submitHostForm(values, false));
   const handleLockClick = handleSubmit((values) =>
-    submitHostForm(values, true)
+    submitHostForm(values, true),
   );
   const handleUnlockClick = () => {
     onClose?.();

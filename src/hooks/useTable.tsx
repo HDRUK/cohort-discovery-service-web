@@ -51,7 +51,7 @@ export const useTable = <TData extends MRT_RowData>({
         : []),
       ...columns,
     ],
-    [columns, enableRowSelection]
+    [columns, enableRowSelection],
   );
 
   return useMaterialReactTable<TData>({
@@ -125,8 +125,8 @@ export const useTable = <TData extends MRT_RowData>({
           const cleanSelection = (sel: Record<string, boolean>) =>
             Object.fromEntries(
               Object.entries(sel).filter(
-                ([k, v]) => v && visibleRowIds.includes(k)
-              )
+                ([k, v]) => v && visibleRowIds.includes(k),
+              ),
             ) as Record<string, boolean>;
 
           const current = { ...(table.getState().rowSelection ?? {}) };

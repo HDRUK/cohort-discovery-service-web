@@ -6,16 +6,16 @@ import { ApiResponse, Concept } from "../types/api";
 
 const attachConcepts = async (
   conceptSetId: number,
-  conceptIds: number[]
+  conceptIds: number[],
 ): Promise<void> => {
   await Promise.all(
     conceptIds.map((conceptId) =>
       apiPost<ApiResponse<Concept>, Record<string, never>>(
         API_ROUTES.attachConcept(conceptSetId, conceptId),
         {},
-        { cache: "no-store" }
-      )
-    )
+        { cache: "no-store" },
+      ),
+    ),
   );
 };
 

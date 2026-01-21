@@ -34,7 +34,7 @@ const CollectionHostAdmin = ({
       selectedHostIds.length > 0
         ? collectionHosts.find((h) => h.client_id === selectedHostIds[0])
         : null,
-    [collectionHosts, selectedHostIds]
+    [collectionHosts, selectedHostIds],
   );
 
   const [expandedSide, setExpandedSide] = useState<ExpandedSide | null>(null);
@@ -42,13 +42,13 @@ const CollectionHostAdmin = ({
   const toggleExpandLeft = () => {
     setRowSelection({});
     setExpandedSide((prev) =>
-      prev === ExpandedSide.LEFT ? null : ExpandedSide.LEFT
+      prev === ExpandedSide.LEFT ? null : ExpandedSide.LEFT,
     );
   };
 
   const toggleExpandRight = () => {
     setExpandedSide((prev) =>
-      prev === ExpandedSide.RIGHT ? null : ExpandedSide.RIGHT
+      prev === ExpandedSide.RIGHT ? null : ExpandedSide.RIGHT,
     );
   };
 

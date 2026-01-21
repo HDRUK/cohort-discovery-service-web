@@ -7,7 +7,7 @@ export const getContainerSx =
     collapsible: boolean,
     expanded: boolean,
     expandedWidth: number | string,
-    collapsedWidth: number | string
+    collapsedWidth: number | string,
   ): SxProps<Theme> =>
   (theme: Theme) => ({
     width: collapsible
@@ -27,7 +27,7 @@ export const getTextFieldSx = (
   collapsible: boolean,
   expanded: boolean,
   inputBgColor: string,
-  hasWarning: boolean = false
+  hasWarning: boolean = false,
 ): SxProps<Theme> => ({
   "& .MuiOutlinedInput-root": {
     borderRadius: 20,
@@ -87,7 +87,7 @@ export const getTextFieldSx = (
 
 export const getHtmlInputSx = (
   collapsible: boolean,
-  expanded: boolean
+  expanded: boolean,
 ): SxProps<Theme> => ({
   opacity: collapsible ? (expanded ? 1 : 0) : 1,
   transition: collapsible ? "opacity 150ms" : "none",

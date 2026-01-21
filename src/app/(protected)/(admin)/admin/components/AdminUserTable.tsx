@@ -26,7 +26,7 @@ const AdminUserTable = ({ users }: { users: User[] }) => {
         header: "Email",
       },
     ],
-    []
+    [],
   );
 
   const table = useTable<User>({

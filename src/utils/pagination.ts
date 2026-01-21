@@ -31,7 +31,7 @@ const roundToNice = (n: number) => {
 const buildRowsPerPageOptions = (
   perPageDefault: number,
   min = 5,
-  max = 200
+  max = 200,
 ) => {
   const effectiveMin =
     perPageDefault >= 50 ? 10 : perPageDefault >= 25 ? 5 : min;

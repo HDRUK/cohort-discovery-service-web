@@ -70,7 +70,7 @@ const ActionMenuSection = ({
   const compact = compactProp ?? compactMeasured;
 
   const [expanded, setExpanded] = React.useState<boolean>(
-    fixedExpanded ? true : defaultExpanded
+    fixedExpanded ? true : defaultExpanded,
   );
 
   React.useEffect(() => {

@@ -45,7 +45,7 @@ export type SingleBoundSelectorProps<TStored, TUi = TStored> = {
 
 function deriveOperatorAndValue<TStored, TUi>(
   constraint: NullablePair<TStored>,
-  parse: (stored: TStored | null) => TUi | null
+  parse: (stored: TStored | null) => TUi | null,
 ): { operator: SingleSidedOperator; value: TUi | null } {
   const [left, right] = constraint;
 
@@ -77,22 +77,22 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
 }: SingleBoundSelectorProps<TStored, TUi>) {
   const parseFn = useMemo(
     () => parse ?? ((v: TStored | null) => v as unknown as TUi | null),
-    [parse]
+    [parse],
   );
 
   const serialiseFn = useMemo(
     () => serialise ?? ((v: TUi | null) => v as unknown as TStored | null),
-    [serialise]
+    [serialise],
   );
 
   const { operator, value } = useMemo(
     () => deriveOperatorAndValue(constraint, parseFn),
-    [parseFn, constraint]
+    [parseFn, constraint],
   );
 
   const handleOperatorChange = (
     _e: React.MouseEvent<HTMLElement>,
-    nextOperator: SingleSidedOperator | null
+    nextOperator: SingleSidedOperator | null,
   ) => {
     if (!nextOperator) return;
 
@@ -100,7 +100,7 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
     onConstraintChange(
       nextOperator === SingleSidedOperator.GREATER_THAN
         ? [stored, null]
-        : [null, stored]
+        : [null, stored],
     );
   };
 
@@ -109,7 +109,7 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
     onConstraintChange(
       operator === SingleSidedOperator.GREATER_THAN
         ? [stored, null]
-        : [null, stored]
+        : [null, stored],
     );
   };
 

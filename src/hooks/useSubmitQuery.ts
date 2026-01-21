@@ -21,7 +21,7 @@ const useSubmitQuery = () => {
       selectedDatasets: qb.selectedDatasets,
       queryName: qb.queryName,
       queryBuilderJson: qb.queryBuilderJson,
-    })
+    }),
   );
 
   const { valid } = queryBuilderJson;

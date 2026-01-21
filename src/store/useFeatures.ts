@@ -22,7 +22,7 @@ const useFeatures = (): Features =>
         queryNlp: !!flags[FeatureName.QueryNlp],
         inAppMessenger: !!flags[FeatureName.InAppMessenger],
       };
-    })
+    }),
   );
 
 export default useFeatures;

@@ -89,7 +89,7 @@ export default function MarqueeSelection({
 
       return { x, y };
     },
-    [containerRef]
+    [containerRef],
   );
 
   const computeSelection = useCallback(
@@ -112,7 +112,7 @@ export default function MarqueeSelection({
       }
       return selection;
     },
-    [containerRef, idAttr, selectable]
+    [containerRef, idAttr, selectable],
   );
 
   useEffect(() => {
@@ -178,7 +178,7 @@ export default function MarqueeSelection({
       setRectState(rectN);
 
       const selected = computeSelection(rectN).filter(
-        (id) => id !== insideRef.current
+        (id) => id !== insideRef.current,
       );
       const prev = latestSelected.current;
 

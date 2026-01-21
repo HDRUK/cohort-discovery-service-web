@@ -26,14 +26,14 @@ type HierarchyItemProps = {
 export const HierarchyItem = ({
   node,
   groupId,
-  depth = 0
+  depth = 0,
 }: HierarchyItemProps) => {
   const { toggleSelected, selected, getNodeName, setNodeName } =
     useQueryBuilder((qb) => ({
       toggleSelected: qb.toggleSelected,
       selected: qb.selected,
       getNodeName: qb.getNodeName,
-      setNodeName: qb.setNodeName
+      setNodeName: qb.setNodeName,
     }));
   const id = `${ID_REF_SUFFIX}-${node.id}`;
 
@@ -44,17 +44,17 @@ export const HierarchyItem = ({
     listeners,
     transition,
     isOver,
-    isAbove
+    isAbove,
   } = useSortable({
     id,
     data: {
       id: node.id,
-      groupId
-    }
+      groupId,
+    },
   });
 
   const style = {
-    transition
+    transition,
   };
 
   const isGroup = isRuleGroup(node) && node.rules.length > 0;
@@ -99,14 +99,14 @@ export const HierarchyItem = ({
       <ListItemText
         primary={
           <EditableText
-            value={nodeName}
+            defaultValue={nodeName}
             onCommit={(name) => setNodeName(node, name)}
             typographyProps={{
-              component: "span"
+              component: "span",
             }}
             textFieldProps={{
               variant: "standard",
-              size: "small"
+              size: "small",
             }}
           />
         }
@@ -129,7 +129,7 @@ export const HierarchyItem = ({
   const groupIds = node.rules.map((rule) => rule.id);
   const selectedIds = trueKeys(selected);
   const hasAnySelectedInGroup = selectedIds.some((id) =>
-    groupIds.includes(id as string)
+    groupIds.includes(id as string),
   );
 
   return (

@@ -3,13 +3,13 @@ import { useEffect, useMemo, useState } from "react";
 export const useDebounce = <T>(
   value: T,
   delay = 100,
-  flushNow?: (v: T) => boolean
+  flushNow?: (v: T) => boolean,
 ): T => {
   const [debounced, setDebounced] = useState(value);
 
   const shouldFlush = useMemo(
     () => (flushNow ? flushNow(value) : false),
-    [flushNow, value]
+    [flushNow, value],
   );
 
   useEffect(() => {

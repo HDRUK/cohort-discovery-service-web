@@ -18,7 +18,7 @@ describe("QueryBuilder", () => {
         }}
       >
         <QueryBuilder />
-      </MockDaphneStore>
+      </MockDaphneStore>,
     );
     return rendered;
   };
@@ -33,7 +33,7 @@ describe("QueryBuilder", () => {
     expect(groupHeadings).toHaveLength(1);
 
     const groupCard = groupHeadings[0].closest(
-      '[data-testid="clickable-card"]'
+      '[data-testid="clickable-card"]',
     );
     expect(groupCard).toBeInTheDocument();
 
@@ -43,7 +43,7 @@ describe("QueryBuilder", () => {
 
     scope = within(groupRules[0] as HTMLInputElement);
     expect(
-      scope.getByText("Moderna - SARS-CoV-2 (COVID-19) vaccine")
+      scope.getByText("Moderna - SARS-CoV-2 (COVID-19) vaccine"),
     ).toBeInTheDocument();
 
     scope = within(groupRules[1] as HTMLInputElement);
@@ -51,7 +51,7 @@ describe("QueryBuilder", () => {
 
     scope = within(groupRules[2] as HTMLInputElement);
     expect(
-      scope.getByText("Pfizer - SARS-CoV-2 (COVID-19) vaccine")
+      scope.getByText("Pfizer - SARS-CoV-2 (COVID-19) vaccine"),
     ).toBeInTheDocument();
 
     const ruleHeadings = screen.getAllByRole("heading", { name: /rule/i });
@@ -91,7 +91,7 @@ describe("QueryBuilder", () => {
     const startCard = allRules()[initialIndex];
 
     const wrapper = startCard.closest(
-      '[data-testid="sortable-rule"]'
+      '[data-testid="sortable-rule"]',
     ) as HTMLElement;
     expect(wrapper).toBeTruthy();
 

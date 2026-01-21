@@ -32,7 +32,7 @@ const DeleteTimeFrameButton = ({
           ...node,
           timeConstraint: undefined,
         };
-      })
+      }),
     );
   };
 

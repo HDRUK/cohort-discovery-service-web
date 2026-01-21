@@ -92,12 +92,12 @@ const UpdateMultipleCollections = ({
           map.set(
             wg.name,
             (collections[0].workgroups?.filter((cw) => cw.id === wg.id) || [])
-              .length > 0
+              .length > 0,
           );
         });
       }
       return map;
-    }
+    },
   );
 
   const submitForm = useCallback(
@@ -107,7 +107,7 @@ const UpdateMultipleCollections = ({
         for (const c of collections) {
           const cwNames = new Set((c.workgroups ?? []).map((w) => w.name));
           const newWorkgroups = workgroups.filter(
-            (wg) => workgroupValues.get(wg.name) && !cwNames.has(wg.name)
+            (wg) => workgroupValues.get(wg.name) && !cwNames.has(wg.name),
           );
 
           if (newWorkgroups.length > 0) {
@@ -118,12 +118,12 @@ const UpdateMultipleCollections = ({
             notify.success(
               `Add collection ${c.id} to workgroup${
                 newWorkgroups.length > 1 ? "s" : ""
-              } ${newWorkgroups.map((wg) => wg.name).join(", ")}`
+              } ${newWorkgroups.map((wg) => wg.name).join(", ")}`,
             );
           }
 
           const workgroupsToRemove = workgroups.filter(
-            (wg) => !workgroupValues.get(wg.name) && cwNames.has(wg.name)
+            (wg) => !workgroupValues.get(wg.name) && cwNames.has(wg.name),
           );
 
           if (workgroupsToRemove.length > 0) {
@@ -134,7 +134,7 @@ const UpdateMultipleCollections = ({
             notify.success(
               `Removed collection ${c.id} from workgroup${
                 workgroupsToRemove.length > 1 ? "s" : ""
-              } ${workgroupsToRemove.map((wg) => wg.name).join(", ")}`
+              } ${workgroupsToRemove.map((wg) => wg.name).join(", ")}`,
             );
           }
         }
@@ -151,7 +151,7 @@ const UpdateMultipleCollections = ({
                 CollectionStatus[
                   data.collection.model_state.state.id
                 ].toLowerCase(),
-            }
+            },
           );
           notify.success(
             `Transitioned collections (${collections
@@ -160,7 +160,7 @@ const UpdateMultipleCollections = ({
               CollectionStatus[
                 data.collection.model_state.state.id as CollectionStatus
               ]
-            }`
+            }`,
           );
         }
 
@@ -183,17 +183,17 @@ const UpdateMultipleCollections = ({
       onClose,
       workgroups,
       workgroupValues,
-    ]
+    ],
   );
 
   const handleEnter = useCallback(
     () => handleSubmit((values) => submitForm(values, false))(),
-    [handleSubmit, submitForm]
+    [handleSubmit, submitForm],
   );
 
   const handleLockClick = useCallback(
     () => handleSubmit((values) => submitForm(values, true))(),
-    [handleSubmit, submitForm]
+    [handleSubmit, submitForm],
   );
 
   const handleUnlockClick = useCallback(() => {
@@ -283,7 +283,7 @@ const UpdateMultipleCollections = ({
             ([name, checked]) =>
               checked && (
                 <Chip color="secondary" label={name} key={`wg-chip-${name}`} />
-              )
+              ),
           )}
         {!collectionsHaveMatchingWorkgroups && !!collections && (
           <Box>{<Chip label={"MIXED"} key={"wg-chip-mixed"} />}</Box>

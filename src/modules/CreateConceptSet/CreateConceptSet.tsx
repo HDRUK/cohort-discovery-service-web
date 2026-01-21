@@ -27,7 +27,7 @@ const schema = yup.object({
     .mixed<OmopTableName>()
     .oneOf(
       Object.values(OmopTableName) as OmopTableName[],
-      "OMOP domain is required"
+      "OMOP domain is required",
     )
     .required("Query context type is required"),
 });

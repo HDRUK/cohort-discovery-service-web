@@ -14,7 +14,7 @@ type WorkgroupsMiddlePanelProps = {
 const WorkgroupsMiddlePanel = ({ collections }: WorkgroupsMiddlePanelProps) => {
   const selectedWorkgroup = useAdminStore((s) => s.selectedWorkgroup);
   const removeCollectionsFromWorkgroup = useAdminStore(
-    (s) => s.removeCollectionsFromWorkgroup
+    (s) => s.removeCollectionsFromWorkgroup,
   );
 
   const notify = useNotify();
@@ -33,7 +33,7 @@ const WorkgroupsMiddlePanel = ({ collections }: WorkgroupsMiddlePanelProps) => {
           <CollectionsTable
             initialData={collections}
             tableTitle={`${capitaliseFirstLetter(
-              selectedWorkgroup?.name.toLowerCase()
+              selectedWorkgroup?.name.toLowerCase(),
             )} Workgroups`}
             tableSubTitle="Collections"
             deleteOverride={async (ids: string[]) => {
@@ -44,7 +44,7 @@ const WorkgroupsMiddlePanel = ({ collections }: WorkgroupsMiddlePanelProps) => {
               notify.success(
                 `${ids.length} Collection${
                   ids.length > 1 ? "s" : ""
-                } removed from workgroup ${selectedWorkgroup.name}`
+                } removed from workgroup ${selectedWorkgroup.name}`,
               );
             }}
           />

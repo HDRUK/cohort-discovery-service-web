@@ -20,7 +20,7 @@ const setQueryBuilderJson = jest.fn();
 describe("Rule", () => {
   const renderComponent = (
     opArgs: Partial<RuleGroupType> = {},
-    rest?: Partial<RuleGroupProps>
+    rest?: Partial<RuleGroupProps>,
   ) => {
     const group = {
       id: "group-1",
@@ -63,7 +63,7 @@ describe("Rule", () => {
         }}
       >
         <RuleGroup {...rest} group={group} parentGroupId="outer-group" />
-      </MockDaphneStore>
+      </MockDaphneStore>,
     );
     return {
       query,
@@ -108,7 +108,7 @@ describe("Rule", () => {
 
     const groupHeading = screen.getByRole("heading", { name: /group/i });
     const groupCard = groupHeading.closest(
-      '[data-testid="clickable-card"]'
+      '[data-testid="clickable-card"]',
     ) as Element;
     expect(groupCard).toBeInTheDocument();
 
@@ -140,7 +140,7 @@ describe("Rule", () => {
     expect(updateById).toHaveBeenCalledWith(
       query,
       "group-1",
-      expect.any(Function)
+      expect.any(Function),
     );
     expect(setQueryBuilderJson).toHaveBeenCalled();
   });
