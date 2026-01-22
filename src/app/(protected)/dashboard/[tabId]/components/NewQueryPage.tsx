@@ -4,7 +4,7 @@ import { Skeleton } from "@mui/material";
 import { Suspense } from "react";
 import CohortBuilder from "./CohortBuilder";
 
-type PageSearchParams = { query?: string };
+type PageSearchParams = { query?: string; open_queries?: string };
 
 const NewQueryPage = async (props: PageSearchParams) => {
   return (

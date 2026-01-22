@@ -105,7 +105,7 @@ const QueriesTable = ({
           <MuiLink
             component={Link}
             href={{
-              pathname: routes.dashboardNewQuery(pid),
+              pathname: routes.dashboardNewQuery(undefined, pid),
               query: { query: pid },
             }}
             onClick={() => {
@@ -232,13 +232,25 @@ const QueriesTable = ({
               deleteProps: {
                 onClick: () => {
                   deleteQueries([row.original.pid]);
+                  const openQueries = (searchParams.get("open_queries") || "")
+                    .split(",")
+                    .filter((q) => q && q !== row.original.pid);
+                  router.push(routes.dashboardHistory(openQueries));
                 },
               },
               reRunProps: {
                 label: "Re-run query",
                 onClick: async () => {
                   const { data } = await rerunQuery(row.original.pid);
-                  router.push(routes.dashboardQueryResult(data.query_pid));
+                  const openQueries = (searchParams.get("open_queries") || "")
+                    .split(",")
+                    .filter((q) => q);
+                  if (openQueries.indexOf(data.query_pid) === -1) {
+                    openQueries.push(data.query_pid);
+                  }
+                  router.push(
+                    routes.dashboardQueryResult(data.query_pid, openQueries),
+                  );
                 },
               },
               downloadProps: {
@@ -255,8 +267,14 @@ const QueriesTable = ({
                   setQueryName("");
 
                   setQueryBuilderJson(row.original.definition);
+                  const openQueries = (searchParams.get("open_queries") || "")
+                    .split(",")
+                    .filter((q) => q);
                   router.push(
-                    routes.dashboardNewQuery(`query=${row.original.pid}`),
+                    routes.dashboardNewQuery(
+                      openQueries,
+                      `query=${row.original.pid}`,
+                    ),
                   );
                 },
               },

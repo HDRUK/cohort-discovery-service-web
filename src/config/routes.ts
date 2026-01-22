@@ -10,11 +10,27 @@ const adminPath = (subpath?: string) => `/admin${subpath ? `/${subpath}` : ""}`;
 
 export const routes = {
   dashboard: dashboardPath(),
-  dashboardNewQuery: (queryParams?: string) =>
-    dashboardPath("new-query", queryParams),
-  dashboardQueryResult: (pid: string) =>
-    `${dashboardPath("query-result")}?query=${pid ? pid : ""}`,
-  dashboardHistory: dashboardPath("query-history"),
+  dashboardNewQuery: (openQueries?: string[], queryParams?: string) =>
+    dashboardPath(
+      "new-query",
+      `${openQueries ? `open_queries=${openQueries.join(",")}` : ""}${
+        queryParams ? `&${queryParams}` : ""
+      }`,
+    ),
+  dashboardQueryResult: (
+    pid: string,
+    openQueries?: string[],
+    queryParams?: string,
+  ) =>
+    `${dashboardPath("query-result")}-${pid ? pid : ""}?query=${
+      pid ? pid : ""
+    }${openQueries ? `&open_queries=${openQueries.join(",")}` : ""}${
+      queryParams ? `&${queryParams}` : ""
+    }`,
+  dashboardHistory: (openQueries?: string[], queryParams?: string) =>
+    `${dashboardPath("query-history")}?${
+      openQueries ? `open_queries=${openQueries.join(",")}` : ""
+    }${queryParams ? `&${queryParams}` : ""}`,
   dashboardCollections: dashboardPath("collections"),
   dashboardCodes: dashboardPath("codes"),
   profile: "/profile",

@@ -26,6 +26,7 @@ export interface CollectionsSearchParams extends ApiSearchParams {
 
 export interface QueryHistorySearchParams extends ApiSearchParams {
   query?: string;
+  open_queries?: string[];
 }
 
 export interface CacheOptions {
