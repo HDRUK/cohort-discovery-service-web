@@ -32,13 +32,13 @@ const useSubmitQuery = () => {
     try {
       const res = await fetchResults(queryName);
       const newPid = res.data.query_pid;
-      const open_queries = searchParams.get("open_queries");
-      const array_open_queries = (open_queries ?? "").split(",");
-      array_open_queries.push(newPid);
+      const openQueries = searchParams.get("open_queries");
+      const arrayOpenQueries = (openQueries ?? "").split(",");
+      arrayOpenQueries.push(newPid);
       router.push(
         routes.dashboardQueryResult(
           newPid,
-          array_open_queries.filter((q) => q) ?? [],
+          arrayOpenQueries.filter((q) => q) ?? [],
         ),
       );
     } catch (e) {
