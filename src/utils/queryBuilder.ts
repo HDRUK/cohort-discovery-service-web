@@ -31,7 +31,7 @@ const queryToText = (node: RuleGroupType) => {
           return "were not recorded as having race ";
         case "Gender":
           return `were not recorded as having ${mapDomain(
-            "gender"
+            "gender",
           ).toLowerCase()}`;
         default:
           return "not associated with";
@@ -77,7 +77,7 @@ const queryToText = (node: RuleGroupType) => {
 
   const leafText = (
     rule: ConceptOperator,
-    exclude: boolean
+    exclude: boolean,
   ): { verb: string | null; text: string | null } => {
     const c = rule.concept;
     if (!c) return { verb: null, text: null };
