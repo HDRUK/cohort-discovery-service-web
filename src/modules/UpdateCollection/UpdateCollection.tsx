@@ -57,7 +57,7 @@ export type UpdateCollectionProps = {
   expandedRight: boolean;
   expandedLeft: boolean;
   onClose?: () => void;
-  isAdmin?: boolean;
+  admin?: boolean;
 };
 
 const getDefaultValues = (collection: CollectionWithHosts | null) => {
@@ -114,7 +114,7 @@ const UpdateCollection = ({
   collectionHosts,
   workgroups,
   expandedRight,
-  isAdmin = false,
+  admin = false,
   onClose,
 }: UpdateCollectionProps) => {
   const { currentCustodian, updateCollection } = useCustodianStore(
@@ -474,7 +474,7 @@ const UpdateCollection = ({
           />
         </Stack>
 
-        {!isAdmin && (
+        {!admin && (
           <Stack>
             <FormLabel underlined>Host Credentials</FormLabel>
             Client ID
