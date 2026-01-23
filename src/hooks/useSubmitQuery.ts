@@ -1,12 +1,13 @@
 import { useDaphneStore } from "@/store/useDaphneStore";
 import useQueryBuilder from "@/store/useQueryBuilder";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { routes } from "@/config/routes";
 import { useEffect } from "react";
 
 const useSubmitQuery = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const fetchResults = useDaphneStore((s) => s.userData.fetchResults);
   const { isLoading, setIsLoading } = useDaphneStore((s) => s.stateManagement);
 
@@ -31,7 +32,15 @@ const useSubmitQuery = () => {
     try {
       const res = await fetchResults(queryName);
       const newPid = res.data.query_pid;
-      router.push(routes.dashboardQueryResult(newPid));
+      const openQueries = searchParams.get("open_queries");
+      const arrayOpenQueries = (openQueries ?? "").split(",");
+      arrayOpenQueries.push(newPid);
+      router.push(
+        routes.dashboardQueryResult(
+          newPid,
+          arrayOpenQueries.filter((q) => q) ?? [],
+        ),
+      );
     } catch (e) {
       setIsLoading(false);
       throw e;

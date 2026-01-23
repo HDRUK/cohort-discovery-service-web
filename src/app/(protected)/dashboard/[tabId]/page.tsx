@@ -19,41 +19,53 @@ const DashboardTabPage = async (props: {
 }) => {
   const { params, searchParams } = props;
   const { tabId } = await params;
-  const { query } = await searchParams;
+  const { query, open_queries: openQueries } = await searchParams;
+  const arrayOpenQueries = ((openQueries as string) ?? "").split(",");
 
-  let queryName: string | undefined;
+  const resultsTabs = openQueries
+    ? await Promise.all(
+        arrayOpenQueries.map(async (tabId) => {
+          const { data: openQueryData } = await getQuery(tabId as string);
 
-  if (query && query !== "undefined") {
-    const { data } = await getQuery(query as string);
-
-    if (data) {
-      queryName = capVarChar(getQueryName(data), 30, true);
-    }
-  }
-  const hasQuery = !!query;
+          return {
+            id: `query-result-${tabId}`,
+            label: `Result: ${
+              openQueryData
+                ? capVarChar(getQueryName(openQueryData), 30, true)
+                : tabId
+            }`,
+            href: routes.dashboardQueryResult(
+              tabId as string,
+              arrayOpenQueries ?? [],
+            ),
+            onCloseHref: routes.dashboardNewQuery(
+              arrayOpenQueries.filter((val) => val !== tabId) ?? [],
+            ),
+            page: <QueryResultsPage {...props} />,
+          };
+        }),
+      )
+    : [];
 
   const TABS = [
     {
       id: "new-query",
       label: "New Query",
-      href: routes.dashboardNewQuery(),
-      page: <NewQueryPage query={query as string} />,
-    },
-    {
-      id: "query-result",
-      disabled: !hasQuery,
-      label: queryName ?? "Query Result",
-      href: routes.dashboardQueryResult(query as string),
-      onCloseHref: routes.dashboardNewQuery(),
-      page: <QueryResultsPage {...props} />,
+      href: routes.dashboardNewQuery(arrayOpenQueries),
+      page: (
+        <NewQueryPage
+          query={query as string}
+          open_queries={(openQueries ?? "").toString()}
+        />
+      ),
     },
     {
       id: "query-history",
       label: "Query History",
-      href: routes.dashboardHistory,
+      href: routes.dashboardHistory(arrayOpenQueries),
       page: <QueryHistoryPage {...props} />,
     },
-  ];
+  ].concat(resultsTabs);
 
   const isValidTabId = (tabId: string) => TABS.some((t) => t.id === tabId);
 
