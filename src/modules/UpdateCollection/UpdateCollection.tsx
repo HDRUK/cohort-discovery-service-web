@@ -1,7 +1,6 @@
 "use client";
 import {
   Typography,
-  IconButton,
   Chip,
   Box,
   MenuItem,
@@ -308,96 +307,103 @@ const UpdateCollection = ({
 
   return (
     <FormProvider {...formMethods}>
-      <Typography
-        component="div"
-        variant="overline"
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          width: "100%",
-        }}
+      <ActionMenuSection
+        title={
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+            }}
+          >
+            <Typography component="span" variant="overline">
+              Collection
+            </Typography>
+            <Box
+              sx={{
+                ml: "auto",
+                borderRadius: 1,
+                p: 0.5,
+                "&:hover": {
+                  bgcolor: "grey.300",
+                },
+              }}
+              onClick={() => {
+                if (expandedRight) {
+                  handleLockClick();
+                } else {
+                  handleUnlockClick();
+                }
+              }}
+            >
+              {expandedRight ? <LockOpenIcon /> : <LockOutlineIcon />}
+            </Box>
+          </Box>
+        }
+        fixedExpanded
+        scrollable
       >
-        Collection
-        <IconButton
-          size="small"
-          sx={{ ml: "auto" }}
-          onClick={() => {
-            if (expandedRight) {
-              handleLockClick();
-            } else {
-              handleUnlockClick();
-            }
+        <FormLabel underlined>Collection Status</FormLabel>
+        <ManageCollectionStatus
+          collection={collection}
+          expandedRight={expandedRight}
+          key={collection.id}
+          control={control}
+          setValue={setValue}
+        />
+        <FormLabel underlined>Workgroup access</FormLabel>
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 1,
+            alignItems: "center",
           }}
         >
-          {expandedRight ? <LockOpenIcon /> : <LockOutlineIcon />}
-        </IconButton>
-      </Typography>
-
-      <FormLabel underlined>Collection Status</FormLabel>
-
-      <ManageCollectionStatus
-        collection={collection}
-        expandedRight={expandedRight}
-        key={collection.id}
-        control={control}
-        setValue={setValue}
-      />
-
-      <FormLabel underlined>Workgroup access</FormLabel>
-
-      <Box
-        sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 1,
-          alignItems: "center",
-        }}
-      >
-        {Array.from(workgroupValues.entries()).map(
-          ([name, checked]) =>
-            checked && (
-              <Chip color="secondary" label={name} key={`wg-chip-${name}`} />
-            ),
-        )}
-      </Box>
-
-      {expandedRight && (
-        <Controller
-          name="workgroups"
-          control={control}
-          render={() => (
-            <FormGroup>
-              <Box display="flex" flexDirection="column">
-                {workgroups?.map((w) => (
-                  <FormControlLabel
-                    control={
-                      <SquareCheckbox
-                        checked={Boolean(workgroupValues.get(w.name))}
-                        key={`wg-checkbox-${w.name}`}
-                        name={w.name}
-                        onChange={handleChange}
-                      />
-                    }
-                    label={w.name}
-                    key={`wg-checkbox-label-${w.name}`}
-                  />
-                ))}
-              </Box>
-            </FormGroup>
+          {Array.from(workgroupValues.entries()).map(
+            ([name, checked]) =>
+              checked && (
+                <Chip color="secondary" label={name} key={`wg-chip-${name}`} />
+              ),
           )}
-        />
-      )}
-
-      <ActionMenuSection
-        gap={2}
-        title={"Collection Credentials"}
-        fixedExpanded
-        defaultExpanded
-        accordionSummarySx={{
-          mt: 2,
-        }}
-      >
-        {/* missing in the BE - ticket created
+        </Box>
+        {expandedRight && (
+          <Controller
+            name="workgroups"
+            control={control}
+            render={() => (
+              <FormGroup>
+                <Box display="flex" flexDirection="column">
+                  {workgroups?.map((w) => (
+                    <FormControlLabel
+                      control={
+                        <SquareCheckbox
+                          checked={Boolean(workgroupValues.get(w.name))}
+                          key={`wg-checkbox-${w.name}`}
+                          name={w.name}
+                          onChange={handleChange}
+                        />
+                      }
+                      label={w.name}
+                      key={`wg-checkbox-label-${w.name}`}
+                    />
+                  ))}
+                </Box>
+              </FormGroup>
+            )}
+          />
+        )}
+        <ActionMenuSection
+          gap={2}
+          title={"Collection Credentials"}
+          fixedExpanded
+          defaultExpanded
+          accordionSummarySx={{
+            mt: 2,
+          }}
+        >
+          {/* missing in the BE - ticket created
         <FormTextField
         value={collection.custodian.url}
           copyable
@@ -406,151 +412,153 @@ const UpdateCollection = ({
         />
         */}
 
-        <FormTextField
-          labelUnderlined
-          copyable
-          disabled
-          value={collection.pid}
-          label="Collection ID"
-        />
+          <FormTextField
+            labelUnderlined
+            copyable
+            disabled
+            value={collection.pid}
+            label="Collection ID"
+          />
 
-        <Controller
-          disabled={!expandedRight}
-          name="collection.url"
-          control={control}
-          rules={{ required: "URL is required" }}
-          render={({ field, fieldState: { error } }) => (
-            <FormTextField
-              copyable
-              {...field}
-              label="Link to Associated Dataset"
-              labelUnderlined
-              error={error}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleEnter();
-                }
-              }}
-            />
-          )}
-        />
-
-        <Stack>
-          <FormLabel underlined>Collection Connection</FormLabel>
           <Controller
-            name="collection.host_id"
+            disabled={!expandedRight}
+            name="collection.url"
             control={control}
-            rules={{
-              required: "A collection host is required",
-              validate: (value) =>
-                Number(value) > 0 || "Please select a valid collection host",
-            }}
+            rules={{ required: "URL is required" }}
             render={({ field, fieldState: { error } }) => (
-              <FormDropdown
+              <FormTextField
+                copyable
                 {...field}
-                select
-                label="Host"
+                label="Link to Associated Dataset"
+                labelUnderlined
                 error={error}
-                fullWidth
-                required
-                placeHolderOption={
-                  <MenuItem value={0} disabled>
-                    Select a collection host
-                  </MenuItem>
-                }
-                options={collectionHosts.map((ch) => ({
-                  label: ch.name,
-                  value: ch.id,
-                }))}
-                chipColor="secondary"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleEnter();
+                  }
+                }}
               />
             )}
           />
-        </Stack>
 
-        <Stack>
-          <FormLabel underlined>Host Credentials</FormLabel>
-
-          <FormTextField
-            copyable
-            disabled
-            value={collection.host?.[0]?.client_id}
-            label="Client ID"
-          />
-          <FormTextField
-            type="password"
-            copyable
-            disabled
-            value={collection.host?.[0]?.client_secret}
-            label="Client Secret"
-          />
-        </Stack>
-      </ActionMenuSection>
-
-      <ActionMenuSection
-        gap={2}
-        title={"Collection Distributions"}
-        fixedExpanded
-        defaultExpanded
-        accordionSummarySx={{
-          mt: 2,
-        }}
-      >
-        <DistributionStatus disabled={!expandedRight} collection={collection} />
-        <CollectionConfig<UpdateCollectionFormValues>
-          disabled={!expandedRight}
-          keepExpanded
-          frequencyFieldName={"config.frequency_mode"}
-          runTimeFrequencyFieldName={"config.run_time_frequency"}
-          runTimeHourFieldName={"config.run_time_hour"}
-          runTimeMinuteFieldName={"config.run_time_minute"}
-        />
-      </ActionMenuSection>
-
-      <ActionMenuSection
-        gap={2}
-        title={"Collection Info"}
-        fixedExpanded
-        defaultExpanded
-        accordionSummarySx={{
-          mt: 2,
-        }}
-      >
-        <Controller
-          name="collection.name"
-          disabled={!expandedRight}
-          control={control}
-          rules={{ required: "A name is required" }}
-          render={({ field, fieldState: { error } }) => (
-            <FormTextField
-              {...field}
-              label="Name"
-              error={error}
-              fullWidth
-              labelUnderlined
-              required
+          <Stack>
+            <FormLabel underlined>Collection Connection</FormLabel>
+            <Controller
+              name="collection.host_id"
+              control={control}
+              rules={{
+                required: "A collection host is required",
+                validate: (value) =>
+                  Number(value) > 0 || "Please select a valid collection host",
+              }}
+              render={({ field, fieldState: { error } }) => (
+                <FormDropdown
+                  {...field}
+                  select
+                  label="Host"
+                  error={error}
+                  fullWidth
+                  required
+                  placeHolderOption={
+                    <MenuItem value={0} disabled>
+                      Select a collection host
+                    </MenuItem>
+                  }
+                  options={collectionHosts.map((ch) => ({
+                    label: ch.name,
+                    value: ch.id,
+                  }))}
+                  chipColor="secondary"
+                />
+              )}
             />
-          )}
-        />
-        <Controller
-          name="collection.description"
-          disabled={!expandedRight}
-          control={control}
-          rules={{ required: "A description is required" }}
-          render={({ field, fieldState: { error } }) => (
+          </Stack>
+
+          <Stack>
+            <FormLabel underlined>Host Credentials</FormLabel>
+
             <FormTextField
-              {...field}
-              label="Description"
-              error={error}
-              fullWidth
-              labelUnderlined
-              required
+              copyable
+              disabled
+              value={collection.host?.[0]?.client_id}
+              label="Client ID"
             />
-          )}
-        />
-        {/* supposed to also have supoprt contact / adminstractive contact */}
-        <UpdateCollectionGuidance />
+            <FormTextField
+              type="password"
+              copyable
+              disabled
+              value={collection.host?.[0]?.client_secret}
+              label="Client Secret"
+            />
+          </Stack>
+        </ActionMenuSection>
+        <ActionMenuSection
+          gap={2}
+          title={"Collection Distributions"}
+          fixedExpanded
+          defaultExpanded
+          accordionSummarySx={{
+            mt: 2,
+          }}
+        >
+          <DistributionStatus
+            disabled={!expandedRight}
+            collection={collection}
+          />
+          <CollectionConfig<UpdateCollectionFormValues>
+            disabled={!expandedRight}
+            keepExpanded
+            frequencyFieldName={"config.frequency_mode"}
+            runTimeFrequencyFieldName={"config.run_time_frequency"}
+            runTimeHourFieldName={"config.run_time_hour"}
+            runTimeMinuteFieldName={"config.run_time_minute"}
+          />
+        </ActionMenuSection>
+        <ActionMenuSection
+          gap={2}
+          title={"Collection Info"}
+          fixedExpanded
+          defaultExpanded
+          accordionSummarySx={{
+            mt: 2,
+          }}
+        >
+          <Controller
+            name="collection.name"
+            disabled={!expandedRight}
+            control={control}
+            rules={{ required: "A name is required" }}
+            render={({ field, fieldState: { error } }) => (
+              <FormTextField
+                {...field}
+                label="Name"
+                error={error}
+                fullWidth
+                labelUnderlined
+                required
+              />
+            )}
+          />
+          <Controller
+            name="collection.description"
+            disabled={!expandedRight}
+            control={control}
+            rules={{ required: "A description is required" }}
+            render={({ field, fieldState: { error } }) => (
+              <FormTextField
+                {...field}
+                label="Description"
+                error={error}
+                fullWidth
+                labelUnderlined
+                required
+              />
+            )}
+          />
+          {/* supposed to also have supoprt contact / adminstractive contact */}
+          <UpdateCollectionGuidance />
+        </ActionMenuSection>
       </ActionMenuSection>
     </FormProvider>
   );
