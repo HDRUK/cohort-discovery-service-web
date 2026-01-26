@@ -1,5 +1,5 @@
 "use client";
-import { Typography, Stack, Box, Link } from "@mui/material";
+import { Typography, Stack, Box } from "@mui/material";
 import LockOutlineIcon from "@mui/icons-material/LockOutline";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import CopyableVariable from "@/components/CopyableVariable";

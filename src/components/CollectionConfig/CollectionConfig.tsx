@@ -109,9 +109,6 @@ const CollectionConfig = <TFormValues extends FieldValues>({
                       label: capitaliseFirstLetter(key.toLowerCase()),
                     }),
                   )}
-                  onClick={(event) => {
-                    field.onChange("");
-                  }}
                 />
               )}
             />
