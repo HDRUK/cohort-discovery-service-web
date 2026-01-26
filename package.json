@@ -47,6 +47,7 @@
     "dayjs": "^1.11.13",
     "jsonwebtoken": "^9.0.2",
     "jws": "^3.2.3",
+    "lodash": "^4.17.23",
     "material-react-table": "^3.2.1",
     "next": "^16.0.10",
     "next-auth": "^4.24.13",

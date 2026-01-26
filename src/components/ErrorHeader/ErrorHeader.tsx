@@ -1,5 +1,6 @@
 import { Link, Typography } from "@mui/material";
 import { FieldErrors } from "react-hook-form";
+import { startCase } from "lodash";
 
 const ErrorHeader = ({
   errors,
@@ -18,7 +19,7 @@ const ErrorHeader = ({
           <Typography key={`${error_entry}`} role="alert" color="error">
             Cannot save changes {editing ? "and lock the editing" : ""} as a
             mandatory field has been left empty in the{" "}
-            <Link href={`#${error_entry}`}>{error_entry}</Link>
+            <Link href={`#${error_entry}`}> {startCase(error_entry)}</Link>
           </Typography>
         );
       })
@@ -40,7 +41,7 @@ const ErrorHeader = ({
               Cannot save changes {editing ? "and lock the editing" : ""} as a
               mandatory field has been left empty in the{" "}
               <Link href={`#${error_section}.${error_entry}`}>
-                {error_section} {error_entry}
+                {startCase(`${error_section} ${error_entry}`)}
               </Link>
             </Typography>
           );
