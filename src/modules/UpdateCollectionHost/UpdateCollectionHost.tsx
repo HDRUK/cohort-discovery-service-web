@@ -1,5 +1,5 @@
 "use client";
-import { Typography, IconButton, Stack } from "@mui/material";
+import { Typography, Stack, Box } from "@mui/material";
 import LockOutlineIcon from "@mui/icons-material/LockOutline";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import CopyableVariable from "@/components/CopyableVariable";
@@ -10,6 +10,7 @@ import { useNotify } from "@/providers/NotifyProvider";
 import { useDaphneStore } from "@/store/useDaphneStore";
 import FormTextField from "@/components/FormTextField";
 import FormLabel from "@/components/FormLabel";
+import ActionMenuSection from "@/components/ActionMenuSection";
 
 type CollectionHostFormValues = { hostName: string };
 
@@ -71,61 +72,77 @@ const UpdateCollectionHost = ({
 
   return (
     <FormProvider {...formMethods}>
-      <Typography
-        component="div"
-        variant="overline"
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          width: "100%",
-        }}
-      >
-        Host
-        <IconButton
-          size="small"
-          sx={{ ml: "auto" }}
-          onClick={() => {
-            if (expandedRight) {
-              handleLockClick();
-            } else {
-              handleUnlockClick();
-            }
-          }}
-        >
-          {expandedRight ? <LockOpenIcon /> : <LockOutlineIcon />}
-        </IconButton>
-      </Typography>
-
-      <Controller
-        name="hostName"
-        control={control}
-        disabled={!expandedRight}
-        rules={{ required: "Host name is required" }}
-        render={({ field, fieldState: { error } }) => (
-          <FormTextField
-            {...field}
-            slotProps={{ input: { sx: { borderRadius: 0 } } }}
-            error={error}
-            helperText={error?.message}
-            label="Host Name"
-            labelUnderlined
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                handleEnter();
-              }
+      <ActionMenuSection
+        title={
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
             }}
-          />
-        )}
-      />
+          >
+            <Typography component="span" variant="overline">
+              Host
+            </Typography>
+            <Box
+              sx={{
+                ml: "auto",
+                borderRadius: 1,
+                p: 0.5,
+                "&:hover": {
+                  bgcolor: "grey.300",
+                },
+              }}
+              onClick={() => {
+                if (expandedRight) {
+                  handleLockClick();
+                } else {
+                  handleUnlockClick();
+                }
+              }}
+            >
+              {expandedRight ? <LockOpenIcon /> : <LockOutlineIcon />}
+            </Box>
+          </Box>
+        }
+        fixedExpanded
+        scrollable
+      >
+        <Controller
+          name="hostName"
+          control={control}
+          disabled={!expandedRight}
+          rules={{ required: "Host name is required" }}
+          render={({ field, fieldState: { error } }) => (
+            <FormTextField
+              {...field}
+              slotProps={{ input: { sx: { borderRadius: 0 } } }}
+              error={error}
+              helperText={error?.message}
+              label="Host Name"
+              labelUnderlined
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleEnter();
+                }
+              }}
+            />
+          )}
+        />
 
-      <Stack sx={{ mt: 1 }}>
-        <FormLabel underlined> Host Credentials</FormLabel>
-        Client ID
-        <CopyableVariable value={selectedCollectionHost.client_id} />
-        Client Secret
-        <CopyableVariable hidden value={selectedCollectionHost.client_secret} />
-      </Stack>
+        <Stack sx={{ mt: 1 }}>
+          <FormLabel underlined> Host Credentials</FormLabel>
+          Client ID
+          <CopyableVariable value={selectedCollectionHost.client_id} />
+          Client Secret
+          <CopyableVariable
+            hidden
+            value={selectedCollectionHost.client_secret}
+          />
+        </Stack>
+      </ActionMenuSection>
     </FormProvider>
   );
 };
