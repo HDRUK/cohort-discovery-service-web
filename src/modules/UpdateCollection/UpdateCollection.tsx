@@ -45,6 +45,7 @@ import addCollectionToWorkgroups from "@/actions/addCollectionToWorkgroups";
 import SquareCheckbox from "@/components/SquareCheckbox";
 import ManageCollectionStatus from "@/modules/ManageCollectionStatus";
 import CopyableVariable from "@/components/CopyableVariable";
+import ErrorHeader from "@/components/ErrorHeader";
 
 const UpdateCollectionGuidance = maskClientTest(
   () => import("./UpdateCollectionGuidance"),
@@ -345,24 +346,7 @@ const UpdateCollection = ({
                 {expandedRight ? <LockOpenIcon /> : <LockOutlineIcon />}
               </Box>
             </Box>
-            {Object.keys(errors).length > 0 &&
-              Object.entries(errors).map(([error_section, error]) => {
-                return Object.entries(error).map(([error_entry, _]) => {
-                  return (
-                    <Typography
-                      key={`${error_section}.${error_entry}`}
-                      role="alert"
-                      color="error"
-                    >
-                      Cannot save changes and lock the editing as a mandatory
-                      field has been left empty in the{" "}
-                      <Link href={`#${error_section}.${error_entry}`}>
-                        {error_section} {error_entry}
-                      </Link>
-                    </Typography>
-                  );
-                });
-              })}
+            <ErrorHeader errors={errors} depth={2} />
           </>
         }
         fixedExpanded

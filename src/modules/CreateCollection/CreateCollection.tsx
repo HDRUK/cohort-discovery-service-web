@@ -17,6 +17,7 @@ import { REGEX_URL_NO_WWW } from "@/config/regex";
 import FormDropdown from "@/components/FormDropdown";
 import useCustodianStore from "@/store/useCustodianStore";
 import { useEffect, useMemo } from "react";
+import ErrorHeader from "@/components/ErrorHeader";
 
 interface CreateCollectionProps {
   collectionHosts: CollectionHost[];
@@ -111,24 +112,7 @@ const CreateCollection = ({
             underline
             accordionSummarySx={{ mb: 2 }}
           >
-            {Object.keys(errors).length > 0 &&
-              Object.entries(errors).map(([error_section, error]) => {
-                return Object.entries(error).map(([error_entry, _]) => {
-                  return (
-                    <Typography
-                      key={`${error_section}.${error_entry}`}
-                      role="alert"
-                      color="error"
-                    >
-                      Cannot save changes as a mandatory field has been left
-                      empty in the{" "}
-                      <Link href={`#${error_section}.${error_entry}`}>
-                        {error_section} {error_entry}
-                      </Link>
-                    </Typography>
-                  );
-                });
-              })}
+            <ErrorHeader errors={errors} depth={2} />
             {!currentCustodian && !!custodians && (
               <Controller
                 name="custodian_pid"
