@@ -99,7 +99,7 @@ const CollectionConfig = <TFormValues extends FieldValues>({
                 <FormRadioGroup
                   {...field}
                   onChange={(_event, value) => field.onChange(Number(value))}
-                  id={frequencyFieldName}
+                  id={field.name}
                   label="Frequency"
                   error={!!fieldState.error}
                   required
@@ -123,7 +123,7 @@ const CollectionConfig = <TFormValues extends FieldValues>({
               render={({ field, fieldState: { error } }) => (
                 <FormTextField
                   {...field}
-                  id={runTimeFrequencyFieldName}
+                  id={field.name}
                   error={error}
                   select
                   fullWidth

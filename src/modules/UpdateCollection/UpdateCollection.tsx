@@ -482,7 +482,7 @@ const UpdateCollection = ({
                   {...field}
                   select
                   label="Host"
-                  id="collection.host_id"
+                  id={field.name}
                   error={error}
                   fullWidth
                   required
@@ -553,7 +553,7 @@ const UpdateCollection = ({
             render={({ field, fieldState: { error } }) => (
               <FormTextField
                 {...field}
-                id="collection.name"
+                id={field.name}
                 label="Name"
                 error={error}
                 fullWidth
@@ -570,7 +570,7 @@ const UpdateCollection = ({
             render={({ field, fieldState: { error } }) => (
               <FormTextField
                 {...field}
-                id="collection.description"
+                id={field.name}
                 label="Description"
                 error={error}
                 fullWidth

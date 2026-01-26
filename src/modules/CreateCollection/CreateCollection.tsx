@@ -1,4 +1,4 @@
-import { Box, Stack, Button, MenuItem } from "@mui/material";
+import { Box, Stack, Button, MenuItem, Typography, Link } from "@mui/material";
 
 import { useForm, Controller, FormProvider, useWatch } from "react-hook-form";
 import { CreateCollectionFormValues } from "@/types/forms";
@@ -62,7 +62,7 @@ const CreateCollection = ({
     control,
     reset,
     resetField,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
   } = formMethods;
 
   const selectedCustodianPid = useWatch({ name: "custodian_pid", control });
@@ -111,6 +111,24 @@ const CreateCollection = ({
             underline
             accordionSummarySx={{ mb: 2 }}
           >
+            {Object.keys(errors).length > 0 &&
+              Object.entries(errors).map(([error_section, error]) => {
+                return Object.entries(error).map(([error_entry, _]) => {
+                  return (
+                    <Typography
+                      key={`${error_section}.${error_entry}`}
+                      role="alert"
+                      color="error"
+                    >
+                      Cannot save changes as a mandatory field has been left
+                      empty in the{" "}
+                      <Link href={`#${error_section}.${error_entry}`}>
+                        {error_section} {error_entry}
+                      </Link>
+                    </Typography>
+                  );
+                });
+              })}
             {!currentCustodian && !!custodians && (
               <Controller
                 name="custodian_pid"
@@ -121,6 +139,7 @@ const CreateCollection = ({
                     {...field}
                     select
                     label="Custodian"
+                    id={field.name}
                     error={error}
                     fullWidth
                     required
@@ -146,6 +165,7 @@ const CreateCollection = ({
                   {...field}
                   select
                   label="Collection Host"
+                  id={field.name}
                   error={error}
                   fullWidth
                   required
@@ -172,6 +192,7 @@ const CreateCollection = ({
                 <FormTextField
                   {...field}
                   label="Name"
+                  id={field.name}
                   error={error}
                   fullWidth
                   required
@@ -187,6 +208,7 @@ const CreateCollection = ({
                 <FormTextField
                   {...field}
                   label="Description"
+                  id={field.name}
                   error={error}
                   fullWidth
                   required
@@ -210,6 +232,7 @@ const CreateCollection = ({
                   error={error}
                   required
                   label="Link to Associated Datasets"
+                  id={field.name}
                   fullWidth
                 />
               )}
@@ -226,6 +249,7 @@ const CreateCollection = ({
                   disabled
                   select
                   label="Query Context Type"
+                  id={field.name}
                   error={error}
                   fullWidth
                   required
