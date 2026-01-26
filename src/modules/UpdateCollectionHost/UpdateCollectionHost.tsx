@@ -112,7 +112,7 @@ const UpdateCollectionHost = ({
                 {expandedRight ? <LockOpenIcon /> : <LockOutlineIcon />}
               </Box>
             </Box>
-            <ErrorHeader errors={errors} depth={1} />
+            <ErrorHeader errors={errors} depth={1} editing />
           </>
         }
         fixedExpanded

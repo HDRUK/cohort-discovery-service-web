@@ -345,7 +345,7 @@ const UpdateCollection = ({
                 {expandedRight ? <LockOpenIcon /> : <LockOutlineIcon />}
               </Box>
             </Box>
-            <ErrorHeader errors={errors} depth={2} />
+            <ErrorHeader errors={errors} depth={2} editing />
           </>
         }
         fixedExpanded
