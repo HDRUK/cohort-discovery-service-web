@@ -7,6 +7,7 @@ import {
   Stack,
   FormGroup,
   FormControlLabel,
+  Link,
 } from "@mui/material";
 import LockOutlineIcon from "@mui/icons-material/LockOutline";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
@@ -154,7 +155,7 @@ const UpdateCollection = ({
     control,
     handleSubmit,
     reset,
-    formState: { isDirty },
+    formState: { isDirty, errors },
   } = formMethods;
 
   useEffect(() => {
@@ -312,37 +313,57 @@ const UpdateCollection = ({
     <FormProvider {...formMethods}>
       <ActionMenuSection
         title={
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-            }}
-          >
-            <Typography component="span" variant="overline">
-              Collection
-            </Typography>
+          <>
             <Box
               sx={{
-                ml: "auto",
-                borderRadius: 1,
-                p: 0.5,
-                "&:hover": {
-                  bgcolor: "grey.300",
-                },
-              }}
-              onClick={() => {
-                if (expandedRight) {
-                  handleLockClick();
-                } else {
-                  handleUnlockClick();
-                }
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
               }}
             >
-              {expandedRight ? <LockOpenIcon /> : <LockOutlineIcon />}
+              <Typography component="span" variant="overline">
+                Collection
+              </Typography>
+              <Box
+                sx={{
+                  ml: "auto",
+                  borderRadius: 1,
+                  p: 0.5,
+                  "&:hover": {
+                    bgcolor: "grey.300",
+                  },
+                }}
+                onClick={() => {
+                  if (expandedRight) {
+                    handleLockClick();
+                  } else {
+                    handleUnlockClick();
+                  }
+                }}
+              >
+                {expandedRight ? <LockOpenIcon /> : <LockOutlineIcon />}
+              </Box>
             </Box>
-          </Box>
+            {Object.keys(errors).length > 0 &&
+              Object.entries(errors).map(([error_section, error]) => {
+                return Object.entries(error).map(([error_entry, _]) => {
+                  return (
+                    <Typography
+                      key={`${error_section}.${error_entry}`}
+                      role="alert"
+                      color="error"
+                    >
+                      Cannot save changes and lock the editing as a mandatory
+                      field has been left empty in the{" "}
+                      <Link href={`#${error_section}.${error_entry}`}>
+                        {error_section} {error_entry}
+                      </Link>
+                    </Typography>
+                  );
+                });
+              })}
+          </>
         }
         fixedExpanded
         scrollable
@@ -461,6 +482,7 @@ const UpdateCollection = ({
                   {...field}
                   select
                   label="Host"
+                  id="collection.host_id"
                   error={error}
                   fullWidth
                   required
@@ -531,6 +553,7 @@ const UpdateCollection = ({
             render={({ field, fieldState: { error } }) => (
               <FormTextField
                 {...field}
+                id="collection.name"
                 label="Name"
                 error={error}
                 fullWidth
@@ -547,6 +570,7 @@ const UpdateCollection = ({
             render={({ field, fieldState: { error } }) => (
               <FormTextField
                 {...field}
+                id="collection.description"
                 label="Description"
                 error={error}
                 fullWidth
