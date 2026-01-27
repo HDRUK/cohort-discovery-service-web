@@ -1,6 +1,5 @@
 import useQueryBuilder from "@/store/useQueryBuilder";
 import { CombinatorType, RuleNodeType } from "@/types/rules";
-import { trueKeys } from "@/utils/numbers";
 import {
   createOperator,
   createRule,
