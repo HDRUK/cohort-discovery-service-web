@@ -174,7 +174,7 @@ const RuleWrapper = ({
       {...containerProps}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      sx={containerSx(isSelected, containerProps?.sx)}
+      sx={containerSx(isSelected && !isDragging, containerProps?.sx)}
     >
       <Box sx={headerRowSx}>
         <Collapse

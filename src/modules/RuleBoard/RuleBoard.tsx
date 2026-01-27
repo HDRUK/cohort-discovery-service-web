@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment } from "react";
+import { Fragment, useMemo } from "react";
 
 import Rule from "@/modules/Rule";
 import {
@@ -41,7 +41,7 @@ function renderRule(item: RuleNodeType, ruleGroupId: string) {
 }
 
 const RuleBoard = ({ ruleGroup, children, ...rest }: RuleBoardProps) => {
-  const { rules, id } = ruleGroup;
+  const { rules, id } = useMemo(() => ruleGroup, [ruleGroup]);
   const { setNodeRef } = useDroppable({
     id,
     data: { type: "container", containerId: id },

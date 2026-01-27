@@ -35,7 +35,13 @@ import ThreePaneSwimLaneLayout from "../ThreePaneSwimLaneLayout";
 import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
 import useRightClickMenu from "@/hooks/useRightClickMenu";
 
-const QueryBuilder = ({ query }: { query?: Query }) => {
+const QueryBuilder = ({
+  query,
+  errorOnDrag = false,
+}: {
+  query?: Query;
+  errorOnDrag?: boolean;
+}) => {
   const {
     queryBuilderJson,
     resetQueryBuilderJson,
@@ -76,14 +82,17 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
   const [active, setActive] = useState<Active | null>(null);
   const [activeNode, setActiveNode] = useState<RuleNodeType | null>(null);
 
-  const onDragStart = (e: DragStartEvent) => {
-    setActive(e.active);
+  const onDragStart = useCallback(
+    () => (e: DragStartEvent) => {
+      setActive(e.active);
 
-    const node = findById(queryBuilderJson, e.active.id as string);
-    if (node) {
-      setActiveNode(node);
-    }
-  };
+      const node = findById(queryBuilderJson, e.active.id as string);
+      if (node) {
+        setActiveNode(node);
+      }
+    },
+    [queryBuilderJson],
+  );
 
   const onDragOver = useCallback(
     (e: DragOverEvent) => {
@@ -118,7 +127,6 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
           targetIndex = overData.position;
         }
       }
-
       setQueryBuilderJson(
         moveItemIntoGroup(
           queryBuilderJson,
@@ -126,9 +134,10 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
           overGroupId,
           targetIndex,
         ),
+        errorOnDrag,
       );
     },
-    [active, queryBuilderJson, boardIndex, setQueryBuilderJson],
+    [errorOnDrag, active, queryBuilderJson, boardIndex, setQueryBuilderJson],
   );
 
   const onDragEnd = useCallback(
@@ -174,7 +183,7 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
       setActiveNode(null);
       setActive(null);
     },
-    [active, queryBuilderJson, boardIndex, setQueryBuilderJson],
+    [active, boardIndex, queryBuilderJson, setQueryBuilderJson],
   );
 
   const onChangeSelection = useCallback(
