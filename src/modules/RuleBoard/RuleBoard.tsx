@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useMemo } from "react";
+import { Fragment } from "react";
 
 import Rule from "@/modules/Rule";
 import {
