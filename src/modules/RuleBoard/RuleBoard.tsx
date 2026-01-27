@@ -41,7 +41,7 @@ function renderRule(item: RuleNodeType, ruleGroupId: string) {
 }
 
 const RuleBoard = ({ ruleGroup, children, ...rest }: RuleBoardProps) => {
-  const { rules, id } = useMemo(() => ruleGroup, [ruleGroup]);
+  const { rules, id } = ruleGroup;
   const { setNodeRef } = useDroppable({
     id,
     data: { type: "container", containerId: id },
