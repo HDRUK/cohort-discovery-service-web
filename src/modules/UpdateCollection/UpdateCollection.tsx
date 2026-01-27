@@ -95,7 +95,7 @@ const getDefaultValues = (collection: CollectionWithHosts | null) => {
       name,
       description: description || "",
       url: url || ("" as UrlString),
-      host_id: host.id,
+      host_id: host?.id ?? "",
       model_state: model_state,
       workgroups: workgroups,
     },
