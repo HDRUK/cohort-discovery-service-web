@@ -68,16 +68,18 @@ const SearchConcepts = ({
 
   const onSearch = useCallback(
     async (value: string) => {
-      if (!value) return;
       if (value === lastQueryRef.current) return;
       lastQueryRef.current = value;
-      setSelected?.({ ...initialSelectedRef.current });
-      const { data } = await searchForConcepts(value, domain);
-      setNoOptionsFound(data.length === 0);
-      if (data) {
-        setOptions(data as Concept[]);
+      if (!value) {
+        setOptions([]);
+        setNoOptionsFound(false);
         return;
       }
+      setSelected?.({ ...initialSelectedRef.current });
+      const { data } = await searchForConcepts(value, domain);
+      setOptions((data as Concept[]) ?? []);
+      setNoOptionsFound(data?.length === 0);
+      return;
     },
     [domain, searchForConcepts, setSelected],
   );
