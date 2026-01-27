@@ -19,9 +19,9 @@ import { useElementSize } from "@/hooks/useElementSize";
 import { ActionMenuSectionContext } from "./ActionMenuSectionContext";
 
 export interface ActionMenuSectionProps
-  extends Omit<AccordionProps, "children" | "title"> {
+  extends Omit<AccordionProps, "children"> {
   summary?: React.ReactNode;
-  title?: React.ReactNode | string;
+  title?: string;
   shortTitle?: string | React.ReactNode;
   underline?: boolean;
   attributes?: DraggableAttributes;
@@ -61,7 +61,7 @@ const ActionMenuSection = ({
   compact: compactProp,
   ...rest
 }: ActionMenuSectionProps) => {
-  const titleLowercase = typeof title === "string" ? title.toLowerCase() : "";
+  const titleLowercase = (title ?? "").toLowerCase();
   const baseId = id ?? (titleLowercase || "section");
 
   const [ref, size] = useElementSize<HTMLDivElement>(baseId, {}, 10);
@@ -174,11 +174,7 @@ const ActionMenuSection = ({
                     </Box>
                   </Tooltip>
                 ) : (
-                  <Typography
-                    variant="overline"
-                    color="text.secondary"
-                    sx={{ width: "100%" }}
-                  >
+                  <Typography variant="overline" color="text.secondary">
                     {title}
                   </Typography>
                 )}

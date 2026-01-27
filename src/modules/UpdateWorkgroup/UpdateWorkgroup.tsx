@@ -1,5 +1,5 @@
 "use client";
-import { Typography, Box } from "@mui/material";
+import { Typography, IconButton } from "@mui/material";
 import LockOutlineIcon from "@mui/icons-material/LockOutline";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import ActionMenuSection from "@/components/ActionMenuSection";
@@ -84,79 +84,66 @@ const UpdateWorkgroup = ({
 
   return (
     <FormProvider {...formMethods}>
-      <ActionMenuSection
-        title={
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-            }}
-          >
-            <Typography component="span" variant="overline">
-              Workgroup
-            </Typography>
-            <Box
-              sx={{
-                ml: "auto",
-                borderRadius: 1,
-                p: 0.5,
-                "&:hover": {
-                  bgcolor: "grey.300",
-                },
-              }}
-              onClick={() => {
-                if (expandedRight) {
-                  handleLockClick();
-                } else {
-                  handleUnlockClick();
-                }
-              }}
-            >
-              {expandedRight ? <LockOpenIcon /> : <LockOutlineIcon />}
-            </Box>
-          </Box>
-        }
-        fixedExpanded
-        scrollable
+      <Typography
+        component="div"
+        variant="overline"
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          width: "100%",
+        }}
       >
-        <ActionMenuSection
-          title={"Add Collections"}
-          fixedExpanded
-          defaultExpanded
-          underline
+        Workgroup
+        <IconButton
+          size="small"
+          sx={{ ml: "auto" }}
+          onClick={() => {
+            if (expandedRight) {
+              handleLockClick();
+            } else {
+              handleUnlockClick();
+            }
+          }}
         >
-          <Controller
-            name="collections"
-            disabled={!expandedRight}
-            control={control}
-            render={({ field, fieldState: { error } }) => {
-              return (
-                <FormMultiSelect
-                  {...field}
-                  placeholder="Search and add approved collections..."
-                  disabled={!expandedRight}
-                  multiple
-                  options={collections.map((c) => ({
-                    label: c.name,
-                    value: c.id as ValueType,
-                  }))}
-                  getChipLabel={(options, value) =>
-                    options.find((option) => option.value === value.value)
-                      ?.label || ""
-                  }
-                  tagsBelow
-                  error={error}
-                  sx={{ pt: 1 }}
-                  onChange={(value) => {
-                    field.onChange(value);
-                  }}
-                />
-              );
-            }}
-          />
-        </ActionMenuSection>
+          {expandedRight ? <LockOpenIcon /> : <LockOutlineIcon />}
+        </IconButton>
+      </Typography>
+
+      <ActionMenuSection
+        title={"Add Collections"}
+        fixedExpanded
+        defaultExpanded
+        underline
+      >
+        <Controller
+          name="collections"
+          disabled={!expandedRight}
+          control={control}
+          render={({ field, fieldState: { error } }) => {
+            return (
+              <FormMultiSelect
+                {...field}
+                placeholder="Search and add approved collections..."
+                disabled={!expandedRight}
+                multiple
+                options={collections.map((c) => ({
+                  label: c.name,
+                  value: c.id as ValueType,
+                }))}
+                getChipLabel={(options, value) =>
+                  options.find((option) => option.value === value.value)
+                    ?.label || ""
+                }
+                tagsBelow
+                error={error}
+                sx={{ pt: 1 }}
+                onChange={(value) => {
+                  field.onChange(value);
+                }}
+              />
+            );
+          }}
+        />
       </ActionMenuSection>
     </FormProvider>
   );
