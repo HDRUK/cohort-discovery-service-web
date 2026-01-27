@@ -37,9 +37,24 @@ const useNodeActions = (node: RuleNodeType) => {
   );
 
   const handleDeleteRule = useCallback(() => {
+    if (currentIdIsSelectedNode && selectedNodeIds.length > 1) {
+      const newQuery = selectedNodeIds.reduce(
+        (acc, id) => removeById(acc, id as string),
+        queryBuilderJson,
+      );
+      setQueryBuilderJson(newQuery);
+      return;
+    }
+
     const newQuery = removeById(queryBuilderJson, id);
     setQueryBuilderJson(newQuery);
-  }, [id, queryBuilderJson, setQueryBuilderJson]);
+  }, [
+    id,
+    queryBuilderJson,
+    setQueryBuilderJson,
+    currentIdIsSelectedNode,
+    selectedNodeIds,
+  ]);
 
   const handleConvertToGroup = useCallback(() => {
     if (currentIdIsSelectedNode && selectedNodeIds.length > 1) {
