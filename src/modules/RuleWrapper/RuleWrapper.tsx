@@ -119,9 +119,10 @@ const RuleWrapper = ({
   const handleOnSelect = useCallback(
     (e: React.MouseEvent) => {
       const isShift = e.shiftKey;
-      toggleSelected(id, !isShift);
       e.preventDefault();
       e.stopPropagation();
+      window.getSelection()?.removeAllRanges();
+      toggleSelected(id, !isShift);
     },
     [id, toggleSelected],
   );
@@ -185,6 +186,7 @@ const RuleWrapper = ({
         >
           <IconButton
             aria-label="Drag"
+            data-draggable="true"
             size="small"
             {...(sortable ? attributes : {})}
             {...(sortable ? listeners : {})}

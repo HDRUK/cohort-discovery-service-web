@@ -14,6 +14,7 @@ import {
   createRuleGroup,
   findById,
   findByIdWithNeighbors,
+  getSelectedOrdered,
 } from "@/utils/rules";
 import { useCallback, useMemo } from "react";
 
@@ -27,7 +28,10 @@ const useNodeActions = (node: RuleNodeType) => {
       selected: qb.selected,
     }),
   );
-  const selectedNodeIds = useMemo(() => trueKeys(selected), [selected]);
+  const selectedNodeIds = useMemo(
+    () => getSelectedOrdered(selected, queryBuilderJson),
+    [selected, queryBuilderJson],
+  );
   const currentIdIsSelectedNode = useMemo(
     () => selectedNodeIds.includes(id),
     [selectedNodeIds, id],
@@ -67,7 +71,7 @@ const useNodeActions = (node: RuleNodeType) => {
         queryJsonWithOtherIdsRemoved,
         primaryId as string,
         () => newGroup,
-        !belowIsOperator
+        !belowIsOperator && !!below
           ? {
               node: createOperator(),
               position: "after",

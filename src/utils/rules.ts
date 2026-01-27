@@ -10,6 +10,7 @@ import {
   OperatorType,
   AgeFilterType,
 } from "@/types/rules";
+import { UniqueIdentifier } from "@dnd-kit/core";
 import { v4 as uuidv4 } from "uuid";
 
 export enum RuleErrors {
@@ -98,8 +99,8 @@ export function groupToRules(
     combinator === CombinatorType.AND
       ? CombinatorType.OR
       : combinator === CombinatorType.OR
-      ? CombinatorType.AND
-      : combinator;
+        ? CombinatorType.AND
+        : combinator;
 
   function normaliseGroupExclude(group: RuleGroupType): RuleGroupType {
     const clonedRules = group.rules.map((item: RuleNodeType) => {
@@ -396,8 +397,8 @@ export function validateRuleTree(
     (isRuleGroup(n)
       ? n.valid
       : isRuleLeaf(n)
-      ? n.valid
-      : (n as OperatorType).valid) !== false;
+        ? n.valid
+        : (n as OperatorType).valid) !== false;
 
   const getOperatorKind = (op: OperatorType): string => {
     return `${op.combinator}-${op.exclude ?? false}`;
@@ -619,4 +620,23 @@ export function validateRuleTree(
   const validatedRoot = validateGroup(root);
 
   return validatedRoot;
+}
+
+export function getSelectedOrdered(
+  selected: Record<UniqueIdentifier, boolean>,
+  root: RuleGroupType,
+) {
+  const out: string[] = [];
+  const walk = (node: RuleNodeType) => {
+    const key = String(node.id);
+
+    if (selected[key]) out.push(key);
+
+    if (isRuleGroup(node)) {
+      for (const child of node.rules) walk(child);
+    }
+  };
+
+  walk(root);
+  return out;
 }
