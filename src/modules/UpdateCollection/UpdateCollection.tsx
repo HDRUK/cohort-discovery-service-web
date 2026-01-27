@@ -453,6 +453,7 @@ const UpdateCollection = ({
           <Stack>
             <FormLabel underlined>Collection Connection</FormLabel>
             <Controller
+              disabled={!expandedRight}
               name="collection.host_id"
               control={control}
               rules={{
