@@ -495,7 +495,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
           ...state.queryBuilder,
           queryBuilderJson: updatedQuery,
           boardIndex: buildIndexFromModel(updatedQuery),
-          queryAsText: text,
+          ...(validate ? { queryAsText: text } : {}),
         },
       }));
 

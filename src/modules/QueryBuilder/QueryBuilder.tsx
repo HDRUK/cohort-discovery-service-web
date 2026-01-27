@@ -82,17 +82,14 @@ const QueryBuilder = ({
   const [active, setActive] = useState<Active | null>(null);
   const [activeNode, setActiveNode] = useState<RuleNodeType | null>(null);
 
-  const onDragStart = useCallback(
-    () => (e: DragStartEvent) => {
-      setActive(e.active);
+  const onDragStart = (e: DragStartEvent) => {
+    setActive(e.active);
 
-      const node = findById(queryBuilderJson, e.active.id as string);
-      if (node) {
-        setActiveNode(node);
-      }
-    },
-    [queryBuilderJson],
-  );
+    const node = findById(queryBuilderJson, e.active.id as string);
+    if (node) {
+      setActiveNode(node);
+    }
+  };
 
   const onDragOver = useCallback(
     (e: DragOverEvent) => {
@@ -183,7 +180,7 @@ const QueryBuilder = ({
       setActiveNode(null);
       setActive(null);
     },
-    [active, boardIndex, queryBuilderJson, setQueryBuilderJson],
+    [active, queryBuilderJson, boardIndex, setQueryBuilderJson],
   );
 
   const onChangeSelection = useCallback(
