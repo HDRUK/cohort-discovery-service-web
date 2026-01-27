@@ -44,6 +44,7 @@ import addCollectionToWorkgroups from "@/actions/addCollectionToWorkgroups";
 import SquareCheckbox from "@/components/SquareCheckbox";
 import ManageCollectionStatus from "@/modules/ManageCollectionStatus";
 import CopyableVariable from "@/components/CopyableVariable";
+import ErrorHeader from "@/components/ErrorHeader";
 
 const UpdateCollectionGuidance = maskClientTest(
   () => import("./UpdateCollectionGuidance"),
@@ -154,7 +155,7 @@ const UpdateCollection = ({
     control,
     handleSubmit,
     reset,
-    formState: { isDirty },
+    formState: { isDirty, errors },
   } = formMethods;
 
   useEffect(() => {
@@ -312,37 +313,40 @@ const UpdateCollection = ({
     <FormProvider {...formMethods}>
       <ActionMenuSection
         title={
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-            }}
-          >
-            <Typography component="span" variant="overline">
-              Collection
-            </Typography>
+          <>
             <Box
               sx={{
-                ml: "auto",
-                borderRadius: 1,
-                p: 0.5,
-                "&:hover": {
-                  bgcolor: "grey.300",
-                },
-              }}
-              onClick={() => {
-                if (expandedRight) {
-                  handleLockClick();
-                } else {
-                  handleUnlockClick();
-                }
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
               }}
             >
-              {expandedRight ? <LockOpenIcon /> : <LockOutlineIcon />}
+              <Typography component="span" variant="overline">
+                Collection
+              </Typography>
+              <Box
+                sx={{
+                  ml: "auto",
+                  borderRadius: 1,
+                  p: 0.5,
+                  "&:hover": {
+                    bgcolor: "grey.300",
+                  },
+                }}
+                onClick={() => {
+                  if (expandedRight) {
+                    handleLockClick();
+                  } else {
+                    handleUnlockClick();
+                  }
+                }}
+              >
+                {expandedRight ? <LockOpenIcon /> : <LockOutlineIcon />}
+              </Box>
             </Box>
-          </Box>
+            <ErrorHeader errors={errors} depth={2} editing />
+          </>
         }
         fixedExpanded
         scrollable
@@ -461,6 +465,7 @@ const UpdateCollection = ({
                   {...field}
                   select
                   label="Host"
+                  id={field.name}
                   error={error}
                   fullWidth
                   required
@@ -531,6 +536,7 @@ const UpdateCollection = ({
             render={({ field, fieldState: { error } }) => (
               <FormTextField
                 {...field}
+                id={field.name}
                 label="Name"
                 error={error}
                 fullWidth
@@ -547,6 +553,7 @@ const UpdateCollection = ({
             render={({ field, fieldState: { error } }) => (
               <FormTextField
                 {...field}
+                id={field.name}
                 label="Description"
                 error={error}
                 fullWidth
