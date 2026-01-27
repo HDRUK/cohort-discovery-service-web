@@ -3,7 +3,7 @@
 import { useDaphneStore } from "@/store/useDaphneStore";
 import { Concept } from "@/types/api";
 import { SearchBar } from "@hdruk/ui";
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import {
   Checkbox,
   FormControlLabel,
