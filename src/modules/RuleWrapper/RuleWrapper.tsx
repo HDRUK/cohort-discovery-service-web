@@ -118,7 +118,9 @@ const RuleWrapper = ({
 
   const handleOnSelect = useCallback(
     (e: React.MouseEvent) => {
-      toggleSelected(id);
+      const isShift = e.shiftKey;
+      toggleSelected(id, !isShift);
+      e.preventDefault();
       e.stopPropagation();
     },
     [id, toggleSelected],

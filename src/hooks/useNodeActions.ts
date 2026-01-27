@@ -1,5 +1,6 @@
 import useQueryBuilder from "@/store/useQueryBuilder";
 import { CombinatorType, RuleNodeType } from "@/types/rules";
+import { trueKeys } from "@/utils/numbers";
 import {
   createOperator,
   createRule,
@@ -10,16 +11,27 @@ import {
   ruleToGroup,
   groupToRules,
   updateById,
+  createRuleGroup,
+  findById,
+  findByIdWithNeighbors,
 } from "@/utils/rules";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 const useNodeActions = (node: RuleNodeType) => {
   const { id } = node;
 
-  const { queryBuilderJson, setQueryBuilderJson } = useQueryBuilder((qb) => ({
-    queryBuilderJson: qb.queryBuilderJson,
-    setQueryBuilderJson: qb.setQueryBuilderJson,
-  }));
+  const { queryBuilderJson, setQueryBuilderJson, selected } = useQueryBuilder(
+    (qb) => ({
+      queryBuilderJson: qb.queryBuilderJson,
+      setQueryBuilderJson: qb.setQueryBuilderJson,
+      selected: qb.selected,
+    }),
+  );
+  const selectedNodeIds = useMemo(() => trueKeys(selected), [selected]);
+  const currentIdIsSelectedNode = useMemo(
+    () => selectedNodeIds.includes(id),
+    [selectedNodeIds, id],
+  );
 
   const handleDeleteRule = useCallback(() => {
     const newQuery = removeById(queryBuilderJson, id);
@@ -27,6 +39,45 @@ const useNodeActions = (node: RuleNodeType) => {
   }, [id, queryBuilderJson, setQueryBuilderJson]);
 
   const handleConvertToGroup = useCallback(() => {
+    if (currentIdIsSelectedNode && selectedNodeIds.length > 1) {
+      const [primaryId, ...otherIds] = selectedNodeIds;
+
+      const newRules = selectedNodeIds
+        .map((id) => findById(queryBuilderJson, id as string))
+        .filter((x) => !!x);
+
+      const lastNode = newRules[newRules.length - 1];
+      const lastId = lastNode.id;
+
+      const lastIdIsOperator = isOperator(lastNode);
+
+      const newGroup = createRuleGroup(
+        lastIdIsOperator ? [...newRules, createRule()] : newRules,
+      );
+
+      const queryJsonWithOtherIdsRemoved = otherIds.reduce(
+        (acc, id) => removeById(acc, id as string),
+        queryBuilderJson,
+      );
+
+      const { below } = findByIdWithNeighbors(queryBuilderJson, lastId);
+      const belowIsOperator = below ? isOperator(below) : false;
+
+      const queryJsonWithNewGroup = updateById(
+        queryJsonWithOtherIdsRemoved,
+        primaryId as string,
+        () => newGroup,
+        !belowIsOperator
+          ? {
+              node: createOperator(),
+              position: "after",
+            }
+          : undefined,
+      );
+
+      setQueryBuilderJson(queryJsonWithNewGroup);
+      return;
+    }
     setQueryBuilderJson(
       updateById(queryBuilderJson, id, (node) => {
         if (!isRuleLeaf(node)) return node;
@@ -34,7 +85,13 @@ const useNodeActions = (node: RuleNodeType) => {
         return newGroup;
       }),
     );
-  }, [id, queryBuilderJson, setQueryBuilderJson]);
+  }, [
+    id,
+    queryBuilderJson,
+    setQueryBuilderJson,
+    selectedNodeIds,
+    currentIdIsSelectedNode,
+  ]);
 
   const handleChangeOperator = useCallback(() => {
     setQueryBuilderJson(
@@ -78,7 +135,8 @@ const useNodeActions = (node: RuleNodeType) => {
 
   const actions = [
     { action: handleDeleteRule, label: "Delete" },
-    ...(isRuleLeaf(node)
+    ...(isRuleLeaf(node) ||
+    (currentIdIsSelectedNode && selectedNodeIds.length > 1)
       ? [{ action: handleConvertToGroup, label: "Convert to Group" }]
       : []),
     ...(isOperator(node)

@@ -229,7 +229,6 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
         selectable='[data-selectable="true"]'
         idAttr="data-id"
         ignoreWhenInside='[data-draggable="true"]'
-        requireModifierKey="Shift"
         onChange={onChangeSelection}
       />
     </>
