@@ -17,18 +17,25 @@ const CollectionsRightPanel = ({
   ...props
 }: CollectionsRightPanelProps) => {
   const selectedCollections = useUserStore((u) => u.selectedCollections);
+  const count = selectedCollections?.length ?? 0;
 
-  if (selectedCollections && selectedCollections.length === 1) {
+  if (expandedLeft) {
+    return <CollectionGuidance creating />;
+  }
+
+  if (count === 1) {
+    const [collection] = selectedCollections!;
     return (
       <UpdateCollection
-        collection={selectedCollections[0]}
-        key={`update-coll-${selectedCollections[0].id}`}
+        collection={collection}
+        key={`update-coll-${collection.id}`}
         expandedLeft={expandedLeft}
         {...props}
       />
     );
   }
-  if (selectedCollections && selectedCollections.length > 1) {
+
+  if (count > 1) {
     return (
       <UpdateMultipleCollections
         collections={selectedCollections}
@@ -38,7 +45,8 @@ const CollectionsRightPanel = ({
       />
     );
   }
-  return <CollectionGuidance creating={expandedLeft} />;
+
+  return <CollectionGuidance creating={false} />;
 };
 
 export default CollectionsRightPanel;

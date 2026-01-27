@@ -90,6 +90,7 @@ const CollectionsAdmin = ({
         middle={<CollectionsTable admin={admin} initialData={collections} />}
         right={
           <CollectionsRightPanel
+            admin={admin}
             collectionHosts={collectionHosts}
             workgroups={workgroups}
             expandedRight={expandedRight}

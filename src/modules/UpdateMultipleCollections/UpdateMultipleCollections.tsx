@@ -9,12 +9,7 @@ import {
 } from "@mui/material";
 import LockOutlineIcon from "@mui/icons-material/LockOutline";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
-import {
-  CollectionHost,
-  CollectionStatus,
-  CollectionWithHosts,
-  Workgroup,
-} from "@/types/api";
+import { CollectionStatus, CollectionWithHosts, Workgroup } from "@/types/api";
 import {
   Controller,
   FieldValues,
@@ -42,7 +37,6 @@ import { UpdateCollectionFormValues } from "@/types/forms";
 
 export type UpdateMultipleCollectionProps = {
   collections: CollectionWithHosts[];
-  collectionHosts: CollectionHost[];
   workgroups: Workgroup[];
   expandedRight: boolean;
   expandedLeft: boolean;
@@ -51,7 +45,6 @@ export type UpdateMultipleCollectionProps = {
 
 const UpdateMultipleCollections = ({
   collections,
-  collectionHosts,
   workgroups,
   expandedRight,
   onClose,
@@ -202,7 +195,6 @@ const UpdateMultipleCollections = ({
 
   useLogDependencyChanges("UpdateMultipleCollections", {
     collections,
-    collectionHosts,
     ...formMethods,
     currentCustodian,
     handleEnter,

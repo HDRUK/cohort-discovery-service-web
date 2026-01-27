@@ -322,6 +322,7 @@ export interface CollectionHost {
   query_context_type: string;
   client_id: string;
   client_secret: string;
+  custodian: Custodian;
 }
 
 export type UrlString = `http${"s" | ""}://${string}`;

@@ -7,6 +7,7 @@ export interface CollectionHostFormValues {
 }
 
 export interface CreateCollectionFormValues {
+  custodian_pid: string;
   collection: CreateCollectionPost;
   config: CreateCollectionConfigPost;
 }

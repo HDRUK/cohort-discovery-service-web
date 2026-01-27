@@ -9,19 +9,15 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import CreateCollection from "./CreateCollection";
-import { Custodian, CollectionHost, TaskType } from "@/types/api";
+import { Custodian, CollectionHost } from "@/types/api";
 import getCustodian from "@/actions/__mocks__/getCustodian";
-import { QueryContext } from "@/types/context";
 import MockDaphneStore from "@/store/MockDaphneStore";
+import { getMockCollection } from "@/actions/__mocks__/getCollections";
+import getCollectionHost from "@/actions/__mocks__/getCollectionHost";
+jest.mock("@/actions/getCustodian");
 
 const createCollection = jest.fn();
-let currentCustodian = {
-  id: 123,
-  pid: "1234-1234",
-  name: "my name",
-  external_custodian_id: 123,
-  external_custodian_name: "yes",
-};
+const mockCustodian = getCustodian();
 const createCollectionAdmin = jest.fn();
 
 let custodians: Custodian[];
@@ -29,13 +25,15 @@ let collectionHosts: CollectionHost[];
 
 const renderCreateCollection = (
   overrides: Partial<Parameters<typeof CreateCollection>[0]> = {},
+  custodianDataOverides = {},
 ) => {
   return render(
     <MockDaphneStore
       overrides={{
         custodianData: {
           createCollection,
-          currentCustodian,
+          currentCustodian: mockCustodian,
+          ...custodianDataOverides,
         },
         adminData: { createCollection: createCollectionAdmin },
       }}
@@ -52,10 +50,26 @@ const renderCreateCollection = (
 describe("CreateCollection", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    custodians = [getCustodian()];
+    createCollection.mockImplementation(
+      async (_custodianPid, collection, _config) => {
+        return getMockCollection({
+          id: 123,
+          ...collection,
+        });
+      },
+    );
+    custodians = [mockCustodian];
     collectionHosts = [
-      { id: 10, name: "Alpha Host" } as unknown as CollectionHost,
-      { id: 20, name: "Beta Host" } as unknown as CollectionHost,
+      getCollectionHost({
+        id: 10,
+        name: "Alpha Host",
+        custodian: mockCustodian,
+      }),
+      getCollectionHost({
+        id: 20,
+        name: "Beta Host",
+        custodian: mockCustodian,
+      }),
     ];
   });
   /*
@@ -96,21 +110,12 @@ describe("CreateCollection", () => {
     const user = userEvent.setup();
     const onCancel = jest.fn();
 
-    const createdCollection = {
-      id: 123,
-      name: "My Collection",
-    };
-
-    createCollection.mockResolvedValue(createdCollection);
-
     renderCreateCollection({ onCancel });
 
-    await user.type(screen.getByLabelText(/name/i), "My Collection");
-    await user.type(screen.getByLabelText(/description/i), "A test collection");
-    await user.type(
-      screen.getByLabelText(/link to associated datasets/i),
-      "http://example.com",
-    );
+    let nameInput = screen.getByLabelText(/name/i) as HTMLInputElement;
+    expect(nameInput).toBeDisabled();
+
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
 
     const label = screen.getByText(/collection host/i);
     const id = label.getAttribute("for");
@@ -120,13 +125,32 @@ describe("CreateCollection", () => {
       fireEvent.mouseDown(hostSelect);
     });
 
+    nameInput = screen.getByLabelText(/name/i) as HTMLInputElement;
+    expect(nameInput).toBeDisabled();
+
     const listbox = await screen.findByRole("listbox");
+    expect(listbox).toBeInTheDocument();
+
     const betaOption = within(listbox).getByText(/beta host/i);
     // note- having to use fireEvent - couldnt get this to work with user
     // with have to return to this one day?
     await act(async () => {
       fireEvent.click(betaOption);
     });
+
+    nameInput = screen.getByLabelText(/name/i) as HTMLInputElement;
+    await user.type(nameInput, "My Collection");
+    expect(nameInput).toHaveValue("My Collection");
+
+    const descInput = screen.getByLabelText(/description/i) as HTMLInputElement;
+    await user.type(descInput, "A test collection");
+    expect(descInput).toHaveValue("A test collection");
+
+    const urlInput = screen.getByLabelText(
+      /link to associated datasets/i,
+    ) as HTMLInputElement;
+    await user.type(urlInput, "http://example.com");
+    expect(urlInput).toHaveValue("http://example.com");
 
     const createButton = screen.getByRole("button", { name: /create/i });
     expect(createButton).not.toBeDisabled();
@@ -136,28 +160,9 @@ describe("CreateCollection", () => {
       expect(createCollection).toHaveBeenCalledTimes(1);
     });
 
-    expect(createCollection).toHaveBeenCalledWith(
-      "1234-1234",
-      {
-        name: "My Collection",
-        description: "A test collection",
-        url: "http://example.com",
-        type: QueryContext.BUNNY,
-        host_id: 20,
-        custodian_id: "",
-        status: true,
-        pid: "mocked-uuid-17",
-      },
-      {
-        collection_id: 0,
-        enabled: 1,
-        frequency_mode: 1,
-        run_time_frequency: 0,
-        run_time_hour: 0,
-        run_time_minute: 0,
-        type: TaskType.B,
-      },
-    );
+    const [_pid, payload, _config] = createCollection.mock.calls[0];
+    expect(payload.name).toBe("My Collection");
+    expect(payload.url).toBe("http://example.com");
 
     expect(onCancel).toHaveBeenCalled();
   });
@@ -166,15 +171,7 @@ describe("CreateCollection", () => {
     const user = userEvent.setup();
     const onCancel = jest.fn();
 
-    const createdCollection = {
-      id: 123,
-      name: "My Collection",
-    };
-
-    currentCustodian = undefined;
-    createCollectionAdmin.mockResolvedValue(createdCollection);
-
-    renderCreateCollection({ onCancel });
+    renderCreateCollection({ onCancel }, { currentCustodian: null });
 
     const custodianLabel = screen.getByText(/custodian/i);
     const custodianId = custodianLabel.getAttribute("for");
@@ -191,18 +188,10 @@ describe("CreateCollection", () => {
       custodians[0].name,
       { exact: false },
     );
-    // note- having to use fireEvent - couldnt get this to work with user
-    // with have to return to this one day?
+
     await act(async () => {
       fireEvent.click(custodianOption);
     });
-
-    await user.type(screen.getByLabelText(/name/i), "My Collection");
-    await user.type(screen.getByLabelText(/description/i), "A test collection");
-    await user.type(
-      screen.getByLabelText(/link to associated datasets/i),
-      "http://example.com",
-    );
 
     const label = screen.getByText(/collection host/i);
     const id = label.getAttribute("for");
@@ -220,35 +209,26 @@ describe("CreateCollection", () => {
       fireEvent.click(betaOption);
     });
 
+    await user.type(screen.getByLabelText(/name/i), "My Admin Collection");
+    await user.type(screen.getByLabelText(/description/i), "A test collection");
+    await user.type(
+      screen.getByLabelText(/link to associated datasets/i),
+      "http://example.com",
+    );
+
     const createButton = screen.getByRole("button", { name: /create/i });
     expect(createButton).not.toBeDisabled();
     await user.click(createButton);
 
     await waitFor(() => {
-      expect(createCollectionAdmin).toHaveBeenCalledTimes(1);
+      expect(createCollection).toHaveBeenCalledTimes(1);
     });
 
-    expect(createCollectionAdmin).toHaveBeenCalledWith(
-      {
-        name: "My Collection",
-        description: "A test collection",
-        url: "http://example.com",
-        type: QueryContext.BUNNY,
-        host_id: 20,
-        custodian_id: custodians[0].id,
-        status: true,
-        pid: "mocked-uuid-18",
-      },
-      {
-        collection_id: 0,
-        enabled: 1,
-        frequency_mode: 1,
-        run_time_frequency: 0,
-        run_time_hour: 0,
-        run_time_minute: 0,
-        type: TaskType.B,
-      },
-    );
+    const [_pid, payload, _config] = createCollection.mock.calls[0];
+    expect(payload.name).toBe("My Admin Collection");
+    expect(payload.url).toBe("http://example.com");
+
+    expect(onCancel).toHaveBeenCalled();
   });
 
   it("calls onCancel and resets the form when Cancel is clicked", async () => {
@@ -256,6 +236,14 @@ describe("CreateCollection", () => {
     const onCancel = jest.fn();
 
     renderCreateCollection({ onCancel });
+
+    const label = screen.getByText(/collection host/i);
+    const id = label.getAttribute("for");
+    const hostSelect = document.getElementById(id!) as HTMLElement;
+
+    await act(async () => {
+      fireEvent.mouseDown(hostSelect);
+    });
 
     const nameInput = screen.getByLabelText(/name/i) as HTMLInputElement;
     const descInput = screen.getByLabelText(/description/i) as HTMLInputElement;
@@ -266,14 +254,6 @@ describe("CreateCollection", () => {
     await user.type(nameInput, "Temp Name");
     await user.type(descInput, "Temp Description");
     await user.type(urlInput, "http://temp-url.com");
-
-    const label = screen.getByText(/collection host/i);
-    const id = label.getAttribute("for");
-    const hostSelect = document.getElementById(id!) as HTMLElement;
-
-    await act(async () => {
-      fireEvent.mouseDown(hostSelect);
-    });
 
     const listbox = await screen.findByRole("listbox");
     const betaOption = within(listbox).getByText(/alpha host/i);

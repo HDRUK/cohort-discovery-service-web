@@ -43,6 +43,7 @@ import removeCollectionFromWorkgroups from "@/actions/removeCollectionFromWorkgr
 import addCollectionToWorkgroups from "@/actions/addCollectionToWorkgroups";
 import SquareCheckbox from "@/components/SquareCheckbox";
 import ManageCollectionStatus from "@/modules/ManageCollectionStatus";
+import CopyableVariable from "@/components/CopyableVariable";
 
 const UpdateCollectionGuidance = maskClientTest(
   () => import("./UpdateCollectionGuidance"),
@@ -55,6 +56,7 @@ export type UpdateCollectionProps = {
   expandedRight: boolean;
   expandedLeft: boolean;
   onClose?: () => void;
+  admin?: boolean;
 };
 
 const getDefaultValues = (collection: CollectionWithHosts | null) => {
@@ -111,6 +113,7 @@ const UpdateCollection = ({
   collectionHosts,
   workgroups,
   expandedRight,
+  admin = false,
   onClose,
 }: UpdateCollectionProps) => {
   const { currentCustodian, updateCollection } = useCustodianStore(
@@ -415,7 +418,8 @@ const UpdateCollection = ({
           <FormTextField
             labelUnderlined
             copyable
-            disabled
+            disabled={!expandedRight}
+            readOnly={expandedRight}
             value={collection.pid}
             label="Collection ID"
           />
@@ -475,23 +479,18 @@ const UpdateCollection = ({
             />
           </Stack>
 
-          <Stack>
-            <FormLabel underlined>Host Credentials</FormLabel>
-
-            <FormTextField
-              copyable
-              disabled
-              value={collection.host?.[0]?.client_id}
-              label="Client ID"
-            />
-            <FormTextField
-              type="password"
-              copyable
-              disabled
-              value={collection.host?.[0]?.client_secret}
-              label="Client Secret"
-            />
-          </Stack>
+          {!admin && (
+            <Stack>
+              <FormLabel underlined>Host Credentials</FormLabel>
+              Client ID
+              <CopyableVariable value={collection.host?.[0]?.client_id} />
+              Client Secret
+              <CopyableVariable
+                hidden
+                value={collection.host?.[0]?.client_secret}
+              />
+            </Stack>
+          )}
         </ActionMenuSection>
         <ActionMenuSection
           gap={2}
