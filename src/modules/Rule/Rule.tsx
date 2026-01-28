@@ -20,8 +20,10 @@ import useNodeActions from "@/hooks/useNodeActions";
 import InvalidRule from "@/components/InvalidRule";
 import { mapDomain } from "@/utils/domains";
 
-export interface RuleProps
-  extends Omit<RuleWrapperProps, "node" | "type" | "render"> {
+export interface RuleProps extends Omit<
+  RuleWrapperProps,
+  "node" | "type" | "render"
+> {
   rule: RuleLeafType;
   groupId?: string;
 }
@@ -42,11 +44,13 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     setQueryBuilderJson,
     showDescendants,
     setShowDescendants,
+    select,
   } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
     showDescendants: qb.showDescendants[id],
     setShowDescendants: qb.setShowDescendants,
+    select: qb.select,
   }));
 
   const toggleShowDescendants = useCallback(
@@ -172,6 +176,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
                     onClick={(e: React.MouseEvent) => {
                       e.stopPropagation();
                       setConcept({ ...concept, alternatives: [] });
+                      select(id);
                     }}
                   />
 
@@ -189,6 +194,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
                           e.stopPropagation();
                           e.preventDefault();
                           setConcept(removeAlternative(concept, childConcept));
+                          select(id);
                         }}
                       >
                         {" "}
