@@ -11,6 +11,7 @@ import { useDaphneStore } from "@/store/useDaphneStore";
 import FormTextField from "@/components/FormTextField";
 import FormLabel from "@/components/FormLabel";
 import ActionMenuSection from "@/components/ActionMenuSection";
+import ErrorHeader from "@/components/ErrorHeader";
 
 type CollectionHostFormValues = { hostName: string };
 
@@ -38,7 +39,12 @@ const UpdateCollectionHost = ({
     },
   });
 
-  const { handleSubmit, control, setValue } = formMethods;
+  const {
+    handleSubmit,
+    control,
+    setValue,
+    formState: { errors },
+  } = formMethods;
 
   useEffect(() => {
     if (selectedCollectionHost)
@@ -74,37 +80,40 @@ const UpdateCollectionHost = ({
     <FormProvider {...formMethods}>
       <ActionMenuSection
         title={
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-            }}
-          >
-            <Typography component="span" variant="overline">
-              Host
-            </Typography>
+          <>
             <Box
               sx={{
-                ml: "auto",
-                borderRadius: 1,
-                p: 0.5,
-                "&:hover": {
-                  bgcolor: "grey.300",
-                },
-              }}
-              onClick={() => {
-                if (expandedRight) {
-                  handleLockClick();
-                } else {
-                  handleUnlockClick();
-                }
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
               }}
             >
-              {expandedRight ? <LockOpenIcon /> : <LockOutlineIcon />}
+              <Typography component="span" variant="overline">
+                Host
+              </Typography>
+              <Box
+                sx={{
+                  ml: "auto",
+                  borderRadius: 1,
+                  p: 0.5,
+                  "&:hover": {
+                    bgcolor: "grey.300",
+                  },
+                }}
+                onClick={() => {
+                  if (expandedRight) {
+                    handleLockClick();
+                  } else {
+                    handleUnlockClick();
+                  }
+                }}
+              >
+                {expandedRight ? <LockOpenIcon /> : <LockOutlineIcon />}
+              </Box>
             </Box>
-          </Box>
+            <ErrorHeader errors={errors} depth={1} editing />
+          </>
         }
         fixedExpanded
         scrollable
@@ -117,6 +126,7 @@ const UpdateCollectionHost = ({
           render={({ field, fieldState: { error } }) => (
             <FormTextField
               {...field}
+              id={field.name}
               slotProps={{ input: { sx: { borderRadius: 0 } } }}
               error={error}
               helperText={error?.message}

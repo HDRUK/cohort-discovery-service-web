@@ -84,6 +84,7 @@ import {
   getTagCustodianCollection,
   getUserQueryTag,
   TAG_COLLECTION_ADMIN,
+  TAG_COLLECTION_HOSTS,
   TAG_COLLECTIONS,
   TAG_CONCEPT_SETS,
   TAG_WORKGROUP_ADMIN,
@@ -735,6 +736,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     updateCollectionHost: async (id, payload) => {
       await updateCollectionHost(id, payload);
       const currentCustodian = get().custodianData.currentCustodian;
+      await revalidateAction(TAG_COLLECTION_HOSTS);
       if (currentCustodian)
         await revalidateAction(getCollectionHostTag(currentCustodian.pid));
     },
@@ -759,6 +761,8 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       await revalidateAction(getTagCustodianCollection(custodianPid));
       await revalidateAction(TAG_COLLECTION_ADMIN);
       await revalidateAction(TAG_COLLECTIONS);
+      await revalidateAction(getCollectionHostTag(data.custodian.pid));
+      await revalidateAction(TAG_COLLECTION_HOSTS);
       return data;
     },
     updateCollection: async (id, payload, payloadConfig) => {
@@ -770,7 +774,8 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       await revalidateAction(getTagCustodianCollection(data.custodian.pid));
       await revalidateAction(TAG_COLLECTION_ADMIN);
       await revalidateAction(TAG_COLLECTIONS);
-
+      await revalidateAction(getCollectionHostTag(data.custodian.pid));
+      await revalidateAction(TAG_COLLECTION_HOSTS);
       return data;
     },
     deleteCollection: async (id, custodianPid) => {
@@ -802,6 +807,8 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       await revalidateAction(getTagCustodianCollection(data.custodian.pid));
       await revalidateAction(TAG_COLLECTION_ADMIN);
       await revalidateAction(TAG_COLLECTIONS);
+      await revalidateAction(getCollectionHostTag(data.custodian.pid));
+      await revalidateAction(TAG_COLLECTION_HOSTS);
       return data;
     },
     updateCollection: async (id, payload, payloadConfig) => {
@@ -812,6 +819,8 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       await revalidateAction(getTagCustodianCollection(data.custodian.pid));
       await revalidateAction(TAG_COLLECTION_ADMIN);
       await revalidateAction(TAG_COLLECTIONS);
+      await revalidateAction(getCollectionHostTag(data.custodian.pid));
+      await revalidateAction(TAG_COLLECTION_HOSTS);
       return data;
     },
     deleteCollection: async (id) => {
