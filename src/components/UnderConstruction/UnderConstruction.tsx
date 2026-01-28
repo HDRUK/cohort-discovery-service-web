@@ -9,11 +9,19 @@ export default function UnderConstruction() {
 
   return (
     <Box sx={{ height: "100%", p: 2, display: "grid", placeItems: "center" }}>
-      <Paper sx={{ width: "100%", maxWidth: 720, p: 4 }}>
+      <Paper
+        sx={{
+          width: "100%",
+          maxWidth: 720,
+          p: 4,
+          border: 1,
+          borderColor: "warning.main",
+        }}
+      >
         <Stack spacing={2}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <ConstructionRoundedIcon />
-            <Typography variant="h5">Under construction</Typography>
+            <ConstructionRoundedIcon color="warning" />
+            <Typography variant="h4">Under construction</Typography>
           </Box>
 
           <Typography color="text.secondary">
@@ -21,7 +29,11 @@ export default function UnderConstruction() {
           </Typography>
 
           <Stack direction="row" spacing={1}>
-            <Button variant="outlined" onClick={() => router.back()}>
+            <Button
+              color="warning"
+              variant="outlined"
+              onClick={() => router.back()}
+            >
               Go back
             </Button>
           </Stack>
