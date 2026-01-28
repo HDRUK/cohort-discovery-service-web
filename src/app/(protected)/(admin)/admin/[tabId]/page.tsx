@@ -35,7 +35,7 @@ const CustodianAdminPage = async ({
             href: routes.adminUsers,
             page: (
               <Suspense fallback={<UsersSkeleton />}>
-                <UsersTab />
+                <UsersTab applicationMode={applicationMode} />
               </Suspense>
             ),
           },
