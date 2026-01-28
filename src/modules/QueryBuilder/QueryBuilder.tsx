@@ -35,7 +35,13 @@ import ThreePaneSwimLaneLayout from "../ThreePaneSwimLaneLayout";
 import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
 import useRightClickMenu from "@/hooks/useRightClickMenu";
 
-const QueryBuilder = ({ query }: { query?: Query }) => {
+const QueryBuilder = ({
+  query,
+  errorOnDrag = false,
+}: {
+  query?: Query;
+  errorOnDrag?: boolean;
+}) => {
   const {
     queryBuilderJson,
     resetQueryBuilderJson,
@@ -118,7 +124,6 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
           targetIndex = overData.position;
         }
       }
-
       setQueryBuilderJson(
         moveItemIntoGroup(
           queryBuilderJson,
@@ -126,9 +131,10 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
           overGroupId,
           targetIndex,
         ),
+        errorOnDrag,
       );
     },
-    [active, queryBuilderJson, boardIndex, setQueryBuilderJson],
+    [errorOnDrag, active, queryBuilderJson, boardIndex, setQueryBuilderJson],
   );
 
   const onDragEnd = useCallback(

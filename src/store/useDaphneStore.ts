@@ -120,7 +120,10 @@ export interface DaphneStoreState {
     queryName: string;
     setQueryName: (name: string) => void;
     queryBuilderJson: RuleGroupType;
-    setQueryBuilderJson: (query: RuleGroupType) => RuleGroupType;
+    setQueryBuilderJson: (
+      query: RuleGroupType,
+      validate?: boolean,
+    ) => RuleGroupType;
     resetQueryBuilderJson: () => void;
     errors: string[];
     setErrors: (rules: RuleGroupType, pids: UniqueIdentifier[]) => void;
@@ -480,8 +483,10 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
     createNewAgeFilter: (above: boolean = true) =>
       get().queryBuilder.createNewNode(NodeKind.AGE_FILTER, above),
     queryAsText: queryToText(DEFAULT_QUERY),
-    setQueryBuilderJson: (query: RuleGroupType) => {
-      const updatedQuery = get().queryBuilder.validateRules(query);
+    setQueryBuilderJson: (query: RuleGroupType, validate = true) => {
+      const updatedQuery = validate
+        ? get().queryBuilder.validateRules(query)
+        : query;
       const text = updatedQuery.valid ? queryToText(query) : "";
 
       set((state) => ({
@@ -490,7 +495,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
           ...state.queryBuilder,
           queryBuilderJson: updatedQuery,
           boardIndex: buildIndexFromModel(updatedQuery),
-          queryAsText: text,
+          ...(validate ? { queryAsText: text } : {}),
         },
       }));
 
