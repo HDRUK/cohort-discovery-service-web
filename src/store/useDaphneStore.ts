@@ -125,7 +125,7 @@ export interface DaphneStoreState {
       query: RuleGroupType,
       validate?: boolean,
     ) => RuleGroupType;
-    resetQueryBuilderJson: () => void;
+    resetQueryBuilderJson: (resetQueryName?: boolean) => void;
     errors: string[];
     setErrors: (rules: RuleGroupType, pids: UniqueIdentifier[]) => void;
     appendError: (error: string) => void;
@@ -289,7 +289,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
 
   queryBuilder: {
     queryBuilderJson: validateRuleTree(DEFAULT_QUERY),
-    resetQueryBuilderJson: () => {
+    resetQueryBuilderJson: (resetQueryName?: boolean) => {
       const {
         queryBuilder: { setQueryBuilderJson },
       } = get();
@@ -301,7 +301,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
           queryBuilder: {
             ...state.queryBuilder,
             selected: {},
-            queryName: "",
+            ...(resetQueryName ? { queryName: "" } : null),
           },
         };
       });
