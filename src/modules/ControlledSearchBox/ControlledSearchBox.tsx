@@ -17,7 +17,7 @@ type FormValues<K extends string> = Record<K, string>;
 
 export interface ControlledSearchBoxProps<
   TParams extends ApiSearchParams = ApiSearchParams,
-  K extends StringParamKey<TParams> = StringParamKey<TParams>
+  K extends StringParamKey<TParams> = StringParamKey<TParams>,
 > extends SearchBoxProps {
   paramName?: K;
   useErrors?: boolean;
@@ -25,7 +25,7 @@ export interface ControlledSearchBoxProps<
 
 const ControlledSearchBox = <
   TParams extends ApiSearchParams = ApiSearchParams,
-  K extends StringParamKey<TParams> = StringParamKey<TParams>
+  K extends StringParamKey<TParams> = StringParamKey<TParams>,
 >({
   paramName,
   useErrors = false,
@@ -61,6 +61,10 @@ const ControlledSearchBox = <
             : {})}
           collapsible={false}
           onSubmit={handleSubmit(onSubmit)}
+          onClickEndAdornment={handleSubmit(onSubmit)}
+          onKeyDown={(e) =>
+            e.key === "Enter" ? handleSubmit(onSubmit)() : null
+          }
         />
       )}
     />

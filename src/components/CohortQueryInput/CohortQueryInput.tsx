@@ -156,7 +156,7 @@ const CohortQueryInput = () => {
             placeholder="Search for a cohort e.g. females above 50 with diabetes type-ii"
             fullWidth
             variant="outlined"
-            onClickEndAornment={submitQuery}
+            onClickEndAdornment={submitQuery}
             loading={isLoading}
             warning={warnings.length > 0}
             disabled={disabled || !!error}
