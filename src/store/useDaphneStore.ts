@@ -301,7 +301,7 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
           queryBuilder: {
             ...state.queryBuilder,
             selected: {},
-            ...(resetQueryName ? { queryName: "" } : null),
+            ...(resetQueryName ? { queryName: "" } : {}),
           },
         };
       });
