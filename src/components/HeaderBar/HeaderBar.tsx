@@ -8,21 +8,35 @@ import { useDaphneStore } from "@/store/useDaphneStore";
 import PositionedMenu, { PositionedMenuItem } from "../PositionedMenu";
 import { useRouter } from "next/navigation";
 
-const HeaderBar = () => {
+const HeaderBar = ({ standalone }: { standalone: boolean }) => {
   const router = useRouter();
   const {
     userData: { user, setUser },
   } = useDaphneStore();
 
   const links: PositionedMenuItem[] = [
-    {
-      id: "logout",
-      label: "Logout",
-      onClick: () => {
-        setUser(null);
-        router.push("/api/auth/logout");
-      },
-    },
+    ...(standalone
+      ? [
+          {
+            id: "logout",
+            label: "Logout",
+            onClick: () => {
+              setUser(null);
+              router.push("/api/auth/logout");
+            },
+          },
+        ]
+      : [
+          {
+            id: "back",
+            label: "Back",
+            onClick: () => {
+              alert("go back");
+              //setUser(null);
+              //router.push("/api/auth/logout");
+            },
+          },
+        ]),
   ];
 
   return (

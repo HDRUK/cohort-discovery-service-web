@@ -9,6 +9,7 @@ import getMe from "@/actions/getMe";
 import getCustodians from "@/actions/getCustodians";
 import getFeatureFlags from "@/actions/getFeatureFlags";
 import { isStandalone } from "@/utils/modes";
+import { ErrorMode } from "@/lib/apiClient";
 
 const applicationMode = process.env.APPLICATION_MODE;
 
@@ -38,12 +39,14 @@ export default async function ProtectedLayout({
 
   const user = decoded.user as TokenUser;
 
-  let me;
-  try {
-    const { data } = await getMe();
-    me = data;
-  } catch {
-    forbidden();
+  const { data: me, error } = await getMe({ errorMode: ErrorMode.RESULT });
+  const { code: errorCode } = error ?? {};
+
+  if (errorCode === 404) {
+    //if (isStandalone(applicationMode)) {
+    //notFound();
+    //}
+    redirect("/user-not-found");
   }
 
   const roles = me.roles.map((r) => r.name) ?? [];

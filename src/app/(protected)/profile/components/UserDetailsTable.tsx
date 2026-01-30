@@ -20,9 +20,9 @@ type KVRow = {
 const UserDetailsTable = ({ user }: { user: CombinedUser }) => {
   const data: KVRow[] = [
     { label: "ID", value: user.id },
-    { label: "Gateway ID", value: user?.token_user?.id },
+    { label: "Token ID", value: user?.token_user?.id },
     {
-      label: "Gateway Teams",
+      label: "Custodians",
       value: user.token_user?.cohort_admin_teams?.length ? (
         <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
           {user.token_user.cohort_admin_teams.map((t) => (

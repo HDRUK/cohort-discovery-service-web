@@ -36,6 +36,7 @@ export interface CacheOptions {
 export interface ApiResponse<T> {
   message: string;
   data: T;
+  error?: { text: string; code: number };
 }
 
 export interface WithTimestamps {

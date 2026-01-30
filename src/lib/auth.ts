@@ -16,8 +16,12 @@ export async function getTokenUser(): Promise<{
   const decoded = token ? (jwt.decode(token) as JwtPayload) : undefined;
 
   const user = decoded?.user as TokenUser;
-  if (!user && isStandalone(applicationMode)) {
-    redirect("/login");
+  if (!user) {
+    if (isStandalone(applicationMode)) {
+      redirect("/login");
+    } else {
+      redirect("/user-not-found");
+    }
   }
 
   return { user };
