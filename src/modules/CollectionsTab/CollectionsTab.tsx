@@ -7,6 +7,7 @@ import { Box, Skeleton } from "@mui/material";
 import getCustodians from "@/actions/getCustodians";
 import getAdminWorkgroups from "@/actions/getAdminWorkgroups";
 import getCustodianCollections from "@/actions/getCustodianCollections";
+import getCustodianCollectionHosts from "@/actions/getCustodianCollectionHosts";
 
 export const CollectionsSkeleton = () => (
   <Box sx={{ height: "100%", p: 2 }}>
@@ -32,7 +33,7 @@ const CollectionsTab = async ({
     { data: custodians },
     { data: workgroups },
   ] = await Promise.all([
-    getCollectionHosts(),
+    isAdmin ? getCollectionHosts() : getCustodianCollectionHosts(custodianPid),
     isAdmin
       ? getAdminCollections({ params })
       : getCustodianCollections(custodianPid, { params }),
