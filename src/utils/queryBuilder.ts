@@ -108,13 +108,22 @@ const queryToText = (node: RuleGroupType) => {
     }
 
     if (isAgeFilter(n)) {
-      if (n.value[0] === MIN_AGE_FILTER && n.value[1] === MAX_AGE_FILTER) {
+      if (
+        [MIN_AGE_FILTER, null].includes(n.value[0]) &&
+        [MAX_AGE_FILTER, null].includes(n.value[1])
+      ) {
         return [{ text: "are of any age" }];
       }
-      if (n.value[0] > MIN_AGE_FILTER && n.value[1] === MAX_AGE_FILTER) {
+      if (
+        n.value[0] > MIN_AGE_FILTER &&
+        [MAX_AGE_FILTER, null].includes(n.value[1])
+      ) {
         return [{ text: `are older than ${n.value[0]} years` }];
       }
-      if (n.value[0] === MIN_AGE_FILTER && n.value[1] < MAX_AGE_FILTER) {
+      if (
+        [MIN_AGE_FILTER, null].includes(n.value[0]) &&
+        n.value[1] < MAX_AGE_FILTER
+      ) {
         return [{ text: `are younger than ${n.value[1]} years` }];
       }
       return [
