@@ -2,7 +2,7 @@ import { useShallow } from "zustand/react/shallow";
 import {
   QueryBuilderStoreState,
   useQueryBuilderStore,
-} from "./queryBuilderStore";
+} from "@/store/queryBuilderStore";
 
 const useQueryBuilder = <T>(sel: (qb: QueryBuilderStoreState) => T) =>
   useQueryBuilderStore(useShallow((s) => sel(s)));

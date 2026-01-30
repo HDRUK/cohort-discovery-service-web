@@ -31,8 +31,8 @@ import {
   TAG_CONCEPT_SETS,
   getUserQueryTag,
 } from "@/config/tags";
-import { DEFAULT_QUERY, useQueryBuilderStore } from "./queryBuilderStore";
-import { useCustodianDataStore } from "./custodianDataStore";
+import { DEFAULT_QUERY, useQueryBuilderStore } from "@/store/queryBuilderStore";
+import { useCustodianDataStore } from "@/store/custodianDataStore";
 
 export interface UserDataStoreState {
   user: CombinedUser | undefined | null;
@@ -87,21 +87,21 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
   setUser: (user) =>
     set((state) => ({
       ...state,
-      userData: { ...state, user },
+      user,
     })),
 
   custodians: [],
   setCustodians: (custodians) =>
     set((state) => ({
       ...state,
-      userData: { ...state, custodians },
+      custodians,
     })),
 
   queries: [],
   setQueries: (queries) =>
     set((state) => ({
       ...state,
-      userData: { ...state, queries },
+      queries,
     })),
 
   fetchResults: async (name, reset = false) => {
@@ -133,7 +133,7 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
   setSelectedCollections: (selectedCollections) =>
     set((state) => ({
       ...state,
-      userData: { ...state, selectedCollections },
+      selectedCollections,
     })),
 
   runDistributions: async (collection, query_type) => {
@@ -149,7 +149,7 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
   setConceptSets: (conceptSets) =>
     set((state) => ({
       ...state,
-      userData: { ...state, conceptSets },
+      conceptSets,
     })),
 
   createConceptSet: async (payload) => {

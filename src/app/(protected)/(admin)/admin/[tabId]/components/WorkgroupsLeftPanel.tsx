@@ -8,7 +8,7 @@ import { Collection, Workgroup } from "@/types/api";
 import { useCallback, useEffect } from "react";
 import useSearchParams from "@/hooks/useSearchParams";
 import { capitaliseFirstLetter } from "@/utils/string";
-import useAdminStore from "@/store/useAdminStore";
+import useAdminStore from "@/hooks/useAdminStore";
 
 type WorkgroupsLeftPanelProps = {
   workgroups: Workgroup[];

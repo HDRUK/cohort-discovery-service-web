@@ -11,7 +11,7 @@ import { revalidateAction } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
 import FormMultiSelect from "@/components/FormMultiSelect";
 import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
-import useAdminStore from "@/store/useAdminStore";
+import useAdminStore from "@/hooks/useAdminStore";
 import { TAG_CUSTODIAN_COLLECTION, TAG_WORKGROUP_ADMIN } from "@/config/tags";
 export type UpdateWorkgroupProps = {
   collections: Collection[];

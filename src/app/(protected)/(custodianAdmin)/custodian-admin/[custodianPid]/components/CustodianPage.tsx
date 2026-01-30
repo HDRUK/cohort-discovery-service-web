@@ -6,8 +6,8 @@ import { Paper } from "@mui/material";
 import { forbidden } from "next/navigation";
 import { useEffect } from "react";
 
-import useUserStore from "@/store/useUserStore";
-import useCustodianStore from "@/store/useCustodianStore";
+import useUserStore from "@/hooks/useUserStore";
+import useCustodianStore from "@/hooks/useCustodianStore";
 
 const CustodianPage = ({
   custodian,

@@ -14,7 +14,7 @@ import { useNotify } from "@/providers/NotifyProvider";
 import CollectionConfig from "@/components/CollectionConfig";
 import { REGEX_URL_NO_WWW } from "@/config/regex";
 import FormDropdown from "@/components/FormDropdown";
-import useCustodianStore from "@/store/useCustodianStore";
+import useCustodianStore from "@/hooks/useCustodianStore";
 import { useEffect, useMemo } from "react";
 import ErrorHeader from "@/components/ErrorHeader";
 

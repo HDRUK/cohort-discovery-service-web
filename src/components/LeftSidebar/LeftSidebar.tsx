@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { Box, List } from "@mui/material";
 
 import { routes } from "../../config/routes";
-import useUserStore from "@/store/useUserStore";
+import useUserStore from "@/hooks/useUserStore";
 import LeftSidebarMenuItem from "./LeftSidebarMenuItem";
 
 const drawerWidth = 240;

@@ -4,7 +4,7 @@ import { CollectionWithHosts, Paginated } from "@/types/api";
 import CollectionsTable from "@/components/CollectionsTable";
 import { Box, Typography } from "@mui/material";
 import { capitaliseFirstLetter } from "@/utils/string";
-import useAdminStore from "@/store/useAdminStore";
+import useAdminStore from "@/hooks/useAdminStore";
 import { useNotify } from "@/providers/NotifyProvider";
 
 type WorkgroupsMiddlePanelProps = {

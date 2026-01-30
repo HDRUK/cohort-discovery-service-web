@@ -3,9 +3,8 @@
 import { CombinedUser, Custodian, FeatureFlag } from "@/types/api";
 import { forbidden } from "next/navigation";
 import { ReactNode, useEffect } from "react";
-
-import { useUserDataStore } from "@/store/userDataStore";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
+import useUserStore from "@/hooks/useUserStore";
 
 interface ProtectedPageProps {
   user: CombinedUser;
@@ -20,8 +19,8 @@ const ProtectedPage = ({
   featureFlags,
   children,
 }: ProtectedPageProps) => {
-  const setUser = useUserDataStore((s) => s.setUser);
-  const setCustodians = useUserDataStore((s) => s.setCustodians);
+  const setUser = useUserStore((s) => s.setUser);
+  const setCustodians = useUserStore((s) => s.setCustodians);
   const setFlags = useFeatureFlagsStore((s) => s.setFlags);
 
   useEffect(() => {

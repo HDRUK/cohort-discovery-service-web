@@ -19,7 +19,7 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import { revalidateAction } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
-import useCustodianStore from "@/store/useCustodianStore";
+import useCustodianStore from "@/hooks/useCustodianStore";
 import { useLogDependencyChanges } from "@/utils/deps";
 import {
   getTagCustodianCollection,

@@ -27,7 +27,7 @@ import { removeFalseKeys, trueKeys } from "@/utils/numbers";
 import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
 import { DatasetErrors } from "@/utils/datasets";
 import { FeatureName } from "@/types/api";
-import { useFeatureFlagsStore } from "./featureFlagsStore";
+import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 
 export enum NodeKind {
   RULE = "RULE",

@@ -1,7 +1,7 @@
 "use client";
 
-import useCustodianStore from "@/store/useCustodianStore";
-import useUserStore from "@/store/useUserStore";
+import useCustodianStore from "@/hooks/useCustodianStore";
+import useUserStore from "@/hooks/useUserStore";
 import { checkIsAdmin } from "@/utils/user";
 import { forbidden } from "next/navigation";
 import { useEffect } from "react";

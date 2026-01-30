@@ -3,7 +3,7 @@ import UpdateWorkgroup, {
 } from "@/modules/UpdateWorkgroup";
 import { maskClientTest } from "@/lib/maskClientTest";
 import { WorkgroupGuidanceProps } from "./WorkgroupsGuidance";
-import useAdminStore from "@/store/useAdminStore";
+import useAdminStore from "@/hooks/useAdminStore";
 
 const WorkgroupGuidance = maskClientTest<WorkgroupGuidanceProps>(
   () => import("./WorkgroupsGuidance"),

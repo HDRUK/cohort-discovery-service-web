@@ -6,11 +6,12 @@ export interface FeatureFlagsStoreState {
   setFlags: (flags: FeatureFlag) => void;
 }
 
+export interface FeatureFlagsStoreState {
+  flags: FeatureFlag | null;
+  setFlags: (flags: FeatureFlag) => void;
+}
+
 export const useFeatureFlagsStore = create<FeatureFlagsStoreState>((set) => ({
   flags: null,
-  setFlags: (flags) =>
-    set((state) => ({
-      ...state,
-      featureFlags: { ...state, flags },
-    })),
+  setFlags: (flags) => set({ flags }),
 }));

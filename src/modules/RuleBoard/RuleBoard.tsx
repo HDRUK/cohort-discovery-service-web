@@ -22,7 +22,7 @@ import {
 import useHasMounted from "@/hooks/useHasMounted";
 import RuleAgeFilter from "../RuleAgeFilter";
 import SkeletonFull from "@/components/SkeletonFull";
-import useStateManagement from "@/store/useStateManagement";
+import useStateManagement from "@/hooks/useStateManagement";
 
 interface RuleBoardProps extends BoxProps {
   ruleGroup: RuleGroupType;

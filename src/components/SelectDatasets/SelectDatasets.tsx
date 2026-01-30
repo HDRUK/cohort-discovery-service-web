@@ -1,6 +1,6 @@
 "use client";
 
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { Collection, GroupedCollection, Network } from "../../types/api";
 import {
   AccordionSummary,

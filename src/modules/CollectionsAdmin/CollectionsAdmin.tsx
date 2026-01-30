@@ -18,7 +18,7 @@ import ControlledSearchBox from "@/modules/ControlledSearchBox";
 import CollectionsLeftPanel from "@/modules/CollectionsLeftPanel";
 import CollectionsRightPanel from "@/modules/CollectionsRightPanel";
 import { useLogDependencyChanges } from "@/utils/deps";
-import useCustodianStore from "@/store/useCustodianStore";
+import useCustodianStore from "@/hooks/useCustodianStore";
 
 const CollectionsAdmin = ({
   admin = false,

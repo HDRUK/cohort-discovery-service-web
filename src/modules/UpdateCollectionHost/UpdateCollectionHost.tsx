@@ -11,7 +11,7 @@ import FormTextField from "@/components/FormTextField";
 import FormLabel from "@/components/FormLabel";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import ErrorHeader from "@/components/ErrorHeader";
-import useCustodianStore from "@/store/useCustodianStore";
+import useCustodianStore from "@/hooks/useCustodianStore";
 
 type CollectionHostFormValues = { hostName: string };
 

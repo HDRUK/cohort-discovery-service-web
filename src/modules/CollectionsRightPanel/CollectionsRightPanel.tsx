@@ -4,7 +4,7 @@ import UpdateCollection, {
 import UpdateMultipleCollections from "../UpdateMultipleCollections";
 import { maskClientTest } from "@/lib/maskClientTest";
 import { CollectionGuidanceProps } from "./CollectionsGuidance";
-import useUserStore from "@/store/useUserStore";
+import useUserStore from "@/hooks/useUserStore";
 
 const CollectionGuidance = maskClientTest<CollectionGuidanceProps>(
   () => import("./CollectionsGuidance"),

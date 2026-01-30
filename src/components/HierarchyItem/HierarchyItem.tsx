@@ -1,7 +1,7 @@
 "use client";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import useSortable from "@/hooks/useSortable";
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { RuleNodeType } from "@/types/rules";
 import { isRuleGroup } from "@/utils/rules";
 

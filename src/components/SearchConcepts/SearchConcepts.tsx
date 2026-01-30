@@ -18,7 +18,7 @@ import {
   Divider,
 } from "@mui/material";
 import { ConceptItem, ConceptItemProps } from "./ConceptItem";
-import useUserStore from "@/store/useUserStore";
+import useUserStore from "@/hooks/useUserStore";
 
 interface SlotProps {
   conceptItem: ConceptItemProps;

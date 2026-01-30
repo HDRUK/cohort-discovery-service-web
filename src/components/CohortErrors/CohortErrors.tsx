@@ -3,8 +3,8 @@
 import { Stack, Typography } from "@mui/material";
 import ErrorIcon from "@/components/ErrorIcon";
 import { Warning } from "@mui/icons-material";
-import useStateManagement from "@/store/useStateManagement";
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useStateManagement from "@/hooks/useStateManagement";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 
 const CohortErrors = () => {
   const {

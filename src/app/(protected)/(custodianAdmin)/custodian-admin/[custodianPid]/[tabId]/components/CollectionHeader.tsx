@@ -1,6 +1,6 @@
 "use client";
 
-import useUserStore from "@/store/useUserStore";
+import useUserStore from "@/hooks/useUserStore";
 import { Skeleton, Box, Typography } from "@mui/material";
 
 const CollectionHeader = ({ pid }: { pid: string }) => {

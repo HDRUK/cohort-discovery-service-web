@@ -12,8 +12,8 @@ import { isAgeFilter, isRuleLeaf, updateById } from "@/utils/rules";
 import { AgeFilterType, RuleLeafType } from "@/types/rules";
 import { CustomH1 } from "@/components/GuidanceHeaders";
 import { MAX_AGE_FILTER, MIN_AGE_FILTER } from "@/config/rules";
-import useFeatures from "@/store/useFeatures";
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useFeatures from "@/hooks/useFeatures";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 
 import SingleBoundSelector, {
   NullablePair,
@@ -80,7 +80,8 @@ const RuleAgeSelector = ({
     setQueryBuilderJson: qb.setQueryBuilderJson,
   }));
 
-  const { constrainForBunnyV1 } = useFeatures();
+  const flags = useFeatures();
+  const { constrainForBunnyV1 } = flags;
 
   const values = isRuleLeaf(rule) ? rule.ageConstraint : rule.value;
 

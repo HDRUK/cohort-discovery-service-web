@@ -1,6 +1,6 @@
 "use client";
 
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 
 import { useEffect, useMemo, useState } from "react";
 import { Query, Paginated } from "@/types/api";
@@ -29,7 +29,7 @@ import useSearchParams from "@/hooks/useSearchParams";
 import { buildQueryHistoryParams } from "@/utils/params";
 import { AvailableFormats } from "@/components/DownloadButton/DownloadButton";
 import rerunQuery from "@/actions/rerunQuery";
-import useUserStore from "@/store/useUserStore";
+import useUserStore from "@/hooks/useUserStore";
 import { getUserQueryTag, TAG_QUERIES } from "@/config/tags";
 
 interface QueriesTableProps {

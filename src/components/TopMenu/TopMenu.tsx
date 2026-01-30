@@ -7,7 +7,7 @@ import TabsShell from "@/components/TabsShell";
 import { routes } from "../../config/routes";
 import { TabType } from "../TabsShell/TabsShell";
 import { checkIsAdmin } from "@/utils/user";
-import useUserStore from "@/store/useUserStore";
+import useUserStore from "@/hooks/useUserStore";
 
 export default function TopMenu() {
   const pathname = usePathname();

@@ -4,7 +4,7 @@ import { CollectionHostFormValues } from "@/types/forms";
 import { QueryContext } from "@/types/context";
 import FormTextField from "@/components/FormTextField";
 import FormDropdown from "@/components/FormDropdown";
-import useCustodianStore from "@/store/useCustodianStore";
+import useCustodianStore from "@/hooks/useCustodianStore";
 
 interface CollectionHostFormProps {
   custodianId: number;

@@ -10,7 +10,7 @@ import { NotifyProvider } from "@/providers/NotifyProvider";
 const createCollectionHost = jest.fn();
 const onCancel = jest.fn();
 
-jest.mock("@/store/useDaphneStore", () => ({
+jest.mock("@/hooks/useDaphneStore", () => ({
   useDaphneStore: () => ({
     custodianData: {
       createCollectionHost,

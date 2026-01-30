@@ -5,10 +5,10 @@ import ActionMenuSection from "@/components/ActionMenuSection";
 import AddButton from "@/components/AddButton";
 import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
 import Hierarchy from "../Hierarchy";
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { Box } from "@mui/material";
 import SkeletonFull from "@/components/SkeletonFull";
-import useStateManagement from "@/store/useStateManagement";
+import useStateManagement from "@/hooks/useStateManagement";
 
 const ActionMenu: React.FC = () => {
   const {

@@ -11,7 +11,7 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import { useForm, Controller } from "react-hook-form";
 import { useState } from "react";
-import useUserStore from "@/store/useUserStore";
+import useUserStore from "@/hooks/useUserStore";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { OmopTableName } from "@/types/omop";

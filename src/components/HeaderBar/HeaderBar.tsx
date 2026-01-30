@@ -6,7 +6,7 @@ import logo from "@/assets/logo.svg";
 import userIcon from "@/assets/user_logo.svg";
 import PositionedMenu, { PositionedMenuItem } from "../PositionedMenu";
 import { useRouter } from "next/navigation";
-import useUserStore from "@/store/useUserStore";
+import useUserStore from "@/hooks/useUserStore";
 
 const HeaderBar = () => {
   const router = useRouter();

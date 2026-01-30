@@ -5,7 +5,7 @@ import { useCallback } from "react";
 import ConceptChip from "@/components/ConceptChip";
 import { RuleLeafType } from "@/types/rules";
 
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 import {
   isEmptyRule,
   updateById,

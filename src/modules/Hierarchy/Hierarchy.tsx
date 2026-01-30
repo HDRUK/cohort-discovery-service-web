@@ -23,7 +23,7 @@ import HierarchyItem from "@/components/HierarchyItem";
 import { ID_REF_SUFFIX } from "@/config/defaults";
 import useHasMounted from "@/hooks/useHasMounted";
 import SkeletonFull from "@/components/SkeletonFull";
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 
 export const Hierarchy = () => {
   const { queryBuilderJson, setQueryBuilderJson, boardIndex } = useQueryBuilder(

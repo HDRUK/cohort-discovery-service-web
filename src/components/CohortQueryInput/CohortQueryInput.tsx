@@ -4,7 +4,7 @@ import { useForm, Controller, useWatch } from "react-hook-form";
 import { Box } from "@mui/material";
 import { useCallback, useEffect, useRef } from "react";
 import SearchBox from "../SearchBox";
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 import {
   DEFAULT_SEARCH_WAIT_TIME,
   MAX_INVALID_REASONS,
@@ -13,7 +13,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import useSubmitQuery from "@/hooks/useSubmitQuery";
 import { ArrowForward } from "@mui/icons-material";
 import { RuleErrors } from "@/utils/rules";
-import useStateManagement from "@/store/useStateManagement";
+import useStateManagement from "@/hooks/useStateManagement";
 
 type FormValues = {
   cohortQueryInput: string;

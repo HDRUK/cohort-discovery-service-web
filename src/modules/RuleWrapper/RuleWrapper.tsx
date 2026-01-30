@@ -14,7 +14,7 @@ import {
 import { ReactNode, RefObject, useCallback, useMemo, useState } from "react";
 import useSortable from "@/hooks/useSortable";
 import { DragIndicator } from "@mui/icons-material";
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 
 import {
   containerSx,
@@ -39,7 +39,7 @@ import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
 import { mergeSx } from "@/utils/helpers";
 import RuleAgeSelector from "@/components/RuleAgeSelector";
 import { isAgeFilter, isRuleLeaf } from "@/utils/rules";
-import useFeatures from "@/store/useFeatures";
+import useFeatures from "@/hooks/useFeatures";
 
 interface Action {
   action: () => void;

@@ -8,7 +8,7 @@ import { useMemo } from "react";
 import { useElementSize } from "./useElementSize";
 import { quantise } from "@/utils/numbers";
 import { useDndContext } from "@dnd-kit/core";
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 
 export interface UseSortablePlusReturn extends ReturnType<
   typeof useDndSortable

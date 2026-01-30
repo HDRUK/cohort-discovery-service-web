@@ -1,6 +1,6 @@
-import useUserStore from "@/store/useUserStore";
-import useQueryBuilder from "@/store/useQueryBuilder";
-import useStateManagement from "@/store/useStateManagement";
+import useUserStore from "@/hooks/useUserStore";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
+import useStateManagement from "@/hooks/useStateManagement";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { routes } from "@/config/routes";

@@ -10,7 +10,7 @@ import AddNewConcept from "./AddNewConcept";
 import ActionDeleteButton from "@/components/ActionDeleteButton";
 import CreateConceptSet from "@/modules/CreateConceptSet";
 import Table from "@/components/Table";
-import useUserStore from "@/store/useUserStore";
+import useUserStore from "@/hooks/useUserStore";
 
 const MyDefinitions = ({ conceptSets }: { conceptSets: ConceptSet[] }) => {
   const removeConceptsFromSet = useUserStore((s) => s.removeConceptsFromSet);

@@ -13,8 +13,8 @@ import CollectionHostLeftPanel from "./CollectionHostLeftPanel";
 import CollectionHostListPanel from "./CollectionHostListPanel";
 import CollectionHostRightPanel from "./CollectionHostRightPanel";
 
-import useUserStore from "@/store/useUserStore";
-import useCustodianStore from "@/store/useCustodianStore";
+import useUserStore from "@/hooks/useUserStore";
+import useCustodianStore from "@/hooks/useCustodianStore";
 
 const CollectionHostAdmin = ({
   pid,

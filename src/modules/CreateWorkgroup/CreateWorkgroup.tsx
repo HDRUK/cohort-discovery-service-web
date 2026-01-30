@@ -9,7 +9,7 @@ import { useNotify } from "@/providers/NotifyProvider";
 
 import FormMultiSelect from "@/components/FormMultiSelect";
 import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
-import useAdminStore from "@/store/useAdminStore";
+import useAdminStore from "@/hooks/useAdminStore";
 
 interface CreateCollectionProps {
   collections?: Collection[];

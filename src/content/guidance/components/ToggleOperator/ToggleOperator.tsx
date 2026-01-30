@@ -4,7 +4,7 @@ import FormControl from "@mui/material/FormControl";
 import SquareRadio from "@/components/SquareRadio";
 import { CombinatorType, OperatorType } from "@/types/rules";
 import { updateById } from "@/utils/rules";
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 
 type ToggleOperatorProps = {
   operator: OperatorType;

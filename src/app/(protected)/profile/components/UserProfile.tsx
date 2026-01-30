@@ -1,7 +1,7 @@
 "use client";
 
 import UserDetailsTable from "./UserDetailsTable";
-import useUserStore from "@/store/useUserStore";
+import useUserStore from "@/hooks/useUserStore";
 
 const UserProfile = () => {
   const user = useUserStore((s) => s.user);

@@ -8,7 +8,7 @@ import LaunchIcon from "@mui/icons-material/Launch";
 import { useEffect, useMemo } from "react";
 import { useTable } from "../../hooks/useTable";
 import { formatNumber } from "@/utils/numbers";
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 import useSearchParams from "@/hooks/useSearchParams";
 import { DEFAULT_INTERVAL, STATUS_LABELS } from "@/config/defaults";
 import Table from "../../components/Table";

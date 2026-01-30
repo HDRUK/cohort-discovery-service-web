@@ -46,7 +46,7 @@ import { getMockQuery } from "@/actions/__mocks__/getQueries";
 
 import { useQueryBuilderStore } from "./queryBuilderStore";
 import { useStateManagementStore } from "@/store/stateManagementStore";
-import { useUserDataStore } from "@/store/userDataStore";
+import { useUserDataStore } from "@/hooks/userDataStore";
 import { useCustodianDataStore } from "@/store/custodianDataStore";
 import { useAdminDataStore } from "@/store/adminDataStore";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";

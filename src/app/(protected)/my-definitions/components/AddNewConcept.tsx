@@ -8,7 +8,7 @@ import { ConceptSet } from "@/types/api";
 import { useMemo, useState } from "react";
 import { useNotify } from "@/providers/NotifyProvider";
 import { falseKeys, trueKeys } from "@/utils/numbers";
-import useUserStore from "@/store/useUserStore";
+import useUserStore from "@/hooks/useUserStore";
 
 const AddNewConcept = ({ conceptSet }: { conceptSet: ConceptSet }) => {
   const notify = useNotify();

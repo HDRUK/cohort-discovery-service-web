@@ -1,6 +1,6 @@
 "use client";
 
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 
 import { updateById } from "@/utils/rules";
 import { isRuleLeaf } from "@/utils/rules";
