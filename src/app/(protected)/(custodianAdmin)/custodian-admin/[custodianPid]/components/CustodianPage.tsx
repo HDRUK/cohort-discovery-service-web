@@ -1,11 +1,13 @@
 "use client";
 
 import SkeletonFull from "@/components/SkeletonFull";
-import { useDaphneStore } from "@/store/useDaphneStore";
 import { Custodian } from "@/types/api";
 import { Paper } from "@mui/material";
 import { forbidden } from "next/navigation";
 import { useEffect } from "react";
+
+import useUserStore from "@/store/useUserStore";
+import useCustodianStore from "@/store/useCustodianStore";
 
 const CustodianPage = ({
   custodian,
@@ -14,10 +16,8 @@ const CustodianPage = ({
   custodian: Custodian;
   children: React.ReactNode;
 }) => {
-  const {
-    userData: { user },
-    custodianData: { setCurrentCustodian },
-  } = useDaphneStore();
+  const user = useUserStore((s) => s.user);
+  const setCurrentCustodian = useCustodianStore((s) => s.setCurrentCustodian);
 
   useEffect(() => {
     setCurrentCustodian(custodian);
@@ -30,6 +30,7 @@ const CustodianPage = ({
     }
     return children;
   }
+
   return (
     <Paper sx={{ display: "flex", height: "100%" }}>
       <SkeletonFull />

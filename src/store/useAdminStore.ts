@@ -1,7 +1,7 @@
 import { useShallow } from "zustand/react/shallow";
-import { DaphneStoreState, useDaphneStore } from "./useDaphneStore";
+import { AdminDataStoreState, useAdminDataStore } from "./adminDataStore";
 
-const useAdminStore = <T>(sel: (qb: DaphneStoreState["adminData"]) => T) =>
-  useDaphneStore(useShallow((s) => sel(s.adminData)));
+const useAdminStore = <T>(sel: (s: AdminDataStoreState) => T) =>
+  useAdminDataStore(useShallow((st) => sel(st)));
 
 export default useAdminStore;

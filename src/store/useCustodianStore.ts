@@ -1,8 +1,10 @@
 import { useShallow } from "zustand/react/shallow";
-import { DaphneStoreState, useDaphneStore } from "./useDaphneStore";
+import {
+  CustodianDataStoreState,
+  useCustodianDataStore,
+} from "./custodianDataStore";
 
-const useCustodianStore = <T>(
-  sel: (qb: DaphneStoreState["custodianData"]) => T,
-) => useDaphneStore(useShallow((s) => sel(s.custodianData)));
+const useCustodianStore = <T>(sel: (s: CustodianDataStoreState) => T) =>
+  useCustodianDataStore(useShallow((st) => sel(st)));
 
 export default useCustodianStore;

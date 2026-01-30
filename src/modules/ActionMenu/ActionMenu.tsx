@@ -7,8 +7,8 @@ import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
 import Hierarchy from "../Hierarchy";
 import useQueryBuilder from "@/store/useQueryBuilder";
 import { Box } from "@mui/material";
-import { useDaphneStore } from "@/store/useDaphneStore";
 import SkeletonFull from "@/components/SkeletonFull";
+import useStateManagement from "@/store/useStateManagement";
 
 const ActionMenu: React.FC = () => {
   const {
@@ -23,7 +23,7 @@ const ActionMenu: React.FC = () => {
     createNewAgeFilter: qb.createNewAgeFilter,
   }));
 
-  const isLoading = useDaphneStore((s) => s.stateManagement.isLoading);
+  const isLoading = useStateManagement((s) => s.isLoading);
   if (isLoading) {
     return <SkeletonFull />;
   }

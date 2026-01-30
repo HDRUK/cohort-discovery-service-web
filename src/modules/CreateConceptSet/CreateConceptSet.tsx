@@ -11,7 +11,7 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import { useForm, Controller } from "react-hook-form";
 import { useState } from "react";
-import { useDaphneStore } from "@/store/useDaphneStore";
+import useUserStore from "@/store/useUserStore";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { OmopTableName } from "@/types/omop";
@@ -35,9 +35,7 @@ const schema = yup.object({
 type ConceptSetFormValues = yup.InferType<typeof schema>;
 
 const CreateConceptSetForm = ({ onCancel }: CreateConceptSetFormProps) => {
-  const {
-    userData: { createConceptSet },
-  } = useDaphneStore();
+  const createConceptSet = useUserStore((s) => s.createConceptSet);
 
   const [submitting, setSubmitting] = useState(false);
 

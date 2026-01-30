@@ -1,5 +1,6 @@
-import { useDaphneStore } from "@/store/useDaphneStore";
+import useUserStore from "@/store/useUserStore";
 import useQueryBuilder from "@/store/useQueryBuilder";
+import useStateManagement from "@/store/useStateManagement";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { routes } from "@/config/routes";
@@ -8,8 +9,12 @@ import { useEffect } from "react";
 const useSubmitQuery = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const fetchResults = useDaphneStore((s) => s.userData.fetchResults);
-  const { isLoading, setIsLoading } = useDaphneStore((s) => s.stateManagement);
+
+  const fetchResults = useUserStore((s) => s.fetchResults);
+  const { isLoading, setIsLoading } = useStateManagement((s) => ({
+    isLoading: s.isLoading,
+    setIsLoading: s.setIsLoading,
+  }));
 
   useEffect(() => {
     return () => {

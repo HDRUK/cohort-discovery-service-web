@@ -5,15 +5,13 @@ import { usePathname } from "next/navigation";
 
 import TabsShell from "@/components/TabsShell";
 import { routes } from "../../config/routes";
-import { useDaphneStore } from "@/store/useDaphneStore";
 import { TabType } from "../TabsShell/TabsShell";
 import { checkIsAdmin } from "@/utils/user";
+import useUserStore from "@/store/useUserStore";
 
 export default function TopMenu() {
   const pathname = usePathname();
-  const {
-    userData: { user },
-  } = useDaphneStore();
+  const user = useUserStore((s) => s.user);
 
   const userCustodians = useMemo(
     () => user?.custodians ?? [],

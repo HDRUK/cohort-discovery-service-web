@@ -1,12 +1,10 @@
 "use client";
 
-import { useDaphneStore } from "@/store/useDaphneStore";
 import UserDetailsTable from "./UserDetailsTable";
+import useUserStore from "@/store/useUserStore";
 
 const UserProfile = () => {
-  const {
-    userData: { user },
-  } = useDaphneStore();
+  const user = useUserStore((s) => s.user);
 
   return <>{user && <UserDetailsTable user={user} />}</>;
 };

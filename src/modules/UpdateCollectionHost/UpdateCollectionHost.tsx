@@ -7,11 +7,11 @@ import { CollectionHost } from "@/types/api";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useEffect } from "react";
 import { useNotify } from "@/providers/NotifyProvider";
-import { useDaphneStore } from "@/store/useDaphneStore";
 import FormTextField from "@/components/FormTextField";
 import FormLabel from "@/components/FormLabel";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import ErrorHeader from "@/components/ErrorHeader";
+import useCustodianStore from "@/store/useCustodianStore";
 
 type CollectionHostFormValues = { hostName: string };
 
@@ -29,9 +29,7 @@ const UpdateCollectionHost = ({
 }: UpdateCollectionHostProps) => {
   const notify = useNotify();
 
-  const {
-    custodianData: { updateCollectionHost },
-  } = useDaphneStore();
+  const updateCollectionHost = useCustodianStore((s) => s.updateCollectionHost);
 
   const formMethods = useForm<CollectionHostFormValues>({
     defaultValues: {
