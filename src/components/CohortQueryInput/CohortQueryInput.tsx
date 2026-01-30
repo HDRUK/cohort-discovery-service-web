@@ -12,8 +12,8 @@ import {
 } from "@/config/defaults";
 import { useDebounce } from "@/hooks/useDebounce";
 import useSubmitQuery from "@/hooks/useSubmitQuery";
-import { ArrowForward } from "@mui/icons-material";
 import { RuleErrors } from "@/utils/rules";
+import SubmitQueryButton from "@/components/SubmitQueryButton";
 
 type FormValues = {
   cohortQueryInput: string;
@@ -148,20 +148,22 @@ const CohortQueryInput = () => {
           },
         }}
         render={({ field, fieldState: { error, isDirty } }) => (
-          <SearchBox
-            {...field}
-            collapsible={false}
-            error={isDirty ? false : !!error}
-            type="search"
-            placeholder="Search for a cohort e.g. females above 50 with diabetes type-ii"
-            fullWidth
-            variant="outlined"
-            onClickEndAdornment={submitQuery}
-            loading={isLoading}
-            warning={warnings.length > 0}
-            disabled={disabled || !!error}
-            endIcon={<ArrowForward />}
-          />
+          <Box display="flex" flexDirection="row" sx={{ gap: 1 }}>
+            <SearchBox
+              {...field}
+              collapsible={false}
+              error={isDirty ? false : !!error}
+              type="search"
+              placeholder="Search for a cohort e.g. females above 50 with diabetes type-ii"
+              fullWidth
+              variant="outlined"
+              loading={isLoading}
+              warning={warnings.length > 0}
+              disabled={disabled || !!error}
+              showEndIcon={false}
+            />
+            <SubmitQueryButton warning={warnings.length > 0} />
+          </Box>
         )}
       />
     </Box>
