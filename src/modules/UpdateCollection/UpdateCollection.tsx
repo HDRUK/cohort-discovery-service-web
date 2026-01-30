@@ -23,7 +23,7 @@ import { Controller, FormProvider, useForm } from "react-hook-form";
 import FormTextField from "@/components/FormTextField";
 import CollectionConfig from "@/components/CollectionConfig";
 import { UpdateCollectionFormValues } from "@/types/forms";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { revalidateAction } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
 import FormDropdown from "@/components/FormDropdown";
@@ -154,9 +154,25 @@ const UpdateCollection = ({
   const {
     control,
     handleSubmit,
+    resetField,
     reset,
     formState: { isDirty, errors },
   } = formMethods;
+
+  const collectionCustodianPid = collection.custodian.pid;
+  //const selectedHostId = useWatch({ name: "collection.host_id", control });
+
+  const allowedCollectionHosts = useMemo(
+    () =>
+      collectionHosts.filter(
+        (ch) => ch.custodian.pid === collectionCustodianPid,
+      ),
+    [collectionHosts, collectionCustodianPid],
+  );
+
+  useEffect(() => {
+    resetField("collection.host_id", { defaultValue: 0 });
+  }, [allowedCollectionHosts, resetField]);
 
   useEffect(() => {
     if (!collection) return;
@@ -475,7 +491,7 @@ const UpdateCollection = ({
                       Select a collection host
                     </MenuItem>
                   }
-                  options={collectionHosts.map((ch) => ({
+                  options={allowedCollectionHosts.map((ch) => ({
                     label: ch.name,
                     value: ch.id,
                   }))}

@@ -745,6 +745,8 @@ export const useDaphneStore = create<DaphneStoreState>((set, get) => ({
       const currentCustodian = get().custodianData.currentCustodian;
       if (currentCustodian)
         await revalidateAction(getCollectionHostTag(currentCustodian.pid));
+
+      await revalidateAction(TAG_COLLECTION_HOSTS);
     },
     createCollection: async (custodianPid, payload, payloadConfig) => {
       // note: inconsistancy between using custodian Id and custodian Pid
