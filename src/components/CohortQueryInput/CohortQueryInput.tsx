@@ -75,7 +75,7 @@ const CohortQueryInput = () => {
 
   const resetQuery = useCallback(() => {
     clearFormErrors();
-    resetQueryBuilderJson();
+    resetQueryBuilderJson(false);
     resetField("cohortQueryInput", {
       defaultValue: queryAsText,
       keepTouched: true,

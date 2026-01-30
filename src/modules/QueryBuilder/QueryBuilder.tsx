@@ -65,7 +65,7 @@ const QueryBuilder = ({
   }));
 
   useEffect(() => {
-    resetQueryBuilderJson();
+    resetQueryBuilderJson(true);
   }, [resetQueryBuilderJson]);
 
   useEffect(() => {
