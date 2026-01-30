@@ -30,7 +30,7 @@ export type SearchBoxProps = Omit<TextFieldProps, "errors"> & {
   expandedWidth?: number | string;
   inputBgColor?: string;
   actions?: React.ReactNode[];
-  onClickEndAornment?: () => void;
+  onClickEndAdornment?: () => void;
   endIcon?: React.ReactNode;
 };
 
@@ -44,7 +44,7 @@ const SearchBox = ({
   inputBgColor = "#fff",
   actions,
   disabled,
-  onClickEndAornment,
+  onClickEndAdornment,
   endIcon,
   ...rest
 }: SearchBoxProps) => {
@@ -69,7 +69,7 @@ const SearchBox = ({
     e.preventDefault();
     e.stopPropagation();
     if (collapsible) toggle();
-    onClickEndAornment?.();
+    onClickEndAdornment?.();
   };
 
   const actionChildren = React.Children.toArray(actions);
