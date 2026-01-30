@@ -160,7 +160,6 @@ const UpdateCollection = ({
   } = formMethods;
 
   const collectionCustodianPid = collection.custodian.pid;
-  //const selectedHostId = useWatch({ name: "collection.host_id", control });
 
   const allowedCollectionHosts = useMemo(
     () =>
