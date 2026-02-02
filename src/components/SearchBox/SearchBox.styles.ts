@@ -28,6 +28,7 @@ export const getTextFieldSx = (
   expanded: boolean,
   inputBgColor: string,
   hasWarning: boolean = false,
+  hasError: boolean = false,
 ): SxProps<Theme> => ({
   "& .MuiOutlinedInput-root": {
     borderRadius: 20,
@@ -47,30 +48,34 @@ export const getTextFieldSx = (
 
   ...(hasWarning
     ? {
-        "& .MuiOutlinedInput-root:not(.Mui-focused):not(.Mui-error) .MuiOutlinedInput-notchedOutline":
+        "& .MuiOutlinedInput-root:not(.Mui-error) .MuiOutlinedInput-notchedOutline":
           {
             border: (t: Theme) => `2px solid ${t.palette.warning.main}`,
             opacity: 1,
             display: "inherit",
           },
-        "& .MuiInputLabel-root:not(.Mui-focused):not(.Mui-error)": {
+        "& .MuiInputLabel-root:not(.Mui-error)": {
           color: (t: Theme) => t.palette.warning.main,
         },
       }
     : null),
-
-  "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-    border: (t: Theme) => `2px solid ${t.palette.success.main}`,
-    opacity: 1,
-    display: "inherit",
-  },
+  ...(hasError
+    ? {
+        "& .MuiOutlinedInput-root:not(.Mui-error) .MuiOutlinedInput-notchedOutline":
+          {
+            border: (t: Theme) => `2px solid ${t.palette.error.main}`,
+            opacity: 1,
+            display: "inherit",
+          },
+        "& .MuiInputLabel-root:not(.Mui-error)": {
+          color: (t: Theme) => t.palette.error.main,
+        },
+      }
+    : null),
 
   "& .MuiInputLabel-root": {
     color: (t: Theme) => t.palette.text.secondary,
     zIndex: 1,
-  },
-  "& .MuiInputLabel-root.Mui-focused": {
-    color: (t: Theme) => t.palette.success.main,
   },
 
   "& .MuiInputAdornment-root": { position: "relative", zIndex: 2 },
