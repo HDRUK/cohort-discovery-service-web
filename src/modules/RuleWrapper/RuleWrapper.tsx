@@ -11,6 +11,7 @@ import {
   Collapse,
   CardActions,
   Fade,
+  Divider,
 } from "@mui/material";
 import { ReactNode, RefObject, useCallback, useMemo, useState } from "react";
 import useSortable from "@/hooks/useSortable";
@@ -298,6 +299,8 @@ const RuleWrapper = ({
               )}
 
             <RightClickMenu {...rightClickMenuMethods} actions={actions} />
+            <Divider variant="fullWidth" />
+            <Box height={40}></Box>
           </Card>
         )}
 
