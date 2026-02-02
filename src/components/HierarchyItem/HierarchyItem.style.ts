@@ -11,6 +11,7 @@ export const listItemButtonSx =
     isOver: boolean,
     isAbove: boolean,
     depth: number,
+    isSelected: boolean,
   ): SxProps<Theme> =>
   (theme) => ({
     color: theme.palette.text.primary,
@@ -23,6 +24,8 @@ export const listItemButtonSx =
     outlineOffset: -1,
 
     position: "relative",
+    bgcolor: isSelected ? "background.default" : "none",
+
     ...(isOver && {
       "&::after": {
         content: '""',

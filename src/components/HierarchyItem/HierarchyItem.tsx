@@ -87,7 +87,13 @@ export const HierarchyItem = ({
       onClick={toggleCheckbox}
       onContextMenu={handleContextMenu}
       component="div"
-      sx={listItemButtonSx(isDragging, isOver, isAbove, depth)}
+      sx={listItemButtonSx(
+        isDragging,
+        isOver,
+        isAbove,
+        depth,
+        selected[node.id],
+      )}
     >
       <SquareRadio
         size="medium"
