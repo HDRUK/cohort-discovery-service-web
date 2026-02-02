@@ -103,6 +103,8 @@ const MockDaphneStore = ({
         _w: number | string,
         _h: number | string,
       ) => {},
+      hovered: {},
+      setHovered: (_id: UniqueIdentifier, _reset: boolean) => {},
       selected: {},
       toggleSelected: (_id: UniqueIdentifier) => {},
       setQueryBuilderJson: (q: RuleGroupType) => validateRuleTree(q),
