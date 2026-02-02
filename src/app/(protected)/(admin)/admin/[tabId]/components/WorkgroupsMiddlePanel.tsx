@@ -1,15 +1,20 @@
 "use client";
 
 import CollectionsTable from "@/components/CollectionsTable";
-import { Box, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { capitaliseFirstLetter } from "@/utils/string";
 import useAdminStore from "@/hooks/useAdminStore";
 import { useNotify } from "@/providers/NotifyProvider";
+import UserTable from "@/components/UserTable";
 
 const WorkgroupsMiddlePanel = () => {
   const selectedWorkgroup = useAdminStore((s) => s.selectedWorkgroup);
   const removeCollectionsFromWorkgroup = useAdminStore(
     (s) => s.removeCollectionsFromWorkgroup,
+  );
+
+  const removeUsersFromWorkgroup = useAdminStore(
+    (s) => s.removeUsersFromWorkgroup,
   );
 
   const notify = useNotify();
@@ -23,12 +28,12 @@ const WorkgroupsMiddlePanel = () => {
         minHeight: 0,
       }}
     >
-      {
-        !!selectedWorkgroup && (
+      {!!selectedWorkgroup && (
+        <Stack gap={2} sx={{ flex: 1, minHeight: 0 }}>
           <CollectionsTable
             tableTitle={`${capitaliseFirstLetter(
               selectedWorkgroup?.name.toLowerCase(),
-            )} Workgroups`}
+            )} Workgroup`}
             tableSubTitle="Collections"
             deleteOverride={async (ids: string[]) => {
               await removeCollectionsFromWorkgroup({
@@ -41,10 +46,28 @@ const WorkgroupsMiddlePanel = () => {
                 } removed from workgroup ${selectedWorkgroup.name}`,
               );
             }}
+            boxSxProps={{ maxHeight: 420 }}
           />
-        )
-        //* Space here for Users Table post MVP
-      }
+          <UserTable
+            tableTitle={`${capitaliseFirstLetter(
+              selectedWorkgroup?.name.toLowerCase(),
+            )} Workgroup`}
+            tableSubTitle="Users"
+            handleDelete={async (ids: string[]) => {
+              await removeUsersFromWorkgroup({
+                ids: ids.map((id) => +id),
+                workgroup_id: selectedWorkgroup.id,
+              });
+              notify.success(
+                `${ids.length} Users${
+                  ids.length > 1 ? "s" : ""
+                } removed from workgroup ${selectedWorkgroup.name}`,
+              );
+            }}
+            boxSxProps={{ maxHeight: 420, minHeight: 400 }}
+          />
+        </Stack>
+      )}
       {!selectedWorkgroup && (
         <Box sx={{ mx: "auto", my: "auto" }}>
           <Typography variant="h5">

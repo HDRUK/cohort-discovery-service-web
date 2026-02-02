@@ -20,6 +20,7 @@ export interface UpdateCollectionFormValues {
 
 export interface UpdateWorkgroupFormValues {
   collections: OptionsType[];
+  users: OptionsType[];
 }
 
 export interface CreateWorkgroupFormValues {

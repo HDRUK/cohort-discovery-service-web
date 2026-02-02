@@ -24,6 +24,9 @@ import {
   CollectionHost,
   Paginated,
   CollectionWithHosts,
+  User,
+  AddUsersToWorkgroupPost,
+  RemoveUsersFromWorkgroupPost,
 } from "@/types/api";
 import {
   getCollectionHostTag,
@@ -32,10 +35,16 @@ import {
   TAG_COLLECTIONS,
   TAG_COLLECTION_HOSTS,
   TAG_WORKGROUP_ADMIN,
+  TAG_ADMIN_USERS,
 } from "@/config/tags";
 import { emptyPaginated } from "@/utils/pagination";
+import addUsersToWorkgroup from "@/actions/addUsersToWorkgroup";
+import removeUserFromWorkgroup from "@/actions/removeUsersFromWorkgroup";
 
 export interface AdminDataStoreState {
+  users: User[];
+  setUsers: (users: User[]) => void;
+
   // for collections the admin searches on in the tables
   collections: Paginated<CollectionWithHosts>;
   setCollections: (collections: Paginated<CollectionWithHosts>) => void;
@@ -70,6 +79,11 @@ export interface AdminDataStoreState {
     payload: RemoveCollectionsFromWorkgroupPost,
   ) => Promise<void>;
 
+  addUsersToWorkgroup: (payload: AddUsersToWorkgroupPost) => Promise<number[]>;
+  removeUsersFromWorkgroup: (
+    payload: RemoveUsersFromWorkgroupPost,
+  ) => Promise<void>;
+
   addCollectionToWorkgroups: (
     payload: AddCollectionToWorkgroupsPost,
   ) => Promise<number[]>;
@@ -79,9 +93,15 @@ export interface AdminDataStoreState {
 
   selectedWorkgroup: Workgroup | null;
   setSelectedWorkgroup: (workgroup: Workgroup | null) => void;
+
+  selectedUser: User | null;
+  setSelectedUser: (user: User | null) => void;
 }
 
 export const useAdminDataStore = create<AdminDataStoreState>((set) => ({
+  users: [],
+  setUsers: (users) => set((state) => ({ ...state, users })),
+
   allAprovedCollections: [],
   setAllAprovedCollections: (allAprovedCollections) =>
     set((state) => ({
@@ -165,6 +185,21 @@ export const useAdminDataStore = create<AdminDataStoreState>((set) => ({
     await revalidateAction(TAG_WORKGROUP_ADMIN);
   },
 
+  addUsersToWorkgroup: async (payload) => {
+    const data = await addUsersToWorkgroup(payload);
+    await revalidateAction(TAG_WORKGROUP_ADMIN);
+    await revalidateAction(TAG_COLLECTION_ADMIN);
+    await revalidateAction(TAG_ADMIN_USERS);
+    return data.map((d) => d.data);
+  },
+
+  removeUsersFromWorkgroup: async (payload) => {
+    await removeUserFromWorkgroup(payload);
+    await revalidateAction(TAG_COLLECTION_ADMIN);
+    await revalidateAction(TAG_WORKGROUP_ADMIN);
+    await revalidateAction(TAG_ADMIN_USERS);
+  },
+
   addCollectionToWorkgroups: async (payload) => {
     const data = await addCollectionToWorkgroups(payload);
     await revalidateAction(TAG_WORKGROUP_ADMIN);
@@ -183,5 +218,12 @@ export const useAdminDataStore = create<AdminDataStoreState>((set) => ({
     set((state) => ({
       ...state,
       selectedWorkgroup,
+    })),
+
+  selectedUser: null,
+  setSelectedUser: (selectedUser) =>
+    set((state) => ({
+      ...state,
+      selectedUser,
     })),
 }));
