@@ -299,8 +299,12 @@ const RuleWrapper = ({
               )}
 
             <RightClickMenu {...rightClickMenuMethods} actions={actions} />
-            <Divider variant="fullWidth" />
-            <Box height={40}></Box>
+            {type === "Rule" && (
+              <>
+                <Divider variant="fullWidth" />
+                <Box height={40}></Box>
+              </>
+            )}
           </Card>
         )}
 
