@@ -75,6 +75,9 @@ export interface QueryBuilderStoreState {
     height: number | string,
   ) => void;
 
+  hovered: Record<UniqueIdentifier, boolean>;
+  setHovered: (id: UniqueIdentifier, reset?: boolean) => void;
+
   selected: Record<UniqueIdentifier, boolean>;
   setSelected: (
     id: UniqueIdentifier | UniqueIdentifier[],
@@ -161,6 +164,14 @@ export const useQueryBuilderStore = create<QueryBuilderStoreState>(
           [id]: { width, height },
         },
       })),
+
+    hovered: {},
+    setHovered: async (id: UniqueIdentifier, reset: boolean = false) => {
+      set((state) => ({
+        ...state,
+        hovered: { [id]: !reset },
+      }));
+    },
 
     selected: {},
     setSelected: (id, nextValue = true, reset = false) => {
