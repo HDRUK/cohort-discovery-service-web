@@ -11,7 +11,7 @@ const getConcepts = async (
   domain?: string,
   page = 1,
   per_page = DEFAULT_CODES_PER_PAGE,
-): Promise<ApiResponse<Paginated<Partial<Concept>[]>>> => {
+): Promise<ApiResponse<Paginated<Partial<Concept>>>> => {
   const params = new URLSearchParams({
     page: String(page),
     per_page: String(per_page),
@@ -21,7 +21,7 @@ const getConcepts = async (
   });
 
   const { data, message } = await apiGet<
-    ApiResponse<Paginated<Partial<Concept>[]>>
+    ApiResponse<Paginated<Partial<Concept>>>
   >({
     url: API_ROUTES.searchConcepts,
     params,

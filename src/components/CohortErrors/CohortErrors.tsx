@@ -1,10 +1,10 @@
 "use client";
 
 import { Stack, Typography } from "@mui/material";
-import useQueryBuilder from "@/store/useQueryBuilder";
 import ErrorIcon from "@/components/ErrorIcon";
 import { Warning } from "@mui/icons-material";
-import { useDaphneStore } from "@/store/useDaphneStore";
+import useStateManagement from "@/hooks/useStateManagement";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 
 const CohortErrors = () => {
   const {
@@ -14,8 +14,11 @@ const CohortErrors = () => {
     queryBuilderJson: qb.queryBuilderJson,
     errors: qb.errors,
   }));
-  const isLoading = useDaphneStore((s) => s.stateManagement.isLoading);
+
+  const isLoading = useStateManagement((s) => s.isLoading);
+
   if (isLoading) return null;
+
   return (
     <>
       {errors.length > 0 && (
@@ -33,6 +36,7 @@ const CohortErrors = () => {
           </Stack>
         </Stack>
       )}
+
       {warnings.length > 0 && (
         <Stack direction="row" gap={1} marginLeft={2}>
           <Warning color="warning" />

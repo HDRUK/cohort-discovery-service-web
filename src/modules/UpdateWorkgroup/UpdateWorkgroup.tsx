@@ -3,7 +3,6 @@ import { Typography, Box } from "@mui/material";
 import LockOutlineIcon from "@mui/icons-material/LockOutline";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import ActionMenuSection from "@/components/ActionMenuSection";
-import { Collection } from "@/types/api";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { UpdateWorkgroupFormValues } from "@/types/forms";
 import { useEffect } from "react";
@@ -11,22 +10,20 @@ import { revalidateAction } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
 import FormMultiSelect from "@/components/FormMultiSelect";
 import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
-import useAdminStore from "@/store/useAdminStore";
+import useAdminStore from "@/hooks/useAdminStore";
 import { TAG_CUSTODIAN_COLLECTION, TAG_WORKGROUP_ADMIN } from "@/config/tags";
+
 export type UpdateWorkgroupProps = {
-  collections: Collection[];
   expandedRight: boolean;
   onClose?: () => void;
 };
 
-const UpdateWorkgroup = ({
-  collections,
-  expandedRight,
-  onClose,
-}: UpdateWorkgroupProps) => {
+const UpdateWorkgroup = ({ expandedRight, onClose }: UpdateWorkgroupProps) => {
   const addCollectionsToWorkgroup = useAdminStore(
     (s) => s.addCollectionsToWorkgroup,
   );
+  const collections = useAdminStore((s) => s.allAprovedCollections);
+
   const selectedWorkgroup = useAdminStore((s) => s.selectedWorkgroup);
 
   const notify = useNotify();

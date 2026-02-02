@@ -10,13 +10,13 @@ import { TAG_ADMIN_USERS } from "@/config/tags";
 const getUsersList = async (
   page = 1,
   per_page = DEFAULT_USERS_PER_PAGE,
-): Promise<ApiResponse<Paginated<User[]>>> => {
+): Promise<ApiResponse<Paginated<User>>> => {
   const params = new URLSearchParams({
     page: String(page),
     per_page: String(per_page),
   });
 
-  return await apiGet<ApiResponse<Paginated<User[]>>>({
+  return await apiGet<ApiResponse<Paginated<User>>>({
     url: API_ROUTES.users,
     params,
     tags: [TAG_ADMIN_USERS],

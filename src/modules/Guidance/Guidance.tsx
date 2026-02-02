@@ -8,7 +8,7 @@ import AgeFilterGuidance from "@/content/guidance/queryBuilder/ageFilter.mdx";
 import EmptyRuleGuidance from "@/content/guidance/queryBuilder/emptyRule.mdx";
 import { Box, BoxProps, Link, LinkProps } from "@mui/material";
 import { useCallback, useMemo } from "react";
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import {
   createOperator,
@@ -42,7 +42,7 @@ import { DeleteMenuItemProps } from "@/components/DeleteMenuItem/DeleteMenuItem"
 import AddAgeButton from "@/components/AddAgeButton";
 import RuleAgeSelector from "@/components/RuleAgeSelector";
 import DeleteAgeButton from "@/components/DeleteAgeButton";
-import useFeatures from "@/store/useFeatures";
+import useFeatures from "@/hooks/useFeatures";
 
 export const baseComponents = {
   a: ({ href, children }: LinkProps) => (

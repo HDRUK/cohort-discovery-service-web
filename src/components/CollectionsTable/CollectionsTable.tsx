@@ -26,18 +26,16 @@ import getCustodianCollections from "@/actions/getCustodianCollections";
 import getAdminCollections from "@/actions/getAdminCollections";
 import { isEqualTask } from "@/utils/distributions";
 import { useLogDependencyChanges } from "@/utils/deps";
-import useAdminStore from "@/store/useAdminStore";
-import useCustodianStore from "@/store/useCustodianStore";
-import useUserStore from "@/store/useUserStore";
+import useAdminStore from "@/hooks/useAdminStore";
+import useCustodianStore from "@/hooks/useCustodianStore";
+import useUserStore from "@/hooks/useUserStore";
 import { useNotify } from "@/providers/NotifyProvider";
 import { getTagCustodianCollection, TAG_COLLECTION_ADMIN } from "@/config/tags";
 import { buildCollectionParams } from "@/utils/params";
 import StatusChip from "@/components/StatusChip";
 
 export interface CollectionsTableProps {
-  initialData: Paginated<CollectionWithHosts[]>;
   showPid?: boolean;
-  admin?: boolean;
   refreshRate?: number;
   tableTitle?: string;
   tableSubTitle?: string;
@@ -45,9 +43,7 @@ export interface CollectionsTableProps {
 }
 
 const CollectionsTable = ({
-  initialData,
   showPid = false,
-  admin = false,
   refreshRate = 5,
   tableTitle,
   tableSubTitle,
@@ -58,11 +54,21 @@ const CollectionsTable = ({
 
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
 
+  const currentCustodian = useCustodianStore((s) => s.current.custodian);
+  const isAdmin = useMemo(() => !currentCustodian, [currentCustodian]);
   const deleteCollectionAdmin = useAdminStore((s) => s.deleteCollection);
   const deleteCollection = useCustodianStore((s) => s.deleteCollection);
-  const currentCustodian = useCustodianStore((s) => s.currentCustodian);
   const selectedCollections = useUserStore((s) => s.selectedCollections);
   const setSelectedCollections = useUserStore((s) => s.setSelectedCollections);
+
+  const adminCollections = useAdminStore((s) => s.collections);
+  const custodianCollections = useCustodianStore((s) => s.current.collections);
+
+  // initial data is fetch from the store to speed up rendering
+  // - fallsback to client side fetch if we need to refresh
+  // - may need further improvement here as it's still confusing to follow
+  //   where the initial data is set
+  const initialData = isAdmin ? adminCollections : custodianCollections;
 
   const notify = useNotify();
 
@@ -75,7 +81,7 @@ const CollectionsTable = ({
     [searchParams, currentCustodian],
   );
   const qc = useQueryClient();
-  const { data: collections } = useQuery<Paginated<CollectionWithHosts[]>>({
+  const { data: collections } = useQuery<Paginated<CollectionWithHosts>>({
     queryKey,
     queryFn: async () => {
       const workgroupFilter =
@@ -98,7 +104,7 @@ const CollectionsTable = ({
       const params = buildCollectionParams(collectionParams).toString();
 
       const res =
-        currentCustodian?.pid && !admin
+        currentCustodian?.pid && !isAdmin
           ? await getCustodianCollections(currentCustodian.pid, {
               params,
               cacheOptions: {
@@ -359,7 +365,7 @@ const CollectionsTable = ({
           deleteProps: { onClick: handleDeleteCollections },
           refreshProps: {
             tag:
-              currentCustodian?.pid && !admin
+              currentCustodian?.pid && !isAdmin
                 ? getTagCustodianCollection(currentCustodian.pid)
                 : TAG_COLLECTION_ADMIN,
             label: "Refresh Collections",

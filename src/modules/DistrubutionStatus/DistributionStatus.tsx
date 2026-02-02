@@ -4,7 +4,7 @@ import { Box, Chip, Stack, Typography } from "@mui/material";
 import FormLabel from "@/components/FormLabel";
 import { ReRunButton } from "./ReRunButton";
 import { useLogDependencyChanges } from "@/utils/deps";
-import useUserStore from "@/store/useUserStore";
+import useUserStore from "@/hooks/useUserStore";
 import { useCallback } from "react";
 
 const DistributionStatus = ({

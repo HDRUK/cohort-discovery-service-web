@@ -44,7 +44,7 @@ export interface WithTimestamps {
 }
 
 export interface Paginated<T> {
-  data: T;
+  data: T[];
   current_page: number;
   per_page: number;
   total: number;
@@ -427,5 +427,12 @@ export enum FeatureName {
 }
 
 export type FeatureFlag = Record<FeatureName, boolean>;
+
+export const DEFAULT_FLAGS: FeatureFlag = {
+  [FeatureName.QueryBuilder]: false,
+  [FeatureName.ConstrainForBunnyV1]: false,
+  [FeatureName.QueryNlp]: false,
+  [FeatureName.InAppMessenger]: false,
+};
 
 export type GroupedCollection = { custodian: Custodian; items: Collection[] };

@@ -4,15 +4,15 @@ import { AppBar, Toolbar, Box, Typography } from "@mui/material";
 import Image from "next/image";
 import logo from "@/assets/logo.svg";
 import userIcon from "@/assets/user_logo.svg";
-import { useDaphneStore } from "@/store/useDaphneStore";
 import PositionedMenu, { PositionedMenuItem } from "../PositionedMenu";
 import { useRouter } from "next/navigation";
+import useUserStore from "@/hooks/useUserStore";
 
 const HeaderBar = () => {
   const router = useRouter();
-  const {
-    userData: { user, setUser },
-  } = useDaphneStore();
+
+  const user = useUserStore((s) => s.user);
+  const setUser = useUserStore((s) => s.setUser);
 
   const links: PositionedMenuItem[] = [
     {
@@ -45,6 +45,7 @@ const HeaderBar = () => {
             />
           </Box>
         </Box>
+
         {user && (
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <PositionedMenu isIcon items={links}>

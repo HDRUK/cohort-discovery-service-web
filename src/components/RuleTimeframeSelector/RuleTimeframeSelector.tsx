@@ -2,7 +2,7 @@
 
 import { Stack } from "@mui/material";
 import { ReactNode, useCallback, useMemo } from "react";
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { updateById } from "@/utils/rules";
 import { RuleLeafType } from "@/types/rules";
 import dayjs, { Dayjs } from "dayjs";
@@ -14,7 +14,7 @@ import {
 import { PickerValue } from "@mui/x-date-pickers/internals";
 import { CustomH1 } from "@/components/GuidanceHeaders";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import useFeatures from "@/store/useFeatures";
+import useFeatures from "@/hooks/useFeatures";
 import { getDomainVerbs } from "@/utils/omop";
 import { capitaliseFirstLetter } from "@/utils/string";
 

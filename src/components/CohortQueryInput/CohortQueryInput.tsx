@@ -2,10 +2,9 @@
 
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { Box } from "@mui/material";
-import { useDaphneStore } from "@/store/useDaphneStore";
 import { useCallback, useEffect, useRef } from "react";
 import SearchBox from "../SearchBox";
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 import {
   DEFAULT_SEARCH_WAIT_TIME,
   MAX_INVALID_REASONS,
@@ -13,6 +12,7 @@ import {
 import { useDebounce } from "@/hooks/useDebounce";
 import useSubmitQuery from "@/hooks/useSubmitQuery";
 import { RuleErrors } from "@/utils/rules";
+import useStateManagement from "@/hooks/useStateManagement";
 import SubmitQueryButton from "@/components/SubmitQueryButton";
 
 type FormValues = {
@@ -38,8 +38,9 @@ const CohortQueryInput = () => {
 
   const { disabled } = useSubmitQuery();
 
-  const isLoading = useDaphneStore((s) => s.stateManagement.isLoading);
-  const setIsLoading = useDaphneStore((s) => s.stateManagement.setIsLoading);
+  const isLoading = useStateManagement((s) => s.isLoading);
+  const setIsLoading = useStateManagement((s) => s.setIsLoading);
+
   const lastCommittedRef = useRef<string>(queryAsText);
 
   const {
@@ -113,10 +114,12 @@ const CohortQueryInput = () => {
     const q = (debouncedQuery ?? "").trim();
     if (q === lastCommittedRef.current) return;
     lastCommittedRef.current = q;
+
     if (q === queryAsText) {
       if (q === "") resetQuery();
       return;
     }
+
     handleSubmitSearch(onSubmitSearch, resetQuery)();
   }, [
     queryAsText,

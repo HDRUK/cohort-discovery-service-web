@@ -6,15 +6,16 @@ import AddIcon from "@mui/icons-material/Add";
 import SearchConcepts from "@/components/SearchConcepts";
 import { ConceptSet } from "@/types/api";
 import { useMemo, useState } from "react";
-import { useDaphneStore } from "@/store/useDaphneStore";
 import { useNotify } from "@/providers/NotifyProvider";
 import { falseKeys, trueKeys } from "@/utils/numbers";
+import useUserStore from "@/hooks/useUserStore";
 
 const AddNewConcept = ({ conceptSet }: { conceptSet: ConceptSet }) => {
   const notify = useNotify();
-  const {
-    userData: { addConceptsToSet, removeConceptsFromSet },
-  } = useDaphneStore();
+
+  const addConceptsToSet = useUserStore((s) => s.addConceptsToSet);
+  const removeConceptsFromSet = useUserStore((s) => s.removeConceptsFromSet);
+
   const { domain, concepts } = conceptSet;
 
   const originalIds = useMemo(

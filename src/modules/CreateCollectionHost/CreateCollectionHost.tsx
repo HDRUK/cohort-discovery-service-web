@@ -1,10 +1,10 @@
 import { Box, Stack, Button } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
-import { useDaphneStore } from "@/store/useDaphneStore";
 import { CollectionHostFormValues } from "@/types/forms";
 import { QueryContext } from "@/types/context";
 import FormTextField from "@/components/FormTextField";
 import FormDropdown from "@/components/FormDropdown";
+import useCustodianStore from "@/hooks/useCustodianStore";
 
 interface CollectionHostFormProps {
   custodianId: number;
@@ -17,9 +17,9 @@ const CreateCollectionHost = ({
   onCancel,
   hideContext = true,
 }: CollectionHostFormProps) => {
-  const {
-    custodianData: { createCollectionHost },
-  } = useDaphneStore();
+  const createCollectionHost = useCustodianStore(
+    (st) => st.createCollectionHost,
+  );
 
   const {
     handleSubmit,

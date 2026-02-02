@@ -1,17 +1,12 @@
 "use client";
 
-import { CollectionWithHosts, Paginated } from "@/types/api";
 import CollectionsTable from "@/components/CollectionsTable";
 import { Box, Typography } from "@mui/material";
 import { capitaliseFirstLetter } from "@/utils/string";
-import useAdminStore from "@/store/useAdminStore";
+import useAdminStore from "@/hooks/useAdminStore";
 import { useNotify } from "@/providers/NotifyProvider";
 
-type WorkgroupsMiddlePanelProps = {
-  collections: Paginated<CollectionWithHosts[]>;
-};
-
-const WorkgroupsMiddlePanel = ({ collections }: WorkgroupsMiddlePanelProps) => {
+const WorkgroupsMiddlePanel = () => {
   const selectedWorkgroup = useAdminStore((s) => s.selectedWorkgroup);
   const removeCollectionsFromWorkgroup = useAdminStore(
     (s) => s.removeCollectionsFromWorkgroup,
@@ -31,7 +26,6 @@ const WorkgroupsMiddlePanel = ({ collections }: WorkgroupsMiddlePanelProps) => {
       {
         !!selectedWorkgroup && (
           <CollectionsTable
-            initialData={collections}
             tableTitle={`${capitaliseFirstLetter(
               selectedWorkgroup?.name.toLowerCase(),
             )} Workgroups`}

@@ -1,5 +1,5 @@
 import Switch from "@/components/Switch";
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { RuleLeafType } from "@/types/rules";
 import { FormControlLabel, Stack } from "@mui/material";
 

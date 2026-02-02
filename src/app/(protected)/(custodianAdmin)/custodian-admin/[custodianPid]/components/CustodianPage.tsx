@@ -1,27 +1,36 @@
 "use client";
 
 import SkeletonFull from "@/components/SkeletonFull";
-import { useDaphneStore } from "@/store/useDaphneStore";
-import { Custodian } from "@/types/api";
+import { CollectionHost, Custodian } from "@/types/api";
 import { Paper } from "@mui/material";
 import { forbidden } from "next/navigation";
 import { useEffect } from "react";
 
+import useUserStore from "@/hooks/useUserStore";
+import useCustodianStore from "@/hooks/useCustodianStore";
+
 const CustodianPage = ({
   custodian,
+  collectionHosts,
   children,
 }: {
   custodian: Custodian;
+  collectionHosts: CollectionHost[];
   children: React.ReactNode;
 }) => {
-  const {
-    userData: { user },
-    custodianData: { setCurrentCustodian },
-  } = useDaphneStore();
+  const user = useUserStore((s) => s.user);
+  const setCurrentCustodian = useCustodianStore((s) => s.current.setCustodian);
+  const setCurrentCollectionHosts = useCustodianStore(
+    (s) => s.current.setCollectionHosts,
+  );
 
   useEffect(() => {
     setCurrentCustodian(custodian);
   }, [custodian, setCurrentCustodian]);
+
+  useEffect(() => {
+    setCurrentCollectionHosts(collectionHosts);
+  }, [collectionHosts, setCurrentCollectionHosts]);
 
   if (user && custodian) {
     const { custodians } = user;
@@ -30,6 +39,7 @@ const CustodianPage = ({
     }
     return children;
   }
+
   return (
     <Paper sx={{ display: "flex", height: "100%" }}>
       <SkeletonFull />
