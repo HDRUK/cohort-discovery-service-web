@@ -1,13 +1,9 @@
-import CollectionsAdmin from "@/modules/CollectionsAdmin/CollectionsAdmin";
-import getCollectionHosts from "@/actions/getCollectionHosts";
 import getAdminCollections from "@/actions/getAdminCollections";
 import { CollectionsSearchParams } from "@/types/api";
 import { buildCollectionParams } from "@/utils/params";
 import { Box, Skeleton } from "@mui/material";
-import getCustodians from "@/actions/getCustodians";
-import getAdminWorkgroups from "@/actions/getAdminWorkgroups";
 import getCustodianCollections from "@/actions/getCustodianCollections";
-import getCustodianCollectionHosts from "@/actions/getCustodianCollectionHosts";
+import CollectionsManagement from "../CollectionsManagement";
 
 export const CollectionsSkeleton = () => (
   <Box sx={{ height: "100%", p: 2 }}>
@@ -27,29 +23,13 @@ const CollectionsTab = async ({
 
   const isAdmin = !custodianPid;
 
-  const [
-    { data: collectionHosts },
-    { data: custodianCollections },
-    { data: custodians },
-    { data: workgroups },
-  ] = await Promise.all([
-    isAdmin ? getCollectionHosts() : getCustodianCollectionHosts(custodianPid),
+  const [{ data: collections }] = await Promise.all([
     isAdmin
       ? getAdminCollections({ params })
       : getCustodianCollections(custodianPid, { params }),
-    isAdmin ? getCustodians() : Promise.resolve({ data: undefined }),
-    getAdminWorkgroups(),
   ]);
 
-  return (
-    <CollectionsAdmin
-      admin={isAdmin}
-      collectionHosts={collectionHosts}
-      collections={custodianCollections}
-      custodians={custodians}
-      workgroups={workgroups}
-    />
-  );
+  return <CollectionsManagement isAdmin={isAdmin} collections={collections} />;
 };
 
 export default CollectionsTab;

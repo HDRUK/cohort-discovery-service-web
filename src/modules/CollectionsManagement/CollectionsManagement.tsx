@@ -1,41 +1,43 @@
 "use client";
 import {
-  CollectionWithHosts,
-  CollectionHost,
-  Paginated,
   CollectionsSearchParams,
-  Workgroup,
-  Custodian,
+  CollectionWithHosts,
+  Paginated,
 } from "@/types/api";
 import { Box, Skeleton } from "@mui/material";
 import Title from "@/components/Title";
 import ThreePaneSwimLaneLayout, {
   ExpandedSide,
 } from "@/modules/ThreePaneSwimLaneLayout";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import CollectionsTable from "@/components/CollectionsTable";
 import ControlledSearchBox from "@/modules/ControlledSearchBox";
 import CollectionsLeftPanel from "@/modules/CollectionsLeftPanel";
 import CollectionsRightPanel from "@/modules/CollectionsRightPanel";
 import { useLogDependencyChanges } from "@/utils/deps";
 import useCustodianStore from "@/hooks/useCustodianStore";
+import useAdminStore from "@/hooks/useAdminStore";
 
-const CollectionsAdmin = ({
-  admin = false,
-  custodians = undefined,
+const CollectionsManagement = ({
+  isAdmin,
   collections,
-  collectionHosts,
-  workgroups,
 }: {
-  admin?: boolean;
-  custodians?: Custodian[] | undefined;
-  collections: Paginated<CollectionWithHosts[]>;
-  collectionHosts: CollectionHost[];
-  workgroups: Workgroup[];
+  isAdmin: boolean;
+  collections: Paginated<CollectionWithHosts>;
 }) => {
   const custodian = useCustodianStore(
-    (custodianData) => custodianData.currentCustodian,
+    (custodianData) => custodianData.current.custodian,
   );
+
+  const setAdminCollections = useAdminStore((s) => s.setCollections);
+  const setCustodianCollections = useCustodianStore(
+    (s) => s.current.setCollections,
+  );
+
+  useEffect(() => {
+    if (isAdmin) setAdminCollections(collections);
+    else setCustodianCollections(collections);
+  }, [isAdmin, collections, setAdminCollections, setCustodianCollections]);
 
   const [expandedSide, setExpandedSide] = useState<ExpandedSide | null>(null);
   const expandedLeft = expandedSide === ExpandedSide.LEFT;
@@ -53,10 +55,8 @@ const CollectionsAdmin = ({
     );
   }, [setExpandedSide]);
 
-  useLogDependencyChanges("CollectionsAdmin", {
+  useLogDependencyChanges("CollectionsManagement", {
     custodian,
-    collections,
-    collectionHosts,
     expandedSide,
     expandedLeft,
     expandedRight,
@@ -64,7 +64,7 @@ const CollectionsAdmin = ({
     toggleExpandLeft,
   });
 
-  if (!admin && !custodian) return <Skeleton height={"100%"} />;
+  if (!isAdmin && !custodian) return <Skeleton height={"100%"} />;
 
   return (
     <Box
@@ -81,18 +81,13 @@ const CollectionsAdmin = ({
         left={
           <CollectionsLeftPanel
             expandedLeft={expandedLeft}
-            collectionHosts={collectionHosts}
-            custodians={custodians}
             onCreate={toggleExpandLeft}
             onCancelCreate={toggleExpandLeft}
           />
         }
-        middle={<CollectionsTable admin={admin} initialData={collections} />}
+        middle={<CollectionsTable />}
         right={
           <CollectionsRightPanel
-            admin={admin}
-            collectionHosts={collectionHosts}
-            workgroups={workgroups}
             expandedRight={expandedRight}
             expandedLeft={expandedLeft}
             onClose={() => toggleExpandRight()}
@@ -103,4 +98,4 @@ const CollectionsAdmin = ({
   );
 };
 
-export default CollectionsAdmin;
+export default CollectionsManagement;

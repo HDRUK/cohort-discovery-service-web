@@ -4,22 +4,17 @@ import List from "@/components/List";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import AddButton from "@/components/AddButton";
 import CreateCollection from "@/modules/CreateCollection";
-import { CollectionHost, Custodian } from "@/types/api";
 import { useCallback } from "react";
 import useSearchParams from "@/hooks/useSearchParams";
 import { CollectionFilterStatus } from "@/types/collections";
 
 type CollectionsCreatePanelProps = {
-  collectionHosts: CollectionHost[];
-  custodians?: Custodian[];
   expandedLeft: boolean;
   onCreate: () => void;
   onCancelCreate: () => void;
 };
 
 const CollectionsLeftPanel = ({
-  collectionHosts,
-  custodians,
   expandedLeft,
   onCreate,
   onCancelCreate,
@@ -59,13 +54,7 @@ const CollectionsLeftPanel = ({
           disabled={expandedLeft}
         />
 
-        {expandedLeft && (
-          <CreateCollection
-            collectionHosts={collectionHosts}
-            custodians={custodians}
-            onCancel={onCancelCreate}
-          />
-        )}
+        {expandedLeft && <CreateCollection onCancel={onCancelCreate} />}
       </ActionMenuSection>
 
       <ActionMenuSection

@@ -12,12 +12,10 @@ import LockOutlineIcon from "@mui/icons-material/LockOutline";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import {
-  CollectionHost,
   CollectionStatus,
   CollectionWithHosts,
   FrequencyMode,
   UrlString,
-  Workgroup,
 } from "@/types/api";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import FormTextField from "@/components/FormTextField";
@@ -45,6 +43,7 @@ import SquareCheckbox from "@/components/SquareCheckbox";
 import ManageCollectionStatus from "@/modules/ManageCollectionStatus";
 import CopyableVariable from "@/components/CopyableVariable";
 import ErrorHeader from "@/components/ErrorHeader";
+import { useAdminDataStore } from "@/store/adminDataStore";
 
 const UpdateCollectionGuidance = maskClientTest(
   () => import("./UpdateCollectionGuidance"),
@@ -52,12 +51,9 @@ const UpdateCollectionGuidance = maskClientTest(
 
 export type UpdateCollectionProps = {
   collection: CollectionWithHosts;
-  collectionHosts: CollectionHost[];
-  workgroups: Workgroup[];
   expandedRight: boolean;
   expandedLeft: boolean;
   onClose?: () => void;
-  admin?: boolean;
 };
 
 const getDefaultValues = (collection: CollectionWithHosts | null) => {
@@ -111,18 +107,19 @@ const getDefaultValues = (collection: CollectionWithHosts | null) => {
 
 const UpdateCollection = ({
   collection,
-  collectionHosts,
-  workgroups,
   expandedRight,
-  admin = false,
   onClose,
 }: UpdateCollectionProps) => {
-  const { currentCustodian, updateCollection } = useCustodianStore(
-    (custodianData) => ({
-      currentCustodian: custodianData.currentCustodian,
-      updateCollection: custodianData.updateCollection,
-    }),
+  const currentCustodian = useCustodianStore((s) => s.current.custodian);
+
+  const currentCollectionHosts = useCustodianStore(
+    (s) => s.current.collectionHosts,
   );
+  const updateCollection = useCustodianStore((s) => s.updateCollection);
+  const collectionHosts = useAdminDataStore((s) => s.collectionHosts);
+  const workgroups = useAdminDataStore((s) => s.workgroups);
+
+  const isAdmin = useMemo(() => !currentCustodian, [currentCustodian]);
 
   const { updateCollection: updateCollectionAdmin } = useAdminStore(
     (adminData) => ({
@@ -161,13 +158,19 @@ const UpdateCollection = ({
 
   const collectionCustodianPid = collection.custodian.pid;
 
-  const allowedCollectionHosts = useMemo(
-    () =>
-      collectionHosts.filter(
+  const allowedCollectionHosts = useMemo(() => {
+    if (isAdmin) {
+      return collectionHosts.filter(
         (ch) => ch.custodian.pid === collectionCustodianPid,
-      ),
-    [collectionHosts, collectionCustodianPid],
-  );
+      );
+    }
+    return currentCollectionHosts;
+  }, [
+    currentCollectionHosts,
+    collectionHosts,
+    isAdmin,
+    collectionCustodianPid,
+  ]);
 
   useEffect(() => {
     resetField("collection.host_id", { defaultValue: 0 });
@@ -374,47 +377,56 @@ const UpdateCollection = ({
           control={control}
           setValue={setValue}
         />
-        <FormLabel underlined>Workgroup access</FormLabel>
-        <Box
-          sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 1,
-            alignItems: "center",
-          }}
-        >
-          {Array.from(workgroupValues.entries()).map(
-            ([name, checked]) =>
-              checked && (
-                <Chip color="secondary" label={name} key={`wg-chip-${name}`} />
-              ),
-          )}
-        </Box>
-        {expandedRight && (
-          <Controller
-            name="workgroups"
-            control={control}
-            render={() => (
-              <FormGroup>
-                <Box display="flex" flexDirection="column">
-                  {workgroups?.map((w) => (
-                    <FormControlLabel
-                      control={
-                        <SquareCheckbox
-                          checked={Boolean(workgroupValues.get(w.name))}
-                          key={`wg-checkbox-${w.name}`}
-                          name={w.name}
-                          onChange={handleChange}
-                        />
-                      }
-                      label={w.name}
-                      key={`wg-checkbox-label-${w.name}`}
+        {isAdmin && (
+          <>
+            <FormLabel underlined>Workgroup access</FormLabel>
+            <Box
+              sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 1,
+                alignItems: "center",
+              }}
+            >
+              {Array.from(workgroupValues.entries()).map(
+                ([name, checked]) =>
+                  checked && (
+                    <Chip
+                      color="secondary"
+                      label={name}
+                      key={`wg-chip-${name}`}
                     />
-                  ))}
-                </Box>
-              </FormGroup>
+                  ),
+              )}
+            </Box>
+
+            {expandedRight && (
+              <Controller
+                name="workgroups"
+                control={control}
+                render={() => (
+                  <FormGroup>
+                    <Box display="flex" flexDirection="column">
+                      {workgroups?.map((w) => (
+                        <FormControlLabel
+                          control={
+                            <SquareCheckbox
+                              checked={Boolean(workgroupValues.get(w.name))}
+                              key={`wg-checkbox-${w.name}`}
+                              name={w.name}
+                              onChange={handleChange}
+                            />
+                          }
+                          label={w.name}
+                          key={`wg-checkbox-label-${w.name}`}
+                        />
+                      ))}
+                    </Box>
+                  </FormGroup>
+                )}
+              />
             )}
-          />
+          </>
         )}
         <ActionMenuSection
           gap={2}
@@ -500,7 +512,7 @@ const UpdateCollection = ({
             />
           </Stack>
 
-          {!admin && (
+          {!isAdmin && (
             <Stack>
               <FormLabel underlined>Host Credentials</FormLabel>
               Client ID

@@ -1,7 +1,7 @@
 "use client";
 
 import SkeletonFull from "@/components/SkeletonFull";
-import { Custodian } from "@/types/api";
+import { CollectionHost, Custodian } from "@/types/api";
 import { Paper } from "@mui/material";
 import { forbidden } from "next/navigation";
 import { useEffect } from "react";
@@ -11,17 +11,26 @@ import useCustodianStore from "@/hooks/useCustodianStore";
 
 const CustodianPage = ({
   custodian,
+  collectionHosts,
   children,
 }: {
   custodian: Custodian;
+  collectionHosts: CollectionHost[];
   children: React.ReactNode;
 }) => {
   const user = useUserStore((s) => s.user);
-  const setCurrentCustodian = useCustodianStore((s) => s.setCurrentCustodian);
+  const setCurrentCustodian = useCustodianStore((s) => s.current.setCustodian);
+  const setCurrentCollectionHosts = useCustodianStore(
+    (s) => s.current.setCollectionHosts,
+  );
 
   useEffect(() => {
     setCurrentCustodian(custodian);
   }, [custodian, setCurrentCustodian]);
+
+  useEffect(() => {
+    setCurrentCollectionHosts(collectionHosts);
+  }, [collectionHosts, setCurrentCollectionHosts]);
 
   if (user && custodian) {
     const { custodians } = user;

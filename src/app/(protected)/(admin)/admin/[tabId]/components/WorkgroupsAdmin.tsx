@@ -1,31 +1,31 @@
 "use client";
 import {
-  Collection,
   CollectionsSearchParams,
   CollectionWithHosts,
   Paginated,
-  Workgroup,
 } from "@/types/api";
 import { Box, Skeleton } from "@mui/material";
 import Title from "@/components/Title";
 import ThreePaneSwimLaneLayout, {
   ExpandedSide,
 } from "@/modules/ThreePaneSwimLaneLayout";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ControlledSearchBox from "@/modules/ControlledSearchBox";
 import WorkgroupsLeftPanel from "./WorkgroupsLeftPanel";
 import WorkgroupsMiddlePanel from "./WorkgroupsMiddlePanel";
 import WorkgroupsRightPanel from "./WorkgroupsRightPanel";
+import { useAdminDataStore } from "@/store/adminDataStore";
 
 const WorkgroupsAdmin = ({
   collections,
-  allCollections,
-  workgroups,
 }: {
-  collections: Paginated<CollectionWithHosts[]>;
-  allCollections: Collection[];
-  workgroups: Workgroup[];
+  collections: Paginated<CollectionWithHosts>;
 }) => {
+  const setCollections = useAdminDataStore((s) => s.setCollections);
+  useEffect(() => {
+    setCollections(collections);
+  }, [collections, setCollections]);
+
   const [expandedSide, setExpandedSide] = useState<ExpandedSide | null>(null);
   const expandedLeft = expandedSide === ExpandedSide.LEFT;
   const expandedRight = expandedSide === ExpandedSide.RIGHT;
@@ -58,17 +58,14 @@ const WorkgroupsAdmin = ({
         rightDisabled={false}
         left={
           <WorkgroupsLeftPanel
-            workgroups={workgroups}
             expandedLeft={expandedLeft}
-            collections={allCollections}
             onCreate={toggleExpandLeft}
             onCancelCreate={toggleExpandLeft}
           />
         }
-        middle={<WorkgroupsMiddlePanel collections={collections} />}
+        middle={<WorkgroupsMiddlePanel />}
         right={
           <WorkgroupsRightPanel
-            collections={allCollections}
             expandedRight={expandedRight}
             onClose={() => toggleExpandRight()}
           />

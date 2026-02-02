@@ -14,7 +14,9 @@ import {
   CreateCollectionPost,
   CreateCollectionConfigPost,
   UpdateCollectionHostPayload,
-  Workgroup,
+  CollectionHost,
+  Paginated,
+  CollectionWithHosts,
 } from "@/types/api";
 import {
   getCollectionHostTag,
@@ -23,14 +25,19 @@ import {
   TAG_COLLECTIONS,
   TAG_COLLECTION_HOSTS,
 } from "@/config/tags";
+import { emptyPaginated } from "@/utils/pagination";
 
 export interface CustodianDataStoreState {
-  currentCustodian: Custodian | null;
-  setCurrentCustodian: (custodian: Custodian | null) => void;
+  current: {
+    custodian: Custodian | null;
+    setCustodian: (custodian: Custodian | null) => void;
 
-  collections: Collection[];
-  setCollections: (collections: Collection[]) => void;
+    collections: Paginated<CollectionWithHosts>;
+    setCollections: (collections: Paginated<CollectionWithHosts>) => void;
 
+    collectionHosts: CollectionHost[];
+    setCollectionHosts: (collectionHosts: CollectionHost[]) => void;
+  };
   createCollectionHost: (
     custodianId: number,
     payload: { name: string; context: string },
@@ -55,31 +62,41 @@ export interface CustodianDataStoreState {
     id: number | string,
     custodianPid: string,
   ) => Promise<void>;
-
-  workgroups: Workgroup[];
-  setWorkgroups: (workgroups: Workgroup[]) => void;
 }
 
 export const useCustodianDataStore = create<CustodianDataStoreState>(
   (set, get) => ({
-    currentCustodian: null,
-    setCurrentCustodian: (custodian) =>
-      set((state) => ({
-        ...state,
+    current: {
+      custodian: null,
+      setCustodian: (custodian) =>
+        set((state) => ({
+          ...state,
+          current: { ...state.current, custodian },
+        })),
 
-        currentCustodian: custodian,
-      })),
+      collections: emptyPaginated<CollectionWithHosts>([]),
+      setCollections: (collections) =>
+        set((state) => ({
+          ...state,
+          current: {
+            ...state.current,
+            collections,
+          },
+        })),
 
-    collections: [],
-    setCollections: (collections) =>
-      set((state) => ({
-        ...state,
-        collections,
-      })),
-
+      collectionHosts: [],
+      setCollectionHosts: (collectionHosts) =>
+        set((state) => ({
+          ...state,
+          current: {
+            ...state.current,
+            collectionHosts,
+          },
+        })),
+    },
     createCollectionHost: async (custodianId, payload) => {
       await createCollectionHost(custodianId, payload);
-      const currentCustodian = get().currentCustodian;
+      const currentCustodian = get().current.custodian;
       if (currentCustodian?.id === custodianId) {
         await revalidateAction(getCollectionHostTag(currentCustodian.pid));
       }
@@ -87,7 +104,7 @@ export const useCustodianDataStore = create<CustodianDataStoreState>(
 
     updateCollectionHost: async (id, payload) => {
       await updateCollectionHost(id, payload);
-      const currentCustodian = get().currentCustodian;
+      const currentCustodian = get().current.custodian;
       await revalidateAction(TAG_COLLECTION_HOSTS);
       if (currentCustodian)
         await revalidateAction(getCollectionHostTag(currentCustodian.pid));
@@ -95,7 +112,7 @@ export const useCustodianDataStore = create<CustodianDataStoreState>(
 
     deleteCollectionHost: async (id) => {
       await deleteCollectionHost(id);
-      const currentCustodian = get().currentCustodian;
+      const currentCustodian = get().current.custodian;
       if (currentCustodian)
         await revalidateAction(getCollectionHostTag(currentCustodian.pid));
       await revalidateAction(TAG_COLLECTION_HOSTS);
@@ -112,7 +129,7 @@ export const useCustodianDataStore = create<CustodianDataStoreState>(
       await revalidateAction(getTagCustodianCollection(custodianPid));
       await revalidateAction(TAG_COLLECTION_ADMIN);
       await revalidateAction(TAG_COLLECTIONS);
-      await revalidateAction(getCollectionHostTag(data.custodian.pid));
+      await revalidateAction(getCollectionHostTag(custodianPid));
       await revalidateAction(TAG_COLLECTION_HOSTS);
 
       return data;
@@ -138,12 +155,5 @@ export const useCustodianDataStore = create<CustodianDataStoreState>(
       await revalidateAction(getTagCustodianCollection(custodianPid));
       await revalidateAction(TAG_COLLECTION_ADMIN);
     },
-
-    workgroups: [],
-    setWorkgroups: (workgroups) =>
-      set((state) => ({
-        ...state,
-        workgroups,
-      })),
   }),
 );

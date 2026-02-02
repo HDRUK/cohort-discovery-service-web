@@ -67,7 +67,7 @@ export interface UserDataStoreState {
   searchForConcepts: (
     searchTerm: string,
     domain?: string,
-  ) => Promise<Paginated<Partial<Concept>[]>>;
+  ) => Promise<Paginated<Partial<Concept>>>;
 
   addConceptsToSet: (
     conceptSetId: number,
@@ -125,7 +125,7 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
 
   rerunTask: async (id) => {
     await rerunTask(id);
-    const custodian = useCustodianDataStore.getState().currentCustodian;
+    const custodian = useCustodianDataStore.getState().current.custodian;
     if (custodian) revalidateCustodian(custodian);
   },
 

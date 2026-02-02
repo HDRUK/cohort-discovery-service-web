@@ -31,7 +31,7 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
   setValue,
 }: ManageCollectionStatusProps<TFieldValues>) => {
   const { currentCustodian } = useCustodianStore((custodianData) => ({
-    currentCustodian: custodianData.currentCustodian,
+    currentCustodian: custodianData.current.custodian,
   }));
   const notify = useNotify();
 

@@ -150,7 +150,7 @@ const MockDaphneStore = ({
         RESOLVE<void>(undefined),
       searchForConcepts: async (searchTerm: string, domain?: string) => {
         const { data } = await getConcepts(searchTerm, domain);
-        return data as Paginated<Partial<Concept>[]>;
+        return data as Paginated<Partial<Concept>>;
       },
       addConceptsToSet: (_conceptSetId: number, _conceptIds: number[]) =>
         RESOLVE<void>(undefined),
@@ -165,9 +165,6 @@ const MockDaphneStore = ({
 
   useCustodianDataStore.setState(
     {
-      currentCustodian: null,
-      collections: [] as Collection[],
-      workgroups: [] as Workgroup[],
       createCollectionHost: (
         _custodianId: number,
         _payload: { name: string; context: string },
@@ -190,6 +187,12 @@ const MockDaphneStore = ({
       deleteCollection: (_id: number | string, _custodianPid: string) =>
         RESOLVE<void>(undefined),
       ...(overrides?.custodian ?? {}),
+      current: {
+        custodian: null,
+        collections: [] as Collection[],
+        workgroups: [] as Workgroup[],
+        ...(overrides?.custodian?.current ?? {}),
+      },
     } as CustodianStoreState,
     true,
   );

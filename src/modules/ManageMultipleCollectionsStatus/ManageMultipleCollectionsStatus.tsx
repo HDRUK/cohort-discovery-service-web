@@ -23,7 +23,7 @@ const ManageMultipleCollectionsStatus = ({
   const { control, setValue } = useFormContext<UpdateCollectionFormValues>();
 
   const { currentCustodian } = useCustodianStore((custodianData) => ({
-    currentCustodian: custodianData.currentCustodian,
+    currentCustodian: custodianData.current.custodian,
   }));
   const notify = useNotify();
 

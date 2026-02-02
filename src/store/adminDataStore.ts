@@ -21,6 +21,9 @@ import {
   RemoveCollectionsFromWorkgroupPost,
   AddCollectionToWorkgroupsPost,
   RemoveCollectionFromWorkgroupsPost,
+  CollectionHost,
+  Paginated,
+  CollectionWithHosts,
 } from "@/types/api";
 import {
   getCollectionHostTag,
@@ -30,10 +33,22 @@ import {
   TAG_COLLECTION_HOSTS,
   TAG_WORKGROUP_ADMIN,
 } from "@/config/tags";
+import { emptyPaginated } from "@/utils/pagination";
 
 export interface AdminDataStoreState {
-  collections: Collection[];
-  setCollections: (collections: Collection[]) => void;
+  // for collections the admin searches on in the tables
+  collections: Paginated<CollectionWithHosts>;
+  setCollections: (collections: Paginated<CollectionWithHosts>) => void;
+
+  // for all collections needed when assigning workgroups
+  allAprovedCollections: Collection[];
+  setAllAprovedCollections: (allAprovedCollections: Collection[]) => void;
+
+  collectionHosts: CollectionHost[];
+  setCollectionHosts: (collectionHosts: CollectionHost[]) => void;
+
+  workgroups: Workgroup[];
+  setWorkgroups: (workgroups: Workgroup[]) => void;
 
   createCollection: (
     payload: CreateCollectionPost,
@@ -67,11 +82,32 @@ export interface AdminDataStoreState {
 }
 
 export const useAdminDataStore = create<AdminDataStoreState>((set) => ({
-  collections: [],
+  allAprovedCollections: [],
+  setAllAprovedCollections: (allAprovedCollections) =>
+    set((state) => ({
+      ...state,
+      allAprovedCollections,
+    })),
+
+  collections: emptyPaginated<CollectionWithHosts>([]),
   setCollections: (collections) =>
     set((state) => ({
       ...state,
       collections,
+    })),
+
+  collectionHosts: [],
+  setCollectionHosts: (collectionHosts) =>
+    set((state) => ({
+      ...state,
+      collectionHosts,
+    })),
+
+  workgroups: [],
+  setWorkgroups: (workgroups) =>
+    set((state) => ({
+      ...state,
+      workgroups,
     })),
 
   createCollection: async (payload, payloadConfig) => {

@@ -3,12 +3,7 @@ import { useForm, Controller, FormProvider, useWatch } from "react-hook-form";
 import { CreateCollectionFormValues } from "@/types/forms";
 import { QueryContext } from "@/types/context";
 import FormTextField from "@/components/FormTextField";
-import {
-  CollectionHost,
-  Custodian,
-  TaskType,
-  FrequencyMode,
-} from "@/types/api";
+import { TaskType, FrequencyMode } from "@/types/api";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import { useNotify } from "@/providers/NotifyProvider";
 import CollectionConfig from "@/components/CollectionConfig";
@@ -17,20 +12,23 @@ import FormDropdown from "@/components/FormDropdown";
 import useCustodianStore from "@/hooks/useCustodianStore";
 import { useEffect, useMemo } from "react";
 import ErrorHeader from "@/components/ErrorHeader";
+import { useUserDataStore } from "@/hooks/userDataStore";
+import { useAdminDataStore } from "@/store/adminDataStore";
 
 interface CreateCollectionProps {
-  collectionHosts: CollectionHost[];
-  custodians?: Custodian[];
   onCancel?: () => void;
 }
 
-const CreateCollection = ({
-  collectionHosts,
-  custodians,
-  onCancel,
-}: CreateCollectionProps) => {
+const CreateCollection = ({ onCancel }: CreateCollectionProps) => {
   const createCollection = useCustodianStore((s) => s.createCollection);
-  const currentCustodian = useCustodianStore((s) => s.currentCustodian);
+  const currentCustodian = useCustodianStore((s) => s.current.custodian);
+  const currentCollectionHosts = useCustodianStore(
+    (s) => s.current.collectionHosts,
+  );
+  const collectionHosts = useAdminDataStore((s) => s.collectionHosts);
+  const custodians = useUserDataStore((s) => s.custodians);
+
+  const isAdmin = !currentCustodian;
 
   const notify = useNotify();
 
@@ -68,11 +66,14 @@ const CreateCollection = ({
   const selectedCustodianPid = useWatch({ name: "custodian_pid", control });
   const selectedHostId = useWatch({ name: "collection.host_id", control });
 
-  const allowedCollectionHosts = useMemo(
-    () =>
-      collectionHosts.filter((ch) => ch.custodian.pid === selectedCustodianPid),
-    [collectionHosts, selectedCustodianPid],
-  );
+  const allowedCollectionHosts = useMemo(() => {
+    if (isAdmin) {
+      return collectionHosts.filter(
+        (ch) => ch.custodian.pid === selectedCustodianPid,
+      );
+    }
+    return currentCollectionHosts;
+  }, [currentCollectionHosts, collectionHosts, isAdmin, selectedCustodianPid]);
 
   useEffect(() => {
     resetField("collection.host_id", { defaultValue: 0 });

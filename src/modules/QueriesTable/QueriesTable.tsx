@@ -33,7 +33,7 @@ import useUserStore from "@/hooks/useUserStore";
 import { getUserQueryTag, TAG_QUERIES } from "@/config/tags";
 
 interface QueriesTableProps {
-  initialData: Paginated<Query[]>;
+  initialData: Paginated<Query>;
   columnVisibility?: Record<string, boolean>;
 }
 
@@ -59,7 +59,7 @@ const QueriesTable = ({
     () => [`queries-${searchParams.toString()}`],
     [searchParams],
   );
-  const { data: queries } = useQuery<Paginated<Query[]>>({
+  const { data: queries } = useQuery<Paginated<Query>>({
     queryKey,
     queryFn: async () => {
       const searchParamsObject = buildQueryHistoryParams({
