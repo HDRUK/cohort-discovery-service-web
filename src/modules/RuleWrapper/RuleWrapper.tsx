@@ -163,7 +163,7 @@ const RuleWrapper = ({
 
   const onCardMouseLeave = useCallback(() => {
     setHovered(id, true);
-  }, [setHovered]);
+  }, [id, setHovered]);
 
   const { handleContextMenu, ...rightClickMenuMethods } = useRightClickMenu();
 
