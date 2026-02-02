@@ -99,6 +99,7 @@ const RuleWrapper = ({
     setNodeName,
     queryBuilderJson,
     setQueryBuilderJson,
+    setHovered,
   } = useQueryBuilder((qb) => ({
     isSelected: !!qb.selected[id],
     toggleSelected: qb.toggleSelected,
@@ -106,6 +107,7 @@ const RuleWrapper = ({
     setNodeName: qb.setNodeName,
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
+    setHovered: qb.setHovered,
   }));
 
   const { constrainForBunnyV1 } = useFeatures();
@@ -141,7 +143,7 @@ const RuleWrapper = ({
     [id, toggleSelected],
   );
 
-  const onMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+  const onMouseOver = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     setShowHandle(true);
     setShowDelete(true);
@@ -153,6 +155,15 @@ const RuleWrapper = ({
       setShowDelete(false);
     }
   }, [showHandle, isDragging, isSelected, setShowHandle, setShowDelete]);
+
+  const onCardMouseOver = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    setHovered(id);
+  };
+
+  const onCardMouseLeave = useCallback(() => {
+    setHovered(id, true);
+  }, [setHovered]);
 
   const { handleContextMenu, ...rightClickMenuMethods } = useRightClickMenu();
 
@@ -171,7 +182,9 @@ const RuleWrapper = ({
     valid,
     handleContextMenu,
     onMouseLeave,
-    onMouseEnter,
+    onMouseOver,
+    onCardMouseOver,
+    onCardMouseLeave,
     handleOnSelect,
     showHandle,
     setNodeRef,
@@ -193,7 +206,7 @@ const RuleWrapper = ({
       ref={setNodeRef}
       style={sortable ? style : {}}
       {...containerProps}
-      onMouseEnter={onMouseEnter}
+      onMouseOver={onMouseOver}
       onMouseLeave={onMouseLeave}
       sx={containerSx(isSelected && !isDragging, containerProps?.sx)}
     >
@@ -235,6 +248,8 @@ const RuleWrapper = ({
             sx={mergeSx(cardSx(isSelected, valid), cardPropsSx)}
             onContextMenu={handleContextMenu}
             onClick={handleOnSelect}
+            onMouseOver={onCardMouseOver}
+            onMouseLeave={onCardMouseLeave}
             {...cardProps}
           >
             {!hideHeader && (
