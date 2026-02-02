@@ -10,6 +10,7 @@ import {
   CardProps,
   Collapse,
   CardActions,
+  Fade,
 } from "@mui/material";
 import { ReactNode, RefObject, useCallback, useMemo, useState } from "react";
 import useSortable from "@/hooks/useSortable";
@@ -18,6 +19,8 @@ import useQueryBuilder from "@/hooks/useQueryBuilder";
 
 import {
   containerSx,
+  deleteButtonSx,
+  deleteIconSx,
   dragButtonSx,
   dragIconSx,
   skeletonSx,
@@ -38,8 +41,9 @@ import useRightClickMenu from "@/hooks/useRightClickMenu";
 import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
 import { mergeSx } from "@/utils/helpers";
 import RuleAgeSelector from "@/components/RuleAgeSelector";
-import { isAgeFilter, isRuleLeaf } from "@/utils/rules";
+import { isAgeFilter, isRuleLeaf, removeById } from "@/utils/rules";
 import useFeatures from "@/hooks/useFeatures";
+import Close from "@mui/icons-material/Close";
 
 interface Action {
   action: () => void;
@@ -87,13 +91,21 @@ const RuleWrapper = ({
     exclude = !!node.exclude;
   }
 
-  const { isSelected, toggleSelected, getNodeName, setNodeName } =
-    useQueryBuilder((qb) => ({
-      isSelected: !!qb.selected[id],
-      toggleSelected: qb.toggleSelected,
-      getNodeName: qb.getNodeName,
-      setNodeName: qb.setNodeName,
-    }));
+  const {
+    isSelected,
+    toggleSelected,
+    getNodeName,
+    setNodeName,
+    queryBuilderJson,
+    setQueryBuilderJson,
+  } = useQueryBuilder((qb) => ({
+    isSelected: !!qb.selected[id],
+    toggleSelected: qb.toggleSelected,
+    getNodeName: qb.getNodeName,
+    setNodeName: qb.setNodeName,
+    queryBuilderJson: qb.queryBuilderJson,
+    setQueryBuilderJson: qb.setQueryBuilderJson,
+  }));
 
   const { constrainForBunnyV1 } = useFeatures();
 
@@ -115,6 +127,7 @@ const RuleWrapper = ({
   });
 
   const [showHandle, setShowHandle] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
 
   const handleOnSelect = useCallback(
     (e: React.MouseEvent) => {
@@ -130,15 +143,22 @@ const RuleWrapper = ({
   const onMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     setShowHandle(true);
+    setShowDelete(true);
   };
 
   const onMouseLeave = useCallback(() => {
     if (showHandle && !isDragging && !isSelected) {
       setShowHandle(false);
+      setShowDelete(false);
     }
-  }, [showHandle, isDragging, isSelected, setShowHandle]);
+  }, [showHandle, isDragging, isSelected, setShowHandle, setShowDelete]);
 
   const { handleContextMenu, ...rightClickMenuMethods } = useRightClickMenu();
+
+  const handleDelete = useCallback(() => {
+    const newQuery = removeById(queryBuilderJson, id);
+    setQueryBuilderJson(newQuery);
+  }, [id, queryBuilderJson, setQueryBuilderJson]);
 
   const nodeName = useMemo(() => getNodeName(node), [node, getNodeName]);
 
@@ -184,16 +204,18 @@ const RuleWrapper = ({
           unmountOnExit
           sx={{ display: "flex", alignItems: "center" }}
         >
-          <IconButton
-            aria-label="Drag"
-            data-draggable="true"
-            size="small"
-            {...(sortable ? attributes : {})}
-            {...(sortable ? listeners : {})}
-            sx={dragButtonSx}
-          >
-            <DragIndicator fontSize="small" sx={dragIconSx(isDragging)} />
-          </IconButton>
+          <Fade in={showHandle || forceShowHandle || isDragging}>
+            <IconButton
+              aria-label="Drag"
+              data-draggable="true"
+              size="small"
+              {...(sortable ? attributes : {})}
+              {...(sortable ? listeners : {})}
+              sx={dragButtonSx}
+            >
+              <DragIndicator fontSize="small" sx={dragIconSx(isDragging)} />
+            </IconButton>
+          </Fade>
         </Collapse>
         {isDragging ? (
           <Skeleton
@@ -292,6 +314,26 @@ const RuleWrapper = ({
             </IconButton>
           </Collapse>
         )}
+        <Collapse
+          in={showDelete || forceShowHandle}
+          orientation="horizontal"
+          collapsedSize={0}
+          unmountOnExit
+          sx={{ display: "flex", alignItems: "center" }}
+        >
+          <Fade in={showDelete || forceShowHandle}>
+            <IconButton
+              aria-label="Delete"
+              size="small"
+              {...(sortable ? attributes : {})}
+              {...(sortable ? listeners : {})}
+              sx={deleteButtonSx}
+              onClick={handleDelete}
+            >
+              <Close fontSize="medium" sx={deleteIconSx(isDragging)} />
+            </IconButton>
+          </Fade>
+        </Collapse>
       </Box>
       {isSelected && (
         <EditableText
