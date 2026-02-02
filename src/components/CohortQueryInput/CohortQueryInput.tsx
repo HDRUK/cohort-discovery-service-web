@@ -36,7 +36,7 @@ const CohortQueryInput = () => {
     warnings: qb.queryBuilderJson.warnings,
   }));
 
-  const { submit: submitQuery, disabled } = useSubmitQuery();
+  const { disabled } = useSubmitQuery();
 
   const isLoading = useDaphneStore((s) => s.stateManagement.isLoading);
   const setIsLoading = useDaphneStore((s) => s.stateManagement.setIsLoading);
