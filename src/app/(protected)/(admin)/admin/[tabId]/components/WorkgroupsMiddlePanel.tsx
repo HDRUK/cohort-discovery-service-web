@@ -6,8 +6,11 @@ import { capitaliseFirstLetter } from "@/utils/string";
 import useAdminStore from "@/hooks/useAdminStore";
 import { useNotify } from "@/providers/NotifyProvider";
 import UserTable from "@/components/UserTable";
+import useFeatures from "@/hooks/useFeatures";
 
 const WorkgroupsMiddlePanel = () => {
+  const { manageWorkgroupsInternal } = useFeatures();
+
   const selectedWorkgroup = useAdminStore((s) => s.selectedWorkgroup);
   const removeCollectionsFromWorkgroup = useAdminStore(
     (s) => s.removeCollectionsFromWorkgroup,
@@ -48,24 +51,26 @@ const WorkgroupsMiddlePanel = () => {
             }}
             boxSxProps={{ minHeight: 300 }}
           />
-          <UserTable
-            tableTitle={`${capitaliseFirstLetter(
-              selectedWorkgroup?.name.toLowerCase(),
-            )} Workgroup`}
-            tableSubTitle="Users"
-            handleDelete={async (ids: string[]) => {
-              await removeUsersFromWorkgroup({
-                ids: ids.map((id) => +id),
-                workgroup_id: selectedWorkgroup.id,
-              });
-              notify.success(
-                `${ids.length} Users${
-                  ids.length > 1 ? "s" : ""
-                } removed from workgroup ${selectedWorkgroup.name}`,
-              );
-            }}
-            boxSxProps={{ minHeight: 300 }}
-          />
+          {manageWorkgroupsInternal && (
+            <UserTable
+              tableTitle={`${capitaliseFirstLetter(
+                selectedWorkgroup?.name.toLowerCase(),
+              )} Workgroup`}
+              tableSubTitle="Users"
+              handleDelete={async (ids: string[]) => {
+                await removeUsersFromWorkgroup({
+                  ids: ids.map((id) => +id),
+                  workgroup_id: selectedWorkgroup.id,
+                });
+                notify.success(
+                  `${ids.length} Users${
+                    ids.length > 1 ? "s" : ""
+                  } removed from workgroup ${selectedWorkgroup.name}`,
+                );
+              }}
+              boxSxProps={{ minHeight: 300 }}
+            />
+          )}
         </Stack>
       )}
       {!selectedWorkgroup && (
