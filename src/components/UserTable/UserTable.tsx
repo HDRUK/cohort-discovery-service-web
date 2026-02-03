@@ -5,7 +5,7 @@ import {
   MRT_RowSelectionState,
   type MRT_ColumnDef,
 } from "material-react-table";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Table from "@/components/Table";
 import useSearchParams from "@/hooks/useSearchParams";
 import { capitaliseFirstLetter } from "@/utils/string";
@@ -36,7 +36,6 @@ const UserTable = ({
 
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
 
-  const setSelectedUser = useAdminStore((s) => s.setSelectedUser);
   const users = useAdminStore((s) => s.users);
 
   const selectedUserIds = useMemo(

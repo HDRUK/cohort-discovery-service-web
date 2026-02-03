@@ -435,6 +435,7 @@ export enum FeatureName {
   ConstrainForBunnyV1 = "constrain-for-bunny-v1",
   QueryNlp = "query-nlp",
   InAppMessenger = "in-app-messenger",
+  ManageWorkgroupsInternal = "manage-workgroups-internal",
 }
 
 export type FeatureFlag = Record<FeatureName, boolean>;
@@ -444,6 +445,7 @@ export const DEFAULT_FLAGS: FeatureFlag = {
   [FeatureName.ConstrainForBunnyV1]: false,
   [FeatureName.QueryNlp]: false,
   [FeatureName.InAppMessenger]: false,
+  [FeatureName.ManageWorkgroupsInternal]: true,
 };
 
 export type GroupedCollection = { custodian: Custodian; items: Collection[] };

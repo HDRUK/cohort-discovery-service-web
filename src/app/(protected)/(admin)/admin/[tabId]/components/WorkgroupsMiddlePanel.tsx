@@ -29,7 +29,7 @@ const WorkgroupsMiddlePanel = () => {
       }}
     >
       {!!selectedWorkgroup && (
-        <Stack gap={2} sx={{ flex: 1, minHeight: 0 }}>
+        <Stack gap={2}>
           <CollectionsTable
             tableTitle={`${capitaliseFirstLetter(
               selectedWorkgroup?.name.toLowerCase(),
@@ -46,7 +46,7 @@ const WorkgroupsMiddlePanel = () => {
                 } removed from workgroup ${selectedWorkgroup.name}`,
               );
             }}
-            boxSxProps={{ maxHeight: 420 }}
+            boxSxProps={{ flex: 1, minHeight: 300 }}
           />
           <UserTable
             tableTitle={`${capitaliseFirstLetter(
@@ -64,7 +64,7 @@ const WorkgroupsMiddlePanel = () => {
                 } removed from workgroup ${selectedWorkgroup.name}`,
               );
             }}
-            boxSxProps={{ maxHeight: 420, minHeight: 400 }}
+            boxSxProps={{ flex: 1, minHeight: 300 }}
           />
         </Stack>
       )}
