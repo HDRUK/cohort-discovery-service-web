@@ -1,5 +1,5 @@
 "use client";
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import ActionMenu from "../ActionMenu";
@@ -65,7 +65,7 @@ const QueryBuilder = ({
   }));
 
   useEffect(() => {
-    resetQueryBuilderJson();
+    resetQueryBuilderJson(true);
   }, [resetQueryBuilderJson]);
 
   useEffect(() => {

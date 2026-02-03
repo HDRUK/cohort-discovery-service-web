@@ -1,6 +1,6 @@
 "use client";
 
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 import Title from "@/components/Title";
 import { useNotify } from "../../providers/NotifyProvider";
 import EditableText from "../EditableText";

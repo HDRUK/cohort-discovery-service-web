@@ -1,6 +1,5 @@
 "use client";
 
-import { useDaphneStore } from "@/store/useDaphneStore";
 import { RuleNodeType } from "@/types/rules";
 import { moveItemIntoGroup } from "@/utils/rules";
 import {
@@ -24,11 +23,16 @@ import HierarchyItem from "@/components/HierarchyItem";
 import { ID_REF_SUFFIX } from "@/config/defaults";
 import useHasMounted from "@/hooks/useHasMounted";
 import SkeletonFull from "@/components/SkeletonFull";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 
 export const Hierarchy = () => {
-  const {
-    queryBuilder: { queryBuilderJson, setQueryBuilderJson, boardIndex },
-  } = useDaphneStore();
+  const { queryBuilderJson, setQueryBuilderJson, boardIndex } = useQueryBuilder(
+    (qb) => ({
+      queryBuilderJson: qb.queryBuilderJson,
+      setQueryBuilderJson: qb.setQueryBuilderJson,
+      boardIndex: qb.boardIndex,
+    }),
+  );
 
   const { rules } = queryBuilderJson;
 
@@ -54,7 +58,6 @@ export const Hierarchy = () => {
 
       const currentIndex = board.indexOf(activeId as string);
 
-      //if dragging from a different group, put it after
       const targetIndex =
         board.indexOf(overId as string) + (currentIndex < 0 ? 1 : 0);
 

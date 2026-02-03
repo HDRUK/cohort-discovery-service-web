@@ -9,7 +9,7 @@ import Table from "../Table";
 
 const DEFAULT_PER_PAGE = 20;
 
-const CodeStats = ({ codes }: { codes: Paginated<CodeStat[]> }) => {
+const CodeStats = ({ codes }: { codes: Paginated<CodeStat> }) => {
   const columns = useMemo<MRT_ColumnDef<CodeStat>[]>(
     () => [
       {

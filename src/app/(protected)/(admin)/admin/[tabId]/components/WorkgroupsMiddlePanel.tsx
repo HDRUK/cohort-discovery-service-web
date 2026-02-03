@@ -1,20 +1,23 @@
 "use client";
 
-import { CollectionWithHosts, Paginated } from "@/types/api";
 import CollectionsTable from "@/components/CollectionsTable";
-import { Box, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { capitaliseFirstLetter } from "@/utils/string";
-import useAdminStore from "@/store/useAdminStore";
+import useAdminStore from "@/hooks/useAdminStore";
 import { useNotify } from "@/providers/NotifyProvider";
+import UserTable from "@/components/UserTable";
+import useFeatures from "@/hooks/useFeatures";
 
-type WorkgroupsMiddlePanelProps = {
-  collections: Paginated<CollectionWithHosts[]>;
-};
+const WorkgroupsMiddlePanel = () => {
+  const { manageWorkgroupsInternal } = useFeatures();
 
-const WorkgroupsMiddlePanel = ({ collections }: WorkgroupsMiddlePanelProps) => {
   const selectedWorkgroup = useAdminStore((s) => s.selectedWorkgroup);
   const removeCollectionsFromWorkgroup = useAdminStore(
     (s) => s.removeCollectionsFromWorkgroup,
+  );
+
+  const removeUsersFromWorkgroup = useAdminStore(
+    (s) => s.removeUsersFromWorkgroup,
   );
 
   const notify = useNotify();
@@ -28,13 +31,12 @@ const WorkgroupsMiddlePanel = ({ collections }: WorkgroupsMiddlePanelProps) => {
         minHeight: 0,
       }}
     >
-      {
-        !!selectedWorkgroup && (
+      {!!selectedWorkgroup && (
+        <Stack gap={2}>
           <CollectionsTable
-            initialData={collections}
             tableTitle={`${capitaliseFirstLetter(
               selectedWorkgroup?.name.toLowerCase(),
-            )} Workgroups`}
+            )} Workgroup`}
             tableSubTitle="Collections"
             deleteOverride={async (ids: string[]) => {
               await removeCollectionsFromWorkgroup({
@@ -47,10 +49,30 @@ const WorkgroupsMiddlePanel = ({ collections }: WorkgroupsMiddlePanelProps) => {
                 } removed from workgroup ${selectedWorkgroup.name}`,
               );
             }}
+            boxSxProps={{ minHeight: 300 }}
           />
-        )
-        //* Space here for Users Table post MVP
-      }
+          {manageWorkgroupsInternal && (
+            <UserTable
+              tableTitle={`${capitaliseFirstLetter(
+                selectedWorkgroup?.name.toLowerCase(),
+              )} Workgroup`}
+              tableSubTitle="Users"
+              handleDelete={async (ids: string[]) => {
+                await removeUsersFromWorkgroup({
+                  ids: ids.map((id) => +id),
+                  workgroup_id: selectedWorkgroup.id,
+                });
+                notify.success(
+                  `${ids.length} Users${
+                    ids.length > 1 ? "s" : ""
+                  } removed from workgroup ${selectedWorkgroup.name}`,
+                );
+              }}
+              boxSxProps={{ minHeight: 300 }}
+            />
+          )}
+        </Stack>
+      )}
       {!selectedWorkgroup && (
         <Box sx={{ mx: "auto", my: "auto" }}>
           <Typography variant="h5">

@@ -14,35 +14,65 @@ import getCustodian from "@/actions/__mocks__/getCustodian";
 import MockDaphneStore from "@/store/MockDaphneStore";
 import { getMockCollection } from "@/actions/__mocks__/getCollections";
 import getCollectionHost from "@/actions/__mocks__/getCollectionHost";
+import { useCustodianDataStore } from "@/store/custodianDataStore";
 jest.mock("@/actions/getCustodian");
 
 const createCollection = jest.fn();
 const mockCustodian = getCustodian();
+const mockCollectionHosts = [
+  getCollectionHost({
+    id: 10,
+    name: "Alpha Host",
+    custodian: mockCustodian,
+  }),
+  getCollectionHost({
+    id: 20,
+    name: "Beta Host",
+    custodian: mockCustodian,
+  }),
+];
 const createCollectionAdmin = jest.fn();
 
 let custodians: Custodian[];
 let collectionHosts: CollectionHost[];
 
+type CustodianStoreState = ReturnType<typeof useCustodianDataStore.getState>;
+
+type CustodianStoreOverrides = Partial<Omit<CustodianStoreState, "current">> & {
+  current?: Partial<CustodianStoreState["current"]>;
+};
+
 const renderCreateCollection = (
   overrides: Partial<Parameters<typeof CreateCollection>[0]> = {},
-  custodianDataOverides = {},
+  custodianDataOverides: CustodianStoreOverrides = {},
 ) => {
+  const currentOverrides: Partial<CustodianStoreState["current"]> =
+    custodianDataOverides.current ?? {};
+
   return render(
     <MockDaphneStore
       overrides={{
-        custodianData: {
+        custodian: {
           createCollection,
-          currentCustodian: mockCustodian,
           ...custodianDataOverides,
+          current: {
+            custodian: custodians[0],
+            setCustodian: jest.fn(),
+            collectionHosts: collectionHosts,
+            setCollectionHosts: jest.fn(),
+            ...currentOverrides,
+          },
         },
-        adminData: { createCollection: createCollectionAdmin },
+        admin: {
+          createCollection: createCollectionAdmin,
+          collectionHosts: collectionHosts,
+        },
+        user: {
+          custodians,
+        },
       }}
     >
-      <CreateCollection
-        custodians={custodians}
-        collectionHosts={collectionHosts}
-        {...overrides}
-      />
+      <CreateCollection {...overrides} />
     </MockDaphneStore>,
   );
 };
@@ -59,19 +89,9 @@ describe("CreateCollection", () => {
       },
     );
     custodians = [mockCustodian];
-    collectionHosts = [
-      getCollectionHost({
-        id: 10,
-        name: "Alpha Host",
-        custodian: mockCustodian,
-      }),
-      getCollectionHost({
-        id: 20,
-        name: "Beta Host",
-        custodian: mockCustodian,
-      }),
-    ];
+    collectionHosts = mockCollectionHosts;
   });
+
   /*
   it("renders the main fields and sections", () => {
     renderCreateCollection();
@@ -171,7 +191,7 @@ describe("CreateCollection", () => {
     const user = userEvent.setup();
     const onCancel = jest.fn();
 
-    renderCreateCollection({ onCancel }, { currentCustodian: null });
+    renderCreateCollection({ onCancel }, { current: { custodian: null } });
 
     const custodianLabel = screen.getByText(/custodian/i);
     const custodianId = custodianLabel.getAttribute("for");

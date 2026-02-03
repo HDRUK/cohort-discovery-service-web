@@ -3,7 +3,7 @@
 import { Button } from "@mui/material";
 import useSubmitQuery from "@/hooks/useSubmitQuery";
 
-const SubmitQueryButton = () => {
+const SubmitQueryButton = ({ warning = false }: { warning: boolean }) => {
   const { submit, disabled } = useSubmitQuery();
 
   return (
@@ -13,28 +13,25 @@ const SubmitQueryButton = () => {
       disabled={disabled}
       sx={(theme) => ({
         borderRadius: 20,
-        borderWidth: 1,
+        borderWidth: 2,
+        whiteSpace: "nowrap",
 
-        borderColor: theme.palette.text.secondary,
+        borderColor: warning
+          ? theme.palette.warning.main
+          : theme.palette.success.main,
         backgroundColor: !disabled
           ? theme.palette.common.white
           : theme.palette.background.default,
         color: theme.palette.text.primary,
 
-        fontWeight: 500,
+        fontWeight: 400,
         fontSize: 15,
 
-        "&:hover": {
-          borderWidth: 1,
-          borderColor: "transparent",
-          backgroundColor: theme.palette.action.hover,
-        },
-
         "&.Mui-disabled": {
-          borderWidth: 1,
-          borderColor: theme.palette.action.disabledBackground,
-          color: theme.palette.text.disabled,
-          backgroundColor: "transparent",
+          borderWidth: 2,
+          borderColor: theme.palette.grey[300],
+          color: theme.palette.text.secondary,
+          backgroundColor: theme.palette.grey[200],
         },
       })}
       onClick={(event) => {

@@ -30,6 +30,15 @@ export const dragIconSx = (isDragging: boolean): SxProps<Theme> => ({
   opacity: isDragging ? 0 : 1,
 });
 
+export const deleteButtonSx: SxProps<Theme> = {
+  cursor: "pointer",
+  mt: 0.25,
+};
+
+export const deleteIconSx = (isDragging: boolean): SxProps<Theme> => ({
+  opacity: isDragging ? 0 : 1,
+});
+
 export const skeletonSx = (
   width: number | string = "100%",
   height: number | string = "100%",

@@ -11,11 +11,10 @@ import {
   type MRT_ColumnDef,
 } from "material-react-table";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Box, Tooltip, Typography } from "@mui/material";
+import { Tooltip, Typography } from "@mui/material";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import Table from "@/components/Table";
 import CopyableVariable from "../CopyableVariable";
-import Title from "@/components/Title";
 import useSearchParams from "@/hooks/useSearchParams";
 import { capitaliseFirstLetter } from "@/utils/string";
 import { getDatetime } from "@/utils/date";
@@ -26,18 +25,17 @@ import getCustodianCollections from "@/actions/getCustodianCollections";
 import getAdminCollections from "@/actions/getAdminCollections";
 import { isEqualTask } from "@/utils/distributions";
 import { useLogDependencyChanges } from "@/utils/deps";
-import useAdminStore from "@/store/useAdminStore";
-import useCustodianStore from "@/store/useCustodianStore";
-import useUserStore from "@/store/useUserStore";
+import useAdminStore from "@/hooks/useAdminStore";
+import useCustodianStore from "@/hooks/useCustodianStore";
+import useUserStore from "@/hooks/useUserStore";
 import { useNotify } from "@/providers/NotifyProvider";
 import { getTagCustodianCollection, TAG_COLLECTION_ADMIN } from "@/config/tags";
 import { buildCollectionParams } from "@/utils/params";
 import StatusChip from "@/components/StatusChip";
+import { TableProps } from "../Table/Table";
 
-export interface CollectionsTableProps {
-  initialData: Paginated<CollectionWithHosts[]>;
+export interface CollectionsTableProps extends TableProps {
   showPid?: boolean;
-  admin?: boolean;
   refreshRate?: number;
   tableTitle?: string;
   tableSubTitle?: string;
@@ -45,24 +43,33 @@ export interface CollectionsTableProps {
 }
 
 const CollectionsTable = ({
-  initialData,
   showPid = false,
-  admin = false,
   refreshRate = 5,
   tableTitle,
   tableSubTitle,
   deleteOverride,
+  ...rest
 }: CollectionsTableProps) => {
   const { searchParams, getSearchParam } = useSearchParams("collection_filter");
   const filter_name = getSearchParam() || "all";
 
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
 
+  const currentCustodian = useCustodianStore((s) => s.current.custodian);
+  const isAdmin = useMemo(() => !currentCustodian, [currentCustodian]);
   const deleteCollectionAdmin = useAdminStore((s) => s.deleteCollection);
   const deleteCollection = useCustodianStore((s) => s.deleteCollection);
-  const currentCustodian = useCustodianStore((s) => s.currentCustodian);
   const selectedCollections = useUserStore((s) => s.selectedCollections);
   const setSelectedCollections = useUserStore((s) => s.setSelectedCollections);
+
+  const adminCollections = useAdminStore((s) => s.collections);
+  const custodianCollections = useCustodianStore((s) => s.current.collections);
+
+  // initial data is fetch from the store to speed up rendering
+  // - fallsback to client side fetch if we need to refresh
+  // - may need further improvement here as it's still confusing to follow
+  //   where the initial data is set
+  const initialData = isAdmin ? adminCollections : custodianCollections;
 
   const notify = useNotify();
 
@@ -75,7 +82,7 @@ const CollectionsTable = ({
     [searchParams, currentCustodian],
   );
   const qc = useQueryClient();
-  const { data: collections } = useQuery<Paginated<CollectionWithHosts[]>>({
+  const { data: collections } = useQuery<Paginated<CollectionWithHosts>>({
     queryKey,
     queryFn: async () => {
       const workgroupFilter =
@@ -98,7 +105,7 @@ const CollectionsTable = ({
       const params = buildCollectionParams(collectionParams).toString();
 
       const res =
-        currentCustodian?.pid && !admin
+        currentCustodian?.pid && !isAdmin
           ? await getCustodianCollections(currentCustodian.pid, {
               params,
               cacheOptions: {
@@ -313,60 +320,29 @@ const CollectionsTable = ({
     deleteCollectionAdmin,
   });
 
-  if (collections.total === 0)
-    return (
-      <Box
-        sx={{
-          px: 2,
-          display: "flex",
-          flexDirection: "column",
-          flex: 1,
-          minHeight: 0,
-        }}
-      >
-        <Title
-          title={tableTitle || "Collections"}
-          subTitle={tableSubTitle || capitaliseFirstLetter(filter_name)}
-        />
-        <Box sx={{ mx: "auto", my: "auto" }}>
-          <Typography variant="h5">
-            Collections will appear here when they are created
-          </Typography>
-        </Box>
-      </Box>
-    );
-
   return (
-    <Box
-      sx={{
-        px: 1,
-        display: "flex",
-        flexDirection: "column",
-        flex: 1,
-        minHeight: 0,
+    <Table
+      key="custodian-collection-table"
+      emptyMessage={"Collections will appear here when they are created"}
+      table={table}
+      leftAction={{
+        titleProps: {
+          title: tableTitle || "Collections",
+          subTitle: tableSubTitle || capitaliseFirstLetter(filter_name),
+        },
       }}
-    >
-      <Table
-        key="custodian-collection-table"
-        table={table}
-        leftAction={{
-          titleProps: {
-            title: tableTitle || "Collections",
-            subTitle: tableSubTitle || capitaliseFirstLetter(filter_name),
-          },
-        }}
-        rightAction={{
-          deleteProps: { onClick: handleDeleteCollections },
-          refreshProps: {
-            tag:
-              currentCustodian?.pid && !admin
-                ? getTagCustodianCollection(currentCustodian.pid)
-                : TAG_COLLECTION_ADMIN,
-            label: "Refresh Collections",
-          },
-        }}
-      />
-    </Box>
+      rightAction={{
+        deleteProps: { onClick: handleDeleteCollections },
+        refreshProps: {
+          tag:
+            currentCustodian?.pid && !isAdmin
+              ? getTagCustodianCollection(currentCustodian.pid)
+              : TAG_COLLECTION_ADMIN,
+          label: "Refresh Collections",
+        },
+      }}
+      {...rest}
+    />
   );
 };
 

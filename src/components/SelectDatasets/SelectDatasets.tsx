@@ -1,6 +1,6 @@
 "use client";
 
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { Collection, GroupedCollection, Network } from "../../types/api";
 import {
   AccordionSummary,
@@ -15,6 +15,7 @@ import SelectNetworkDatasets, {
 } from "../SelectNetworkDatasets";
 import RefreshButton from "../RefreshButton";
 import { TAG_COLLECTIONS } from "@/config/tags";
+import { intersection } from "lodash";
 
 const SelectDatasets = ({
   initialSelection,
@@ -37,6 +38,8 @@ const SelectDatasets = ({
     mountedRef.current = true;
     if (selectedDatasets.length === 0) {
       setSelectedDatasets(initialSelection ?? []);
+    } else {
+      setSelectedDatasets(intersection(initialSelection, selectedDatasets));
     }
   }, [selectedDatasets, initialSelection, setSelectedDatasets]);
 

@@ -1,9 +1,15 @@
 "use client";
 
-import { useDaphneStore } from "@/store/useDaphneStore";
 import { Concept } from "@/types/api";
 import { SearchBar } from "@hdruk/ui";
-import { Dispatch, SetStateAction, useMemo, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useMemo,
+  useState,
+  useCallback,
+  useRef,
+} from "react";
 import {
   Checkbox,
   FormControlLabel,
@@ -11,8 +17,8 @@ import {
   Box,
   Divider,
 } from "@mui/material";
-import { useCallback, useRef } from "react";
 import { ConceptItem, ConceptItemProps } from "./ConceptItem";
+import useUserStore from "@/hooks/useUserStore";
 
 interface SlotProps {
   conceptItem: ConceptItemProps;
@@ -35,12 +41,12 @@ const SearchConcepts = ({
   slotProps,
   multiple = false,
 }: SearchConceptsProps) => {
-  const {
-    userData: { searchForConcepts },
-  } = useDaphneStore();
+  const searchForConcepts = useUserStore((s) => s.searchForConcepts);
 
   const lastQueryRef = useRef<string>("");
-  const initialSelectedRef = useRef<Record<number, boolean>>({ ...selected });
+  const initialSelectedRef = useRef<Record<number, boolean>>({
+    ...(selected ?? {}),
+  });
 
   const [options, setOptions] = useState<Concept[]>([]);
   const [noOptionsFound, setNoOptionsFound] = useState(false);
@@ -48,11 +54,7 @@ const SearchConcepts = ({
   const allSelected = useMemo(() => {
     if (options?.length === 0) return false;
     if (selected === undefined) return false;
-    return options.every((o) => {
-      const id = o?.concept_id;
-      if (!id) return false;
-      return selected[id] === true;
-    });
+    return options.every((o) => selected[o.concept_id] === true);
   }, [selected, options]);
 
   const toggleSelectAll = useCallback(() => {
@@ -61,7 +63,6 @@ const SearchConcepts = ({
       options.forEach((o) => {
         next[o.concept_id] = !allSelected;
       });
-
       return next;
     });
   }, [options, allSelected, setSelected]);
@@ -70,16 +71,18 @@ const SearchConcepts = ({
     async (value: string) => {
       if (value === lastQueryRef.current) return;
       lastQueryRef.current = value;
+
       if (!value) {
         setOptions([]);
         setNoOptionsFound(false);
         return;
       }
+
       setSelected?.({ ...initialSelectedRef.current });
+
       const { data } = await searchForConcepts(value, domain);
       setOptions((data as Concept[]) ?? []);
       setNoOptionsFound(data?.length === 0);
-      return;
     },
     [domain, searchForConcepts, setSelected],
   );
@@ -112,10 +115,7 @@ const SearchConcepts = ({
             <FormControlLabel
               key={"selectAll"}
               control={
-                <Checkbox
-                  checked={allSelected}
-                  onChange={() => toggleSelectAll()}
-                />
+                <Checkbox checked={allSelected} onChange={toggleSelectAll} />
               }
               label={"Select All"}
             />

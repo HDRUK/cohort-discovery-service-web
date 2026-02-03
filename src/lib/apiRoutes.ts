@@ -43,6 +43,7 @@ export const API_ROUTES = {
   adminWorkgroups: `${API_URL}/workgroups`,
   authCallback: "http://localhost:8100/auth/callback",
   users: `${API_URL}/users`,
+  user: (id: number) => `${API_URL}/users/${id}`,
   featureFlags: `${API_URL}/features`,
 };
 

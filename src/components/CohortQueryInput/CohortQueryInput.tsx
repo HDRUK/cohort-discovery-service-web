@@ -2,18 +2,18 @@
 
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { Box } from "@mui/material";
-import { useDaphneStore } from "@/store/useDaphneStore";
 import { useCallback, useEffect, useRef } from "react";
 import SearchBox from "../SearchBox";
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 import {
   DEFAULT_SEARCH_WAIT_TIME,
   MAX_INVALID_REASONS,
 } from "@/config/defaults";
 import { useDebounce } from "@/hooks/useDebounce";
 import useSubmitQuery from "@/hooks/useSubmitQuery";
-import { ArrowForward } from "@mui/icons-material";
 import { RuleErrors } from "@/utils/rules";
+import useStateManagement from "@/hooks/useStateManagement";
+import SubmitQueryButton from "@/components/SubmitQueryButton";
 
 type FormValues = {
   cohortQueryInput: string;
@@ -36,10 +36,11 @@ const CohortQueryInput = () => {
     warnings: qb.queryBuilderJson.warnings,
   }));
 
-  const { submit: submitQuery, disabled } = useSubmitQuery();
+  const { disabled } = useSubmitQuery();
 
-  const isLoading = useDaphneStore((s) => s.stateManagement.isLoading);
-  const setIsLoading = useDaphneStore((s) => s.stateManagement.setIsLoading);
+  const isLoading = useStateManagement((s) => s.isLoading);
+  const setIsLoading = useStateManagement((s) => s.setIsLoading);
+
   const lastCommittedRef = useRef<string>(queryAsText);
 
   const {
@@ -75,7 +76,7 @@ const CohortQueryInput = () => {
 
   const resetQuery = useCallback(() => {
     clearFormErrors();
-    resetQueryBuilderJson();
+    resetQueryBuilderJson(false);
     resetField("cohortQueryInput", {
       defaultValue: queryAsText,
       keepTouched: true,
@@ -113,10 +114,12 @@ const CohortQueryInput = () => {
     const q = (debouncedQuery ?? "").trim();
     if (q === lastCommittedRef.current) return;
     lastCommittedRef.current = q;
+
     if (q === queryAsText) {
       if (q === "") resetQuery();
       return;
     }
+
     handleSubmitSearch(onSubmitSearch, resetQuery)();
   }, [
     queryAsText,
@@ -148,20 +151,22 @@ const CohortQueryInput = () => {
           },
         }}
         render={({ field, fieldState: { error, isDirty } }) => (
-          <SearchBox
-            {...field}
-            collapsible={false}
-            error={isDirty ? false : !!error}
-            type="search"
-            placeholder="Search for a cohort e.g. females above 50 with diabetes type-ii"
-            fullWidth
-            variant="outlined"
-            onClickEndAornment={submitQuery}
-            loading={isLoading}
-            warning={warnings.length > 0}
-            disabled={disabled || !!error}
-            endIcon={<ArrowForward />}
-          />
+          <Box display="flex" flexDirection="row" sx={{ gap: 1 }}>
+            <SearchBox
+              {...field}
+              collapsible={false}
+              error={isDirty ? false : !!error}
+              type="search"
+              placeholder="Search for a cohort e.g. females above 50 with diabetes type-ii"
+              fullWidth
+              variant="outlined"
+              loading={isLoading}
+              warning={warnings.length > 0}
+              disabled={disabled || !!error}
+              showEndIcon={false}
+            />
+            <SubmitQueryButton warning={warnings.length > 0} />
+          </Box>
         )}
       />
     </Box>

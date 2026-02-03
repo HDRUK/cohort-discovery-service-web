@@ -1,9 +1,7 @@
 import WorkgroupsAdmin from "./WorkgroupsAdmin";
-import getAdminWorkgroups from "@/actions/getAdminWorkgroups";
 import { CollectionsSearchParams } from "@/types/api";
 import { buildCollectionParams } from "@/utils/params";
 import { Box, Skeleton } from "@mui/material";
-import getCollections from "@/actions/getCollections";
 import getAdminCollections from "@/actions/getAdminCollections";
 import { DEFAULT_PER_PAGE } from "@/config/defaults";
 
@@ -27,23 +25,9 @@ const WorkgroupsTab = async ({
     ...rest,
   });
 
-  const [
-    { data: collections },
-    { data: allCollections },
-    { data: workgroups },
-  ] = await Promise.all([
-    getAdminCollections({ params }),
-    getCollections(),
-    getAdminWorkgroups({ params }),
-  ]);
+  const { data: collections } = await getAdminCollections({ params });
 
-  return (
-    <WorkgroupsAdmin
-      collections={collections}
-      allCollections={allCollections}
-      workgroups={workgroups}
-    />
-  );
+  return <WorkgroupsAdmin collections={collections} />;
 };
 
 export default WorkgroupsTab;

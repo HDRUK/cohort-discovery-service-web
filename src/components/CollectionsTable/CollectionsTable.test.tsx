@@ -2,21 +2,52 @@ import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import CollectionsTable, { CollectionsTableProps } from "./CollectionsTable";
 import getCustodianCollections from "@/actions/getCustodianCollections";
+import getCustodian from "@/actions/__mocks__/getCustodian";
 import MockDaphneStore from "@/store/MockDaphneStore";
+import { CollectionWithHosts, Paginated } from "@/types/api";
 jest.mock("@/actions/getCustodianCollections");
+jest.mock("@/actions/getCustodian");
 
 describe("CollectionsTable", () => {
-  const renderCollectionsTable = (props: CollectionsTableProps) =>
+  const renderCollectionsTableAdmin = (
+    collections: Paginated<CollectionWithHosts>,
+    props?: CollectionsTableProps,
+  ) =>
     render(
-      <MockDaphneStore>
+      <MockDaphneStore
+        overrides={{
+          admin: {
+            collections,
+          },
+        }}
+      >
         <CollectionsTable {...props} />
       </MockDaphneStore>,
     );
 
-  it("renders the correct column headers", async () => {
+  const renderCollectionsTable = (
+    collections: Paginated<CollectionWithHosts>,
+    props?: CollectionsTableProps,
+  ) =>
+    render(
+      <MockDaphneStore
+        overrides={{
+          custodian: {
+            current: {
+              custodian: getCustodian(),
+              collections,
+            },
+          },
+        }}
+      >
+        <CollectionsTable {...props} />
+      </MockDaphneStore>,
+    );
+
+  it("renders the correct column headers for admin", async () => {
     const collections = await getCustodianCollections("abc");
 
-    renderCollectionsTable({ initialData: collections.data });
+    renderCollectionsTableAdmin(collections.data);
 
     const columns = [
       "Name",
@@ -32,10 +63,19 @@ describe("CollectionsTable", () => {
     }
   });
 
-  it("displays data when collections exist", async () => {
+  it("displays data when collections exist for admin", async () => {
     const collections = await getCustodianCollections("abc");
 
-    renderCollectionsTable({ initialData: collections.data });
+    renderCollectionsTableAdmin(collections.data);
+
+    expect(screen.getByText("Test Dataset #1")).toBeInTheDocument();
+    expect(screen.getByText("Test Dataset #2")).toBeInTheDocument();
+  });
+
+  it("displays data when collections exist for custodian", async () => {
+    const collections = await getCustodianCollections("abc");
+
+    renderCollectionsTable(collections.data);
 
     expect(screen.getByText("Test Dataset #1")).toBeInTheDocument();
     expect(screen.getByText("Test Dataset #2")).toBeInTheDocument();

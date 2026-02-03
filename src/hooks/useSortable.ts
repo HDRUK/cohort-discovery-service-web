@@ -8,10 +8,11 @@ import { useMemo } from "react";
 import { useElementSize } from "./useElementSize";
 import { quantise } from "@/utils/numbers";
 import { useDndContext } from "@dnd-kit/core";
-import { useDaphneStore } from "@/store/useDaphneStore";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 
-export interface UseSortablePlusReturn
-  extends ReturnType<typeof useDndSortable> {
+export interface UseSortablePlusReturn extends ReturnType<
+  typeof useDndSortable
+> {
   isLast: boolean;
   style: React.CSSProperties;
   anchorRef: React.RefObject<HTMLDivElement | HTMLLIElement | null>;
@@ -21,7 +22,7 @@ export interface UseSortablePlusReturn
 }
 
 const useSortable = (args: UseSortableArguments): UseSortablePlusReturn => {
-  const boardIndex = useDaphneStore((s) => s.queryBuilder.boardIndex);
+  const boardIndex = useQueryBuilder((s) => s.boardIndex);
 
   const params = useDndSortable(args);
   const { over, active } = useDndContext();

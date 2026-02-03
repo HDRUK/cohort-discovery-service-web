@@ -24,19 +24,22 @@ import {
 export type SearchBoxProps = Omit<TextFieldProps, "errors"> & {
   loading?: boolean;
   warning?: boolean;
+  error?: boolean;
   collapsible?: boolean;
   defaultExpanded?: boolean;
   collapsedWidth?: number | string;
   expandedWidth?: number | string;
   inputBgColor?: string;
   actions?: React.ReactNode[];
-  onClickEndAornment?: () => void;
+  onClickEndAdornment?: () => void;
   endIcon?: React.ReactNode;
+  showEndIcon?: boolean;
 };
 
 const SearchBox = ({
   loading = false,
   warning = false,
+  error = false,
   collapsible = true,
   defaultExpanded = true,
   collapsedWidth = 0,
@@ -44,8 +47,9 @@ const SearchBox = ({
   inputBgColor = "#fff",
   actions,
   disabled,
-  onClickEndAornment,
+  onClickEndAdornment,
   endIcon,
+  showEndIcon = true,
   ...rest
 }: SearchBoxProps) => {
   const [expanded, setExpanded] = useState(
@@ -69,7 +73,7 @@ const SearchBox = ({
     e.preventDefault();
     e.stopPropagation();
     if (collapsible) toggle();
-    onClickEndAornment?.();
+    onClickEndAdornment?.();
   };
 
   const actionChildren = React.Children.toArray(actions);
@@ -94,7 +98,13 @@ const SearchBox = ({
             id={STABLE_ID}
             inputRef={inputRef}
             type="search"
-            sx={getTextFieldSx(collapsible, expanded, inputBgColor, warning)}
+            sx={getTextFieldSx(
+              collapsible,
+              expanded,
+              inputBgColor,
+              warning,
+              error,
+            )}
             slotProps={{
               htmlInput: {
                 sx: getHtmlInputSx(collapsible, expanded),
@@ -105,7 +115,7 @@ const SearchBox = ({
                   <InputAdornment position="end" sx={inputAdornmentSx}>
                     {loading ? (
                       <CircularProgress size={24} color="inherit" />
-                    ) : (
+                    ) : showEndIcon ? (
                       <IconButton
                         type="button"
                         disabled={disabled}
@@ -121,7 +131,7 @@ const SearchBox = ({
                       >
                         {endIcon ?? <SearchIcon fontSize="small" />}
                       </IconButton>
-                    )}
+                    ) : null}
                   </InputAdornment>
                 ),
               },

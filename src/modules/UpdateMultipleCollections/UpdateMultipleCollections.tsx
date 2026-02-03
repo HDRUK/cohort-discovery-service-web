@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import LockOutlineIcon from "@mui/icons-material/LockOutline";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
-import { CollectionStatus, CollectionWithHosts, Workgroup } from "@/types/api";
+import { CollectionStatus, CollectionWithHosts } from "@/types/api";
 import {
   Controller,
   FieldValues,
@@ -19,7 +19,7 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import { revalidateAction } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
-import useCustodianStore from "@/store/useCustodianStore";
+import useCustodianStore from "@/hooks/useCustodianStore";
 import { useLogDependencyChanges } from "@/utils/deps";
 import {
   getTagCustodianCollection,
@@ -34,10 +34,10 @@ import ManageMultipleCollectionsStatus from "@/modules/ManageMultipleCollections
 import UpdateMultipleCollectionsGuidance from "./UpdateMultipleCollectionsGuidance";
 import transitionCollections from "@/actions/transitionCollections";
 import { UpdateCollectionFormValues } from "@/types/forms";
+import { useAdminDataStore } from "@/store/adminDataStore";
 
 export type UpdateMultipleCollectionProps = {
   collections: CollectionWithHosts[];
-  workgroups: Workgroup[];
   expandedRight: boolean;
   expandedLeft: boolean;
   onClose?: () => void;
@@ -45,13 +45,14 @@ export type UpdateMultipleCollectionProps = {
 
 const UpdateMultipleCollections = ({
   collections,
-  workgroups,
   expandedRight,
   onClose,
 }: UpdateMultipleCollectionProps) => {
   const { currentCustodian } = useCustodianStore((custodianData) => ({
-    currentCustodian: custodianData.currentCustodian,
+    currentCustodian: custodianData.current.custodian,
   }));
+
+  const workgroups = useAdminDataStore((s) => s.workgroups);
 
   const notify = useNotify();
 
@@ -249,9 +250,7 @@ const UpdateMultipleCollections = ({
           {expandedRight ? <LockOpenIcon /> : <LockOutlineIcon />}
         </IconButton>
       </Typography>
-
       <FormLabel underlined>Collection Status</FormLabel>
-
       <ManageMultipleCollectionsStatus
         collections={collections}
         expandedRight={expandedRight}
@@ -260,7 +259,6 @@ const UpdateMultipleCollections = ({
           .sort()
           .join("-")}`}
       />
-
       <FormLabel underlined>Workgroup access</FormLabel>
       <Box
         sx={{
@@ -281,7 +279,6 @@ const UpdateMultipleCollections = ({
           <Box>{<Chip label={"MIXED"} key={"wg-chip-mixed"} />}</Box>
         )}
       </Box>
-
       {expandedRight && (
         <>
           <Controller

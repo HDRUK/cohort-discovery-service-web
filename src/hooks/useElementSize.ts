@@ -1,6 +1,6 @@
 import { useLayoutEffect, useMemo, useRef } from "react";
 import type { UniqueIdentifier } from "@dnd-kit/core";
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { useDebouncedCallback } from "./useDebounceCallback";
 
 interface ElementSizeProps {
@@ -14,7 +14,7 @@ export function useElementSize<T extends HTMLElement>(
   delay: number = 100,
 ): [
   React.RefObject<T | null>,
-  { width: number | string; height: number | string }
+  { width: number | string; height: number | string },
 ] {
   const { sizeCache, setSizeCache } = useQueryBuilder((qb) => ({
     sizeCache: qb.sizeCache,

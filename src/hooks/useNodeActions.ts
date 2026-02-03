@@ -1,4 +1,4 @@
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { CombinatorType, RuleNodeType } from "@/types/rules";
 import {
   createOperator,

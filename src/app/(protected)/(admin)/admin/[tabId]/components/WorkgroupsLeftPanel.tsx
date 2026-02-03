@@ -4,28 +4,24 @@ import List from "@/components/List";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import AddButton from "@/components/AddButton";
 import CreateWorkgroup from "@/modules/CreateWorkgroup";
-import { Collection, Workgroup } from "@/types/api";
 import { useCallback, useEffect } from "react";
 import useSearchParams from "@/hooks/useSearchParams";
 import { capitaliseFirstLetter } from "@/utils/string";
-import useAdminStore from "@/store/useAdminStore";
+import useAdminStore from "@/hooks/useAdminStore";
 
 type WorkgroupsLeftPanelProps = {
-  workgroups: Workgroup[];
-  collections: Collection[];
   expandedLeft: boolean;
   onCreate: () => void;
   onCancelCreate: () => void;
 };
 
 const WorkgroupsLeftPanel = ({
-  workgroups,
-  collections,
   expandedLeft,
   onCreate,
   onCancelCreate,
 }: WorkgroupsLeftPanelProps) => {
   const setSelectedWorkgroup = useAdminStore((s) => s.setSelectedWorkgroup);
+  const workgroups = useAdminStore((s) => s.workgroups);
 
   const { getSearchParam, setSearchParam } =
     useSearchParams("workgroup_filter");
@@ -65,12 +61,7 @@ const WorkgroupsLeftPanel = ({
           disabled={expandedLeft}
         />
 
-        {expandedLeft && (
-          <CreateWorkgroup
-            collections={collections}
-            onCancel={onCancelCreate}
-          />
-        )}
+        {expandedLeft && <CreateWorkgroup onCancel={onCancelCreate} />}
       </ActionMenuSection>
 
       <ActionMenuSection

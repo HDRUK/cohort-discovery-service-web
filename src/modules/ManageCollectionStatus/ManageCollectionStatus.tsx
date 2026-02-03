@@ -3,7 +3,7 @@ import AddButton from "@/components/AddButton";
 import FormRadioGroup from "@/components/FormRadioGroup";
 import StatusChip from "@/components/StatusChip";
 import { useNotify } from "@/providers/NotifyProvider";
-import useCustodianStore from "@/store/useCustodianStore";
+import useCustodianStore from "@/hooks/useCustodianStore";
 import { Collection, CollectionStatus } from "@/types/api";
 import { UpdateCollectionFormValues } from "@/types/forms";
 import { getCollectionStatus } from "@/utils/colours";
@@ -31,7 +31,7 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
   setValue,
 }: ManageCollectionStatusProps<TFieldValues>) => {
   const { currentCustodian } = useCustodianStore((custodianData) => ({
-    currentCustodian: custodianData.currentCustodian,
+    currentCustodian: custodianData.current.custodian,
   }));
   const notify = useNotify();
 
