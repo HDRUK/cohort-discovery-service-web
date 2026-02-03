@@ -13,12 +13,18 @@ const baseURL = process.env.API_BASE_URL ?? "http://localhost:8100";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 
-interface RequestOptions<B = unknown> {
+export enum ErrorMode {
+  THROW = "throw",
+  RESULT = "result",
+}
+
+export interface RequestOptions<B = unknown> {
   headers?: Record<string, string>;
   body?: B;
   signal?: AbortSignal;
   cache?: RequestCache;
   next?: NextFetchRequestConfig;
+  errorMode?: ErrorMode;
 }
 
 export type CachedGetArgs = {
@@ -71,7 +77,14 @@ async function request<TResponse, TBody = undefined>(
   options: RequestOptions<TBody> = {},
 ): Promise<TResponse | never> {
   const fullUrl = url.startsWith("http") ? url : `${baseURL}${url}`;
-  const { headers = {}, body, signal, cache, next } = options;
+  const {
+    headers = {},
+    body,
+    signal,
+    cache,
+    next,
+    errorMode = ErrorMode.THROW,
+  } = options;
 
   const cookieStore = await cookies();
   const token = cookieStore.get(ACCESS_TOKEN_NAME)?.value;
@@ -92,6 +105,12 @@ async function request<TResponse, TBody = undefined>(
 
     if (!response.ok) {
       const errorText = await extractErrorMessage(response);
+      if (errorMode === ErrorMode.RESULT)
+        return {
+          data: null,
+          error: { text: errorText, code: response.status },
+        } as TResponse;
+
       console.error(errorText + " url: " + fullUrl);
       throw new ApiError(response.status, errorText);
     }

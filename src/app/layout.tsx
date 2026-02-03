@@ -5,7 +5,7 @@ import { Box } from "@mui/material";
 import ThemeRegistry from "@/components/ThemeRegistry";
 import TopMenu from "@/components/TopMenu";
 import HeaderBar from "@/components/HeaderBar";
-import { isIntegrated } from "@/utils/modes";
+import { isStandalone } from "@/utils/modes";
 
 const sourceSans = Source_Sans_3({
   variable: "--font-source-sans-3",
@@ -24,7 +24,8 @@ export const metadata: Metadata = {
   description: "New cohort discovery tool",
 };
 
-const hideNav = isIntegrated(process.env.APPLICATION_MODE);
+const hideNav = process.env.HIDE_NAV === "1";
+const applicationMode = process.env.APPLICATION_MODE;
 
 export default async function RootLayout({
   children,
@@ -36,7 +37,9 @@ export default async function RootLayout({
           <Box
             sx={{ display: "flex", flexDirection: "column", height: "100vh" }}
           >
-            {!hideNav && <HeaderBar />}
+            {!hideNav && (
+              <HeaderBar standalone={isStandalone(applicationMode)} />
+            )}
 
             <Box
               sx={{

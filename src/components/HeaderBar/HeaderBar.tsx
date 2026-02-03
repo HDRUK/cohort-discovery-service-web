@@ -8,21 +8,36 @@ import PositionedMenu, { PositionedMenuItem } from "../PositionedMenu";
 import { useRouter } from "next/navigation";
 import useUserStore from "@/hooks/useUserStore";
 
-const HeaderBar = () => {
+const NEXT_PUBLIC_LOGIN_URL =
+  process.env.NEXT_PUBLIC_LOGIN_URL ?? "https://healthdatagateway.org";
+
+const HeaderBar = ({ standalone }: { standalone: boolean }) => {
   const router = useRouter();
 
   const user = useUserStore((s) => s.user);
   const setUser = useUserStore((s) => s.setUser);
 
   const links: PositionedMenuItem[] = [
-    {
-      id: "logout",
-      label: "Logout",
-      onClick: () => {
-        setUser(null);
-        router.push("/api/auth/logout");
-      },
-    },
+    ...(standalone
+      ? [
+          {
+            id: "logout",
+            label: "Logout",
+            onClick: () => {
+              setUser(null);
+              router.push("/api/auth/logout");
+            },
+          },
+        ]
+      : [
+          {
+            id: "back",
+            label: "Back",
+            onClick: () => {
+              router.push(NEXT_PUBLIC_LOGIN_URL);
+            },
+          },
+        ]),
   ];
 
   return (
