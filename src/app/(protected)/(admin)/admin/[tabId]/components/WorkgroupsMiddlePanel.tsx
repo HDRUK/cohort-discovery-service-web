@@ -46,7 +46,7 @@ const WorkgroupsMiddlePanel = () => {
                 } removed from workgroup ${selectedWorkgroup.name}`,
               );
             }}
-            boxSxProps={{ flex: 1, minHeight: 300 }}
+            boxSxProps={{ minHeight: 300 }}
           />
           <UserTable
             tableTitle={`${capitaliseFirstLetter(
@@ -64,7 +64,7 @@ const WorkgroupsMiddlePanel = () => {
                 } removed from workgroup ${selectedWorkgroup.name}`,
               );
             }}
-            boxSxProps={{ flex: 1, minHeight: 300 }}
+            boxSxProps={{ minHeight: 300 }}
           />
         </Stack>
       )}

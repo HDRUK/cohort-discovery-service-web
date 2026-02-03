@@ -82,6 +82,9 @@ const Table = <TData extends MRT_RowData>({
         px: 1,
         display: "flex",
         flexDirection: "column",
+        flex: 1,
+        minHeight: 0,
+        overflow: "hidden",
         ...boxSxProps,
       }}
     >
