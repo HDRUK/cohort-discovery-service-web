@@ -1,4 +1,4 @@
-import { Box, Divider, Grid } from "@mui/material";
+import { Box, BoxProps, Divider, Grid, Typography } from "@mui/material";
 import {
   MaterialReactTable,
   MaterialReactTableProps,
@@ -20,6 +20,7 @@ import ControlledSearchBox, {
 } from "@/modules/ControlledSearchBox";
 
 export interface TableProps {
+  emptyMessage?: string;
   leftAction?: {
     titleProps?: TitleProps;
     searchProps?: ControlledSearchBoxProps;
@@ -39,15 +40,18 @@ export interface TableProps {
     };
   };
   details?: React.ReactNode;
+  boxSxProps?: BoxProps["sx"];
 }
 
 type DTableProps<TData extends MRT_RowData> = MaterialReactTableProps<TData> &
   TableProps;
 
 const Table = <TData extends MRT_RowData>({
+  emptyMessage,
   leftAction,
   rightAction,
   details,
+  boxSxProps,
   ...props
 }: DTableProps<TData>) => {
   const { table } = props;
@@ -70,6 +74,8 @@ const Table = <TData extends MRT_RowData>({
     downloadProps ?? {};
   const { onClick: onEditClick, ...restEditProps } = editProps ?? {};
 
+  const nrows = table?.getRowCount() ?? 0;
+
   return (
     <Box
       sx={{
@@ -79,6 +85,7 @@ const Table = <TData extends MRT_RowData>({
         flex: 1,
         minHeight: 0,
         overflow: "hidden",
+        ...boxSxProps,
       }}
     >
       {(rightAction || leftAction) && (
@@ -133,7 +140,13 @@ const Table = <TData extends MRT_RowData>({
           <Divider /> {details}
         </Box>
       )}
-      <MaterialReactTable {...props} />
+      {emptyMessage && nrows === 0 ? (
+        <Box sx={{ mx: "auto", my: "auto" }}>
+          <Typography variant="h5">{emptyMessage}</Typography>
+        </Box>
+      ) : (
+        <MaterialReactTable {...props} />
+      )}
     </Box>
   );
 };

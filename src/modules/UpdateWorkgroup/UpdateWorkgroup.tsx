@@ -22,7 +22,11 @@ const UpdateWorkgroup = ({ expandedRight, onClose }: UpdateWorkgroupProps) => {
   const addCollectionsToWorkgroup = useAdminStore(
     (s) => s.addCollectionsToWorkgroup,
   );
+
+  const addUsersToWorkgroup = useAdminStore((s) => s.addUsersToWorkgroup);
+
   const collections = useAdminStore((s) => s.allAprovedCollections);
+  const users = useAdminStore((s) => s.users);
 
   const selectedWorkgroup = useAdminStore((s) => s.selectedWorkgroup);
 
@@ -31,6 +35,7 @@ const UpdateWorkgroup = ({ expandedRight, onClose }: UpdateWorkgroupProps) => {
   const formMethods = useForm<UpdateWorkgroupFormValues>({
     defaultValues: {
       collections: [],
+      users: [],
     },
   });
 
@@ -41,6 +46,7 @@ const UpdateWorkgroup = ({ expandedRight, onClose }: UpdateWorkgroupProps) => {
 
     const newValues = {
       collections: [],
+      users: [],
     };
 
     reset(newValues, {
@@ -57,12 +63,25 @@ const UpdateWorkgroup = ({ expandedRight, onClose }: UpdateWorkgroupProps) => {
 
     const { id } = selectedWorkgroup;
 
+    if (data.users.length > 0) {
+      await addUsersToWorkgroup({
+        ids: data.users.map((c) => +c.value),
+        workgroup_id: id,
+      });
+      notify.success(`Updated workgroup users ${selectedWorkgroup?.name}`);
+
+      revalidateAction(TAG_CUSTODIAN_COLLECTION);
+      revalidateAction(TAG_WORKGROUP_ADMIN);
+    }
+
     if (data.collections.length > 0) {
       await addCollectionsToWorkgroup({
         ids: data.collections.map((c) => +c.value),
         workgroup_id: id,
       });
-      notify.success(`Updated workgroup ${selectedWorkgroup?.name}`);
+      notify.success(
+        `Updated workgroup collections ${selectedWorkgroup?.name}`,
+      );
 
       revalidateAction(TAG_CUSTODIAN_COLLECTION);
       revalidateAction(TAG_WORKGROUP_ADMIN);
@@ -136,6 +155,42 @@ const UpdateWorkgroup = ({ expandedRight, onClose }: UpdateWorkgroupProps) => {
                   disabled={!expandedRight}
                   multiple
                   options={collections.map((c) => ({
+                    label: c.name,
+                    value: c.id as ValueType,
+                  }))}
+                  getChipLabel={(options, value) =>
+                    options.find((option) => option.value === value.value)
+                      ?.label || ""
+                  }
+                  tagsBelow
+                  error={error}
+                  sx={{ pt: 1 }}
+                  onChange={(value) => {
+                    field.onChange(value);
+                  }}
+                />
+              );
+            }}
+          />
+        </ActionMenuSection>
+        <ActionMenuSection
+          title={"Add Users"}
+          fixedExpanded
+          defaultExpanded
+          underline
+        >
+          <Controller
+            name="users"
+            disabled={!expandedRight}
+            control={control}
+            render={({ field, fieldState: { error } }) => {
+              return (
+                <FormMultiSelect
+                  {...field}
+                  placeholder="Search and add users..."
+                  disabled={!expandedRight}
+                  multiple
+                  options={users.map((c) => ({
                     label: c.name,
                     value: c.id as ValueType,
                   }))}

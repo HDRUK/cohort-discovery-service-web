@@ -11,11 +11,10 @@ import {
   type MRT_ColumnDef,
 } from "material-react-table";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Box, Tooltip, Typography } from "@mui/material";
+import { Tooltip, Typography } from "@mui/material";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import Table from "@/components/Table";
 import CopyableVariable from "../CopyableVariable";
-import Title from "@/components/Title";
 import useSearchParams from "@/hooks/useSearchParams";
 import { capitaliseFirstLetter } from "@/utils/string";
 import { getDatetime } from "@/utils/date";
@@ -33,8 +32,9 @@ import { useNotify } from "@/providers/NotifyProvider";
 import { getTagCustodianCollection, TAG_COLLECTION_ADMIN } from "@/config/tags";
 import { buildCollectionParams } from "@/utils/params";
 import StatusChip from "@/components/StatusChip";
+import { TableProps } from "../Table/Table";
 
-export interface CollectionsTableProps {
+export interface CollectionsTableProps extends TableProps {
   showPid?: boolean;
   refreshRate?: number;
   tableTitle?: string;
@@ -48,6 +48,7 @@ const CollectionsTable = ({
   tableTitle,
   tableSubTitle,
   deleteOverride,
+  ...rest
 }: CollectionsTableProps) => {
   const { searchParams, getSearchParam } = useSearchParams("collection_filter");
   const filter_name = getSearchParam() || "all";
@@ -319,60 +320,29 @@ const CollectionsTable = ({
     deleteCollectionAdmin,
   });
 
-  if (collections.total === 0)
-    return (
-      <Box
-        sx={{
-          px: 2,
-          display: "flex",
-          flexDirection: "column",
-          flex: 1,
-          minHeight: 0,
-        }}
-      >
-        <Title
-          title={tableTitle || "Collections"}
-          subTitle={tableSubTitle || capitaliseFirstLetter(filter_name)}
-        />
-        <Box sx={{ mx: "auto", my: "auto" }}>
-          <Typography variant="h5">
-            Collections will appear here when they are created
-          </Typography>
-        </Box>
-      </Box>
-    );
-
   return (
-    <Box
-      sx={{
-        px: 1,
-        display: "flex",
-        flexDirection: "column",
-        flex: 1,
-        minHeight: 0,
+    <Table
+      key="custodian-collection-table"
+      emptyMessage={"Collections will appear here when they are created"}
+      table={table}
+      leftAction={{
+        titleProps: {
+          title: tableTitle || "Collections",
+          subTitle: tableSubTitle || capitaliseFirstLetter(filter_name),
+        },
       }}
-    >
-      <Table
-        key="custodian-collection-table"
-        table={table}
-        leftAction={{
-          titleProps: {
-            title: tableTitle || "Collections",
-            subTitle: tableSubTitle || capitaliseFirstLetter(filter_name),
-          },
-        }}
-        rightAction={{
-          deleteProps: { onClick: handleDeleteCollections },
-          refreshProps: {
-            tag:
-              currentCustodian?.pid && !isAdmin
-                ? getTagCustodianCollection(currentCustodian.pid)
-                : TAG_COLLECTION_ADMIN,
-            label: "Refresh Collections",
-          },
-        }}
-      />
-    </Box>
+      rightAction={{
+        deleteProps: { onClick: handleDeleteCollections },
+        refreshProps: {
+          tag:
+            currentCustodian?.pid && !isAdmin
+              ? getTagCustodianCollection(currentCustodian.pid)
+              : TAG_COLLECTION_ADMIN,
+          label: "Refresh Collections",
+        },
+      }}
+      {...rest}
+    />
   );
 };
 

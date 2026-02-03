@@ -11,6 +11,8 @@ const useFeatures = () =>
         constrainForBunnyV1: flags[FeatureName.ConstrainForBunnyV1] ?? false,
         queryNlp: flags[FeatureName.QueryNlp] ?? false,
         inAppMessenger: flags[FeatureName.InAppMessenger] ?? false,
+        manageWorkgroupsInternal:
+          flags[FeatureName.ManageWorkgroupsInternal] ?? true,
       };
     }),
   );

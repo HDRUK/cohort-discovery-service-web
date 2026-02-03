@@ -263,6 +263,7 @@ export interface User extends WithTimestamps {
   new_user_status?: number;
   roles: Role[];
   custodians: Custodian[];
+  workgroups?: Workgroup[];
 }
 
 export interface ExternalCustodian {
@@ -376,12 +377,22 @@ export interface AddCollectionsToWorkgroupPost {
   workgroup_id: number;
 }
 
+export interface AddUsersToWorkgroupPost {
+  ids: number[];
+  workgroup_id: number;
+}
+
 export interface AddCollectionToWorkgroupsPost {
   id: number;
   workgroup_ids: number[];
 }
 
 export interface RemoveCollectionsFromWorkgroupPost {
+  ids: number[];
+  workgroup_id: number;
+}
+
+export interface RemoveUsersFromWorkgroupPost {
   ids: number[];
   workgroup_id: number;
 }
@@ -424,6 +435,7 @@ export enum FeatureName {
   ConstrainForBunnyV1 = "constrain-for-bunny-v1",
   QueryNlp = "query-nlp",
   InAppMessenger = "in-app-messenger",
+  ManageWorkgroupsInternal = "manage-workgroups-internal",
 }
 
 export type FeatureFlag = Record<FeatureName, boolean>;
@@ -433,6 +445,7 @@ export const DEFAULT_FLAGS: FeatureFlag = {
   [FeatureName.ConstrainForBunnyV1]: false,
   [FeatureName.QueryNlp]: false,
   [FeatureName.InAppMessenger]: false,
+  [FeatureName.ManageWorkgroupsInternal]: true,
 };
 
 export type GroupedCollection = { custodian: Custodian; items: Collection[] };
