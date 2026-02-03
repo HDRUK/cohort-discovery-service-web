@@ -28,12 +28,13 @@ export const HierarchyItem = ({
   groupId,
   depth = 0,
 }: HierarchyItemProps) => {
-  const { toggleSelected, selected, getNodeName, setNodeName } =
+  const { toggleSelected, selected, getNodeName, setNodeName, hovered } =
     useQueryBuilder((qb) => ({
       toggleSelected: qb.toggleSelected,
       selected: qb.selected,
       getNodeName: qb.getNodeName,
       setNodeName: qb.setNodeName,
+      hovered: qb.hovered,
     }));
   const id = `${ID_REF_SUFFIX}-${node.id}`;
 
@@ -87,7 +88,14 @@ export const HierarchyItem = ({
       onClick={toggleCheckbox}
       onContextMenu={handleContextMenu}
       component="div"
-      sx={listItemButtonSx(isDragging, isOver, isAbove, depth)}
+      sx={listItemButtonSx(
+        isDragging,
+        isOver,
+        isAbove,
+        depth,
+        selected[node.id],
+        !!hovered?.[node.id],
+      )}
     >
       <SquareRadio
         size="medium"
