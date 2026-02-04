@@ -1,4 +1,5 @@
 "use client";
+import GuidanceModal from "@/components/GuidanceModal";
 import { QUERY_BUILDER_GUIDANCE_COOKIE } from "@/config/internals";
 import { maskClientTest } from "@/lib/maskClientTest";
 import { ReactNode, useState } from "react";
@@ -26,7 +27,16 @@ const QueryBuilderGuidanceWrapper = ({
     setShowGuidance(false);
   };
 
-  if (showGuidance) return <QueryBuilderGuidance onClose={handleClose} />;
+  if (showGuidance)
+    return (
+      <>
+        <GuidanceModal
+          open={showGuidance}
+          onClose={handleClose}
+        ></GuidanceModal>
+        {children}
+      </>
+    ); //<QueryBuilderGuidance onClose={handleClose} />;
 
   return children;
 };
