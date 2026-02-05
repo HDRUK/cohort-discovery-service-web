@@ -29,17 +29,16 @@ const GuidanceModal = ({
       onClose={onClose}
       closeButtonSx={{ bgcolor: "#475DA7" }}
       maxWidth="lg"
-      children={
-        showHeader ? (
-          <Box display="flex" flexDirection="column">
-            <QueryBuilderWelcome onClose={onClose} />
-            <QueryBuilderGuidance />
-          </Box>
-        ) : (
-          <QueryBuilderGuidance onClose={onClose} />
-        )
-      }
-    ></Modal>
+    >
+      {showHeader ? (
+        <Box display="flex" flexDirection="column">
+          <QueryBuilderWelcome onClose={onClose} />
+          <QueryBuilderGuidance />
+        </Box>
+      ) : (
+        <QueryBuilderGuidance onClose={onClose} />
+      )}
+    </Modal>
   );
 };
 
