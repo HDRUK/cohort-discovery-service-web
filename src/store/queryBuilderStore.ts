@@ -77,6 +77,8 @@ export interface QueryBuilderStoreState {
 
   hovered: Record<UniqueIdentifier, boolean>;
   setHovered: (id: UniqueIdentifier, reset?: boolean) => void;
+  helpTooltipOpen: boolean;
+  setHelpTooltipOpen: (open: boolean, durationMs?: number) => void;
 
   selected: Record<UniqueIdentifier, boolean>;
   setSelected: (
@@ -171,6 +173,23 @@ export const useQueryBuilderStore = create<QueryBuilderStoreState>(
         ...state,
         hovered: { [id]: !reset },
       }));
+    },
+
+    helpTooltipOpen: true,
+    setHelpTooltipOpen: (open: boolean, durationMs: number = 0) => {
+      set((state) => ({
+        ...state,
+        helpTooltipOpen: open,
+      }));
+
+      if (open && durationMs > 0) {
+        setTimeout(() => {
+          set((state) => ({
+            ...state,
+            helpTooltipOpen: false,
+          }));
+        }, durationMs);
+      }
     },
 
     selected: {},

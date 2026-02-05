@@ -11,14 +11,19 @@ import { checkIsAdmin } from "@/utils/user";
 import useUserStore from "@/hooks/useUserStore";
 import { HelpIcon } from "@/icons/HelpIcon";
 import HelpTooltip from "../HelpTooltip";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 
 export default function TopMenu() {
   const pathname = usePathname();
   const user = useUserStore((s) => s.user);
 
   const [guidanceOpen, setGuidanceOpen] = useState(false);
-  const [tooltipOpen, setTooltipOpen] = useState(true);
-  setTimeout(() => setTooltipOpen(false), 10000);
+  const { helpTooltipOpen, setHelpTooltipOpen } = useQueryBuilder((qb) => ({
+    helpTooltipOpen: qb.helpTooltipOpen,
+    setHelpTooltipOpen: qb.setHelpTooltipOpen,
+  }));
+
+  setTimeout(() => setHelpTooltipOpen(false), 10000);
 
   const userCustodians = useMemo(
     () => user?.custodians ?? [],
@@ -86,7 +91,7 @@ export default function TopMenu() {
   };
 
   const handleTooltipClose = () => {
-    setTooltipOpen(false);
+    setHelpTooltipOpen(false);
   };
 
   return (
@@ -110,7 +115,7 @@ export default function TopMenu() {
           <HelpTooltip
             title="Tool guidance can be found here"
             placement="left"
-            open={tooltipOpen}
+            open={helpTooltipOpen}
             onClose={handleTooltipClose}
             sx={{ zIndex: 1250 }}
           >
