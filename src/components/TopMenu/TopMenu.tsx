@@ -10,12 +10,15 @@ import GuidanceModal from "../GuidanceModal";
 import { checkIsAdmin } from "@/utils/user";
 import useUserStore from "@/hooks/useUserStore";
 import { HelpIcon } from "@/icons/HelpIcon";
+import HelpTooltip from "../HelpTooltip";
 
 export default function TopMenu() {
   const pathname = usePathname();
   const user = useUserStore((s) => s.user);
 
   const [guidanceOpen, setGuidanceOpen] = useState(false);
+  const [tooltipOpen, setTooltipOpen] = useState(true);
+  setTimeout(() => setTooltipOpen(false), 10000);
 
   const userCustodians = useMemo(
     () => user?.custodians ?? [],
@@ -74,17 +77,21 @@ export default function TopMenu() {
     tabs[0]?.id ??
     0;
 
-  const handleGuidance = () => {
+  const handleGuidanceOpen = () => {
     setGuidanceOpen(true);
   };
 
-  const handleClose = () => {
+  const handleGuidanceClose = () => {
     setGuidanceOpen(false);
+  };
+
+  const handleTooltipClose = () => {
+    setTooltipOpen(false);
   };
 
   return (
     <>
-      <GuidanceModal open={guidanceOpen} onClose={handleClose} />
+      <GuidanceModal open={guidanceOpen} onClose={handleGuidanceClose} />
       <TabsShell
         forceValue
         tabs={tabs}
@@ -100,10 +107,17 @@ export default function TopMenu() {
           backgroundColor: theme.palette.background.paper,
         })}
         endIcon={
-          <HelpIcon
-            sx={{ maxHeight: 20, maxWidth: 20, color: "#475da7", mr: 2 }}
-            onClick={handleGuidance}
-          />
+          <HelpTooltip
+            title="Tool guidance can be found here"
+            placement="left"
+            open={tooltipOpen}
+            onClose={handleTooltipClose}
+          >
+            <HelpIcon
+              sx={{ maxHeight: 20, maxWidth: 20, color: "#475da7", mr: 2 }}
+              onClick={handleGuidanceOpen}
+            />
+          </HelpTooltip>
         }
       />
     </>
