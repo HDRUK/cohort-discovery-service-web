@@ -5,7 +5,7 @@ const HelpTooltip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
 ))(({ theme }) => ({
   [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: "#475da7",
+    backgroundColor: theme.palette.tooltip?.main,
     color: theme.palette.common.white,
   },
 }));
