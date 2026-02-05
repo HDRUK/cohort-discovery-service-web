@@ -12,6 +12,7 @@ import useUserStore from "@/hooks/useUserStore";
 import { HelpIcon } from "@/icons/HelpIcon";
 import HelpTooltip from "../HelpTooltip";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
+import theme from "@/config/theme";
 
 export default function TopMenu() {
   const pathname = usePathname();
@@ -120,7 +121,12 @@ export default function TopMenu() {
             sx={{ zIndex: 1250 }}
           >
             <HelpIcon
-              sx={{ maxHeight: 20, maxWidth: 20, color: "#475da7", mr: 2 }}
+              sx={{
+                maxHeight: 20,
+                maxWidth: 20,
+                color: theme.palette.tooltip?.main,
+                mr: 2,
+              }}
               onClick={handleGuidanceOpen}
             />
           </HelpTooltip>
