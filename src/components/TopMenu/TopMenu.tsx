@@ -1,17 +1,21 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 
 import TabsShell from "@/components/TabsShell";
 import { routes } from "../../config/routes";
 import { TabType } from "../TabsShell/TabsShell";
+import GuidanceModal from "../GuidanceModal";
 import { checkIsAdmin } from "@/utils/user";
 import useUserStore from "@/hooks/useUserStore";
+import { HelpIcon } from "@/icons/HelpIcon";
 
 export default function TopMenu() {
   const pathname = usePathname();
   const user = useUserStore((s) => s.user);
+
+  const [guidanceOpen, setGuidanceOpen] = useState(false);
 
   const userCustodians = useMemo(
     () => user?.custodians ?? [],
@@ -70,21 +74,38 @@ export default function TopMenu() {
     tabs[0]?.id ??
     0;
 
+  const handleGuidance = () => {
+    setGuidanceOpen(true);
+  };
+
+  const handleClose = () => {
+    setGuidanceOpen(false);
+  };
+
   return (
-    <TabsShell
-      forceValue
-      tabs={tabs}
-      value={currentTabValue}
-      sx={{ height: "auto" }}
-      tabSx={(theme) => ({
-        "&.Mui-selected": {
-          bgcolor: theme.palette.secondary.main,
-          color: theme.palette.secondary.contrastText,
-        },
-      })}
-      tabHeaderSx={(theme) => ({
-        backgroundColor: theme.palette.background.paper,
-      })}
-    />
+    <>
+      <GuidanceModal open={guidanceOpen} onClose={handleClose} />
+      <TabsShell
+        forceValue
+        tabs={tabs}
+        value={currentTabValue}
+        sx={{ height: "auto" }}
+        tabSx={(theme) => ({
+          "&.Mui-selected": {
+            bgcolor: theme.palette.secondary.main,
+            color: theme.palette.secondary.contrastText,
+          },
+        })}
+        tabHeaderSx={(theme) => ({
+          backgroundColor: theme.palette.background.paper,
+        })}
+        endIcon={
+          <HelpIcon
+            sx={{ maxHeight: 20, maxWidth: 20, color: "#475da7", mr: 2 }}
+            onClick={handleGuidance}
+          />
+        }
+      />
+    </>
   );
 }

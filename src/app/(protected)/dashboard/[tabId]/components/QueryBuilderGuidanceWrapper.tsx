@@ -1,12 +1,7 @@
 "use client";
 import GuidanceModal from "@/components/GuidanceModal";
 import { QUERY_BUILDER_GUIDANCE_COOKIE } from "@/config/internals";
-import { maskClientTest } from "@/lib/maskClientTest";
 import { ReactNode, useState } from "react";
-
-const QueryBuilderGuidance = maskClientTest(
-  () => import("./QueryBuilderGuidance"),
-);
 
 interface QueryBuilderGuidanceWrapperProps {
   initialShowGuidance: boolean;
@@ -30,13 +25,10 @@ const QueryBuilderGuidanceWrapper = ({
   if (showGuidance)
     return (
       <>
-        <GuidanceModal
-          open={showGuidance}
-          onClose={handleClose}
-        ></GuidanceModal>
+        <GuidanceModal open={showGuidance} onClose={handleClose} showHeader />
         {children}
       </>
-    ); //<QueryBuilderGuidance onClose={handleClose} />;
+    );
 
   return children;
 };

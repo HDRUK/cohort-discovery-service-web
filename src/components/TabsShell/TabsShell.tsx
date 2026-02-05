@@ -38,6 +38,7 @@ type TabsShellProps = {
   tabHeaderSx?: BoxProps["sx"];
   tabContentSx?: BoxProps["sx"];
   forceValue?: boolean;
+  endIcon?: React.ReactNode;
 };
 
 export default function TabsShell({
@@ -48,6 +49,7 @@ export default function TabsShell({
   tabHeaderSx,
   tabContentSx,
   forceValue = false,
+  endIcon = null,
 }: TabsShellProps) {
   const router = useRouter();
   const [internalValue, setInternalValue] = React.useState(
@@ -65,7 +67,12 @@ export default function TabsShell({
   return (
     <Box sx={mergeSx(defaultRootSx, sx)}>
       <TabContext value={forceValue ? value || 0 : internalValue}>
-        <Box sx={mergeSx(defaultTabHeaderSx, tabHeaderSx)}>
+        <Box
+          sx={mergeSx(defaultTabHeaderSx, tabHeaderSx)}
+          display="flex"
+          flexDirection="row"
+          justifyContent="space-between"
+        >
           <TabList
             onChange={handleChange}
             allowScrollButtonsMobile
@@ -116,6 +123,7 @@ export default function TabsShell({
               },
             )}
           </TabList>
+          <Box alignContent="center">{endIcon}</Box>
         </Box>
 
         {kids.length > 0 && (
