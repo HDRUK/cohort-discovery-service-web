@@ -112,6 +112,7 @@ export default function TopMenu() {
             placement="left"
             open={tooltipOpen}
             onClose={handleTooltipClose}
+            sx={{ zIndex: 1250 }}
           >
             <HelpIcon
               sx={{ maxHeight: 20, maxWidth: 20, color: "#475da7", mr: 2 }}
