@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 
 import TabsShell from "@/components/TabsShell";
@@ -24,7 +24,11 @@ export default function TopMenu() {
     setHelpTooltipOpen: qb.setHelpTooltipOpen,
   }));
 
-  setTimeout(() => setHelpTooltipOpen(false), 10000);
+  useEffect(() => {
+    if (!helpTooltipOpen) return;
+    const id = setTimeout(() => setHelpTooltipOpen(false), 10000);
+    return () => clearTimeout(id);
+  }, [helpTooltipOpen, setHelpTooltipOpen]);
 
   const userCustodians = useMemo(
     () => user?.custodians ?? [],
