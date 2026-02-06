@@ -25,10 +25,10 @@ export default function TopMenu() {
   }));
 
   useEffect(() => {
-    if (!helpTooltipOpen) return;
+    if (!helpTooltipOpen || !user) return;
     const id = setTimeout(() => setHelpTooltipOpen(false), 10000);
     return () => clearTimeout(id);
-  }, [helpTooltipOpen, setHelpTooltipOpen]);
+  }, [helpTooltipOpen, setHelpTooltipOpen, user]);
 
   const userCustodians = useMemo(
     () => user?.custodians ?? [],
@@ -120,7 +120,7 @@ export default function TopMenu() {
           <HelpTooltip
             title="Tool guidance can be found here"
             placement="left"
-            open={helpTooltipOpen}
+            open={helpTooltipOpen && user}
             onClose={handleTooltipClose}
             sx={{ zIndex: 1250 }}
           >
