@@ -31,6 +31,7 @@ export const themeOptions: ThemeOptions = {
     action: {
       disabledBackground: "#F0F0F0",
     },
+    tooltip: { main: "#475da7" },
   },
   zIndex: {
     drawer: 2,
