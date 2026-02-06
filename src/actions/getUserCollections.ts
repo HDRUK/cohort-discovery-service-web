@@ -1,16 +1,21 @@
 "use server";
 
+import { getTokenUser } from "@/lib/auth";
 import { apiGet, CachedGetArgs } from "../lib/apiClient";
 import { API_ROUTES } from "../lib/apiRoutes";
 import { Collection, ApiResponse } from "../types/api";
-import { TAG_COLLECTIONS, TAG_COLLECTIONS_USER } from "@/config/tags";
+import { getTagsUserCollections, TAG_COLLECTIONS } from "@/config/tags";
 
 const getUserCollections = async (
   args?: Omit<CachedGetArgs, "url">,
 ): Promise<ApiResponse<Collection[]>> => {
+  const {
+    user: { id: userId },
+  } = await getTokenUser();
+
   return await apiGet<ApiResponse<Collection[]>>({
     url: API_ROUTES.userCollections,
-    tags: [TAG_COLLECTIONS_USER, TAG_COLLECTIONS],
+    tags: [getTagsUserCollections(userId), TAG_COLLECTIONS],
     ...args,
   });
 };

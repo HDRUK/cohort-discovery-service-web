@@ -9,7 +9,7 @@ import addCollectionsToWorkgroup from "@/actions/addCollectionsToWorkgroup";
 import removeCollectionsFromWorkgroup from "@/actions/removeCollectionsFromWorkgroup";
 import addCollectionToWorkgroups from "@/actions/addCollectionToWorkgroups";
 import removeCollectionFromWorkgroups from "@/actions/removeCollectionFromWorkgroups";
-import { revalidateAction } from "@/actions/revalidate";
+import { revalidateAction, revalidateCollections } from "@/actions/revalidate";
 import {
   Collection,
   CreateCollectionPost,
@@ -31,7 +31,7 @@ import {
 import {
   getCollectionHostTag,
   getTagCustodianCollection,
-  TAG_COLLECTION_ADMIN,
+  TAG_COLLECTIONS_ADMIN,
   TAG_COLLECTIONS,
   TAG_COLLECTION_HOSTS,
   TAG_WORKGROUP_ADMIN,
@@ -138,11 +138,7 @@ export const useAdminDataStore = create<AdminDataStoreState>((set) => ({
       collection_id: data.id,
     });
 
-    await revalidateAction(getTagCustodianCollection(data.custodian.pid));
-    await revalidateAction(TAG_COLLECTION_ADMIN);
-    await revalidateAction(TAG_COLLECTIONS);
-    await revalidateAction(getCollectionHostTag(data.custodian.pid));
-    await revalidateAction(TAG_COLLECTION_HOSTS);
+    await revalidateCollections(data.custodian.pid);
 
     return data;
   },
@@ -151,19 +147,14 @@ export const useAdminDataStore = create<AdminDataStoreState>((set) => ({
     const { data } = await updateCollection(id, payload);
     await updateCollectionConfig(data.config.id, payloadConfig);
 
-    await revalidateAction(getTagCustodianCollection(data.custodian.pid));
-    await revalidateAction(TAG_COLLECTION_ADMIN);
-    await revalidateAction(TAG_COLLECTIONS);
-    await revalidateAction(getCollectionHostTag(data.custodian.pid));
-    await revalidateAction(TAG_COLLECTION_HOSTS);
+    await revalidateCollections(data.custodian.pid);
 
     return data;
   },
 
   deleteCollection: async (id) => {
     await deleteCollection(id);
-    await revalidateAction(TAG_COLLECTION_ADMIN);
-    await revalidateAction(TAG_COLLECTIONS);
+    await revalidateCollections();
   },
 
   createWorkgroup: async (payload) => {
@@ -175,27 +166,27 @@ export const useAdminDataStore = create<AdminDataStoreState>((set) => ({
   addCollectionsToWorkgroup: async (payload) => {
     const data = await addCollectionsToWorkgroup(payload);
     await revalidateAction(TAG_WORKGROUP_ADMIN);
-    await revalidateAction(TAG_COLLECTION_ADMIN);
+    await revalidateCollections();
     return data.map((d) => d.data);
   },
 
   removeCollectionsFromWorkgroup: async (payload) => {
     await removeCollectionsFromWorkgroup(payload);
-    await revalidateAction(TAG_COLLECTION_ADMIN);
+    await revalidateCollections();
     await revalidateAction(TAG_WORKGROUP_ADMIN);
   },
 
   addUsersToWorkgroup: async (payload) => {
     const data = await addUsersToWorkgroup(payload);
     await revalidateAction(TAG_WORKGROUP_ADMIN);
-    await revalidateAction(TAG_COLLECTION_ADMIN);
+    await revalidateCollections();
     await revalidateAction(TAG_ADMIN_USERS);
     return data.map((d) => d.data);
   },
 
   removeUsersFromWorkgroup: async (payload) => {
     await removeUserFromWorkgroup(payload);
-    await revalidateAction(TAG_COLLECTION_ADMIN);
+    await revalidateCollections();
     await revalidateAction(TAG_WORKGROUP_ADMIN);
     await revalidateAction(TAG_ADMIN_USERS);
   },
@@ -203,13 +194,13 @@ export const useAdminDataStore = create<AdminDataStoreState>((set) => ({
   addCollectionToWorkgroups: async (payload) => {
     const data = await addCollectionToWorkgroups(payload);
     await revalidateAction(TAG_WORKGROUP_ADMIN);
-    await revalidateAction(TAG_COLLECTION_ADMIN);
+    await revalidateCollections();
     return data.map((d) => d.data);
   },
 
   removeCollectionFromWorkgroups: async (payload) => {
     await removeCollectionFromWorkgroups(payload);
-    await revalidateAction(TAG_COLLECTION_ADMIN);
+    await revalidateCollections();
     await revalidateAction(TAG_WORKGROUP_ADMIN);
   },
 
