@@ -28,15 +28,7 @@ import {
   AddUsersToWorkgroupPost,
   RemoveUsersFromWorkgroupPost,
 } from "@/types/api";
-import {
-  getCollectionHostTag,
-  getTagCustodianCollection,
-  TAG_COLLECTIONS_ADMIN,
-  TAG_COLLECTIONS,
-  TAG_COLLECTION_HOSTS,
-  TAG_WORKGROUP_ADMIN,
-  TAG_ADMIN_USERS,
-} from "@/config/tags";
+import { TAG_WORKGROUP_ADMIN, TAG_ADMIN_USERS } from "@/config/tags";
 import { emptyPaginated } from "@/utils/pagination";
 import addUsersToWorkgroup from "@/actions/addUsersToWorkgroup";
 import removeUserFromWorkgroup from "@/actions/removeUsersFromWorkgroup";

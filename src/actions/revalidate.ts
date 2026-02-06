@@ -33,7 +33,10 @@ export const revalidateCustodian = async (custodian: Custodian) => {
   revalidateCustodianByPid(pid);
 };
 
-export const revalidateCollections = (pid?: string, includeHosts = true) =>
+export const revalidateCollections = async (
+  pid?: string,
+  includeHosts = true,
+) =>
   Promise.all([
     revalidateUserAction(TAG_COLLECTIONS_USER),
     revalidateAction(TAG_COLLECTIONS_ADMIN),

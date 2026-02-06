@@ -29,7 +29,10 @@ import useAdminStore from "@/hooks/useAdminStore";
 import useCustodianStore from "@/hooks/useCustodianStore";
 import useUserStore from "@/hooks/useUserStore";
 import { useNotify } from "@/providers/NotifyProvider";
-import { getTagCustodianCollection, TAG_COLLECTION_ADMIN } from "@/config/tags";
+import {
+  getTagCustodianCollection,
+  TAG_COLLECTIONS_ADMIN,
+} from "@/config/tags";
 import { buildCollectionParams } from "@/utils/params";
 import StatusChip from "@/components/StatusChip";
 import { TableProps } from "../Table/Table";
@@ -337,7 +340,7 @@ const CollectionsTable = ({
           tag:
             currentCustodian?.pid && !isAdmin
               ? getTagCustodianCollection(currentCustodian.pid)
-              : TAG_COLLECTION_ADMIN,
+              : TAG_COLLECTIONS_ADMIN,
           label: "Refresh Collections",
         },
       }}

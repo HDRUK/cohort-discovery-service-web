@@ -22,17 +22,12 @@ import FormTextField from "@/components/FormTextField";
 import CollectionConfig from "@/components/CollectionConfig";
 import { UpdateCollectionFormValues } from "@/types/forms";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { revalidateAction } from "@/actions/revalidate";
+import { revalidateCollections } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
 import FormDropdown from "@/components/FormDropdown";
 import DistributionStatus from "../DistrubutionStatus";
 import useCustodianStore from "@/hooks/useCustodianStore";
 import { useLogDependencyChanges } from "@/utils/deps";
-import {
-  getTagCustodianCollection,
-  TAG_COLLECTION_ADMIN,
-  TAG_CUSTODIAN_COLLECTION,
-} from "@/config/tags";
 import FormLabel from "@/components/FormLabel";
 import { maskClientTest } from "@/lib/maskClientTest";
 import transitionCollection from "@/actions/transitionCollection";
@@ -255,11 +250,7 @@ const UpdateCollection = ({
             }`,
           );
         }
-        revalidateAction(TAG_CUSTODIAN_COLLECTION);
-        revalidateAction(TAG_COLLECTION_ADMIN);
-        if (currentCustodian) {
-          revalidateAction(getTagCustodianCollection(currentCustodian.pid));
-        }
+        revalidateCollections(currentCustodian?.pid ?? undefined);
       }
 
       if (closeAfter) {

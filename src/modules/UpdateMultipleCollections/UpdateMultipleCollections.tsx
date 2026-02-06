@@ -17,15 +17,10 @@ import {
   useForm,
 } from "react-hook-form";
 import { useCallback, useEffect, useState } from "react";
-import { revalidateAction } from "@/actions/revalidate";
+import { revalidateCollections } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
 import useCustodianStore from "@/hooks/useCustodianStore";
 import { useLogDependencyChanges } from "@/utils/deps";
-import {
-  getTagCustodianCollection,
-  TAG_COLLECTION_ADMIN,
-  TAG_CUSTODIAN_COLLECTION,
-} from "@/config/tags";
 import SquareCheckbox from "@/components/SquareCheckbox";
 import removeCollectionFromWorkgroups from "@/actions/removeCollectionFromWorkgroups";
 import addCollectionToWorkgroups from "@/actions/addCollectionToWorkgroups";
@@ -158,11 +153,7 @@ const UpdateMultipleCollections = ({
           );
         }
 
-        revalidateAction(TAG_CUSTODIAN_COLLECTION);
-        revalidateAction(TAG_COLLECTION_ADMIN);
-        if (currentCustodian) {
-          revalidateAction(getTagCustodianCollection(currentCustodian.pid));
-        }
+        revalidateCollections(currentCustodian?.pid ?? undefined);
       }
 
       if (closeAfter) {
