@@ -120,7 +120,7 @@ export default function TopMenu() {
           <HelpTooltip
             title="Tool guidance can be found here"
             placement="left"
-            open={helpTooltipOpen && user}
+            open={helpTooltipOpen && !!user}
             onClose={handleTooltipClose}
             sx={{ zIndex: 1250 }}
           >
