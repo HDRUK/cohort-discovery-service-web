@@ -11,10 +11,12 @@ type ToggleExclusionProps = {
 };
 
 const ToggleExclusion = ({ node }: ToggleExclusionProps) => {
-  const { queryBuilderJson, setQueryBuilderJson } = useQueryBuilder((qb) => ({
-    queryBuilderJson: qb.queryBuilderJson,
-    setQueryBuilderJson: qb.setQueryBuilderJson,
-  }));
+  const { queryBuilderJson, setQueryBuilderJson, setSelectedGuidance } =
+    useQueryBuilder((qb) => ({
+      queryBuilderJson: qb.queryBuilderJson,
+      setQueryBuilderJson: qb.setQueryBuilderJson,
+      setSelectedGuidance: qb.setSelectedGuidance,
+    }));
 
   const handleToggleExclusion = (newNode: RuleLeafType) => {
     setQueryBuilderJson(
@@ -25,6 +27,7 @@ const ToggleExclusion = ({ node }: ToggleExclusionProps) => {
   const value = node?.exclude ? 0 : 1;
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedGuidance(node.id);
     const nextValue = Number(event.target.value);
     const nextExclude = nextValue === 0;
     handleToggleExclusion({ ...node, exclude: nextExclude });

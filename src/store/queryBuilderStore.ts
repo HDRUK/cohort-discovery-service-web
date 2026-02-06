@@ -112,6 +112,9 @@ export interface QueryBuilderStoreState {
   ) => void;
 
   validateRules: (root: RuleGroupType) => RuleGroupType;
+
+  selectedGuidance: string | null;
+  setSelectedGuidance: (id: string | null) => void;
 }
 
 export const useQueryBuilderStore = create<QueryBuilderStoreState>(
@@ -437,5 +440,12 @@ export const useQueryBuilderStore = create<QueryBuilderStoreState>(
           featureFlags?.[FeatureName.ConstrainForBunnyV1] || false,
       });
     },
+
+    selectedGuidance: null,
+    setSelectedGuidance: (id: string | null) =>
+      set((state) => ({
+        ...state,
+        selectedGuidance: id,
+      })),
   }),
 );
