@@ -78,8 +78,10 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
             }}
           />
         )}
+      {/* Only show a chip if initial status is not DRAFT */}
       {initialStatusId !== CollectionStatus.DRAFT && (
         <Box sx={{ mb: 1 }}>
+          {/* Handle the case where ACTIVE -> DRAFT, labelling visually as INACTIVE */}
           {selectedStatusId === CollectionStatus.DRAFT &&
           initialStatusId === CollectionStatus.ACTIVE ? (
             <Chip
