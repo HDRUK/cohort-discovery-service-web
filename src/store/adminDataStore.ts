@@ -33,7 +33,7 @@ import { TAG_WORKGROUP_ADMIN, TAG_ADMIN_USERS } from "@/config/tags";
 import { emptyPaginated } from "@/utils/pagination";
 import addUsersToWorkgroup from "@/actions/addUsersToWorkgroup";
 import removeUserFromWorkgroup from "@/actions/removeUsersFromWorkgroup";
-import transitionCollection from "@/actions/transitionCollection";
+import transitionCollections from "@/actions/transitionCollections";
 
 export interface AdminDataStoreState {
   users: User[];
@@ -86,7 +86,7 @@ export interface AdminDataStoreState {
   ) => Promise<void>;
 
   updateCollectionStatus: (
-    id: number,
+    idOrIds: number | number[],
     status: CollectionStatus,
   ) => Promise<void>;
 
@@ -203,9 +203,11 @@ export const useAdminDataStore = create<AdminDataStoreState>((set) => ({
     await revalidateAction(TAG_WORKGROUP_ADMIN);
   },
 
-  updateCollectionStatus: async (id, status) => {
+  updateCollectionStatus: async (idOrIds, status) => {
     const state = CollectionStatus[status].toLowerCase();
-    await transitionCollection(id, { state });
+    const ids = Array.isArray(idOrIds) ? idOrIds : [idOrIds];
+
+    await transitionCollections(ids, { state });
     await revalidateCollections();
   },
 

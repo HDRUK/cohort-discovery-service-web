@@ -27,7 +27,6 @@ import addCollectionToWorkgroups from "@/actions/addCollectionToWorkgroups";
 import FormLabel from "@/components/FormLabel";
 import ManageMultipleCollectionsStatus from "@/modules/ManageMultipleCollectionsStatus";
 import UpdateMultipleCollectionsGuidance from "./UpdateMultipleCollectionsGuidance";
-import transitionCollections from "@/actions/transitionCollections";
 import { UpdateCollectionFormValues } from "@/types/forms";
 import { useAdminDataStore } from "@/store/adminDataStore";
 
@@ -43,11 +42,12 @@ const UpdateMultipleCollections = ({
   expandedRight,
   onClose,
 }: UpdateMultipleCollectionProps) => {
-  const { currentCustodian } = useCustodianStore((custodianData) => ({
-    currentCustodian: custodianData.current.custodian,
-  }));
+  const currentCustodian = useCustodianStore((s) => s.current.custodian);
 
   const workgroups = useAdminDataStore((s) => s.workgroups);
+  const updateCollectionStatus = useAdminDataStore(
+    (s) => s.updateCollectionStatus,
+  );
 
   const notify = useNotify();
 
@@ -133,14 +133,9 @@ const UpdateMultipleCollections = ({
           collections[0].model_state?.state_id !==
             data.collection.model_state?.state.id
         ) {
-          await transitionCollections(
+          await updateCollectionStatus(
             collections.map((c) => c.id),
-            {
-              state:
-                CollectionStatus[
-                  data.collection.model_state.state.id
-                ].toLowerCase(),
-            },
+            data.collection.model_state.state.id,
           );
           notify.success(
             `Transitioned collections (${collections
@@ -168,6 +163,7 @@ const UpdateMultipleCollections = ({
       onClose,
       workgroups,
       workgroupValues,
+      updateCollectionStatus,
     ],
   );
 

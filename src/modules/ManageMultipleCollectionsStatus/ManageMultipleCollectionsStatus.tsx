@@ -1,4 +1,3 @@
-import transitionCollections from "@/actions/transitionCollections";
 import AddButton from "@/components/AddButton";
 import FormRadioGroup from "@/components/FormRadioGroup";
 import StatusChip from "@/components/StatusChip";
@@ -22,9 +21,10 @@ const ManageMultipleCollectionsStatus = ({
 }: ManageMultipleCollectionsStatusProps) => {
   const { control, setValue } = useFormContext<UpdateCollectionFormValues>();
 
-  const { currentCustodian } = useCustodianStore((custodianData) => ({
-    currentCustodian: custodianData.current.custodian,
-  }));
+  const currentCustodian = useCustodianStore((s) => s.current.custodian);
+  const requestCollectionMadeActive = useCustodianStore(
+    (s) => s.requestCollectionMadeActive,
+  );
   const notify = useNotify();
 
   const uniqueStates = [
@@ -65,13 +65,8 @@ const ManageMultipleCollectionsStatus = ({
   }
 
   const handleAction = async () => {
-    //update
-    await transitionCollections(
-      collections.map((c) => c.id),
-      {
-        state: "pending",
-      },
-    );
+    await requestCollectionMadeActive(collections.map((c) => c.id));
+    setSelectedStatusId(CollectionStatus.PENDING);
     setSelectedStatusId(CollectionStatus.PENDING);
     notify.success(
       `Requested for collections (${collections
