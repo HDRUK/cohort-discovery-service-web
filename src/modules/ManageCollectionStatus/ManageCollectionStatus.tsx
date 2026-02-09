@@ -100,10 +100,11 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
             <FormRadioGroup
               label=""
               options={options
-                .filter((o) => o !== selectedStatusId)
+                .filter((o) => o !== selectedStatusId) // don't show currently selected status as an option
                 .map((option) => {
                   return {
                     label:
+                      // In the case where ACTIVE -> DRAFT, provide the visual label as INACTIVE
                       option === CollectionStatus.DRAFT &&
                       selectedStatusId === CollectionStatus.ACTIVE
                         ? "INACTIVE"
