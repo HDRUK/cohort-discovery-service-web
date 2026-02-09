@@ -10,12 +10,14 @@ import React from "react";
 type ToggleExclusionProps = {
   node: RuleLeafType;
   // show: boolean;
+  target: string;
   children?: React.ReactNode;
 };
 
 const ToggleExclusionGuidance = ({
   node,
   // show,
+  target,
   children,
 }: ToggleExclusionProps) => {
   const { queryBuilderJson, setQueryBuilderJson, selectedGuidance } =
@@ -39,7 +41,8 @@ const ToggleExclusionGuidance = ({
   //   handleToggleExclusion({ ...node, exclude: nextExclude });
   // };
   // if (!show) return null;
-  if (selectedGuidance === node.id) return children;
+  console.log(selectedGuidance, target);
+  if (selectedGuidance === target) return children;
   return null;
 };
 

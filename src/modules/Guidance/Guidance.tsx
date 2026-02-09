@@ -121,25 +121,34 @@ const Guidance = () => {
 
   const { constrainForBunnyV1 } = useFeatures();
 
+  interface GuidanceProps extends TypographyProps {
+    target: string;
+  }
   const makeRuleComponents = (node: RuleLeafType) => ({
     ...baseComponents,
-    ToggleExclusion: () => <ToggleExclusion node={node} />,
-    ToggleExclusionGuidance: (props: TypographyProps) => (
+    ToggleExclusion: () => (
+      <ToggleExclusion key="ToggleExclusion" node={node} />
+    ),
+    ToggleExclusionGuidance: (props: GuidanceProps) => (
       <ToggleExclusionGuidance node={node} {...props} />
     ),
     ShowDescendants: () => <ShowDescendants node={node} />,
-    AddTimeFrameButton: (props: AddButtonProps) => (
-      <AddTimeFrameButton
+    AddTimeFrameButton: (props: AddButtonProps) =>
+      !node.timeConstraint && (
+        <AddTimeFrameButton
+          key="RuleTimeframeSelector"
+          rule={node}
+          {...props}
+        />
+      ),
+    AddAgeButton: (props: AddButtonProps) =>
+      !node.ageConstraint && <AddAgeButton rule={node} {...props} />,
+    RuleTimeframeSelector: (props: { title: string }) => (
+      <RuleTimeframeSelector
+        key="RuleTimeframeSelector"
         rule={node}
-        disabled={!!node.timeConstraint}
         {...props}
       />
-    ),
-    AddAgeButton: (props: AddButtonProps) => (
-      <AddAgeButton rule={node} disabled={!!node.ageConstraint} {...props} />
-    ),
-    RuleTimeframeSelector: (props: { title: string }) => (
-      <RuleTimeframeSelector rule={node} {...props} />
     ),
     DeleteTimeFrameButton: (props: DeleteMenuItemProps) => (
       <DeleteTimeFrameButton rule={node} {...props} />

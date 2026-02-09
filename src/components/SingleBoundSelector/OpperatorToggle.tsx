@@ -7,11 +7,12 @@ interface OperatorToggleProps {
   operator: SingleSidedOperator;
   handleOperatorChange: (
     event: React.MouseEvent<HTMLElement>,
-    newOperator: SingleSidedOperator
+    newOperator: SingleSidedOperator,
   ) => void;
   readOnly?: boolean;
   greaterThanLabel: React.ReactNode;
   lessThanLabel: React.ReactNode;
+  onClick?: () => void;
 }
 
 const OperatorToggle = ({
@@ -20,6 +21,7 @@ const OperatorToggle = ({
   readOnly,
   greaterThanLabel,
   lessThanLabel,
+  onClick,
 }: OperatorToggleProps) => {
   const [open, setOpen] = React.useState(false);
 
@@ -40,7 +42,7 @@ const OperatorToggle = ({
 
   return (
     <ClickAwayListener onClickAway={() => setOpen(false)}>
-      <Stack direction={"row"} gap={1}>
+      <Stack direction={"row"} gap={1} onClick={onClick}>
         <Tooltip title="Change operator" disableInteractive>
           <CircularIconButton
             disabled={!!readOnly}

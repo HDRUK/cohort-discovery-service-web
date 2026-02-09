@@ -14,12 +14,21 @@ interface AddAgeButtonProps extends AddButtonProps {
 }
 
 const AddAgeButton = ({ rule, ...props }: AddAgeButtonProps) => {
-  const { queryBuilderJson, setQueryBuilderJson } = useQueryBuilder((qb) => ({
+  const {
+    queryBuilderJson,
+    setQueryBuilderJson,
+    selectedGuidance,
+    setSelectedGuidance,
+  } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
+    selectedGuidance: qb.selectedGuidance,
+    setSelectedGuidance: qb.setSelectedGuidance,
   }));
 
   const onClick = () => {
+    setSelectedGuidance("RuleTimeframeSelector");
+
     setQueryBuilderJson(
       updateById(queryBuilderJson, rule.id, (node) => {
         if (!isRuleLeaf(node)) {

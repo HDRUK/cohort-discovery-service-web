@@ -1,6 +1,6 @@
 "use client";
 
-import { Stack } from "@mui/material";
+import { ClickAwayListener, Stack } from "@mui/material";
 import { ReactNode, useCallback, useMemo } from "react";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { updateById } from "@/utils/rules";
@@ -39,9 +39,16 @@ const RuleTimeframeSelector = ({
   open,
   ...props
 }: RuleTimeframeSelectorProps) => {
-  const { queryBuilderJson, setQueryBuilderJson } = useQueryBuilder((qb) => ({
+  const {
+    queryBuilderJson,
+    setQueryBuilderJson,
+    selectedGuidance,
+    setSelectedGuidance,
+  } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
+    selectedGuidance: qb.selectedGuidance,
+    setSelectedGuidance: qb.setSelectedGuidance,
   }));
 
   const { constrainForBunnyV1 } = useFeatures();
@@ -52,6 +59,8 @@ const RuleTimeframeSelector = ({
   }, [rule.timeConstraint]);
 
   const handleLeftChange = (value: PickerValue) => {
+    console.log("handleLeftChange");
+    setSelectedGuidance("RuleTimeframeSelector");
     setQueryBuilderJson(
       updateById(queryBuilderJson, rule.id, (node) => ({
         ...node,
@@ -64,6 +73,9 @@ const RuleTimeframeSelector = ({
   };
 
   const handleRightChange = (value: PickerValue) => {
+    console.log("handleRightChange");
+    setSelectedGuidance("RuleTimeframeSelector");
+
     setQueryBuilderJson(
       updateById(queryBuilderJson, rule.id, (node) => ({
         ...node,
@@ -114,42 +126,52 @@ const RuleTimeframeSelector = ({
   );
 
   if (!rule.timeConstraint) return null;
+  console.log("RuleTimeframeSelector rule.id", rule.id);
 
   if (constrainForBunnyV1) {
     return (
       <>
         {title && <CustomH1>{title}</CustomH1>}
-        <SingleBoundSelector<string, Dayjs>
-          constraint={rule.timeConstraint}
-          onConstraintChange={(next) => {
-            setQueryBuilderJson(
-              updateById(queryBuilderJson, rule.id, (node) => ({
-                ...node,
-                timeConstraint: next,
-              })),
-            );
+        <ClickAwayListener
+          onClickAway={() => {
+            if (selectedGuidance === "RuleTimeframeSelector")
+              setSelectedGuidance(null);
           }}
-          parse={parseIsoToDayjs}
-          serialise={serialiseDayjsToIso}
-          readOnly={readOnly}
-          anyLabel={`${capitaliseFirstLetter(verb)} at any time`}
-          renderPicker={({ value, onChange }) => (
-            <DatePicker
-              {...commonPickerProps}
-              value={value}
-              onChange={(v) => onChange(v)}
-            />
-          )}
-          renderReadOnlyLabel={({ operator, value }) =>
-            value
-              ? `${capitaliseFirstLetter(verb)} ${
-                  operator === SingleSidedOperator.GREATER_THAN
-                    ? "after"
-                    : "before"
-                } ${value.format("MM-YYYY")}`
-              : `${capitaliseFirstLetter(verb)} at any time`
-          }
-        />
+        >
+          <SingleBoundSelector<string, Dayjs>
+            constraint={rule.timeConstraint}
+            onConstraintChange={(next) => {
+              setSelectedGuidance("RuleTimeframeSelector");
+              setQueryBuilderJson(
+                updateById(queryBuilderJson, rule.id, (node) => ({
+                  ...node,
+                  timeConstraint: next,
+                })),
+              );
+            }}
+            parse={parseIsoToDayjs}
+            serialise={serialiseDayjsToIso}
+            readOnly={readOnly}
+            anyLabel={`${capitaliseFirstLetter(verb)} at any time`}
+            renderPicker={({ value, onChange }) => (
+              <DatePicker
+                {...commonPickerProps}
+                value={value}
+                onChange={(v) => onChange(v)}
+              />
+            )}
+            renderReadOnlyLabel={({ operator, value }) =>
+              value
+                ? `${capitaliseFirstLetter(verb)} ${
+                    operator === SingleSidedOperator.GREATER_THAN
+                      ? "after"
+                      : "before"
+                  } ${value.format("MM-YYYY")}`
+                : `${capitaliseFirstLetter(verb)} at any time`
+            }
+            onClick={() => setSelectedGuidance("RuleTimeframeSelector")}
+          />
+        </ClickAwayListener>
         {children}
       </>
     );
