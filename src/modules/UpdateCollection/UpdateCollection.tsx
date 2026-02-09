@@ -30,7 +30,6 @@ import useCustodianStore from "@/hooks/useCustodianStore";
 import { useLogDependencyChanges } from "@/utils/deps";
 import FormLabel from "@/components/FormLabel";
 import { maskClientTest } from "@/lib/maskClientTest";
-import transitionCollection from "@/actions/transitionCollection";
 import useAdminStore from "@/hooks/useAdminStore";
 import removeCollectionFromWorkgroups from "@/actions/removeCollectionFromWorkgroups";
 import addCollectionToWorkgroups from "@/actions/addCollectionToWorkgroups";
@@ -111,16 +110,17 @@ const UpdateCollection = ({
     (s) => s.current.collectionHosts,
   );
   const updateCollection = useCustodianStore((s) => s.updateCollection);
+  const requestCollectionMadeActive = useCustodianStore(
+    (s) => s.requestCollectionMadeActive,
+  );
+
+  const updateCollectionAdmin = useAdminStore((s) => s.updateCollection);
+  const updateCollectionStatus = useAdminStore((s) => s.updateCollectionStatus);
   const collectionHosts = useAdminDataStore((s) => s.collectionHosts);
   const workgroups = useAdminDataStore((s) => s.workgroups);
 
   const isAdmin = useMemo(() => !currentCustodian, [currentCustodian]);
 
-  const { updateCollection: updateCollectionAdmin } = useAdminStore(
-    (adminData) => ({
-      updateCollection: adminData.updateCollection,
-    }),
-  );
   const firstUpdate = useRef(true);
 
   const notify = useNotify();
@@ -236,19 +236,24 @@ const UpdateCollection = ({
           collection.model_state?.state_id !==
             data.collection.model_state?.state.id
         ) {
-          await transitionCollection(id, {
-            state:
-              CollectionStatus[
-                data.collection.model_state.state.id
-              ].toLowerCase(),
-          });
-          notify.success(
-            `Transitioned collection "${name}" to status ${
-              CollectionStatus[
-                data.collection.model_state.state.id as CollectionStatus
-              ]
-            }`,
-          );
+          if (isAdmin) {
+            await updateCollectionStatus(
+              id,
+              data.collection.model_state.state.id,
+            );
+
+            notify.success(
+              `Transitioned collection "${name}" to status ${
+                CollectionStatus[
+                  data.collection.model_state.state.id as CollectionStatus
+                ]
+              }`,
+            );
+          } else {
+            await requestCollectionMadeActive(id);
+
+            notify.success(`Requested collection "${name}" be made active`);
+          }
         }
         revalidateCollections(currentCustodian?.pid ?? undefined);
       }
@@ -264,9 +269,12 @@ const UpdateCollection = ({
       notify,
       updateCollection,
       updateCollectionAdmin,
+      updateCollectionStatus,
+      requestCollectionMadeActive,
       onClose,
       workgroups,
       workgroupValues,
+      isAdmin,
     ],
   );
 
@@ -429,13 +437,13 @@ const UpdateCollection = ({
           }}
         >
           {/* missing in the BE - ticket created
-        <FormTextField
-        value={collection.custodian.url}
-          copyable
-          label="Link to Custodian Page"
-          labelUnderlined
-        />
-        */}
+            <FormTextField
+            value={collection.custodian.url}
+              copyable
+              label="Link to Custodian Page"
+              labelUnderlined
+            />
+          */}
 
           <FormTextField
             labelUnderlined

@@ -56,7 +56,7 @@ const WorkgroupsLeftPanel = ({
     >
       <ActionMenuSection title={"Create"} defaultExpanded underline>
         <AddButton
-          action={onCreate}
+          onClick={onCreate}
           label={"Workgroup"}
           disabled={expandedLeft}
         />

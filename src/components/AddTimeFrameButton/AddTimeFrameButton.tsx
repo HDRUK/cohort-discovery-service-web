@@ -34,7 +34,7 @@ const AddAgeButton = ({ rule, ...props }: AddAgeButtonProps) => {
     );
   };
 
-  return <AddButton {...props} action={onClick} />;
+  return <AddButton {...props} onClick={onClick} />;
 };
 
 export default AddAgeButton;

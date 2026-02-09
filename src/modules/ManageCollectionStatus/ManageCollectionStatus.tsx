@@ -1,4 +1,3 @@
-import transitionCollection from "@/actions/transitionCollection";
 import AddButton from "@/components/AddButton";
 import FormRadioGroup from "@/components/FormRadioGroup";
 import StatusChip from "@/components/StatusChip";
@@ -33,6 +32,9 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
   const { currentCustodian } = useCustodianStore((custodianData) => ({
     currentCustodian: custodianData.current.custodian,
   }));
+  const requestCollectionMadeActive = useCustodianStore(
+    (s) => s.requestCollectionMadeActive,
+  );
   const notify = useNotify();
 
   const initialStatusId = collection.model_state?.state_id;
@@ -67,10 +69,8 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
           <AddButton
             disabled={!expandedRight}
             label={"Request to make active"}
-            action={async () => {
-              await transitionCollection(collection.id, {
-                state: "pending",
-              });
+            onClick={async () => {
+              await requestCollectionMadeActive(collection.id);
               setSelectedStatusId(CollectionStatus.PENDING);
               notify.success(
                 `Requested for collection "${collection.name}" to be made active`,

@@ -17,8 +17,10 @@ import {
   CollectionHost,
   Paginated,
   CollectionWithHosts,
+  CollectionStatus,
 } from "@/types/api";
 import { emptyPaginated } from "@/utils/pagination";
+import transitionCollections from "@/actions/transitionCollections";
 
 export interface CustodianDataStoreState {
   current: {
@@ -55,6 +57,8 @@ export interface CustodianDataStoreState {
     id: number | string,
     custodianPid: string,
   ) => Promise<void>;
+
+  requestCollectionMadeActive: (ids: number | number[]) => Promise<void>;
 }
 
 export const useCustodianDataStore = create<CustodianDataStoreState>(
@@ -132,6 +136,14 @@ export const useCustodianDataStore = create<CustodianDataStoreState>(
     deleteCollection: async (id, custodianPid) => {
       await deleteCollection(id);
       await revalidateCollections(custodianPid);
+    },
+
+    requestCollectionMadeActive: async (idOrIds: number | number[]) => {
+      const currentCustodian = get().current.custodian;
+      const ids = Array.isArray(idOrIds) ? idOrIds : [idOrIds];
+      const state = CollectionStatus[CollectionStatus.PENDING].toLowerCase();
+      await transitionCollections(ids, { state });
+      await revalidateCollections(currentCustodian?.pid);
     },
   }),
 );
