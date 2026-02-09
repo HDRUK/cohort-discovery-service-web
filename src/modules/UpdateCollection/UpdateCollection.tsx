@@ -110,9 +110,6 @@ const UpdateCollection = ({
     (s) => s.current.collectionHosts,
   );
   const updateCollection = useCustodianStore((s) => s.updateCollection);
-  const requestCollectionMadeActive = useCustodianStore(
-    (s) => s.requestCollectionMadeActive,
-  );
 
   const updateCollectionAdmin = useAdminStore((s) => s.updateCollection);
   const updateCollectionStatus = useAdminStore((s) => s.updateCollectionStatus);
@@ -236,24 +233,18 @@ const UpdateCollection = ({
           collection.model_state?.state_id !==
             data.collection.model_state?.state.id
         ) {
-          if (isAdmin) {
-            await updateCollectionStatus(
-              id,
-              data.collection.model_state.state.id,
-            );
+          await updateCollectionStatus(
+            id,
+            data.collection.model_state.state.id,
+          );
 
-            notify.success(
-              `Transitioned collection "${name}" to status ${
-                CollectionStatus[
-                  data.collection.model_state.state.id as CollectionStatus
-                ]
-              }`,
-            );
-          } else {
-            await requestCollectionMadeActive(id);
-
-            notify.success(`Requested collection "${name}" be made active`);
-          }
+          notify.success(
+            `Transitioned collection "${name}" to status ${
+              CollectionStatus[
+                data.collection.model_state.state.id as CollectionStatus
+              ]
+            }`,
+          );
         }
         revalidateCollections(currentCustodian?.pid ?? undefined);
       }
@@ -270,11 +261,9 @@ const UpdateCollection = ({
       updateCollection,
       updateCollectionAdmin,
       updateCollectionStatus,
-      requestCollectionMadeActive,
       onClose,
       workgroups,
       workgroupValues,
-      isAdmin,
     ],
   );
 
