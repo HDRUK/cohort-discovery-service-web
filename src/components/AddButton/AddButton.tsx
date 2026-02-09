@@ -1,28 +1,51 @@
-import { Button, ButtonProps, IconButton, Tooltip } from "@mui/material";
+import {
+  Button,
+  ButtonProps,
+  CircularProgress,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { useActionMenuSection } from "../ActionMenuSection";
+import { useState } from "react";
 
-export interface AddButtonProps extends ButtonProps {
+export type AddButtonProps = Omit<ButtonProps, "action" | "onClick"> & {
   label: string;
-  action: () => void;
-}
+  onClick: () => void | Promise<void>;
+};
 
-const AddButton = ({ label, action, ...rest }: AddButtonProps) => {
+const AddButton = ({ label, onClick, disabled, ...rest }: AddButtonProps) => {
   const { compact } = useActionMenuSection();
+  const [loading, setLoading] = useState(false);
+
+  const handleClick = async () => {
+    if (loading) return;
+    try {
+      setLoading(true);
+      await onClick();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const isDisabled = Boolean(disabled) || loading;
 
   return (
     <>
       {compact ? (
         <Tooltip title={`Add ${label}`} disableHoverListener={!compact}>
-          <IconButton onClick={() => action()}>
-            <AddIcon />
-          </IconButton>
+          <span>
+            <IconButton disabled={isDisabled} onClick={handleClick}>
+              {loading ? <CircularProgress size={20} /> : <AddIcon />}
+            </IconButton>
+          </span>
         </Tooltip>
       ) : (
         <Button
           variant="text"
-          startIcon={<AddIcon />}
-          onClick={() => action()}
+          startIcon={loading ? <CircularProgress size={20} /> : <AddIcon />}
+          disabled={isDisabled}
+          onClick={handleClick}
           sx={{
             justifyContent: "flex-start",
             textAlign: "left",

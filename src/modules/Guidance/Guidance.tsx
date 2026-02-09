@@ -157,7 +157,7 @@ const Guidance = () => {
       AddNewRuleButton: (props: AddButtonProps) => (
         <AddButton
           {...props}
-          action={() => handleCreateNewRuleInGroup(id, rules)}
+          onClick={() => handleCreateNewRuleInGroup(id, rules)}
         />
       ),
     };

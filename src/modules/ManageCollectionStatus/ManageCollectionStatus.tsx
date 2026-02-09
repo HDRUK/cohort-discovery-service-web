@@ -69,7 +69,7 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
           <AddButton
             disabled={!expandedRight}
             label={"Request to make active"}
-            action={async () => {
+            onClick={async () => {
               await requestCollectionMadeActive(collection.id);
               setSelectedStatusId(CollectionStatus.PENDING);
               notify.success(

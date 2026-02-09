@@ -49,7 +49,7 @@ const CollectionsLeftPanel = ({
         fixedExpanded={expandedLeft}
       >
         <AddButton
-          action={onCreate}
+          onClick={onCreate}
           label={"Collection"}
           disabled={expandedLeft}
         />

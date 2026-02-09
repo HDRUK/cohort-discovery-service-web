@@ -139,9 +139,10 @@ export const useCustodianDataStore = create<CustodianDataStoreState>(
     },
 
     requestCollectionMadeActive: async (id) => {
+      const currentCustodian = get().current.custodian;
       const state = CollectionStatus[CollectionStatus.PENDING].toLowerCase();
       await transitionCollection(id, { state });
-      await revalidateCollections();
+      await revalidateCollections(currentCustodian?.pid);
     },
   }),
 );

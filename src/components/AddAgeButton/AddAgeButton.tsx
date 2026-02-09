@@ -34,7 +34,7 @@ const AddTimeFrameButton = ({ rule, ...props }: AddTimeFrameButtonProps) => {
     );
   };
 
-  return <AddButton {...props} action={onClick} />;
+  return <AddButton {...props} onClick={onClick} />;
 };
 
 export default AddTimeFrameButton;

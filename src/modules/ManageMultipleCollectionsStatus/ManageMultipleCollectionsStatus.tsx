@@ -65,6 +65,7 @@ const ManageMultipleCollectionsStatus = ({
   }
 
   const handleAction = async () => {
+    //update
     await transitionCollections(
       collections.map((c) => c.id),
       {
@@ -86,7 +87,7 @@ const ManageMultipleCollectionsStatus = ({
           <AddButton
             disabled={!expandedRight}
             label={"Request to make active"}
-            action={handleAction}
+            onClick={handleAction}
           />
         )}
       {/* Only show a chip if initial status is not DRAFT */}
