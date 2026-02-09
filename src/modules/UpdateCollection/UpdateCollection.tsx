@@ -436,6 +436,15 @@ const UpdateCollection = ({
             mt: 2,
           }}
         >
+          {/* missing in the BE - ticket created
+            <FormTextField
+            value={collection.custodian.url}
+              copyable
+              label="Link to Custodian Page"
+              labelUnderlined
+            />
+          */}
+
           <FormTextField
             labelUnderlined
             copyable
@@ -580,6 +589,7 @@ const UpdateCollection = ({
               />
             )}
           />
+          {/* supposed to also have supoprt contact / adminstractive contact */}
           <UpdateCollectionGuidance />
         </ActionMenuSection>
       </ActionMenuSection>
