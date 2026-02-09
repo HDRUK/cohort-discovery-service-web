@@ -1,4 +1,3 @@
-import transitionCollection from "@/actions/transitionCollection";
 import AddButton from "@/components/AddButton";
 import FormRadioGroup from "@/components/FormRadioGroup";
 import StatusChip from "@/components/StatusChip";
@@ -33,6 +32,9 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
   const { currentCustodian } = useCustodianStore((custodianData) => ({
     currentCustodian: custodianData.current.custodian,
   }));
+  const requestCollectionMadeActive = useCustodianStore(
+    (s) => s.requestCollectionMadeActive,
+  );
   const notify = useNotify();
 
   const initialStatusId = collection.model_state?.state_id;
@@ -68,9 +70,7 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
             disabled={!expandedRight}
             label={"Request to make active"}
             action={async () => {
-              await transitionCollection(collection.id, {
-                state: "pending",
-              });
+              await requestCollectionMadeActive(collection.id);
               setSelectedStatusId(CollectionStatus.PENDING);
               notify.success(
                 `Requested for collection "${collection.name}" to be made active`,
@@ -78,10 +78,8 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
             }}
           />
         )}
-      {/* Only show a chip if initial status is not DRAFT */}
       {initialStatusId !== CollectionStatus.DRAFT && (
         <Box sx={{ mb: 1 }}>
-          {/* Handle the case where ACTIVE -> DRAFT, labelling visually as INACTIVE */}
           {selectedStatusId === CollectionStatus.DRAFT &&
           initialStatusId === CollectionStatus.ACTIVE ? (
             <Chip
@@ -102,11 +100,10 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
             <FormRadioGroup
               label=""
               options={options
-                .filter((o) => o !== selectedStatusId) // don't show currently selected status as an option
+                .filter((o) => o !== selectedStatusId)
                 .map((option) => {
                   return {
                     label:
-                      // In the case where ACTIVE -> DRAFT, provide the visual label as INACTIVE
                       option === CollectionStatus.DRAFT &&
                       selectedStatusId === CollectionStatus.ACTIVE
                         ? "INACTIVE"

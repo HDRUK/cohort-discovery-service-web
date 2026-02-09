@@ -27,11 +27,13 @@ import {
   User,
   AddUsersToWorkgroupPost,
   RemoveUsersFromWorkgroupPost,
+  CollectionStatus,
 } from "@/types/api";
 import { TAG_WORKGROUP_ADMIN, TAG_ADMIN_USERS } from "@/config/tags";
 import { emptyPaginated } from "@/utils/pagination";
 import addUsersToWorkgroup from "@/actions/addUsersToWorkgroup";
 import removeUserFromWorkgroup from "@/actions/removeUsersFromWorkgroup";
+import transitionCollection from "@/actions/transitionCollection";
 
 export interface AdminDataStoreState {
   users: User[];
@@ -81,6 +83,11 @@ export interface AdminDataStoreState {
   ) => Promise<number[]>;
   removeCollectionFromWorkgroups: (
     payload: RemoveCollectionFromWorkgroupsPost,
+  ) => Promise<void>;
+
+  updateCollectionStatus: (
+    id: number,
+    status: CollectionStatus,
   ) => Promise<void>;
 
   selectedWorkgroup: Workgroup | null;
@@ -194,6 +201,12 @@ export const useAdminDataStore = create<AdminDataStoreState>((set) => ({
     await removeCollectionFromWorkgroups(payload);
     await revalidateCollections();
     await revalidateAction(TAG_WORKGROUP_ADMIN);
+  },
+
+  updateCollectionStatus: async (id, status) => {
+    const state = CollectionStatus[status].toLowerCase();
+    await transitionCollection(id, { state });
+    await revalidateCollections();
   },
 
   selectedWorkgroup: null,
