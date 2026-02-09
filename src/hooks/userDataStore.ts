@@ -27,7 +27,7 @@ import {
   CollectionWithHosts,
 } from "@/types/api";
 import {
-  TAG_COLLECTION_ADMIN,
+  TAG_COLLECTIONS_ADMIN,
   TAG_CONCEPT_SETS,
   getUserQueryTag,
 } from "@/config/tags";
@@ -141,7 +141,7 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
     const res = await rerunDistributions(pid, { query_type });
 
     revalidateCustodian(custodian);
-    revalidateAction(TAG_COLLECTION_ADMIN);
+    revalidateAction(TAG_COLLECTIONS_ADMIN);
     return res.data;
   },
 

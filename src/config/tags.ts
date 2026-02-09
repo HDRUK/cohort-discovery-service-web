@@ -1,4 +1,4 @@
-export const TAG_COLLECTION_ADMIN = "collection-admin";
+export const TAG_COLLECTIONS_ADMIN = "collection-admin";
 export const TAG_CUSTODIAN_COLLECTION = "custodian-collection";
 export const TAG_COLLECTIONS = "collections";
 export const TAG_COLLECTIONS_USER = "collections-user";
@@ -7,6 +7,9 @@ export const TAG_QUERIES = "queries";
 
 export const getCollectionHostTag = (custodianPid: string) =>
   `collection-host-${custodianPid}`;
+
+export const getTagsUserCollections = (userId: string | number) =>
+  `${TAG_COLLECTIONS_USER}-${userId}`;
 
 export const TAG_CUSTODIANS = "custodians";
 

@@ -7,7 +7,7 @@ import createCollectionConfig from "@/actions/createCollectionConfig";
 import updateCollection from "@/actions/updateCollection";
 import updateCollectionConfig from "@/actions/updateCollectionConfig";
 import deleteCollection from "@/actions/deleteCollection";
-import { revalidateAction } from "@/actions/revalidate";
+import { revalidateCollections } from "@/actions/revalidate";
 import {
   Collection,
   Custodian,
@@ -18,13 +18,6 @@ import {
   Paginated,
   CollectionWithHosts,
 } from "@/types/api";
-import {
-  getCollectionHostTag,
-  getTagCustodianCollection,
-  TAG_COLLECTION_ADMIN,
-  TAG_COLLECTIONS,
-  TAG_COLLECTION_HOSTS,
-} from "@/config/tags";
 import { emptyPaginated } from "@/utils/pagination";
 
 export interface CustodianDataStoreState {
@@ -98,24 +91,20 @@ export const useCustodianDataStore = create<CustodianDataStoreState>(
       await createCollectionHost(custodianId, payload);
       const currentCustodian = get().current.custodian;
       if (currentCustodian?.id === custodianId) {
-        await revalidateAction(getCollectionHostTag(currentCustodian.pid));
+        await revalidateCollections(currentCustodian.pid);
       }
     },
 
     updateCollectionHost: async (id, payload) => {
       await updateCollectionHost(id, payload);
       const currentCustodian = get().current.custodian;
-      await revalidateAction(TAG_COLLECTION_HOSTS);
-      if (currentCustodian)
-        await revalidateAction(getCollectionHostTag(currentCustodian.pid));
+      await revalidateCollections(currentCustodian?.pid);
     },
 
     deleteCollectionHost: async (id) => {
       await deleteCollectionHost(id);
       const currentCustodian = get().current.custodian;
-      if (currentCustodian)
-        await revalidateAction(getCollectionHostTag(currentCustodian.pid));
-      await revalidateAction(TAG_COLLECTION_HOSTS);
+      await revalidateCollections(currentCustodian?.pid);
     },
 
     createCollection: async (custodianPid, payload, payloadConfig) => {
@@ -126,11 +115,7 @@ export const useCustodianDataStore = create<CustodianDataStoreState>(
         collection_id: data.id,
       });
 
-      await revalidateAction(getTagCustodianCollection(custodianPid));
-      await revalidateAction(TAG_COLLECTION_ADMIN);
-      await revalidateAction(TAG_COLLECTIONS);
-      await revalidateAction(getCollectionHostTag(custodianPid));
-      await revalidateAction(TAG_COLLECTION_HOSTS);
+      await revalidateCollections(custodianPid);
 
       return data;
     },
@@ -140,20 +125,13 @@ export const useCustodianDataStore = create<CustodianDataStoreState>(
 
       const idConfig = data.config.id;
       await updateCollectionConfig(idConfig, payloadConfig);
-
-      await revalidateAction(getTagCustodianCollection(data.custodian.pid));
-      await revalidateAction(TAG_COLLECTION_ADMIN);
-      await revalidateAction(TAG_COLLECTIONS);
-      await revalidateAction(getCollectionHostTag(data.custodian.pid));
-      await revalidateAction(TAG_COLLECTION_HOSTS);
-
+      await revalidateCollections(data.custodian.pid);
       return data;
     },
 
     deleteCollection: async (id, custodianPid) => {
       await deleteCollection(id);
-      await revalidateAction(getTagCustodianCollection(custodianPid));
-      await revalidateAction(TAG_COLLECTION_ADMIN);
+      await revalidateCollections(custodianPid);
     },
   }),
 );
