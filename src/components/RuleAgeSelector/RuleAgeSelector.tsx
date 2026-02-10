@@ -79,13 +79,11 @@ const RuleAgeSelector = ({
   const {
     queryBuilderJson,
     setQueryBuilderJson,
-    selectedGuidance,
     setSelectedGuidance,
     selected,
   } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
-    selectedGuidance: qb.selectedGuidance,
     setSelectedGuidance: qb.setSelectedGuidance,
     selected: qb.selected,
   }));
@@ -154,84 +152,81 @@ const RuleAgeSelector = ({
       <>
         {title && <CustomH1>{title}</CustomH1>}
 
-        <Stack direction="column">
-          <SingleBoundSelector<number>
-            constraint={ageConstraint}
-            readOnly={readOnly}
-            anyLabel="Any age"
-            onConstraintChange={(next) => {
-              setSelectedGuidance(key, true);
+        <SingleBoundSelector<number>
+          constraint={ageConstraint}
+          readOnly={readOnly}
+          anyLabel="Any age"
+          onConstraintChange={(next) => {
+            setSelectedGuidance(key, true);
 
-              setQueryBuilderJson(
-                updateById(queryBuilderJson, rule.id, (node) => {
-                  const left =
-                    next[0] == null ? null : clamp(next[0], minAge, maxAge);
-                  const right =
-                    next[1] == null ? null : clamp(next[1], minAge, maxAge);
+            setQueryBuilderJson(
+              updateById(queryBuilderJson, rule.id, (node) => {
+                const left =
+                  next[0] == null ? null : clamp(next[0], minAge, maxAge);
+                const right =
+                  next[1] == null ? null : clamp(next[1], minAge, maxAge);
 
-                  if (isRuleLeaf(node)) {
-                    return {
-                      ...node,
-                      ageConstraint: [
-                        left != null && left > minAge ? left : null,
-                        right != null && right < maxAge ? right : null,
-                      ],
-                    };
-                  }
-
-                  if (isAgeFilter(node)) {
-                    if (left != null) return { ...node, value: [left, maxAge] };
-                    if (right != null)
-                      return { ...node, value: [minAge, right] };
-                    return { ...node, value: [minAge, maxAge] };
-                  }
-
-                  return node;
-                }),
-              );
-            }}
-            renderPicker={({ value, onChange }) => (
-              <FormControlLabel
-                sx={{ m: 0 }}
-                control={
-                  <TextField
-                    size="small"
-                    type="number"
-                    value={value ?? ""}
-                    slotProps={{
-                      htmlInput: { min: minAge, max: maxAge },
-                    }}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                    }}
-                    onChange={(e) => {
-                      const raw = e.target.value;
-                      if (raw === "") return onChange(null);
-
-                      const n = Number(raw);
-                      if (Number.isNaN(n)) return;
-
-                      onChange(clamp(n, minAge, maxAge));
-                    }}
-                  />
+                if (isRuleLeaf(node)) {
+                  return {
+                    ...node,
+                    ageConstraint: [
+                      left != null && left > minAge ? left : null,
+                      right != null && right < maxAge ? right : null,
+                    ],
+                  };
                 }
-                slotProps={{ typography: { sx: { mx: 1 } } }}
-                label="Years"
-              />
-            )}
-            renderReadOnlyLabel={() => (
-              <RuleAgeSelectorReadOnly
-                to={to}
-                from={from}
-                minAge={minAge}
-                maxAge={maxAge}
-              />
-            )}
-            onClick={() => setSelectedGuidance(key, true)}
-          />
-          {children}
-        </Stack>
+
+                if (isAgeFilter(node)) {
+                  if (left != null) return { ...node, value: [left, maxAge] };
+                  if (right != null) return { ...node, value: [minAge, right] };
+                  return { ...node, value: [minAge, maxAge] };
+                }
+
+                return node;
+              }),
+            );
+          }}
+          renderPicker={({ value, onChange }) => (
+            <FormControlLabel
+              sx={{ m: 0 }}
+              control={
+                <TextField
+                  size="small"
+                  type="number"
+                  value={value ?? ""}
+                  slotProps={{
+                    htmlInput: { min: minAge, max: maxAge },
+                  }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    if (raw === "") return onChange(null);
+
+                    const n = Number(raw);
+                    if (Number.isNaN(n)) return;
+
+                    onChange(clamp(n, minAge, maxAge));
+                  }}
+                />
+              }
+              slotProps={{ typography: { sx: { mx: 1 } } }}
+              label="Years"
+            />
+          )}
+          renderReadOnlyLabel={() => (
+            <RuleAgeSelectorReadOnly
+              to={to}
+              from={from}
+              minAge={minAge}
+              maxAge={maxAge}
+            />
+          )}
+          onClick={() => setSelectedGuidance(key, true)}
+        />
+        {children}
       </>
     );
   }
