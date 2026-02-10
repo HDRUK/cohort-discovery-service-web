@@ -14,12 +14,22 @@ interface DeleteAgeButtonProps extends DeleteMenuItemProps {
 }
 
 const DeleteAgeButton = ({ rule, ...props }: DeleteAgeButtonProps) => {
-  const { queryBuilderJson, setQueryBuilderJson } = useQueryBuilder((qb) => ({
+  const {
+    queryBuilderJson,
+    setQueryBuilderJson,
+    setSelectedGuidance,
+    selected,
+  } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
+    setSelectedGuidance: qb.setSelectedGuidance,
+    selected: qb.selected,
   }));
 
+  const keySuffix =
+    Object.keys(selected).length === 1 ? Object.keys(selected)[0] : "multiple";
   const onClick = () => {
+    setSelectedGuidance(`RuleAgeSelector-${keySuffix}`, false);
     setQueryBuilderJson(
       updateById(queryBuilderJson, rule.id, (node) => {
         if (!isRuleLeaf(node)) {

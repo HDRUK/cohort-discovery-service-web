@@ -8,13 +8,14 @@
 
 # Include/Exclude
 
-<ToggleExclusion/>
+<CollapsibleGuidance keyPrefix="ToggleExclusion" >
+  <ToggleExclusion/>
+  <Box>
+    Toggle <b>Including</b> to add items that meet the selected criteria.
 
-<ToggleExclusionGuidance target="ToggleExclusion" >
-Toggle <b>Including</b> to add items that meet the selected criteria.
-
-Toggle <b>Excluding</b> to remove items that meet the selected criteria.
-</ToggleExclusionGuidance>
+    Toggle <b>Excluding</b> to remove items that meet the selected criteria.
+  </Box>
+</CollapsibleGuidance>
 {/* - not available yet
 
 # Descendants
@@ -29,17 +30,20 @@ Toggle <b>Excluding</b> to remove items that meet the selected criteria.
 
 <AddAgeButton label={`Add age of patient when ${props.category.toLowerCase()} was ${props.verb}`} />
 
+<CollapsibleGuidance keyPrefix="RuleTimeframeSelector" >
+  <RuleTimeframeSelector title={`Timeframe of Condition Diagnosis`} key={"yo"}>
+    <DeleteTimeFrameButton label={`Remove timeframe constraint for this ${props.category}`} />
+  </RuleTimeframeSelector>
+  <Box>
+    Set the time frame for this rule — the window when the condition occurred/measurement was recorded/medication was prescribed.
+  </Box>
+</CollapsibleGuidance>
 
-
-<RuleTimeframeSelector title={`Timeframe of Condition Diagnosis`}>
-<DeleteTimeFrameButton label={`Remove timeframe constraint for this ${props.category}`} />
-</RuleTimeframeSelector>
-
-<ToggleExclusionGuidance target="RuleTimeframeSelector" >
-Set the time frame for this rule — the window when the condition occurred/measurement was recorded/medication was prescribed.
-</ToggleExclusionGuidance>
-
-<RuleAgeSelector title={`Patient Age at Condition Diagnosis`}>
-<DeleteAgeButton label={`Remove age of person constraint for this ${props.category}`} />
-</RuleAgeSelector>
-
+<CollapsibleGuidance keyPrefix="RuleAgeSelector" >
+  <RuleAgeSelector title={`Patient Age at Condition Diagnosis`} key={"hello"}>
+    <DeleteAgeButton label={`Remove age of person constraint for this ${props.category}`} />
+  </RuleAgeSelector>
+  <Box>
+    Define the patient age range by adjusting slider value. Age may be rounded ±1 year in some datasets, to either protect patient data or as specific day or month was not recorded.
+  </Box>
+</CollapsibleGuidance>

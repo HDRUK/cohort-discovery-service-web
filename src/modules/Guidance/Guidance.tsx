@@ -51,6 +51,7 @@ import RuleAgeSelector from "@/components/RuleAgeSelector";
 import DeleteAgeButton from "@/components/DeleteAgeButton";
 import useFeatures from "@/hooks/useFeatures";
 import ToggleExclusionGuidance from "@/content/guidance/components/ToggleExclusionGuidance";
+import CollapsibleGuidance from "@/components/CollapsibleGuidance";
 
 export const baseComponents = {
   a: ({ href, children }: LinkProps) => (
@@ -126,6 +127,10 @@ const Guidance = () => {
   }
   const makeRuleComponents = (node: RuleLeafType) => ({
     ...baseComponents,
+    Box: (props) => <Box {...props}></Box>,
+    CollapsibleGuidance: (props: {}) => (
+      <CollapsibleGuidance {...props}></CollapsibleGuidance>
+    ),
     ToggleExclusion: () => (
       <ToggleExclusion key="ToggleExclusion" node={node} />
     ),

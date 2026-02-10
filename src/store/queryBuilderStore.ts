@@ -113,8 +113,8 @@ export interface QueryBuilderStoreState {
 
   validateRules: (root: RuleGroupType) => RuleGroupType;
 
-  selectedGuidance: string | null;
-  setSelectedGuidance: (id: string | null) => void;
+  selectedGuidance: Record<string, boolean>;
+  setSelectedGuidance: (id: string, value: boolean) => void;
 }
 
 export const useQueryBuilderStore = create<QueryBuilderStoreState>(
@@ -441,11 +441,11 @@ export const useQueryBuilderStore = create<QueryBuilderStoreState>(
       });
     },
 
-    selectedGuidance: null,
-    setSelectedGuidance: (id: string | null) =>
+    selectedGuidance: {},
+    setSelectedGuidance: (id: string, value: boolean) =>
       set((state) => ({
         ...state,
-        selectedGuidance: id,
+        selectedGuidance: { [id]: value },
       })),
   }),
 );

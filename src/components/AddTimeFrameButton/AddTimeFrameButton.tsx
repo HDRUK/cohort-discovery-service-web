@@ -19,16 +19,19 @@ const AddAgeButton = ({ rule, ...props }: AddAgeButtonProps) => {
     setQueryBuilderJson,
     selectedGuidance,
     setSelectedGuidance,
+    selected,
   } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
     selectedGuidance: qb.selectedGuidance,
     setSelectedGuidance: qb.setSelectedGuidance,
+    selected: qb.selected,
   }));
 
+  const keySuffix =
+    Object.keys(selected).length === 1 ? Object.keys(selected)[0] : "multiple";
   const onClick = () => {
-    setSelectedGuidance("RuleTimeframeSelector");
-
+    setSelectedGuidance(`RuleTimeframeSelector-${keySuffix}`, true);
     setQueryBuilderJson(
       updateById(queryBuilderJson, rule.id, (node) => {
         if (!isRuleLeaf(node)) {
