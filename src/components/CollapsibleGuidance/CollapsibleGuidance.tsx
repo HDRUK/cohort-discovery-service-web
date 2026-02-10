@@ -31,10 +31,10 @@ const CollapsibleGuidance = ({
     // } else {
     //   console.log("selected", "multiple");
     // }
-    const keySuffix =
-      Object.keys(selected).length === 1
-        ? Object.keys(selected)[0]
-        : "multiple";
+    // const keySuffix =
+    //   Object.keys(selected).length === 1
+    //     ? Object.keys(selected)[0]
+    //     : "multiple";
     // console.log("keySuffix", keySuffix);
     const key = collapsibleGuidanceKey(keyPrefix, selected);
     // console.log("key", key);
