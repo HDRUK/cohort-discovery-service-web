@@ -6,14 +6,7 @@ import OperatorGuidance from "@/content/guidance/queryBuilder/operator.mdx";
 import GroupGuidance from "@/content/guidance/queryBuilder/group.mdx";
 import AgeFilterGuidance from "@/content/guidance/queryBuilder/ageFilter.mdx";
 import EmptyRuleGuidance from "@/content/guidance/queryBuilder/emptyRule.mdx";
-import {
-  Box,
-  BoxProps,
-  Link,
-  LinkProps,
-  Typography,
-  TypographyProps,
-} from "@mui/material";
+import { Box, BoxProps, Link, LinkProps, TypographyProps } from "@mui/material";
 import { useCallback, useMemo } from "react";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import ActionMenuSection from "@/components/ActionMenuSection";
@@ -50,7 +43,6 @@ import AddAgeButton from "@/components/AddAgeButton";
 import RuleAgeSelector from "@/components/RuleAgeSelector";
 import DeleteAgeButton from "@/components/DeleteAgeButton";
 import useFeatures from "@/hooks/useFeatures";
-import ToggleExclusionGuidance from "@/content/guidance/components/ToggleExclusionGuidance";
 import CollapsibleGuidance from "@/components/CollapsibleGuidance";
 
 export const baseComponents = {
@@ -128,14 +120,11 @@ const Guidance = () => {
   const makeRuleComponents = (node: RuleLeafType) => ({
     ...baseComponents,
     Box: (props) => <Box {...props}></Box>,
-    CollapsibleGuidance: (props: {}) => (
+    CollapsibleGuidance: (props: GuidanceProps) => (
       <CollapsibleGuidance {...props}></CollapsibleGuidance>
     ),
     ToggleExclusion: () => (
       <ToggleExclusion key="ToggleExclusion" node={node} />
-    ),
-    ToggleExclusionGuidance: (props: GuidanceProps) => (
-      <ToggleExclusionGuidance node={node} {...props} />
     ),
     ShowDescendants: () => <ShowDescendants node={node} />,
     AddTimeFrameButton: (props: AddButtonProps) =>
