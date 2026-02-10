@@ -261,7 +261,6 @@ const RuleAgeSelector = ({
               setDraftAge(nextRange);
             }}
             onChangeCommitted={handleCommitChange}
-            onTouch={() => setSelectedGuidance(key, true)}
           />
         )}
       </Stack>
