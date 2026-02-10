@@ -18,9 +18,7 @@ const ToggleGuidanceButton = ({
   const active =
     guidanceKey in selectedGuidance && selectedGuidance[guidanceKey] === true;
   const handleClick = () => {
-    active
-      ? setSelectedGuidance(guidanceKey, false)
-      : setSelectedGuidance(guidanceKey, true);
+    setSelectedGuidance(guidanceKey, !active);
   };
 
   return (
