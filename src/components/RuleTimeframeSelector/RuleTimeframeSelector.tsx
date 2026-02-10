@@ -130,6 +130,8 @@ const RuleTimeframeSelector = ({
   if (constrainForBunnyV1) {
     return (
       <>
+        {title && <CustomH1>{title}</CustomH1>}
+
         <SingleBoundSelector<string, Dayjs>
           constraint={rule.timeConstraint}
           onClick={() => setSelectedGuidance(key, true)}
