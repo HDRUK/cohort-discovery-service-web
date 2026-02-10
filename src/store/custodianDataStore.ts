@@ -154,7 +154,6 @@ export const useCustodianDataStore = create<CustodianDataStoreState>(
 
       let nextState: string;
 
-      // really quite confusing between inactive->draft
       switch (stateId) {
         case CollectionStatus.ACTIVE:
           // ACTIVE -> DRAFT
