@@ -18,10 +18,11 @@ import {
   isEmptyRule,
   isOperator,
   isRuleGroup,
+  isRuleLeaf,
   updateById,
 } from "@/utils/rules";
-import { isRuleLeaf } from "@/utils/rules";
 import { trueKeys } from "@/utils/numbers";
+import { capitaliseFirstLetter } from "@/utils/string";
 import {
   AgeFilterType,
   OperatorType,
@@ -206,14 +207,19 @@ const Guidance = () => {
       }
 
       const category = selectedNode?.rule?.concept?.category || "";
-      const { verb, verbPastTense } = getDomainVerbs(category);
+      const { verb, verbPastTense, noun } = getDomainVerbs(
+        category.toLowerCase(),
+      );
 
       return (
         <ActionMenuSection title={"Rule"} fixedExpanded scrollable>
           <RuleGuidance
-            category={selectedNode.rule.concept?.category || ""}
+            category={capitaliseFirstLetter(
+              selectedNode.rule.concept?.category || "",
+            )}
             verb={verb}
             verbPastTense={verbPastTense}
+            noun={capitaliseFirstLetter(noun)}
             timeConstraint={selectedNode?.timeConstraint}
             ageConstraint={selectedNode?.ageConstraint}
             components={makeRuleComponents(selectedNode)}
