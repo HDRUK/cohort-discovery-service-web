@@ -59,6 +59,7 @@ export interface CustodianDataStoreState {
   ) => Promise<void>;
 
   requestCollectionMadeActive: (ids: number | number[]) => Promise<void>;
+  toggleCollectionActive: (collection: CollectionWithHosts) => Promise<string>;
 }
 
 export const useCustodianDataStore = create<CustodianDataStoreState>(
@@ -144,6 +145,36 @@ export const useCustodianDataStore = create<CustodianDataStoreState>(
       const state = CollectionStatus[CollectionStatus.PENDING].toLowerCase();
       await transitionCollections(ids, { state });
       await revalidateCollections(currentCustodian?.pid);
+    },
+
+    toggleCollectionActive: async (collection: CollectionWithHosts) => {
+      const currentCustodian = get().current.custodian;
+
+      const stateId = collection.model_state.state_id;
+
+      let nextState: string;
+
+      switch (stateId) {
+        case CollectionStatus.ACTIVE:
+          // ACTIVE -> DRAFT
+          nextState = CollectionStatus[CollectionStatus.DRAFT].toLowerCase();
+          break;
+
+        case CollectionStatus.DRAFT:
+          // DRAFT -> PENDING
+          nextState = CollectionStatus[CollectionStatus.PENDING].toLowerCase();
+          break;
+
+        default:
+          // fallback
+          nextState = CollectionStatus[CollectionStatus.PENDING].toLowerCase();
+          break;
+      }
+
+      await transitionCollections([collection.id], { state: nextState });
+      await revalidateCollections(currentCustodian?.pid);
+
+      return nextState;
     },
   }),
 );

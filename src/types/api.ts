@@ -137,7 +137,7 @@ export interface Collection extends WithTimestamps {
   n_concepts?: number;
   custodian: Custodian;
   custodian_id?: number;
-  model_state?: ModelState;
+  model_state: ModelState;
 }
 
 export interface CollectionConfig {

@@ -110,8 +110,8 @@ const UpdateCollection = ({
     (s) => s.current.collectionHosts,
   );
   const updateCollection = useCustodianStore((s) => s.updateCollection);
-  const requestCollectionMadeActive = useCustodianStore(
-    (s) => s.requestCollectionMadeActive,
+  const toggleCollectionActive = useCustodianStore(
+    (s) => s.toggleCollectionActive,
   );
 
   const updateCollectionAdmin = useAdminStore((s) => s.updateCollection);
@@ -250,9 +250,9 @@ const UpdateCollection = ({
               }`,
             );
           } else {
-            await requestCollectionMadeActive(id);
+            const newStateName = await toggleCollectionActive(collection);
 
-            notify.success(`Requested collection "${name}" be made active`);
+            notify.success(`Changed collection "${name}" be ${newStateName}`);
           }
         }
         revalidateCollections(currentCustodian?.pid ?? undefined);
@@ -270,7 +270,7 @@ const UpdateCollection = ({
       updateCollection,
       updateCollectionAdmin,
       updateCollectionStatus,
-      requestCollectionMadeActive,
+      toggleCollectionActive,
       onClose,
       workgroups,
       workgroupValues,
