@@ -120,7 +120,7 @@ const Guidance = () => {
   }
   const makeRuleComponents = (node: RuleLeafType) => ({
     ...baseComponents,
-    Box: (props) => <Box {...props}></Box>,
+    Box: (props: BoxProps) => <Box {...props}></Box>,
     CollapsibleGuidance: (props: GuidanceProps) => (
       <CollapsibleGuidance {...props}></CollapsibleGuidance>
     ),
