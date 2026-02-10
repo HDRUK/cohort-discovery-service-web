@@ -8,6 +8,7 @@ import { isRuleLeaf } from "@/utils/rules";
 import { RuleLeafType } from "@/types/rules";
 import AddButton from "@/components/AddButton";
 import { AddButtonProps } from "@/components/AddButton/AddButton";
+import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
 
 interface AddTimeFrameButtonProps extends AddButtonProps {
   rule: RuleLeafType;
@@ -26,11 +27,11 @@ const AddTimeFrameButton = ({ rule, ...props }: AddTimeFrameButtonProps) => {
     selected: qb.selected,
   }));
 
-  const keySuffix =
-    Object.keys(selected).length === 1 ? Object.keys(selected)[0] : "multiple";
-
   const onClick = () => {
-    setSelectedGuidance(`RuleAgeSelector-${keySuffix}`, true);
+    setSelectedGuidance(
+      collapsibleGuidanceKey("RuleAgeSelector", selected),
+      true,
+    );
     setQueryBuilderJson(
       updateById(queryBuilderJson, rule.id, (node) => {
         if (!isRuleLeaf(node)) {

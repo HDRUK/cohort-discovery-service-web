@@ -8,6 +8,7 @@ import { isRuleLeaf } from "@/utils/rules";
 import { RuleLeafType } from "@/types/rules";
 import DeleteMenuItem from "../DeleteMenuItem";
 import { DeleteMenuItemProps } from "../DeleteMenuItem/DeleteMenuItem";
+import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
 
 interface DeleteAgeButtonProps extends DeleteMenuItemProps {
   rule: RuleLeafType;
@@ -26,10 +27,11 @@ const DeleteAgeButton = ({ rule, ...props }: DeleteAgeButtonProps) => {
     selected: qb.selected,
   }));
 
-  const keySuffix =
-    Object.keys(selected).length === 1 ? Object.keys(selected)[0] : "multiple";
   const onClick = () => {
-    setSelectedGuidance(`RuleAgeSelector-${keySuffix}`, false);
+    setSelectedGuidance(
+      collapsibleGuidanceKey("RuleAgeSelector", selected),
+      false,
+    );
     setQueryBuilderJson(
       updateById(queryBuilderJson, rule.id, (node) => {
         if (!isRuleLeaf(node)) {

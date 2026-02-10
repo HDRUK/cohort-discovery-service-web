@@ -21,6 +21,7 @@ import { capitaliseFirstLetter } from "@/utils/string";
 import SingleBoundSelector, {
   SingleSidedOperator,
 } from "@/components/SingleBoundSelector";
+import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
 
 export interface RuleTimeframeSelectorProps extends DatePickerProps {
   children?: ReactNode;
@@ -57,10 +58,11 @@ const RuleTimeframeSelector = ({
     const [start, end] = rule.timeConstraint ?? [null, null];
     return [start ? dayjs(start) : null, end ? dayjs(end) : null];
   }, [rule.timeConstraint]);
-  const keySuffix =
-    Object.keys(selected).length === 1 ? Object.keys(selected)[0] : "multiple";
+
+  const key = collapsibleGuidanceKey("RuleTimeframeSelector", selected);
+
   const handleLeftChange = (value: PickerValue) => {
-    setSelectedGuidance(`RuleTimeframeSelector-${keySuffix}`, true);
+    setSelectedGuidance(key, true);
     setQueryBuilderJson(
       updateById(queryBuilderJson, rule.id, (node) => ({
         ...node,
@@ -73,7 +75,7 @@ const RuleTimeframeSelector = ({
   };
 
   const handleRightChange = (value: PickerValue) => {
-    setSelectedGuidance(`RuleTimeframeSelector-${keySuffix}`, true);
+    setSelectedGuidance(key, true);
     setQueryBuilderJson(
       updateById(queryBuilderJson, rule.id, (node) => ({
         ...node,
@@ -130,11 +132,9 @@ const RuleTimeframeSelector = ({
       <>
         <SingleBoundSelector<string, Dayjs>
           constraint={rule.timeConstraint}
-          onClick={() =>
-            setSelectedGuidance(`RuleTimeframeSelector-${keySuffix}`, true)
-          }
+          onClick={() => setSelectedGuidance(key, true)}
           onConstraintChange={(next) => {
-            setSelectedGuidance(`RuleTimeframeSelector-${keySuffix}`, true);
+            setSelectedGuidance(key, true);
             setQueryBuilderJson(
               updateById(queryBuilderJson, rule.id, (node) => ({
                 ...node,

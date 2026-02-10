@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { CustomH1 } from "../GuidanceHeaders";
 import { Box, BoxProps, ClickAwayListener } from "@mui/material";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
+import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
 
 interface CollapsibleGuidanceProps extends Omit<
   BoxProps,
@@ -16,19 +17,13 @@ const CollapsibleGuidance = ({
   keyPrefix,
   children,
 }: CollapsibleGuidanceProps) => {
-  const {
-    queryBuilderJson,
-    setQueryBuilderJson,
-    selectedGuidance,
-    setSelectedGuidance,
-    selected,
-  } = useQueryBuilder((qb) => ({
-    queryBuilderJson: qb.queryBuilderJson,
-    setQueryBuilderJson: qb.setQueryBuilderJson,
-    selectedGuidance: qb.selectedGuidance,
-    setSelectedGuidance: qb.setSelectedGuidance,
-    selected: qb.selected,
-  }));
+  const { selectedGuidance, setSelectedGuidance, selected } = useQueryBuilder(
+    (qb) => ({
+      selectedGuidance: qb.selectedGuidance,
+      setSelectedGuidance: qb.setSelectedGuidance,
+      selected: qb.selected,
+    }),
+  );
   if (children) {
     // const firstChild = children[0] ?? null;
     // if (Object.keys(selected).length === 1) {
@@ -41,7 +36,7 @@ const CollapsibleGuidance = ({
         ? Object.keys(selected)[0]
         : "multiple";
     // console.log("keySuffix", keySuffix);
-    const key = `${keyPrefix}-${keySuffix}`;
+    const key = collapsibleGuidanceKey(keyPrefix, selected);
     // console.log("key", key);
     // console.log(`CollapsibleGuidance ${keyPrefix} children`, children);
     // console.log(

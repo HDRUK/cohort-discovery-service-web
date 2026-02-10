@@ -8,6 +8,7 @@ import { isRuleLeaf } from "@/utils/rules";
 import { RuleLeafType } from "@/types/rules";
 import DeleteMenuItem from "../DeleteMenuItem";
 import { DeleteMenuItemProps } from "../DeleteMenuItem/DeleteMenuItem";
+import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
 
 interface DeleteTimeFrameButtonProps extends DeleteMenuItemProps {
   rule: RuleLeafType;
@@ -28,10 +29,12 @@ const DeleteTimeFrameButton = ({
     setSelectedGuidance: qb.setSelectedGuidance,
     selected: qb.selected,
   }));
-  const keySuffix =
-    Object.keys(selected).length === 1 ? Object.keys(selected)[0] : "multiple";
+
   const onClick = () => {
-    setSelectedGuidance(`RuleTimeframeSelector-${keySuffix}`, false);
+    setSelectedGuidance(
+      collapsibleGuidanceKey("RuleTimeframeSelector", selected),
+      false,
+    );
     setQueryBuilderJson(
       updateById(queryBuilderJson, rule.id, (node) => {
         if (!isRuleLeaf(node)) {

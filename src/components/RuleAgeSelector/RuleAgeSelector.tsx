@@ -20,6 +20,7 @@ import SingleBoundSelector, {
   NullablePair,
 } from "@/components/SingleBoundSelector";
 import { clamp } from "@/utils/numbers";
+import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
 
 export interface RuleAgeSelectorProps {
   children?: ReactNode;
@@ -146,8 +147,9 @@ const RuleAgeSelector = ({
   }, [minAge, maxAge]);
 
   if (!values) return null;
-  const keySuffix =
-    Object.keys(selected).length === 1 ? Object.keys(selected)[0] : "multiple";
+
+  const key = collapsibleGuidanceKey("RuleAgeSelector", selected);
+
   if (constrainForBunnyV1 && !overrideConstrainForBunny) {
     return (
       <>
@@ -159,7 +161,7 @@ const RuleAgeSelector = ({
             readOnly={readOnly}
             anyLabel="Any age"
             onConstraintChange={(next) => {
-              setSelectedGuidance(`RuleAgeSelector-${keySuffix}`, true);
+              setSelectedGuidance(key, true);
 
               setQueryBuilderJson(
                 updateById(queryBuilderJson, rule.id, (node) => {
@@ -227,9 +229,7 @@ const RuleAgeSelector = ({
                 maxAge={maxAge}
               />
             )}
-            onClick={() =>
-              setSelectedGuidance(`RuleAgeSelector-${keySuffix}`, true)
-            }
+            onClick={() => setSelectedGuidance(key, true)}
           />
           {children}
         </Stack>
@@ -267,9 +267,7 @@ const RuleAgeSelector = ({
               setDraftAge(nextRange);
             }}
             onChangeCommitted={handleCommitChange}
-            onTouch={() =>
-              setSelectedGuidance(`RuleAgeSelector-${keySuffix}`, true)
-            }
+            onTouch={() => setSelectedGuidance(key, true)}
           />
         )}
       </Stack>
