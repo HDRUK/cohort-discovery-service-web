@@ -5,7 +5,6 @@ import SquareRadio from "@/components/SquareRadio";
 import { RuleLeafType } from "@/types/rules";
 import { updateById } from "@/utils/rules";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import { ClickAwayListener } from "@mui/material";
 import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
 
 type ToggleExclusionProps = {
