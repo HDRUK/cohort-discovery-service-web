@@ -4,6 +4,8 @@
   * @property {string} verb
   * @property {string} verbPastTense
   *  OMOP domain name
+  * @property {[string | null, string | null] | undefined} timeConstraint
+  * @property {[string | null, string | null] | undefined} ageConstraint
   */}
 
 <CollapsibleGuidance keyPrefix="ToggleExclusion" title="Include/Exclude">
@@ -28,7 +30,7 @@
 
 <AddAgeButton label={`Add age of patient when ${props.category.toLowerCase()} was ${props.verb}`} />
 
-<CollapsibleGuidance keyPrefix="RuleTimeframeSelector" title={`Timeframe of Condition Diagnosis`}>
+<CollapsibleGuidance keyPrefix="RuleTimeframeSelector" title={props.timeConstraint && `Timeframe of Condition Diagnosis`}>
   <RuleTimeframeSelector>
     <DeleteTimeFrameButton label={`Remove timeframe constraint for this ${props.category}`} />
   </RuleTimeframeSelector>
@@ -37,7 +39,7 @@
   </Box>
 </CollapsibleGuidance>
 
-<CollapsibleGuidance keyPrefix="RuleAgeSelector" title={`Patient Age at Condition Diagnosis`}>
+<CollapsibleGuidance keyPrefix="RuleAgeSelector" title={props.ageConstraint && `Patient Age at Condition Diagnosis`}>
   <RuleAgeSelector>
     <DeleteAgeButton label={`Remove age of person constraint for this ${props.category}`} />
   </RuleAgeSelector>

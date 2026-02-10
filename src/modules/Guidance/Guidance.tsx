@@ -214,6 +214,8 @@ const Guidance = () => {
             category={selectedNode.rule.concept?.category || ""}
             verb={verb}
             verbPastTense={verbPastTense}
+            timeConstraint={selectedNode?.timeConstraint}
+            ageConstraint={selectedNode?.ageConstraint}
             components={makeRuleComponents(selectedNode)}
           />
         </ActionMenuSection>
