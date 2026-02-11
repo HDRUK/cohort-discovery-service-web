@@ -234,7 +234,13 @@ const RuleAgeSelector = ({
     <>
       {title && <CustomH1>{title}</CustomH1>}
 
-      <Stack direction="column" spacing={2} alignItems="center" paddingX={2}>
+      <Stack
+        direction="column"
+        spacing={2}
+        alignItems="center"
+        paddingX={2}
+        paddingBottom={4}
+      >
         {readOnly ? (
           <RuleAgeSelectorReadOnly
             to={to}
