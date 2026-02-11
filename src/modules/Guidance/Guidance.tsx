@@ -202,7 +202,11 @@ const Guidance = () => {
     if (isRuleLeaf(selectedNode)) {
       if (isEmptyRule(selectedNode)) {
         return (
-          <ActionMenuSection title={"Build Guidance"} fixedExpanded scrollable>
+          <ActionMenuSection
+            title={"Search Categories"}
+            fixedExpanded
+            scrollable
+          >
             <EmptyRuleGuidance components={baseComponents} />
           </ActionMenuSection>
         );
