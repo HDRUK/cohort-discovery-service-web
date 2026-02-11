@@ -12,6 +12,7 @@ import FormLabel from "@/components/FormLabel";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import ErrorHeader from "@/components/ErrorHeader";
 import useCustodianStore from "@/hooks/useCustodianStore";
+import theme from "@/config/theme";
 
 type CollectionHostFormValues = { hostName: string };
 
@@ -107,7 +108,11 @@ const UpdateCollectionHost = ({
                   }
                 }}
               >
-                {expandedRight ? <LockOpenIcon /> : <LockOutlineIcon />}
+                {expandedRight ? (
+                  <LockOpenIcon sx={{ color: theme.palette.tooltip?.main }} />
+                ) : (
+                  <LockOutlineIcon />
+                )}
               </Box>
             </Box>
             <ErrorHeader errors={errors} depth={1} editing />
