@@ -19,6 +19,7 @@ import SingleBoundSelector, {
   NullablePair,
 } from "@/components/SingleBoundSelector";
 import { clamp } from "@/utils/numbers";
+import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
 
 export interface RuleAgeSelectorProps {
   children?: ReactNode;
@@ -75,9 +76,16 @@ const RuleAgeSelector = ({
   const minAge = MIN_AGE_FILTER;
   const maxAge = MAX_AGE_FILTER;
 
-  const { queryBuilderJson, setQueryBuilderJson } = useQueryBuilder((qb) => ({
+  const {
+    queryBuilderJson,
+    setQueryBuilderJson,
+    setSelectedGuidance,
+    selected,
+  } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
+    setSelectedGuidance: qb.setSelectedGuidance,
+    selected: qb.selected,
   }));
 
   const flags = useFeatures();
@@ -137,6 +145,8 @@ const RuleAgeSelector = ({
 
   if (!values) return null;
 
+  const key = collapsibleGuidanceKey("RuleAgeSelector", selected);
+
   if (constrainForBunnyV1 && !overrideConstrainForBunny) {
     return (
       <>
@@ -147,6 +157,8 @@ const RuleAgeSelector = ({
           readOnly={readOnly}
           anyLabel="Any age"
           onConstraintChange={(next) => {
+            setSelectedGuidance(key, true);
+
             setQueryBuilderJson(
               updateById(queryBuilderJson, rule.id, (node) => {
                 const left =
@@ -221,6 +233,7 @@ const RuleAgeSelector = ({
   return (
     <>
       {title && <CustomH1>{title}</CustomH1>}
+
       <Stack direction="column" spacing={2} alignItems="center" paddingX={2}>
         {readOnly ? (
           <RuleAgeSelectorReadOnly

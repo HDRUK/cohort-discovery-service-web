@@ -52,6 +52,7 @@ const QueryBuilder = ({
     createNewGroup,
     createNewRule,
     createNewAgeFilter,
+    selectedGuidance,
   } = useQueryBuilder((qb) => ({
     resetQueryBuilderJson: qb.resetQueryBuilderJson,
     queryBuilderJson: qb.queryBuilderJson,
@@ -62,6 +63,7 @@ const QueryBuilder = ({
     createNewGroup: qb.createNewGroup,
     createNewRule: qb.createNewRule,
     createNewAgeFilter: qb.createNewAgeFilter,
+    selectedGuidance: qb.selectedGuidance,
   }));
 
   useEffect(() => {

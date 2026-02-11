@@ -16,31 +16,37 @@ const getDomainVerbs = (category: string) => {
       return {
         verb: "diagnosed",
         verbPastTense: "was diagnosed",
+        noun: "diagnosis",
       };
     case "drug":
       return {
         verb: "taken",
         verbPastTense: "was taken",
+        noun: "intake",
       };
     case "observation":
       return {
         verb: "observed",
         verbPastTense: "was observed",
+        noun: "observation",
       };
     case "measurement":
       return {
         verb: "measured",
         verbPastTense: "was measured",
+        noun: "measurement",
       };
     case "gender":
       return {
         verb: "recorded",
         verbPastTense: "was recorded",
+        noun: "record",
       };
     default:
       return {
         verb: "recorded",
         verbPastTense: "was recorded",
+        noun: "record",
       };
   }
 };

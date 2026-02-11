@@ -9,6 +9,7 @@ import {
 } from "@/utils/rules";
 import { mapDomain } from "./domains";
 import { MAX_AGE_FILTER, MIN_AGE_FILTER } from "@/config/rules";
+import { UniqueIdentifier } from "@dnd-kit/core";
 
 type Piece = { verb?: string | null; text: string };
 
@@ -219,4 +220,14 @@ const queryToText = (node: RuleGroupType) => {
   return `${subject} ${body}`;
 };
 
-export { queryToText };
+const collapsibleGuidanceKey = (
+  componentName: string,
+  selected: Record<UniqueIdentifier, boolean>,
+) => {
+  const keySuffix =
+    Object.keys(selected).length === 1 ? Object.keys(selected)[0] : "multiple";
+
+  return `${componentName}-${keySuffix}`;
+};
+
+export { queryToText, collapsibleGuidanceKey };

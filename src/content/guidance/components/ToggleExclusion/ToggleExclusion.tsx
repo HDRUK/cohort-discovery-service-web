@@ -5,15 +5,23 @@ import SquareRadio from "@/components/SquareRadio";
 import { RuleLeafType } from "@/types/rules";
 import { updateById } from "@/utils/rules";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
+import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
 
 type ToggleExclusionProps = {
   node: RuleLeafType;
 };
 
 const ToggleExclusion = ({ node }: ToggleExclusionProps) => {
-  const { queryBuilderJson, setQueryBuilderJson } = useQueryBuilder((qb) => ({
+  const {
+    queryBuilderJson,
+    setQueryBuilderJson,
+    setSelectedGuidance,
+    selected,
+  } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
+    setSelectedGuidance: qb.setSelectedGuidance,
+    selected: qb.selected,
   }));
 
   const handleToggleExclusion = (newNode: RuleLeafType) => {
@@ -25,6 +33,10 @@ const ToggleExclusion = ({ node }: ToggleExclusionProps) => {
   const value = node?.exclude ? 0 : 1;
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedGuidance(
+      collapsibleGuidanceKey("ToggleExclusion", selected),
+      true,
+    );
     const nextValue = Number(event.target.value);
     const nextExclude = nextValue === 0;
     handleToggleExclusion({ ...node, exclude: nextExclude });

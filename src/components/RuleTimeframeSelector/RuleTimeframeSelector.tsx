@@ -21,6 +21,7 @@ import { capitaliseFirstLetter } from "@/utils/string";
 import SingleBoundSelector, {
   SingleSidedOperator,
 } from "@/components/SingleBoundSelector";
+import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
 
 export interface RuleTimeframeSelectorProps extends DatePickerProps {
   children?: ReactNode;
@@ -39,9 +40,16 @@ const RuleTimeframeSelector = ({
   open,
   ...props
 }: RuleTimeframeSelectorProps) => {
-  const { queryBuilderJson, setQueryBuilderJson } = useQueryBuilder((qb) => ({
+  const {
+    queryBuilderJson,
+    setQueryBuilderJson,
+    setSelectedGuidance,
+    selected,
+  } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
+    setSelectedGuidance: qb.setSelectedGuidance,
+    selected: qb.selected,
   }));
 
   const { constrainForBunnyV1 } = useFeatures();
@@ -51,7 +59,10 @@ const RuleTimeframeSelector = ({
     return [start ? dayjs(start) : null, end ? dayjs(end) : null];
   }, [rule.timeConstraint]);
 
+  const key = collapsibleGuidanceKey("RuleTimeframeSelector", selected);
+
   const handleLeftChange = (value: PickerValue) => {
+    setSelectedGuidance(key, true);
     setQueryBuilderJson(
       updateById(queryBuilderJson, rule.id, (node) => ({
         ...node,
@@ -64,6 +75,7 @@ const RuleTimeframeSelector = ({
   };
 
   const handleRightChange = (value: PickerValue) => {
+    setSelectedGuidance(key, true);
     setQueryBuilderJson(
       updateById(queryBuilderJson, rule.id, (node) => ({
         ...node,
@@ -119,9 +131,11 @@ const RuleTimeframeSelector = ({
     return (
       <>
         {title && <CustomH1>{title}</CustomH1>}
+
         <SingleBoundSelector<string, Dayjs>
           constraint={rule.timeConstraint}
           onConstraintChange={(next) => {
+            setSelectedGuidance(key, true);
             setQueryBuilderJson(
               updateById(queryBuilderJson, rule.id, (node) => ({
                 ...node,

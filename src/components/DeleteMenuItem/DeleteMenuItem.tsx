@@ -1,5 +1,5 @@
 import { Button, ButtonProps } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { DeleteIcon } from "@/icons/DeleteIcon";
 
 export interface DeleteMenuItemProps extends ButtonProps {
   label: string;
