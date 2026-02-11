@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, Children } from "react";
 import { CustomH1 } from "../GuidanceHeaders";
 import { Box, BoxProps, ClickAwayListener, IconButton } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
@@ -36,7 +36,7 @@ interface CollapsibleGuidanceProps extends Omit<
 > {
   title: ReactNode;
   keyPrefix: string;
-  children: ReactNode[];
+  children?: ReactNode | ReactNode[];
 }
 
 const CollapsibleGuidance = ({
@@ -76,6 +76,10 @@ const CollapsibleGuidance = ({
     const showThisGuidance =
       key in selectedGuidance && selectedGuidance[key] === true;
     // console.log("showThisGuidance", showThisGuidance);
+
+    // Ensure we have an array we can index into without TypeScript errors
+    const childrenArray = Children.toArray(children as ReactNode[]);
+
     return (
       <>
         {title && (
@@ -107,7 +111,7 @@ const CollapsibleGuidance = ({
           }}
         >
           <Box sx={{ p: 0, m: 0 }}>
-            {showThisGuidance ? children : children[0]}
+            {showThisGuidance ? children : childrenArray[0]}
           </Box>
         </ClickAwayListener>
       </>

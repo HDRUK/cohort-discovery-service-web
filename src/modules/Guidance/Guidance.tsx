@@ -117,6 +117,8 @@ const Guidance = () => {
 
   interface GuidanceProps extends TypographyProps {
     target: string;
+    keyPrefix: string;
+    title: string;
   }
   const makeRuleComponents = (node: RuleLeafType) => ({
     ...baseComponents,
