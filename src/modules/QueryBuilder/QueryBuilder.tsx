@@ -202,7 +202,6 @@ const QueryBuilder = ({
     { action: createNewGroup, label: "Add Group" },
   ];
 
-  console.log("selectedGuidance", selectedGuidance);
   return (
     <>
       <ThreePaneSwimLaneLayout
