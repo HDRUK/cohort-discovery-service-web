@@ -134,7 +134,6 @@ const RuleTimeframeSelector = ({
 
         <SingleBoundSelector<string, Dayjs>
           constraint={rule.timeConstraint}
-          onClick={() => setSelectedGuidance(key, true)}
           onConstraintChange={(next) => {
             setSelectedGuidance(key, true);
             setQueryBuilderJson(

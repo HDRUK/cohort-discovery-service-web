@@ -224,7 +224,6 @@ const RuleAgeSelector = ({
               maxAge={maxAge}
             />
           )}
-          onClick={() => setSelectedGuidance(key, true)}
         />
         {children}
       </>
