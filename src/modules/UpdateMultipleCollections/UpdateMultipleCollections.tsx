@@ -29,6 +29,7 @@ import ManageMultipleCollectionsStatus from "@/modules/ManageMultipleCollections
 import UpdateMultipleCollectionsGuidance from "./UpdateMultipleCollectionsGuidance";
 import { UpdateCollectionFormValues } from "@/types/forms";
 import { useAdminDataStore } from "@/store/adminDataStore";
+import theme from "@/config/theme";
 
 export type UpdateMultipleCollectionProps = {
   collections: CollectionWithHosts[];
@@ -234,7 +235,11 @@ const UpdateMultipleCollections = ({
             }
           }}
         >
-          {expandedRight ? <LockOpenIcon /> : <LockOutlineIcon />}
+          {expandedRight ? (
+            <LockOpenIcon sx={{ color: theme.palette.tooltip?.main }} />
+          ) : (
+            <LockOutlineIcon />
+          )}
         </IconButton>
       </Typography>
       <FormLabel underlined>Collection Status</FormLabel>
