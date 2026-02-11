@@ -10,6 +10,7 @@ import getCustodians from "@/actions/getCustodians";
 import getFeatureFlags from "@/actions/getFeatureFlags";
 import { isStandalone } from "@/utils/modes";
 import { ErrorMode } from "@/lib/apiClient";
+import { Paper } from "@mui/material";
 
 const applicationMode = process.env.APPLICATION_MODE;
 
@@ -54,6 +55,9 @@ export default async function ProtectedLayout({
   const hasGeneralAccess = roles?.includes(RoleName.USER);
   const hasAdminAccess = roles.includes(RoleName.ADMIN);
   const hasTeamAccess = me.custodians.length > 0;
+
+  console.log({ roles, custodians: me.custodians });
+  console.log({ hasGeneralAccess, hasAdminAccess, hasTeamAccess });
 
   if (!(hasGeneralAccess || hasAdminAccess || hasTeamAccess)) {
     forbidden();
