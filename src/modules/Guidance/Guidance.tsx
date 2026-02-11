@@ -182,6 +182,9 @@ const Guidance = () => {
 
   const makeAgeFilterComponents = (node: AgeFilterType) => ({
     ...baseComponents,
+    CollapsibleGuidance: (props: GuidanceProps) => (
+      <CollapsibleGuidance {...props}></CollapsibleGuidance>
+    ),
     RuleAgeSelector: (props: { title: string }) => (
       <RuleAgeSelector
         rule={node}
@@ -190,6 +193,7 @@ const Guidance = () => {
         overrideConstrainForBunny={true}
       />
     ),
+    Box: (props: BoxProps) => <Box {...props}></Box>,
   });
 
   if (!selectedNode) {
@@ -202,7 +206,11 @@ const Guidance = () => {
     if (isRuleLeaf(selectedNode)) {
       if (isEmptyRule(selectedNode)) {
         return (
-          <ActionMenuSection title={"Build Guidance"} fixedExpanded scrollable>
+          <ActionMenuSection
+            title={"Search Categories"}
+            fixedExpanded
+            scrollable
+          >
             <EmptyRuleGuidance components={baseComponents} />
           </ActionMenuSection>
         );
@@ -242,7 +250,7 @@ const Guidance = () => {
       );
     } else if (isAgeFilter(selectedNode)) {
       return (
-        <ActionMenuSection title={"Age"} fixedExpanded scrollable>
+        <ActionMenuSection title={"Age Rule"} fixedExpanded scrollable>
           <AgeFilterGuidance
             components={makeAgeFilterComponents(selectedNode)}
           />

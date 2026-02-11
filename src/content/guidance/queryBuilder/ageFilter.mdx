@@ -1,7 +1,10 @@
+<CollapsibleGuidance keyPrefix="RuleAgeSelector" title="Patient Age">
+  <RuleAgeSelector />
+  <Box>
+    Define the patient age range by adjusting slider value.
 
-<RuleAgeSelector title={`Select the age of the person`}/>
-
-
-# Guidance
-
-Define the patient age range by adjusting slider value. Age may be rounded ±1 year in some datasets, to either protect patient data or as specific day or month was not recorded, so consider this when setting the range for your research question.
+    <Box sx={{ color: "red" }}>
+      Age may be rounded ±1 year in some datasets, to either protect patient data or as specific day or month was not recorded.
+    </Box>
+  </Box>
+</CollapsibleGuidance>
