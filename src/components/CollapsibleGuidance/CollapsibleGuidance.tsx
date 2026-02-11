@@ -15,8 +15,7 @@ const ToggleGuidanceButton = ({
   selectedGuidance: Record<string, boolean>;
   setSelectedGuidance: (id: string, value: boolean) => void;
 }) => {
-  const active =
-    guidanceKey in selectedGuidance && selectedGuidance[guidanceKey] === true;
+  const active = selectedGuidance[guidanceKey] ?? false;
   const handleClick = () => {
     setSelectedGuidance(guidanceKey, !active);
   };
@@ -73,8 +72,7 @@ const CollapsibleGuidance = ({
     // console.log("other children", children.slice(0, children.length - 1));
     // console.log("selectedGuidance", selectedGuidance);
     // console.log("key", key);
-    const showThisGuidance =
-      key in selectedGuidance && selectedGuidance[key] === true;
+    const showThisGuidance = selectedGuidance[key] ?? false;
     // console.log("showThisGuidance", showThisGuidance);
 
     // Ensure we have an array we can index into without TypeScript errors
