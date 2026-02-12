@@ -1,32 +1,38 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 
 import TabsShell from "@/components/TabsShell";
 import { routes } from "../../config/routes";
-import { useDaphneStore } from "@/store/useDaphneStore";
 import { TabType } from "../TabsShell/TabsShell";
-import { isAdmin } from "@/utils/token";
+import GuidanceModal from "../GuidanceModal";
+import { checkIsAdmin } from "@/utils/user";
+import useUserStore from "@/hooks/useUserStore";
+import { HelpIcon } from "@/icons/HelpIcon";
+import HelpTooltip from "../HelpTooltip";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
+import theme from "@/config/theme";
 
 export default function TopMenu() {
   const pathname = usePathname();
-  const {
-    userData: { user },
-    custodianData: { custodians },
-  } = useDaphneStore();
+  const user = useUserStore((s) => s.user);
 
-  const teamIds = useMemo(
-    () => user?.token_user?.cohort_admin_teams?.map((t) => String(t.id)) ?? [],
-    [user]
-  );
+  const [guidanceOpen, setGuidanceOpen] = useState(false);
+  const { helpTooltipOpen, setHelpTooltipOpen } = useQueryBuilder((qb) => ({
+    helpTooltipOpen: qb.helpTooltipOpen,
+    setHelpTooltipOpen: qb.setHelpTooltipOpen,
+  }));
+
+  useEffect(() => {
+    if (!helpTooltipOpen || !user) return;
+    const id = setTimeout(() => setHelpTooltipOpen(false), 10000);
+    return () => clearTimeout(id);
+  }, [helpTooltipOpen, setHelpTooltipOpen, user]);
 
   const userCustodians = useMemo(
-    () =>
-      (custodians ?? []).filter((c) =>
-        teamIds.includes(String(c.external_custodian_id))
-      ),
-    [custodians, teamIds]
+    () => user?.custodians ?? [],
+    [user?.custodians],
   );
 
   const tabs = useMemo<TabType[]>(() => {
@@ -55,7 +61,7 @@ export default function TopMenu() {
             },
           ]
         : []),
-      ...(isAdmin(user?.token_user)
+      ...(checkIsAdmin(user)
         ? [
             {
               id: routes.admin,
@@ -81,21 +87,55 @@ export default function TopMenu() {
     tabs[0]?.id ??
     0;
 
+  const handleGuidanceOpen = () => {
+    setGuidanceOpen(true);
+  };
+
+  const handleGuidanceClose = () => {
+    setGuidanceOpen(false);
+  };
+
+  const handleTooltipClose = () => {
+    setHelpTooltipOpen(false);
+  };
+
   return (
-    <TabsShell
-      forceValue
-      tabs={tabs}
-      value={currentTabValue}
-      sx={{ height: "auto" }}
-      tabSx={(theme) => ({
-        "&.Mui-selected": {
-          bgcolor: theme.palette.secondary.main,
-          color: theme.palette.secondary.contrastText,
-        },
-      })}
-      tabHeaderSx={(theme) => ({
-        backgroundColor: theme.palette.background.paper,
-      })}
-    />
+    <>
+      <GuidanceModal open={guidanceOpen} onClose={handleGuidanceClose} />
+      <TabsShell
+        forceValue
+        tabs={tabs}
+        value={currentTabValue}
+        sx={{ height: "auto" }}
+        tabSx={(theme) => ({
+          "&.Mui-selected": {
+            bgcolor: theme.palette.secondary.main,
+            color: theme.palette.secondary.contrastText,
+          },
+        })}
+        tabHeaderSx={(theme) => ({
+          backgroundColor: theme.palette.background.paper,
+        })}
+        endIcon={
+          <HelpTooltip
+            title="Tool guidance can be found here"
+            placement="left"
+            open={helpTooltipOpen && !!user}
+            onClose={handleTooltipClose}
+            sx={{ zIndex: 1250 }}
+          >
+            <HelpIcon
+              sx={{
+                maxHeight: 20,
+                maxWidth: 20,
+                color: theme.palette.tooltip?.main,
+                mr: 2,
+              }}
+              onClick={handleGuidanceOpen}
+            />
+          </HelpTooltip>
+        }
+      />
+    </>
   );
 }

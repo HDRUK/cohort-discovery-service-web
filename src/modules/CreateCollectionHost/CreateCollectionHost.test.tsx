@@ -5,32 +5,33 @@ import CreateCollectionHost from "./CreateCollectionHost";
 import { Custodian } from "@/types/api";
 import getCustodian from "@/actions/__mocks__/getCustodian";
 import { NotifyProvider } from "@/providers/NotifyProvider";
+import MockDaphneStore from "@/store/MockDaphneStore";
 
 // --- Mock Daphne store ---
 const createCollectionHost = jest.fn();
 const onCancel = jest.fn();
 
-jest.mock("@/store/useDaphneStore", () => ({
-  useDaphneStore: () => ({
-    custodianData: {
-      createCollectionHost,
-    },
-  }),
-}));
-
 let custodian: Custodian;
 
 const renderCreateColllectionHost = (
-  overrides: Partial<React.ComponentProps<typeof CreateCollectionHost>> = {}
+  overrides: Partial<React.ComponentProps<typeof CreateCollectionHost>> = {},
 ) =>
   render(
     <NotifyProvider>
-      <CreateCollectionHost
-        custodianId={custodian.id}
-        onCancel={onCancel}
-        {...overrides}
-      />
-    </NotifyProvider>
+      <MockDaphneStore
+        overrides={{
+          custodian: {
+            createCollectionHost,
+          },
+        }}
+      >
+        <CreateCollectionHost
+          custodianId={custodian.id}
+          onCancel={onCancel}
+          {...overrides}
+        />
+      </MockDaphneStore>
+    </NotifyProvider>,
   );
 
 describe("CreateCollectionHost", () => {

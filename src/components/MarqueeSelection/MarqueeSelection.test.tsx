@@ -109,6 +109,7 @@ describe("MarqueeSelection", () => {
 
     await user.pointer([
       { target: container, keys: "[MouseLeft>]", coords: { x: 10, y: 10 } },
+      { coords: { x: 20, y: 20 } },
       { coords: { x: 380, y: 180 } },
       { keys: "[/MouseLeft]" },
     ]);
@@ -125,6 +126,7 @@ describe("MarqueeSelection", () => {
 
     await user.pointer([
       { target: container, keys: "[MouseLeft>]", coords: { x: 10, y: 10 } },
+      { coords: { x: 20, y: 20 } },
       { coords: { x: 380, y: 300 } },
       { keys: "[/MouseLeft]" },
     ]);

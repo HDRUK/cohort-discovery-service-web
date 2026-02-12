@@ -2,7 +2,6 @@
 import { useState, useMemo } from "react";
 import { Box, Skeleton } from "@mui/material";
 import Title from "@/components/Title";
-import { useDaphneStore } from "@/store/useDaphneStore";
 import { CollectionHost } from "@/types/api";
 import { MRT_RowSelectionState } from "material-react-table";
 import { trueKeys } from "@/utils/numbers";
@@ -14,6 +13,9 @@ import CollectionHostLeftPanel from "./CollectionHostLeftPanel";
 import CollectionHostListPanel from "./CollectionHostListPanel";
 import CollectionHostRightPanel from "./CollectionHostRightPanel";
 
+import useUserStore from "@/hooks/useUserStore";
+import useCustodianStore from "@/hooks/useCustodianStore";
+
 const CollectionHostAdmin = ({
   pid,
   collectionHosts,
@@ -22,9 +24,9 @@ const CollectionHostAdmin = ({
   collectionHosts: CollectionHost[];
 }) => {
   const notify = useNotify();
-  const {
-    custodianData: { custodians, deleteCollectionHost },
-  } = useDaphneStore();
+
+  const custodians = useUserStore((s) => s.custodians);
+  const deleteCollectionHost = useCustodianStore((s) => s.deleteCollectionHost);
 
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
   const selectedHostIds = useMemo(() => trueKeys(rowSelection), [rowSelection]);
@@ -34,7 +36,7 @@ const CollectionHostAdmin = ({
       selectedHostIds.length > 0
         ? collectionHosts.find((h) => h.client_id === selectedHostIds[0])
         : null,
-    [collectionHosts, selectedHostIds]
+    [collectionHosts, selectedHostIds],
   );
 
   const [expandedSide, setExpandedSide] = useState<ExpandedSide | null>(null);
@@ -42,13 +44,13 @@ const CollectionHostAdmin = ({
   const toggleExpandLeft = () => {
     setRowSelection({});
     setExpandedSide((prev) =>
-      prev === ExpandedSide.LEFT ? null : ExpandedSide.LEFT
+      prev === ExpandedSide.LEFT ? null : ExpandedSide.LEFT,
     );
   };
 
   const toggleExpandRight = () => {
     setExpandedSide((prev) =>
-      prev === ExpandedSide.RIGHT ? null : ExpandedSide.RIGHT
+      prev === ExpandedSide.RIGHT ? null : ExpandedSide.RIGHT,
     );
   };
 
@@ -59,7 +61,7 @@ const CollectionHostAdmin = ({
   const noCollectionHosts = collectionHosts.length === 0;
 
   const handleDeleteHost = async () => {
-    selectedHostIds.map((clientId) => {
+    selectedHostIds.forEach((clientId) => {
       const id = collectionHosts.find((h) => h.client_id === clientId)?.id;
       if (id) {
         deleteCollectionHost(id);

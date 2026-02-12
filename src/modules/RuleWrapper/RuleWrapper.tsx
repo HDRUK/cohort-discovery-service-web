@@ -10,14 +10,18 @@ import {
   CardProps,
   Collapse,
   CardActions,
+  Fade,
+  Divider,
 } from "@mui/material";
 import { ReactNode, RefObject, useCallback, useMemo, useState } from "react";
 import useSortable from "@/hooks/useSortable";
 import { DragIndicator } from "@mui/icons-material";
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 
 import {
   containerSx,
+  deleteButtonSx,
+  deleteIconSx,
   dragButtonSx,
   dragIconSx,
   skeletonSx,
@@ -38,8 +42,9 @@ import useRightClickMenu from "@/hooks/useRightClickMenu";
 import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
 import { mergeSx } from "@/utils/helpers";
 import RuleAgeSelector from "@/components/RuleAgeSelector";
-import { isAgeFilter, isRuleLeaf } from "@/utils/rules";
-import useFeatures from "@/store/useFeatures";
+import { isAgeFilter, isRuleLeaf, removeById } from "@/utils/rules";
+import useFeatures from "@/hooks/useFeatures";
+import Close from "@mui/icons-material/Close";
 
 interface Action {
   action: () => void;
@@ -58,7 +63,7 @@ export interface RuleWrapperProps extends BoxProps {
   containerProps?: BoxProps;
   render: (
     rule: RuleNodeType,
-    ref?: RefObject<HTMLDivElement | HTMLLIElement | null>
+    ref?: RefObject<HTMLDivElement | HTMLLIElement | null>,
   ) => ReactNode;
   actions?: Action[];
   forceShowHandle?: boolean;
@@ -87,13 +92,23 @@ const RuleWrapper = ({
     exclude = !!node.exclude;
   }
 
-  const { isSelected, toggleSelected, getNodeName, setNodeName } =
-    useQueryBuilder((qb) => ({
-      isSelected: !!qb.selected[id],
-      toggleSelected: qb.toggleSelected,
-      getNodeName: qb.getNodeName,
-      setNodeName: qb.setNodeName,
-    }));
+  const {
+    isSelected,
+    toggleSelected,
+    getNodeName,
+    setNodeName,
+    queryBuilderJson,
+    setQueryBuilderJson,
+    setHovered,
+  } = useQueryBuilder((qb) => ({
+    isSelected: !!qb.selected[id],
+    toggleSelected: qb.toggleSelected,
+    getNodeName: qb.getNodeName,
+    setNodeName: qb.setNodeName,
+    queryBuilderJson: qb.queryBuilderJson,
+    setQueryBuilderJson: qb.setQueryBuilderJson,
+    setHovered: qb.setHovered,
+  }));
 
   const { constrainForBunnyV1 } = useFeatures();
 
@@ -115,27 +130,47 @@ const RuleWrapper = ({
   });
 
   const [showHandle, setShowHandle] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
 
   const handleOnSelect = useCallback(
     (e: React.MouseEvent) => {
-      toggleSelected(id);
+      const isShift = e.shiftKey;
+      e.preventDefault();
       e.stopPropagation();
+      window.getSelection()?.removeAllRanges();
+      toggleSelected(id, !isShift);
     },
-    [id, toggleSelected]
+    [id, toggleSelected],
   );
 
-  const onMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+  const onMouseOver = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     setShowHandle(true);
+    setShowDelete(true);
   };
 
   const onMouseLeave = useCallback(() => {
     if (showHandle && !isDragging && !isSelected) {
       setShowHandle(false);
+      setShowDelete(false);
     }
-  }, [showHandle, isDragging, isSelected, setShowHandle]);
+  }, [showHandle, isDragging, isSelected, setShowHandle, setShowDelete]);
+
+  const onCardMouseOver = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    setHovered(id);
+  };
+
+  const onCardMouseLeave = useCallback(() => {
+    setHovered(id, true);
+  }, [id, setHovered]);
 
   const { handleContextMenu, ...rightClickMenuMethods } = useRightClickMenu();
+
+  const handleDelete = useCallback(() => {
+    const newQuery = removeById(queryBuilderJson, id);
+    setQueryBuilderJson(newQuery);
+  }, [id, queryBuilderJson, setQueryBuilderJson]);
 
   const nodeName = useMemo(() => getNodeName(node), [node, getNodeName]);
 
@@ -147,7 +182,9 @@ const RuleWrapper = ({
     valid,
     handleContextMenu,
     onMouseLeave,
-    onMouseEnter,
+    onMouseOver,
+    onCardMouseOver,
+    onCardMouseLeave,
     handleOnSelect,
     showHandle,
     setNodeRef,
@@ -169,9 +206,9 @@ const RuleWrapper = ({
       ref={setNodeRef}
       style={sortable ? style : {}}
       {...containerProps}
-      onMouseEnter={onMouseEnter}
+      onMouseOver={onMouseOver}
       onMouseLeave={onMouseLeave}
-      sx={containerSx(isSelected, containerProps?.sx)}
+      sx={containerSx(isSelected && !isDragging, containerProps?.sx)}
     >
       <Box sx={headerRowSx}>
         <Collapse
@@ -181,15 +218,18 @@ const RuleWrapper = ({
           unmountOnExit
           sx={{ display: "flex", alignItems: "center" }}
         >
-          <IconButton
-            aria-label="Drag"
-            size="small"
-            {...(sortable ? attributes : {})}
-            {...(sortable ? listeners : {})}
-            sx={dragButtonSx}
-          >
-            <DragIndicator fontSize="small" sx={dragIconSx(isDragging)} />
-          </IconButton>
+          <Fade in={showHandle || forceShowHandle || isDragging}>
+            <IconButton
+              aria-label="Drag"
+              data-draggable="true"
+              size="small"
+              {...(sortable ? attributes : {})}
+              {...(sortable ? listeners : {})}
+              sx={dragButtonSx}
+            >
+              <DragIndicator fontSize="small" sx={dragIconSx(isDragging)} />
+            </IconButton>
+          </Fade>
         </Collapse>
         {isDragging ? (
           <Skeleton
@@ -208,6 +248,8 @@ const RuleWrapper = ({
             sx={mergeSx(cardSx(isSelected, valid), cardPropsSx)}
             onContextMenu={handleContextMenu}
             onClick={handleOnSelect}
+            onMouseOver={onCardMouseOver}
+            onMouseLeave={onCardMouseLeave}
             {...cardProps}
           >
             {!hideHeader && (
@@ -272,6 +314,12 @@ const RuleWrapper = ({
               )}
 
             <RightClickMenu {...rightClickMenuMethods} actions={actions} />
+            {type === "Rule" && (
+              <>
+                <Divider variant="fullWidth" />
+                <Box height={40}></Box>
+              </>
+            )}
           </Card>
         )}
 
@@ -288,10 +336,30 @@ const RuleWrapper = ({
             </IconButton>
           </Collapse>
         )}
+        <Collapse
+          in={showDelete || forceShowHandle}
+          orientation="horizontal"
+          collapsedSize={0}
+          unmountOnExit
+          sx={{ display: "flex", alignItems: "center" }}
+        >
+          <Fade in={showDelete || forceShowHandle}>
+            <IconButton
+              aria-label="Delete"
+              size="small"
+              {...(sortable ? attributes : {})}
+              {...(sortable ? listeners : {})}
+              sx={deleteButtonSx}
+              onClick={handleDelete}
+            >
+              <Close fontSize="medium" sx={deleteIconSx(isDragging)} />
+            </IconButton>
+          </Fade>
+        </Collapse>
       </Box>
       {isSelected && (
         <EditableText
-          value={nodeName}
+          defaultValue={nodeName}
           onCommit={(name) => setNodeName(node, name)}
           typographyProps={{
             component: "span",

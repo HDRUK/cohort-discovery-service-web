@@ -1,50 +1,46 @@
 import { Box, Stack, Button, MenuItem } from "@mui/material";
-
-import { useForm, Controller, FormProvider } from "react-hook-form";
+import { useForm, Controller, FormProvider, useWatch } from "react-hook-form";
 import { CreateCollectionFormValues } from "@/types/forms";
 import { QueryContext } from "@/types/context";
 import FormTextField from "@/components/FormTextField";
-import {
-  CollectionHost,
-  Custodian,
-  TaskType,
-  FrequencyMode,
-} from "@/types/api";
+import { TaskType, FrequencyMode } from "@/types/api";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import { useNotify } from "@/providers/NotifyProvider";
 import CollectionConfig from "@/components/CollectionConfig";
 import { REGEX_URL_NO_WWW } from "@/config/regex";
 import FormDropdown from "@/components/FormDropdown";
-import { v4 as uuidv4 } from "uuid";
-import useAdminStore from "@/store/useAdminStore";
-import useCustodianStore from "@/store/useCustodianStore";
+import useCustodianStore from "@/hooks/useCustodianStore";
+import { useEffect, useMemo } from "react";
+import ErrorHeader from "@/components/ErrorHeader";
+import { useUserDataStore } from "@/hooks/userDataStore";
+import { useAdminDataStore } from "@/store/adminDataStore";
 
 interface CreateCollectionProps {
-  collectionHosts: CollectionHost[];
-  custodians?: Custodian[];
   onCancel?: () => void;
 }
 
-const CreateCollection = ({
-  collectionHosts,
-  custodians,
-  onCancel,
-}: CreateCollectionProps) => {
-  const createCollectionAdmin = useAdminStore((s) => s.createCollection);
+const CreateCollection = ({ onCancel }: CreateCollectionProps) => {
   const createCollection = useCustodianStore((s) => s.createCollection);
-  const currentCustodian = useCustodianStore((s) => s.currentCustodian);
+  const currentCustodian = useCustodianStore((s) => s.current.custodian);
+  const currentCollectionHosts = useCustodianStore(
+    (s) => s.current.collectionHosts,
+  );
+  const collectionHosts = useAdminDataStore((s) => s.collectionHosts);
+  const custodians = useUserDataStore((s) => s.custodians);
+
+  const isAdmin = !currentCustodian;
 
   const notify = useNotify();
 
   const formMethods = useForm<CreateCollectionFormValues>({
     defaultValues: {
+      custodian_pid: currentCustodian?.pid ?? "",
       collection: {
         name: "",
         description: "",
         url: "",
         type: QueryContext.BUNNY,
         host_id: 0,
-        custodian_id: "",
         status: true,
       },
       config: {
@@ -63,18 +59,32 @@ const CreateCollection = ({
     handleSubmit,
     control,
     reset,
-    formState: { isSubmitting },
+    resetField,
+    formState: { isSubmitting, errors },
   } = formMethods;
 
+  const selectedCustodianPid = useWatch({ name: "custodian_pid", control });
+  const selectedHostId = useWatch({ name: "collection.host_id", control });
+
+  const allowedCollectionHosts = useMemo(() => {
+    if (isAdmin) {
+      return collectionHosts.filter(
+        (ch) => ch.custodian.pid === selectedCustodianPid,
+      );
+    }
+    return currentCollectionHosts;
+  }, [currentCollectionHosts, collectionHosts, isAdmin, selectedCustodianPid]);
+
+  useEffect(() => {
+    resetField("collection.host_id", { defaultValue: 0 });
+  }, [allowedCollectionHosts, resetField]);
+
   const onSubmit = async (data: CreateCollectionFormValues) => {
-    data.collection.pid = uuidv4();
-    const createdCollection = currentCustodian
-      ? await createCollection(
-          currentCustodian.pid,
-          data.collection,
-          data.config
-        )
-      : await createCollectionAdmin(data.collection, data.config);
+    const createdCollection = await createCollection(
+      data.custodian_pid,
+      data.collection,
+      data.config,
+    );
 
     notify.success(`Created collection ${createdCollection.name}`);
     onCancel?.();
@@ -94,16 +104,18 @@ const CreateCollection = ({
           mb: 5,
         }}
       >
-        <ActionMenuSection
-          title={"New Collection"}
-          fixedExpanded
-          defaultExpanded
-          underline
-        >
-          <Stack spacing={2} width={"70%"} height={"100%"}>
+        <Stack spacing={2} width={"70%"} height={"100%"}>
+          <ActionMenuSection
+            title={"New Collection"}
+            fixedExpanded
+            defaultExpanded
+            underline
+            accordionSummarySx={{ mb: 2 }}
+          >
+            <ErrorHeader errors={errors} depth={2} />
             {!currentCustodian && !!custodians && (
               <Controller
-                name="collection.custodian_id"
+                name="custodian_pid"
                 control={control}
                 rules={{ required: "Custodian is required" }}
                 render={({ field, fieldState: { error } }) => (
@@ -111,11 +123,12 @@ const CreateCollection = ({
                     {...field}
                     select
                     label="Custodian"
+                    id={field.name}
                     error={error}
                     fullWidth
                     required
                     options={Object.values(custodians).map((opt) => ({
-                      value: opt.id,
+                      value: opt.pid,
                       label: opt.name.toUpperCase(),
                     }))}
                   />
@@ -123,13 +136,47 @@ const CreateCollection = ({
               />
             )}
             <Controller
+              name="collection.host_id"
+              control={control}
+              rules={{
+                required: "A collection host is required",
+                validate: (value) =>
+                  Number(value) > 0 || "Please select a valid collection host",
+              }}
+              disabled={!selectedCustodianPid}
+              render={({ field, fieldState: { error } }) => (
+                <FormDropdown
+                  {...field}
+                  select
+                  label="Collection Host"
+                  id={field.name}
+                  error={error}
+                  fullWidth
+                  required
+                  placeHolderOption={
+                    <MenuItem value={0} disabled>
+                      Select a collection host
+                    </MenuItem>
+                  }
+                  options={allowedCollectionHosts.map((ch) => ({
+                    label: ch.name,
+                    value: ch.id,
+                  }))}
+                  chipColor="secondary"
+                />
+              )}
+            />
+
+            <Controller
               name="collection.name"
               control={control}
               rules={{ required: "Name is required" }}
+              disabled={!selectedHostId}
               render={({ field, fieldState: { error } }) => (
                 <FormTextField
                   {...field}
                   label="Name"
+                  id={field.name}
                   error={error}
                   fullWidth
                   required
@@ -140,10 +187,12 @@ const CreateCollection = ({
               name="collection.description"
               control={control}
               rules={{ required: "A description is required" }}
+              disabled={!selectedHostId}
               render={({ field, fieldState: { error } }) => (
                 <FormTextField
                   {...field}
                   label="Description"
+                  id={field.name}
                   error={error}
                   fullWidth
                   required
@@ -160,26 +209,31 @@ const CreateCollection = ({
                   message: "Enter a valid URL (including http(s):// )",
                 },
               }}
+              disabled={!selectedHostId}
               render={({ field, fieldState: { error } }) => (
                 <FormTextField
                   {...field}
                   error={error}
                   required
                   label="Link to Associated Datasets"
+                  id={field.name}
                   fullWidth
                 />
               )}
             />
+            {/* // component disabled anyway, it should not be shown
             <Controller
               name="collection.type"
               control={control}
               rules={{ required: "Query context type is required" }}
+              disabled={!selectedHostId}
               render={({ field, fieldState: { error } }) => (
                 <FormDropdown
                   {...field}
                   disabled
                   select
                   label="Query Context Type"
+                  id={field.name}
                   error={error}
                   fullWidth
                   required
@@ -189,53 +243,24 @@ const CreateCollection = ({
                   }))}
                 />
               )}
-            />
-            <Controller
-              name="collection.host_id"
-              control={control}
-              rules={{
-                required: "A collection host is required",
-                validate: (value) =>
-                  Number(value) > 0 || "Please select a valid collection host",
-              }}
-              render={({ field, fieldState: { error } }) => (
-                <FormDropdown
-                  {...field}
-                  select
-                  label="Collection Host"
-                  error={error}
-                  fullWidth
-                  required
-                  placeHolderOption={
-                    <MenuItem value={0} disabled>
-                      Select a collection host
-                    </MenuItem>
-                  }
-                  options={collectionHosts.map((ch) => ({
-                    label: ch.name,
-                    value: ch.id,
-                  }))}
-                  chipColor="secondary"
-                />
-              )}
-            />
-          </Stack>
-        </ActionMenuSection>
+            />*/}
+          </ActionMenuSection>
 
-        <ActionMenuSection
-          title={"Collection Configuration"}
-          fixedExpanded
-          defaultExpanded
-          underline
-        >
-          <CollectionConfig<CreateCollectionFormValues>
-            keepExpanded
-            frequencyFieldName={"config.frequency_mode"}
-            runTimeFrequencyFieldName={"config.run_time_frequency"}
-            runTimeHourFieldName={"config.run_time_hour"}
-            runTimeMinuteFieldName={"config.run_time_minute"}
-          />
-        </ActionMenuSection>
+          <ActionMenuSection
+            title={"Collection Configuration"}
+            fixedExpanded
+            defaultExpanded
+          >
+            <CollectionConfig<CreateCollectionFormValues>
+              keepExpanded
+              frequencyFieldName={"config.frequency_mode"}
+              runTimeFrequencyFieldName={"config.run_time_frequency"}
+              runTimeHourFieldName={"config.run_time_hour"}
+              runTimeMinuteFieldName={"config.run_time_minute"}
+              disabled={!selectedHostId}
+            />
+          </ActionMenuSection>
+        </Stack>
 
         <Stack direction="row" spacing={1} justifyContent="flex-end">
           <Button
@@ -250,7 +275,11 @@ const CreateCollection = ({
           >
             Cancel
           </Button>
-          <Button type="submit" variant="outlined" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            variant="outlined"
+            disabled={isSubmitting || !selectedHostId}
+          >
             {isSubmitting ? "Creating..." : "Create"}
           </Button>
         </Stack>

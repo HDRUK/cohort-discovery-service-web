@@ -7,15 +7,15 @@ import { Box, Grid } from "@mui/material";
 import dayjs from "dayjs";
 import ConceptTable from "./ConceptTable";
 import AddNewConcept from "./AddNewConcept";
-import { useDaphneStore } from "@/store/useDaphneStore";
 import ActionDeleteButton from "@/components/ActionDeleteButton";
 import CreateConceptSet from "@/modules/CreateConceptSet";
 import Table from "@/components/Table";
+import useUserStore from "@/hooks/useUserStore";
 
 const MyDefinitions = ({ conceptSets }: { conceptSets: ConceptSet[] }) => {
-  const {
-    userData: { removeConceptsFromSet, removeConceptSet, setConceptSets },
-  } = useDaphneStore();
+  const removeConceptsFromSet = useUserStore((s) => s.removeConceptsFromSet);
+  const removeConceptSet = useUserStore((s) => s.removeConceptSet);
+  const setConceptSets = useUserStore((s) => s.setConceptSets);
 
   useEffect(() => {
     setConceptSets(conceptSets);
@@ -23,7 +23,7 @@ const MyDefinitions = ({ conceptSets }: { conceptSets: ConceptSet[] }) => {
 
   const onDelete = useCallback(
     async (id: number) => removeConceptSet(id),
-    [removeConceptSet]
+    [removeConceptSet],
   );
 
   const columns = useMemo<MRT_ColumnDef<ConceptSet>[]>(
@@ -73,7 +73,7 @@ const MyDefinitions = ({ conceptSets }: { conceptSets: ConceptSet[] }) => {
         size: 20,
       },
     ],
-    [onDelete]
+    [onDelete],
   );
 
   const table = useTable({

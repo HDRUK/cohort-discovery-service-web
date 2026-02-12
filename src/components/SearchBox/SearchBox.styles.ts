@@ -7,7 +7,7 @@ export const getContainerSx =
     collapsible: boolean,
     expanded: boolean,
     expandedWidth: number | string,
-    collapsedWidth: number | string
+    collapsedWidth: number | string,
   ): SxProps<Theme> =>
   (theme: Theme) => ({
     width: collapsible
@@ -26,42 +26,64 @@ export const getContainerSx =
 export const getTextFieldSx = (
   collapsible: boolean,
   expanded: boolean,
-  inputBgColor: string
+  inputBgColor: string,
+  hasWarning: boolean = false,
+  hasError: boolean = false,
 ): SxProps<Theme> => ({
   "& .MuiOutlinedInput-root": {
-    borderRadius: 100,
-    boxShadow: "0px 2px 0px rgba(0, 0, 0, 0.23)",
+    borderRadius: 20,
+    boxShadow: "0px 2px 2px rgba(0, 0, 0, 0.23)",
     backgroundColor: inputBgColor,
-    p: 0,
+    px: 0,
+    py: 0.5,
   },
+
   "& .MuiOutlinedInput-notchedOutline": {
     zIndex: 0,
-    borderTop: "none",
-    borderLeftColor: "rgba(0,0,0,0.1)",
-    borderRightColor: "rgba(0,0,0,0.1)",
-    borderBottomColor: "rgba(0,0,0,0.23)",
+    border: 0,
     opacity: collapsible ? (expanded ? 1 : 0) : 1,
     transition: collapsible ? "opacity 150ms" : "none",
     display: collapsible ? (expanded ? "none" : "inherit") : "inherit",
   },
-  "& .MuiInputAdornment-root": { position: "relative", zIndex: 2 },
-  "& .MuiFormLabel-root": {
+
+  ...(hasWarning
+    ? {
+        "& .MuiOutlinedInput-root:not(.Mui-error) .MuiOutlinedInput-notchedOutline":
+          {
+            border: (t: Theme) => `2px solid ${t.palette.warning.main}`,
+            opacity: 1,
+            display: "inherit",
+          },
+        "& .MuiInputLabel-root:not(.Mui-error)": {
+          color: (t: Theme) => t.palette.warning.main,
+        },
+      }
+    : null),
+  ...(hasError
+    ? {
+        "& .MuiOutlinedInput-root:not(.Mui-error) .MuiOutlinedInput-notchedOutline":
+          {
+            border: (t: Theme) => `2px solid ${t.palette.error.main}`,
+            opacity: 1,
+            display: "inherit",
+          },
+        "& .MuiInputLabel-root:not(.Mui-error)": {
+          color: (t: Theme) => t.palette.error.main,
+        },
+      }
+    : null),
+
+  "& .MuiInputLabel-root": {
+    color: (t: Theme) => t.palette.text.secondary,
     zIndex: 1,
   },
+
+  "& .MuiInputAdornment-root": { position: "relative", zIndex: 2 },
+
   "& .MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline": {
-    display: "inherit",
+    border: (t: Theme) => `2px solid ${t.palette.error.main}`,
     opacity: 1,
-    borderColor: (t: Theme) => t.palette.error.main,
-  },
-  "& .MuiOutlinedInput-root.Mui-error.Mui-disabled .MuiOutlinedInput-notchedOutline":
-    {
-      borderColor: (t: Theme) => t.palette.error.main,
-    },
-  "& .MuiInputLabel-root": {
-    color: "text.secondary",
-  },
-  "& .MuiInputLabel-root.Mui-focused": {
-    color: "text.secondary",
+    display: "inherit",
   },
   "& .MuiInputLabel-root.Mui-error": {
     color: (t: Theme) => t.palette.error.main,
@@ -70,7 +92,7 @@ export const getTextFieldSx = (
 
 export const getHtmlInputSx = (
   collapsible: boolean,
-  expanded: boolean
+  expanded: boolean,
 ): SxProps<Theme> => ({
   opacity: collapsible ? (expanded ? 1 : 0) : 1,
   transition: collapsible ? "opacity 150ms" : "none",

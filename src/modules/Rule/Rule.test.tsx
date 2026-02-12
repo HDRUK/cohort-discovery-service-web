@@ -20,7 +20,7 @@ const setQueryBuilderJson = jest.fn();
 describe("Rule", () => {
   const renderComponent = (
     opArgs: Partial<RuleLeafType> = {},
-    rest?: Partial<RuleProps>
+    rest?: Partial<RuleProps>,
   ) => {
     const rule = {
       id: "rule-1",
@@ -45,7 +45,7 @@ describe("Rule", () => {
         }}
       >
         <Rule {...rest} rule={rule} groupId="group-1" />
-      </MockDaphneStore>
+      </MockDaphneStore>,
     );
     return {
       query,
@@ -58,7 +58,7 @@ describe("Rule", () => {
     expect(screen.getByText("Rule 1234")).toBeInTheDocument();
     expect(screen.getByText("Include")).toBeInTheDocument();
     expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("WarningAmberIcon")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("ErrorIcon")).not.toBeInTheDocument();
   });
 
   it("renders the Rule card correctly when it is an exclusion", () => {
@@ -69,7 +69,7 @@ describe("Rule", () => {
 
   it("renders the Rule card correctly when not valid", () => {
     renderComponent({ valid: false });
-    expect(screen.queryByTestId("WarningAmberIcon")).toBeInTheDocument();
+    expect(screen.queryByTestId("ErrorIcon")).toBeInTheDocument();
   });
 
   it("renders the Rule card correctly when concept is blank", async () => {
@@ -107,7 +107,7 @@ describe("Rule", () => {
     expect(updateById).toHaveBeenCalledWith(
       query,
       "rule-1",
-      expect.any(Function)
+      expect.any(Function),
     );
     expect(setQueryBuilderJson).toHaveBeenCalled();
   });

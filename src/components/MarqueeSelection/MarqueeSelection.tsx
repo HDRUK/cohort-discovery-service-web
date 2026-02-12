@@ -20,6 +20,7 @@ type MarqueeSelectionProps = {
   requireModifierKey?: "Shift" | "Alt" | "Meta" | "Control" | null;
   ignoreWhenInside?: string;
   zIndex?: number;
+  dragThresholdPx?: number; // NEW: how far mouse must move before we start marquee
 };
 
 type Rect = { x: number; y: number; w: number; h: number };
@@ -48,6 +49,7 @@ export default function MarqueeSelection({
   requireModifierKey = null,
   ignoreWhenInside = '[data-draggable="true"]',
   zIndex = 30,
+  dragThresholdPx = 4,
 }: MarqueeSelectionProps) {
   const [dragging, setDragging] = useState(false);
   const startRef = useRef<{ x: number; y: number } | null>(null);
@@ -55,6 +57,9 @@ export default function MarqueeSelection({
   const [rectState, setRectState] = useState<Rect | null>(null);
   const latestSelected = useRef<string[]>([]);
   const insideRef = useRef<string | null>(null);
+
+  const pendingRef = useRef(false);
+  const startClientRef = useRef<{ x: number; y: number } | null>(null);
 
   const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
   useEffect(() => {
@@ -89,7 +94,7 @@ export default function MarqueeSelection({
 
       return { x, y };
     },
-    [containerRef]
+    [containerRef],
   );
 
   const computeSelection = useCallback(
@@ -98,9 +103,11 @@ export default function MarqueeSelection({
       const items = Array.from(el.querySelectorAll<HTMLElement>(selectable));
       const containerRect = el.getBoundingClientRect();
       const selection: string[] = [];
+
       for (const it of items) {
         const id = it.getAttribute(idAttr);
         if (!id) continue;
+
         const ir = it.getBoundingClientRect();
         const local: Rect = {
           x: ir.left - containerRect.left + el.scrollLeft,
@@ -108,11 +115,13 @@ export default function MarqueeSelection({
           w: ir.width,
           h: ir.height,
         };
+
         if (intersects(rectN, local)) selection.push(id);
       }
+
       return selection;
     },
-    [containerRef, idAttr, selectable]
+    [containerRef, idAttr, selectable],
   );
 
   useEffect(() => {
@@ -120,27 +129,23 @@ export default function MarqueeSelection({
     const container = containerRef.current;
     if (!container) return;
 
+    const passesModifier = (e: PointerEvent) => {
+      if (!requireModifierKey) return true;
+      if (requireModifierKey === "Shift") return e.shiftKey;
+      if (requireModifierKey === "Alt") return e.altKey;
+      if (requireModifierKey === "Meta") return e.metaKey;
+      if (requireModifierKey === "Control") return e.ctrlKey;
+      return true;
+    };
+
     const onPointerDown = (e: PointerEvent) => {
       if (disabled) return;
       if (e.button !== 0) return;
+      if (!passesModifier(e)) return;
 
-      if (
-        requireModifierKey &&
-        !(
-          (requireModifierKey === "Shift" && e.shiftKey) ||
-          (requireModifierKey === "Alt" && e.altKey) ||
-          (requireModifierKey === "Meta" && e.metaKey) ||
-          (requireModifierKey === "Control" && e.ctrlKey)
-        )
-      ) {
-        return;
-      }
-
-      insideRef.current = null;
       if (ignoreWhenInside) {
-        const el = (e.target as HTMLElement)?.closest(ignoreWhenInside);
-        const dataId = el?.getAttribute("data-id");
-        insideRef.current = dataId || null;
+        const inside = (e.target as HTMLElement)?.closest(ignoreWhenInside);
+        if (inside) return;
       }
 
       const { left, top, right, bottom } = container.getBoundingClientRect();
@@ -149,36 +154,56 @@ export default function MarqueeSelection({
         e.clientX > right ||
         e.clientY < top ||
         e.clientY > bottom
-      )
+      ) {
         return;
+      }
 
-      container.setPointerCapture?.(e.pointerId);
       const p = getLocalPoint(e.clientX, e.clientY);
       startRef.current = p;
-      rectRef.current = { x: p.x, y: p.y, w: 0, h: 0 };
-      setRectState({ ...rectRef.current });
-      latestSelected.current = [];
-      setDragging(true);
+      startClientRef.current = { x: e.clientX, y: e.clientY };
+      pendingRef.current = true;
 
-      e.preventDefault();
-      e.stopPropagation();
+      rectRef.current = { x: p.x, y: p.y, w: 0, h: 0 };
+      latestSelected.current = [];
+      insideRef.current = null;
     };
 
     const onPointerMove = (e: PointerEvent) => {
-      if (!dragging || !startRef.current) return;
+      if (disabled) return;
+      if (!pendingRef.current || !startRef.current || !startClientRef.current)
+        return;
+
+      if (!dragging) {
+        const dx = e.clientX - startClientRef.current.x;
+        const dy = e.clientY - startClientRef.current.y;
+        if (Math.hypot(dx, dy) < dragThresholdPx) return;
+
+        container.setPointerCapture?.(e.pointerId);
+        setDragging(true);
+
+        const rectN0 = normalizeRect(rectRef.current);
+        setRectState(rectN0);
+
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
       const p = getLocalPoint(e.clientX, e.clientY);
       const start = startRef.current;
+
       rectRef.current = {
         x: start.x,
         y: start.y,
         w: p.x - start.x,
         h: p.y - start.y,
       };
+
       const rectN = normalizeRect(rectRef.current);
       setRectState(rectN);
 
       const selected = computeSelection(rectN).filter(
-        (id) => id !== insideRef.current
+        (id) => id !== insideRef.current,
       );
       const prev = latestSelected.current;
 
@@ -199,10 +224,22 @@ export default function MarqueeSelection({
     };
 
     const endDrag = () => {
-      if (!dragging) return;
+      if (!pendingRef.current) return;
+
+      pendingRef.current = false;
+      startClientRef.current = null;
+      insideRef.current = null;
+
+      if (!dragging) {
+        startRef.current = null;
+        latestSelected.current = [];
+        return;
+      }
+
       setDragging(false);
       setRectState(null);
       onEnd?.(latestSelected.current);
+
       startRef.current = null;
       latestSelected.current = [];
     };
@@ -233,6 +270,7 @@ export default function MarqueeSelection({
     requireModifierKey,
     computeSelection,
     getLocalPoint,
+    dragThresholdPx,
   ]);
 
   useLogDependencyChanges("selection-effect", {
@@ -247,6 +285,7 @@ export default function MarqueeSelection({
     requireModifierKey,
     computeSelection,
     getLocalPoint,
+    dragThresholdPx,
   });
 
   if (!portalTarget || !rectState) return null;

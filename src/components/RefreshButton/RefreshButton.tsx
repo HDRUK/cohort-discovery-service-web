@@ -13,45 +13,30 @@ import { revalidateAction } from "@/actions/revalidate";
 const isProd = process.env.NODE_ENV === "production";
 
 export interface RefreshButtonProps extends Omit<IconButtonProps, "onClick"> {
-  tag?: string;
+  tag: string;
   showTooltip?: boolean;
   label?: string;
   text?: string;
-  onClick?: () => void;
 }
 
-const TooltipWrapper = ({
-  enabled,
-  title,
-  children,
-}: {
-  enabled: boolean;
-  title: React.ReactNode;
-  children: React.ReactElement;
-}) => {
-  return enabled ? <Tooltip title={title}>{children}</Tooltip> : children;
-};
-
-export const RefreshButton = ({
+const RefreshButton = ({
   tag,
   label,
   text,
-  onClick,
   showTooltip = false,
   ...rest
 }: RefreshButtonProps) => {
-  const title = label || tag;
+  const title = !isProd || showTooltip ? label ?? tag : null;
   return (
-    <TooltipWrapper enabled={(!isProd || showTooltip) && !!title} title={title}>
+    <Tooltip title={title}>
       <Box display="flex" alignItems="center" gap={1}>
-        <IconButton
-          onClick={onClick ? onClick : () => tag && revalidateAction(tag)}
-          {...rest}
-        >
+        <IconButton onClick={() => revalidateAction(tag)} {...rest}>
           <RefreshIcon fontSize={"small"} />
         </IconButton>
         {text && <Typography variant="body2">{text}</Typography>}
       </Box>
-    </TooltipWrapper>
+    </Tooltip>
   );
 };
+
+export default RefreshButton;

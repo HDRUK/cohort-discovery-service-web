@@ -1,5 +1,5 @@
 "use client";
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 import CodeBlock from "../CodeBlock";
 import ShowOnClick from "../ShowOnClick";
 import CodeIcon from "@mui/icons-material/Code";

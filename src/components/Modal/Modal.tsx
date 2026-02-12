@@ -6,7 +6,11 @@ import {
   IconButton,
   Button,
   DialogProps,
+  Breakpoint,
+  Theme,
 } from "@mui/material";
+import { SxProps } from "@mui/system";
+
 import CloseIcon from "@mui/icons-material/Close";
 import { ReactNode } from "react";
 
@@ -15,7 +19,10 @@ export interface ModalProps extends Omit<DialogProps, "children"> {
   open: boolean;
   onClose: () => void;
   children: ReactNode;
+  maxWidth?: Breakpoint;
+  showTitle?: boolean;
   showCloseButton?: boolean;
+  closeButtonSx?: SxProps<Theme>;
   showActions?: boolean;
   actionLabel?: string;
   secondaryActionLabel?: string;
@@ -28,7 +35,10 @@ const Modal = ({
   open,
   onClose,
   children,
+  maxWidth = "md",
+  showTitle = true,
   showCloseButton = true,
+  closeButtonSx,
   showActions = true,
   actionLabel = "Close",
   secondaryActionLabel,
@@ -41,24 +51,26 @@ const Modal = ({
       open={open}
       onClose={onClose}
       fullWidth
-      maxWidth="md"
+      maxWidth={maxWidth}
       {...dialogProps}
     >
-      <DialogTitle
-        variant="h3"
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        {title}
-        {showCloseButton && (
-          <IconButton onClick={onClose} size="small" aria-label="close">
-            <CloseIcon />
-          </IconButton>
-        )}
-      </DialogTitle>
+      {showTitle && (
+        <DialogTitle
+          variant="h3"
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          {title}
+          {showCloseButton && (
+            <IconButton onClick={onClose} size="small" aria-label="close">
+              <CloseIcon />
+            </IconButton>
+          )}
+        </DialogTitle>
+      )}
       <DialogContent dividers>{children}</DialogContent>
       {showActions && (
         <DialogActions
@@ -73,7 +85,9 @@ const Modal = ({
               {secondaryActionLabel}
             </Button>
           )}
-          <Button onClick={onClose}>{actionLabel}</Button>
+          <Button onClick={onClose} sx={closeButtonSx}>
+            {actionLabel}
+          </Button>
           {additionalActions}
         </DialogActions>
       )}

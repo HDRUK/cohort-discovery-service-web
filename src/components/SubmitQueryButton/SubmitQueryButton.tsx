@@ -1,48 +1,47 @@
 "use client";
 
-import { IconButton } from "@mui/material";
-import { useDaphneStore } from "@/store/useDaphneStore";
-import useQueryBuilder from "@/store/useQueryBuilder";
-import { useRouter } from "next/navigation";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import { routes } from "@/config/routes";
+import { Button } from "@mui/material";
+import useSubmitQuery from "@/hooks/useSubmitQuery";
 
-const SubmitQueryButton = () => {
-  const router = useRouter();
-  const fetchResults = useDaphneStore((s) => s.userData.fetchResults);
-  const { isLoading, setIsLoading } = useDaphneStore((s) => s.stateManagement);
-
-  const { selectedDatasets, queryName, queryBuilderJson } = useQueryBuilder(
-    (qb) => ({
-      selectedDatasets: qb.selectedDatasets,
-      queryName: qb.queryName,
-      queryBuilderJson: qb.queryBuilderJson,
-    })
-  );
-
-  const { valid } = queryBuilderJson;
-
-  const handleClick = async () => {
-    setIsLoading(true);
-    fetchResults(queryName).then(async (res) => {
-      const newPid = res.data.query_pid;
-      setIsLoading(false);
-      router.replace(routes.dashboardQueryResult(newPid));
-    });
-  };
+const SubmitQueryButton = ({ warning = false }: { warning: boolean }) => {
+  const { submit, disabled } = useSubmitQuery();
 
   return (
-    <IconButton
+    <Button
       component="span"
-      disabled={selectedDatasets.length === 0 || !valid || isLoading}
+      variant="outlined"
+      disabled={disabled}
+      sx={(theme) => ({
+        borderRadius: 20,
+        borderWidth: 2,
+        whiteSpace: "nowrap",
+
+        borderColor: warning
+          ? theme.palette.warning.main
+          : theme.palette.success.main,
+        backgroundColor: !disabled
+          ? theme.palette.common.white
+          : theme.palette.background.default,
+        color: theme.palette.text.primary,
+
+        fontWeight: 400,
+        fontSize: 15,
+
+        "&.Mui-disabled": {
+          borderWidth: 2,
+          borderColor: theme.palette.grey[300],
+          color: theme.palette.text.secondary,
+          backgroundColor: theme.palette.grey[200],
+        },
+      })}
       onClick={(event) => {
         event.stopPropagation();
         event.preventDefault();
-        handleClick();
+        submit();
       }}
     >
-      <ArrowForwardIcon sx={{ color: "white" }} />
-    </IconButton>
+      Run Query
+    </Button>
   );
 };
 

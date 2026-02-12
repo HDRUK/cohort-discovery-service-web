@@ -1,12 +1,25 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-export const useDebounce = <T>(value: T, delay = 100): T => {
+export const useDebounce = <T>(
+  value: T,
+  delay = 100,
+  flushNow?: (v: T) => boolean,
+): T => {
   const [debounced, setDebounced] = useState(value);
 
+  const shouldFlush = useMemo(
+    () => (flushNow ? flushNow(value) : false),
+    [flushNow, value],
+  );
+
   useEffect(() => {
-    const id = window.setTimeout(() => setDebounced(value), delay);
-    return () => window.clearTimeout(id);
-  }, [value, delay]);
+    const ms = shouldFlush ? 0 : delay;
+    const id = globalThis.setTimeout(() => {
+      setDebounced(value);
+    }, ms);
+
+    return () => globalThis.clearTimeout(id);
+  }, [value, delay, shouldFlush]);
 
   return debounced;
 };

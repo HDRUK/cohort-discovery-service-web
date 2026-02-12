@@ -1,14 +1,14 @@
 "use client";
 
-import ToolGuidance from "@/content/guidance/tool.mdx";
-import RuleGuidance from "@/content/guidance/rule.mdx";
-import OperatorGuidance from "@/content/guidance/operator.mdx";
-import GroupGuidance from "@/content/guidance/group.mdx";
-import AgeFilterGuidance from "@/content/guidance/ageFilter.mdx";
-import BuildGuidance from "@/content/guidance/build.mdx";
-import { Box, BoxProps } from "@mui/material";
+import ToolGuidance from "@/content/guidance/queryBuilder/tool.mdx";
+import RuleGuidance from "@/content/guidance/queryBuilder/rule.mdx";
+import OperatorGuidance from "@/content/guidance/queryBuilder/operator.mdx";
+import GroupGuidance from "@/content/guidance/queryBuilder/group.mdx";
+import AgeFilterGuidance from "@/content/guidance/queryBuilder/ageFilter.mdx";
+import EmptyRuleGuidance from "@/content/guidance/queryBuilder/emptyRule.mdx";
+import { Box, BoxProps, Link, LinkProps, TypographyProps } from "@mui/material";
 import { useCallback, useMemo } from "react";
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import {
   createOperator,
@@ -18,10 +18,11 @@ import {
   isEmptyRule,
   isOperator,
   isRuleGroup,
+  isRuleLeaf,
   updateById,
 } from "@/utils/rules";
-import { isRuleLeaf } from "@/utils/rules";
 import { trueKeys } from "@/utils/numbers";
+import { capitaliseFirstLetter } from "@/utils/string";
 import {
   AgeFilterType,
   OperatorType,
@@ -42,9 +43,20 @@ import { DeleteMenuItemProps } from "@/components/DeleteMenuItem/DeleteMenuItem"
 import AddAgeButton from "@/components/AddAgeButton";
 import RuleAgeSelector from "@/components/RuleAgeSelector";
 import DeleteAgeButton from "@/components/DeleteAgeButton";
-import useFeatures from "@/store/useFeatures";
+import useFeatures from "@/hooks/useFeatures";
+import CollapsibleGuidance from "@/components/CollapsibleGuidance";
 
 export const baseComponents = {
+  a: ({ href, children }: LinkProps) => (
+    <Link
+      sx={{ color: "link.main" }}
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {children}
+    </Link>
+  ),
   h1: CustomH1,
   h2: CustomH2,
   ul: (props: BoxProps) => (
@@ -77,7 +89,7 @@ const Guidance = () => {
       selected: qb.selected,
       queryBuilderJson: qb.queryBuilderJson,
       setQueryBuilderJson: qb.setQueryBuilderJson,
-    })
+    }),
   );
 
   const selectedIds = useMemo(() => trueKeys(selected), [selected]);
@@ -95,30 +107,45 @@ const Guidance = () => {
         updateById(queryBuilderJson, id, (node) => ({
           ...node,
           rules: newRules,
-        }))
+        })),
       );
     },
-    [queryBuilderJson, setQueryBuilderJson]
+    [queryBuilderJson, setQueryBuilderJson],
   );
 
   const { constrainForBunnyV1 } = useFeatures();
 
+  interface GuidanceProps extends TypographyProps {
+    target: string;
+    keyPrefix: string;
+    title: string;
+  }
   const makeRuleComponents = (node: RuleLeafType) => ({
     ...baseComponents,
-    ToggleExclusion: () => <ToggleExclusion node={node} />,
+    Box: (props: BoxProps) => <Box {...props}></Box>,
+    CollapsibleGuidance: (props: GuidanceProps) => (
+      <CollapsibleGuidance {...props}></CollapsibleGuidance>
+    ),
+    ToggleExclusion: () => (
+      <ToggleExclusion key="ToggleExclusion" node={node} />
+    ),
     ShowDescendants: () => <ShowDescendants node={node} />,
-    AddTimeFrameButton: (props: AddButtonProps) => (
-      <AddTimeFrameButton
+    AddTimeFrameButton: (props: AddButtonProps) =>
+      !node.timeConstraint && (
+        <AddTimeFrameButton
+          key="RuleTimeframeSelector"
+          rule={node}
+          {...props}
+        />
+      ),
+    AddAgeButton: (props: AddButtonProps) =>
+      !node.ageConstraint && <AddAgeButton rule={node} {...props} />,
+    RuleTimeframeSelector: (props: { title: string }) => (
+      <RuleTimeframeSelector
+        key="RuleTimeframeSelector"
         rule={node}
-        disabled={!!node.timeConstraint}
         {...props}
       />
-    ),
-    AddAgeButton: (props: AddButtonProps) => (
-      <AddAgeButton rule={node} disabled={!!node.ageConstraint} {...props} />
-    ),
-    RuleTimeframeSelector: (props: { title: string }) => (
-      <RuleTimeframeSelector rule={node} {...props} />
     ),
     DeleteTimeFrameButton: (props: DeleteMenuItemProps) => (
       <DeleteTimeFrameButton rule={node} {...props} />
@@ -147,7 +174,7 @@ const Guidance = () => {
       AddNewRuleButton: (props: AddButtonProps) => (
         <AddButton
           {...props}
-          action={() => handleCreateNewRuleInGroup(id, rules)}
+          onClick={() => handleCreateNewRuleInGroup(id, rules)}
         />
       ),
     };
@@ -155,6 +182,9 @@ const Guidance = () => {
 
   const makeAgeFilterComponents = (node: AgeFilterType) => ({
     ...baseComponents,
+    CollapsibleGuidance: (props: GuidanceProps) => (
+      <CollapsibleGuidance {...props}></CollapsibleGuidance>
+    ),
     RuleAgeSelector: (props: { title: string }) => (
       <RuleAgeSelector
         rule={node}
@@ -163,6 +193,7 @@ const Guidance = () => {
         overrideConstrainForBunny={true}
       />
     ),
+    Box: (props: BoxProps) => <Box {...props}></Box>,
   });
 
   if (!selectedNode) {
@@ -175,21 +206,32 @@ const Guidance = () => {
     if (isRuleLeaf(selectedNode)) {
       if (isEmptyRule(selectedNode)) {
         return (
-          <ActionMenuSection title={"Build Guidance"} fixedExpanded scrollable>
-            <BuildGuidance components={baseComponents} />
+          <ActionMenuSection
+            title={"Search Categories"}
+            fixedExpanded
+            scrollable
+          >
+            <EmptyRuleGuidance components={baseComponents} />
           </ActionMenuSection>
         );
       }
 
       const category = selectedNode?.rule?.concept?.category || "";
-      const { verb, verbPastTense } = getDomainVerbs(category);
+      const { verb, verbPastTense, noun } = getDomainVerbs(
+        category.toLowerCase(),
+      );
 
       return (
         <ActionMenuSection title={"Rule"} fixedExpanded scrollable>
           <RuleGuidance
-            category={selectedNode.rule.concept?.category || ""}
+            category={capitaliseFirstLetter(
+              selectedNode.rule.concept?.category || "",
+            )}
             verb={verb}
             verbPastTense={verbPastTense}
+            noun={capitaliseFirstLetter(noun)}
+            timeConstraint={selectedNode?.timeConstraint}
+            ageConstraint={selectedNode?.ageConstraint}
             components={makeRuleComponents(selectedNode)}
           />
         </ActionMenuSection>
@@ -208,7 +250,7 @@ const Guidance = () => {
       );
     } else if (isAgeFilter(selectedNode)) {
       return (
-        <ActionMenuSection title={"Age"} fixedExpanded scrollable>
+        <ActionMenuSection title={"Age Rule"} fixedExpanded scrollable>
           <AgeFilterGuidance
             components={makeAgeFilterComponents(selectedNode)}
           />

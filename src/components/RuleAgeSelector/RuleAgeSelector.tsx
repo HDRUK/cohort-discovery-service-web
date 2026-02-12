@@ -8,17 +8,18 @@ import {
   TextField,
 } from "@mui/material";
 import { ReactNode, useMemo, useState } from "react";
-import useQueryBuilder from "@/store/useQueryBuilder";
 import { isAgeFilter, isRuleLeaf, updateById } from "@/utils/rules";
 import { AgeFilterType, RuleLeafType } from "@/types/rules";
 import { CustomH1 } from "@/components/GuidanceHeaders";
 import { MAX_AGE_FILTER, MIN_AGE_FILTER } from "@/config/rules";
-import useFeatures from "@/store/useFeatures";
+import useFeatures from "@/hooks/useFeatures";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 
 import SingleBoundSelector, {
   NullablePair,
 } from "@/components/SingleBoundSelector";
 import { clamp } from "@/utils/numbers";
+import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
 
 export interface RuleAgeSelectorProps {
   children?: ReactNode;
@@ -75,12 +76,20 @@ const RuleAgeSelector = ({
   const minAge = MIN_AGE_FILTER;
   const maxAge = MAX_AGE_FILTER;
 
-  const { queryBuilderJson, setQueryBuilderJson } = useQueryBuilder((qb) => ({
+  const {
+    queryBuilderJson,
+    setQueryBuilderJson,
+    setSelectedGuidance,
+    selected,
+  } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
+    setSelectedGuidance: qb.setSelectedGuidance,
+    selected: qb.selected,
   }));
 
-  const { constrainForBunnyV1 } = useFeatures();
+  const flags = useFeatures();
+  const { constrainForBunnyV1 } = flags;
 
   const values = isRuleLeaf(rule) ? rule.ageConstraint : rule.value;
 
@@ -108,7 +117,7 @@ const RuleAgeSelector = ({
           return { ...node, value: [l, r] };
         }
         return node;
-      })
+      }),
     );
   };
 
@@ -136,6 +145,8 @@ const RuleAgeSelector = ({
 
   if (!values) return null;
 
+  const key = collapsibleGuidanceKey("RuleAgeSelector", selected);
+
   if (constrainForBunnyV1 && !overrideConstrainForBunny) {
     return (
       <>
@@ -146,6 +157,8 @@ const RuleAgeSelector = ({
           readOnly={readOnly}
           anyLabel="Any age"
           onConstraintChange={(next) => {
+            setSelectedGuidance(key, true);
+
             setQueryBuilderJson(
               updateById(queryBuilderJson, rule.id, (node) => {
                 const left =
@@ -170,7 +183,7 @@ const RuleAgeSelector = ({
                 }
 
                 return node;
-              })
+              }),
             );
           }}
           renderPicker={({ value, onChange }) => (
@@ -220,7 +233,14 @@ const RuleAgeSelector = ({
   return (
     <>
       {title && <CustomH1>{title}</CustomH1>}
-      <Stack direction="column" spacing={2} alignItems="center" paddingX={2}>
+
+      <Stack
+        direction="column"
+        spacing={2}
+        alignItems="center"
+        paddingX={2}
+        paddingBottom={4}
+      >
         {readOnly ? (
           <RuleAgeSelectorReadOnly
             to={to}

@@ -37,7 +37,7 @@ const ConceptTable = ({ concepts, onDelete }: ConceptTableProps) => {
         size: 20,
       },
     ],
-    [onDelete]
+    [onDelete],
   );
 
   const table = useTable({

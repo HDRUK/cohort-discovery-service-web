@@ -1,6 +1,5 @@
 import { PropsWithChildren } from "react";
-import { useDaphneStore } from "@/store/useDaphneStore";
-import type { DaphneStoreState, NodeKind } from "@/store/useDaphneStore";
+
 import type {
   ApiResponse,
   Collection,
@@ -23,6 +22,7 @@ import type {
   AddCollectionToWorkgroupsPost,
   RemoveCollectionFromWorkgroupsPost,
 } from "@/types/api";
+
 import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
 import type {
   BoardIndex,
@@ -31,9 +31,11 @@ import type {
   RuleGroupType,
 } from "@/types/rules";
 import type { UniqueIdentifier } from "@dnd-kit/core";
+
 import getConcepts from "@/actions/__mocks__/getConcepts";
 import { validateRuleTree } from "@/utils/rules";
 import { queryToText } from "@/utils/queryBuilder";
+
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { NotifyProvider } from "@/providers/NotifyProvider";
@@ -41,10 +43,30 @@ import { getMockCollection } from "@/actions/__mocks__/getCollections";
 import { getMockWorkgroup } from "@/actions/__mocks__/getWorkgroups";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { getMockQuery } from "@/actions/__mocks__/getQueries";
+
+import { useQueryBuilderStore } from "./queryBuilderStore";
+import { useStateManagementStore } from "@/store/stateManagementStore";
+import { useUserDataStore } from "@/hooks/userDataStore";
+import { useCustodianDataStore } from "@/store/custodianDataStore";
+import { useAdminDataStore } from "@/store/adminDataStore";
+import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
+
 const queryClient = new QueryClient();
 
+type StateManagementState = ReturnType<typeof useStateManagementStore.getState>;
+type QueryBuilderState = ReturnType<typeof useQueryBuilderStore.getState>;
+type UserStoreState = ReturnType<typeof useUserDataStore.getState>;
+type CustodianStoreState = ReturnType<typeof useCustodianDataStore.getState>;
+type AdminStoreState = ReturnType<typeof useAdminDataStore.getState>;
+type FeatureFlagsStoreState = ReturnType<typeof useFeatureFlagsStore.getState>;
+
 type SliceOverrides = {
-  [K in keyof DaphneStoreState]?: Partial<DaphneStoreState[K]>;
+  stateManagement?: Partial<StateManagementState>;
+  queryBuilder?: Partial<QueryBuilderState>;
+  user?: Partial<UserStoreState>;
+  custodian?: Partial<CustodianStoreState>;
+  admin?: Partial<AdminStoreState>;
+  featureFlags?: Partial<FeatureFlagsStoreState>;
 };
 
 const NOOP = () => {};
@@ -53,41 +75,41 @@ const RESOLVE = <T,>(v: T) => Promise.resolve(v);
 const DEFAULT_QUERY: RuleGroupType =
   process.env.NEXT_PUBLIC_USE_EXAMPLE_QUERY === "true" ? EXAMPLE_1 : NO_QUERY;
 
-function makeDefaultStore(): DaphneStoreState {
-  return {
-    stateManagement: {
+const MockDaphneStore = ({
+  overrides,
+  children,
+}: PropsWithChildren<{ overrides?: SliceOverrides }>) => {
+  useStateManagementStore.setState(
+    {
+      ...useStateManagementStore.getState(),
       isLoading: false,
       setIsLoading: NOOP,
       clearStates: NOOP,
+      ...(overrides?.stateManagement ?? {}),
     },
+    true,
+  );
 
-    queryBuilder: {
+  useQueryBuilderStore.setState(
+    {
       queryBuilderJson: validateRuleTree(DEFAULT_QUERY),
       queryAsText: queryToText(DEFAULT_QUERY),
-
       getNodeName: (node: RuleNodeType) => node?.name ?? node.id,
       setNodeName: (_node: RuleNodeType, _name: string) => {},
-
       boardIndex: {} as BoardIndex,
       sizeCache: {} as SizeCache,
       setSizeCache: (
         _id: UniqueIdentifier,
         _w: number | string,
-        _h: number | string
+        _h: number | string,
       ) => {},
+      hovered: {},
+      setHovered: (_id: UniqueIdentifier, _reset: boolean) => {},
       selected: {},
       toggleSelected: (_id: UniqueIdentifier) => {},
-
-      createNewNode: (_kind: NodeKind, _above: boolean = true) => {},
-      createNewRule: (_above: boolean = true) => {},
-      createNewGroup: (_above: boolean = true) => {},
-      createNewOperator: (_above: boolean = true) => {},
-      createNewAgeFilter: (_above: boolean = true) => {},
-
-      setQueryBuilderJson: NOOP,
+      setQueryBuilderJson: (q: RuleGroupType) => validateRuleTree(q),
       resetQueryBuilderJson: NOOP,
-      getQueryFromText: (_input: string) => {},
-
+      getQueryFromText: (_input: string) => RESOLVE(DEFAULT_QUERY),
       selectedDatasets: [],
       setSelectedDatasets: NOOP,
       queryName: "",
@@ -99,91 +121,93 @@ function makeDefaultStore(): DaphneStoreState {
       setOpenSelectDatasetsPanel: NOOP,
       showDescendants: {},
       setShowDescendants: NOOP,
-      validateRules: (_root: RuleGroupType) => _root,
-    },
+      validateRules: (root: RuleGroupType) => root,
+      errors: [],
+      setErrors: (_rules: RuleGroupType, _pids: UniqueIdentifier[]) => NOOP,
+      appendError: (_error: string) => NOOP,
+      ...(overrides?.queryBuilder ?? {}),
+    } as QueryBuilderState,
+    true,
+  );
 
-    userData: {
+  useUserDataStore.setState(
+    {
       user: null as CombinedUser | undefined | null,
-      setUser: NOOP,
-
       queries: [] as Query[],
-      setQueries: NOOP,
-
+      custodians: [] as Custodian[],
+      selectedCollections: [] as CollectionWithHosts[],
+      conceptSets: [] as ConceptSet[],
       fetchResults: (_queryName?: string, _reset?: boolean) =>
         RESOLVE<ApiResponse<CreateQuery>>({
-          data: { id: 1 } as unknown as CreateQuery,
+          data: { query_pid: "mock-pid" } as unknown as CreateQuery,
           message: "ok",
         }),
-
       rerunTask: NOOP,
-      collections: [] as Collection[],
-      setCollections: NOOP,
-      selectedCollections: [] as CollectionWithHosts[],
       setSelectedCollections: NOOP,
       runDistributions: (
         _collection: CollectionWithHosts,
-        _query_type: DistributionType
+        _query_type: DistributionType,
       ) => RESOLVE<Query>(getMockQuery()),
-
-      conceptSets: [] as ConceptSet[],
-      setConceptSets: NOOP,
-
       createConceptSet: (_payload: CreateConceptSetPost) =>
         RESOLVE<void>(undefined),
-
       searchForConcepts: async (searchTerm: string, domain?: string) => {
         const { data } = await getConcepts(searchTerm, domain);
-        return data as Paginated<Partial<Concept>[]>;
+        return data as Paginated<Partial<Concept>>;
       },
-
       addConceptsToSet: (_conceptSetId: number, _conceptIds: number[]) =>
         RESOLVE<void>(undefined),
-
       removeConceptsFromSet: (_conceptSetId: number, _conceptIds: number[]) =>
         RESOLVE<void>(undefined),
-
       removeConceptSet: (_conceptSetId: number) => RESOLVE<void>(undefined),
-    },
+      deleteQueries: (_pids: string[]) => RESOLVE<void>(undefined),
+      ...(overrides?.user ?? {}),
+    } as UserStoreState,
+    true,
+  );
 
-    custodianData: {
-      currentCustodian: null,
-      setCurrentCustodian: NOOP,
-      custodians: [] as Custodian[],
-      setCustodians: NOOP,
-
+  useCustodianDataStore.setState(
+    {
       createCollectionHost: (
         _custodianId: number,
-        _payload: { name: string; context: string }
+        _payload: { name: string; context: string },
       ) => RESOLVE<void>(undefined),
       updateCollectionHost: (
         _id: number,
-        _payload: UpdateCollectionHostPayload
+        _payload: UpdateCollectionHostPayload,
       ) => RESOLVE<void>(undefined),
       deleteCollectionHost: (_id: number) => RESOLVE<void>(undefined),
       createCollection: (
         _custodianPid: string,
         _payload: CreateCollectionPost,
-        _payloadConfig: Omit<CreateCollectionConfigPost, "collection_id">
+        _payloadConfig: Omit<CreateCollectionConfigPost, "collection_id">,
       ) => RESOLVE<Collection>(getMockCollection()),
       updateCollection: (
         _id: number,
         _payload: Partial<CreateCollectionPost>,
-        _payloadConfig: Partial<CreateCollectionConfigPost>
+        _payloadConfig: Partial<CreateCollectionConfigPost>,
       ) => RESOLVE<Collection>(getMockCollection()),
       deleteCollection: (_id: number | string, _custodianPid: string) =>
         RESOLVE<void>(undefined),
-      workgroups: [] as Workgroup[],
-      setWorkgroups: NOOP,
-    },
+      ...(overrides?.custodian ?? {}),
+      current: {
+        custodian: null,
+        collections: [] as Collection[],
+        workgroups: [] as Workgroup[],
+        ...(overrides?.custodian?.current ?? {}),
+      },
+    } as CustodianStoreState,
+    true,
+  );
 
-    adminData: {
+  useAdminDataStore.setState(
+    {
       collections: [] as Collection[],
-      setCollections: NOOP,
+      selectedWorkgroup: null,
       createCollection: (_payload: CreateCollectionPost) =>
         RESOLVE<Collection>(getMockCollection()),
       updateCollection: (
         _id: number,
-        _payload: Partial<CreateCollectionPost>
+        _payload: Partial<CreateCollectionPost>,
       ) => RESOLVE<Collection>(getMockCollection()),
       deleteCollection: (_id: number | string) => RESOLVE<void>(undefined),
       createWorkgroup: (_payload: {
@@ -194,58 +218,28 @@ function makeDefaultStore(): DaphneStoreState {
       addCollectionsToWorkgroup: (_payload: AddCollectionsToWorkgroupPost) =>
         RESOLVE<number[]>([1]),
       removeCollectionsFromWorkgroup: (
-        _payload: RemoveCollectionsFromWorkgroupPost
+        _payload: RemoveCollectionsFromWorkgroupPost,
       ) => RESOLVE<void>(undefined),
       addCollectionToWorkgroups: (_payload: AddCollectionToWorkgroupsPost) =>
         RESOLVE<number[]>([1]),
       removeCollectionFromWorkgroups: (
-        _payload: RemoveCollectionFromWorkgroupsPost
+        _payload: RemoveCollectionFromWorkgroupsPost,
       ) => RESOLVE<void>(undefined),
-      selectedWorkgroup: null,
-      setSelectedWorkgroup: NOOP,
-    },
+      ...(overrides?.admin ?? {}),
+    } as AdminStoreState,
+    true,
+  );
 
-    featureFlags: {
+  useFeatureFlagsStore.setState(
+    {
+      ...useFeatureFlagsStore.getState(),
       flags: null,
       setFlags: NOOP,
-    },
-  };
-}
-
-const MockDaphneStore = ({
-  overrides,
-  children,
-}: PropsWithChildren<{ overrides?: SliceOverrides }>) => {
-  const defaults = makeDefaultStore();
-
-  const mock: DaphneStoreState = {
-    stateManagement: {
-      ...defaults.stateManagement,
-      ...(overrides?.stateManagement ?? {}),
-    },
-    queryBuilder: {
-      ...defaults.queryBuilder,
-      ...(overrides?.queryBuilder ?? {}),
-    },
-    userData: {
-      ...defaults.userData,
-      ...(overrides?.userData ?? {}),
-    },
-    custodianData: {
-      ...defaults.custodianData,
-      ...(overrides?.custodianData ?? {}),
-    },
-    adminData: {
-      ...defaults.adminData,
-      ...(overrides?.adminData ?? {}),
-    },
-    featureFlags: {
-      ...defaults.featureFlags,
       ...(overrides?.featureFlags ?? {}),
-    },
-  };
+    } as FeatureFlagsStoreState,
+    true,
+  );
 
-  useDaphneStore.setState(mock, true);
   return (
     <QueryClientProvider client={queryClient}>
       <LocalizationProvider dateAdapter={AdapterDayjs}>

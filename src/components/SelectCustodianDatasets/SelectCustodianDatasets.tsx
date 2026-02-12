@@ -1,6 +1,6 @@
 "use client";
 
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { GroupedCollection } from "../../types/api";
 import {
   Chip,
@@ -26,7 +26,7 @@ const SelectCustodianDatasets = ({
 
   const nTotal = custodianCollections.items.length;
   const nSelected = selectedDatasets.filter((pid) =>
-    custodianCollections.items.map((i) => i.pid).includes(pid)
+    custodianCollections.items.map((i) => i.pid).includes(pid),
   ).length;
 
   const handleSelectDataset = (pid: string) => {

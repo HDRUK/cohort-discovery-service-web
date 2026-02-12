@@ -10,7 +10,7 @@ import {
 
 const updateCollectionConfig = async (
   id: number,
-  payload: Partial<CreateCollectionConfigPost>
+  payload: Partial<CreateCollectionConfigPost>,
 ): Promise<ApiResponse<Collection>> => {
   return await apiPut<
     ApiResponse<Collection>,

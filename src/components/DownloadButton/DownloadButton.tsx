@@ -1,5 +1,3 @@
-"use client";
-
 import { IconButtonProps } from "@mui/material";
 
 import DownloadIcon from "@mui/icons-material/Download";
@@ -11,8 +9,10 @@ export enum AvailableFormats {
   CSV = "csv",
 }
 
-export interface DownloadButtonProps
-  extends Omit<IconButtonProps<"a">, "ref" | "href" | "component"> {
+export interface DownloadButtonProps extends Omit<
+  IconButtonProps<"a">,
+  "ref" | "href" | "component"
+> {
   id?: string;
   entity?: string;
   formats?: AvailableFormats[];
@@ -30,9 +30,9 @@ const DownloadButton = ({
     if (disabled || !id || !entity) return;
 
     const url = `/api/download/${encodeURIComponent(
-      id
+      id,
     )}?entity=${encodeURIComponent(entity)}&format=${encodeURIComponent(
-      format
+      format,
     )}`;
     const a = document.createElement("a");
     a.href = url;

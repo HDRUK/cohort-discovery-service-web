@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useState, useRef, ReactNode } from "react";
+import { useState, useRef } from "react";
 import {
   TextField,
   InputAdornment,
@@ -21,33 +21,39 @@ import {
   iconButtonSx,
 } from "./SearchBox.styles";
 
-export type SearchBoxProps = Omit<TextFieldProps, "onSubmit"> & {
+export type SearchBoxProps = Omit<TextFieldProps, "errors"> & {
   loading?: boolean;
-  onSubmit?: () => void | Promise<void>;
+  warning?: boolean;
+  error?: boolean;
   collapsible?: boolean;
   defaultExpanded?: boolean;
   collapsedWidth?: number | string;
   expandedWidth?: number | string;
   inputBgColor?: string;
-  actionIcon?: ReactNode;
   actions?: React.ReactNode[];
+  onClickEndAdornment?: () => void;
+  endIcon?: React.ReactNode;
+  showEndIcon?: boolean;
 };
 
 const SearchBox = ({
-  onSubmit,
   loading = false,
+  warning = false,
+  error = false,
   collapsible = true,
   defaultExpanded = true,
   collapsedWidth = 0,
   expandedWidth = "100%",
   inputBgColor = "#fff",
-  actionIcon,
   actions,
   disabled,
+  onClickEndAdornment,
+  endIcon,
+  showEndIcon = true,
   ...rest
 }: SearchBoxProps) => {
   const [expanded, setExpanded] = useState(
-    collapsible ? defaultExpanded : true
+    collapsible ? defaultExpanded : true,
   );
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -63,14 +69,15 @@ const SearchBox = ({
     });
   };
 
-  const handleIconClick = () => {
+  const handleIconClick = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (collapsible) toggle();
-    else void onSubmit?.();
+    onClickEndAdornment?.();
   };
 
   const actionChildren = React.Children.toArray(actions);
   const nActions = actionChildren.length;
-  const actionsCols = Math.min(2, nActions * 0.5);
 
   const STABLE_ID = "search-box";
 
@@ -86,12 +93,18 @@ const SearchBox = ({
         columnSpacing={2}
         alignItems="center"
       >
-        <Grid size={12 - actionsCols}>
+        <Grid size={"grow"}>
           <TextField
             id={STABLE_ID}
             inputRef={inputRef}
             type="search"
-            sx={getTextFieldSx(collapsible, expanded, inputBgColor)}
+            sx={getTextFieldSx(
+              collapsible,
+              expanded,
+              inputBgColor,
+              warning,
+              error,
+            )}
             slotProps={{
               htmlInput: {
                 sx: getHtmlInputSx(collapsible, expanded),
@@ -100,47 +113,34 @@ const SearchBox = ({
               input: {
                 endAdornment: (
                   <InputAdornment position="end" sx={inputAdornmentSx}>
-                    <IconButton
-                      disabled={disabled}
-                      onClick={handleIconClick}
-                      aria-label={
-                        collapsible
-                          ? expanded
-                            ? "Collapse search"
-                            : "Expand search"
-                          : "Submit search"
-                      }
-                      sx={iconButtonSx(disabled)}
-                    >
-                      {loading ? (
-                        <CircularProgress size={24} color="inherit" />
-                      ) : actionIcon ? (
-                        <>{actionIcon}</>
-                      ) : (
-                        <SearchIcon fontSize="large" />
-                      )}
-                    </IconButton>
+                    {loading ? (
+                      <CircularProgress size={24} color="inherit" />
+                    ) : showEndIcon ? (
+                      <IconButton
+                        type="button"
+                        disabled={disabled}
+                        onClick={handleIconClick}
+                        aria-label={
+                          collapsible
+                            ? expanded
+                              ? "Collapse search"
+                              : "Expand search"
+                            : "Submit search"
+                        }
+                        sx={iconButtonSx(disabled)}
+                      >
+                        {endIcon ?? <SearchIcon fontSize="small" />}
+                      </IconButton>
+                    ) : null}
                   </InputAdornment>
                 ),
               },
             }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                e.stopPropagation();
-                if (collapsible) {
-                  if (expanded) void onSubmit?.();
-                  else toggle();
-                } else {
-                  void onSubmit?.();
-                }
-              }
-            }}
             {...rest}
           />
         </Grid>
-        {actionsCols > 0 && (
-          <Grid size={actionsCols}>{actionChildren.map((child) => child)}</Grid>
+        {nActions > 0 && (
+          <Grid size={"auto"}>{actionChildren.map((child) => child)}</Grid>
         )}
       </Grid>
     </Box>

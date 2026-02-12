@@ -9,12 +9,14 @@ declare module "@mui/material/styles" {
     link: Palette["primary"];
     highlight: Palette["primary"];
     table?: Palette["primary"];
+    tooltip?: Palette["primary"];
   }
   interface PaletteOptions {
     tertiary?: PaletteOptions["primary"];
     link?: PaletteOptions["primary"];
     highlight?: PaletteOptions["primary"];
     table?: PaletteOptions["primary"];
+    tooltip?: PaletteOptions["primary"];
   }
   interface TypographyVariants {
     guidance1: React.CSSProperties;
@@ -52,5 +54,11 @@ declare module "@mui/material/Typography" {
 declare module "@mui/material/Tooltip" {
   interface TooltipProps {
     variant?: "error" | "default";
+  }
+}
+
+declare module "@src/components/HelpTooltip" {
+  interface HelpTooltipPropsColorOverrides {
+    tooltip: true;
   }
 }

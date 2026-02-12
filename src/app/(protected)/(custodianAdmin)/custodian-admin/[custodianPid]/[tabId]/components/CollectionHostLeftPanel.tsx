@@ -34,7 +34,7 @@ const CollectionHostLeftPanel = ({
         underline
       >
         <AddButton
-          action={onCreateNewHost}
+          onClick={onCreateNewHost}
           label={"Host"}
           disabled={expandedLeft}
         />

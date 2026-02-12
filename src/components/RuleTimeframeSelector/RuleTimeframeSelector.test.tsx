@@ -13,7 +13,7 @@ const renderComponent = (props: RuleTimeframeSelectorProps) =>
   render(
     <MockDaphneStore>
       <RuleTimeframeSelector {...props} />
-    </MockDaphneStore>
+    </MockDaphneStore>,
   );
 
 describe("RuleTimeframeSelector", () => {

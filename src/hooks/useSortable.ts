@@ -8,10 +8,11 @@ import { useMemo } from "react";
 import { useElementSize } from "./useElementSize";
 import { quantise } from "@/utils/numbers";
 import { useDndContext } from "@dnd-kit/core";
-import { useDaphneStore } from "@/store/useDaphneStore";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 
-export interface UseSortablePlusReturn
-  extends ReturnType<typeof useDndSortable> {
+export interface UseSortablePlusReturn extends ReturnType<
+  typeof useDndSortable
+> {
   isLast: boolean;
   style: React.CSSProperties;
   anchorRef: React.RefObject<HTMLDivElement | HTMLLIElement | null>;
@@ -21,14 +22,14 @@ export interface UseSortablePlusReturn
 }
 
 const useSortable = (args: UseSortableArguments): UseSortablePlusReturn => {
-  const boardIndex = useDaphneStore((s) => s.queryBuilder.boardIndex);
+  const boardIndex = useQueryBuilder((s) => s.boardIndex);
 
   const params = useDndSortable(args);
   const { over, active } = useDndContext();
 
   const isOver = useMemo(
     () => over?.id !== active?.id && over?.id === args.id,
-    [over, active, args.id]
+    [over, active, args.id],
   );
 
   const isAbove = useMemo(() => {
@@ -64,12 +65,12 @@ const useSortable = (args: UseSortableArguments): UseSortablePlusReturn => {
       opacity: params.isDragging ? 0.6 : 1,
       willChange: "transform",
     }),
-    [params.isDragging, params.transition, transform]
+    [params.isDragging, params.transition, transform],
   );
 
   const isLast = useMemo(
     () => params.newIndex === params.items.length - 2,
-    [params.newIndex, params.items]
+    [params.newIndex, params.items],
   );
 
   const [anchorRef, anchorSize] = useElementSize<

@@ -5,11 +5,11 @@ import { API_ROUTES } from "../lib/apiRoutes";
 import { Collection, CreateConceptSetPost, ApiResponse } from "../types/api";
 
 const createConceptSet = async (
-  payload: CreateConceptSetPost
+  payload: CreateConceptSetPost,
 ): Promise<ApiResponse<Collection>> => {
   return await apiPost<ApiResponse<Collection>, CreateConceptSetPost>(
     API_ROUTES.conceptSets,
-    payload
+    payload,
   );
 };
 

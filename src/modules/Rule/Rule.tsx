@@ -5,7 +5,7 @@ import { useCallback } from "react";
 import ConceptChip from "@/components/ConceptChip";
 import { RuleLeafType } from "@/types/rules";
 
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 import {
   isEmptyRule,
   updateById,
@@ -20,8 +20,10 @@ import useNodeActions from "@/hooks/useNodeActions";
 import InvalidRule from "@/components/InvalidRule";
 import { mapDomain } from "@/utils/domains";
 
-export interface RuleProps
-  extends Omit<RuleWrapperProps, "node" | "type" | "render"> {
+export interface RuleProps extends Omit<
+  RuleWrapperProps,
+  "node" | "type" | "render"
+> {
   rule: RuleLeafType;
   groupId?: string;
 }
@@ -42,16 +44,18 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     setQueryBuilderJson,
     showDescendants,
     setShowDescendants,
+    select,
   } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
     showDescendants: qb.showDescendants[id],
     setShowDescendants: qb.setShowDescendants,
+    select: qb.select,
   }));
 
   const toggleShowDescendants = useCallback(
     () => setShowDescendants(id, !showDescendants),
-    [id, showDescendants, setShowDescendants]
+    [id, showDescendants, setShowDescendants],
   );
 
   const setConcept = useCallback(
@@ -65,10 +69,10 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
             };
           }
           return node;
-        })
+        }),
       );
     },
-    [id, setQueryBuilderJson, queryBuilderJson]
+    [id, setQueryBuilderJson, queryBuilderJson],
   );
 
   const clearConcept = useCallback(() => {
@@ -81,7 +85,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
           };
         }
         return node;
-      })
+      }),
     );
   }, [id, queryBuilderJson, setQueryBuilderJson]);
 
@@ -89,12 +93,12 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     (c: Concept) => {
       setConcept(c);
     },
-    [setConcept]
+    [setConcept],
   );
 
   const removeChild = useCallback((parent: Concept, child: Concept) => {
     const children = parent.children?.filter(
-      (c) => c.concept_id !== child.concept_id
+      (c) => c.concept_id !== child.concept_id,
     );
     const newConcept = {
       ...parent,
@@ -105,7 +109,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
 
   const removeAlternative = useCallback((parent: Concept, child: Concept) => {
     const alternatives = parent.alternatives?.filter(
-      (c) => c.concept_id !== child.concept_id
+      (c) => c.concept_id !== child.concept_id,
     );
     const newConcept = {
       ...parent,
@@ -139,12 +143,14 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
                     indicateIfParent={showDescendants}
                     concept={concept}
                     onDelete={() => clearConcept()}
-                    onClick={(e: React.MouseEvent) => {
-                      if (concept?.children && concept.children.length > 0) {
-                        e.stopPropagation();
-                        toggleShowDescendants();
-                      }
-                    }}
+                    onClick={
+                      (concept?.children?.length ?? 0) > 0
+                        ? (e: React.MouseEvent) => {
+                            e.stopPropagation();
+                            toggleShowDescendants();
+                          }
+                        : undefined
+                    }
                   />
                   {showDescendants &&
                     concept?.children?.map((childConcept) => (
@@ -162,35 +168,23 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
               {isMultipleConcept(concept) && (
                 <>
                   <ConceptChip
-                    chipSx={{
-                      borderColor: "warning.main",
-                    }}
                     indicateIfParent={showDescendants}
                     concept={concept}
                     onDelete={() => {
-                      if (concept?.alternatives[0]) {
-                        const [alternative, ...alternatives] =
-                          concept?.alternatives;
-                        setConcept({ ...alternative, alternatives });
-                      } else {
-                        clearConcept();
-                      }
+                      clearConcept();
                     }}
                     onClick={(e: React.MouseEvent) => {
-                      if (concept?.children && concept.children.length > 0) {
-                        e.stopPropagation();
-                        toggleShowDescendants();
-                      }
+                      e.stopPropagation();
+                      setConcept({ ...concept, alternatives: [] });
+                      select(id);
                     }}
-                  >
-                    <InvalidRule reasons={[]} />
-                  </ConceptChip>
+                  />
 
                   {concept?.alternatives &&
                     concept?.alternatives?.map((childConcept) => (
                       <ConceptChip
                         chipSx={{
-                          borderColor: "warning.main",
+                          borderColor: "error.main",
                         }}
                         draggable={false}
                         key={childConcept.concept_id}
@@ -200,6 +194,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
                           e.stopPropagation();
                           e.preventDefault();
                           setConcept(removeAlternative(concept, childConcept));
+                          select(id);
                         }}
                       >
                         {" "}

@@ -4,7 +4,7 @@ const baseURL = process.env.API_BASE_URL!;
 
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ pid: string }> }
+  { params }: { params: Promise<{ pid: string }> },
 ) {
   const { pid } = await params;
   const urlObj = new URL(req.url);

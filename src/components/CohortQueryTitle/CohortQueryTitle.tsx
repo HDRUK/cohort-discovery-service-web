@@ -1,6 +1,6 @@
 "use client";
 
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 import Title from "@/components/Title";
 import { useNotify } from "../../providers/NotifyProvider";
 import EditableText from "../EditableText";
@@ -17,16 +17,18 @@ const CohortQueryTitle = () => {
       title={"New Query"}
       subTitle={
         <EditableText
-          value={queryName || ""}
+          defaultValue={queryName || ""}
           onCommit={(name) => {
             setQueryName(name);
             notify.success("Query name saved");
           }}
+          showIcon
           typographyProps={{
             component: "span",
             variant: "h5",
           }}
           textFieldProps={{
+            placeholder: "Type query name here",
             variant: "standard",
             size: "small",
             slotProps: {

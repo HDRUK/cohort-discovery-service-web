@@ -13,7 +13,7 @@ const getSearchUsers = async (term?: string): Promise<ApiResponse<User[]>> => {
           "name[]": term,
           "email[]": term,
         }
-      : {}
+      : {},
   );
 
   return await apiGet<ApiResponse<User[]>>({

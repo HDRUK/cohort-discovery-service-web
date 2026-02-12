@@ -1,5 +1,6 @@
 import { ConceptOperator, RuleGroupType, RuleNodeType } from "@/types/rules";
 import {
+  isAgeFilter,
   isMultipleConcept,
   isOperator,
   isRuleGroup,
@@ -7,21 +8,44 @@ import {
   isSingleConcept,
 } from "@/utils/rules";
 import { mapDomain } from "./domains";
+import { MAX_AGE_FILTER, MIN_AGE_FILTER } from "@/config/rules";
+import { UniqueIdentifier } from "@dnd-kit/core";
 
 type Piece = { verb?: string | null; text: string };
 
 const queryToText = (node: RuleGroupType) => {
   const subject = "People who";
 
-  const getVerb = (category: string): string => {
+  const getVerb = (category: string, exclude: boolean = false): string => {
+    if (exclude) {
+      switch (category) {
+        case "Drug":
+          return "did not receive";
+        case "Observation":
+          return "were not observed with";
+        case "Measurement":
+        case "Measured":
+          return "were not measured with";
+        case "Condition":
+          return "were not diagnosed with";
+        case "Race":
+          return "were not recorded as having race ";
+        case "Gender":
+          return `were not recorded as having ${mapDomain(
+            "gender",
+          ).toLowerCase()}`;
+        default:
+          return "not associated with";
+      }
+    }
     switch (category) {
       case "Drug":
         return "received";
       case "Observation":
-        return "observed with";
+        return "were observed with";
       case "Measurement":
       case "Measured":
-        return "measured with";
+        return "were measured with";
       case "Condition":
         return "were diagnosed with";
       case "Race":
@@ -53,13 +77,14 @@ const queryToText = (node: RuleGroupType) => {
   };
 
   const leafText = (
-    rule: ConceptOperator
+    rule: ConceptOperator,
+    exclude: boolean,
   ): { verb: string | null; text: string | null } => {
     const c = rule.concept;
     if (!c) return { verb: null, text: null };
 
     if (isSingleConcept(c)) {
-      const verb = getVerb(c.category);
+      const verb = getVerb(c.category, exclude);
       const desc = cleanDescription(c.description);
       return { verb, text: desc };
     }
@@ -70,7 +95,7 @@ const queryToText = (node: RuleGroupType) => {
           ?.filter((x) => !!x)
           .map((x) => cleanDescription(x.description))
           .join(" or ") || "";
-      const verb = getVerb(c.category);
+      const verb = getVerb(c.category, exclude);
       return { verb, text: texts };
     }
 
@@ -83,11 +108,33 @@ const queryToText = (node: RuleGroupType) => {
       return [{ text }];
     }
 
+    if (isAgeFilter(n)) {
+      const [min_age, max_age] = n.value;
+      if (
+        [MIN_AGE_FILTER, null].includes(min_age) &&
+        [MAX_AGE_FILTER, null].includes(max_age)
+      ) {
+        return [{ text: "are of any age" }];
+      }
+      if (
+        min_age > MIN_AGE_FILTER &&
+        [MAX_AGE_FILTER, null].includes(max_age)
+      ) {
+        return [{ text: `are older than ${min_age} years` }];
+      }
+      if (
+        [MIN_AGE_FILTER, null].includes(min_age) &&
+        max_age < MAX_AGE_FILTER
+      ) {
+        return [{ text: `are younger than ${max_age} years` }];
+      }
+      return [{ text: `are between ${min_age} and ${max_age} years old` }];
+    }
+
     if (isRuleLeaf(n)) {
-      const { verb, text } = leafText(n.rule);
+      const { verb, text } = leafText(n.rule, n.exclude ?? false);
       if (!text) return [];
-      let phrase = verb ? `${verb} ${text}` : text;
-      if (n.exclude) phrase = `not (${phrase})`;
+      const phrase = verb ? `${verb} ${text}` : text;
       return [{ verb: verb ?? null, text: phrase }];
     }
 
@@ -173,4 +220,14 @@ const queryToText = (node: RuleGroupType) => {
   return `${subject} ${body}`;
 };
 
-export { queryToText };
+const collapsibleGuidanceKey = (
+  componentName: string,
+  selected: Record<UniqueIdentifier, boolean>,
+) => {
+  const keySuffix =
+    Object.keys(selected).length === 1 ? Object.keys(selected)[0] : "multiple";
+
+  return `${componentName}-${keySuffix}`;
+};
+
+export { queryToText, collapsibleGuidanceKey };

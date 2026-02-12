@@ -14,7 +14,7 @@ function Wrapper(props: React.ComponentProps<typeof SearchConcepts>) {
 
 describe("SearchConcepts", () => {
   const renderComponent = (
-    props?: React.ComponentProps<typeof SearchConcepts>
+    props?: React.ComponentProps<typeof SearchConcepts>,
   ) => {
     render(<Wrapper {...props} />);
   };

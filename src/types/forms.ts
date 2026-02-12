@@ -7,6 +7,7 @@ export interface CollectionHostFormValues {
 }
 
 export interface CreateCollectionFormValues {
+  custodian_pid: string;
   collection: CreateCollectionPost;
   config: CreateCollectionConfigPost;
 }
@@ -19,6 +20,7 @@ export interface UpdateCollectionFormValues {
 
 export interface UpdateWorkgroupFormValues {
   collections: OptionsType[];
+  users: OptionsType[];
 }
 
 export interface CreateWorkgroupFormValues {

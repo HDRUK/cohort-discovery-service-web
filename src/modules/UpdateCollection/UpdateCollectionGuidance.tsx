@@ -1,6 +1,6 @@
 "use client";
 
-import UpdateCollectionMdx from "@/content/guidance/updateCollection.mdx";
+import UpdateCollectionMdx from "@/content/guidance/custodianAdmin/updateCollection.mdx";
 import { Stack } from "@mui/material";
 import FormLabel from "@/components/FormLabel";
 

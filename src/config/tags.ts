@@ -1,11 +1,15 @@
-export const TAG_COLLECTION_ADMIN = "collection-admin";
+export const TAG_COLLECTIONS_ADMIN = "collection-admin";
 export const TAG_CUSTODIAN_COLLECTION = "custodian-collection";
 export const TAG_COLLECTIONS = "collections";
-
+export const TAG_COLLECTIONS_USER = "collections-user";
 export const TAG_COLLECTION_HOSTS = "collection-hosts";
+export const TAG_QUERIES = "queries";
 
 export const getCollectionHostTag = (custodianPid: string) =>
   `collection-host-${custodianPid}`;
+
+export const getTagsUserCollections = (userId: string | number) =>
+  `${TAG_COLLECTIONS_USER}-${userId}`;
 
 export const TAG_CUSTODIANS = "custodians";
 
@@ -36,10 +40,9 @@ export const getTagConceptSets = (userId: string | number) =>
 export const TAG_FEATURE_FLAGS = "feature-flags";
 export const TAG_LATEST_QUERY = "lastest-query";
 
-export const getTagQueries = (userId: number) => [
-  "queries",
-  `queries-${userId}`,
-];
+export const getUserQueryTag = (id: string | number) => {
+  return `${TAG_QUERIES}-${id}`;
+};
 
 export const getTagsQuery = (pid: string) => ["query", `query-${pid}`];
 

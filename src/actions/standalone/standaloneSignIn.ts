@@ -16,7 +16,7 @@ const standaloneSignIn = async (payload: SignInPost): Promise<boolean> => {
   try {
     const response = await apiPost<ApiResponse<SignInResponse>, SignInPost>(
       API_ROUTES.signIn,
-      payload
+      payload,
     );
 
     const token = response.data?.access_token;

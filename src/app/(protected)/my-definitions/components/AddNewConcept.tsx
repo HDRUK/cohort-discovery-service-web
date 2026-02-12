@@ -6,34 +6,35 @@ import AddIcon from "@mui/icons-material/Add";
 import SearchConcepts from "@/components/SearchConcepts";
 import { ConceptSet } from "@/types/api";
 import { useMemo, useState } from "react";
-import { useDaphneStore } from "@/store/useDaphneStore";
 import { useNotify } from "@/providers/NotifyProvider";
 import { falseKeys, trueKeys } from "@/utils/numbers";
+import useUserStore from "@/hooks/useUserStore";
 
 const AddNewConcept = ({ conceptSet }: { conceptSet: ConceptSet }) => {
   const notify = useNotify();
-  const {
-    userData: { addConceptsToSet, removeConceptsFromSet },
-  } = useDaphneStore();
+
+  const addConceptsToSet = useUserStore((s) => s.addConceptsToSet);
+  const removeConceptsFromSet = useUserStore((s) => s.removeConceptsFromSet);
+
   const { domain, concepts } = conceptSet;
 
   const originalIds = useMemo(
     () => new Set(concepts?.map((c) => c.concept_id) ?? []),
-    [concepts]
+    [concepts],
   );
 
   const [selected, setSelected] = useState<Record<number, boolean>>(
     concepts?.reduce<Record<number, boolean>>((acc, c) => {
       acc[c.concept_id] = true;
       return acc;
-    }, {}) || {}
+    }, {}) || {},
   );
 
   const selectedIds = useMemo(() => trueKeys(selected), [selected]);
   const idsToBeRemoved = useMemo(() => falseKeys(selected), [selected]);
   const idsToAdd = useMemo(
     () => selectedIds.filter((id) => !originalIds.has(id)),
-    [selectedIds, originalIds]
+    [selectedIds, originalIds],
   );
 
   const onSave = async () => {
@@ -47,7 +48,7 @@ const AddNewConcept = ({ conceptSet }: { conceptSet: ConceptSet }) => {
     notify.success(
       `Added ${idsToAdd.length} new concepts to your set${
         idsToBeRemoved.length ? ` and removed ${idsToBeRemoved.length}` : ""
-      }`
+      }`,
     );
   };
 

@@ -3,23 +3,22 @@ import { Box, Stack, Button } from "@mui/material";
 import { useForm, Controller, FormProvider } from "react-hook-form";
 import { CreateWorkgroupFormValues } from "@/types/forms";
 import FormTextField from "@/components/FormTextField";
-import { Collection } from "@/types/api";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import { useNotify } from "@/providers/NotifyProvider";
 
 import FormMultiSelect from "@/components/FormMultiSelect";
 import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
-import useAdminStore from "@/store/useAdminStore";
+import useAdminStore from "@/hooks/useAdminStore";
 
 interface CreateCollectionProps {
-  collections?: Collection[];
   onCancel?: () => void;
 }
 
-const CreateWorkgroup = ({ collections, onCancel }: CreateCollectionProps) => {
+const CreateWorkgroup = ({ onCancel }: CreateCollectionProps) => {
   const createWorkgroup = useAdminStore((s) => s.createWorkgroup);
+  const collections = useAdminStore((s) => s.allAprovedCollections);
   const addCollectionsToWorkgroup = useAdminStore(
-    (s) => s.addCollectionsToWorkgroup
+    (s) => s.addCollectionsToWorkgroup,
   );
 
   const notify = useNotify();

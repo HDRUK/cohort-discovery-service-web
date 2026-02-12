@@ -14,13 +14,13 @@ interface FormDropdownProps extends FormTextFieldProps {
 
 const defaultRenderOption = (
   opt: Option,
-  color: ChipProps["color"] = "primary"
+  color: ChipProps["color"] = "primary",
 ) => <Chip label={opt.label} size="small" color={color} />;
 
 const defaultRenderValue = (
   value: FormTextFieldProps["value"],
   options: Option[],
-  renderSelectedOption: (option: Option) => React.ReactNode
+  renderSelectedOption: (option: Option) => React.ReactNode,
 ) => {
   const option = options.find((opt) => opt.value === value);
 

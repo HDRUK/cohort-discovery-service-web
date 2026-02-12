@@ -4,30 +4,49 @@ import UpdateCollection, {
 import UpdateMultipleCollections from "../UpdateMultipleCollections";
 import { maskClientTest } from "@/lib/maskClientTest";
 import { CollectionGuidanceProps } from "./CollectionsGuidance";
-import useUserStore from "@/store/useUserStore";
+import useUserStore from "@/hooks/useUserStore";
 
 const CollectionGuidance = maskClientTest<CollectionGuidanceProps>(
-  () => import("./CollectionsGuidance")
+  () => import("./CollectionsGuidance"),
 );
 
 type CollectionsRightPanelProps = Omit<UpdateCollectionProps, "collection">;
 
-const CollectionsRightPanel = ({ ...props }: CollectionsRightPanelProps) => {
+const CollectionsRightPanel = ({
+  expandedLeft,
+  ...props
+}: CollectionsRightPanelProps) => {
   const selectedCollections = useUserStore((u) => u.selectedCollections);
+  const count = selectedCollections?.length ?? 0;
 
-  if (selectedCollections && selectedCollections.length === 1) {
-    return <UpdateCollection collection={selectedCollections[0]} {...props} />;
+  if (expandedLeft) {
+    return <CollectionGuidance creating />;
   }
-  if (selectedCollections && selectedCollections.length > 1) {
+
+  if (count === 1) {
+    const [collection] = selectedCollections!;
     return (
-      <UpdateMultipleCollections
-        collections={selectedCollections}
-        key={JSON.stringify(selectedCollections.map((c) => c.id))}
+      <UpdateCollection
+        collection={collection}
+        key={`update-coll-${collection.id}`}
+        expandedLeft={expandedLeft}
         {...props}
       />
     );
   }
-  return <CollectionGuidance />;
+
+  if (count > 1) {
+    return (
+      <UpdateMultipleCollections
+        collections={selectedCollections}
+        key={JSON.stringify(selectedCollections.map((c) => c.id))}
+        expandedLeft={expandedLeft}
+        {...props}
+      />
+    );
+  }
+
+  return <CollectionGuidance creating={false} />;
 };
 
 export default CollectionsRightPanel;

@@ -13,12 +13,18 @@ const baseURL = process.env.API_BASE_URL ?? "http://localhost:8100";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 
-interface RequestOptions<B = unknown> {
+export enum ErrorMode {
+  THROW = "throw",
+  RESULT = "result",
+}
+
+export interface RequestOptions<B = unknown> {
   headers?: Record<string, string>;
   body?: B;
   signal?: AbortSignal;
   cache?: RequestCache;
   next?: NextFetchRequestConfig;
+  errorMode?: ErrorMode;
 }
 
 export type CachedGetArgs = {
@@ -68,10 +74,17 @@ const buildCachedRequest = async ({
 async function request<TResponse, TBody = undefined>(
   method: HttpMethod,
   url: string,
-  options: RequestOptions<TBody> = {}
+  options: RequestOptions<TBody> = {},
 ): Promise<TResponse | never> {
   const fullUrl = url.startsWith("http") ? url : `${baseURL}${url}`;
-  const { headers = {}, body, signal, cache, next } = options;
+  const {
+    headers = {},
+    body,
+    signal,
+    cache,
+    next,
+    errorMode = ErrorMode.THROW,
+  } = options;
 
   const cookieStore = await cookies();
   const token = cookieStore.get(ACCESS_TOKEN_NAME)?.value;
@@ -92,6 +105,12 @@ async function request<TResponse, TBody = undefined>(
 
     if (!response.ok) {
       const errorText = await extractErrorMessage(response);
+      if (errorMode === ErrorMode.RESULT)
+        return {
+          data: null,
+          error: { text: errorText, code: response.status },
+        } as TResponse;
+
       console.error(errorText + " url: " + fullUrl);
       throw new ApiError(response.status, errorText);
     }
@@ -128,7 +147,7 @@ async function handleApiError(error: unknown): Promise<never> {
 }
 
 export async function apiGet<TResponse>(
-  args: CachedGetArgs & { options?: RequestOptions<undefined> }
+  args: CachedGetArgs & { options?: RequestOptions<undefined> },
 ) {
   const { finalUrl, init } = await buildCachedRequest(args);
   return request<TResponse>("GET", finalUrl, {
@@ -140,7 +159,7 @@ export async function apiGet<TResponse>(
 export async function apiPost<TResponse, TBody>(
   url: string,
   body?: TBody,
-  options?: RequestOptions<TBody>
+  options?: RequestOptions<TBody>,
 ) {
   return request<TResponse, TBody>("POST", url, { ...options, body });
 }
@@ -148,14 +167,14 @@ export async function apiPost<TResponse, TBody>(
 export async function apiPut<TResponse, TBody>(
   url: string,
   body: TBody,
-  options?: RequestOptions<TBody>
+  options?: RequestOptions<TBody>,
 ) {
   return request<TResponse, TBody>("PUT", url, { ...options, body });
 }
 
 export async function apiDelete<TResponse>(
   url: string,
-  options?: RequestOptions<undefined>
+  options?: RequestOptions<undefined>,
 ) {
   return request<TResponse>("DELETE", url, options);
 }

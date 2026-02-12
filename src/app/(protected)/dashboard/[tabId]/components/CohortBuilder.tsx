@@ -4,7 +4,7 @@ import { Box, Divider, Stack } from "@mui/material";
 import QueryBuilder from "@/modules/QueryBuilder";
 import CohortQueryInput from "@/components/CohortQueryInput";
 import SelectDatasets from "@/components/SelectDatasets";
-import getCollections from "@/actions/getCollections";
+import getUserCollections from "@/actions/getUserCollections";
 import CohortQueryTitle from "@/components/CohortQueryTitle";
 import FilterDatasets from "@/components/FilterDatasets/FilterDatasets";
 import getQuery from "@/actions/getQuery";
@@ -13,19 +13,17 @@ import { cookies } from "next/headers";
 import { QUERY_BUILDER_GUIDANCE_COOKIE } from "@/config/internals";
 import QueryBuilderGuidanceWrapper from "./QueryBuilderGuidanceWrapper";
 import ShowJsonButton from "@/components/ShowJsonButton";
+import CohortErrors from "@/components/CohortErrors";
 
 const NODE_ENV = process.env?.NODE_ENV;
 
 const CohortBuilder = async (props: { query?: string }) => {
-  const collections = await getCollections();
+  const collections = await getUserCollections();
+
   const cookieStore = await cookies();
   const query = props.query ? await getQuery(props.query) : null;
 
-  const activeCollections = collections.data.filter(
-    (c) => c.demographics?.find((d) => d.name === "SEX")?.count
-  );
-
-  const initialSelection = activeCollections.map((c) => c.pid);
+  const initialSelection = collections.data.map((c) => c.pid);
 
   const cookie = cookieStore?.get(QUERY_BUILDER_GUIDANCE_COOKIE);
 
@@ -51,16 +49,27 @@ const CohortBuilder = async (props: { query?: string }) => {
 
         <SelectDatasets
           initialSelection={initialSelection}
-          collections={activeCollections}
+          collections={collections.data}
         />
 
-        <Title
-          title="Cohort Builder"
-          subTitle="Natural Language"
-          marginY={"auto"}
+        <Stack
+          direction="row"
+          alignItems="flex-start"
+          spacing={2}
+          display={"flex"}
+          overflow={"hidden"}
         >
-          <CohortQueryInput />
-        </Title>
+          <Title
+            marginTop={1.5}
+            title="Cohort Builder"
+            subTitle="Natural Language"
+          />
+
+          <Stack direction="column" spacing={1} sx={{ flex: 1, minWidth: 0 }}>
+            <CohortQueryInput />
+            <CohortErrors />
+          </Stack>
+        </Stack>
 
         <Box sx={{ overflow: "hidden" }}>
           <Divider />

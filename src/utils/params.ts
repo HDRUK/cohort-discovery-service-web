@@ -8,7 +8,7 @@ import {
 export const buildSearchParams = <
   T extends Record<string, SearchParamValue> = SearchParams
 >(
-  params: Partial<T> = {}
+  params: Partial<T> = {},
 ): URLSearchParams => {
   const searchParams = new URLSearchParams();
 
@@ -30,7 +30,7 @@ export const buildSearchParams = <
 };
 
 export const buildCollectionParams = (
-  searchParams: CollectionsSearchParams
+  searchParams: CollectionsSearchParams,
 ) => {
   const { page, per_page, workgroup_filter, collection_filter, search_term } =
     searchParams ?? {};
@@ -47,7 +47,7 @@ export const buildCollectionParams = (
 };
 
 export const buildQueryHistoryParams = (
-  searchParams: QueryHistorySearchParams
+  searchParams: QueryHistorySearchParams,
 ) => {
   const { search_term, ...rest } = searchParams;
   const params = {

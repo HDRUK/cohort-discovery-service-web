@@ -28,7 +28,7 @@ describe("ToggleOperator", () => {
         }}
       >
         <ToggleOperator operator={operator} />
-      </MockDaphneStore>
+      </MockDaphneStore>,
     );
 
     let orRadio = screen.getByLabelText("OR") as HTMLInputElement;

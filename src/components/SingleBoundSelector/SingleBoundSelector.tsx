@@ -41,11 +41,13 @@ export type SingleBoundSelectorProps<TStored, TUi = TStored> = {
   renderReadOnlyLabel?: (args: ReadOnlyLabelArgs<TUi>) => ReactNode;
 
   anyLabel?: string;
+
+  onClick?: () => void;
 };
 
 function deriveOperatorAndValue<TStored, TUi>(
   constraint: NullablePair<TStored>,
-  parse: (stored: TStored | null) => TUi | null
+  parse: (stored: TStored | null) => TUi | null,
 ): { operator: SingleSidedOperator; value: TUi | null } {
   const [left, right] = constraint;
 
@@ -74,25 +76,26 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
   operatorLabelOverrides,
   renderPicker,
   renderReadOnlyLabel,
+  onClick,
 }: SingleBoundSelectorProps<TStored, TUi>) {
   const parseFn = useMemo(
     () => parse ?? ((v: TStored | null) => v as unknown as TUi | null),
-    [parse]
+    [parse],
   );
 
   const serialiseFn = useMemo(
     () => serialise ?? ((v: TUi | null) => v as unknown as TStored | null),
-    [serialise]
+    [serialise],
   );
 
   const { operator, value } = useMemo(
     () => deriveOperatorAndValue(constraint, parseFn),
-    [parseFn, constraint]
+    [parseFn, constraint],
   );
 
   const handleOperatorChange = (
     _e: React.MouseEvent<HTMLElement>,
-    nextOperator: SingleSidedOperator | null
+    nextOperator: SingleSidedOperator | null,
   ) => {
     if (!nextOperator) return;
 
@@ -100,7 +103,7 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
     onConstraintChange(
       nextOperator === SingleSidedOperator.GREATER_THAN
         ? [stored, null]
-        : [null, stored]
+        : [null, stored],
     );
   };
 
@@ -109,7 +112,7 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
     onConstraintChange(
       operator === SingleSidedOperator.GREATER_THAN
         ? [stored, null]
-        : [null, stored]
+        : [null, stored],
     );
   };
 
@@ -138,8 +141,8 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
               value == null
                 ? anyLabel
                 : operator === SingleSidedOperator.GREATER_THAN
-                ? `${greaterThanLabel} ${String(value)}`
-                : `${lessThanLabel} ${String(value)}`;
+                  ? `${greaterThanLabel} ${String(value)}`
+                  : `${lessThanLabel} ${String(value)}`;
 
             return <Paper sx={{ border: 1, p: 1 }}>{defaultText}</Paper>;
           })()
@@ -151,6 +154,7 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
               readOnly={readOnly}
               greaterThanLabel={greaterThanLabel}
               lessThanLabel={lessThanLabel}
+              onClick={onClick}
             />
 
             {renderPicker({

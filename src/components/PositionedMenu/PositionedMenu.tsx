@@ -43,7 +43,7 @@ const PositionedMenu = ({
   };
 
   const handleClose = (
-    event: MouseEvent | TouchEvent | React.SyntheticEvent
+    event: MouseEvent | TouchEvent | React.SyntheticEvent,
   ) => {
     if (
       buttonRef.current &&

@@ -4,7 +4,6 @@ import {
   Controller,
   FieldValues,
   Path,
-  PathValue,
   useController,
   useFormContext,
 } from "react-hook-form";
@@ -12,7 +11,7 @@ import FormTextField from "@/components/FormTextField";
 import { capitaliseFirstLetter, getEnumLabel } from "@/utils/string";
 import { FrequencyMode, frequencyMap } from "@/types/api";
 import FormRadioGroup from "@/components/FormRadioGroup";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import HourMinuteSelect from "../HourMinuteSelect";
 import FormLabel from "../FormLabel";
 
@@ -22,8 +21,9 @@ interface BaseCollectionConfigProps {
   hideSynchronisationTime?: boolean;
 }
 
-interface CollectionConfigProps<TFormValues extends FieldValues>
-  extends BaseCollectionConfigProps {
+interface CollectionConfigProps<
+  TFormValues extends FieldValues,
+> extends BaseCollectionConfigProps {
   frequencyFieldName: Path<TFormValues>;
   runTimeFrequencyFieldName: Path<TFormValues>;
   runTimeHourFieldName: Path<TFormValues>;
@@ -39,10 +39,10 @@ const CollectionConfig = <TFormValues extends FieldValues>({
   runTimeHourFieldName,
   runTimeMinuteFieldName,
 }: CollectionConfigProps<TFormValues>) => {
-  const { control, setValue } = useFormContext<TFormValues>();
+  const { control } = useFormContext<TFormValues>();
 
   const [frequencyExpanded, setFrequencyExpanded] = useState(
-    keepExpanded ? true : false
+    keepExpanded ? true : false,
   );
 
   const {
@@ -66,15 +66,8 @@ const CollectionConfig = <TFormValues extends FieldValues>({
 
   const frequencyLabels = useMemo(
     () => frequencyMap[frequencyField] ?? [],
-    [frequencyField]
+    [frequencyField],
   );
-
-  useEffect(() => {
-    setValue(
-      runTimeFrequencyFieldName,
-      0 as PathValue<TFormValues, typeof runTimeFrequencyFieldName>
-    );
-  }, [runTimeFrequencyFieldName, frequencyField, setValue]);
 
   return (
     <Stack>
@@ -106,6 +99,7 @@ const CollectionConfig = <TFormValues extends FieldValues>({
                 <FormRadioGroup
                   {...field}
                   onChange={(_event, value) => field.onChange(Number(value))}
+                  id={field.name}
                   label="Frequency"
                   error={!!fieldState.error}
                   required
@@ -113,7 +107,7 @@ const CollectionConfig = <TFormValues extends FieldValues>({
                     ([key, value]) => ({
                       value: Number(value),
                       label: capitaliseFirstLetter(key.toLowerCase()),
-                    })
+                    }),
                   )}
                 />
               )}
@@ -126,6 +120,7 @@ const CollectionConfig = <TFormValues extends FieldValues>({
               render={({ field, fieldState: { error } }) => (
                 <FormTextField
                   {...field}
+                  id={field.name}
                   error={error}
                   select
                   fullWidth

@@ -13,24 +13,25 @@ import MockDaphneStore from "@/store/MockDaphneStore";
 import { getMockCollections } from "@/actions/__mocks__/getCollections";
 
 const createWorkgroup = jest.fn();
-const addCollectionToWorkgroup = jest.fn();
+const addCollectionsToWorkgroup = jest.fn();
 
 let collections: Collection[];
 
 const renderCreateWorkgroup = (
-  overrides: Partial<Parameters<typeof CreateWorkgroup>[0]> = {}
+  overrides: Partial<Parameters<typeof CreateWorkgroup>[0]> = {},
 ) => {
   return render(
     <MockDaphneStore
       overrides={{
-        adminData: {
+        admin: {
           createWorkgroup,
-          addCollectionToWorkgroup,
+          addCollectionsToWorkgroup,
+          allAprovedCollections: collections,
         },
       }}
     >
-      <CreateWorkgroup collections={collections} {...overrides} />
-    </MockDaphneStore>
+      <CreateWorkgroup {...overrides} />
+    </MockDaphneStore>,
   );
 };
 

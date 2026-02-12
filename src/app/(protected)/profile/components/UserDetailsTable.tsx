@@ -20,9 +20,9 @@ type KVRow = {
 const UserDetailsTable = ({ user }: { user: CombinedUser }) => {
   const data: KVRow[] = [
     { label: "ID", value: user.id },
-    { label: "Gateway ID", value: user?.token_user?.id },
+    { label: "Token ID", value: user?.token_user?.id },
     {
-      label: "Gateway Teams",
+      label: "Custodians",
       value: user.token_user?.cohort_admin_teams?.length ? (
         <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
           {user.token_user.cohort_admin_teams.map((t) => (
@@ -41,7 +41,7 @@ const UserDetailsTable = ({ user }: { user: CombinedUser }) => {
       value: user.email_verified_at ? (
         <Tooltip
           title={`Verified at ${dayjs(user.email_verified_at).format(
-            "MMM D, YYYY HH:mm"
+            "MMM D, YYYY HH:mm",
           )}`}
         >
           <CheckCircleIcon color="success" fontSize="small" />
@@ -99,7 +99,7 @@ const UserDetailsTable = ({ user }: { user: CombinedUser }) => {
       value: user.token_user?.workgroups?.length ? (
         <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
           {user.token_user.workgroups.map((wg) => (
-            <Chip color="secondary" key={wg.id} size="small" label={wg.name} />
+            <Chip color="secondary" key={wg} size="small" label={wg} />
           ))}
         </Stack>
       ) : (
@@ -126,7 +126,7 @@ const UserDetailsTable = ({ user }: { user: CombinedUser }) => {
         Cell: ({ cell }) => <>{cell.getValue<React.ReactNode>()}</>,
       },
     ],
-    []
+    [],
   );
 
   const table = useTable<KVRow>({

@@ -54,7 +54,7 @@ const getMockModelState = (rest?: Partial<ModelState>): ModelState => {
 
 export const getMockCollection = (
   rest?: Partial<Collection>,
-  count: number = 1213
+  count: number = 1213,
 ): Collection => ({
   id: 1,
   pid: uuidv4(),
@@ -68,7 +68,7 @@ export const getMockCollection = (
   updated_at: "2025-01-01 00:00:00",
   demographics: getMockDemographics({ collection_id: 1, n: count }),
   custodian: getCustodian(),
-  size: getMockDistribution({ collection_id: 1, count }),
+  latest_concept: getMockDistribution({ collection_id: 1, count }),
   ...rest,
 });
 
@@ -81,11 +81,11 @@ export const getMockCollections = (n: number = 2): Collection[] =>
         collection_id: id,
         n: id < 1 ? 1213 : 603,
       }),
-      size: getMockDistribution({
+      latest_concept: getMockDistribution({
         collection_id: id,
         count: id < 1 ? 1213 : 603,
       }),
-    })
+    }),
   );
 
 const getCollections = async (): Promise<ApiResponse<Collection[]>> => {

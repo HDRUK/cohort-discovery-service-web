@@ -1,13 +1,16 @@
+import { EditIcon } from "@/icons/EditIcon";
 import {
+  Box,
   TextField,
   Typography,
   type TextFieldProps,
   type TypographyProps,
 } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 
 export type EditableTextProps = {
-  value: string;
+  defaultValue: string;
   onCommit: (next: string) => void;
   typographyProps?: TypographyProps;
   textFieldProps?: Omit<TextFieldProps, "value" | "onChange">;
@@ -15,10 +18,15 @@ export type EditableTextProps = {
   autoSelect?: boolean;
   trim?: boolean;
   placeholder?: string;
+  showIcon?: boolean;
+};
+
+type FormValues = {
+  value: string;
 };
 
 const EditableText = ({
-  value,
+  defaultValue,
   onCommit,
   typographyProps,
   textFieldProps,
@@ -26,13 +34,24 @@ const EditableText = ({
   autoSelect = false,
   trim = true,
   placeholder,
+  showIcon = false,
 }: EditableTextProps) => {
-  const [editing, setEditing] = useState(!value);
-  const [draft, setDraft] = useState(value);
+  const [editing, setEditing] = useState(!defaultValue);
+  const [hovering, setHovering] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const clickTimeoutRef = useRef<number | null>(null);
   const CLICK_DELAY = 250;
+
+  const { control, handleSubmit, resetField } = useForm<FormValues>({
+    defaultValues: {
+      value: defaultValue,
+    },
+  });
+
+  useEffect(() => {
+    resetField("value", { defaultValue });
+  }, [defaultValue, resetField]);
 
   useEffect(() => {
     if (editing) {
@@ -48,21 +67,19 @@ const EditableText = ({
 
   const startEditing = (e: React.SyntheticEvent) => {
     stop(e);
-    setDraft(value);
     setEditing(true);
   };
 
-  const commit = () => {
-    const next = trim ? draft.trim() : draft;
-    if (!next) return;
-    setEditing(false);
-    if (next !== value) onCommit(next);
+  const commit = ({ value }: FormValues) => {
+    onCommit(trim ? value.trim() : value);
+    if (value) {
+      setEditing(false);
+    }
   };
 
   const cancel = () => {
-    if (!value) return;
+    resetField("value", { defaultValue });
     setEditing(false);
-    setDraft(value);
   };
 
   const handleClick = (e: React.MouseEvent<HTMLSpanElement>) => {
@@ -78,54 +95,80 @@ const EditableText = ({
     }, CLICK_DELAY);
   };
 
-  const displayText = value || placeholder || "";
+  const displayText = defaultValue || placeholder || "";
   const STABLE_ID = "cohort-query-name";
   return (
     <Typography
       {...typographyProps}
       onClick={handleClick}
+      onMouseOver={() => setHovering(true)}
+      onMouseOut={() => setHovering(false)}
       sx={{
         ...(typographyProps?.sx || {}),
-        ...(value
+        ...(defaultValue
           ? {}
           : placeholder
-          ? { opacity: 0.6, fontStyle: "italic" }
-          : {}),
-        cursor: editing ? "text" : undefined,
+            ? { opacity: 0.6, fontStyle: "italic" }
+            : {}),
+        cursor: editing ? "text" : "pointer",
       }}
     >
-      {editing ? (
-        <TextField
-          id={STABLE_ID}
-          autoFocus
-          inputRef={inputRef}
-          value={draft}
-          onChange={(e) => {
-            stop(e);
-            setDraft(e.target.value);
-          }}
-          onPointerDown={(e) => e.stopPropagation()}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              commit();
-            } else if (e.key === "Escape") {
-              e.preventDefault();
-              cancel();
-            }
-          }}
-          onBlur={commitOnBlur ? commit : cancel}
-          {...textFieldProps}
-          slotProps={{
-            ...textFieldProps?.slotProps,
-            htmlInput: {
-              ...(textFieldProps?.slotProps?.htmlInput ?? {}),
-              id: STABLE_ID,
-            },
-          }}
-        />
+      {editing || !defaultValue ? (
+        <Box component={"form"}>
+          <Controller
+            name="value"
+            control={control}
+            defaultValue=""
+            rules={{
+              validate: (v: string) => {
+                const s = trim ? v.trim() : v;
+                if (s === "") return true; // allow empty
+                return (
+                  s.length >= 3 || "Query name must be at least 3 characters"
+                );
+              },
+            }}
+            render={({ field, fieldState: { error } }) => (
+              <TextField
+                id={STABLE_ID}
+                autoFocus
+                inputRef={inputRef}
+                {...field}
+                error={!!error}
+                helperText={error?.message}
+                onPointerDown={(e) => e.stopPropagation()}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSubmit(commit)();
+                  } else if (e.key === "Escape") {
+                    e.preventDefault();
+                    cancel();
+                  }
+                }}
+                onBlur={commitOnBlur ? handleSubmit(commit) : cancel}
+                {...textFieldProps}
+                slotProps={{
+                  ...textFieldProps?.slotProps,
+                  htmlInput: {
+                    ...(textFieldProps?.slotProps?.htmlInput ?? {}),
+                    id: STABLE_ID,
+                  },
+                }}
+              />
+            )}
+          />
+        </Box>
       ) : (
-        <>{displayText}</>
+        <Box
+          display="flex"
+          flexDirection="row"
+          alignItems="center"
+          gap={0.5}
+          sx={{ mb: 0.5 }}
+        >
+          {displayText} {showIcon && hovering ? <EditIcon /> : null}
+        </Box>
       )}
     </Typography>
   );

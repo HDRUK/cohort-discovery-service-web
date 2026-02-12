@@ -1,12 +1,15 @@
 import { cookies, headers } from "next/headers";
-import { forbidden, redirect } from "next/navigation";
+import { forbidden, notFound, redirect } from "next/navigation";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
-import { TokenUser, CombinedUser, Roles } from "@/types/api";
+import { TokenUser, CombinedUser } from "@/types/api";
+import { RoleName } from "@/types/roles";
 import ProtectedPage from "./components/ProtectedPage";
 import getMe from "@/actions/getMe";
 import getCustodians from "@/actions/getCustodians";
 import getFeatureFlags from "@/actions/getFeatureFlags";
+import { isStandalone } from "@/utils/modes";
+import { ErrorMode } from "@/lib/apiClient";
 
 const applicationMode = process.env.APPLICATION_MODE;
 
@@ -19,7 +22,7 @@ export default async function ProtectedLayout({
   const token = cookieStore.get(ACCESS_TOKEN_NAME)?.value;
   const decoded = token ? (jwt.decode(token) as JwtPayload) : undefined;
   if (!token || !decoded) {
-    if (applicationMode === "standalone") {
+    if (isStandalone(applicationMode)) {
       // No token — render the client SignIn component so users can sign in.
       redirect("/login");
     } else {
@@ -36,24 +39,23 @@ export default async function ProtectedLayout({
 
   const user = decoded.user as TokenUser;
 
-  const hasGeneralAccess = user?.cohort_discovery_roles?.includes(
-    Roles.GENERAL_ACCESS
-  );
+  const { data: me, error } = await getMe({ errorMode: ErrorMode.RESULT });
+  const { code: errorCode } = error ?? {};
 
-  const roles = user?.cohort_discovery_roles || [];
-
-  const hasAdminAccess =
-    roles.includes(Roles.ADMIN) || roles.includes(Roles.SYSTEM_ADMIN);
-
-  if (!(hasGeneralAccess || hasAdminAccess)) {
-    forbidden();
+  if (errorCode === 404) {
+    if (isStandalone(applicationMode)) {
+      notFound();
+    }
+    redirect("/user-not-found");
   }
 
-  let me;
-  try {
-    const { data } = await getMe();
-    me = data;
-  } catch {
+  const roles = me.roles.map((r) => r.name) ?? [];
+
+  const hasGeneralAccess = roles?.includes(RoleName.USER);
+  const hasAdminAccess = roles.includes(RoleName.ADMIN);
+  const hasTeamAccess = me.custodians.length > 0;
+
+  if (!(hasGeneralAccess || hasAdminAccess || hasTeamAccess)) {
     forbidden();
   }
 

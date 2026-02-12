@@ -1,6 +1,6 @@
 "use client";
 
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { Collection, GroupedCollection, Network } from "../../types/api";
 import {
   AccordionSummary,
@@ -15,6 +15,7 @@ import SelectNetworkDatasets, {
 } from "../SelectNetworkDatasets";
 import RefreshButton from "../RefreshButton";
 import { TAG_COLLECTIONS } from "@/config/tags";
+import { intersection } from "lodash";
 
 const SelectDatasets = ({
   initialSelection,
@@ -28,7 +29,7 @@ const SelectDatasets = ({
       selectedDatasets: qb.selectedDatasets,
       setSelectedDatasets: qb.setSelectedDatasets,
       open: qb.openSelectDatasetsPanel,
-    })
+    }),
   );
 
   const mountedRef = useRef(false);
@@ -37,6 +38,8 @@ const SelectDatasets = ({
     mountedRef.current = true;
     if (selectedDatasets.length === 0) {
       setSelectedDatasets(initialSelection ?? []);
+    } else {
+      setSelectedDatasets(intersection(initialSelection, selectedDatasets));
     }
   }, [selectedDatasets, initialSelection, setSelectedDatasets]);
 
@@ -45,7 +48,7 @@ const SelectDatasets = ({
       const { custodian } = c;
       (acc[custodian.id] ??= { custodian, items: [] }).items.push(c);
       return acc;
-    }, {})
+    }, {}),
   );
 
   const networkGroups: NetworkGroupedCollections[] = Object.values(
@@ -61,8 +64,8 @@ const SelectDatasets = ({
         acc[key].custodians.push(gc);
         return acc;
       },
-      {}
-    )
+      {},
+    ),
   );
 
   const nTotal = collections.length;

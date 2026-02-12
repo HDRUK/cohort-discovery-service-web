@@ -27,6 +27,7 @@ export type TabType = {
   route?: string;
   onCloseHref?: string;
   disabled?: boolean;
+  handleClose?: () => void;
 };
 
 type TabsShellProps = {
@@ -37,6 +38,7 @@ type TabsShellProps = {
   tabHeaderSx?: BoxProps["sx"];
   tabContentSx?: BoxProps["sx"];
   forceValue?: boolean;
+  endIcon?: React.ReactNode;
 };
 
 export default function TabsShell({
@@ -47,10 +49,11 @@ export default function TabsShell({
   tabHeaderSx,
   tabContentSx,
   forceValue = false,
+  endIcon = null,
 }: TabsShellProps) {
   const router = useRouter();
   const [internalValue, setInternalValue] = React.useState(
-    value ? value : tabs[0]?.id || 0
+    value ? value : tabs[0]?.id || 0,
   );
   const handleChange = (_: React.SyntheticEvent, newValue: string) => {
     if (value && value === internalValue) return;
@@ -64,11 +67,18 @@ export default function TabsShell({
   return (
     <Box sx={mergeSx(defaultRootSx, sx)}>
       <TabContext value={forceValue ? value || 0 : internalValue}>
-        <Box sx={mergeSx(defaultTabHeaderSx, tabHeaderSx)}>
+        <Box
+          sx={mergeSx(defaultTabHeaderSx, tabHeaderSx)}
+          display="flex"
+          flexDirection="row"
+          justifyContent="space-between"
+        >
           <TabList
             onChange={handleChange}
             allowScrollButtonsMobile
             sx={tabListSx}
+            variant="scrollable"
+            scrollButtons="auto"
           >
             {tabs.map(
               ({ id, label, href, onCloseHref, disabled = false }, i) => {
@@ -103,16 +113,17 @@ export default function TabsShell({
                     sx={mergeSx(
                       defaultTabSx,
                       tabSx,
-                      disabled ? { display: "none" } : {}
+                      disabled ? { display: "none" } : {},
                     )}
                     onClick={(e) => {
                       if (!href) e.preventDefault();
                     }}
                   />
                 );
-              }
+              },
             )}
           </TabList>
+          <Box alignContent="center">{endIcon}</Box>
         </Box>
 
         {kids.length > 0 && (

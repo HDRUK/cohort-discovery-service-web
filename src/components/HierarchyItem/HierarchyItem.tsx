@@ -1,7 +1,7 @@
 "use client";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import useSortable from "@/hooks/useSortable";
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { RuleNodeType } from "@/types/rules";
 import { isRuleGroup } from "@/utils/rules";
 
@@ -28,12 +28,13 @@ export const HierarchyItem = ({
   groupId,
   depth = 0,
 }: HierarchyItemProps) => {
-  const { toggleSelected, selected, getNodeName, setNodeName } =
+  const { toggleSelected, selected, getNodeName, setNodeName, hovered } =
     useQueryBuilder((qb) => ({
       toggleSelected: qb.toggleSelected,
       selected: qb.selected,
       getNodeName: qb.getNodeName,
       setNodeName: qb.setNodeName,
+      hovered: qb.hovered,
     }));
   const id = `${ID_REF_SUFFIX}-${node.id}`;
 
@@ -87,7 +88,14 @@ export const HierarchyItem = ({
       onClick={toggleCheckbox}
       onContextMenu={handleContextMenu}
       component="div"
-      sx={listItemButtonSx(isDragging, isOver, isAbove, depth)}
+      sx={listItemButtonSx(
+        isDragging,
+        isOver,
+        isAbove,
+        depth,
+        selected[node.id],
+        !!hovered?.[node.id],
+      )}
     >
       <SquareRadio
         size="medium"
@@ -99,7 +107,7 @@ export const HierarchyItem = ({
       <ListItemText
         primary={
           <EditableText
-            value={nodeName}
+            defaultValue={nodeName}
             onCommit={(name) => setNodeName(node, name)}
             typographyProps={{
               component: "span",
@@ -129,7 +137,7 @@ export const HierarchyItem = ({
   const groupIds = node.rules.map((rule) => rule.id);
   const selectedIds = trueKeys(selected);
   const hasAnySelectedInGroup = selectedIds.some((id) =>
-    groupIds.includes(id as string)
+    groupIds.includes(id as string),
   );
 
   return (

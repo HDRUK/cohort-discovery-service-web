@@ -35,7 +35,7 @@ type Options = {
 function useLogDependencyChanges(
   tag: string,
   depsObj: Deps,
-  options?: Options
+  options?: Options,
 ): void {
   const { enabled = !isProd && useDebug, pretty = true } = options ?? {};
 

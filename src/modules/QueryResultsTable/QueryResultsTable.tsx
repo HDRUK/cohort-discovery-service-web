@@ -8,13 +8,13 @@ import LaunchIcon from "@mui/icons-material/Launch";
 import { useEffect, useMemo } from "react";
 import { useTable } from "../../hooks/useTable";
 import { formatNumber } from "@/utils/numbers";
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 import useSearchParams from "@/hooks/useSearchParams";
 import { DEFAULT_INTERVAL, STATUS_LABELS } from "@/config/defaults";
 import Table from "../../components/Table";
 import { TableProps } from "../../components/Table/Table";
 import getQuery from "@/actions/getQuery";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 interface QueryResultsTableProps {
   initialData: Query;
@@ -35,12 +35,17 @@ const QueryResultsTable = ({
     queryAsText: qb.queryAsText,
   }));
 
-  const { data: query } = useQuery<Query>({
-    queryKey: [
+  const queryKey = useMemo(
+    () => [
       "query",
       initialData.pid,
       `${initialData.pid}-${initialSearchParams.toString()}`,
     ],
+    [initialSearchParams, initialData.pid],
+  );
+  const qc = useQueryClient();
+  const { data: query } = useQuery<Query>({
+    queryKey,
     queryFn: async () => {
       const res = await getQuery(initialData.pid, {
         params: initialSearchParams.toString(),
@@ -55,15 +60,13 @@ const QueryResultsTable = ({
     refetchOnReconnect: false,
     refetchInterval: (query) => {
       const data = query.state.data;
-      const allFailed = data?.tasks?.every((t) => t.failed_at !== null);
-      if (allFailed) {
-        return false;
-      }
-      const hasPending = data?.tasks?.some((t) => !t.result);
-
+      const hasPending = data?.tasks?.some((t) => !t.completed_at);
       return hasPending ? DEFAULT_INTERVAL : false;
     },
   });
+  useEffect(() => {
+    qc.setQueryData(queryKey, initialData);
+  }, [qc, queryKey, initialData]);
 
   const { tasks, name, definition } = query;
 
@@ -98,6 +101,8 @@ const QueryResultsTable = ({
         return (
           <Link
             component="a"
+            rel="noopener noreferrer"
+            target="_blank"
             href={url}
             sx={{
               display: "inline-flex",
@@ -168,7 +173,7 @@ const QueryResultsTable = ({
   const sortedTasks = useMemo(() => {
     if (!currentSortDirection) {
       return [...tasks].sort(
-        (a, b) => (b.result?.count ?? 0) - (a.result?.count ?? 0)
+        (a, b) => (b.result?.count ?? -1) - (a.result?.count ?? -1),
       );
     }
     return tasks;

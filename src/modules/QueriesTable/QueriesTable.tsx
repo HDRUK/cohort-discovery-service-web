@@ -1,8 +1,8 @@
 "use client";
 
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Query, Paginated } from "@/types/api";
 import {
   MRT_ExpandedState,
@@ -21,7 +21,7 @@ import { getTasksStatus, getTotalAllTasks } from "@/utils/tasks";
 import QueryResultsTable from "@/modules/QueryResultsTable";
 import { queryToText } from "@/utils/queryBuilder";
 import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import getQueries from "@/actions/getQueries";
 import { DEFAULT_INTERVAL } from "@/config/defaults";
 import { getQueryName } from "@/utils/query";
@@ -29,9 +29,11 @@ import useSearchParams from "@/hooks/useSearchParams";
 import { buildQueryHistoryParams } from "@/utils/params";
 import { AvailableFormats } from "@/components/DownloadButton/DownloadButton";
 import rerunQuery from "@/actions/rerunQuery";
+import useUserStore from "@/hooks/useUserStore";
+import { getUserQueryTag, TAG_QUERIES } from "@/config/tags";
 
 interface QueriesTableProps {
-  initialData: Paginated<Query[]>;
+  initialData: Paginated<Query>;
   columnVisibility?: Record<string, boolean>;
 }
 
@@ -49,8 +51,16 @@ const QueriesTable = ({
       setQueryName: qb.setQueryName,
     }));
 
-  const { data: queries } = useQuery<Paginated<Query[]>>({
-    queryKey: [`queries-${searchParams.toString()}`],
+  const user = useUserStore((store) => store.user);
+  const deleteQueries = useUserStore((store) => store.deleteQueries);
+
+  const qc = useQueryClient();
+  const queryKey = useMemo(
+    () => [`queries-${searchParams.toString()}`],
+    [searchParams],
+  );
+  const { data: queries } = useQuery<Paginated<Query>>({
+    queryKey,
     queryFn: async () => {
       const searchParamsObject = buildQueryHistoryParams({
         page: Number(searchParams.get("page")) ?? initialData.current_page,
@@ -78,6 +88,9 @@ const QueriesTable = ({
       return hasIncomplete ? DEFAULT_INTERVAL : false;
     },
   });
+  useEffect(() => {
+    qc.setQueryData(queryKey, initialData);
+  }, [qc, queryKey, initialData]);
 
   const columns: MRT_ColumnDef<Query>[] = [
     {
@@ -92,12 +105,12 @@ const QueriesTable = ({
           <MuiLink
             component={Link}
             href={{
-              pathname: routes.dashboardNewQuery(pid),
+              pathname: routes.dashboardNewQuery(undefined, pid),
               query: { query: pid },
             }}
             onClick={() => {
               setSelectedDatasets(
-                row.original.tasks.map((t) => t.collection.pid)
+                row.original.tasks.map((t) => t.collection.pid),
               );
             }}
           >
@@ -209,18 +222,35 @@ const QueriesTable = ({
                 <Grid size={1}>
                   <Typography>
                     {dayjs(row.original.created_at).format(
-                      "DD/MM/YYYY, HH:MM:ss"
+                      "DD/MM/YYYY, HH:MM:ss",
                     )}
                   </Typography>
                 </Grid>
               </Grid>
             ),
             rightAction: {
-              refreshProps: {
+              deleteProps: {
+                onClick: () => {
+                  deleteQueries([row.original.pid]);
+                  const openQueries = (searchParams.get("open_queries") || "")
+                    .split(",")
+                    .filter((q) => q && q !== row.original.pid);
+                  router.push(routes.dashboardHistory(openQueries));
+                },
+              },
+              reRunProps: {
                 label: "Re-run query",
                 onClick: async () => {
                   const { data } = await rerunQuery(row.original.pid);
-                  router.push(routes.dashboardQueryResult(data.query_pid));
+                  const openQueries = (searchParams.get("open_queries") || "")
+                    .split(",")
+                    .filter((q) => q);
+                  if (openQueries.indexOf(data.query_pid) === -1) {
+                    openQueries.push(data.query_pid);
+                  }
+                  router.push(
+                    routes.dashboardQueryResult(data.query_pid, openQueries),
+                  );
                 },
               },
               downloadProps: {
@@ -231,14 +261,20 @@ const QueriesTable = ({
               editProps: {
                 onClick: () => {
                   const ranCollectionPids = row.original.tasks.map(
-                    (t) => t.collection.pid
+                    (t) => t.collection.pid,
                   );
                   setSelectedDatasets(ranCollectionPids);
                   setQueryName("");
 
                   setQueryBuilderJson(row.original.definition);
+                  const openQueries = (searchParams.get("open_queries") || "")
+                    .split(",")
+                    .filter((q) => q);
                   router.push(
-                    routes.dashboardNewQuery(`query=${row.original.pid}`)
+                    routes.dashboardNewQuery(
+                      openQueries,
+                      `query=${row.original.pid}`,
+                    ),
                   );
                 },
               },
@@ -258,8 +294,14 @@ const QueriesTable = ({
         },
       }}
       rightAction={{
-        refreshProps: { tag: "queries", label: "Refresh Queries" },
+        refreshProps: {
+          tag: user ? getUserQueryTag(user.id) : TAG_QUERIES,
+          label: "Refresh Queries",
+        },
         sortProps: { field: "name" },
+        deleteProps: {
+          onClick: deleteQueries,
+        },
       }}
     />
   );

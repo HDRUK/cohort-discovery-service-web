@@ -1,8 +1,10 @@
 "use client";
-import { useDaphneStore } from "@/store/useDaphneStore";
+
 import { CombinedUser, Custodian, FeatureFlag } from "@/types/api";
 import { forbidden } from "next/navigation";
 import { ReactNode, useEffect } from "react";
+import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
+import useUserStore from "@/hooks/useUserStore";
 
 interface ProtectedPageProps {
   user: CombinedUser;
@@ -11,30 +13,25 @@ interface ProtectedPageProps {
   children: ReactNode;
 }
 
-const ProtectedPage = ({ user, custodians, featureFlags, children }: ProtectedPageProps) => {
-  const {
-    userData: { setUser },
-    custodianData: { setCustodians },
-    featureFlags: { setFlags },
-  } = useDaphneStore();
+const ProtectedPage = ({
+  user,
+  custodians,
+  featureFlags,
+  children,
+}: ProtectedPageProps) => {
+  const setUser = useUserStore((s) => s.setUser);
+  const setCustodians = useUserStore((s) => s.setCustodians);
+  const setFlags = useFeatureFlagsStore((s) => s.setFlags);
 
   useEffect(() => {
     setUser(user);
-  }, [user, setUser]);
-
-  useEffect(() => {
     setCustodians(custodians);
-  }, [custodians, setCustodians]);
-
-  useEffect(() => {
     setFlags(featureFlags);
-  }, [featureFlags, setFlags]);
+  }, [user, custodians, featureFlags, setUser, setCustodians, setFlags]);
 
-  if (!user) {
-    forbidden();
-  }
+  if (!user) forbidden();
 
-  return <>{children} </>;
+  return <>{children}</>;
 };
 
 export default ProtectedPage;

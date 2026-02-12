@@ -22,6 +22,7 @@ import {
 import useHasMounted from "@/hooks/useHasMounted";
 import RuleAgeFilter from "../RuleAgeFilter";
 import SkeletonFull from "@/components/SkeletonFull";
+import useStateManagement from "@/hooks/useStateManagement";
 
 interface RuleBoardProps extends BoxProps {
   ruleGroup: RuleGroupType;
@@ -46,9 +47,10 @@ const RuleBoard = ({ ruleGroup, children, ...rest }: RuleBoardProps) => {
     data: { type: "container", containerId: id },
   });
 
+  const isLoading = useStateManagement((s) => s.isLoading);
   const hasMounted = useHasMounted();
 
-  if (!hasMounted) {
+  if (!hasMounted || isLoading) {
     return <SkeletonFull />;
   }
 

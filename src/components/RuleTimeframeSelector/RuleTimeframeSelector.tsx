@@ -2,7 +2,7 @@
 
 import { Stack } from "@mui/material";
 import { ReactNode, useCallback, useMemo } from "react";
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { updateById } from "@/utils/rules";
 import { RuleLeafType } from "@/types/rules";
 import dayjs, { Dayjs } from "dayjs";
@@ -14,13 +14,14 @@ import {
 import { PickerValue } from "@mui/x-date-pickers/internals";
 import { CustomH1 } from "@/components/GuidanceHeaders";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import useFeatures from "@/store/useFeatures";
+import useFeatures from "@/hooks/useFeatures";
 import { getDomainVerbs } from "@/utils/omop";
 import { capitaliseFirstLetter } from "@/utils/string";
 
 import SingleBoundSelector, {
   SingleSidedOperator,
 } from "@/components/SingleBoundSelector";
+import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
 
 export interface RuleTimeframeSelectorProps extends DatePickerProps {
   children?: ReactNode;
@@ -39,9 +40,16 @@ const RuleTimeframeSelector = ({
   open,
   ...props
 }: RuleTimeframeSelectorProps) => {
-  const { queryBuilderJson, setQueryBuilderJson } = useQueryBuilder((qb) => ({
+  const {
+    queryBuilderJson,
+    setQueryBuilderJson,
+    setSelectedGuidance,
+    selected,
+  } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
+    setSelectedGuidance: qb.setSelectedGuidance,
+    selected: qb.selected,
   }));
 
   const { constrainForBunnyV1 } = useFeatures();
@@ -51,7 +59,10 @@ const RuleTimeframeSelector = ({
     return [start ? dayjs(start) : null, end ? dayjs(end) : null];
   }, [rule.timeConstraint]);
 
+  const key = collapsibleGuidanceKey("RuleTimeframeSelector", selected);
+
   const handleLeftChange = (value: PickerValue) => {
+    setSelectedGuidance(key, true);
     setQueryBuilderJson(
       updateById(queryBuilderJson, rule.id, (node) => ({
         ...node,
@@ -59,11 +70,12 @@ const RuleTimeframeSelector = ({
           value?.toISOString() ?? null,
           rightValue?.toISOString() ?? null,
         ],
-      }))
+      })),
     );
   };
 
   const handleRightChange = (value: PickerValue) => {
+    setSelectedGuidance(key, true);
     setQueryBuilderJson(
       updateById(queryBuilderJson, rule.id, (node) => ({
         ...node,
@@ -71,7 +83,7 @@ const RuleTimeframeSelector = ({
           leftValue?.toISOString() ?? null,
           value?.toISOString() ?? null,
         ],
-      }))
+      })),
     );
   };
 
@@ -105,12 +117,12 @@ const RuleTimeframeSelector = ({
 
   const parseIsoToDayjs = useCallback(
     (iso: string | null) => (iso ? dayjs(iso) : null),
-    []
+    [],
   );
 
   const serialiseDayjsToIso = useCallback(
     (d: Dayjs | null) => (d ? d.toISOString() : null),
-    []
+    [],
   );
 
   if (!rule.timeConstraint) return null;
@@ -119,14 +131,16 @@ const RuleTimeframeSelector = ({
     return (
       <>
         {title && <CustomH1>{title}</CustomH1>}
+
         <SingleBoundSelector<string, Dayjs>
           constraint={rule.timeConstraint}
           onConstraintChange={(next) => {
+            setSelectedGuidance(key, true);
             setQueryBuilderJson(
               updateById(queryBuilderJson, rule.id, (node) => ({
                 ...node,
                 timeConstraint: next,
-              }))
+              })),
             );
           }}
           parse={parseIsoToDayjs}

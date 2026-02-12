@@ -1,6 +1,6 @@
 "use client";
 
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { Chip, Box, Tooltip, Typography } from "@mui/material";
 import Title from "../Title";
 import { DatasetErrors } from "@/utils/datasets";

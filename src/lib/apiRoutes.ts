@@ -6,6 +6,7 @@ export const API_ROUTES = {
   rerunTask: (id: string) => `${API_URL}/task/re-run/${id}`,
   tasks: `${API_URL}/tasks`,
   queries: `${API_URL}/queries`,
+  deleteQueriesBulk: `${API_URL}/queries/delete/bulk`,
   rerunQuery: (id: string) => `${API_URL}/query/re-run/${id}`,
   parseQuery: `${API_URL}/parse-query`,
   collections: `${API_URL}/collections`,
@@ -26,6 +27,7 @@ export const API_ROUTES = {
   custodianCollections: (pid: string) =>
     `${API_URL}/custodians/${pid}/collections`,
   adminCollections: `${API_URL}/admin/collections`,
+  userCollections: `${API_URL}/user/collections`,
   collectionConfig: `${API_URL}/collection_config`,
   rerunDistributions: (pid: string) =>
     `${API_URL}/collection/${pid}/distributions/run-manually`,
@@ -41,6 +43,7 @@ export const API_ROUTES = {
   adminWorkgroups: `${API_URL}/workgroups`,
   authCallback: "http://localhost:8100/auth/callback",
   users: `${API_URL}/users`,
+  user: (id: number) => `${API_URL}/users/${id}`,
   featureFlags: `${API_URL}/features`,
 };
 

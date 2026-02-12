@@ -10,11 +10,11 @@ import {
 
 const updateCollectionHost = async (
   hostId: number,
-  payload: UpdateCollectionHostPayload
+  payload: UpdateCollectionHostPayload,
 ): Promise<ApiResponse<CollectionHost>> => {
   return await apiPut<ApiResponse<CollectionHost>, UpdateCollectionHostPayload>(
     API_ROUTES.collectionHost(hostId),
-    payload
+    payload,
   );
 };
 

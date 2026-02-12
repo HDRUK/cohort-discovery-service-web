@@ -19,7 +19,7 @@ const setQueryBuilderJson = jest.fn();
 describe("RuleOperator", () => {
   const renderComponent = (
     opArgs: Partial<OperatorType> = {},
-    rest?: Partial<RuleOperatorProps>
+    rest?: Partial<RuleOperatorProps>,
   ) => {
     const operator = {
       id: "op-1",
@@ -39,7 +39,7 @@ describe("RuleOperator", () => {
         }}
       >
         <RuleOperator {...rest} operator={operator} groupId="group-1" />
-      </MockDaphneStore>
+      </MockDaphneStore>,
     );
     return {
       query,
@@ -50,18 +50,18 @@ describe("RuleOperator", () => {
   it("renders the combinator chip correctly for AND", () => {
     renderComponent();
     expect(screen.getByText("AND")).toBeInTheDocument();
-    expect(screen.queryByTestId("WarningAmberIcon")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("ErrorIcon")).not.toBeInTheDocument();
   });
 
   it("renders the combinator chip correctly for OR", () => {
     renderComponent({ combinator: CombinatorType.OR });
     expect(screen.getByText("OR")).toBeInTheDocument();
-    expect(screen.queryByTestId("WarningAmberIcon")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("ErrorIcon")).not.toBeInTheDocument();
   });
 
   it("shows warning icon when rule is invalid", () => {
     renderComponent({ valid: false });
-    expect(screen.queryByTestId("WarningAmberIcon")).toBeInTheDocument();
+    expect(screen.queryByTestId("ErrorIcon")).toBeInTheDocument();
   });
 
   it("hides itself when hidden prop is true", () => {

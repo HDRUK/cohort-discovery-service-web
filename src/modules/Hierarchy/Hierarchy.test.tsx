@@ -34,7 +34,7 @@ describe("QueryBuilder", () => {
           },
         },
       },
-    ]
+    ],
   ) => {
     const group = validateRuleTree({
       id: "group-1",
@@ -50,7 +50,7 @@ describe("QueryBuilder", () => {
         }}
       >
         <Hierarchy />
-      </MockDaphneStore>
+      </MockDaphneStore>,
     );
     return rendered;
   };
@@ -105,7 +105,7 @@ describe("QueryBuilder", () => {
         .find((li) => within(li).queryByText(id));
 
       expect(row).toBeTruthy();
-      const icon = within(row!).queryByTestId("WarningAmberIcon");
+      const icon = within(row!).queryByTestId("ErrorIcon");
       expect(icon).toBeInTheDocument();
     });
   });

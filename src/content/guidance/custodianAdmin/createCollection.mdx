@@ -1,0 +1,29 @@
+{/**
+  * @typedef Props
+  * @property {string} taskUrl
+  */}
+
+
+A **Collection** maps to a database containing discoverable data via a BUNNY link installed in your own environment. When you create a Collection with our system, you must configure your BUNNY(s) to authenticate and connect to our Cohort Discovery API using the automatically generated persistent ID for the collection to receive new query jobs to run (calculate cohort counts).
+
+<br/>
+Use the example configuration below and replace the placeholders with the values shown in the **Collection** and the **Host** you use for your Collection details.
+
+<br/>
+You will need the following configured in your setup:
+{(() => {
+  const yaml = `
+  - TASK_API_BASE_URL=${props.taskUrl}
+  - TASK_API_USERNAME=<HOST_CLIENT_ID>
+  - TASK_API_PASSWORD=<HOST_CLIENT_SECRET>
+  - COLLECTION_ID=<COLLECTION_ID>
+
+`;
+  return (
+    <pre>
+      <code className="language-yaml">{yaml}</code>
+    </pre>
+  );
+})()}
+
+For detailed setup instructions, see [Hutch bunny config](https://hutch.health/bunny/config).

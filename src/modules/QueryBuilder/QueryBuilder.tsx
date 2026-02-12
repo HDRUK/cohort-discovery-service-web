@@ -1,5 +1,5 @@
 "use client";
-import useQueryBuilder from "@/store/useQueryBuilder";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import ActionMenu from "../ActionMenu";
@@ -35,7 +35,13 @@ import ThreePaneSwimLaneLayout from "../ThreePaneSwimLaneLayout";
 import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
 import useRightClickMenu from "@/hooks/useRightClickMenu";
 
-const QueryBuilder = ({ query }: { query?: Query }) => {
+const QueryBuilder = ({
+  query,
+  errorOnDrag = false,
+}: {
+  query?: Query;
+  errorOnDrag?: boolean;
+}) => {
   const {
     queryBuilderJson,
     resetQueryBuilderJson,
@@ -46,6 +52,7 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
     createNewGroup,
     createNewRule,
     createNewAgeFilter,
+    selectedGuidance,
   } = useQueryBuilder((qb) => ({
     resetQueryBuilderJson: qb.resetQueryBuilderJson,
     queryBuilderJson: qb.queryBuilderJson,
@@ -56,10 +63,11 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
     createNewGroup: qb.createNewGroup,
     createNewRule: qb.createNewRule,
     createNewAgeFilter: qb.createNewAgeFilter,
+    selectedGuidance: qb.selectedGuidance,
   }));
 
   useEffect(() => {
-    resetQueryBuilderJson();
+    resetQueryBuilderJson(true);
   }, [resetQueryBuilderJson]);
 
   useEffect(() => {
@@ -70,7 +78,7 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
-    useSensor(KeyboardSensor)
+    useSensor(KeyboardSensor),
   );
 
   const [active, setActive] = useState<Active | null>(null);
@@ -118,17 +126,17 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
           targetIndex = overData.position;
         }
       }
-
       setQueryBuilderJson(
         moveItemIntoGroup(
           queryBuilderJson,
           activeData?.id as string,
           overGroupId,
-          targetIndex
-        )
+          targetIndex,
+        ),
+        errorOnDrag,
       );
     },
-    [active, queryBuilderJson, boardIndex, setQueryBuilderJson]
+    [errorOnDrag, active, queryBuilderJson, boardIndex, setQueryBuilderJson],
   );
 
   const onDragEnd = useCallback(
@@ -167,14 +175,14 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
           queryBuilderJson,
           activeData.id,
           overGroupId,
-          targetIndex
-        )
+          targetIndex,
+        ),
       );
 
       setActiveNode(null);
       setActive(null);
     },
-    [active, queryBuilderJson, boardIndex, setQueryBuilderJson]
+    [active, queryBuilderJson, boardIndex, setQueryBuilderJson],
   );
 
   const onChangeSelection = useCallback(
@@ -182,7 +190,7 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
       select(ids);
       deselect(deselectedIds);
     },
-    [deselect, select]
+    [deselect, select],
   );
 
   const boardRef = useRef<HTMLDivElement>(null);
@@ -229,7 +237,6 @@ const QueryBuilder = ({ query }: { query?: Query }) => {
         selectable='[data-selectable="true"]'
         idAttr="data-id"
         ignoreWhenInside='[data-draggable="true"]'
-        requireModifierKey="Shift"
         onChange={onChangeSelection}
       />
     </>

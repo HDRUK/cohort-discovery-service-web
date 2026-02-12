@@ -1,4 +1,5 @@
 import { QueryContext } from "./context";
+import { Role, RoleName } from "./roles";
 import { RuleGroupType } from "./rules";
 
 export type SearchParamValue =
@@ -25,6 +26,7 @@ export interface CollectionsSearchParams extends ApiSearchParams {
 
 export interface QueryHistorySearchParams extends ApiSearchParams {
   query?: string;
+  open_queries?: string[];
 }
 
 export interface CacheOptions {
@@ -34,6 +36,7 @@ export interface CacheOptions {
 export interface ApiResponse<T> {
   message: string;
   data: T;
+  error?: { text: string; code: number };
 }
 
 export interface WithTimestamps {
@@ -42,7 +45,7 @@ export interface WithTimestamps {
 }
 
 export interface Paginated<T> {
-  data: T;
+  data: T[];
   current_page: number;
   per_page: number;
   total: number;
@@ -134,7 +137,7 @@ export interface Collection extends WithTimestamps {
   n_concepts?: number;
   custodian: Custodian;
   custodian_id?: number;
-  model_state?: ModelState;
+  model_state: ModelState;
 }
 
 export interface CollectionConfig {
@@ -216,12 +219,6 @@ export enum Rquestroles {
   GENERAL_ACCESS = "GENERAL_ACCESS",
 }
 
-export enum Roles {
-  GENERAL_ACCESS = "GENERAL_ACCESS",
-  SYSTEM_ADMIN = "SYSTEM_ADMIN",
-  ADMIN = "admin",
-}
-
 export enum FrequencyMode {
   WEEKLY = "1",
   MONTHLY = "2",
@@ -265,6 +262,9 @@ export interface User extends WithTimestamps {
   name: string;
   email_verified_at: string | null;
   new_user_status?: number;
+  roles: Role[];
+  custodians: Custodian[];
+  workgroups?: Workgroup[];
 }
 
 export interface ExternalCustodian {
@@ -283,8 +283,8 @@ export interface TokenUser {
   is_nhse_sde_approval: boolean;
   organisation: string;
   provider: string;
-  workgroups: Workgroup[];
-  cohort_discovery_roles: Roles[];
+  workgroups: string[];
+  cohort_discovery_roles: RoleName[];
   cohort_admin_teams: ExternalCustodian[];
 }
 
@@ -324,6 +324,7 @@ export interface CollectionHost {
   query_context_type: string;
   client_id: string;
   client_secret: string;
+  custodian: Custodian;
 }
 
 export type UrlString = `http${"s" | ""}://${string}`;
@@ -337,6 +338,7 @@ export interface CreateCollectionPost {
   custodian_id: string;
   status?: boolean;
   pid: string;
+  model_state?: ModelState;
 }
 
 export interface UpdateCollectionPayload {
@@ -376,12 +378,22 @@ export interface AddCollectionsToWorkgroupPost {
   workgroup_id: number;
 }
 
+export interface AddUsersToWorkgroupPost {
+  ids: number[];
+  workgroup_id: number;
+}
+
 export interface AddCollectionToWorkgroupsPost {
   id: number;
   workgroup_ids: number[];
 }
 
 export interface RemoveCollectionsFromWorkgroupPost {
+  ids: number[];
+  workgroup_id: number;
+}
+
+export interface RemoveUsersFromWorkgroupPost {
   ids: number[];
   workgroup_id: number;
 }
@@ -424,8 +436,17 @@ export enum FeatureName {
   ConstrainForBunnyV1 = "constrain-for-bunny-v1",
   QueryNlp = "query-nlp",
   InAppMessenger = "in-app-messenger",
+  ManageWorkgroupsInternal = "manage-workgroups-internal",
 }
 
 export type FeatureFlag = Record<FeatureName, boolean>;
+
+export const DEFAULT_FLAGS: FeatureFlag = {
+  [FeatureName.QueryBuilder]: false,
+  [FeatureName.ConstrainForBunnyV1]: false,
+  [FeatureName.QueryNlp]: false,
+  [FeatureName.InAppMessenger]: false,
+  [FeatureName.ManageWorkgroupsInternal]: true,
+};
 
 export type GroupedCollection = { custodian: Custodian; items: Collection[] };

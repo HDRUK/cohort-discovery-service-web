@@ -2,8 +2,8 @@ import { ApiResponse, Concept, Paginated } from "@/types/api";
 
 const getConcepts = async (
   searchTerm: string,
-  domain?: string
-): Promise<ApiResponse<Paginated<Concept[]>>> => {
+  domain?: string,
+): Promise<ApiResponse<Paginated<Concept>>> => {
   const t = (searchTerm ?? "").toLowerCase();
 
   const concepts = [

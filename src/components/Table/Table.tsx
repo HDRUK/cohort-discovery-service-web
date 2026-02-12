@@ -1,4 +1,4 @@
-import { Box, Divider, Grid } from "@mui/material";
+import { Box, BoxProps, Divider, Grid, Typography } from "@mui/material";
 import {
   MaterialReactTable,
   MaterialReactTableProps,
@@ -6,25 +6,28 @@ import {
 } from "material-react-table";
 import React, { useMemo } from "react";
 import { trueKeys } from "@/utils/numbers";
-import RefreshButton from "@/components/RefreshButton";
-import DownloadButton from "../DownloadButton";
-import { DownloadButtonProps } from "../DownloadButton/DownloadButton";
-import SortButton, { SortButtonProps } from "../SortButton/SortButton";
-import EditButton, { EditButtonProps } from "../EditButton";
-import { RefreshButtonProps } from "../RefreshButton/RefreshButton";
-import DeleteButton, { DeleteButtonProps } from "../DeleteButton";
+import RefreshButton, { RefreshButtonProps } from "@/components/RefreshButton";
+import ReRunButton, { ReRunButtonProps } from "../ReRunButton/ReRunButton";
+import DownloadButton, {
+  DownloadButtonProps,
+} from "@/components/DownloadButton";
+import SortButton, { SortButtonProps } from "@/components/SortButton";
+import EditButton, { EditButtonProps } from "@/components/EditButton";
+import DeleteButton, { DeleteButtonProps } from "@/components/DeleteButton";
 import Title, { TitleProps } from "@/components/Title";
 import ControlledSearchBox, {
   ControlledSearchBoxProps,
 } from "@/modules/ControlledSearchBox";
 
 export interface TableProps {
+  emptyMessage?: string;
   leftAction?: {
     titleProps?: TitleProps;
     searchProps?: ControlledSearchBoxProps;
   };
   rightAction?: {
     refreshProps?: RefreshButtonProps;
+    reRunProps?: ReRunButtonProps;
     deleteProps?: Omit<DeleteButtonProps, "onClick"> & {
       onClick?: (selectedRowIds: string[]) => void;
     };
@@ -37,15 +40,18 @@ export interface TableProps {
     };
   };
   details?: React.ReactNode;
+  boxSxProps?: BoxProps["sx"];
 }
 
 type DTableProps<TData extends MRT_RowData> = MaterialReactTableProps<TData> &
   TableProps;
 
 const Table = <TData extends MRT_RowData>({
+  emptyMessage,
   leftAction,
   rightAction,
   details,
+  boxSxProps,
   ...props
 }: DTableProps<TData>) => {
   const { table } = props;
@@ -54,13 +60,21 @@ const Table = <TData extends MRT_RowData>({
   const selectedRows = useMemo(() => trueKeys(rowSelection), [rowSelection]);
 
   const { titleProps, searchProps } = leftAction || {};
-  const { sortProps, editProps, refreshProps, deleteProps, downloadProps } =
-    rightAction || {};
+  const {
+    sortProps,
+    editProps,
+    refreshProps,
+    reRunProps,
+    deleteProps,
+    downloadProps,
+  } = rightAction || {};
 
   const { onClick: onDeleteClick, ...restDeleteProps } = deleteProps ?? {};
   const { onClick: onDownloadClick, ...restDownloadProps } =
     downloadProps ?? {};
   const { onClick: onEditClick, ...restEditProps } = editProps ?? {};
+
+  const nrows = table?.getRowCount() ?? 0;
 
   return (
     <Box
@@ -71,6 +85,7 @@ const Table = <TData extends MRT_RowData>({
         flex: 1,
         minHeight: 0,
         overflow: "hidden",
+        ...boxSxProps,
       }}
     >
       {(rightAction || leftAction) && (
@@ -93,6 +108,8 @@ const Table = <TData extends MRT_RowData>({
 
                 {refreshProps && <RefreshButton {...refreshProps} />}
 
+                {reRunProps && <ReRunButton {...reRunProps} />}
+
                 {editProps && (
                   <EditButton
                     {...restEditProps}
@@ -103,7 +120,6 @@ const Table = <TData extends MRT_RowData>({
                 {deleteProps && (
                   <DeleteButton
                     {...restDeleteProps}
-                    disabled={!selectedRows.length}
                     onClick={() => onDeleteClick?.(selectedRows)}
                   />
                 )}
@@ -124,7 +140,13 @@ const Table = <TData extends MRT_RowData>({
           <Divider /> {details}
         </Box>
       )}
-      <MaterialReactTable {...props} />
+      {emptyMessage && nrows === 0 ? (
+        <Box sx={{ mx: "auto", my: "auto" }}>
+          <Typography variant="h5">{emptyMessage}</Typography>
+        </Box>
+      ) : (
+        <MaterialReactTable {...props} />
+      )}
     </Box>
   );
 };
