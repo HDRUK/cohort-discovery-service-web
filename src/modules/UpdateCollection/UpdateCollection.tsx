@@ -146,7 +146,6 @@ const UpdateCollection = ({
   const {
     control,
     handleSubmit,
-    resetField,
     reset,
     formState: { isDirty, errors },
   } = formMethods;
@@ -167,16 +166,14 @@ const UpdateCollection = ({
     collectionCustodianPid,
   ]);
 
-  useEffect(() => {
-    resetField("collection.host_id", { defaultValue: 0 });
-  }, [allowedCollectionHosts, resetField]);
-
+  const lastCollectionIdRef = useRef<number | null>(null);
   useEffect(() => {
     if (!collection) return;
+    //dont reset if the data just refreshed while editing
+    if (lastCollectionIdRef.current === collection.id) return;
+    lastCollectionIdRef.current = collection.id;
 
-    const newValues = getDefaultValues(collection);
-
-    reset(newValues, {
+    reset(getDefaultValues(collection), {
       keepDirty: false,
       keepTouched: false,
     });
