@@ -10,9 +10,11 @@ import {
 } from "material-react-table";
 import { useTable } from "./useTable";
 import { buildRowsPerPageOptions } from "@/utils/pagination";
+import { DEFAULT_PER_PAGE } from "@/config/defaults";
 
-interface UsePaginatedTableOptions<TData extends MRT_RowData>
-  extends Partial<MRT_TableOptions<TData>> {
+interface UsePaginatedTableOptions<TData extends MRT_RowData> extends Partial<
+  MRT_TableOptions<TData>
+> {
   columns: MRT_ColumnDef<TData>[];
   data: TData[];
   rowCount: number;
@@ -36,9 +38,13 @@ export function usePaginatedTable<TData extends { pid: string }>({
   const searchParams = useSearchParams();
 
   const page = parseInt(searchParams.get("page") || "1");
+  const resolvedPerPageDefault =
+    perPageDefault > 0 ? perPageDefault : DEFAULT_PER_PAGE;
   const perPage = parseInt(
-    searchParams.get("per_page") || perPageDefault.toString(),
+    searchParams.get("per_page") || resolvedPerPageDefault.toString(),
+    10,
   );
+  const rowsPerPageOptions = buildRowsPerPageOptions(resolvedPerPageDefault);
 
   const [pagination, setPagination] = useState({
     pageIndex: page - 1,
@@ -101,7 +107,7 @@ export function usePaginatedTable<TData extends { pid: string }>({
       ...state,
     },
     muiPaginationProps: {
-      rowsPerPageOptions: buildRowsPerPageOptions(perPageDefault),
+      rowsPerPageOptions,
     },
     muiBottomToolbarProps: {
       sx: {

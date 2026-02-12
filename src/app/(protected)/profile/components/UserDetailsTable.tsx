@@ -99,7 +99,7 @@ const UserDetailsTable = ({ user }: { user: CombinedUser }) => {
       value: user.token_user?.workgroups?.length ? (
         <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
           {user.token_user.workgroups.map((wg) => (
-            <Chip color="secondary" key={wg.id} size="small" label={wg.name} />
+            <Chip color="secondary" key={wg} size="small" label={wg} />
           ))}
         </Stack>
       ) : (
