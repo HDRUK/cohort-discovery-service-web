@@ -1,4 +1,4 @@
-import { IconButtonProps } from "@mui/material";
+import { Box, IconButtonProps, Typography } from "@mui/material";
 
 import DownloadIcon from "@mui/icons-material/Download";
 import PositionedMenu, { PositionedMenuItem } from "../PositionedMenu";
@@ -16,6 +16,7 @@ export interface DownloadButtonProps extends Omit<
   id?: string;
   entity?: string;
   formats?: AvailableFormats[];
+  isIcon?: boolean;
 }
 
 const DownloadButton = ({
@@ -23,6 +24,7 @@ const DownloadButton = ({
   entity,
   formats = [AvailableFormats.JSON],
   disabled,
+  isIcon = true,
 }: DownloadButtonProps) => {
   const notify = useNotify();
 
@@ -50,9 +52,23 @@ const DownloadButton = ({
     onClick: () => download(format),
   }));
 
-  return (
+  return isIcon ? (
     <PositionedMenu data-testid="download-button" isIcon items={items}>
       <DownloadIcon />
+    </PositionedMenu>
+  ) : (
+    <PositionedMenu
+      data-testid="download-button"
+      items={items}
+      startIcon={<DownloadIcon />}
+      variant="text"
+      sx={{
+        justifyContent: "flex-start",
+        textAlign: "left",
+        color: "text.primary",
+      }}
+    >
+      Download
     </PositionedMenu>
   );
 };

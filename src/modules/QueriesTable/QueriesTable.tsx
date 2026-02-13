@@ -229,55 +229,54 @@ const QueriesTable = ({
               </Grid>
             ),
             rightAction: {
-              deleteProps: {
-                onClick: () => {
-                  deleteQueries([row.original.pid]);
-                  const openQueries = (searchParams.get("open_queries") || "")
-                    .split(",")
-                    .filter((q) => q && q !== row.original.pid);
-                  router.push(routes.dashboardHistory(openQueries));
-                },
-              },
-              reRunProps: {
-                label: "Re-run query",
-                onClick: async () => {
-                  const { data } = await rerunQuery(row.original.pid);
-                  const openQueries = (searchParams.get("open_queries") || "")
-                    .split(",")
-                    .filter((q) => q);
-                  if (openQueries.indexOf(data.query_pid) === -1) {
-                    openQueries.push(data.query_pid);
-                  }
-                  router.push(
-                    routes.dashboardQueryResult(data.query_pid, openQueries),
-                  );
-                },
-              },
-              downloadProps: {
-                id: row.original.pid,
-                entity: "queries",
-                formats: [AvailableFormats.JSON],
-              },
-              editProps: {
-                onClick: () => {
-                  const ranCollectionPids = row.original.tasks.map(
-                    (t) => t.collection.pid,
-                  );
-                  setSelectedDatasets(ranCollectionPids);
-                  setQueryName("");
-
-                  setQueryBuilderJson(row.original.definition);
-                  const openQueries = (searchParams.get("open_queries") || "")
-                    .split(",")
-                    .filter((q) => q);
-                  router.push(
-                    routes.dashboardNewQuery(
-                      openQueries,
-                      `query=${row.original.pid}`,
-                    ),
-                  );
-                },
-              },
+              // deleteProps: {
+              //   onClick: () => {
+              //     deleteQueries([row.original.pid]);
+              //     const openQueries = (searchParams.get("open_queries") || "")
+              //       .split(",")
+              //       .filter((q) => q && q !== row.original.pid);
+              //     router.push(routes.dashboardHistory(openQueries));
+              //   },
+              // },
+              // reRunProps: {
+              //   label: "Re-run query",
+              //   onClick: async () => {
+              //     const { data } = await rerunQuery(row.original.pid);
+              //     const openQueries = (searchParams.get("open_queries") || "")
+              //       .split(",")
+              //       .filter((q) => q);
+              //     if (openQueries.indexOf(data.query_pid) === -1) {
+              //       openQueries.push(data.query_pid);
+              //     }
+              //     router.push(
+              //       routes.dashboardQueryResult(data.query_pid, openQueries),
+              //     );
+              //   },
+              // },
+              // downloadProps: {
+              //   id: row.original.pid,
+              //   entity: "queries",
+              //   formats: [AvailableFormats.JSON],
+              // },
+              // editProps: {
+              //   onClick: () => {
+              //     const ranCollectionPids = row.original.tasks.map(
+              //       (t) => t.collection.pid,
+              //     );
+              //     setSelectedDatasets(ranCollectionPids);
+              //     setQueryName("");
+              //     setQueryBuilderJson(row.original.definition);
+              //     const openQueries = (searchParams.get("open_queries") || "")
+              //       .split(",")
+              //       .filter((q) => q);
+              //     router.push(
+              //       routes.dashboardNewQuery(
+              //         openQueries,
+              //         `query=${row.original.pid}`,
+              //       ),
+              //     );
+              //   },
+              // },
             },
           }}
         />
@@ -303,6 +302,7 @@ const QueriesTable = ({
           onClick: deleteQueries,
         },
       }}
+      rightPanel={true}
     />
   );
 };

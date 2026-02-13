@@ -95,6 +95,7 @@ const PositionedMenu = ({
         {...commonButtonProps}
         {...specificButtonProps}
         {...rest}
+        variant={isIcon ? undefined : "text"}
       >
         {children}
       </ButtonComponent>

@@ -1,13 +1,28 @@
 import EditIcon from "@mui/icons-material/Edit";
-import { IconButton, IconButtonProps } from "@mui/material";
+import { Button, IconButton, IconButtonProps } from "@mui/material";
 export interface EditButtonProps extends IconButtonProps {
   children?: React.ReactNode;
+  label?: string;
 }
-const EditButton = ({ children, ...props }: EditButtonProps) => (
-  <IconButton {...props}>
-    <EditIcon />
-    {children}
-  </IconButton>
-);
+const EditButton = ({ children, label, ...props }: EditButtonProps) =>
+  label ? (
+    <Button
+      variant="text"
+      startIcon={<EditIcon />}
+      sx={{
+        justifyContent: "flex-start",
+        textAlign: "left",
+        color: "text.primary",
+      }}
+      {...props}
+    >
+      {label}
+    </Button>
+  ) : (
+    <IconButton {...props}>
+      <EditIcon />
+      {children}
+    </IconButton>
+  );
 
 export default EditButton;

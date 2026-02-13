@@ -2,10 +2,10 @@
 
 import {
   IconButton,
-  Typography,
   Box,
   IconButtonProps,
   Tooltip,
+  Button,
 } from "@mui/material";
 import CachedIcon from "@mui/icons-material/Cached";
 
@@ -31,10 +31,25 @@ const ReRunButton = ({
   return (
     <Tooltip title={title}>
       <Box display="flex" alignItems="center" gap={1}>
-        <IconButton onClick={onClick} {...rest}>
-          <CachedIcon fontSize={"small"} />
-        </IconButton>
-        {text && <Typography variant="body2">{text}</Typography>}
+        {text ? (
+          <Button
+            variant="text"
+            startIcon={<CachedIcon fontSize={"small"} />}
+            onClick={onClick}
+            sx={{
+              justifyContent: "flex-start",
+              textAlign: "left",
+              color: "text.primary",
+            }}
+            {...rest}
+          >
+            {text}
+          </Button>
+        ) : (
+          <IconButton onClick={onClick} {...rest}>
+            <CachedIcon fontSize={"small"} />
+          </IconButton>
+        )}
       </Box>
     </Tooltip>
   );
