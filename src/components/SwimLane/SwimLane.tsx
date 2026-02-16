@@ -41,8 +41,6 @@ const SwimLane = ({
       onTransitionStart={hideOnTransiton ? handleTransitionStart : undefined}
       onTransitionEnd={hideOnTransiton ? handleTransitionEnd : undefined}
       sx={(theme) => ({
-        overflowY: scrollable ? "auto" : undefined,
-        scrollbarGutter: scrollable ? "stable" : undefined,
         display: "flex",
         flexDirection: "column",
         minHeight: 0,
@@ -50,6 +48,37 @@ const SwimLane = ({
         transition: theme.transitions.create(["width", "flex-basis"], {
           easing: theme.transitions.easing.sharp,
           duration: theme.transitions.duration.short,
+        }),
+        ...(scrollable && {
+          overflowY: "auto",
+          scrollbarGutter: "stable",
+          scrollbarWidth: "thin",
+          scrollbarColor: "transparent transparent",
+
+          "&::-webkit-scrollbar": {
+            width: 10,
+          },
+
+          "&::-webkit-scrollbar-thumb": {
+            backgroundColor: "transparent",
+            borderRadius: 999,
+          },
+          "&::-webkit-scrollbar-track": {
+            backgroundColor: "transparent",
+          },
+
+          "&:hover::-webkit-scrollbar-thumb, &:focus-within::-webkit-scrollbar-thumb":
+            {
+              backgroundColor: theme.palette.action.active,
+            },
+          "&:hover::-webkit-scrollbar-track, &:focus-within::-webkit-scrollbar-track":
+            {
+              backgroundColor: theme.palette.action.hover,
+            },
+
+          "&:hover, &:focus-within": {
+            scrollbarColor: `${theme.palette.action.active} ${theme.palette.action.hover}`,
+          },
         }),
       })}
       {...rest}
