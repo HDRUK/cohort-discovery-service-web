@@ -1,3 +1,9 @@
+## [1.0.2](https://github.com/HDRUK/project-daphne-web/compare/v1.0.1...v1.0.2) (2026-02-16)
+
+### 🐛 Bug Fixes
+
+* **DP-465:** Disable cache on rerunTask, as calling with the same pid would defer to cache and ignore request ([05ec26f](https://github.com/HDRUK/project-daphne-web/commit/05ec26fa384a89e77f62c7f67ffd81ca8d2df77d)), closes [DP-465](DP-465)
+
 ## [1.0.1](https://github.com/HDRUK/project-daphne-web/compare/v1.0.0...v1.0.1) (2026-01-09)
 
 ### 🐛 Bug Fixes
