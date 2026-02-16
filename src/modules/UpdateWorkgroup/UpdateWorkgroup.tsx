@@ -12,6 +12,7 @@ import FormMultiSelect from "@/components/FormMultiSelect";
 import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
 import useAdminStore from "@/hooks/useAdminStore";
 import { TAG_CUSTODIAN_COLLECTION, TAG_WORKGROUP_ADMIN } from "@/config/tags";
+import theme from "@/config/theme";
 
 export type UpdateWorkgroupProps = {
   expandedRight: boolean;
@@ -130,7 +131,11 @@ const UpdateWorkgroup = ({ expandedRight, onClose }: UpdateWorkgroupProps) => {
                 }
               }}
             >
-              {expandedRight ? <LockOpenIcon /> : <LockOutlineIcon />}
+              {expandedRight ? (
+                <LockOpenIcon sx={{ color: theme.palette.tooltip?.main }} />
+              ) : (
+                <LockOutlineIcon />
+              )}
             </Box>
           </Box>
         }

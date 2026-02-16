@@ -38,6 +38,7 @@ import ManageCollectionStatus from "@/modules/ManageCollectionStatus";
 import CopyableVariable from "@/components/CopyableVariable";
 import ErrorHeader from "@/components/ErrorHeader";
 import { useAdminDataStore } from "@/store/adminDataStore";
+import theme from "@/config/theme";
 
 const UpdateCollectionGuidance = maskClientTest(
   () => import("./UpdateCollectionGuidance"),
@@ -356,7 +357,11 @@ const UpdateCollection = ({
                   }
                 }}
               >
-                {expandedRight ? <LockOpenIcon /> : <LockOutlineIcon />}
+                {expandedRight ? (
+                  <LockOpenIcon sx={{ color: theme.palette.tooltip?.main }} />
+                ) : (
+                  <LockOutlineIcon />
+                )}
               </Box>
             </Box>
             <ErrorHeader errors={errors} depth={2} editing />
