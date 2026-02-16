@@ -41,6 +41,8 @@ const SwimLane = ({
       onTransitionStart={hideOnTransiton ? handleTransitionStart : undefined}
       onTransitionEnd={hideOnTransiton ? handleTransitionEnd : undefined}
       sx={(theme) => ({
+        overflowY: scrollable ? "auto" : undefined,
+        scrollbarGutter: scrollable ? "stable" : undefined,
         display: "flex",
         flexDirection: "column",
         minHeight: 0,
@@ -59,8 +61,10 @@ const SwimLane = ({
           flexDirection: "column",
           flex: 1,
           minHeight: 0,
-          p: 2,
-          mx: 1,
+          py: 2,
+          px: 2,
+          mx: 0,
+
           ...paperSx,
         }}
       >
@@ -70,7 +74,10 @@ const SwimLane = ({
             flexDirection: "column",
             flex: 1,
             minHeight: 0,
-            overflowY: scrollable ? "auto" : undefined,
+
+            //px: 1,
+            //border: 1,
+            px: 0,
           }}
         >
           {!isTransitioning && children}

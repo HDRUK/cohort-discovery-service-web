@@ -18,8 +18,10 @@ import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { useElementSize } from "@/hooks/useElementSize";
 import { ActionMenuSectionContext } from "./ActionMenuSectionContext";
 
-export interface ActionMenuSectionProps
-  extends Omit<AccordionProps, "children" | "title"> {
+export interface ActionMenuSectionProps extends Omit<
+  AccordionProps,
+  "children" | "title"
+> {
   summary?: React.ReactNode;
   title?: React.ReactNode | string;
   shortTitle?: string | React.ReactNode;

@@ -22,7 +22,7 @@
     "@emotion/styled": "^11.14.1",
     "@fontsource/roboto": "^5.2.6",
     "@google/generative-ai": "^0.24.1",
-    "@hdruk/ui": "^1.0.4",
+    "@hdruk/ui": "file:.yalc/@hdruk/ui",
     "@hookform/resolvers": "^5.2.2",
     "@mdx-js/loader": "^3.1.1",
     "@mdx-js/react": "^3.1.1",
