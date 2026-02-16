@@ -11,6 +11,7 @@
     "lint:fix": "eslint . --fix",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
+    "semi": "npx semantic-release",
     "test": "jest",
     "test:watch": "jest --watch --transformIgnorePatterns \"node_modules/(?!pretty-bytes)/\"  "
   },
