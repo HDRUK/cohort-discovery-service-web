@@ -13,6 +13,7 @@ const useFeatures = () =>
         inAppMessenger: flags[FeatureName.InAppMessenger] ?? false,
         manageWorkgroupsInternal:
           flags[FeatureName.ManageWorkgroupsInternal] ?? true,
+        hdrukTheme: flags[FeatureName.HdrukTheme] ?? true,
       };
     }),
   );

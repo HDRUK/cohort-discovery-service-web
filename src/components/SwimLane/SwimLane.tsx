@@ -49,6 +49,37 @@ const SwimLane = ({
           easing: theme.transitions.easing.sharp,
           duration: theme.transitions.duration.short,
         }),
+        ...(scrollable && {
+          overflowY: "auto",
+          scrollbarGutter: "stable",
+          scrollbarWidth: "thin",
+          scrollbarColor: "transparent transparent",
+
+          "&::-webkit-scrollbar": {
+            width: 10,
+          },
+
+          "&::-webkit-scrollbar-thumb": {
+            backgroundColor: "transparent",
+            borderRadius: 999,
+          },
+          "&::-webkit-scrollbar-track": {
+            backgroundColor: "transparent",
+          },
+
+          "&:hover::-webkit-scrollbar-thumb, &:focus-within::-webkit-scrollbar-thumb":
+            {
+              backgroundColor: theme.palette.action.active,
+            },
+          "&:hover::-webkit-scrollbar-track, &:focus-within::-webkit-scrollbar-track":
+            {
+              backgroundColor: theme.palette.action.hover,
+            },
+
+          "&:hover, &:focus-within": {
+            scrollbarColor: `${theme.palette.action.active} ${theme.palette.action.hover}`,
+          },
+        }),
       })}
       {...rest}
       size={size}
@@ -60,7 +91,8 @@ const SwimLane = ({
           flex: 1,
           minHeight: 0,
           p: 2,
-          mx: 1,
+          mx: 0,
+
           ...paperSx,
         }}
       >
@@ -70,7 +102,7 @@ const SwimLane = ({
             flexDirection: "column",
             flex: 1,
             minHeight: 0,
-            overflowY: scrollable ? "auto" : undefined,
+            px: 0,
           }}
         >
           {!isTransitioning && children}

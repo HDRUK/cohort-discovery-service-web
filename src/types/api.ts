@@ -437,6 +437,7 @@ export enum FeatureName {
   QueryNlp = "query-nlp",
   InAppMessenger = "in-app-messenger",
   ManageWorkgroupsInternal = "manage-workgroups-internal",
+  HdrukTheme = "hdruk-uk-theme",
 }
 
 export type FeatureFlag = Record<FeatureName, boolean>;
@@ -447,6 +448,7 @@ export const DEFAULT_FLAGS: FeatureFlag = {
   [FeatureName.QueryNlp]: false,
   [FeatureName.InAppMessenger]: false,
   [FeatureName.ManageWorkgroupsInternal]: true,
+  [FeatureName.HdrukTheme]: true,
 };
 
 export type GroupedCollection = { custodian: Custodian; items: Collection[] };

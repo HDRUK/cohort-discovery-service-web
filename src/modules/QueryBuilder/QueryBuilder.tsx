@@ -52,7 +52,6 @@ const QueryBuilder = ({
     createNewGroup,
     createNewRule,
     createNewAgeFilter,
-    selectedGuidance,
   } = useQueryBuilder((qb) => ({
     resetQueryBuilderJson: qb.resetQueryBuilderJson,
     queryBuilderJson: qb.queryBuilderJson,
@@ -230,7 +229,6 @@ const QueryBuilder = ({
         }
         middleProps={{ ref: boardRef }}
         right={<RuleMenu />}
-        rightProps={{ scrollable: false }}
       />
       <MarqueeSelection
         containerRef={boardRef}

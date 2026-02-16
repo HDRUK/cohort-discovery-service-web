@@ -198,7 +198,7 @@ const Guidance = () => {
 
   if (!selectedNode) {
     return (
-      <ActionMenuSection title={"Tool Guidance"} fixedExpanded scrollable>
+      <ActionMenuSection title={"Tool Guidance"} fixedExpanded>
         <ToolGuidance components={baseComponents} />
       </ActionMenuSection>
     );
@@ -206,11 +206,7 @@ const Guidance = () => {
     if (isRuleLeaf(selectedNode)) {
       if (isEmptyRule(selectedNode)) {
         return (
-          <ActionMenuSection
-            title={"Search Categories"}
-            fixedExpanded
-            scrollable
-          >
+          <ActionMenuSection title={"Search Categories"} fixedExpanded>
             <EmptyRuleGuidance components={baseComponents} />
           </ActionMenuSection>
         );
@@ -222,7 +218,7 @@ const Guidance = () => {
       );
 
       return (
-        <ActionMenuSection title={"Rule"} fixedExpanded scrollable>
+        <ActionMenuSection title={"Rule"} fixedExpanded>
           <RuleGuidance
             category={capitaliseFirstLetter(
               selectedNode.rule.concept?.category || "",
@@ -238,19 +234,19 @@ const Guidance = () => {
       );
     } else if (isOperator(selectedNode)) {
       return (
-        <ActionMenuSection title={"Operator"} fixedExpanded scrollable>
+        <ActionMenuSection title={"Operator"} fixedExpanded>
           <OperatorGuidance components={makeOperatorComponents(selectedNode)} />
         </ActionMenuSection>
       );
     } else if (isRuleGroup(selectedNode)) {
       return (
-        <ActionMenuSection title={"Group"} fixedExpanded scrollable>
+        <ActionMenuSection title={"Group"} fixedExpanded>
           <GroupGuidance components={makeGroupComponents(selectedNode)} />
         </ActionMenuSection>
       );
     } else if (isAgeFilter(selectedNode)) {
       return (
-        <ActionMenuSection title={"Age Rule"} fixedExpanded scrollable>
+        <ActionMenuSection title={"Age Rule"} fixedExpanded>
           <AgeFilterGuidance
             components={makeAgeFilterComponents(selectedNode)}
           />

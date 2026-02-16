@@ -14,6 +14,7 @@ const eslintConfig = defineConfig([
     'coverage/**',
     'build/**',
     'next-env.d.ts',
+    '.yalc/**',
   ]),
   {
     rules: {

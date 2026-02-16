@@ -11,6 +11,7 @@
     "lint:fix": "eslint . --fix",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
+    "semi": "npx semantic-release",
     "test": "jest",
     "test:watch": "jest --watch --transformIgnorePatterns \"node_modules/(?!pretty-bytes)/\"  "
   },
@@ -22,7 +23,7 @@
     "@emotion/styled": "^11.14.1",
     "@fontsource/roboto": "^5.2.6",
     "@google/generative-ai": "^0.24.1",
-    "@hdruk/ui": "^1.0.4",
+    "@hdruk/ui": "^1.0.8",
     "@hookform/resolvers": "^5.2.2",
     "@mdx-js/loader": "^3.1.1",
     "@mdx-js/react": "^3.1.1",
