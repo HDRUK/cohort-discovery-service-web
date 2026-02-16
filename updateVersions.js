@@ -1,5 +1,8 @@
-const fs = require("fs");
-const path = require("path");
+import { readFileSync, writeFileSync } from "fs";
+import { resolve, dirname } from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const newVersion = process.argv[2];
 if (!newVersion) {
@@ -7,25 +10,25 @@ if (!newVersion) {
   process.exit(1);
 }
 function updateChartYamlVersion(newVersion) {
-  const chartFilePath = path.resolve(__dirname, "chart/cohort-web/Chart.yaml");
-  const chartContent = fs.readFileSync(chartFilePath, "utf8");
+  const chartFilePath = resolve(__dirname, "chart/cohort-web/Chart.yaml");
+  const chartContent = readFileSync(chartFilePath, "utf8");
 
   const updatedContent = chartContent.replace(
     /^appVersion:\s*"?[0-9]+\.[0-9]+\.[0-9]+"?/m,
     `appVersion: "${newVersion}"`,
   );
 
-  fs.writeFileSync(chartFilePath, updatedContent, "utf8");
+  writeFileSync(chartFilePath, updatedContent, "utf8");
   console.log(`Updated chart/Chart.yaml to version ${newVersion}`);
 }
 function updatePackageJsonVersion(newVersion) {
-  const packageJsonPath = path.resolve(__dirname, "package.json");
-  const packageJsonContent = fs.readFileSync(packageJsonPath, "utf8");
+  const packageJsonPath = resolve(__dirname, "package.json");
+  const packageJsonContent = readFileSync(packageJsonPath, "utf8");
 
   const packageJson = JSON.parse(packageJsonContent);
   packageJson.version = newVersion;
 
-  fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), "utf8");
+  writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), "utf8");
   console.log(`Updated package.json to version ${newVersion}`);
 }
 
