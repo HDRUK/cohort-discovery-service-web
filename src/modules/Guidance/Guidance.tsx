@@ -206,11 +206,7 @@ const Guidance = () => {
     if (isRuleLeaf(selectedNode)) {
       if (isEmptyRule(selectedNode)) {
         return (
-          <ActionMenuSection
-            title={"Search Categories"}
-            fixedExpanded
-            scrollable
-          >
+          <ActionMenuSection title={"Search Categories"} fixedExpanded>
             <EmptyRuleGuidance components={baseComponents} />
           </ActionMenuSection>
         );
@@ -250,7 +246,7 @@ const Guidance = () => {
       );
     } else if (isAgeFilter(selectedNode)) {
       return (
-        <ActionMenuSection title={"Age Rule"} fixedExpanded scrollable>
+        <ActionMenuSection title={"Age Rule"} fixedExpanded>
           <AgeFilterGuidance
             components={makeAgeFilterComponents(selectedNode)}
           />

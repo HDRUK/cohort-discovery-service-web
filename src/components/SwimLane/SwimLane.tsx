@@ -90,8 +90,7 @@ const SwimLane = ({
           flexDirection: "column",
           flex: 1,
           minHeight: 0,
-          py: 2,
-          px: 2,
+          p: 2,
           mx: 0,
 
           ...paperSx,
@@ -103,9 +102,6 @@ const SwimLane = ({
             flexDirection: "column",
             flex: 1,
             minHeight: 0,
-
-            //px: 1,
-            //border: 1,
             px: 0,
           }}
         >
