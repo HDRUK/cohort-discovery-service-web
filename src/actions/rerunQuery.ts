@@ -7,6 +7,7 @@ import { CreateQuery, ApiResponse } from "../types/api";
 const rerunQuery = async (pid: string): Promise<ApiResponse<CreateQuery>> => {
   return await apiGet<ApiResponse<CreateQuery>>({
     url: API_ROUTES.rerunQuery(pid),
+    cacheOptions: { useCache: false },
   });
 };
 
