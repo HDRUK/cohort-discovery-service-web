@@ -1,3 +1,9 @@
+## [1.1.0](https://github.com/HDRUK/project-daphne-web/compare/v1.0.2...v1.1.0) (2026-02-16)
+
+### ✨ Features
+
+* **DP-1234:** Update Docker build context ([ef5be4d](https://github.com/HDRUK/project-daphne-web/commit/ef5be4ded23066d36a8c8b1b05d14442f27b6372)), closes [DP-1234](DP-1234)
+
 ## [1.0.2](https://github.com/HDRUK/project-daphne-web/compare/v1.0.1...v1.0.2) (2026-02-16)
 
 ### 🐛 Bug Fixes
