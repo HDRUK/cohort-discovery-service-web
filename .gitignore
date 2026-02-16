@@ -13,3 +13,5 @@ npm-debug.log
 *storybook.log
 storybook-static
 coverage
+.yalc
+yalc.lock
