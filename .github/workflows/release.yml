@@ -120,7 +120,8 @@ jobs:
             --build-arg NEXT_PUBLIC_TASK_URL=${{ vars.NEXT_PUBLIC_TASK_URL }} \
             --build-arg NEXT_PUBLIC_USE_EXAMPLE_QUERY=${{ vars.NEXT_PUBLIC_USE_EXAMPLE_QUERY }} \
             --build-arg APPLICATION_MODE=${{ vars.APPLICATION_MODE }} \
-            .
+            ./
+            
           docker push --all-tags '${{ env.GAR_LOCATION }}'-docker.pkg.dev/'${{ env.PROJECT_ID }}'/'${{ env.GAR_NAME }}'/${{ steps.getversion.outputs.version }}
 
       - name: Run Notification
