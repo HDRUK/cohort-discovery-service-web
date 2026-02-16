@@ -1,6 +1,5 @@
 import { Grid, GridProps } from "@mui/material";
 import React, { ReactNode } from "react";
-import SwimLane from "../SwimLane/SwimLane";
 
 export interface SwimLaneContainerProps extends GridProps {
   separatorNode?: ReactNode;
@@ -27,19 +26,7 @@ const SwimLaneContainer = ({
       {childrenArray.map((child, index) => {
         const key = index;
 
-        return (
-          <React.Fragment key={key}>
-            {child}
-            <SwimLane
-              size="auto"
-              paperSx={{ bgcolor: "inherit", px: 0, mx: 0 }}
-            >
-              {separatorNode &&
-                index < childrenArray.length - 1 &&
-                separatorNode}
-            </SwimLane>
-          </React.Fragment>
-        );
+        return <React.Fragment key={key}>{child}</React.Fragment>;
       })}
     </Grid>
   );
