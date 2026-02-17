@@ -9,7 +9,11 @@ import UserTable from "@/components/UserTable";
 import useFeatures from "@/hooks/useFeatures";
 
 const WorkgroupsMiddlePanel = () => {
-  const { manageWorkgroupsInternal } = useFeatures();
+  const features = useFeatures();
+  const { manageWorkgroupsInternal } = features;
+
+  console.log(features);
+  console.log({ manageWorkgroupsInternal });
 
   const selectedWorkgroup = useAdminStore((s) => s.selectedWorkgroup);
   const removeCollectionsFromWorkgroup = useAdminStore(
