@@ -20,8 +20,6 @@ const SwimLaneContainer = ({
         flex: 1,
         minHeight: 0,
         overflow: "hidden",
-        //gap: 2, // ✅ consistent spacing
-        //justifyContent: "flex-start", // ✅ no “mystery” space distribution
       }}
       {...props}
     >
