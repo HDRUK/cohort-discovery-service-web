@@ -79,22 +79,6 @@ npm run lint
 npm run test
 ```
 
-## Docker
-
-A `Dockerfile` is included for containerized builds.
-
-Build:
-
-```bash
-docker build -t daphne-web .
-```
-
-Run:
-
-```bash
-docker run --rm -p 3001:3001 daphne-web
-```
-
 ## Troubleshooting
 
 - If auth redirects fail, verify `NEXT_PUBLIC_LOGIN_URL`.
