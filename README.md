@@ -1,12 +1,12 @@
 # Cohort Discovery Service - Web
 
-Frontend application for the Daphne cohort discovery platform, built with Next.js (App Router), React, and MUI.
+Frontend application for the Cohort Discovery Service, built with Next.js (App Router), React, and MUI.
 
 ## Prerequisites
 
 - Node.js 24+
 - npm 10+
-- Daphne API running locally (default: `http://localhost:8100`)
+- Cohort Discovery Service API running locally (default: `http://localhost:8100`)
 
 ## Quick Start
 
