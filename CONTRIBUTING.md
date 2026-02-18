@@ -1,6 +1,6 @@
-# Contributing to Daphne Web
+# Contributing to Cohort Discovery Service - Web
 
-This document describes the expected workflow and standards for contributions to `project-daphne-web`.
+This document describes the expected workflow and standards for contributions to `cohort-discovery-service-web`.
 
 ## Prerequisites
 
