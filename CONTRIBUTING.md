@@ -65,6 +65,7 @@ Run locally before requesting review:
 npm run lint
 npm run test
 npm run build
+npm run lint:workflows
 ```
 
 For UI-heavy changes, also run:
@@ -74,6 +75,8 @@ npm run build-storybook
 ```
 
 CI also runs lint, tests, build, and Storybook build.
+
+`lint:workflows` requires `actionlint` on your machine (for example: `brew install actionlint`).
 
 ## Coding Patterns in This Repo
 
