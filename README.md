@@ -1,4 +1,4 @@
-# Daphne Web
+# Cohort Discovery Service - Web
 
 Frontend application for the Daphne cohort discovery platform, built with Next.js (App Router), React, and MUI.
 
@@ -16,7 +16,7 @@ Frontend application for the Daphne cohort discovery platform, built with Next.j
 npm install
 ```
 
-2. Create local env file:
+2. Create and fill local env file:
 
 ```bash
 cp .env.example .env
