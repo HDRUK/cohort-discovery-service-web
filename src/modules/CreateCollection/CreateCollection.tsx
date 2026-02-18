@@ -96,12 +96,12 @@ const CreateCollection = ({ onCancel }: CreateCollectionProps) => {
         component="form"
         onSubmit={handleSubmit(onSubmit)}
         sx={{
-          mt: 2,
-          height: "100%",
+          flex: 1,
+          minHeight: 0,
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          mb: 5,
+          pb: 5,
         }}
       >
         <Stack spacing={2} width={"70%"} height={"100%"}>
