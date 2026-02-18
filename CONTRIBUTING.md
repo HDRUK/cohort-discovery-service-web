@@ -6,7 +6,7 @@ This document describes the expected workflow and standards for contributions to
 
 - Node.js (use a current LTS locally; CI runs Node 20)
 - npm
-- Access to the Daphne API for local testing
+- Access to the Cohort Discovery Service API for local testing
 
 ## Local Setup
 
