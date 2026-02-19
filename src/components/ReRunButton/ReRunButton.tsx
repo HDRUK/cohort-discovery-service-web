@@ -1,15 +1,7 @@
 "use client";
 
-import {
-  IconButton,
-  Box,
-  IconButtonProps,
-  Tooltip,
-  Button,
-} from "@mui/material";
+import { IconButton, IconButtonProps, Button } from "@mui/material";
 import CachedIcon from "@mui/icons-material/Cached";
-
-const isProd = process.env.NODE_ENV === "production";
 
 export interface ReRunButtonProps extends Omit<IconButtonProps, "onClick"> {
   tag?: string;
@@ -27,31 +19,36 @@ const ReRunButton = ({
   showTooltip = false,
   ...rest
 }: ReRunButtonProps) => {
-  const title = !isProd || showTooltip ? label : null;
+  const ButtonComponent = (!text ? IconButton : Button) as React.ElementType;
+
+  const specificButtonProps = !text
+    ? {
+        sx: {
+          bgcolor: "white",
+          borderRadius: "50%",
+          height: 36,
+          width: 36,
+        },
+      }
+    : {
+        variant: "text",
+        sx: {
+          justifyContent: "flex-start",
+          textAlign: "left",
+          color: "text.primary",
+        },
+        startIcon: <CachedIcon fontSize={"small"} />,
+      };
   return (
-    <Tooltip title={title}>
-      <Box display="flex" alignItems="center" gap={1}>
-        {text ? (
-          <Button
-            variant="text"
-            startIcon={<CachedIcon fontSize={"small"} />}
-            onClick={onClick}
-            sx={{
-              justifyContent: "flex-start",
-              textAlign: "left",
-              color: "text.primary",
-            }}
-            {...rest}
-          >
-            {text}
-          </Button>
-        ) : (
-          <IconButton onClick={onClick} {...rest}>
-            <CachedIcon fontSize={"small"} />
-          </IconButton>
-        )}
-      </Box>
-    </Tooltip>
+    <ButtonComponent
+      onClick={onClick}
+      {...specificButtonProps}
+      {...rest}
+      variant={!text ? undefined : "text"}
+    >
+      {!text && <CachedIcon />}
+      {text}
+    </ButtonComponent>
   );
 };
 

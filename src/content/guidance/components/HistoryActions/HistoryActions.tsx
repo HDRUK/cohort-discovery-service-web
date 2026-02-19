@@ -60,10 +60,8 @@ const HistoryActions = ({
     setDialogOpen(false);
   };
 
-  const handleDelete = () => {
-    console.log("here", selectedIds);
-    const response = deleteQueries(selectedIds);
-    console.log(response);
+  const handleDelete = async () => {
+    await deleteQueries(selectedIds);
     const openQueries = (searchParams.get("open_queries") || "")
       .split(",")
       .filter((q) => q && !(q in selectedIds));
