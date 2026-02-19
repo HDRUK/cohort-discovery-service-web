@@ -3,8 +3,31 @@
   * @property {string} taskUrl
   */}
 
+## BUNNY setup
 
-A **Collection** maps to a database containing discoverable data via a BUNNY link installed in your own environment. When you create a Collection with our system, you must configure your BUNNY(s) to authenticate and connect to our Cohort Discovery API using the automatically generated persistent ID for the collection to receive new query jobs to run (calculate cohort counts).
+A **Collection** maps to a database containing discoverable data via a BUNNY link installed in your own environment. 
+When you create a Collection with our system, you must configure your BUNNY(s) to authenticate and connect to our Cohort Discovery API using the automatically generated persistent ID for the collection to receive new query jobs to run (calculate cohort counts).
+
+<br/>
+For detailed setup instructions, see [Hutch bunny config](https://hutch.health/bunny/config).
+
+<br/>
+
+As per our custodian setup instructions you will need to run at least two BUNNYs with different task types:
+{(() => {
+  const yaml = `
+  - TASK_API_TYPE="a" or "b"
+`;
+  return (
+    <pre>
+      <code className="language-yaml">{yaml}</code>
+    </pre>
+  );
+})()}
+
+* "a" type BUNNYs run queries it receives and returns record counts
+* "b" type BUNNYs run configurable distribution jobs that report counts per each health data code present in the dataset, as well as demographic counts.
+
 
 <br/>
 Use the example configuration below and replace the placeholders with the values shown in the **Collection** and the **Host** you use for your Collection details.
@@ -26,4 +49,13 @@ You will need the following configured in your setup:
   );
 })()}
 
-For detailed setup instructions, see [Hutch bunny config](https://hutch.health/bunny/config).
+
+## Collection Configuration
+
+For the "b" type BUNNY(s) you can configure a cronjob for these to run Weekly, Monthly, Quarterly or Biannually. 
+The default is for these to run at midnight (GMT) on the interval you select. 
+
+If you expect your underlying data to regularly change then you should configure this to run weekly. 
+
+When you have created your collection you can then unlock the details to make edits to the metadata and select the variables you need to configure your BUNNYs.
+You can also force run the "b" type jobs - to scan for demographics and concepts. 
