@@ -54,7 +54,7 @@ export default async function RootLayout({
                   minHeight: 0,
                 }}
               >
-                {!hideNav && <TopMenu />}
+                {!hideNav && <TopMenu standalone={standalone} />}
 
                 <Box
                   component="main"
