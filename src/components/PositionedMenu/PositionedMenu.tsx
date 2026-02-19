@@ -1,5 +1,5 @@
 import * as React from "react";
-import Button from "@mui/material/Button";
+import Button, { ButtonProps } from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import {
   ClickAwayListener,
@@ -16,7 +16,7 @@ export interface PositionedMenuItem {
   onClick: () => void;
 }
 
-interface PositionedMenuProps {
+interface PositionedMenuProps extends ButtonProps {
   children: React.ReactNode;
   isIcon?: boolean;
   active?: boolean;
