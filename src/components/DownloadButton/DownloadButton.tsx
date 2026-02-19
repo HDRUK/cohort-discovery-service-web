@@ -67,6 +67,7 @@ const DownloadButton = ({
         textAlign: "left",
         color: "text.primary",
       }}
+      size="large"
     >
       Download
     </PositionedMenu>
