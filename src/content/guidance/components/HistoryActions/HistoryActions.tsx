@@ -1,6 +1,21 @@
 "use client";
 
-import { Stack, Typography } from "@mui/material";
+import { useState } from "react";
+import {
+  Box,
+  Button,
+  Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  FormControl,
+  FormControlLabel,
+  IconButton,
+  Stack,
+  Typography,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+
 import deleteQueries from "@/actions/deleteQueries";
 import getQuery from "@/actions/getQuery";
 import rerunQuery from "@/actions/rerunQuery";
@@ -33,9 +48,19 @@ const HistoryActions = ({
       setQueryBuilderJson: qb.setQueryBuilderJson,
       setQueryName: qb.setQueryName,
     }));
-  console.log(selectedIds);
 
-  const onDeleteClick = () => {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [confirmationValue, setConfirmationValue] = useState(false);
+
+  const handleConfirmationChange = () => {
+    setConfirmationValue(!confirmationValue);
+  };
+
+  const handleCancel = () => {
+    setDialogOpen(false);
+  };
+
+  const handleDelete = () => {
     console.log("here", selectedIds);
     const response = deleteQueries(selectedIds);
     console.log(response);
@@ -43,7 +68,12 @@ const HistoryActions = ({
       .split(",")
       .filter((q) => q && !(q in selectedIds));
     router.push(routes.dashboardHistory(openQueries));
-    notify.success("Deleted query");
+    notify.success(`Deleted ${multiple ? "queries" : "query"}`);
+  };
+
+  const onDeleteClick = () => {
+    setConfirmationValue(false);
+    setDialogOpen(true);
   };
 
   return (
@@ -64,10 +94,12 @@ const HistoryActions = ({
             );
           }}
           text="Re-run"
+          size="large"
         />
       )}
       {!multiple && (
         <EditButton
+          label="Edit"
           onClick={async () => {
             const result = await getQuery(selectedIds[0]);
             const ranCollectionPids = result.data.tasks.map(
@@ -83,7 +115,6 @@ const HistoryActions = ({
               routes.dashboardNewQuery(openQueries, `query=${result.data.pid}`),
             );
           }}
-          label="Edit"
           size="large"
         />
       )}
@@ -94,6 +125,52 @@ const HistoryActions = ({
         isIcon={false}
       />
       <DeleteMenuItem label="Delete" action={onDeleteClick} size="large" />
+      <Dialog open={dialogOpen}>
+        <Box display="flex" justifyContent="right" padding={1}>
+          <IconButton
+            onClick={handleCancel}
+            size="small"
+            aria-label="close"
+            color="secondary"
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+        <Box
+          display="flex"
+          flexDirection="column"
+          justifyContent="center"
+          px={15}
+          pb={3}
+        >
+          <Typography textAlign="center">
+            Are you sure you want to delete{" "}
+            {multiple ? "these query results" : "this query result"}?
+          </Typography>
+          <DialogContent>
+            <FormControl>
+              <FormControlLabel
+                control={<Checkbox />}
+                checked={confirmationValue}
+                label="I understand this action is permanent"
+                onChange={handleConfirmationChange}
+              />
+            </FormControl>
+          </DialogContent>
+          <DialogActions sx={{ display: "flex", justifyContent: "center" }}>
+            <Button
+              disabled={!confirmationValue}
+              onClick={handleDelete}
+              variant="outlined"
+            >
+              Yes
+            </Button>
+            <Button autoFocus onClick={handleCancel} color="secondary">
+              No
+            </Button>
+          </DialogActions>
+        </Box>
+      </Dialog>
     </Stack>
   );
 };
