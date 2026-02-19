@@ -28,3 +28,9 @@ export interface CreateWorkgroupFormValues {
   collections: OptionsType[];
   active: boolean;
 }
+
+export interface CreateNetworkFormValues {
+  name: string;
+  url: string;
+  custodians: OptionsType[];
+}

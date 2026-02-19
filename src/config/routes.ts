@@ -39,6 +39,7 @@ export const routes = {
   adminUsers: adminPath("users"),
   adminWorkgroups: adminPath("workgroups"),
   adminCollections: adminPath("collections"),
+  adminNetworks: adminPath("networks"),
   teamHome: teamPath,
   teamHosts: (pid: string) => teamPath(pid, "hosts"),
   teamCollections: (pid: string) => teamPath(pid, "collections"),

@@ -28,12 +28,22 @@ import {
   AddUsersToWorkgroupPost,
   RemoveUsersFromWorkgroupPost,
   CollectionStatus,
+  Network,
+  AddCustodianToNetworkPost,
+  CreateNetworkPost,
 } from "@/types/api";
-import { TAG_WORKGROUP_ADMIN, TAG_ADMIN_USERS } from "@/config/tags";
+import {
+  TAG_WORKGROUP_ADMIN,
+  TAG_ADMIN_USERS,
+  TAG_NETWORKS,
+} from "@/config/tags";
 import { emptyPaginated } from "@/utils/pagination";
 import addUsersToWorkgroup from "@/actions/addUsersToWorkgroup";
 import removeUserFromWorkgroup from "@/actions/removeUsersFromWorkgroup";
 import transitionCollections from "@/actions/transitionCollections";
+import createNetwork from "@/actions/createNetwork";
+import addCustodiansToNetwork from "@/actions/addCustodiansToNetwork";
+import deleteNetwork from "@/actions/deleteNetwork";
 
 export interface AdminDataStoreState {
   users: User[];
@@ -52,6 +62,9 @@ export interface AdminDataStoreState {
 
   workgroups: Workgroup[];
   setWorkgroups: (workgroups: Workgroup[]) => void;
+
+  networks: Network[];
+  setNetworks: (networks: Network[]) => void;
 
   createCollection: (
     payload: CreateCollectionPost,
@@ -90,8 +103,17 @@ export interface AdminDataStoreState {
     status: CollectionStatus,
   ) => Promise<void>;
 
+  createNetwork: (payload: CreateNetworkPost) => Promise<Network>;
+  deleteNetwork: (id: number) => Promise<void>;
+  addCustodiansToNetwork: (
+    payload: AddCustodianToNetworkPost,
+  ) => Promise<number[]>;
+
   selectedWorkgroup: Workgroup | null;
   setSelectedWorkgroup: (workgroup: Workgroup | null) => void;
+
+  selectedNetwork: Network | null;
+  setSelectedNetwork: (network: Network | null) => void;
 
   selectedUser: User | null;
   setSelectedUser: (user: User | null) => void;
@@ -127,6 +149,13 @@ export const useAdminDataStore = create<AdminDataStoreState>((set) => ({
     set((state) => ({
       ...state,
       workgroups,
+    })),
+
+  networks: [],
+  setNetworks: (networks) =>
+    set((state) => ({
+      ...state,
+      networks,
     })),
 
   createCollection: async (payload, payloadConfig) => {
@@ -211,6 +240,24 @@ export const useAdminDataStore = create<AdminDataStoreState>((set) => ({
     await revalidateCollections();
   },
 
+  createNetwork: async (payload: CreateNetworkPost) => {
+    const { data } = await createNetwork(payload);
+    await revalidateAction(TAG_NETWORKS);
+
+    return data;
+  },
+  deleteNetwork: async (id: number) => {
+    await deleteNetwork(id);
+    await revalidateAction(TAG_NETWORKS);
+  },
+  addCustodiansToNetwork: async (payload: AddCustodianToNetworkPost) => {
+    console.log({ payload });
+    const res = await addCustodiansToNetwork(payload);
+    await revalidateAction(TAG_NETWORKS);
+
+    return res.map((r) => r.data);
+  },
+
   selectedWorkgroup: null,
   setSelectedWorkgroup: (selectedWorkgroup) =>
     set((state) => ({
@@ -223,5 +270,12 @@ export const useAdminDataStore = create<AdminDataStoreState>((set) => ({
     set((state) => ({
       ...state,
       selectedUser,
+    })),
+
+  selectedNetwork: null,
+  setSelectedNetwork: (selectedNetwork) =>
+    set((state) => ({
+      ...state,
+      selectedNetwork,
     })),
 }));
