@@ -101,7 +101,7 @@ const CreateCollection = ({ onCancel }: CreateCollectionProps) => {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          pb: 5,
+          pb: 2,
         }}
       >
         <Stack spacing={2} width={"70%"} height={"100%"}>
