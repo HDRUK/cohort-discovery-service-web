@@ -5,7 +5,6 @@ import ActionMenuSection from "@/components/ActionMenuSection";
 import AddButton from "@/components/AddButton";
 import { useCallback, useEffect } from "react";
 import useSearchParams from "@/hooks/useSearchParams";
-import { capitaliseFirstLetter } from "@/utils/string";
 import useAdminStore from "@/hooks/useAdminStore";
 import CreateNetwork from "@/modules/CreateNetwork";
 import { useConfirm } from "@/hooks/useConfirm";
@@ -21,6 +20,7 @@ const NetworksLeftPanel = ({
   onCreate,
   onCancelCreate,
 }: NetworksLeftPanelProps) => {
+  const selectedNetwork = useAdminStore((s) => s.selectedNetwork);
   const setSelectedNetwork = useAdminStore((s) => s.setSelectedNetwork);
   const networks = useAdminStore((s) => s.networks);
   const deleteNetwork = useAdminStore((s) => s.deleteNetwork);
@@ -77,8 +77,9 @@ const NetworksLeftPanel = ({
       >
         <List
           items={networks.map((network) => ({
+            selected: selectedNetwork?.id === network.id,
             id: network.id,
-            label: capitaliseFirstLetter(network?.name?.toLowerCase()),
+            label: network?.name,
             onClick: () => onSelectNetwork(network.id),
             rightClickActions: [
               {

@@ -20,6 +20,7 @@ const WorkgroupsLeftPanel = ({
   onCreate,
   onCancelCreate,
 }: WorkgroupsLeftPanelProps) => {
+  const selectedWorkgroup = useAdminStore((s) => s.selectedWorkgroup);
   const setSelectedWorkgroup = useAdminStore((s) => s.setSelectedWorkgroup);
   const workgroups = useAdminStore((s) => s.workgroups);
 
@@ -74,6 +75,7 @@ const WorkgroupsLeftPanel = ({
           items={workgroups.map((workgroup) => ({
             label: capitaliseFirstLetter(workgroup.name.toLowerCase()),
             onClick: () => onSelectWorkgroup(workgroup.id),
+            selected: selectedWorkgroup?.id === workgroup.id,
           }))}
         />
       </ActionMenuSection>

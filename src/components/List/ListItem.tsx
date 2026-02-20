@@ -9,6 +9,7 @@ export interface ListItemType {
   onClick: () => void;
   disabled?: boolean;
   rightClickActions?: RightClickAction[];
+  selected?: boolean;
 }
 
 const ListItem = ({
@@ -17,6 +18,7 @@ const ListItem = ({
   disabled,
   onClick,
   rightClickActions,
+  selected,
 }: ListItemType) => {
   const { handleContextMenu, ...rightClickMenuMethods } = useRightClickMenu();
 
@@ -27,6 +29,7 @@ const ListItem = ({
       component="div"
       onClick={onClick}
       onContextMenu={handleContextMenu}
+      selected={selected}
     >
       <ListItemText sx={{ color: "text.primary" }} primary={label} />
       {rightClickActions && (
