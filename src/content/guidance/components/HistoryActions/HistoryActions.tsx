@@ -118,7 +118,7 @@ const HistoryActions = ({
         />
       )}
       <DownloadButton
-        id={selectedIds[0]}
+        ids={selectedIds}
         entity="queries"
         formats={[AvailableFormats.JSON]}
         isIcon={false}

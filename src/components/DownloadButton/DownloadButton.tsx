@@ -13,14 +13,14 @@ export interface DownloadButtonProps extends Omit<
   IconButtonProps<"a">,
   "ref" | "href" | "component"
 > {
-  id?: string;
+  ids?: string[];
   entity?: string;
   formats?: AvailableFormats[];
   isIcon?: boolean;
 }
 
 const DownloadButton = ({
-  id,
+  ids,
   entity,
   formats = [AvailableFormats.JSON],
   disabled,
@@ -29,21 +29,23 @@ const DownloadButton = ({
   const notify = useNotify();
 
   const download = async (format: AvailableFormats) => {
-    if (disabled || !id || !entity) return;
-
-    const url = `/api/download/${encodeURIComponent(
-      id,
-    )}?entity=${encodeURIComponent(entity)}&format=${encodeURIComponent(
-      format,
-    )}`;
-    const a = document.createElement("a");
-    a.href = url;
-    a.target = "_self";
-    a.rel = "noopener noreferrer";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    notify.success(`Downloading ${entity} as ${format} has started`);
+    if (disabled || !ids || ids.length === 0 || !entity) return;
+    ids.map((id, idx) => {
+      const url = `/api/download/${encodeURIComponent(
+        id,
+      )}?entity=${encodeURIComponent(entity)}&format=${encodeURIComponent(
+        format,
+      )}`;
+      const a = document.createElement("a");
+      a.href = url;
+      a.target = "_self";
+      a.rel = "noopener noreferrer";
+      document.body.appendChild(a);
+      setTimeout(() => {
+        a.click();
+        notify.success(`Downloading ${entity} as ${format} has started`);
+      }, 100 * idx);
+    });
   };
 
   const items: PositionedMenuItem[] = formats.map((format) => ({

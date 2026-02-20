@@ -19,7 +19,6 @@ import ControlledSearchBox, {
   ControlledSearchBoxProps,
 } from "@/modules/ControlledSearchBox";
 import TwoPaneSwimLaneLayout from "@/modules/TwoPaneSwimLaneLayout";
-import QueryHistoryGuidance from "@/modules/QueryHistory";
 
 export interface TableProps {
   emptyMessage?: string;
