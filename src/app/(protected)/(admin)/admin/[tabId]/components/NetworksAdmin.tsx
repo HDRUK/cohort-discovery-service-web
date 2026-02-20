@@ -1,20 +1,11 @@
 "use client";
-import {
-  CollectionsSearchParams,
-  CollectionWithHosts,
-  Network,
-  Paginated,
-} from "@/types/api";
+import { Network } from "@/types/api";
 import { Box, Skeleton } from "@mui/material";
 import Title from "@/components/Title";
 import ThreePaneSwimLaneLayout, {
   ExpandedSide,
 } from "@/modules/ThreePaneSwimLaneLayout";
 import { useEffect, useState } from "react";
-import ControlledSearchBox from "@/modules/ControlledSearchBox";
-import WorkgroupsLeftPanel from "./WorkgroupsLeftPanel";
-import WorkgroupsMiddlePanel from "./WorkgroupsMiddlePanel";
-import WorkgroupsRightPanel from "./WorkgroupsRightPanel";
 import { useAdminDataStore } from "@/store/adminDataStore";
 import NetworksLeftPanel from "./NetworksLeftPanel";
 import NetworksMiddlePanel from "./NetworksMiddlePanel";
@@ -36,8 +27,6 @@ const NetworksAdmin = ({ networks }: { networks: Network[] }) => {
     );
   };
 
-  // needs a url
-
   const toggleExpandRight = () => {
     setExpandedSide((prev) =>
       prev === ExpandedSide.RIGHT ? null : ExpandedSide.RIGHT,
@@ -51,10 +40,6 @@ const NetworksAdmin = ({ networks }: { networks: Network[] }) => {
       sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}
     >
       <Title title="Networks" subTitle="Management" />
-      {/*<ControlledSearchBox<CollectionsSearchParams>
-        paramName="search_term"
-        placeholder="Search by collection name or username..."
-      />*/}
       <ThreePaneSwimLaneLayout
         expandedSide={expandedSide}
         rightDisabled={false}

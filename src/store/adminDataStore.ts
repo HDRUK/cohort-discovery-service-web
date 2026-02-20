@@ -47,6 +47,7 @@ import createNetwork from "@/actions/createNetwork";
 import addCustodiansToNetwork from "@/actions/addCustodiansToNetwork";
 import deleteNetwork from "@/actions/deleteNetwork";
 import removeCustodiansFromNetwork from "@/actions/removeCustodiansToNetwork";
+import updateNetwork from "@/actions/updateNetwork";
 
 export interface AdminDataStoreState {
   users: User[];
@@ -253,7 +254,7 @@ export const useAdminDataStore = create<AdminDataStoreState>((set) => ({
     return data;
   },
   updateNetwork: async (id: number, payload: UpdateNetworkPost) => {
-    //const { data } = await createNetwork(payload);
+    await updateNetwork(id, payload);
     await revalidateNetworks();
   },
   deleteNetwork: async (id: number) => {
