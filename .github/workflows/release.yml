@@ -37,7 +37,7 @@ jobs:
         run: |
           branch="${GITHUB_REF_NAME}"         # ex: release/1.23.4
           version="${branch#release/}"        # strip prefix
-          echo "version=$version" >> $GITHUB_OUTPUT
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Google Auth
         id: auth
