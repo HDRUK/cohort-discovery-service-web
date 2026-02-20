@@ -1,34 +1,46 @@
 "use client";
 
-import QueryHistoryMdx from "@/content/guidance/queryHistory.mdx";
 import HistoryActions from "@/content/guidance/components/HistoryActions";
-import { baseComponents } from "@/modules/Guidance/Guidance";
 import ActionMenuSection from "@/components/ActionMenuSection";
+import { Typography } from "@mui/material";
+import { CustomH1 } from "@/components/GuidanceHeaders";
 
 const QueryHistoryGuidance = ({ selectedIds }: { selectedIds: string[] }) => {
   const empty = !selectedIds.length;
 
   const multiple = !empty && selectedIds.length > 1;
 
-  const components = {
-    ...baseComponents,
-    empty: () => empty,
-    HistoryActions: () => (
-      <HistoryActions multiple={multiple} selectedIds={selectedIds} />
-    ),
-  };
   return (
     <ActionMenuSection
       title={`Result History${multiple ? " Bulk Actions" : ""}`}
       fixedExpanded
       scrollable
     >
-      <QueryHistoryMdx
-        components={components}
-        empty={empty}
-        multiple={multiple}
-        selectedIds={selectedIds}
-      />
+      {empty &&
+        "Select a result row to edit a previous query, rerun it to generate updated results, download the output, or remove it from your list. You can also select multiple to bulk delete or download."}
+      {!empty && (
+        <HistoryActions multiple={multiple} selectedIds={selectedIds} />
+      )}
+      <CustomH1>Result Interpretation</CustomH1>
+      Please note that results show rounded cohort counts not exact patient
+      numbers. Low count suppression is applied to results to protect
+      identification, so '0' counts may mean no results or be a suppressed low
+      value. This is set by each data collection, but typically is for counts
+      below 10.
+      <CustomH1>Statuses</CustomH1>
+      <Typography>
+        <b>Pending</b> — The query is currently running and are awaiting the
+        return of results.
+      </Typography>
+      <Typography>
+        <b>Completed</b> — The query has finished for this collection and the
+        total count is finalised.
+      </Typography>
+      <Typography>
+        <b>Error</b> — The query could not be completed for this collection due
+        to an issue on the data custodian side. Please re-run the query and if
+        issues persist please feel free to contact the Gateway Helpdesk.
+      </Typography>
     </ActionMenuSection>
   );
 };
