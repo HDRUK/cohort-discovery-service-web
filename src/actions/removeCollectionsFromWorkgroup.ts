@@ -2,7 +2,7 @@
 
 import { apiDelete } from "../lib/apiClient";
 import { API_ROUTES } from "../lib/apiRoutes";
-import { ApiResponse, RemoveCollectionsFromWorkgroupPost } from "../types/api";
+import { RemoveCollectionsFromWorkgroupPost, ApiResponse } from "../types/api";
 
 const removeCollectionsFromWorkgroup = async (
   payload: RemoveCollectionsFromWorkgroupPost,
