@@ -1,18 +1,13 @@
-import { Box, Stack, Typography } from "@mui/material";
-
-import LockOutlineIcon from "@mui/icons-material/LockOutline";
-import LockOpenIcon from "@mui/icons-material/LockOpen";
+import { Stack } from "@mui/material";
 import { useForm, Controller, FormProvider } from "react-hook-form";
 import { UpdateNetworkFormValues } from "@/types/forms";
 import FormTextField from "@/components/FormTextField";
-import ActionMenuSection from "@/components/ActionMenuSection";
 import { useNotify } from "@/providers/NotifyProvider";
 
 import FormMultiSelect from "@/components/FormMultiSelect";
 import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
 import useAdminStore from "@/hooks/useAdminStore";
 import useUserStore from "@/hooks/useUserStore";
-import theme from "@/config/theme";
 import { useEffect } from "react";
 import UpdatePanel from "@/components/UpdatePanel";
 

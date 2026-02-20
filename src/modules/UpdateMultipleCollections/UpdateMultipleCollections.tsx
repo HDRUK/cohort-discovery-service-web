@@ -1,14 +1,5 @@
 "use client";
-import {
-  Typography,
-  IconButton,
-  Chip,
-  Box,
-  FormGroup,
-  FormControlLabel,
-} from "@mui/material";
-import LockOutlineIcon from "@mui/icons-material/LockOutline";
-import LockOpenIcon from "@mui/icons-material/LockOpen";
+import { Chip, Box, FormGroup, FormControlLabel } from "@mui/material";
 import { CollectionStatus, CollectionWithHosts } from "@/types/api";
 import {
   Controller,
@@ -29,7 +20,7 @@ import ManageMultipleCollectionsStatus from "@/modules/ManageMultipleCollections
 import UpdateMultipleCollectionsGuidance from "./UpdateMultipleCollectionsGuidance";
 import { UpdateCollectionFormValues } from "@/types/forms";
 import { useAdminDataStore } from "@/store/adminDataStore";
-import theme from "@/config/theme";
+import UpdatePanel from "@/components/UpdatePanel";
 
 export type UpdateMultipleCollectionProps = {
   collections: CollectionWithHosts[];
@@ -214,93 +205,76 @@ const UpdateMultipleCollections = ({
 
   return (
     <FormProvider {...formMethods}>
-      <Typography
-        component="div"
-        variant="overline"
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          width: "100%",
-        }}
+      <UpdatePanel
+        label="Bulk Collection Actions"
+        expandedRight={expandedRight}
+        onLockClick={handleLockClick}
+        onUnlockClick={handleUnlockClick}
       >
-        Bulk Collection Actions
-        <IconButton
-          size="small"
-          sx={{ ml: "auto" }}
-          onClick={() => {
-            if (expandedRight) {
-              handleLockClick();
-            } else {
-              handleUnlockClick();
-            }
+        <FormLabel underlined>Collection Status</FormLabel>
+        <ManageMultipleCollectionsStatus
+          collections={collections}
+          expandedRight={expandedRight}
+          key={`manage-multiple-colls-status-${collections
+            .map((c) => c.id)
+            .sort()
+            .join("-")}`}
+        />
+        <FormLabel underlined>Workgroup access</FormLabel>
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 1,
+            alignItems: "center",
           }}
         >
-          {expandedRight ? (
-            <LockOpenIcon sx={{ color: theme.palette.tooltip?.main }} />
-          ) : (
-            <LockOutlineIcon />
-          )}
-        </IconButton>
-      </Typography>
-      <FormLabel underlined>Collection Status</FormLabel>
-      <ManageMultipleCollectionsStatus
-        collections={collections}
-        expandedRight={expandedRight}
-        key={`manage-multiple-colls-status-${collections
-          .map((c) => c.id)
-          .sort()
-          .join("-")}`}
-      />
-      <FormLabel underlined>Workgroup access</FormLabel>
-      <Box
-        sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 1,
-          alignItems: "center",
-        }}
-      >
-        {collectionsHaveMatchingWorkgroups &&
-          Array.from(workgroupValues.entries()).map(
-            ([name, checked]) =>
-              checked && (
-                <Chip color="secondary" label={name} key={`wg-chip-${name}`} />
-              ),
-          )}
-        {!collectionsHaveMatchingWorkgroups && !!collections && (
-          <Box>{<Chip label={"MIXED"} key={"wg-chip-mixed"} />}</Box>
-        )}
-      </Box>
-      {expandedRight && (
-        <>
-          <Controller
-            name="workgroups"
-            disabled={!expandedRight}
-            control={control}
-            render={() => (
-              <FormGroup>
-                <Box display="flex" flexDirection="column">
-                  {workgroups?.map((w) => (
-                    <FormControlLabel
-                      control={
-                        <SquareCheckbox
-                          checked={Boolean(workgroupValues.get(w.name))}
-                          key={`wg-checkbox-${w.name}`}
-                          name={w.name}
-                          onChange={handleChange}
-                        />
-                      }
-                      label={w.name}
-                      key={`wg-checkbox-label-${w.name}`}
-                    />
-                  ))}
-                </Box>
-              </FormGroup>
+          {collectionsHaveMatchingWorkgroups &&
+            Array.from(workgroupValues.entries()).map(
+              ([name, checked]) =>
+                checked && (
+                  <Chip
+                    color="secondary"
+                    label={name}
+                    key={`wg-chip-${name}`}
+                  />
+                ),
             )}
-          />
-          <UpdateMultipleCollectionsGuidance />
-        </>
-      )}
+          {!collectionsHaveMatchingWorkgroups && !!collections && (
+            <Box>{<Chip label={"MIXED"} key={"wg-chip-mixed"} />}</Box>
+          )}
+        </Box>
+        {expandedRight && (
+          <>
+            <Controller
+              name="workgroups"
+              disabled={!expandedRight}
+              control={control}
+              render={() => (
+                <FormGroup>
+                  <Box display="flex" flexDirection="column">
+                    {workgroups?.map((w) => (
+                      <FormControlLabel
+                        control={
+                          <SquareCheckbox
+                            checked={Boolean(workgroupValues.get(w.name))}
+                            key={`wg-checkbox-${w.name}`}
+                            name={w.name}
+                            onChange={handleChange}
+                          />
+                        }
+                        label={w.name}
+                        key={`wg-checkbox-label-${w.name}`}
+                      />
+                    ))}
+                  </Box>
+                </FormGroup>
+              )}
+            />
+            <UpdateMultipleCollectionsGuidance />
+          </>
+        )}
+      </UpdatePanel>
     </FormProvider>
   );
 };

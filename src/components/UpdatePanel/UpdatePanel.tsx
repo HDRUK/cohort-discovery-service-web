@@ -1,4 +1,4 @@
-import { Box, Typography, IconButton } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import LockOutlineIcon from "@mui/icons-material/LockOutline";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import theme from "@/config/theme";
@@ -42,12 +42,21 @@ export const UpdatePanel = ({
           >
             {rightExtras}
 
-            <IconButton
-              size="small"
-              onClick={expandedRight ? onLockClick : onUnlockClick}
+            <Box
               sx={{
+                ml: "auto",
                 borderRadius: 1,
-                "&:hover": { bgcolor: "grey.300" },
+                p: 0.5,
+                "&:hover": {
+                  bgcolor: "grey.300",
+                },
+              }}
+              onClick={() => {
+                if (expandedRight) {
+                  onLockClick();
+                } else {
+                  onUnlockClick();
+                }
               }}
             >
               {expandedRight ? (
@@ -55,7 +64,7 @@ export const UpdatePanel = ({
               ) : (
                 <LockOutlineIcon />
               )}
-            </IconButton>
+            </Box>
           </Box>
         </Box>
       }
