@@ -16,11 +16,13 @@ const ActionMenu: React.FC = () => {
     createNewGroup,
     createNewRule,
     createNewAgeFilter,
+    createNewOperator,
   } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     createNewGroup: qb.createNewGroup,
     createNewRule: qb.createNewRule,
     createNewAgeFilter: qb.createNewAgeFilter,
+    createNewOperator: qb.createNewOperator,
   }));
 
   const isLoading = useStateManagement((s) => s.isLoading);
@@ -47,6 +49,7 @@ const ActionMenu: React.FC = () => {
         <AddButton onClick={createNewAgeFilter} label={"Add age filter"} />
         <AddButton onClick={createNewRule} label={"Add rule"} />
         <AddButton onClick={createNewGroup} label={"Add group"} />
+        <AddButton onClick={createNewOperator} label={"Add operator"} />
       </ActionMenuSection>
       <ActionMenuSection
         title={"Hierarchy"}
