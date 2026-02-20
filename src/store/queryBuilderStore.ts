@@ -278,7 +278,9 @@ export const useQueryBuilderStore = create<QueryBuilderStoreState>(
 
         return [
           ...(needLeadingOperator ? [createOperator()] : []),
-          ...(skipFirstOperator ? additions.slice(1) : additions),
+          ...(skipFirstOperator && additions.length > 1
+            ? additions.slice(1)
+            : additions),
         ];
       };
 

@@ -53,6 +53,7 @@ const QueryBuilder = ({
     createNewGroup,
     createNewRule,
     createNewAgeFilter,
+    createNewOperator,
   } = useQueryBuilder((qb) => ({
     resetQueryBuilderJson: qb.resetQueryBuilderJson,
     queryBuilderJson: qb.queryBuilderJson,
@@ -63,6 +64,7 @@ const QueryBuilder = ({
     createNewGroup: qb.createNewGroup,
     createNewRule: qb.createNewRule,
     createNewAgeFilter: qb.createNewAgeFilter,
+    createNewOperator: qb.createNewOperator,
     selectedGuidance: qb.selectedGuidance,
   }));
 
@@ -200,6 +202,7 @@ const QueryBuilder = ({
     { action: createNewAgeFilter, label: "Add Age Filter" },
     { action: createNewRule, label: "Add Rule" },
     { action: createNewGroup, label: "Add Group" },
+    { action: createNewOperator, label: "Add Operator" },
   ];
 
   return (
