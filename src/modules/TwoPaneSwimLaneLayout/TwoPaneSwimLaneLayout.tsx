@@ -14,7 +14,7 @@ type TwoPaneSwimLaneLayoutProps = {
   totalWidth?: number;
   left: ReactNode;
   leftProps?: SwimLaneProps;
-  right: ReactNode;
+  right?: ReactNode;
   rightProps?: SwimLaneProps;
 };
 
