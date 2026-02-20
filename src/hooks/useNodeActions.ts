@@ -17,7 +17,12 @@ import {
 } from "@/utils/rules";
 import { useCallback, useMemo } from "react";
 
-const useNodeActions = (node: RuleNodeType) => {
+export interface RightClickAction {
+  action: () => void;
+  label: string;
+}
+
+const useNodeActions = (node: RuleNodeType): RightClickAction[] => {
   const { id } = node;
 
   const { queryBuilderJson, setQueryBuilderJson, selected } = useQueryBuilder(

@@ -1,29 +1,14 @@
-import { ListItemButton, ListItemText, ListProps } from "@mui/material";
+import { ListProps } from "@mui/material";
 import { List as MuiList } from "@mui/material";
+import ListItem, { ListItemType } from "./ListItem";
 
-interface ListItem {
-  label: string;
-  onClick: () => void;
-}
-
-const List = ({
-  items,
-  disabled = false,
-  ...props
-}: ListProps & { items: ListItem[]; disabled?: boolean }) => {
+const List = ({ items, ...props }: ListProps & { items: ListItemType[] }) => {
   // to-do: to implement a compact version
   //const { compact } = useActionMenuSection();
   return (
     <MuiList disablePadding {...props}>
-      {items.map(({ label, onClick }) => (
-        <ListItemButton
-          disabled={disabled}
-          key={label}
-          component="div"
-          onClick={onClick}
-        >
-          <ListItemText sx={{ color: "text.primary" }} primary={label} />
-        </ListItemButton>
+      {items.map((item) => (
+        <ListItem key={item.id ?? item.label} {...item} />
       ))}
     </MuiList>
   );

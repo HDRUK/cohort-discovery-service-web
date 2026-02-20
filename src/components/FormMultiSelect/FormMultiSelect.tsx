@@ -1,4 +1,3 @@
-import theme from "@/config/theme";
 import { Close } from "@mui/icons-material";
 import {
   Autocomplete,
@@ -11,7 +10,7 @@ import {
   FormLabel,
 } from "@mui/material";
 import type { ChipProps } from "@mui/material/Chip";
-import { ReactNode, useId, useState } from "react";
+import { ReactNode, useId, useMemo, useState } from "react";
 import { FieldError } from "react-hook-form";
 
 export type ValueType = number | string;
@@ -20,8 +19,10 @@ export type OptionsType = {
   label: string;
 };
 
-interface FormMultiSelectProps
-  extends Omit<BaseSelectProps<OptionsType>, "onChange" | "value" | "error"> {
+interface FormMultiSelectProps extends Omit<
+  BaseSelectProps<OptionsType>,
+  "onChange" | "value" | "error"
+> {
   label?: string;
   options: OptionsType[];
   startIcon?: ReactNode;
@@ -64,6 +65,12 @@ const FormMultiSelect = ({
   ...restProps
 }: FormMultiSelectProps) => {
   const [values, setValues] = useState<OptionsType[]>([]);
+
+  const selectedValues = useMemo<OptionsType[]>(
+    () => (Array.isArray(value) ? value : value ? [value] : []),
+    [value],
+  );
+
   const [prevDisabled, setPrevDisabled] = useState<boolean>(disabled);
 
   const generatedId = useId();
@@ -163,44 +170,34 @@ const FormMultiSelect = ({
         )}
         noOptionsText={noOptionsText}
       />
-      {tagsBelow && values && values.length > 0 && (
+      {!disabled && tagsBelow && selectedValues.length > 0 && (
         <Stack>
-          {values.map((val) => {
-            return (
-              <Chip
-                key={val.value}
-                label={
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      fontSize: "14px",
-                    }}
-                  >
-                    <Close
-                      onClick={() => handleDelete(val)}
-                      sx={{
-                        cursor: "pointer",
-                        color: theme.palette.grey[500],
-                      }}
-                    />
-                    {getChipLabel
-                      ? getChipLabel(options, val)
-                      : val.label.length > maxLabelLength
+          {selectedValues.map((val) => (
+            <Chip
+              key={val.value}
+              label={
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    fontSize: 14,
+                  }}
+                >
+                  <Close
+                    onClick={() => handleDelete(val)}
+                    style={{ cursor: "pointer" }}
+                  />
+                  {getChipLabel
+                    ? getChipLabel(options, val)
+                    : val.label.length > maxLabelLength
                       ? val.label.substring(0, maxLabelLength) + "..."
                       : val.label}
-                  </div>
-                }
-                color={chipColor}
-                sx={{
-                  m: 0.5,
-                  backgroundColor: theme.palette.background.paper,
-                  justifyContent: "left",
-                  fontWeight: 400,
-                }}
-              />
-            );
-          })}
+                </div>
+              }
+              color={chipColor}
+              sx={{ m: 0.5, justifyContent: "left", fontWeight: 400 }}
+            />
+          ))}
         </Stack>
       )}
     </FormControl>
