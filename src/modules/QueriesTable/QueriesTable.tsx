@@ -19,16 +19,14 @@ import { routes } from "@/config/routes";
 import Table from "@/components/Table";
 import { getTasksStatus, getTotalAllTasks } from "@/utils/tasks";
 import QueryResultsTable from "@/modules/QueryResultsTable";
+import QueryHistoryGuidance from "@/modules/QueryHistory/QueryHistoryGuidance";
 import { queryToText } from "@/utils/queryBuilder";
-import { useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import getQueries from "@/actions/getQueries";
 import { DEFAULT_INTERVAL } from "@/config/defaults";
 import { getQueryName } from "@/utils/query";
 import useSearchParams from "@/hooks/useSearchParams";
 import { buildQueryHistoryParams } from "@/utils/params";
-import { AvailableFormats } from "@/components/DownloadButton/DownloadButton";
-import rerunQuery from "@/actions/rerunQuery";
 import useUserStore from "@/hooks/useUserStore";
 import { getUserQueryTag, TAG_QUERIES } from "@/config/tags";
 
@@ -41,15 +39,10 @@ const QueriesTable = ({
   initialData,
   columnVisibility = { pid: false, "mrt-row-expand": false },
 }: QueriesTableProps) => {
-  const router = useRouter();
   const { searchParams } = useSearchParams();
-  const { setQueryBuilderJson, setSelectedDatasets, setQueryName } =
-    useQueryBuilder((qb) => ({
-      resetQueryBuilderJson: qb.resetQueryBuilderJson,
-      setSelectedDatasets: qb.setSelectedDatasets,
-      setQueryBuilderJson: qb.setQueryBuilderJson,
-      setQueryName: qb.setQueryName,
-    }));
+  const { setSelectedDatasets } = useQueryBuilder((qb) => ({
+    setSelectedDatasets: qb.setSelectedDatasets,
+  }));
 
   const user = useUserStore((store) => store.user);
   const deleteQueries = useUserStore((store) => store.deleteQueries);
@@ -228,57 +221,6 @@ const QueriesTable = ({
                 </Grid>
               </Grid>
             ),
-            rightAction: {
-              deleteProps: {
-                onClick: () => {
-                  deleteQueries([row.original.pid]);
-                  const openQueries = (searchParams.get("open_queries") || "")
-                    .split(",")
-                    .filter((q) => q && q !== row.original.pid);
-                  router.push(routes.dashboardHistory(openQueries));
-                },
-              },
-              reRunProps: {
-                label: "Re-run query",
-                onClick: async () => {
-                  const { data } = await rerunQuery(row.original.pid);
-                  const openQueries = (searchParams.get("open_queries") || "")
-                    .split(",")
-                    .filter((q) => q);
-                  if (openQueries.indexOf(data.query_pid) === -1) {
-                    openQueries.push(data.query_pid);
-                  }
-                  router.push(
-                    routes.dashboardQueryResult(data.query_pid, openQueries),
-                  );
-                },
-              },
-              downloadProps: {
-                id: row.original.pid,
-                entity: "queries",
-                formats: [AvailableFormats.JSON],
-              },
-              editProps: {
-                onClick: () => {
-                  const ranCollectionPids = row.original.tasks.map(
-                    (t) => t.collection.pid,
-                  );
-                  setSelectedDatasets(ranCollectionPids);
-                  setQueryName("");
-
-                  setQueryBuilderJson(row.original.definition);
-                  const openQueries = (searchParams.get("open_queries") || "")
-                    .split(",")
-                    .filter((q) => q);
-                  router.push(
-                    routes.dashboardNewQuery(
-                      openQueries,
-                      `query=${row.original.pid}`,
-                    ),
-                  );
-                },
-              },
-            },
           }}
         />
       </Paper>
@@ -303,6 +245,7 @@ const QueriesTable = ({
           onClick: deleteQueries,
         },
       }}
+      rightPanel={QueryHistoryGuidance}
     />
   );
 };
