@@ -67,6 +67,7 @@ const HistoryActions = ({
       .filter((q) => q && !(q in selectedIds));
     router.push(routes.dashboardHistory(openQueries));
     notify.success(`Deleted ${multiple ? "queries" : "query"}`);
+    setDialogOpen(false);
   };
 
   const onDeleteClick = () => {

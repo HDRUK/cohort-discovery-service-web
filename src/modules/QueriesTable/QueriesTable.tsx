@@ -19,6 +19,7 @@ import { routes } from "@/config/routes";
 import Table from "@/components/Table";
 import { getTasksStatus, getTotalAllTasks } from "@/utils/tasks";
 import QueryResultsTable from "@/modules/QueryResultsTable";
+import QueryHistoryGuidance from "@/modules/QueryHistory/QueryHistoryGuidance";
 import { queryToText } from "@/utils/queryBuilder";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import getQueries from "@/actions/getQueries";
@@ -244,7 +245,7 @@ const QueriesTable = ({
           onClick: deleteQueries,
         },
       }}
-      rightPanel={true}
+      rightPanel={QueryHistoryGuidance}
     />
   );
 };

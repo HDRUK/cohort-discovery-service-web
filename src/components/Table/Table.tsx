@@ -43,7 +43,7 @@ export interface TableProps {
   };
   details?: React.ReactNode;
   boxSxProps?: BoxProps["sx"];
-  rightPanel?: React.ReactNode;
+  rightPanel?: (selectedIds: string[]) => React.ReactNode;
 }
 
 type DTableProps<TData extends MRT_RowData> = MaterialReactTableProps<TData> &
@@ -154,9 +154,7 @@ const Table = <TData extends MRT_RowData>({
             <MaterialReactTable {...props} />
           )
         }
-        right={
-          rightPanel && <QueryHistoryGuidance selectedIds={selectedRows} />
-        }
+        right={rightPanel && rightPanel(selectedRows)}
       />
     </Box>
   );

@@ -5,7 +5,7 @@ import ActionMenuSection from "@/components/ActionMenuSection";
 import { Typography } from "@mui/material";
 import { CustomH1 } from "@/components/GuidanceHeaders";
 
-const QueryHistoryGuidance = ({ selectedIds }: { selectedIds: string[] }) => {
+const QueryHistoryGuidance = (selectedIds: string[]) => {
   const empty = !selectedIds.length;
 
   const multiple = !empty && selectedIds.length > 1;
