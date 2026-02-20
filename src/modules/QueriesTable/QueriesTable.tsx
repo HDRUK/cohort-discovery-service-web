@@ -20,7 +20,6 @@ import Table from "@/components/Table";
 import { getTasksStatus, getTotalAllTasks } from "@/utils/tasks";
 import QueryResultsTable from "@/modules/QueryResultsTable";
 import { queryToText } from "@/utils/queryBuilder";
-import { useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import getQueries from "@/actions/getQueries";
 import { DEFAULT_INTERVAL } from "@/config/defaults";

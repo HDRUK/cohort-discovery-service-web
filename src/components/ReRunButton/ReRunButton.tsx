@@ -5,7 +5,6 @@ import CachedIcon from "@mui/icons-material/Cached";
 
 export interface ReRunButtonProps extends Omit<IconButtonProps, "onClick"> {
   tag?: string;
-  showTooltip?: boolean;
   label?: string;
   text?: string;
   onClick: () => void;
@@ -16,7 +15,6 @@ const ReRunButton = ({
   label,
   text,
   onClick,
-  showTooltip = false,
   ...rest
 }: ReRunButtonProps) => {
   const ButtonComponent = (!text ? IconButton : Button) as React.ElementType;

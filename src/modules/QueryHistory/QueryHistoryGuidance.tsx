@@ -24,9 +24,9 @@ const QueryHistoryGuidance = ({ selectedIds }: { selectedIds: string[] }) => {
       <CustomH1>Result Interpretation</CustomH1>
       Please note that results show rounded cohort counts not exact patient
       numbers. Low count suppression is applied to results to protect
-      identification, so '0' counts may mean no results or be a suppressed low
-      value. This is set by each data collection, but typically is for counts
-      below 10.
+      identification, so &apos;0&apos; counts may mean no results or be a
+      suppressed low value. This is set by each data collection, but typically
+      is for counts below 10.
       <CustomH1>Statuses</CustomH1>
       <Typography>
         <b>Pending</b> — The query is currently running and are awaiting the

@@ -1,4 +1,4 @@
-import { Box, IconButtonProps, Typography } from "@mui/material";
+import { IconButtonProps } from "@mui/material";
 
 import DownloadIcon from "@mui/icons-material/Download";
 import PositionedMenu, { PositionedMenuItem } from "../PositionedMenu";
