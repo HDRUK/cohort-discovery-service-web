@@ -18,6 +18,7 @@ import WorkgroupsRightPanel from "./WorkgroupsRightPanel";
 import { useAdminDataStore } from "@/store/adminDataStore";
 import NetworksLeftPanel from "./NetworksLeftPanel";
 import NetworksMiddlePanel from "./NetworksMiddlePanel";
+import NetworksRightPanel from "./NetworksRightPanel";
 
 const NetworksAdmin = ({ networks }: { networks: Network[] }) => {
   const setNetworks = useAdminDataStore((s) => s.setNetworks);
@@ -45,16 +46,6 @@ const NetworksAdmin = ({ networks }: { networks: Network[] }) => {
 
   if (!networks) return <Skeleton height={"100%"} />;
 
-  {
-    /**/
-  }
-
-  {
-    /*<WorkgroupsRightPanel
-            expandedRight={expandedRight}
-            onClose={() => toggleExpandRight()}
-          />*/
-  }
   return (
     <Box
       sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}
@@ -75,7 +66,12 @@ const NetworksAdmin = ({ networks }: { networks: Network[] }) => {
           />
         }
         middle={<NetworksMiddlePanel />}
-        right={<b> hi</b>}
+        right={
+          <NetworksRightPanel
+            expandedRight={expandedRight}
+            onClose={() => toggleExpandRight()}
+          />
+        }
       />
     </Box>
   );

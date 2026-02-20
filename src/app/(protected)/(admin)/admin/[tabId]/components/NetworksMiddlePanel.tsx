@@ -1,20 +1,14 @@
 "use client";
 
-import CollectionsTable from "@/components/CollectionsTable";
 import { Box, Stack, Typography } from "@mui/material";
-import { capitaliseFirstLetter } from "@/utils/string";
 import useAdminStore from "@/hooks/useAdminStore";
 import { useNotify } from "@/providers/NotifyProvider";
 import CustodianTable from "@/components/CustodianTable";
 
 const NetworksMiddlePanel = () => {
   const selectedNetwork = useAdminStore((s) => s.selectedNetwork);
-  const removeCollectionsFromWorkgroup = useAdminStore(
-    (s) => s.removeCollectionsFromWorkgroup,
-  );
-
-  const removeUsersFromWorkgroup = useAdminStore(
-    (s) => s.removeUsersFromWorkgroup,
+  const removeCustodiansFromNetwork = useAdminStore(
+    (s) => s.removeCustodiansFromNetwork,
   );
 
   const notify = useNotify();
@@ -31,17 +25,15 @@ const NetworksMiddlePanel = () => {
       {!!selectedNetwork && (
         <Stack gap={2}>
           <CustodianTable
-            tableTitle={`${capitaliseFirstLetter(
-              selectedNetwork?.name.toLowerCase(),
-            )} Workgroup`}
+            tableTitle={`${selectedNetwork?.name} Network`}
             tableSubTitle="Collections"
-            deleteOverride={async (ids: string[]) => {
-              /*await removeCollectionsFromWorkgroup({
-                ids: ids.map((id) => +id),
+            handleDelete={async (ids: string[]) => {
+              await removeCustodiansFromNetwork({
+                custodian_ids: ids.map((id) => +id),
                 id: selectedNetwork.id,
-              });*/
+              });
               notify.success(
-                `${ids.length} Collection${
+                `${ids.length} Custodian${
                   ids.length > 1 ? "s" : ""
                 } removed from network ${selectedNetwork.name}`,
               );

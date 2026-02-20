@@ -34,7 +34,7 @@ const NetworksLeftPanel = ({
     setSelectedNetwork(network ?? null);
   }, [networks, workgroupId, setSelectedNetwork]);
 
-  const onSelectWorkgroup = useCallback(
+  const onSelectNetwork = useCallback(
     (id?: number) => {
       if (!id) {
         setSearchParam(null);
@@ -64,7 +64,9 @@ const NetworksLeftPanel = ({
           disabled={expandedLeft}
         />
 
-        {expandedLeft && <CreateNetwork onCancel={onCancelCreate} />}
+        {expandedLeft && (
+          <CreateNetwork onCreate={onSelectNetwork} onCancel={onCancelCreate} />
+        )}
       </ActionMenuSection>
 
       <ActionMenuSection
@@ -77,7 +79,7 @@ const NetworksLeftPanel = ({
           items={networks.map((network) => ({
             id: network.id,
             label: capitaliseFirstLetter(network?.name?.toLowerCase()),
-            onClick: () => onSelectWorkgroup(network.id),
+            onClick: () => onSelectNetwork(network.id),
             rightClickActions: [
               {
                 label: "Delete",

@@ -34,3 +34,9 @@ export interface CreateNetworkFormValues {
   url: string;
   custodians: OptionsType[];
 }
+
+export interface UpdateNetworkFormValues {
+  name: string;
+  url: string;
+  custodians: OptionsType[];
+}

@@ -5,13 +5,11 @@ import {
   MRT_RowSelectionState,
   type MRT_ColumnDef,
 } from "material-react-table";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Table from "@/components/Table";
 import useSearchParams from "@/hooks/useSearchParams";
 import { capitaliseFirstLetter } from "@/utils/string";
-
 import useAdminStore from "@/hooks/useAdminStore";
-
 import { useTable } from "@/hooks/useTable";
 import dayjs from "dayjs";
 import { TableProps } from "../Table/Table";
@@ -39,18 +37,25 @@ const CustodianTable = ({
 
   const custodians = useUserDataStore((s) => s.custodians);
 
-  const selectedUserIds = useMemo(
+  const selectedCustodianIds = useMemo(
     () => trueKeys(rowSelection ?? {}),
     [rowSelection],
   );
 
   const networks = useAdminStore((s) => s.networks);
-  const activeNetwork = networks.find((nw) => String(nw.id) === nw_filter);
+  const activeNetwork = useMemo(
+    () => networks.find((nw) => String(nw.id) === nw_filter),
+    [networks, nw_filter],
+  );
 
   const hydratedCustodians = useMemo(
     () => custodians.filter((c) => c.network?.id === activeNetwork?.id),
     [custodians, activeNetwork],
   );
+
+  useEffect(() => {
+    console.log({ hydratedCustodians }, "hydratedCustodians changed");
+  }, [hydratedCustodians]);
 
   const columns: MRT_ColumnDef<Custodian>[] = [
     {
@@ -95,7 +100,7 @@ const CustodianTable = ({
       table={table}
       leftAction={{
         titleProps: {
-          title: tableTitle || "users",
+          title: tableTitle || "Custodians",
           subTitle:
             tableSubTitle || capitaliseFirstLetter(activeNetwork?.name ?? ""),
         },
@@ -103,7 +108,7 @@ const CustodianTable = ({
       rightAction={{
         deleteProps: {
           onClick: handleDelete,
-          disabled: selectedUserIds.length === 0,
+          disabled: selectedCustodianIds.length === 0,
         },
       }}
       {...rest}

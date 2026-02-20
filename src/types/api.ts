@@ -157,6 +157,7 @@ export interface CollectionWithHosts extends Collection {
 
 export interface Network extends WithTimestamps {
   name: string;
+  url: string | null;
   pid: string;
   enabled: boolean;
   custodians: Custodian[];
@@ -415,7 +416,17 @@ export interface CreateNetworkPost {
   url: string;
 }
 
-export interface AddCustodianToNetworkPost {
+export interface UpdateNetworkPost {
+  name: string;
+  url: string;
+}
+
+export interface AddCustodiansToNetworkPost {
+  id: number;
+  custodian_ids: number[];
+}
+
+export interface RemoveCustodiansFromNetworkPost {
   id: number;
   custodian_ids: number[];
 }

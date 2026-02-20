@@ -9,7 +9,11 @@ import addCollectionsToWorkgroup from "@/actions/addCollectionsToWorkgroup";
 import removeCollectionsFromWorkgroup from "@/actions/removeCollectionsFromWorkgroup";
 import addCollectionToWorkgroups from "@/actions/addCollectionToWorkgroups";
 import removeCollectionFromWorkgroups from "@/actions/removeCollectionFromWorkgroups";
-import { revalidateAction, revalidateCollections } from "@/actions/revalidate";
+import {
+  revalidateAction,
+  revalidateCollections,
+  revalidateNetworks,
+} from "@/actions/revalidate";
 import {
   Collection,
   CreateCollectionPost,
@@ -29,14 +33,12 @@ import {
   RemoveUsersFromWorkgroupPost,
   CollectionStatus,
   Network,
-  AddCustodianToNetworkPost,
+  AddCustodiansToNetworkPost,
   CreateNetworkPost,
+  RemoveCustodiansFromNetworkPost,
+  UpdateNetworkPost,
 } from "@/types/api";
-import {
-  TAG_WORKGROUP_ADMIN,
-  TAG_ADMIN_USERS,
-  TAG_NETWORKS,
-} from "@/config/tags";
+import { TAG_WORKGROUP_ADMIN, TAG_ADMIN_USERS } from "@/config/tags";
 import { emptyPaginated } from "@/utils/pagination";
 import addUsersToWorkgroup from "@/actions/addUsersToWorkgroup";
 import removeUserFromWorkgroup from "@/actions/removeUsersFromWorkgroup";
@@ -44,6 +46,7 @@ import transitionCollections from "@/actions/transitionCollections";
 import createNetwork from "@/actions/createNetwork";
 import addCustodiansToNetwork from "@/actions/addCustodiansToNetwork";
 import deleteNetwork from "@/actions/deleteNetwork";
+import removeCustodiansFromNetwork from "@/actions/removeCustodiansToNetwork";
 
 export interface AdminDataStoreState {
   users: User[];
@@ -104,9 +107,13 @@ export interface AdminDataStoreState {
   ) => Promise<void>;
 
   createNetwork: (payload: CreateNetworkPost) => Promise<Network>;
+  updateNetwork: (id: number, payload: UpdateNetworkPost) => Promise<void>;
   deleteNetwork: (id: number) => Promise<void>;
   addCustodiansToNetwork: (
-    payload: AddCustodianToNetworkPost,
+    payload: AddCustodiansToNetworkPost,
+  ) => Promise<number[]>;
+  removeCustodiansFromNetwork: (
+    payload: RemoveCustodiansFromNetworkPost,
   ) => Promise<number[]>;
 
   selectedWorkgroup: Workgroup | null;
@@ -242,19 +249,27 @@ export const useAdminDataStore = create<AdminDataStoreState>((set) => ({
 
   createNetwork: async (payload: CreateNetworkPost) => {
     const { data } = await createNetwork(payload);
-    await revalidateAction(TAG_NETWORKS);
-
+    await revalidateNetworks();
     return data;
+  },
+  updateNetwork: async (id: number, payload: UpdateNetworkPost) => {
+    //const { data } = await createNetwork(payload);
+    await revalidateNetworks();
   },
   deleteNetwork: async (id: number) => {
     await deleteNetwork(id);
-    await revalidateAction(TAG_NETWORKS);
+    await revalidateNetworks();
   },
-  addCustodiansToNetwork: async (payload: AddCustodianToNetworkPost) => {
-    console.log({ payload });
+  addCustodiansToNetwork: async (payload: AddCustodiansToNetworkPost) => {
     const res = await addCustodiansToNetwork(payload);
-    await revalidateAction(TAG_NETWORKS);
-
+    await revalidateNetworks();
+    return res.map((r) => r.data);
+  },
+  removeCustodiansFromNetwork: async (
+    payload: RemoveCustodiansFromNetworkPost,
+  ) => {
+    const res = await removeCustodiansFromNetwork(payload);
+    await revalidateNetworks();
     return res.map((r) => r.data);
   },
 

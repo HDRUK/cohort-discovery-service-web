@@ -10,13 +10,13 @@ import FormMultiSelect from "@/components/FormMultiSelect";
 import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
 import useAdminStore from "@/hooks/useAdminStore";
 import useUserStore from "@/hooks/useUserStore";
-import { REGEX_URL_NO_WWW } from "@/config/regex";
 
 interface CreateCollectionProps {
+  onCreate?: (id: number) => void;
   onCancel?: () => void;
 }
 
-const CreateNetwork = ({ onCancel }: CreateCollectionProps) => {
+const CreateNetwork = ({ onCreate, onCancel }: CreateCollectionProps) => {
   const createNetwork = useAdminStore((s) => s.createNetwork);
   const networks = useAdminStore((s) => s.networks);
   const custodians = useUserStore((s) => s.custodians);
@@ -53,7 +53,7 @@ const CreateNetwork = ({ onCancel }: CreateCollectionProps) => {
     }
 
     notify.success(`Created network ${createdNetwork.name}`);
-
+    onCreate?.(createdNetwork.id);
     onCancel?.();
   };
 

@@ -8,6 +8,8 @@ import {
   TAG_COLLECTIONS,
   TAG_COLLECTIONS_ADMIN,
   TAG_COLLECTIONS_USER,
+  TAG_CUSTODIANS,
+  TAG_NETWORKS,
 } from "@/config/tags";
 import { getTokenUser } from "@/lib/auth";
 import { Custodian } from "@/types/api";
@@ -49,3 +51,9 @@ export const revalidateCollections = async (
         ]
       : []),
   ]);
+
+export const revalidateNetworks = async () => {
+  await revalidateAction(TAG_NETWORKS);
+  await revalidateAction(TAG_CUSTODIANS);
+  await revalidateCollections();
+};
