@@ -205,7 +205,7 @@ const CollectionsTable = ({
       {
         id: "network",
         header: "Network",
-        accessorFn: (row) => row.custodian.network ?? " - ",
+        accessorFn: (row) => row.custodian.network?.name ?? " - ",
         size: 100,
         minSize: 100,
         maxSize: 200,
