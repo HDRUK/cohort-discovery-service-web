@@ -1,3 +1,12 @@
+## [1.2.0](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.1.0...v1.2.0) (2026-02-23)
+
+### ✨ Features
+
+* **DP-0000:** Contibution guide and template ([ccda076](https://github.com/HDRUK/cohort-discovery-service-web/commit/ccda076e71611538a3575e68f2d0017ec4d2af6e)), closes [DP-0000](DP-0000)
+* **DP-0000:** Update README for public use ([a1b00bc](https://github.com/HDRUK/cohort-discovery-service-web/commit/a1b00bc78c77ecc17f5c69065639f5758820140a)), closes [DP-0000](DP-0000)
+* **DP-459:** Yaml linting ([1b0ee91](https://github.com/HDRUK/cohort-discovery-service-web/commit/1b0ee919f5b0897445e10ecee8afb4f9c389573c)), closes [DP-459](DP-459)
+* **DP-485:** Links profile back to Gateway per .env setting. Removes My Account tab in integrated mode ([5002ba3](https://github.com/HDRUK/cohort-discovery-service-web/commit/5002ba38a250a9a9514b6fe46af77677ca647b06)), closes [DP-485](DP-485) [Gateway](Gateway)
+
 ## [1.1.0](https://github.com/HDRUK/project-daphne-web/compare/v1.0.2...v1.1.0) (2026-02-16)
 
 ### ✨ Features
