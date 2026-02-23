@@ -11,6 +11,7 @@ import UsersTab, { UsersSkeleton } from "./components/UsersTab";
 import WorkgroupsTab, { WorkgroupsSkeleton } from "./components/WorkgroupsTab";
 import { SearchParams } from "@/types/api";
 import { isStandalone } from "@/utils/modes";
+import NetworksTab from "./components/NetworksTab";
 
 type Params = Promise<{ tabId: string }>;
 
@@ -58,6 +59,16 @@ const CustodianAdminPage = async ({
       page: (
         <Suspense fallback={<CollectionsSkeleton />}>
           <CollectionsTab searchParams={apiSearchParams} />
+        </Suspense>
+      ),
+    },
+    {
+      id: "networks",
+      label: "Networks",
+      href: routes.adminNetworks,
+      page: (
+        <Suspense fallback={<CollectionsSkeleton />}>
+          <NetworksTab searchParams={apiSearchParams} />
         </Suspense>
       ),
     },

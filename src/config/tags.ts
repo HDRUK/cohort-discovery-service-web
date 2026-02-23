@@ -12,6 +12,7 @@ export const getTagsUserCollections = (userId: string | number) =>
   `${TAG_COLLECTIONS_USER}-${userId}`;
 
 export const TAG_CUSTODIANS = "custodians";
+export const TAG_NETWORKS = "custodians-networks";
 
 export const getCustodianTag = (pid: string) => `custodian-${pid}`;
 

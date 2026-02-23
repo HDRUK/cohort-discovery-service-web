@@ -155,6 +155,14 @@ export interface CollectionWithHosts extends Collection {
   workgroups?: Workgroup[];
 }
 
+export interface Network extends WithTimestamps {
+  name: string;
+  url: string | null;
+  pid: string;
+  enabled: boolean;
+  custodians: Custodian[];
+}
+
 export interface Result extends WithTimestamps {
   id: number;
   pid: string;
@@ -294,7 +302,7 @@ export interface Network {
   id: number;
 }
 
-export interface Custodian {
+export interface Custodian extends WithTimestamps {
   id: number;
   pid: string;
   name: string;
@@ -401,6 +409,26 @@ export interface RemoveUsersFromWorkgroupPost {
 export interface RemoveCollectionFromWorkgroupsPost {
   id: number;
   workgroup_ids: number[];
+}
+
+export interface CreateNetworkPost {
+  name: string;
+  url: string;
+}
+
+export interface UpdateNetworkPost {
+  name: string;
+  url: string;
+}
+
+export interface AddCustodiansToNetworkPost {
+  id: number;
+  custodian_ids: number[];
+}
+
+export interface RemoveCustodiansFromNetworkPost {
+  id: number;
+  custodian_ids: number[];
 }
 
 export interface Concept {

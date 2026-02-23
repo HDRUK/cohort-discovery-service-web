@@ -1,6 +1,5 @@
 "use client";
 import {
-  Typography,
   Chip,
   Box,
   MenuItem,
@@ -8,8 +7,6 @@ import {
   FormGroup,
   FormControlLabel,
 } from "@mui/material";
-import LockOutlineIcon from "@mui/icons-material/LockOutline";
-import LockOpenIcon from "@mui/icons-material/LockOpen";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import {
   CollectionStatus,
@@ -38,7 +35,7 @@ import ManageCollectionStatus from "@/modules/ManageCollectionStatus";
 import CopyableVariable from "@/components/CopyableVariable";
 import ErrorHeader from "@/components/ErrorHeader";
 import { useAdminDataStore } from "@/store/adminDataStore";
-import theme from "@/config/theme";
+import UpdatePanel from "@/components/UpdatePanel";
 
 const UpdateCollectionGuidance = maskClientTest(
   () => import("./UpdateCollectionGuidance"),
@@ -325,51 +322,14 @@ const UpdateCollection = ({
   }, [workgroupValues, setValue]);
 
   return (
-    <FormProvider {...formMethods}>
-      <ActionMenuSection
-        title={
-          <>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "100%",
-              }}
-            >
-              <Typography component="span" variant="overline">
-                Collection
-              </Typography>
-              <Box
-                sx={{
-                  ml: "auto",
-                  borderRadius: 1,
-                  p: 0.5,
-                  "&:hover": {
-                    bgcolor: "grey.300",
-                  },
-                }}
-                onClick={() => {
-                  if (expandedRight) {
-                    handleLockClick();
-                  } else {
-                    handleUnlockClick();
-                  }
-                }}
-              >
-                {expandedRight ? (
-                  <LockOpenIcon sx={{ color: theme.palette.tooltip?.main }} />
-                ) : (
-                  <LockOutlineIcon />
-                )}
-              </Box>
-            </Box>
-            <ErrorHeader errors={errors} depth={2} editing />
-          </>
-        }
-        fixedExpanded
-        scrollable
-      >
+    <UpdatePanel
+      label="Collection"
+      expandedRight={expandedRight}
+      onLockClick={() => handleSubmit((v) => submitForm(v, true))()}
+      onUnlockClick={() => onClose?.()}
+      rightExtras={<ErrorHeader errors={errors} depth={2} editing />}
+    >
+      <FormProvider {...formMethods}>
         <FormLabel underlined>Collection Status</FormLabel>
         <ManageCollectionStatus
           collection={collection}
@@ -594,8 +554,8 @@ const UpdateCollection = ({
           {/* supposed to also have supoprt contact / adminstractive contact */}
           <UpdateCollectionGuidance />
         </ActionMenuSection>
-      </ActionMenuSection>
-    </FormProvider>
+      </FormProvider>
+    </UpdatePanel>
   );
 };
 

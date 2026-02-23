@@ -19,7 +19,9 @@ const CollectionsLeftPanel = ({
   onCreate,
   onCancelCreate,
 }: CollectionsCreatePanelProps) => {
-  const { setSearchParam } = useSearchParams("collection_filter");
+  const { getSearchParam, setSearchParam } =
+    useSearchParams("collection_filter");
+  const searchParam = getSearchParam();
 
   const onSelectCollectionsStatus = useCallback(
     (status?: string) => {
@@ -69,31 +71,37 @@ const CollectionsLeftPanel = ({
               label: "All Collections",
               onClick: () =>
                 onSelectCollectionsStatus(CollectionFilterStatus.ALL),
+              selected: searchParam === CollectionFilterStatus.ALL,
             },
             {
               label: "Draft Collections",
               onClick: () =>
                 onSelectCollectionsStatus(CollectionFilterStatus.DRAFT),
+              selected: searchParam === CollectionFilterStatus.DRAFT,
             },
             {
               label: "Active Collections",
               onClick: () =>
                 onSelectCollectionsStatus(CollectionFilterStatus.ACTIVE),
+              selected: searchParam === CollectionFilterStatus.ACTIVE,
             },
             {
               label: "Pending Collections",
               onClick: () =>
                 onSelectCollectionsStatus(CollectionFilterStatus.PENDING),
+              selected: searchParam === CollectionFilterStatus.PENDING,
             },
             {
               label: "Suspended Collections",
               onClick: () =>
                 onSelectCollectionsStatus(CollectionFilterStatus.SUSPENDED),
+              selected: searchParam === CollectionFilterStatus.SUSPENDED,
             },
             {
               label: "Rejected Collections",
               onClick: () =>
                 onSelectCollectionsStatus(CollectionFilterStatus.REJECTED),
+              selected: searchParam === CollectionFilterStatus.REJECTED,
             },
           ]}
         />

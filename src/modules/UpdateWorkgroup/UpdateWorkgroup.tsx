@@ -1,7 +1,5 @@
 "use client";
-import { Typography, Box } from "@mui/material";
-import LockOutlineIcon from "@mui/icons-material/LockOutline";
-import LockOpenIcon from "@mui/icons-material/LockOpen";
+import UpdatePanel from "@/components/UpdatePanel";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { UpdateWorkgroupFormValues } from "@/types/forms";
@@ -12,7 +10,6 @@ import FormMultiSelect from "@/components/FormMultiSelect";
 import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
 import useAdminStore from "@/hooks/useAdminStore";
 import { TAG_CUSTODIAN_COLLECTION, TAG_WORKGROUP_ADMIN } from "@/config/tags";
-import theme from "@/config/theme";
 
 export type UpdateWorkgroupProps = {
   expandedRight: boolean;
@@ -101,46 +98,11 @@ const UpdateWorkgroup = ({ expandedRight, onClose }: UpdateWorkgroupProps) => {
 
   return (
     <FormProvider {...formMethods}>
-      <ActionMenuSection
-        title={
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-            }}
-          >
-            <Typography component="span" variant="overline">
-              Workgroup
-            </Typography>
-            <Box
-              sx={{
-                ml: "auto",
-                borderRadius: 1,
-                p: 0.5,
-                "&:hover": {
-                  bgcolor: "grey.300",
-                },
-              }}
-              onClick={() => {
-                if (expandedRight) {
-                  handleLockClick();
-                } else {
-                  handleUnlockClick();
-                }
-              }}
-            >
-              {expandedRight ? (
-                <LockOpenIcon sx={{ color: theme.palette.tooltip?.main }} />
-              ) : (
-                <LockOutlineIcon />
-              )}
-            </Box>
-          </Box>
-        }
-        fixedExpanded
-        scrollable
+      <UpdatePanel
+        label="Workgroup"
+        expandedRight={expandedRight}
+        onLockClick={handleLockClick}
+        onUnlockClick={handleUnlockClick}
       >
         <ActionMenuSection
           title={"Add Collections"}
@@ -214,7 +176,7 @@ const UpdateWorkgroup = ({ expandedRight, onClose }: UpdateWorkgroupProps) => {
             }}
           />
         </ActionMenuSection>
-      </ActionMenuSection>
+      </UpdatePanel>
     </FormProvider>
   );
 };

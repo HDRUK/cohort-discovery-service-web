@@ -91,8 +91,8 @@ const SwimLane = ({
           flex: 1,
           minHeight: 0,
           p: 2,
-          mx: 0,
-
+          mr: 1,
+          overflow: "auto",
           ...paperSx,
         }}
       >

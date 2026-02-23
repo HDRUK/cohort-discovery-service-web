@@ -18,6 +18,7 @@ import Title, { TitleProps } from "@/components/Title";
 import ControlledSearchBox, {
   ControlledSearchBoxProps,
 } from "@/modules/ControlledSearchBox";
+import TwoPaneSwimLaneLayout from "@/modules/TwoPaneSwimLaneLayout";
 
 export interface TableProps {
   emptyMessage?: string;
@@ -41,6 +42,7 @@ export interface TableProps {
   };
   details?: React.ReactNode;
   boxSxProps?: BoxProps["sx"];
+  rightPanel?: (selectedIds: string[]) => React.ReactNode;
 }
 
 type DTableProps<TData extends MRT_RowData> = MaterialReactTableProps<TData> &
@@ -52,6 +54,7 @@ const Table = <TData extends MRT_RowData>({
   rightAction,
   details,
   boxSxProps,
+  rightPanel,
   ...props
 }: DTableProps<TData>) => {
   const { table } = props;
@@ -127,7 +130,7 @@ const Table = <TData extends MRT_RowData>({
                 {downloadProps && (
                   <DownloadButton
                     {...restDownloadProps}
-                    onClick={() => onDownloadClick?.(selectedRows)}
+                    onClick={() => onDownloadClick?.(selectedRows)} // note that this gets ignored by DownloadButton
                   />
                 )}
               </Box>
@@ -140,13 +143,18 @@ const Table = <TData extends MRT_RowData>({
           <Divider /> {details}
         </Box>
       )}
-      {emptyMessage && nrows === 0 ? (
-        <Box sx={{ mx: "auto", my: "auto" }}>
-          <Typography variant="h5">{emptyMessage}</Typography>
-        </Box>
-      ) : (
-        <MaterialReactTable {...props} />
-      )}
+      <TwoPaneSwimLaneLayout
+        left={
+          emptyMessage && nrows === 0 ? (
+            <Box sx={{ mx: "auto", my: "auto" }}>
+              <Typography variant="h5">{emptyMessage}</Typography>
+            </Box>
+          ) : (
+            <MaterialReactTable {...props} />
+          )
+        }
+        right={rightPanel && rightPanel(selectedRows)}
+      />
     </Box>
   );
 };

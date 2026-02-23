@@ -53,7 +53,7 @@ const TableWithState = () => {
         rightAction={{
           deleteProps: { onClick: handleDeleteRows },
           downloadProps: {
-            id: "download-id",
+            ids: ["download-id"],
             entity: "test-entity",
             formats: [AvailableFormats.JSON],
           },
@@ -119,7 +119,7 @@ describe("Table", () => {
     expect(handleDeleteRows).toHaveBeenLastCalledWith(["2"]);
   });
 
-  it("it can donwload on click", async () => {
+  it("it can download on click", async () => {
     const user = userEvent.setup();
 
     const realCreateElement = document.createElement.bind(document);

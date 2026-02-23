@@ -14,7 +14,11 @@ import HelpTooltip from "../HelpTooltip";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import theme from "@/config/theme";
 
-export default function TopMenu() {
+type TopMenuProps = {
+  standalone: boolean;
+};
+
+export default function TopMenu({ standalone }: TopMenuProps) {
   const pathname = usePathname();
   const user = useUserStore((s) => s.user);
 
@@ -51,7 +55,7 @@ export default function TopMenu() {
         route: routes.teamHome(uc.pid),
         page: null,
       })),
-      ...(user
+      ...(user && standalone
         ? [
             {
               id: routes.profile,
@@ -75,7 +79,7 @@ export default function TopMenu() {
     ];
 
     return baseTabs;
-  }, [user, userCustodians]);
+  }, [standalone, user, userCustodians]);
 
   const currentTabValue =
     tabs.find((tab) => {

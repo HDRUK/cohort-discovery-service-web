@@ -27,6 +27,7 @@ import {
 import RuleBoard from "@/modules/RuleBoard";
 import DragOverlay from "@/components/DragOverlay";
 
+import { QueryBuilderSkeleton } from "./QueryBuilderSkeleton";
 import { RuleNodeType } from "@/types/rules";
 import { findById, moveItemIntoGroup } from "@/utils/rules";
 import MarqueeSelection from "@/components/MarqueeSelection";
@@ -52,6 +53,7 @@ const QueryBuilder = ({
     createNewGroup,
     createNewRule,
     createNewAgeFilter,
+    createNewOperator,
   } = useQueryBuilder((qb) => ({
     resetQueryBuilderJson: qb.resetQueryBuilderJson,
     queryBuilderJson: qb.queryBuilderJson,
@@ -62,6 +64,7 @@ const QueryBuilder = ({
     createNewGroup: qb.createNewGroup,
     createNewRule: qb.createNewRule,
     createNewAgeFilter: qb.createNewAgeFilter,
+    createNewOperator: qb.createNewOperator,
     selectedGuidance: qb.selectedGuidance,
   }));
 
@@ -199,6 +202,7 @@ const QueryBuilder = ({
     { action: createNewAgeFilter, label: "Add Age Filter" },
     { action: createNewRule, label: "Add Rule" },
     { action: createNewGroup, label: "Add Group" },
+    { action: createNewOperator, label: "Add Operator" },
   ];
 
   return (
@@ -206,29 +210,42 @@ const QueryBuilder = ({
       <ThreePaneSwimLaneLayout
         left={<ActionMenu />}
         middle={
-          <>
-            <DndContext
-              sensors={sensors}
-              onDragStart={onDragStart}
-              onDragOver={onDragOver}
-              onDragEnd={onDragEnd}
-              modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
-              collisionDetection={closestCorners}
-              measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
-            >
-              <RuleBoard
-                ruleGroup={queryBuilderJson}
-                onContextMenu={handleContextMenu}
+          queryBuilderJson?.rules && queryBuilderJson.rules.length > 0 ? (
+            <>
+              <DndContext
+                sensors={sensors}
+                onDragStart={onDragStart}
+                onDragOver={onDragOver}
+                onDragEnd={onDragEnd}
+                modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
+                collisionDetection={closestCorners}
+                measuring={{
+                  droppable: { strategy: MeasuringStrategy.Always },
+                }}
               >
-                <RightClickMenu {...rightClickMenuMethods} actions={actions} />
-              </RuleBoard>
+                <RuleBoard
+                  ruleGroup={queryBuilderJson}
+                  onContextMenu={handleContextMenu}
+                >
+                  <RightClickMenu
+                    {...rightClickMenuMethods}
+                    actions={actions}
+                  />
+                </RuleBoard>
 
-              <DragOverlay node={activeNode} />
-            </DndContext>
-          </>
+                <DragOverlay node={activeNode} />
+              </DndContext>
+            </>
+          ) : (
+            <QueryBuilderSkeleton />
+          )
         }
         middleProps={{ ref: boardRef }}
         right={<RuleMenu />}
+        rightDisabled={
+          !queryBuilderJson ||
+          (queryBuilderJson?.rules && queryBuilderJson.rules.length === 0)
+        }
       />
       <MarqueeSelection
         containerRef={boardRef}

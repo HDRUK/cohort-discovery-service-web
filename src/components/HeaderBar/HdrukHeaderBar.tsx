@@ -1,11 +1,30 @@
 "use client";
 import Image from "next/image";
+import Link, { type LinkProps } from "next/link";
 import logo from "@/assets/logo.svg";
 import { Header } from "@hdruk/ui";
 import useUserStore from "@/hooks/useUserStore";
+import { type AnchorHTMLAttributes } from "react";
 
 const NEXT_PUBLIC_LOGIN_URL =
   process.env.NEXT_PUBLIC_LOGIN_URL ?? "https://healthdatagateway.org";
+const PROFILE_HREF = `${NEXT_PUBLIC_LOGIN_URL}/account/profile`;
+
+type HeaderLinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> &
+  LinkProps;
+
+const HeaderLink = ({ href, rel, ...props }: HeaderLinkProps) => {
+  const isProfileLink = href.toString() === PROFILE_HREF;
+
+  return (
+    <Link
+      href={href}
+      {...props}
+      target={isProfileLink ? "_blank" : undefined}
+      rel={isProfileLink ? "noopener noreferrer" : rel}
+    />
+  );
+};
 
 const HdrukHeader = () => {
   const user = useUserStore((s) => s.user);
@@ -23,9 +42,10 @@ const HdrukHeader = () => {
       accountNavigation={{
         profile: {
           label: "My Profile",
-          href: `${NEXT_PUBLIC_LOGIN_URL}/account/profile`,
+          href: PROFILE_HREF,
         },
       }}
+      linkComponent={HeaderLink}
       accountInitialsColour="#90D0EC"
       appBarColour="secondary"
       isLoggedIn={!!user}
