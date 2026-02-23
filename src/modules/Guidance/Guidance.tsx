@@ -6,6 +6,7 @@ import OperatorGuidance from "@/content/guidance/queryBuilder/operator.mdx";
 import GroupGuidance from "@/content/guidance/queryBuilder/group.mdx";
 import AgeFilterGuidance from "@/content/guidance/queryBuilder/ageFilter.mdx";
 import EmptyRuleGuidance from "@/content/guidance/queryBuilder/emptyRule.mdx";
+import MultipleItemGuidance from "@/content/guidance/queryBuilder/multipleItem.mdx";
 import { Box, BoxProps, Link, LinkProps, TypographyProps } from "@mui/material";
 import { useCallback, useMemo } from "react";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
@@ -13,12 +14,17 @@ import ActionMenuSection from "@/components/ActionMenuSection";
 import {
   createOperator,
   createRule,
+  createRuleGroup,
   findById,
+  findByIdWithNeighbors,
+  getSelectedOrdered,
   isAgeFilter,
   isEmptyRule,
   isOperator,
   isRuleGroup,
   isRuleLeaf,
+  removeById,
+  ruleToGroup,
   updateById,
 } from "@/utils/rules";
 import { trueKeys } from "@/utils/numbers";
@@ -28,6 +34,7 @@ import {
   OperatorType,
   RuleGroupType,
   RuleLeafType,
+  RuleNodeType,
 } from "@/types/rules";
 import ToggleExclusion from "@/content/guidance/components/ToggleExclusion";
 import ShowDescendants from "@/content/guidance/components/ShowDescendants";
@@ -39,7 +46,12 @@ import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
 import { CustomH1, CustomH2 } from "@/components/GuidanceHeaders";
 import { getDomainVerbs } from "@/utils/omop";
 import DeleteTimeFrameButton from "@/components/DeleteTimeFrameButton";
-import { DeleteMenuItemProps } from "@/components/DeleteMenuItem/DeleteMenuItem";
+import DeleteMenuItem, {
+  DeleteMenuItemProps,
+} from "@/components/DeleteMenuItem/DeleteMenuItem";
+import ConvertToGroupMenuItem, {
+  ConvertToGroupMenuItemProps,
+} from "@/components/ConvertToGroupMenuItem/ConvertToGroupMenuItem";
 import AddAgeButton from "@/components/AddAgeButton";
 import RuleAgeSelector from "@/components/RuleAgeSelector";
 import DeleteAgeButton from "@/components/DeleteAgeButton";
@@ -84,17 +96,17 @@ export const baseComponents = {
 };
 
 const Guidance = () => {
-  const { queryBuilderJson, setQueryBuilderJson, selected } = useQueryBuilder(
-    (qb) => ({
+  const { boardIndex, queryBuilderJson, setQueryBuilderJson, selected } =
+    useQueryBuilder((qb) => ({
+      boardIndex: qb.boardIndex,
       selected: qb.selected,
       queryBuilderJson: qb.queryBuilderJson,
       setQueryBuilderJson: qb.setQueryBuilderJson,
-    }),
-  );
+    }));
 
   const selectedIds = useMemo(() => trueKeys(selected), [selected]);
   const selectedNode = useMemo(() => {
-    if (selectedIds.length !== 1) return;
+    if (selectedIds.length === 0) return;
     const node = findById(queryBuilderJson, String(selectedIds[0]));
     return node;
   }, [queryBuilderJson, selectedIds]);
@@ -114,6 +126,14 @@ const Guidance = () => {
   );
 
   const { constrainForBunnyV1 } = useFeatures();
+
+  const handleDelete = useCallback(() => {
+    let newQuery = queryBuilderJson;
+    for (const id of selectedIds) {
+      newQuery = removeById(newQuery, String(id));
+      setQueryBuilderJson(newQuery);
+    }
+  }, [selectedIds, queryBuilderJson, setQueryBuilderJson]);
 
   interface GuidanceProps extends TypographyProps {
     target: string;
@@ -199,7 +219,132 @@ const Guidance = () => {
     ),
     Box: (props: BoxProps) => <Box {...props}></Box>,
   });
+  console.log(selectedNode, selectedIds);
 
+  const selectedNodeIds = useMemo(
+    () => getSelectedOrdered(selected, queryBuilderJson),
+    [selected, queryBuilderJson],
+  );
+
+  const { id } = selectedNode ?? { id: "" };
+
+  const currentIdIsSelectedNode = useMemo(
+    () => selectedNodeIds.includes(id),
+    [selectedNodeIds, id],
+  );
+
+  console.log("boardIndex", boardIndex);
+  console.log(
+    "boardGroupContents",
+    boardIndex.itemsByGroup[boardIndex.containers[0]],
+  );
+
+  const nodeIsInGroup = (nodeId: string) => {
+    const boardContents = boardIndex.itemsByGroup[boardIndex.containers[0]];
+    return !boardContents?.includes(nodeId);
+  };
+
+  const handleConvertToGroup = useCallback(() => {
+    if (currentIdIsSelectedNode && selectedNodeIds.length > 1) {
+      const [primaryId, ...otherIds] = selectedNodeIds;
+
+      const newRules = selectedNodeIds
+        .map((id) => findById(queryBuilderJson, id as string))
+        .filter((x) => !!x);
+
+      const lastNode = newRules[newRules.length - 1];
+      const lastId = lastNode.id;
+
+      const lastIdIsOperator = isOperator(lastNode);
+
+      const newGroup = createRuleGroup(
+        lastIdIsOperator ? [...newRules, createRule()] : newRules,
+      );
+
+      const queryJsonWithOtherIdsRemoved = otherIds.reduce(
+        (acc, id) => removeById(acc, id as string),
+        queryBuilderJson,
+      );
+
+      const { below } = findByIdWithNeighbors(queryBuilderJson, lastId);
+      const belowIsOperator = below ? isOperator(below) : false;
+
+      const queryJsonWithNewGroup = updateById(
+        queryJsonWithOtherIdsRemoved,
+        primaryId as string,
+        () => newGroup,
+        !belowIsOperator && !!below
+          ? {
+              node: createOperator(),
+              position: "after",
+            }
+          : undefined,
+      );
+
+      setQueryBuilderJson(queryJsonWithNewGroup);
+      return;
+    }
+    setQueryBuilderJson(
+      updateById(queryBuilderJson, id, (node) => {
+        if (!isRuleLeaf(node)) return node;
+        const newGroup = ruleToGroup(node);
+        return newGroup;
+      }),
+    );
+  }, [
+    id,
+    queryBuilderJson,
+    setQueryBuilderJson,
+    selectedNodeIds,
+    currentIdIsSelectedNode,
+  ]);
+
+  const makeMultipleItemComponents = () => ({
+    ...baseComponents,
+    CollapsibleGuidance: (props: GuidanceProps) => (
+      <CollapsibleGuidance {...props}></CollapsibleGuidance>
+    ),
+    DeleteMenuItem: (props: DeleteMenuItemProps) => (
+      <DeleteMenuItem {...props} action={handleDelete}></DeleteMenuItem>
+    ),
+    ConvertToGroupMenuItem: (props: ConvertToGroupMenuItemProps) => (
+      <ConvertToGroupMenuItem
+        {...props}
+        onClick={() => handleConvertToGroup()}
+      />
+    ),
+    Box: (props: BoxProps) => <Box {...props}></Box>,
+  });
+
+  if (selectedIds.length > 1) {
+    console.log(
+      "any group?:",
+      selectedIds.some((id) =>
+        isRuleGroup(
+          findById(queryBuilderJson, String(id)) ?? ({} as RuleNodeType),
+        ),
+      ),
+    );
+    console.log(
+      "any in group?:",
+      selectedIds.some((id) => nodeIsInGroup(String(id))),
+    );
+
+    return (
+      <ActionMenuSection title={"Bulk Select Actions"} fixedExpanded>
+        <MultipleItemGuidance
+          components={makeMultipleItemComponents()}
+          containsGroup={
+            selectedIds.some((id) =>
+              isRuleGroup(
+                findById(queryBuilderJson, String(id)) ?? ({} as RuleNodeType),
+              ),
+            ) || selectedIds.some((id) => nodeIsInGroup(String(id)))
+          }
+        />
+      </ActionMenuSection>
+    );
+  }
   if (!selectedNode) {
     return (
       <ActionMenuSection title={"Tool Guidance"} fixedExpanded>
