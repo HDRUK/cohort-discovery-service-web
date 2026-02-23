@@ -219,7 +219,6 @@ const Guidance = () => {
     ),
     Box: (props: BoxProps) => <Box {...props}></Box>,
   });
-  console.log(selectedNode, selectedIds);
 
   const selectedNodeIds = useMemo(
     () => getSelectedOrdered(selected, queryBuilderJson),
@@ -231,12 +230,6 @@ const Guidance = () => {
   const currentIdIsSelectedNode = useMemo(
     () => selectedNodeIds.includes(id),
     [selectedNodeIds, id],
-  );
-
-  console.log("boardIndex", boardIndex);
-  console.log(
-    "boardGroupContents",
-    boardIndex.itemsByGroup[boardIndex.containers[0]],
   );
 
   const nodeIsInGroup = (nodeId: string) => {
@@ -317,19 +310,6 @@ const Guidance = () => {
   });
 
   if (selectedIds.length > 1) {
-    console.log(
-      "any group?:",
-      selectedIds.some((id) =>
-        isRuleGroup(
-          findById(queryBuilderJson, String(id)) ?? ({} as RuleNodeType),
-        ),
-      ),
-    );
-    console.log(
-      "any in group?:",
-      selectedIds.some((id) => nodeIsInGroup(String(id))),
-    );
-
     return (
       <ActionMenuSection title={"Bulk Select Actions"} fixedExpanded>
         <MultipleItemGuidance
