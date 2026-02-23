@@ -165,6 +165,10 @@ const Guidance = () => {
   const makeOperatorComponents = (node: OperatorType) => ({
     ...baseComponents,
     ToggleOperator: () => <ToggleOperator operator={node} />,
+    Box: (props: BoxProps) => <Box {...props}></Box>,
+    CollapsibleGuidance: (props: GuidanceProps) => (
+      <CollapsibleGuidance {...props}></CollapsibleGuidance>
+    ),
   });
 
   const makeGroupComponents = (group: RuleGroupType) => {

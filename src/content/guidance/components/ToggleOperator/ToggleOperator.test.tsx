@@ -5,6 +5,7 @@ import ToggleOperator from "./ToggleOperator";
 import MockDaphneStore from "@/store/MockDaphneStore";
 import { CombinatorType } from "@/types/rules";
 import { v4 as uuidv4 } from "uuid";
+const setSelectedGuidance = jest.fn();
 
 describe("ToggleOperator", () => {
   afterEach(() => {
@@ -24,6 +25,7 @@ describe("ToggleOperator", () => {
         overrides={{
           queryBuilder: {
             openSelectDatasetsPanel: true,
+            setSelectedGuidance: setSelectedGuidance,
           },
         }}
       >
