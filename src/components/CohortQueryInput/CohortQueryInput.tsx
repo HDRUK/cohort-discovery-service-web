@@ -132,7 +132,6 @@ const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
     resetQuery,
   ]);
 
-  const placeholders = Object.keys(EXAMPLES);
   const anchorRef = useRef<HTMLDivElement | null>(null);
   const [open, setOpen] = useState(false);
 
@@ -184,11 +183,6 @@ const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
                 queries={queries}
                 open={open}
                 anchorEl={anchorRef.current}
-                options={placeholders.map((label) => ({
-                  label,
-                  value: EXAMPLES[label].id,
-                  rules: EXAMPLES[label],
-                }))}
               />
             </Box>
             <SubmitQueryButton warning={warnings.length > 0} />

@@ -2,20 +2,24 @@
 
 import { Paper } from "@mui/material";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import { Option } from "@/types/common";
 import Popper from "@mui/material/Popper";
 import List from "@/components/List";
-import { RuleGroupType } from "@/types/rules";
 import { Query } from "@/types/api";
 import { queryToText } from "@/utils/queryBuilder";
+import { EXAMPLES } from "@/config/queryExamples";
 
 type Props = {
   queries: Query[];
-  options: (Option & { rules: RuleGroupType })[];
   anchorEl: HTMLElement | null;
   open: boolean;
 };
-const SearchOverlay = ({ queries, options, anchorEl, open }: Props) => {
+const SearchOverlay = ({ queries, anchorEl, open }: Props) => {
+  const placeholders = Object.keys(EXAMPLES);
+  const options = placeholders.map((label) => ({
+    label,
+    rules: EXAMPLES[label],
+  }));
+
   const setQueryBuilderJson = useQueryBuilder((qb) => qb.setQueryBuilderJson);
 
   return (
@@ -39,8 +43,9 @@ const SearchOverlay = ({ queries, options, anchorEl, open }: Props) => {
             {
               label: "Query Examples",
               items: options.map((opt) => ({
+                id: opt.rules.id,
                 label: opt.label,
-                value: opt.rules.id,
+                value: opt.rules.name,
                 onClick: () => setQueryBuilderJson(opt.rules),
               })),
             },
