@@ -47,12 +47,10 @@ const QueryResultsPageContent = async ({
           },
           rightAction: {
             downloadProps: {
-              id: queryData.data.pid,
+              ids: [queryData.data.pid],
               entity: "queries",
               formats: [AvailableFormats.JSON],
             },
-            refreshProps: { tag: queryData.data.pid, disabled: true },
-            deleteProps: { disabled: true },
             sortProps: { field: "collection.name" },
           },
         }}
