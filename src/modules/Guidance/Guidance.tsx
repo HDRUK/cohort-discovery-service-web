@@ -54,7 +54,6 @@ import RuleAgeSelector from "@/components/RuleAgeSelector";
 import DeleteAgeButton from "@/components/DeleteAgeButton";
 import useFeatures from "@/hooks/useFeatures";
 import CollapsibleGuidance from "@/components/CollapsibleGuidance";
-import useNodeActions from "@/hooks/useNodeActions";
 
 export const baseComponents = {
   a: ({ href, children }: LinkProps) => (
@@ -218,8 +217,6 @@ const Guidance = () => {
     Box: (props: BoxProps) => <Box {...props}></Box>,
   });
 
-  const { handleConvertToGroup } = useNodeActions(selectedNode);
-
   const makeMultipleItemComponents = () => ({
     ...baseComponents,
     CollapsibleGuidance: (props: GuidanceProps) => (
@@ -229,10 +226,7 @@ const Guidance = () => {
       <DeleteMenuItem {...props} action={handleDelete}></DeleteMenuItem>
     ),
     ConvertToGroupMenuItem: (props: ConvertToGroupMenuItemProps) => (
-      <ConvertToGroupMenuItem
-        {...props}
-        onClick={() => handleConvertToGroup()}
-      />
+      <ConvertToGroupMenuItem {...props} selectedNode={selectedNode} />
     ),
     Box: (props: BoxProps) => <Box {...props}></Box>,
   });
