@@ -20,6 +20,7 @@ import {
   inputAdornmentSx,
   iconButtonSx,
 } from "./SearchBox.styles";
+import useRotatingPlaceholder from "@/hooks/useRotatingPlaceholder";
 
 export type SearchBoxProps = Omit<TextFieldProps, "errors"> & {
   loading?: boolean;
@@ -34,6 +35,7 @@ export type SearchBoxProps = Omit<TextFieldProps, "errors"> & {
   onClickEndAdornment?: () => void;
   endIcon?: React.ReactNode;
   showEndIcon?: boolean;
+  placeholders?: string[];
 };
 
 const SearchBox = ({
@@ -50,6 +52,7 @@ const SearchBox = ({
   onClickEndAdornment,
   endIcon,
   showEndIcon = true,
+  placeholders,
   ...rest
 }: SearchBoxProps) => {
   const [expanded, setExpanded] = useState(
@@ -80,6 +83,8 @@ const SearchBox = ({
   const nActions = actionChildren.length;
 
   const STABLE_ID = "search-box";
+
+  const rotatingPlaceholder = useRotatingPlaceholder(placeholders, 1000);
 
   return (
     <Box
@@ -136,6 +141,9 @@ const SearchBox = ({
                 ),
               },
             }}
+            {...(placeholders?.length
+              ? { placeholder: rotatingPlaceholder }
+              : {})}
             {...rest}
           />
         </Grid>

@@ -1,8 +1,8 @@
 "use client";
 
 import { useForm, Controller, useWatch } from "react-hook-form";
-import { Box } from "@mui/material";
-import { useCallback, useEffect, useRef } from "react";
+import { Box, Paper } from "@mui/material";
+import { useCallback, useEffect, useRef, useState } from "react";
 import SearchBox from "../SearchBox";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import {
@@ -14,12 +14,71 @@ import useSubmitQuery from "@/hooks/useSubmitQuery";
 import { RuleErrors } from "@/utils/rules";
 import useStateManagement from "@/hooks/useStateManagement";
 import SubmitQueryButton from "@/components/SubmitQueryButton";
+import { EXAMPLES } from "@/config/queryExamples";
+import { Option } from "@/types/common";
+import Popper from "@mui/material/Popper";
+import List from "@/components/List";
+import { RuleGroupType } from "@/types/rules";
+import { Query } from "@/types/api";
+import { queryToText } from "@/utils/queryBuilder";
 
 type FormValues = {
   cohortQueryInput: string;
 };
 
-const CohortQueryInput = () => {
+type OverlayProps = {
+  queries: Query[];
+  options: (Option & { rules: RuleGroupType })[];
+  anchorEl: HTMLElement | null;
+  open: boolean;
+};
+const Overlay = ({ queries, options, anchorEl, open }: OverlayProps) => {
+  console.log({ queries });
+
+  const setQueryBuilderJson = useQueryBuilder((qb) => qb.setQueryBuilderJson);
+
+  return (
+    <Popper
+      open={open}
+      anchorEl={anchorEl}
+      placement="bottom-start"
+      modifiers={[{ name: "offset", options: { offset: [0, 4] } }]}
+      style={{ zIndex: 2000 }}
+    >
+      <Paper
+        sx={{
+          width: anchorEl?.clientWidth,
+          boxShadow: 3,
+          borderRadius: 1,
+          p: 1,
+        }}
+      >
+        <List
+          items={[
+            {
+              label: "Query Examples",
+              items: options.map((opt) => ({
+                label: opt.label,
+                value: opt.value,
+                onClick: () => setQueryBuilderJson(opt.rules),
+              })),
+            },
+            {
+              label: "Recent Searches",
+              items: queries.map((q) => ({
+                label: queryToText(q.definition),
+                value: q.id,
+                onClick: () => setQueryBuilderJson(q.definition),
+              })),
+            },
+          ]}
+        />
+      </Paper>
+    </Popper>
+  );
+};
+
+const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
   const {
     queryAsText,
     getQueryFromText,
@@ -129,13 +188,17 @@ const CohortQueryInput = () => {
     resetQuery,
   ]);
 
+  const placeholders = Object.keys(EXAMPLES);
+  const anchorRef = useRef<HTMLDivElement | null>(null);
+  const [open, setOpen] = useState(false);
+
   return (
     <Box
       component="form"
       onSubmit={handleSubmitSearch(onSubmitSearch, resetQuery)}
       sx={{
         width: "95%",
-        overflow: "hidden",
+        overflow: "visible",
         py: 1,
       }}
     >
@@ -152,19 +215,38 @@ const CohortQueryInput = () => {
         }}
         render={({ field, fieldState: { error, isDirty } }) => (
           <Box display="flex" flexDirection="row" sx={{ gap: 1 }}>
-            <SearchBox
-              {...field}
-              collapsible={false}
-              error={isDirty ? false : !!error}
-              type="search"
-              placeholder="Search for a cohort e.g. females above 50 with diabetes type-ii"
-              fullWidth
-              variant="outlined"
-              loading={isLoading}
-              warning={warnings.length > 0}
-              disabled={disabled || !!error}
-              showEndIcon={false}
-            />
+            <Box ref={anchorRef} sx={{ flex: 1 }}>
+              <SearchBox
+                {...field}
+                collapsible={false}
+                error={isDirty ? false : !!error}
+                type="search"
+                placeholders={placeholders}
+                fullWidth
+                variant="outlined"
+                loading={isLoading}
+                warning={warnings.length > 0}
+                disabled={disabled || !!error}
+                showEndIcon={false}
+                onFocus={() => {
+                  setOpen(true);
+                }}
+                onBlur={() => {
+                  field.onBlur();
+                  setTimeout(() => setOpen(false), 150);
+                }}
+              />
+              <Overlay
+                queries={queries}
+                open={open}
+                anchorEl={anchorRef.current}
+                options={placeholders.map((label) => ({
+                  label,
+                  value: EXAMPLES[label].id,
+                  rules: EXAMPLES[label],
+                }))}
+              />
+            </Box>
             <SubmitQueryButton warning={warnings.length > 0} />
           </Box>
         )}
