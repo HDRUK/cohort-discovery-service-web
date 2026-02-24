@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm, Controller, useWatch } from "react-hook-form";
-import { Box, Paper } from "@mui/material";
+import { Box } from "@mui/material";
 import { useCallback, useEffect, useRef, useState } from "react";
 import SearchBox from "../SearchBox";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
@@ -15,67 +15,11 @@ import { RuleErrors } from "@/utils/rules";
 import useStateManagement from "@/hooks/useStateManagement";
 import SubmitQueryButton from "@/components/SubmitQueryButton";
 import { EXAMPLES } from "@/config/queryExamples";
-import { Option } from "@/types/common";
-import Popper from "@mui/material/Popper";
-import List from "@/components/List";
-import { RuleGroupType } from "@/types/rules";
 import { Query } from "@/types/api";
-import { queryToText } from "@/utils/queryBuilder";
+import SearchOverlay from "./SearchOverlay";
 
 type FormValues = {
   cohortQueryInput: string;
-};
-
-type OverlayProps = {
-  queries: Query[];
-  options: (Option & { rules: RuleGroupType })[];
-  anchorEl: HTMLElement | null;
-  open: boolean;
-};
-const Overlay = ({ queries, options, anchorEl, open }: OverlayProps) => {
-  console.log({ queries });
-
-  const setQueryBuilderJson = useQueryBuilder((qb) => qb.setQueryBuilderJson);
-
-  return (
-    <Popper
-      open={open}
-      anchorEl={anchorEl}
-      placement="bottom-start"
-      modifiers={[{ name: "offset", options: { offset: [0, 4] } }]}
-      style={{ zIndex: 2000 }}
-    >
-      <Paper
-        sx={{
-          width: anchorEl?.clientWidth,
-          boxShadow: 3,
-          borderRadius: 1,
-          p: 1,
-        }}
-      >
-        <List
-          items={[
-            {
-              label: "Query Examples",
-              items: options.map((opt) => ({
-                label: opt.label,
-                value: opt.value,
-                onClick: () => setQueryBuilderJson(opt.rules),
-              })),
-            },
-            {
-              label: "Recent Searches",
-              items: queries.map((q) => ({
-                label: queryToText(q.definition),
-                value: q.id,
-                onClick: () => setQueryBuilderJson(q.definition),
-              })),
-            },
-          ]}
-        />
-      </Paper>
-    </Popper>
-  );
 };
 
 const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
@@ -236,7 +180,7 @@ const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
                   setTimeout(() => setOpen(false), 150);
                 }}
               />
-              <Overlay
+              <SearchOverlay
                 queries={queries}
                 open={open}
                 anchorEl={anchorRef.current}
