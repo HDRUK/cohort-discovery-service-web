@@ -1,0 +1,15 @@
+{/**
+  * @typedef Props
+  * @property {boolean} containsGroup
+  */}
+  
+  <DeleteMenuItem label="Delete selected"  size="large" />
+
+<CollapsibleGuidance keyPrefix="ConvertToGroup" title="Grouping">
+  <ConvertToGroupMenuItem label="Convert to group" disabled={props.containsGroup}/>
+  {props.containsGroup ? <Box color="error.main">
+    Nested groups are not supported yet.
+  </Box> :  <Box>
+    Add selected rules to new group.
+  </Box>}
+</CollapsibleGuidance>

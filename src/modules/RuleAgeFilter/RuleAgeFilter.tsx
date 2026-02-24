@@ -6,14 +6,16 @@ import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import useNodeActions from "@/hooks/useNodeActions";
 import RuleAgeSelector from "@/components/RuleAgeSelector";
 
-export interface RuleProps
-  extends Omit<RuleWrapperProps, "node" | "type" | "render"> {
+export interface RuleProps extends Omit<
+  RuleWrapperProps,
+  "node" | "type" | "render"
+> {
   rule: AgeFilterType;
   groupId?: string;
 }
 
 const RuleAgeFilter = ({ rule, groupId, ...rest }: RuleProps) => {
-  const actions = useNodeActions(rule);
+  const { actions } = useNodeActions(rule);
 
   return (
     <RuleWrapper
