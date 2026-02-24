@@ -22,8 +22,8 @@ export interface RightClickAction {
   label: string;
 }
 
-const useNodeActions = (node: RuleNodeType): RightClickAction[] => {
-  const { id } = node;
+const useNodeActions = (node?: RuleNodeType): RightClickAction[] => {
+  const { id } = node ?? { id: "" };
 
   const { queryBuilderJson, setQueryBuilderJson, selected } = useQueryBuilder(
     (qb) => ({
@@ -143,7 +143,7 @@ const useNodeActions = (node: RuleNodeType): RightClickAction[] => {
     );
   }, [id, queryBuilderJson, setQueryBuilderJson]);
 
-  const rules = isRuleGroup(node) ? node.rules : undefined;
+  const rules = node && isRuleGroup(node) ? node.rules : undefined;
   const handleCreateNewRule = useCallback(() => {
     if (!rules) return;
     const newRules = [createRule(), createOperator(), ...rules];
@@ -158,14 +158,14 @@ const useNodeActions = (node: RuleNodeType): RightClickAction[] => {
 
   const actions = [
     { action: handleDeleteRule, label: "Delete" },
-    ...(isRuleLeaf(node) ||
+    ...((node && isRuleLeaf(node)) ||
     (currentIdIsSelectedNode && selectedNodeIds.length > 1)
       ? [{ action: handleConvertToGroup, label: "Convert to Group" }]
       : []),
-    ...(isOperator(node)
+    ...(node && isOperator(node)
       ? [{ action: handleChangeOperator, label: "Change Operator" }]
       : []),
-    ...(isRuleGroup(node)
+    ...(node && isRuleGroup(node)
       ? [
           { action: handleCreateNewRule, label: "Add Rule" },
           { action: handleCollapseGroup, label: "Collapse Group" },

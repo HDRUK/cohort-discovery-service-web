@@ -14,17 +14,14 @@ import ActionMenuSection from "@/components/ActionMenuSection";
 import {
   createOperator,
   createRule,
-  createRuleGroup,
   findById,
-  findByIdWithNeighbors,
-  getSelectedOrdered,
   isAgeFilter,
   isEmptyRule,
+  isInGroup,
   isOperator,
   isRuleGroup,
   isRuleLeaf,
   removeById,
-  ruleToGroup,
   updateById,
 } from "@/utils/rules";
 import { trueKeys } from "@/utils/numbers";
@@ -57,6 +54,7 @@ import RuleAgeSelector from "@/components/RuleAgeSelector";
 import DeleteAgeButton from "@/components/DeleteAgeButton";
 import useFeatures from "@/hooks/useFeatures";
 import CollapsibleGuidance from "@/components/CollapsibleGuidance";
+import useNodeActions from "@/hooks/useNodeActions";
 
 export const baseComponents = {
   a: ({ href, children }: LinkProps) => (
@@ -220,77 +218,7 @@ const Guidance = () => {
     Box: (props: BoxProps) => <Box {...props}></Box>,
   });
 
-  const selectedNodeIds = useMemo(
-    () => getSelectedOrdered(selected, queryBuilderJson),
-    [selected, queryBuilderJson],
-  );
-
-  const { id } = selectedNode ?? { id: "" };
-
-  const currentIdIsSelectedNode = useMemo(
-    () => selectedNodeIds.includes(id),
-    [selectedNodeIds, id],
-  );
-
-  const nodeIsInGroup = (nodeId: string) => {
-    const boardContents = boardIndex.itemsByGroup[boardIndex.containers[0]];
-    return !boardContents?.includes(nodeId);
-  };
-
-  const handleConvertToGroup = useCallback(() => {
-    if (currentIdIsSelectedNode && selectedNodeIds.length > 1) {
-      const [primaryId, ...otherIds] = selectedNodeIds;
-
-      const newRules = selectedNodeIds
-        .map((id) => findById(queryBuilderJson, id as string))
-        .filter((x) => !!x);
-
-      const lastNode = newRules[newRules.length - 1];
-      const lastId = lastNode.id;
-
-      const lastIdIsOperator = isOperator(lastNode);
-
-      const newGroup = createRuleGroup(
-        lastIdIsOperator ? [...newRules, createRule()] : newRules,
-      );
-
-      const queryJsonWithOtherIdsRemoved = otherIds.reduce(
-        (acc, id) => removeById(acc, id as string),
-        queryBuilderJson,
-      );
-
-      const { below } = findByIdWithNeighbors(queryBuilderJson, lastId);
-      const belowIsOperator = below ? isOperator(below) : false;
-
-      const queryJsonWithNewGroup = updateById(
-        queryJsonWithOtherIdsRemoved,
-        primaryId as string,
-        () => newGroup,
-        !belowIsOperator && !!below
-          ? {
-              node: createOperator(),
-              position: "after",
-            }
-          : undefined,
-      );
-
-      setQueryBuilderJson(queryJsonWithNewGroup);
-      return;
-    }
-    setQueryBuilderJson(
-      updateById(queryBuilderJson, id, (node) => {
-        if (!isRuleLeaf(node)) return node;
-        const newGroup = ruleToGroup(node);
-        return newGroup;
-      }),
-    );
-  }, [
-    id,
-    queryBuilderJson,
-    setQueryBuilderJson,
-    selectedNodeIds,
-    currentIdIsSelectedNode,
-  ]);
+  const actions = useNodeActions(selectedNode);
 
   const makeMultipleItemComponents = () => ({
     ...baseComponents,
@@ -303,7 +231,9 @@ const Guidance = () => {
     ConvertToGroupMenuItem: (props: ConvertToGroupMenuItemProps) => (
       <ConvertToGroupMenuItem
         {...props}
-        onClick={() => handleConvertToGroup()}
+        onClick={() =>
+          actions.find((a) => a.label === "Convert to Group")?.action?.()
+        }
       />
     ),
     Box: (props: BoxProps) => <Box {...props}></Box>,
@@ -319,7 +249,7 @@ const Guidance = () => {
               isRuleGroup(
                 findById(queryBuilderJson, String(id)) ?? ({} as RuleNodeType),
               ),
-            ) || selectedIds.some((id) => nodeIsInGroup(String(id)))
+            ) || selectedIds.some((id) => isInGroup(String(id), boardIndex))
           }
         />
       </ActionMenuSection>

@@ -150,6 +150,11 @@ export const isAgeFilter = (n: RuleNodeType): n is AgeFilterType =>
 export const isOperator = (n: RuleNodeType): n is OperatorType =>
   "combinator" in n;
 
+export const isInGroup = (id: string, boardIndex: BoardIndex) => {
+  const boardContents = boardIndex.itemsByGroup[boardIndex.containers[0]];
+  return !boardContents?.includes(id);
+};
+
 export const findById = (
   root: RuleNodeType,
   id: string,
