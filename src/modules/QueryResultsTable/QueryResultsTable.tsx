@@ -15,6 +15,7 @@ import Table from "../../components/Table";
 import { TableProps } from "../../components/Table/Table";
 import getQuery from "@/actions/getQuery";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import QueryHistoryGuidance from "../QueryHistory";
 
 interface QueryResultsTableProps {
   initialData: Query;
@@ -187,7 +188,12 @@ const QueryResultsTable = ({
 
   return (
     <Box sx={{ p: 2, gap: 2, display: "flex", flexDirection: "column" }}>
-      <Table table={table} {...tableProps} />
+      <Table
+        table={table}
+        rightPanel={QueryHistoryGuidance}
+        rightPanelProps={{ resultsView: true }}
+        {...tableProps}
+      />
     </Box>
   );
 };
