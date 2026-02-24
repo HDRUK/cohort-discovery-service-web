@@ -22,7 +22,16 @@ export interface RightClickAction {
   label: string;
 }
 
-const useNodeActions = (node?: RuleNodeType): RightClickAction[] => {
+const useNodeActions = (
+  node?: RuleNodeType,
+): {
+  actions: RightClickAction[];
+  handleDeleteRule: () => void;
+  handleConvertToGroup: () => void;
+  handleChangeOperator: () => void;
+  handleCollapseGroup: () => void;
+  handleCreateNewRule: () => void;
+} => {
   const { id } = node ?? { id: "" };
 
   const { queryBuilderJson, setQueryBuilderJson, selected } = useQueryBuilder(
@@ -173,7 +182,14 @@ const useNodeActions = (node?: RuleNodeType): RightClickAction[] => {
       : []),
   ];
 
-  return actions;
+  return {
+    actions,
+    handleDeleteRule,
+    handleConvertToGroup,
+    handleChangeOperator,
+    handleCollapseGroup,
+    handleCreateNewRule,
+  };
 };
 
 export default useNodeActions;

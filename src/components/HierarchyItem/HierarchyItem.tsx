@@ -81,7 +81,7 @@ export const HierarchyItem = ({
   const nodeName = getNodeName(node);
 
   const { handleContextMenu, ...rightClickMenuMethods } = useRightClickMenu();
-  const actions = useNodeActions(node);
+  const { actions } = useNodeActions(node);
 
   const content = (
     <ListItemButton

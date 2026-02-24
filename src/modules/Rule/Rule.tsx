@@ -118,7 +118,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     return newConcept;
   }, []);
 
-  const actions = useNodeActions(rule);
+  const { actions } = useNodeActions(rule);
 
   return (
     <RuleWrapper

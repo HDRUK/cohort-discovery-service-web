@@ -5,15 +5,17 @@ import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import useNodeActions from "@/hooks/useNodeActions";
 
-export interface RuleGroupProps
-  extends Omit<RuleWrapperProps, "node" | "type" | "render"> {
+export interface RuleGroupProps extends Omit<
+  RuleWrapperProps,
+  "node" | "type" | "render"
+> {
   group: RuleGroupType;
   parentGroupId?: string;
   showConnector?: boolean;
 }
 
 const RuleGroup = ({ group, parentGroupId, ...rest }: RuleGroupProps) => {
-  const actions = useNodeActions(group);
+  const { actions } = useNodeActions(group);
 
   return (
     <RuleWrapper

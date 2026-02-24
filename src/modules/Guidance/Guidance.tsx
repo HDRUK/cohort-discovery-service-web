@@ -218,7 +218,7 @@ const Guidance = () => {
     Box: (props: BoxProps) => <Box {...props}></Box>,
   });
 
-  const actions = useNodeActions(selectedNode);
+  const { handleConvertToGroup } = useNodeActions(selectedNode);
 
   const makeMultipleItemComponents = () => ({
     ...baseComponents,
@@ -231,9 +231,7 @@ const Guidance = () => {
     ConvertToGroupMenuItem: (props: ConvertToGroupMenuItemProps) => (
       <ConvertToGroupMenuItem
         {...props}
-        onClick={() =>
-          actions.find((a) => a.label === "Convert to Group")?.action?.()
-        }
+        onClick={() => handleConvertToGroup()}
       />
     ),
     Box: (props: BoxProps) => <Box {...props}></Box>,
