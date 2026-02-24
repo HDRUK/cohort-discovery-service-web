@@ -1,0 +1,49 @@
+{
+  "id": "24528b27-6e45-475d-863e-26a876dc8492",
+  "rules": [
+    {
+      "id": "612427df-cabf-41a7-b2e1-604b89716149",
+      "exclude": false,
+      "rule": {
+        "concept": {
+          "name": "37311061",
+          "concept_id": 37311061,
+          "description": "COVID-19",
+          "category": "Condition",
+          "children": []
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": "3cf61087-b2bb-4a50-992f-ad307a3fff1a",
+      "combinator": "and",
+      "valid": true
+    },
+    {
+      "id": "3bc2883a-f580-4b59-9c6c-0efe440ccfe2",
+      "exclude": false,
+      "rule": {
+        "concept": {
+          "concept_id": 8532,
+          "name": "FEMALE",
+          "description": "FEMALE",
+          "category": "Gender",
+          "children": [],
+          "match_score": 100,
+          "tokens": ["female"],
+          "phrase_tokens": [],
+          "alternatives": []
+        }
+      },
+      "valid": true,
+      "ageConstraint": [18, null]
+    }
+  ],
+  "constraints": {
+    "ageConstraint": [null, null],
+    "timeConstraint": [null, null]
+  },
+  "warnings": [],
+  "valid": true
+}
