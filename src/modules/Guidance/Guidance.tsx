@@ -126,11 +126,11 @@ const Guidance = () => {
   const { constrainForBunnyV1 } = useFeatures();
 
   const handleDelete = useCallback(() => {
-    let newQuery = queryBuilderJson;
-    for (const id of selectedIds) {
-      newQuery = removeById(newQuery, String(id));
-      setQueryBuilderJson(newQuery);
-    }
+    const newQuery = selectedIds.reduce(
+      (acc, id) => removeById(acc, String(id)),
+      queryBuilderJson,
+    );
+    setQueryBuilderJson(newQuery);
   }, [selectedIds, queryBuilderJson, setQueryBuilderJson]);
 
   interface GuidanceProps extends TypographyProps {
