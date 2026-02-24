@@ -54,6 +54,7 @@ const QueryResultsPageContent = async ({
             sortProps: { field: "collection.name" },
           },
         }}
+        showGuidance
       />
     </>
   );

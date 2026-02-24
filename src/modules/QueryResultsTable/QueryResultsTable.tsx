@@ -22,6 +22,7 @@ interface QueryResultsTableProps {
   initialSearchParams?: URLSearchParams;
   tableProps?: TableProps;
   useTableProps?: Omit<MRT_TableOptions<Task>, "data" | "columns">;
+  showGuidance?: boolean;
 }
 
 const QueryResultsTable = ({
@@ -29,6 +30,7 @@ const QueryResultsTable = ({
   initialSearchParams = new URLSearchParams(),
   tableProps,
   useTableProps,
+  showGuidance = false,
 }: QueryResultsTableProps) => {
   const { setQueryName, setQueryBuilderJson } = useQueryBuilder((qb) => ({
     setQueryName: qb.setQueryName,
@@ -190,8 +192,12 @@ const QueryResultsTable = ({
     <Box sx={{ p: 2, gap: 2, display: "flex", flexDirection: "column" }}>
       <Table
         table={table}
-        rightPanel={QueryHistoryGuidance}
-        rightPanelProps={{ resultsView: true }}
+        {...(showGuidance
+          ? {
+              rightPanel: QueryHistoryGuidance,
+              rightPanelProps: { resultsView: true },
+            }
+          : {})}
         {...tableProps}
       />
     </Box>
