@@ -1,11 +1,7 @@
 "use client";
 
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import {
-  Collection,
-  CollectionStatus,
-  GroupedCollection,
-} from "../../types/api";
+import { Collection, CollectionStatus, GroupedCollection } from "@/types/api";
 import {
   Chip,
   Box,
@@ -16,8 +12,8 @@ import {
   Typography,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import Title from "../Title";
-import SquareCheckbox from "../SquareCheckbox";
+import Title from "@/components/Title";
+import SquareCheckbox from "@/components/SquareCheckbox";
 import usePermissions from "@/hooks/usePermissions";
 
 const SelectCustodianDatasets = ({
