@@ -36,7 +36,7 @@
     <DeleteTimeFrameButton label="Remove timeframe from this rule" />
   </RuleTimeframeSelector>
   <Box>
-    Set the time frame for this rule — the window when the condition occurred/measurement was recorded/medication was prescribed.
+    Set the time frame for this rule — the window when the {props.category.toLowerCase()} was {props.verb}.
   </Box>
 </CollapsibleGuidance>
 
@@ -45,6 +45,9 @@
     <DeleteAgeButton label="Remove age from this rule" />
   </RuleAgeSelector>
   <Box>
-    Define the patient age range by adjusting slider value. Age may be rounded ±1 year in some datasets, to either protect patient data or as specific day or month was not recorded.
+    Define the patient age range by selecting an operand and typing in an age value.
+    <Box sx={{ color: "error.main" }}>
+      Age may be rounded ±1 year in some datasets, to either protect patient data or as specific day or month was not recorded.
+    </Box>
   </Box>
 </CollapsibleGuidance>
