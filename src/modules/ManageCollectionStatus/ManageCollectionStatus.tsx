@@ -137,11 +137,7 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
                   confirmText: "Yes",
                   confirmColor: "success",
                 });
-
                 if (!ok) return;
-
-                console.log({ next, label });
-
                 field.onChange(next);
                 setSelectedStatusId(next);
               }}
