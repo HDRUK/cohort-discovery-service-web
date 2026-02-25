@@ -1,9 +1,9 @@
 "use server";
 
-import { apiGet } from "../../lib/apiClient";
-import { API_ROUTES } from "../../lib/apiRoutes";
-import { CodeStat, ApiResponse, Paginated } from "../../types/api";
-import { DEFAULT_CODES_PER_PAGE } from "../../config/defaults";
+import { apiGet } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/apiRoutes";
+import { CodeStat, ApiResponse, Paginated } from "@/types/api";
+import { DEFAULT_CODES_PER_PAGE } from "@/config/defaults";
 import { getTagCodeStats } from "@/config/tags";
 
 const getCodeStats = async (

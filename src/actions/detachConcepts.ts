@@ -1,8 +1,8 @@
 "use server";
 
-import { apiDelete } from "../lib/apiClient";
-import { API_ROUTES } from "../lib/apiRoutes";
-import { ApiResponse, Concept } from "../types/api";
+import { apiDelete } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/apiRoutes";
+import { ApiResponse, Concept } from "@/types/api";
 
 const detachConcepts = async (
   conceptSetId: number,

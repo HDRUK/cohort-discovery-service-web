@@ -1,8 +1,8 @@
 "use server";
 
-import { apiDelete } from "../lib/apiClient";
-import { API_ROUTES } from "../lib/apiRoutes";
-import { RemoveCollectionFromWorkgroupsPost, ApiResponse } from "../types/api";
+import { apiDelete } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/apiRoutes";
+import { RemoveCollectionFromWorkgroupsPost, ApiResponse } from "@/types/api";
 
 const removeCollectionFromWorkgroups = async (
   payload: RemoveCollectionFromWorkgroupsPost,

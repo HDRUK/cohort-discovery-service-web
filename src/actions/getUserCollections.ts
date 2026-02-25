@@ -1,9 +1,9 @@
 "use server";
 
 import { getTokenUser } from "@/lib/auth";
-import { apiGet, CachedGetArgs } from "../lib/apiClient";
-import { API_ROUTES } from "../lib/apiRoutes";
-import { Collection, ApiResponse } from "../types/api";
+import { apiGet, CachedGetArgs } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/apiRoutes";
+import { Collection, ApiResponse } from "@/types/api";
 import { getTagsUserCollections, TAG_COLLECTIONS } from "@/config/tags";
 
 const getUserCollections = async (

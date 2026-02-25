@@ -1,8 +1,8 @@
 "use server";
 
-import { apiDelete } from "../lib/apiClient";
-import { API_ROUTES } from "../lib/apiRoutes";
-import { ApiResponse, Collection } from "../types/api";
+import { apiDelete } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/apiRoutes";
+import { ApiResponse, Collection } from "@/types/api";
 
 const deleteCollection = async (
   id: number | string,

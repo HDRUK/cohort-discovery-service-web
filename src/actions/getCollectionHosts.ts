@@ -1,9 +1,9 @@
 "use server";
 
 import { TAG_COLLECTION_HOSTS } from "@/config/tags";
-import { apiGet, CachedGetArgs } from "../lib/apiClient";
-import { API_ROUTES } from "../lib/apiRoutes";
-import { ApiResponse, CollectionHost } from "../types/api";
+import { apiGet, CachedGetArgs } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/apiRoutes";
+import { ApiResponse, CollectionHost } from "@/types/api";
 
 const getCollectionHosts = async (
   args?: Omit<CachedGetArgs, "url">,

@@ -1,12 +1,12 @@
 "use server";
 
-import { apiPut } from "../lib/apiClient";
-import { API_ROUTES } from "../lib/apiRoutes";
+import { apiPut } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/apiRoutes";
 import {
   Collection,
   ApiResponse,
   CreateCollectionConfigPost,
-} from "../types/api";
+} from "@/types/api";
 
 const updateCollectionConfig = async (
   id: number,

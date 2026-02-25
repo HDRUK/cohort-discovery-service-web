@@ -1,8 +1,8 @@
 "use server";
 
-import { apiGet, CachedGetArgs } from "../lib/apiClient";
-import { API_ROUTES } from "../lib/apiRoutes";
-import { ApiResponse, Network } from "../types/api";
+import { apiGet, CachedGetArgs } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/apiRoutes";
+import { ApiResponse, Network } from "@/types/api";
 import { TAG_NETWORKS } from "@/config/tags";
 
 const getNetworks = async (

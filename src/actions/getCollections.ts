@@ -1,8 +1,8 @@
 "use server";
 
-import { apiGet, CachedGetArgs } from "../lib/apiClient";
-import { API_ROUTES } from "../lib/apiRoutes";
-import { Collection, ApiResponse } from "../types/api";
+import { apiGet, CachedGetArgs } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/apiRoutes";
+import { Collection, ApiResponse } from "@/types/api";
 import { TAG_COLLECTIONS } from "@/config/tags";
 
 const getCollections = async (

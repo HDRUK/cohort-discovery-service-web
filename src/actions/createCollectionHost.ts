@@ -1,12 +1,12 @@
 "use server";
 
-import { apiPost } from "../lib/apiClient";
-import { API_ROUTES } from "../lib/apiRoutes";
+import { apiPost } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/apiRoutes";
 import {
   CollectionHost,
   CreateCollectionHostPost,
   ApiResponse,
-} from "../types/api";
+} from "@/types/api";
 import { CollectionHostFormValues } from "@/types/forms";
 
 const createCollectionHost = async (

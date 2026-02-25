@@ -1,8 +1,8 @@
 "use server";
 
-import { apiPost } from "../lib/apiClient";
-import { API_ROUTES } from "../lib/apiRoutes";
-import { ApiResponse, Concept } from "../types/api";
+import { apiPost } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/apiRoutes";
+import { ApiResponse, Concept } from "@/types/api";
 
 const attachConcepts = async (
   conceptSetId: number,

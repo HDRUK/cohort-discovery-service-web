@@ -1,8 +1,8 @@
 "use server";
 
-import { apiPut } from "../lib/apiClient";
-import { API_ROUTES } from "../lib/apiRoutes";
-import { Network, ApiResponse, UpdateNetworkPost } from "../types/api";
+import { apiPut } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/apiRoutes";
+import { Network, ApiResponse, UpdateNetworkPost } from "@/types/api";
 
 const updateNetwork = async (
   id: number,

@@ -1,4 +1,4 @@
-import { ApiResponse, Task, Result } from "../../types/api";
+import { ApiResponse, Task, Result } from "@/types/api";
 import { getMockCollections } from "./getCollections";
 
 const [mockCollection1, mockCollection2] = getMockCollections(2);

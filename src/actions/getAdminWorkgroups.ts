@@ -1,9 +1,9 @@
 "use server";
 
 import { TAG_WORKGROUP_ADMIN } from "@/config/tags";
-import { apiGet, CachedGetArgs } from "../lib/apiClient";
-import { API_ROUTES } from "../lib/apiRoutes";
-import { ApiResponse, Workgroup } from "../types/api";
+import { apiGet, CachedGetArgs } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/apiRoutes";
+import { ApiResponse, Workgroup } from "@/types/api";
 
 const getAdminWorkgroups = async (
   args?: Omit<CachedGetArgs, "url">,

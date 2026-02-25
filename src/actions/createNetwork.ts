@@ -1,8 +1,8 @@
 "use server";
 
-import { apiPost } from "../lib/apiClient";
-import { API_ROUTES } from "../lib/apiRoutes";
-import { Network, ApiResponse, CreateNetworkPost } from "../types/api";
+import { apiPost } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/apiRoutes";
+import { Network, ApiResponse, CreateNetworkPost } from "@/types/api";
 
 const createNetwork = async (
   payload: CreateNetworkPost,

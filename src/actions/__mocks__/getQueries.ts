@@ -1,5 +1,5 @@
 import { EXAMPLE_1, EXAMPLE_2 } from "@/config/queryExamples";
-import { Query, ApiResponse, WithIncomplete, Paginated } from "../../types/api";
+import { Query, ApiResponse, WithIncomplete, Paginated } from "@/types/api";
 import { mockTasks } from "./getTasks";
 import { paginateData } from "@/utils/mock";
 

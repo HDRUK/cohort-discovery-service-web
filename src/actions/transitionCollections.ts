@@ -1,8 +1,8 @@
 "use server";
 
-import { apiPut } from "../lib/apiClient";
-import { API_ROUTES } from "../lib/apiRoutes";
-import { Collection, TransitionCollectionPut, ApiResponse } from "../types/api";
+import { apiPut } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/apiRoutes";
+import { Collection, TransitionCollectionPut, ApiResponse } from "@/types/api";
 
 const transitionCollections = async (
   ids: number[],

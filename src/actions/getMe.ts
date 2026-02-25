@@ -1,8 +1,8 @@
 "use server";
 
-import { apiGet, RequestOptions } from "../lib/apiClient";
-import { API_ROUTES } from "../lib/apiRoutes";
-import { User, ApiResponse } from "../types/api";
+import { apiGet, RequestOptions } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/apiRoutes";
+import { User, ApiResponse } from "@/types/api";
 
 const getMe = async (
   options: RequestOptions<undefined> = {},

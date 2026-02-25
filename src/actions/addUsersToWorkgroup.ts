@@ -1,8 +1,8 @@
 "use server";
 
-import { apiPost } from "../lib/apiClient";
-import { API_ROUTES } from "../lib/apiRoutes";
-import { AddUsersToWorkgroupPost, ApiResponse } from "../types/api";
+import { apiPost } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/apiRoutes";
+import { AddUsersToWorkgroupPost, ApiResponse } from "@/types/api";
 
 const addUsersToWorkgroup = async (
   payload: AddUsersToWorkgroupPost,

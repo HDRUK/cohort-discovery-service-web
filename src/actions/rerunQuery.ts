@@ -1,8 +1,8 @@
 "use server";
 
-import { apiGet } from "../lib/apiClient";
-import { API_ROUTES } from "../lib/apiRoutes";
-import { CreateQuery, ApiResponse } from "../types/api";
+import { apiGet } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/apiRoutes";
+import { CreateQuery, ApiResponse } from "@/types/api";
 
 const rerunQuery = async (pid: string): Promise<ApiResponse<CreateQuery>> => {
   return await apiGet<ApiResponse<CreateQuery>>({

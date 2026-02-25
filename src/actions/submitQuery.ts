@@ -1,9 +1,9 @@
 "use server";
 
 import { RuleGroupType } from "@/types/rules";
-import { apiPost } from "../lib/apiClient";
-import { API_ROUTES } from "../lib/apiRoutes";
-import { CreateQuery, CreateQueryPost, ApiResponse } from "../types/api";
+import { apiPost } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/apiRoutes";
+import { CreateQuery, CreateQueryPost, ApiResponse } from "@/types/api";
 import { capVarChar } from "@/utils/string";
 
 const submitQuery = async (

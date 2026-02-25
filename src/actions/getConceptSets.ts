@@ -1,9 +1,9 @@
 "use server";
 
 import { getTokenUser } from "@/lib/auth";
-import { apiGet } from "../lib/apiClient";
-import { API_ROUTES } from "../lib/apiRoutes";
-import { ConceptSet, ApiResponse } from "../types/api";
+import { apiGet } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/apiRoutes";
+import { ConceptSet, ApiResponse } from "@/types/api";
 import { getTagConceptSets } from "@/config/tags";
 
 const getConceptSets = async (): Promise<ApiResponse<ConceptSet[]>> => {

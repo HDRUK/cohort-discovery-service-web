@@ -1,9 +1,9 @@
 "use server";
 
 import { getUserQueryTag, TAG_QUERIES } from "@/config/tags";
-import { apiGet, CachedGetArgs } from "../lib/apiClient";
-import { API_ROUTES } from "../lib/apiRoutes";
-import { Query, ApiResponse, Paginated, WithIncomplete } from "../types/api";
+import { apiGet, CachedGetArgs } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/apiRoutes";
+import { Query, ApiResponse, Paginated, WithIncomplete } from "@/types/api";
 import { getTokenUser } from "@/lib/auth";
 
 const getQueries = async (
