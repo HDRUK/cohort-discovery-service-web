@@ -16,9 +16,9 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
-import deleteQueries from "@/actions/deleteQueries";
-import getQuery from "@/actions/getQuery";
-import rerunQuery from "@/actions/rerunQuery";
+import deleteQueries from "@/actions/query/deleteQueries";
+import getQuery from "@/actions/query/getQuery";
+import rerunQuery from "@/actions/query/rerunQuery";
 import DeleteMenuItem from "@/components/DeleteMenuItem";
 import DownloadButton, {
   AvailableFormats,

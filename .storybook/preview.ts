@@ -3,8 +3,8 @@ import { sb } from "storybook/test";
 import { withThemeFromJSXProvider } from "@storybook/addon-themes";
 import ThemeRegistry from "../src/components/ThemeRegistry";
 
-sb.mock(import("../src/actions/getCollections"));
-sb.mock(import("../src/actions/getTasks"));
+sb.mock(import("../src/actions/collection/getCollections"));
+sb.mock(import("../src/actions/task/getTasks"));
 sb.mock(import("../src/actions/omop/getCodes"));
 
 const preview: Preview = {

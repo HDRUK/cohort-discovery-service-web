@@ -7,7 +7,7 @@ import SelectDatasets from "@/components/SelectDatasets";
 import getUserCollections from "@/actions/getUserCollections";
 import CohortQueryTitle from "@/components/CohortQueryTitle";
 import FilterDatasets from "@/components/FilterDatasets/FilterDatasets";
-import getQuery from "@/actions/getQuery";
+import getQuery from "@/actions/query/getQuery";
 import Title from "@/components/Title";
 import { cookies } from "next/headers";
 import { QUERY_BUILDER_GUIDANCE_COOKIE } from "@/config/internals";
@@ -15,7 +15,7 @@ import QueryBuilderGuidanceWrapper from "./QueryBuilderGuidanceWrapper";
 import ShowJsonButton from "@/components/ShowJsonButton";
 import CohortErrors from "@/components/CohortErrors";
 import { buildQueryHistoryParams } from "@/utils/params";
-import getQueries from "@/actions/getQueries";
+import getQueries from "@/actions/query/getQueries";
 import { DEFAULT_QUERIES_DROPDOWN_PER_PAGE } from "@/config/defaults";
 
 const NODE_ENV = process.env?.NODE_ENV;

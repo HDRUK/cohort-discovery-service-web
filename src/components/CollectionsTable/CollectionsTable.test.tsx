@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import CollectionsTable, { CollectionsTableProps } from "./CollectionsTable";
-import getCustodianCollections from "@/actions/getCustodianCollections";
+import getCustodianCollections from "@/actions/collection/getCustodianCollections";
 import getCustodian from "@/actions/__mocks__/getCustodian";
 import MockDaphneStore from "@/store/MockDaphneStore";
 import { CollectionWithHosts, Paginated } from "@/types/api";
