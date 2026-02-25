@@ -15,6 +15,7 @@ import {
   Path,
   UseFormSetValue,
 } from "react-hook-form";
+import { useConfirm } from "@/hooks/useConfirm";
 
 interface ManageCollectionStatusProps<TFieldValues extends FieldValues> {
   collection: Collection;
@@ -42,15 +43,22 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
     collection.model_state?.state_id ?? -1,
   );
 
-  const destinationOptions = {
-    [CollectionStatus.DRAFT]: [] as CollectionStatus[],
-    [CollectionStatus.PENDING]: currentCustodian
-      ? ([] as CollectionStatus[])
-      : [CollectionStatus.ACTIVE, CollectionStatus.REJECTED],
+  const pendingDestinations: CollectionStatus[] = currentCustodian
+    ? []
+    : [
+        CollectionStatus.ACTIVE,
+        //CollectionStatus.DRAFT,
+        CollectionStatus.REJECTED,
+      ];
+
+  const destinationOptions: Record<CollectionStatus, CollectionStatus[]> = {
+    [CollectionStatus.DRAFT]: [],
+    [CollectionStatus.PENDING]: pendingDestinations,
     [CollectionStatus.ACTIVE]: [CollectionStatus.DRAFT],
-    [CollectionStatus.REJECTED]: [] as CollectionStatus[],
-    [CollectionStatus.SUSPENDED]: [] as CollectionStatus[],
+    [CollectionStatus.REJECTED]: [CollectionStatus.DRAFT],
+    [CollectionStatus.SUSPENDED]: [],
   };
+
   const options = (
     destinationOptions[initialStatusId as CollectionStatus] || []
   ).concat([initialStatusId as CollectionStatus]);
@@ -61,6 +69,8 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
       shouldTouch: selectedStatusId !== initialStatusId,
     });
   }, [initialStatusId, selectedStatusId, setValue]);
+
+  const confirm = useConfirm();
 
   return (
     <>
@@ -78,6 +88,7 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
             }}
           />
         )}
+
       {/* Only show a chip if initial status is not DRAFT */}
       {initialStatusId !== CollectionStatus.DRAFT && (
         <Box sx={{ mb: 1 }}>
@@ -98,9 +109,10 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
         <Controller
           name={"collection.model_state.state_id" as Path<TFieldValues>}
           control={control}
-          render={() => (
+          render={({ field }) => (
             <FormRadioGroup
               label=""
+              value={field.value}
               options={options
                 .filter((o) => o !== selectedStatusId) // don't show currently selected status as an option
                 .map((option) => {
@@ -114,8 +126,28 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
                     value: option,
                   };
                 })}
-              onChange={(e) => {
-                setSelectedStatusId(Number(e.target.value));
+              onChange={async (e) => {
+                const next = Number(e.target.value);
+
+                if (next === selectedStatusId) return;
+
+                const option = getCollectionStatus(next);
+                const label = option.label ?? CollectionStatus[next];
+
+                const ok = await confirm({
+                  props: {
+                    action: `change the collection status of '${collection.name}' to '${label}'`,
+                  },
+                  confirmText: "Yes",
+                  confirmColor: "success",
+                });
+
+                if (!ok) return;
+
+                console.log({ next, label });
+
+                field.onChange(next);
+                setSelectedStatusId(next);
               }}
             />
           )}
