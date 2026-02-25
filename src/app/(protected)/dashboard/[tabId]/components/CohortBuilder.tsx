@@ -4,7 +4,7 @@ import { Box, Divider, Stack } from "@mui/material";
 import QueryBuilder from "@/modules/QueryBuilder";
 import CohortQueryInput from "@/components/CohortQueryInput";
 import SelectDatasets from "@/components/SelectDatasets";
-import getUserCollections from "@/actions/getUserCollections";
+import getUserCollections from "@/actions/collection/getUserCollections";
 import CohortQueryTitle from "@/components/CohortQueryTitle";
 import FilterDatasets from "@/components/FilterDatasets/FilterDatasets";
 import getQuery from "@/actions/query/getQuery";

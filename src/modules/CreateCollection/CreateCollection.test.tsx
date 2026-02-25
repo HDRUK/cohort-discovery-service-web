@@ -15,7 +15,7 @@ import MockDaphneStore from "@/store/MockDaphneStore";
 import { getMockCollection } from "@/actions/__mocks__/getCollections";
 import getCollectionHost from "@/actions/__mocks__/getCollectionHost";
 import { useCustodianDataStore } from "@/store/custodianDataStore";
-jest.mock("@/actions/getCustodian");
+jest.mock("@/actions/custodian/getCustodian");
 
 const createCollection = jest.fn();
 const mockCustodian = getCustodian();

@@ -5,8 +5,8 @@ import getCustodianCollections from "@/actions/collection/getCustodianCollection
 import getCustodian from "@/actions/__mocks__/getCustodian";
 import MockDaphneStore from "@/store/MockDaphneStore";
 import { CollectionWithHosts, Paginated } from "@/types/api";
-jest.mock("@/actions/getCustodianCollections");
-jest.mock("@/actions/getCustodian");
+jest.mock("@/actions/collection/getCustodianCollections");
+jest.mock("@/actions/custodian/getCustodian");
 
 describe("CollectionsTable", () => {
   const renderCollectionsTableAdmin = (

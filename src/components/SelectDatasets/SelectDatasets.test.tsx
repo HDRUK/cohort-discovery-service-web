@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import getCollections from "@/actions/collection/getCollections";
 import SelectDatasets from "./SelectDatasets";
 import MockDaphneStore from "@/store/MockDaphneStore";
-jest.mock("@/actions/getCollections");
+jest.mock("@/actions/collection/getCollections");
 
 const setSelectedDatasets = jest.fn();
 
