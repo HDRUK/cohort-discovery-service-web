@@ -16,6 +16,7 @@ import ShowJsonButton from "@/components/ShowJsonButton";
 import CohortErrors from "@/components/CohortErrors";
 import { buildQueryHistoryParams } from "@/utils/params";
 import getQueries from "@/actions/getQueries";
+import { DEFAULT_QUERIES_DROPDOWN_PER_PAGE } from "@/config/defaults";
 
 const NODE_ENV = process.env?.NODE_ENV;
 
@@ -27,7 +28,7 @@ const CohortBuilder = async (props: { query?: string }) => {
 
   const searchParamsObject = buildQueryHistoryParams({
     page: 1,
-    per_page: 5,
+    per_page: DEFAULT_QUERIES_DROPDOWN_PER_PAGE,
     sort: "created_at:desc",
   });
 
