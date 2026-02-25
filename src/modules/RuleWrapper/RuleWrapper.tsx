@@ -161,7 +161,7 @@ const RuleWrapper = ({
         });
       }
     },
-    [id, toggleSelected, isSelected],
+    [id, toggleSelected, isSelected, node, select, deselect],
   );
 
   const onMouseOver = (e: React.MouseEvent<HTMLDivElement>) => {
