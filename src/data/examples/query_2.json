@@ -2,6 +2,16 @@
   "id": "32f036e6-4a6c-4f33-b998-db011f07563f",
   "rules": [
     {
+      "id": "b843e0a3-494e-487e-b41b-9713c9497e54",
+      "value": [18, 120],
+      "valid": true
+    },
+    {
+      "id": "487cb1d7-7673-4aa6-968a-9b313067dd01",
+      "combinator": "and",
+      "valid": true
+    },
+    {
       "id": "d852d24b-de59-46b6-a66c-de9e4a532d50",
       "exclude": false,
       "rule": {
