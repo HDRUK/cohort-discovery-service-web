@@ -14,6 +14,8 @@ type ListEntry = ListItemType | ListGroupItem;
 const isGroup = (x: ListEntry): x is ListGroupItem => "items" in x;
 
 const List = ({ items, ...props }: ListProps & { items: ListEntry[] }) => {
+  // to-do: to implement a compact version
+  //const { compact } = useActionMenuSection();
   return (
     <MuiList disablePadding {...props}>
       {items.map((entry, index) => {
