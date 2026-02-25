@@ -45,11 +45,7 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
 
   const pendingDestinations: CollectionStatus[] = currentCustodian
     ? []
-    : [
-        CollectionStatus.ACTIVE,
-        //CollectionStatus.DRAFT,
-        CollectionStatus.REJECTED,
-      ];
+    : [CollectionStatus.ACTIVE, CollectionStatus.REJECTED];
 
   const destinationOptions: Record<CollectionStatus, CollectionStatus[]> = {
     [CollectionStatus.DRAFT]: [],
