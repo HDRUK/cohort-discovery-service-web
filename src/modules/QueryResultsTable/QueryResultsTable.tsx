@@ -83,14 +83,6 @@ const QueryResultsTable = ({
 
   const columns: MRT_ColumnDef<Task>[] = [
     {
-      accessorKey: "custodian_name",
-      accessorFn: (row) => row.collection.custodian?.name,
-      header: "Custodian",
-      size: 250,
-      minSize: 250,
-      maxSize: 250,
-    },
-    {
       accessorKey: "collection_name",
       accessorFn: (row) => ({
         name: row.collection.name,
@@ -129,7 +121,7 @@ const QueryResultsTable = ({
     {
       accessorKey: "total",
       accessorFn: (row) => row.result,
-      header: "Total",
+      header: "Total records",
       Cell: ({ cell, row: { original } }) => {
         const result = cell.getValue<Result>();
         const { count, status } = result || {};
@@ -146,6 +138,22 @@ const QueryResultsTable = ({
       size: 100,
       minSize: 100,
       maxSize: 100,
+    },
+    {
+      accessorKey: "custodian_name",
+      accessorFn: (row) => row.collection.custodian?.name,
+      header: "Custodian",
+      size: 250,
+      minSize: 250,
+      maxSize: 250,
+    },
+    {
+      accessorKey: "network_name",
+      accessorFn: (row) => row.collection.custodian?.network?.name,
+      header: "Network",
+      size: 250,
+      minSize: 250,
+      maxSize: 250,
     },
     {
       accessorKey: "status",
