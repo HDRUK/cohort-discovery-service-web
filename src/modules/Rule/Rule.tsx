@@ -44,13 +44,13 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     setQueryBuilderJson,
     showDescendants,
     setShowDescendants,
-    select,
+    setSelected,
   } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
     showDescendants: qb.showDescendants[id],
     setShowDescendants: qb.setShowDescendants,
-    select: qb.select,
+    setSelected: qb.setSelected,
   }));
 
   const toggleShowDescendants = useCallback(
@@ -118,7 +118,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     return newConcept;
   }, []);
 
-  const actions = useNodeActions(rule);
+  const { actions } = useNodeActions(rule);
 
   return (
     <RuleWrapper
@@ -176,7 +176,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
                     onClick={(e: React.MouseEvent) => {
                       e.stopPropagation();
                       setConcept({ ...concept, alternatives: [] });
-                      select(id);
+                      setSelected(id, true, true);
                     }}
                   />
 
@@ -194,7 +194,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
                           e.stopPropagation();
                           e.preventDefault();
                           setConcept(removeAlternative(concept, childConcept));
-                          select(id);
+                          setSelected(id, true, true);
                         }}
                       >
                         {" "}

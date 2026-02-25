@@ -6,6 +6,7 @@ import OperatorGuidance from "@/content/guidance/queryBuilder/operator.mdx";
 import GroupGuidance from "@/content/guidance/queryBuilder/group.mdx";
 import AgeFilterGuidance from "@/content/guidance/queryBuilder/ageFilter.mdx";
 import EmptyRuleGuidance from "@/content/guidance/queryBuilder/emptyRule.mdx";
+import MultipleItemGuidance from "@/content/guidance/queryBuilder/multipleItem.mdx";
 import { Box, BoxProps, Link, LinkProps, TypographyProps } from "@mui/material";
 import { useCallback, useMemo } from "react";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
@@ -16,9 +17,11 @@ import {
   findById,
   isAgeFilter,
   isEmptyRule,
+  isInGroup,
   isOperator,
   isRuleGroup,
   isRuleLeaf,
+  removeById,
   updateById,
 } from "@/utils/rules";
 import { trueKeys } from "@/utils/numbers";
@@ -28,6 +31,7 @@ import {
   OperatorType,
   RuleGroupType,
   RuleLeafType,
+  RuleNodeType,
 } from "@/types/rules";
 import ToggleExclusion from "@/content/guidance/components/ToggleExclusion";
 import ShowDescendants from "@/content/guidance/components/ShowDescendants";
@@ -39,7 +43,12 @@ import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
 import { CustomH1, CustomH2 } from "@/components/GuidanceHeaders";
 import { getDomainVerbs } from "@/utils/omop";
 import DeleteTimeFrameButton from "@/components/DeleteTimeFrameButton";
-import { DeleteMenuItemProps } from "@/components/DeleteMenuItem/DeleteMenuItem";
+import DeleteMenuItem, {
+  DeleteMenuItemProps,
+} from "@/components/DeleteMenuItem/DeleteMenuItem";
+import ConvertToGroupMenuItem, {
+  ConvertToGroupMenuItemProps,
+} from "@/components/ConvertToGroupMenuItem/ConvertToGroupMenuItem";
 import AddAgeButton from "@/components/AddAgeButton";
 import RuleAgeSelector from "@/components/RuleAgeSelector";
 import DeleteAgeButton from "@/components/DeleteAgeButton";
@@ -84,17 +93,17 @@ export const baseComponents = {
 };
 
 const Guidance = () => {
-  const { queryBuilderJson, setQueryBuilderJson, selected } = useQueryBuilder(
-    (qb) => ({
+  const { boardIndex, queryBuilderJson, setQueryBuilderJson, selected } =
+    useQueryBuilder((qb) => ({
+      boardIndex: qb.boardIndex,
       selected: qb.selected,
       queryBuilderJson: qb.queryBuilderJson,
       setQueryBuilderJson: qb.setQueryBuilderJson,
-    }),
-  );
+    }));
 
   const selectedIds = useMemo(() => trueKeys(selected), [selected]);
   const selectedNode = useMemo(() => {
-    if (selectedIds.length !== 1) return;
+    if (selectedIds.length === 0) return;
     const node = findById(queryBuilderJson, String(selectedIds[0]));
     return node;
   }, [queryBuilderJson, selectedIds]);
@@ -114,6 +123,14 @@ const Guidance = () => {
   );
 
   const { constrainForBunnyV1 } = useFeatures();
+
+  const handleDelete = useCallback(() => {
+    const newQuery = selectedIds.reduce(
+      (acc, id) => removeById(acc, String(id)),
+      queryBuilderJson,
+    );
+    setQueryBuilderJson(newQuery);
+  }, [selectedIds, queryBuilderJson, setQueryBuilderJson]);
 
   interface GuidanceProps extends TypographyProps {
     target: string;
@@ -200,6 +217,36 @@ const Guidance = () => {
     Box: (props: BoxProps) => <Box {...props}></Box>,
   });
 
+  const makeMultipleItemComponents = () => ({
+    ...baseComponents,
+    CollapsibleGuidance: (props: GuidanceProps) => (
+      <CollapsibleGuidance {...props}></CollapsibleGuidance>
+    ),
+    DeleteMenuItem: (props: DeleteMenuItemProps) => (
+      <DeleteMenuItem {...props} action={handleDelete}></DeleteMenuItem>
+    ),
+    ConvertToGroupMenuItem: (props: ConvertToGroupMenuItemProps) => (
+      <ConvertToGroupMenuItem {...props} selectedNode={selectedNode} />
+    ),
+    Box: (props: BoxProps) => <Box {...props}></Box>,
+  });
+
+  if (selectedIds.length > 1) {
+    return (
+      <ActionMenuSection title={"Bulk Select Actions"} fixedExpanded>
+        <MultipleItemGuidance
+          components={makeMultipleItemComponents()}
+          containsGroup={
+            selectedIds.some((id) =>
+              isRuleGroup(
+                findById(queryBuilderJson, String(id)) ?? ({} as RuleNodeType),
+              ),
+            ) || selectedIds.some((id) => isInGroup(String(id), boardIndex))
+          }
+        />
+      </ActionMenuSection>
+    );
+  }
   if (!selectedNode) {
     return (
       <ActionMenuSection title={"Tool Guidance"} fixedExpanded>

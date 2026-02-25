@@ -46,7 +46,7 @@ import transitionCollections from "@/actions/transitionCollections";
 import createNetwork from "@/actions/createNetwork";
 import addCustodiansToNetwork from "@/actions/addCustodiansToNetwork";
 import deleteNetwork from "@/actions/deleteNetwork";
-import removeCustodiansFromNetwork from "@/actions/removeCustodiansToNetwork";
+import removeCustodiansFromNetwork from "@/actions/removeCustodiansFromNetwork";
 import updateNetwork from "@/actions/updateNetwork";
 
 export interface AdminDataStoreState {

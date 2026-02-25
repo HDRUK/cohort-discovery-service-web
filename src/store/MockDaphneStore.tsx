@@ -50,6 +50,7 @@ import { useUserDataStore } from "@/hooks/userDataStore";
 import { useCustodianDataStore } from "@/store/custodianDataStore";
 import { useAdminDataStore } from "@/store/adminDataStore";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
+import ConfirmProvider from "@/components/ConfirmProvider";
 
 const queryClient = new QueryClient();
 
@@ -243,7 +244,9 @@ const MockDaphneStore = ({
   return (
     <QueryClientProvider client={queryClient}>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <NotifyProvider>{children}</NotifyProvider>
+        <ConfirmProvider>
+          <NotifyProvider>{children}</NotifyProvider>
+        </ConfirmProvider>
       </LocalizationProvider>
     </QueryClientProvider>
   );

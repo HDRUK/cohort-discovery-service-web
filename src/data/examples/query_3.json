@@ -1,0 +1,98 @@
+{
+  "id": "6f6b6461-4434-403c-8038-4ab8d48618ad",
+  "rules": [
+    {
+      "id": "4343ce5d-0aa8-457a-8411-3e935f808099",
+      "exclude": false,
+      "rule": {
+        "concept": {
+          "concept_id": 37311061,
+          "name": "COVID-19",
+          "description": "COVID-19",
+          "category": "Condition",
+          "children": [],
+          "match_score": 99.7,
+          "tokens": ["19", "covid"],
+          "phrase_tokens": ["covid 19"],
+          "alternatives": []
+        }
+      },
+      "valid": true
+    },
+    {
+      "id": "6997b36e-f743-4b11-b3b4-4aaf70235c33",
+      "combinator": "and",
+      "exclude": false,
+      "valid": true
+    },
+    {
+      "id": "4f191ef6-9123-443b-8cb2-d28af8a9dfd3",
+      "rules": [
+        {
+          "id": "9dd349ba-a14c-4673-815a-87936f296145",
+          "exclude": false,
+          "rule": {
+            "concept": {
+              "name": "3955320",
+              "concept_id": 3955320,
+              "description": "Moderna - SARS-CoV-2 (COVID-19) vaccine",
+              "category": "Drug",
+              "children": []
+            }
+          },
+          "valid": true
+        },
+        {
+          "id": "2ca9902c-4538-49ce-915f-caee496ed330",
+          "combinator": "or",
+          "valid": true
+        },
+        {
+          "id": "07e7f8bf-a357-4914-8dd8-f1a2b383fce0",
+          "exclude": false,
+          "rule": {
+            "concept": {
+              "concept_id": 3955321,
+              "name": "Pfizer - SARS-CoV-2 (COVID-19) vaccine",
+              "description": "Pfizer - SARS-CoV-2 (COVID-19) vaccine",
+              "category": "Drug",
+              "children": [],
+              "match_score": 98.2,
+              "tokens": [
+                "19",
+                "covid",
+                "pfizer",
+                "sars",
+                "cov",
+                "vaccine",
+                "2"
+              ],
+              "phrase_tokens": [
+                "pfizer sars",
+                "cov 2",
+                "sars cov",
+                "cov 2 covid",
+                "pfizer sars cov",
+                "sars cov 2",
+                "covid 19",
+                "2 covid 19",
+                "covid 19 vaccine",
+                "2 covid",
+                "19 vaccine"
+              ],
+              "alternatives": []
+            }
+          },
+          "valid": true
+        }
+      ],
+      "valid": true
+    }
+  ],
+  "constraints": {
+    "ageConstraint": [null, null],
+    "timeConstraint": [null, null]
+  },
+  "warnings": [],
+  "valid": true
+}

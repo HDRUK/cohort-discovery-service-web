@@ -42,7 +42,13 @@ export interface TableProps {
   };
   details?: React.ReactNode;
   boxSxProps?: BoxProps["sx"];
-  rightPanel?: (selectedIds: string[]) => React.ReactNode;
+  rightPanel?: (
+    selectedIds: string[],
+    resultsView?: boolean,
+  ) => React.ReactNode;
+  rightPanelProps?: {
+    resultsView?: boolean;
+  };
 }
 
 type DTableProps<TData extends MRT_RowData> = MaterialReactTableProps<TData> &
@@ -55,6 +61,7 @@ const Table = <TData extends MRT_RowData>({
   details,
   boxSxProps,
   rightPanel,
+  rightPanelProps,
   ...props
 }: DTableProps<TData>) => {
   const { table } = props;
@@ -153,7 +160,9 @@ const Table = <TData extends MRT_RowData>({
             <MaterialReactTable {...props} />
           )
         }
-        right={rightPanel && rightPanel(selectedRows)}
+        right={
+          rightPanel && rightPanel(selectedRows, rightPanelProps?.resultsView)
+        }
       />
     </Box>
   );

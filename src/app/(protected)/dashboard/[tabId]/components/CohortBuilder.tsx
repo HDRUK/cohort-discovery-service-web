@@ -14,6 +14,9 @@ import { QUERY_BUILDER_GUIDANCE_COOKIE } from "@/config/internals";
 import QueryBuilderGuidanceWrapper from "./QueryBuilderGuidanceWrapper";
 import ShowJsonButton from "@/components/ShowJsonButton";
 import CohortErrors from "@/components/CohortErrors";
+import { buildQueryHistoryParams } from "@/utils/params";
+import getQueries from "@/actions/getQueries";
+import { DEFAULT_QUERIES_DROPDOWN_PER_PAGE } from "@/config/defaults";
 
 const NODE_ENV = process.env?.NODE_ENV;
 
@@ -22,6 +25,16 @@ const CohortBuilder = async (props: { query?: string }) => {
 
   const cookieStore = await cookies();
   const query = props.query ? await getQuery(props.query) : null;
+
+  const searchParamsObject = buildQueryHistoryParams({
+    page: 1,
+    per_page: DEFAULT_QUERIES_DROPDOWN_PER_PAGE,
+    sort: "created_at:desc",
+  });
+
+  const { data: userQueries } = await getQueries({
+    params: searchParamsObject,
+  });
 
   const initialSelection = collections.data.map((c) => c.pid);
 
@@ -66,7 +79,7 @@ const CohortBuilder = async (props: { query?: string }) => {
           />
 
           <Stack direction="column" spacing={1} sx={{ flex: 1, minWidth: 0 }}>
-            <CohortQueryInput />
+            <CohortQueryInput queries={userQueries.data} />
             <CohortErrors />
           </Stack>
         </Stack>

@@ -28,14 +28,23 @@ export const HierarchyItem = ({
   groupId,
   depth = 0,
 }: HierarchyItemProps) => {
-  const { toggleSelected, selected, getNodeName, setNodeName, hovered } =
-    useQueryBuilder((qb) => ({
-      toggleSelected: qb.toggleSelected,
-      selected: qb.selected,
-      getNodeName: qb.getNodeName,
-      setNodeName: qb.setNodeName,
-      hovered: qb.hovered,
-    }));
+  const {
+    select,
+    deselect,
+    toggleSelected,
+    selected,
+    getNodeName,
+    setNodeName,
+    hovered,
+  } = useQueryBuilder((qb) => ({
+    select: qb.select,
+    deselect: qb.deselect,
+    toggleSelected: qb.toggleSelected,
+    selected: qb.selected,
+    getNodeName: qb.getNodeName,
+    setNodeName: qb.setNodeName,
+    hovered: qb.hovered,
+  }));
   const id = `${ID_REF_SUFFIX}-${node.id}`;
 
   const {
@@ -65,15 +74,19 @@ export const HierarchyItem = ({
     e.stopPropagation();
 
     const isShift = e.shiftKey;
+    const isMeta = e.metaKey;
 
     const nextParent = !selected[node.id];
-    toggleSelected(node.id, isShift ? false : !isGroup);
+    toggleSelected(node.id, !isShift);
     if (!isRuleGroup(node)) return;
 
     node.rules.forEach((r) => {
-      const childVal = !!selected[r.id];
-      if (childVal !== nextParent) {
-        toggleSelected(r.id, false);
+      if (isMeta) {
+        if (nextParent) {
+          select(r.id);
+        } else {
+          deselect(r.id);
+        }
       }
     });
   };
@@ -81,7 +94,7 @@ export const HierarchyItem = ({
   const nodeName = getNodeName(node);
 
   const { handleContextMenu, ...rightClickMenuMethods } = useRightClickMenu();
-  const actions = useNodeActions(node);
+  const { actions } = useNodeActions(node);
 
   const content = (
     <ListItemButton

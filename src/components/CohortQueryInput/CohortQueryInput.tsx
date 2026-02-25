@@ -2,7 +2,7 @@
 
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { Box } from "@mui/material";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import SearchBox from "../SearchBox";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import {
@@ -14,12 +14,15 @@ import useSubmitQuery from "@/hooks/useSubmitQuery";
 import { RuleErrors } from "@/utils/rules";
 import useStateManagement from "@/hooks/useStateManagement";
 import SubmitQueryButton from "@/components/SubmitQueryButton";
+import { EXAMPLES } from "@/config/queryExamples";
+import { Query } from "@/types/api";
+import SearchOverlay from "./SearchOverlay";
 
 type FormValues = {
   cohortQueryInput: string;
 };
 
-const CohortQueryInput = () => {
+const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
   const {
     queryAsText,
     getQueryFromText,
@@ -129,13 +132,17 @@ const CohortQueryInput = () => {
     resetQuery,
   ]);
 
+  const placeholders = Object.keys(EXAMPLES);
+  const anchorRef = useRef<HTMLDivElement | null>(null);
+  const [open, setOpen] = useState(false);
+
   return (
     <Box
       component="form"
       onSubmit={handleSubmitSearch(onSubmitSearch, resetQuery)}
       sx={{
         width: "95%",
-        overflow: "hidden",
+        overflow: "visible",
         py: 1,
       }}
     >
@@ -152,19 +159,44 @@ const CohortQueryInput = () => {
         }}
         render={({ field, fieldState: { error, isDirty } }) => (
           <Box display="flex" flexDirection="row" sx={{ gap: 1 }}>
-            <SearchBox
-              {...field}
-              collapsible={false}
-              error={isDirty ? false : !!error}
-              type="search"
-              placeholder="Search for a cohort e.g. females above 50 with diabetes type-ii"
-              fullWidth
-              variant="outlined"
-              loading={isLoading}
-              warning={warnings.length > 0}
-              disabled={disabled || !!error}
-              showEndIcon={false}
-            />
+            <Box ref={anchorRef} sx={{ flex: 1 }}>
+              <SearchBox
+                {...field}
+                collapsible={false}
+                error={isDirty ? false : !!error}
+                type="search"
+                placeholders={placeholders}
+                fullWidth
+                variant="outlined"
+                loading={isLoading}
+                warning={warnings.length > 0}
+                disabled={disabled || !!error}
+                showEndIcon={false}
+                onFocus={() => {
+                  setOpen(true);
+                }}
+                onBlur={() => {
+                  field.onBlur();
+                  setTimeout(() => setOpen(false), 150);
+                }}
+                onChange={(e) => {
+                  field.onChange(e);
+                  if (e.target.value) {
+                    setOpen(false);
+                  }
+                }}
+              />
+              <SearchOverlay
+                queries={queries}
+                open={open}
+                anchorEl={anchorRef.current}
+                options={placeholders.map((label) => ({
+                  label,
+                  value: EXAMPLES[label].id,
+                  rules: EXAMPLES[label],
+                }))}
+              />
+            </Box>
             <SubmitQueryButton warning={warnings.length > 0} />
           </Box>
         )}

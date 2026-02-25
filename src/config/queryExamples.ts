@@ -1,6 +1,16 @@
 import { CombinatorType, RuleGroupType } from "@/types/rules";
 import { v4 as uuidv4 } from "uuid";
 
+import query1 from "@/data/examples/query_1.json";
+import query2 from "@/data/examples/query_2.json";
+import query3 from "@/data/examples/query_3.json";
+
+export const EXAMPLES: Record<string, RuleGroupType> = {
+  "E.g. Women over 18 with Covid": query1 as RuleGroupType,
+  "E.g. Adults with diabetes and metformin": query2 as RuleGroupType,
+  "E.g. Covid and moderna or pfizer": query3 as RuleGroupType,
+};
+
 export const NO_QUERY: RuleGroupType = {
   id: uuidv4(),
   rules: [

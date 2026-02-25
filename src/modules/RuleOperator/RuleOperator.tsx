@@ -30,7 +30,7 @@ const RuleOperator = ({
     isSelected: !!qb.selected[id],
   }));
 
-  const actions = useNodeActions(operator);
+  const { actions } = useNodeActions(operator);
 
   return (
     <RuleWrapper

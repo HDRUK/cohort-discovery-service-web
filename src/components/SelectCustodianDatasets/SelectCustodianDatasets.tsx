@@ -1,7 +1,7 @@
 "use client";
 
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import { GroupedCollection } from "../../types/api";
+import { Collection, CollectionStatus, GroupedCollection } from "@/types/api";
 import {
   Chip,
   Box,
@@ -9,10 +9,12 @@ import {
   AccordionSummary,
   AccordionDetails,
   FormControlLabel,
+  Typography,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import Title from "../Title";
-import SquareCheckbox from "../SquareCheckbox";
+import Title from "@/components/Title";
+import SquareCheckbox from "@/components/SquareCheckbox";
+import usePermissions from "@/hooks/usePermissions";
 
 const SelectCustodianDatasets = ({
   custodianCollections,
@@ -23,6 +25,8 @@ const SelectCustodianDatasets = ({
     selectedDatasets: qb.selectedDatasets,
     setSelectedDatasets: qb.setSelectedDatasets,
   }));
+
+  const { isAdmin, isCustodianAdmin } = usePermissions();
 
   const nTotal = custodianCollections.items.length;
   const nSelected = selectedDatasets.filter((pid) =>
@@ -46,6 +50,23 @@ const SelectCustodianDatasets = ({
     const ids = custodianCollections.items.map((i) => i.pid);
     const next = Array.from(new Set([...selectedDatasets, ...ids]));
     setSelectedDatasets(next);
+  };
+
+  const CollectionName = ({ c }: { c: Collection }) => {
+    const isActive = c.model_state.state.id === CollectionStatus.ACTIVE;
+    const showState = (isAdmin || isCustodianAdmin(c.custodian)) && !isActive;
+
+    return (
+      <Typography component="span">
+        <Typography component="span">{c.name}</Typography>
+        {showState && (
+          <Typography component="span" fontWeight={700}>
+            {" "}
+            [{c.model_state.state.name}]
+          </Typography>
+        )}
+      </Typography>
+    );
   };
 
   return (
@@ -104,7 +125,7 @@ const SelectCustodianDatasets = ({
                       checked={selectedDatasets.includes(c.pid)}
                     />
                   }
-                  label={c.name}
+                  label={<CollectionName c={c} />}
                 />
               }
             />
