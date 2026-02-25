@@ -179,6 +179,12 @@ const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
                   field.onBlur();
                   setTimeout(() => setOpen(false), 150);
                 }}
+                onChange={(e) => {
+                  field.onChange(e);
+                  if (e.target.value) {
+                    setOpen(false);
+                  }
+                }}
               />
               <SearchOverlay
                 queries={queries}

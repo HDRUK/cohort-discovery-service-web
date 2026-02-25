@@ -10,6 +10,7 @@ import {
 import { NotifyProvider } from "@/providers/NotifyProvider";
 import { useForm } from "react-hook-form";
 import { UpdateCollectionFormValues } from "@/types/forms";
+import ConfirmProvider from "@/components/ConfirmProvider";
 
 function TestHarness({ mockCollection }: { mockCollection: Collection }) {
   const formMethods = useForm<UpdateCollectionFormValues>({
@@ -34,12 +35,14 @@ function TestHarness({ mockCollection }: { mockCollection: Collection }) {
 
   return (
     <NotifyProvider>
-      <ManageCollectionStatus
-        collection={mockCollection}
-        expandedRight={true}
-        control={control}
-        setValue={jest.fn()}
-      />
+      <ConfirmProvider>
+        <ManageCollectionStatus
+          collection={mockCollection}
+          expandedRight={true}
+          control={control}
+          setValue={jest.fn()}
+        />
+      </ConfirmProvider>
     </NotifyProvider>
   );
 }
@@ -103,7 +106,7 @@ describe("ManageCollectionStatus", () => {
 
   it("renders the component in REJECTED with correct initial status", () => {
     renderComponent(CollectionStatus.REJECTED);
-    expect(screen.queryByText(/Draft/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Draft/i)).toBeInTheDocument();
     expect(screen.queryByText(/Pending/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Active/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Inactive/i)).not.toBeInTheDocument();

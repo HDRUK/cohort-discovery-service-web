@@ -129,9 +129,14 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
           )}
 
           <Box
-            sx={{ display: "flex", justifyContent: "flex-end", gap: 1, mt: 1 }}
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              gap: 1,
+              mt: 1,
+            }}
           >
-            <Button onClick={() => resolveAndClose(false)}>
+            <Button variant="outlined" onClick={() => resolveAndClose(false)}>
               {opts.cancelText}
             </Button>
             <Button
