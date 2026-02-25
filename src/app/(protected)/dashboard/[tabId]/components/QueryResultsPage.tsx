@@ -47,15 +47,18 @@ const QueryResultsPageContent = async ({
           },
           rightAction: {
             downloadProps: {
-              id: queryData.data.pid,
+              ids: [queryData.data.pid],
               entity: "queries",
               formats: [AvailableFormats.JSON],
             },
-            refreshProps: { tag: queryData.data.pid, disabled: true },
-            deleteProps: { disabled: true },
-            sortProps: { field: "collection.name" },
+            // sortProps: { field: "collection.name" },
+            // **SC - disabling this for now because it uses query string for sorting order. But this is not scoped
+            // to the tab, but to the whole page, meaning it's being incorrectly applied to the history page too,
+            // which results in an error. This needs rearchitecting to not use the query string, but that's a
+            // bigger job than the value right now
           },
         }}
+        showGuidance
       />
     </>
   );

@@ -5,18 +5,26 @@ import ActionMenuSection from "@/components/ActionMenuSection";
 import { Typography } from "@mui/material";
 import { CustomH1 } from "@/components/GuidanceHeaders";
 
-const QueryHistoryGuidance = (selectedIds: string[]) => {
+const QueryHistoryGuidance = (
+  selectedIds: string[],
+  resultsView: boolean = false,
+) => {
   const empty = !selectedIds.length;
 
   const multiple = !empty && selectedIds.length > 1;
 
   return (
     <ActionMenuSection
-      title={`Result History${multiple ? " Bulk Actions" : ""}`}
+      title={
+        resultsView
+          ? "Results"
+          : `Result History${multiple ? " Bulk Actions" : ""}`
+      }
       fixedExpanded
       scrollable
     >
       {empty &&
+        !resultsView &&
         "Select a result row to edit a previous query, rerun it to generate updated results, download the output, or remove it from your list. You can also select multiple to bulk delete or download."}
       {!empty && (
         <HistoryActions multiple={multiple} selectedIds={selectedIds} />

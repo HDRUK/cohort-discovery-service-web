@@ -15,12 +15,14 @@ import Table from "../../components/Table";
 import { TableProps } from "../../components/Table/Table";
 import getQuery from "@/actions/getQuery";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import QueryHistoryGuidance from "../QueryHistory";
 
 interface QueryResultsTableProps {
   initialData: Query;
   initialSearchParams?: URLSearchParams;
   tableProps?: TableProps;
   useTableProps?: Omit<MRT_TableOptions<Task>, "data" | "columns">;
+  showGuidance?: boolean;
 }
 
 const QueryResultsTable = ({
@@ -28,6 +30,7 @@ const QueryResultsTable = ({
   initialSearchParams = new URLSearchParams(),
   tableProps,
   useTableProps,
+  showGuidance = false,
 }: QueryResultsTableProps) => {
   const { setQueryName, setQueryBuilderJson } = useQueryBuilder((qb) => ({
     setQueryName: qb.setQueryName,
@@ -187,7 +190,16 @@ const QueryResultsTable = ({
 
   return (
     <Box sx={{ p: 2, gap: 2, display: "flex", flexDirection: "column" }}>
-      <Table table={table} {...tableProps} />
+      <Table
+        table={table}
+        {...(showGuidance
+          ? {
+              rightPanel: QueryHistoryGuidance,
+              rightPanelProps: { resultsView: true },
+            }
+          : {})}
+        {...tableProps}
+      />
     </Box>
   );
 };
