@@ -129,6 +129,7 @@ const CollectionsTable = ({
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     refetchInterval: (query) => {
+      return false;
       const data = query.state.data;
       if (data?.total === 0) return false;
 
