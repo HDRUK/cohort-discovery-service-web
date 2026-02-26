@@ -177,7 +177,7 @@ const useNodeActions = (
     ...(node && isRuleGroup(node)
       ? [
           { action: handleCreateNewRule, label: "Add Rule" },
-          { action: handleCollapseGroup, label: "Collapse Group" },
+          { action: handleCollapseGroup, label: "Ungroup" },
         ]
       : []),
   ];
