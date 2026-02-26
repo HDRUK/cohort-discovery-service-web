@@ -9,6 +9,7 @@ import React, {
   useState,
   TransitionEvent,
 } from "react";
+import { CloseGuardProvider } from "@/providers/CloseGuardProvider";
 
 type SwimLaneBlockerApi = {
   setBlocked: (blocked: boolean, onBackdropClick?: () => void) => void;
@@ -81,83 +82,87 @@ const SwimLane = ({
 
   return (
     <SwimLaneBlockerContext.Provider value={blockerApi}>
-      {showBlocker && (
-        <Portal>
-          <Backdrop
-            open
-            onClick={() => onBackdropClickRef.current?.()}
-            sx={(t) => ({
-              zIndex: t.zIndex.drawer,
-              bgcolor: "rgba(0,0,0,0.2)",
-            })}
-          />
-        </Portal>
-      )}
+      <CloseGuardProvider>
+        {showBlocker && (
+          <Portal>
+            <Backdrop
+              open
+              onClick={() => onBackdropClickRef.current?.()}
+              sx={(t) => ({
+                zIndex: t.zIndex.drawer,
+                bgcolor: "rgba(0,0,0,0.2)",
+              })}
+            />
+          </Portal>
+        )}
 
-      <Grid
-        onTransitionStart={hideOnTransiton ? handleTransitionStart : undefined}
-        onTransitionEnd={hideOnTransiton ? handleTransitionEnd : undefined}
-        sx={(theme) => ({
-          display: "flex",
-          flexDirection: "column",
-          minHeight: 0,
-          height: "100%",
-          transition: theme.transitions.create(["width", "flex-basis"], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.short,
-          }),
-          ...(scrollable && {
-            overflowY: "auto",
-            scrollbarGutter: "stable",
-            scrollbarWidth: "thin",
-            scrollbarColor: "transparent transparent",
-            "&::-webkit-scrollbar": { width: 10 },
-            "&::-webkit-scrollbar-thumb": {
-              backgroundColor: "transparent",
-              borderRadius: 999,
-            },
-            "&::-webkit-scrollbar-track": { backgroundColor: "transparent" },
-            "&:hover::-webkit-scrollbar-thumb, &:focus-within::-webkit-scrollbar-thumb":
-              { backgroundColor: theme.palette.action.active },
-            "&:hover::-webkit-scrollbar-track, &:focus-within::-webkit-scrollbar-track":
-              { backgroundColor: theme.palette.action.hover },
-            "&:hover, &:focus-within": {
-              scrollbarColor: `${theme.palette.action.active} ${theme.palette.action.hover}`,
-            },
-          }),
-
-          // elevate the whole lane above the backdrop when blocked
-          position: "relative",
-          zIndex: showBlocker ? theme.zIndex.drawer + 1 : "auto",
-        })}
-        {...rest}
-        size={size}
-      >
-        <Paper
-          sx={{
+        <Grid
+          onTransitionStart={
+            hideOnTransiton ? handleTransitionStart : undefined
+          }
+          onTransitionEnd={hideOnTransiton ? handleTransitionEnd : undefined}
+          sx={(theme) => ({
             display: "flex",
             flexDirection: "column",
-            flex: 1,
             minHeight: 0,
-            p: 2,
-            mr: 1,
-            overflow: "auto",
-            ...paperSx,
-          }}
+            height: "100%",
+            transition: theme.transitions.create(["width", "flex-basis"], {
+              easing: theme.transitions.easing.sharp,
+              duration: theme.transitions.duration.short,
+            }),
+            ...(scrollable && {
+              overflowY: "auto",
+              scrollbarGutter: "stable",
+              scrollbarWidth: "thin",
+              scrollbarColor: "transparent transparent",
+              "&::-webkit-scrollbar": { width: 10 },
+              "&::-webkit-scrollbar-thumb": {
+                backgroundColor: "transparent",
+                borderRadius: 999,
+              },
+              "&::-webkit-scrollbar-track": { backgroundColor: "transparent" },
+              "&:hover::-webkit-scrollbar-thumb, &:focus-within::-webkit-scrollbar-thumb":
+                { backgroundColor: theme.palette.action.active },
+              "&:hover::-webkit-scrollbar-track, &:focus-within::-webkit-scrollbar-track":
+                { backgroundColor: theme.palette.action.hover },
+              "&:hover, &:focus-within": {
+                scrollbarColor: `${theme.palette.action.active} ${theme.palette.action.hover}`,
+              },
+            }),
+
+            // elevate the whole lane above the backdrop when blocked
+            position: "relative",
+            zIndex: showBlocker ? theme.zIndex.drawer + 1 : "auto",
+          })}
+          {...rest}
+          size={size}
         >
-          <Box
+          <Paper
             sx={{
               display: "flex",
               flexDirection: "column",
               flex: 1,
               minHeight: 0,
-              px: 0,
+              p: 2,
+              mr: 1,
+              overflow: "auto",
+              ...paperSx,
             }}
           >
-            {!isTransitioning && children}
-          </Box>
-        </Paper>
-      </Grid>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                flex: 1,
+                minHeight: 0,
+                px: 0,
+              }}
+            >
+              {!isTransitioning && children}
+            </Box>
+          </Paper>
+        </Grid>
+      </CloseGuardProvider>
     </SwimLaneBlockerContext.Provider>
   );
 };

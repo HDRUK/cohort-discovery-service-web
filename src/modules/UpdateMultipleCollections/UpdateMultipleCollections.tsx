@@ -11,7 +11,7 @@ import { useCallback, useEffect, useState } from "react";
 import { revalidateCollections } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
 import useCustodianStore from "@/hooks/useCustodianStore";
-import { useLogDependencyChanges } from "@/utils/deps";
+import {} from "@/utils/deps";
 import SquareCheckbox from "@/components/SquareCheckbox";
 import removeCollectionFromWorkgroups from "@/actions/removeCollectionFromWorkgroups";
 import addCollectionToWorkgroups from "@/actions/addCollectionToWorkgroups";
@@ -171,15 +171,16 @@ const UpdateMultipleCollections = ({
     onClose?.();
   }, [onClose]);
 
-  useLogDependencyChanges("UpdateMultipleCollections", {
-    collections,
-    ...formMethods,
-    currentCustodian,
-    handleEnter,
-    handleLockClick,
-    handleUnlockClick,
-    submitForm,
-  });
+  ("UpdateMultipleCollections",
+    {
+      collections,
+      ...formMethods,
+      currentCustodian,
+      handleEnter,
+      handleLockClick,
+      handleUnlockClick,
+      submitForm,
+    });
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setWorkgroupValues((prev) => {

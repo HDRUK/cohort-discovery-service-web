@@ -10,21 +10,19 @@ import FormLabel from "@/components/FormLabel";
 import ErrorHeader from "@/components/ErrorHeader";
 import useCustodianStore from "@/hooks/useCustodianStore";
 import UpdatePanel from "@/components/UpdatePanel";
+import { useThreePane } from "@/providers/ThreePaneProvider";
+import { useSaveChanges } from "@/hooks/useSaveChanges";
 
 type CollectionHostFormValues = { hostName: string };
 
 export type UpdateCollectionHostProps = {
   selectedCollectionHost: CollectionHost;
-  expandedRight: boolean;
-  expandedLeft: boolean;
-  onClose?: () => void;
 };
 
 const UpdateCollectionHost = ({
   selectedCollectionHost,
-  expandedRight,
-  onClose,
 }: UpdateCollectionHostProps) => {
+  const { expandedRight, toggleRight: onClose } = useThreePane();
   const notify = useNotify();
   const updateCollectionHost = useCustodianStore((s) => s.updateCollectionHost);
 
@@ -38,7 +36,7 @@ const UpdateCollectionHost = ({
     handleSubmit,
     control,
     setValue,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = formMethods;
 
   useEffect(() => {
@@ -66,6 +64,12 @@ const UpdateCollectionHost = ({
 
   const handleEnter = () =>
     handleSubmit((values) => submitHostForm(values, false))();
+
+  useSaveChanges({
+    enabled: true, //isDirty,
+    entityName: selectedCollectionHost.name,
+    onSave: () => handleSubmit((v) => submitHostForm(v, true))(),
+  });
 
   return (
     <FormProvider {...formMethods}>

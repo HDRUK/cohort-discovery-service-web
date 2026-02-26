@@ -37,6 +37,8 @@ import ErrorHeader from "@/components/ErrorHeader";
 import { useAdminDataStore } from "@/store/adminDataStore";
 import UpdatePanel from "@/components/UpdatePanel";
 import { useThreePane } from "@/providers/ThreePaneProvider";
+import { useCloseGuard } from "@/providers/CloseGuardProvider";
+import { useConfirm } from "@/hooks/useConfirm";
 
 const UpdateCollectionGuidance = maskClientTest(
   () => import("./UpdateCollectionGuidance"),
@@ -130,6 +132,11 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
     },
   );
 
+  const defaultValues = useMemo(
+    () => getDefaultValues(collection),
+    [collection],
+  );
+
   const formMethods = useForm<UpdateCollectionFormValues>({
     defaultValues: getDefaultValues(collection),
   });
@@ -140,6 +147,23 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
     reset,
     formState: { isDirty, errors },
   } = formMethods;
+
+  const { registerCloseGuard } = useCloseGuard();
+  const confirm = useConfirm();
+
+  useEffect(() => {
+    registerCloseGuard(async () => {
+      if (!isDirty) return true;
+
+      return await confirm({
+        props: { action: `discard changes to ${collection.name}` },
+        confirmText: "Discard",
+        confirmColor: "warning",
+      });
+    });
+
+    return () => registerCloseGuard(null);
+  }, [isDirty, collection.name, confirm, registerCloseGuard]);
 
   const collectionCustodianPid = collection.custodian.pid;
 
@@ -160,9 +184,11 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
   const lastCollectionIdRef = useRef<number | null>(null);
   useEffect(() => {
     if (!collection) return;
-    //dont reset if the data just refreshed while editing
-    if (lastCollectionIdRef.current === collection.id) return;
+
+    const ref = lastCollectionIdRef.current;
+    if (ref === collection.id) return;
     lastCollectionIdRef.current = collection.id;
+    if (ref === null) return;
 
     reset(getDefaultValues(collection), {
       keepDirty: false,
@@ -183,66 +209,61 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
         }
         notify.success(`Updated collection ${data.collection.name}`);
 
-        const cwNames = new Set(
+        const currentNames = new Set(
           (collection.workgroups ?? []).map((w) => w.name),
         );
 
-        const newWorkgroups = workgroups.filter(
-          (wg) => workgroupValues.get(wg.name) && !cwNames.has(wg.name),
+        const selectedNames = new Set((data.workgroups ?? []).map(String));
+
+        const toAdd = workgroups.filter(
+          (wg) => selectedNames.has(wg.name) && !currentNames.has(wg.name),
         );
 
-        if (newWorkgroups.length > 0) {
+        const toRemove = workgroups.filter(
+          (wg) => !selectedNames.has(wg.name) && currentNames.has(wg.name),
+        );
+
+        if (toAdd.length > 0) {
           await addCollectionToWorkgroups({
-            id: id,
-            workgroup_ids: newWorkgroups.map((wg) => wg.id),
+            id,
+            workgroup_ids: toAdd.map((wg) => wg.id),
           });
+
           notify.success(
             `Add collection "${name}" to workgroup${
-              newWorkgroups.length > 1 ? "s" : ""
-            } ${newWorkgroups.map((wg) => wg.name).join(", ")}`,
+              toAdd.length > 1 ? "s" : ""
+            } ${toAdd.map((wg) => wg.name).join(", ")}`,
           );
         }
 
-        const workgroupsToRemove = workgroups.filter(
-          (wg) => !workgroupValues.get(wg.name) && cwNames.has(wg.name),
-        );
-
-        if (workgroupsToRemove.length > 0) {
+        if (toRemove.length > 0) {
           await removeCollectionFromWorkgroups({
-            id: id,
-            workgroup_ids: workgroupsToRemove.map((wg) => wg.id),
+            id,
+            workgroup_ids: toRemove.map((wg) => wg.id),
           });
+
           notify.success(
             `Removed collection "${name}" from workgroup${
-              workgroupsToRemove.length > 1 ? "s" : ""
-            } ${workgroupsToRemove.map((wg) => wg.name).join(", ")}`,
+              toRemove.length > 1 ? "s" : ""
+            } ${toRemove.map((wg) => wg.name).join(", ")}`,
           );
         }
 
-        if (
-          data.collection.model_state?.state.id &&
-          collection.model_state?.state_id !==
-            data.collection.model_state?.state.id
-        ) {
-          await updateCollectionStatus(
-            id,
-            data.collection.model_state.state.id,
-          );
+        const nextStateId = data.collection.model_state?.state?.id;
+        if (nextStateId && collection.model_state?.state_id !== nextStateId) {
+          await updateCollectionStatus(id, nextStateId);
 
           notify.success(
             `Changed collection "${name}" to status ${
-              CollectionStatus[
-                data.collection.model_state.state.id as CollectionStatus
-              ]
+              CollectionStatus[nextStateId as CollectionStatus]
             }`,
           );
         }
+
         revalidateCollections(currentCustodian?.pid ?? undefined);
       }
 
-      if (closeAfter) {
-        onClose?.();
-      }
+      if (closeAfter) onClose?.();
     },
     [
       collection,
@@ -254,7 +275,6 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
       updateCollectionStatus,
       onClose,
       workgroups,
-      workgroupValues,
     ],
   );
 
@@ -263,29 +283,7 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
     [handleSubmit, submitForm],
   );
 
-  const handleLockClick = useCallback(
-    () => handleSubmit((values) => submitForm(values, true))(),
-    [handleSubmit, submitForm],
-  );
-
   const { setValue } = formMethods;
-
-  const handleUnlockClick = useCallback(() => {
-    onClose?.();
-  }, [onClose]);
-
-  useLogDependencyChanges("UpdateCollection", {
-    collection,
-    collectionHosts,
-    ...formMethods,
-    currentCustodian,
-    getDefaultValues,
-    updateCollection,
-    handleEnter,
-    handleLockClick,
-    handleUnlockClick,
-    submitForm,
-  });
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setWorkgroupValues((prev) => {
@@ -295,16 +293,18 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
     });
   };
 
-  useEffect(() => {
-    const selectedWorkgroups = Array.from(workgroupValues.entries())
-      .filter(([_, checked]) => checked)
-      .map(([name]) => name);
-    setValue("workgroups", selectedWorkgroups.sort(), {
-      shouldDirty: !firstUpdate.current,
-      shouldTouch: !firstUpdate.current,
+  /* useEffect(() => {
+    const map = new Map<string, boolean>();
+    workgroups.forEach((wg) => {
+      map.set(
+        wg.name,
+        collection.workgroups?.some((cw) => cw.id === wg.id) ?? false,
+      );
     });
-    firstUpdate.current = false;
-  }, [workgroupValues, setValue]);
+
+    firstUpdate.current = true;
+    setWorkgroupValues(map);
+  }, [collection.workgroups, workgroups, setWorkgroupValues]);*/
 
   return (
     <UpdatePanel
@@ -316,13 +316,13 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
     >
       <FormProvider {...formMethods}>
         <FormLabel underlined>Collection Status</FormLabel>
-        <ManageCollectionStatus
+        {/*<ManageCollectionStatus
           collection={collection}
           expandedRight={expandedRight}
           key={collection.id}
           control={control}
           setValue={setValue}
-        />
+        />*/}
         {isAdmin && (
           <>
             <FormLabel underlined>Workgroup access</FormLabel>
@@ -350,26 +350,43 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
               <Controller
                 name="workgroups"
                 control={control}
-                render={() => (
-                  <FormGroup>
-                    <Box display="flex" flexDirection="column">
-                      {workgroups?.map((w) => (
-                        <FormControlLabel
-                          control={
-                            <SquareCheckbox
-                              checked={Boolean(workgroupValues.get(w.name))}
-                              key={`wg-checkbox-${w.name}`}
-                              name={w.name}
-                              onChange={handleChange}
-                            />
-                          }
-                          label={w.name}
-                          key={`wg-checkbox-label-${w.name}`}
-                        />
-                      ))}
-                    </Box>
-                  </FormGroup>
-                )}
+                render={({ field }) => {
+                  const selected = new Set(field.value ?? []);
+
+                  const toggle = (name: string) => (checked: boolean) => {
+                    const next = new Set(selected);
+                    if (checked) next.add(name);
+                    else next.delete(name);
+
+                    // IMPORTANT: onChange will mark dirty vs defaultValues automatically
+                    field.onChange(Array.from(next).sort());
+                  };
+
+                  return (
+                    <FormGroup>
+                      {workgroups.map((wg) => {
+                        const checked = selected.has(wg.name);
+
+                        return (
+                          <FormControlLabel
+                            key={wg.id}
+                            label={wg.name}
+                            control={
+                              <SquareCheckbox
+                                name={wg.name}
+                                checked={checked}
+                                onChange={(e) =>
+                                  toggle(wg.name)(e.target.checked)
+                                }
+                                disabled={!expandedRight}
+                              />
+                            }
+                          />
+                        );
+                      })}
+                    </FormGroup>
+                  );
+                }}
               />
             )}
           </>

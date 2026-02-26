@@ -15,14 +15,14 @@ import CollectionsLeftPanel from "@/modules/CollectionsLeftPanel";
 import CollectionsRightPanel from "@/modules/CollectionsRightPanel";
 import useCustodianStore from "@/hooks/useCustodianStore";
 import useAdminStore from "@/hooks/useAdminStore";
-import { ThreePaneProvider, useThreePane } from "@/providers/ThreePaneProvider";
+import { ThreePaneProvider } from "@/providers/ThreePaneProvider";
 
 type Props = {
   isAdmin: boolean;
   collections: Paginated<CollectionWithHosts>;
 };
 
-const CollectionsManagementInner = ({ isAdmin, collections }: Props) => {
+const CollectionsManagement = ({ isAdmin, collections }: Props) => {
   const custodian = useCustodianStore(
     (custodianData) => custodianData.current.custodian,
   );
@@ -37,35 +37,30 @@ const CollectionsManagementInner = ({ isAdmin, collections }: Props) => {
     else setCustodianCollections(collections);
   }, [isAdmin, collections, setAdminCollections, setCustodianCollections]);
 
-  const { expandedSide, expandedLeft, expandedRight, toggleRight } =
-    useThreePane();
-
   if (!isAdmin && !custodian) return <Skeleton height={"100%"} />;
 
   return (
-    <Box
-      sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}
-    >
-      <Title title="Collections" subTitle="Management" />
-      <ControlledSearchBox<CollectionsSearchParams>
-        paramName="search_term"
-        placeholder="Search by collection name..."
-      />
-      <ThreePaneSwimLaneLayout
-        expandedSide={expandedSide}
-        rightDisabled={false}
-        left={<CollectionsLeftPanel />}
-        middle={<CollectionsTable />}
-        right={<CollectionsRightPanel />}
-      />
-    </Box>
-  );
-};
-
-const CollectionsManagement = (props: Props) => {
-  return (
     <ThreePaneProvider>
-      <CollectionsManagementInner {...props} />
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+          height: "100%",
+        }}
+      >
+        <Title title="Collections" subTitle="Management" />
+        <ControlledSearchBox<CollectionsSearchParams>
+          paramName="search_term"
+          placeholder="Search by collection name..."
+        />
+        <ThreePaneSwimLaneLayout
+          rightDisabled={false}
+          left={<CollectionsLeftPanel />}
+          middle={<CollectionsTable />}
+          right={<CollectionsRightPanel />}
+        />
+      </Box>
     </ThreePaneProvider>
   );
 };
