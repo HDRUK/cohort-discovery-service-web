@@ -21,19 +21,17 @@ import UpdateMultipleCollectionsGuidance from "./UpdateMultipleCollectionsGuidan
 import { UpdateCollectionFormValues } from "@/types/forms";
 import { useAdminDataStore } from "@/store/adminDataStore";
 import UpdatePanel from "@/components/UpdatePanel";
+import { useThreePane } from "@/providers/ThreePaneProvider";
 
 export type UpdateMultipleCollectionProps = {
   collections: CollectionWithHosts[];
-  expandedRight: boolean;
-  expandedLeft: boolean;
-  onClose?: () => void;
 };
 
 const UpdateMultipleCollections = ({
   collections,
-  expandedRight,
-  onClose,
 }: UpdateMultipleCollectionProps) => {
+  const { expandedRight, toggleRight: onClose } = useThreePane();
+
   const currentCustodian = useCustodianStore((s) => s.current.custodian);
 
   const workgroups = useAdminDataStore((s) => s.workgroups);

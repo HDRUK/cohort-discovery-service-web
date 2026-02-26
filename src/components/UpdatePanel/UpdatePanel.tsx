@@ -27,13 +27,11 @@ export const UpdatePanel = ({
 
   useEffect(() => {
     if (expandedRight) {
-      // block page, and when backdrop clicked -> lock/collapse
       setBlocked(true, onLockClick);
     } else {
       setBlocked(false);
     }
 
-    // if this panel unmounts while expanded, clean up
     return () => setBlocked(false);
   }, [expandedRight, onLockClick, setBlocked]);
 

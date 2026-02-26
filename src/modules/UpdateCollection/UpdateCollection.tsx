@@ -36,6 +36,7 @@ import CopyableVariable from "@/components/CopyableVariable";
 import ErrorHeader from "@/components/ErrorHeader";
 import { useAdminDataStore } from "@/store/adminDataStore";
 import UpdatePanel from "@/components/UpdatePanel";
+import { useThreePane } from "@/providers/ThreePaneProvider";
 
 const UpdateCollectionGuidance = maskClientTest(
   () => import("./UpdateCollectionGuidance"),
@@ -43,9 +44,6 @@ const UpdateCollectionGuidance = maskClientTest(
 
 export type UpdateCollectionProps = {
   collection: CollectionWithHosts;
-  expandedRight: boolean;
-  expandedLeft: boolean;
-  onClose?: () => void;
 };
 
 const getDefaultValues = (collection: CollectionWithHosts | null) => {
@@ -97,11 +95,9 @@ const getDefaultValues = (collection: CollectionWithHosts | null) => {
   };
 };
 
-const UpdateCollection = ({
-  collection,
-  expandedRight,
-  onClose,
-}: UpdateCollectionProps) => {
+const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
+  const { expandedRight, toggleRight: onClose } = useThreePane();
+
   const currentCustodian = useCustodianStore((s) => s.current.custodian);
 
   const currentCollectionHosts = useCustodianStore(
