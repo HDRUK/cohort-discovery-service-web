@@ -15,12 +15,14 @@ import Table from "../../components/Table";
 import { TableProps } from "../../components/Table/Table";
 import getQuery from "@/actions/getQuery";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import QueryHistoryGuidance from "../QueryHistory";
 
 interface QueryResultsTableProps {
   initialData: Query;
   initialSearchParams?: URLSearchParams;
   tableProps?: TableProps;
   useTableProps?: Omit<MRT_TableOptions<Task>, "data" | "columns">;
+  showGuidance?: boolean;
 }
 
 const QueryResultsTable = ({
@@ -28,6 +30,7 @@ const QueryResultsTable = ({
   initialSearchParams = new URLSearchParams(),
   tableProps,
   useTableProps,
+  showGuidance = false,
 }: QueryResultsTableProps) => {
   const { setQueryName, setQueryBuilderJson } = useQueryBuilder((qb) => ({
     setQueryName: qb.setQueryName,
@@ -80,14 +83,6 @@ const QueryResultsTable = ({
 
   const columns: MRT_ColumnDef<Task>[] = [
     {
-      accessorKey: "custodian_name",
-      accessorFn: (row) => row.collection.custodian?.name,
-      header: "Custodian",
-      size: 250,
-      minSize: 250,
-      maxSize: 250,
-    },
-    {
       accessorKey: "collection_name",
       accessorFn: (row) => ({
         name: row.collection.name,
@@ -126,7 +121,7 @@ const QueryResultsTable = ({
     {
       accessorKey: "total",
       accessorFn: (row) => row.result,
-      header: "Total",
+      header: "Total records",
       Cell: ({ cell, row: { original } }) => {
         const result = cell.getValue<Result>();
         const { count, status } = result || {};
@@ -143,6 +138,22 @@ const QueryResultsTable = ({
       size: 100,
       minSize: 100,
       maxSize: 100,
+    },
+    {
+      accessorKey: "custodian_name",
+      accessorFn: (row) => row.collection.custodian?.name,
+      header: "Custodian",
+      size: 250,
+      minSize: 250,
+      maxSize: 250,
+    },
+    {
+      accessorKey: "network_name",
+      accessorFn: (row) => row.collection.custodian?.network?.name,
+      header: "Network",
+      size: 250,
+      minSize: 250,
+      maxSize: 250,
     },
     {
       accessorKey: "status",
@@ -187,7 +198,16 @@ const QueryResultsTable = ({
 
   return (
     <Box sx={{ p: 2, gap: 2, display: "flex", flexDirection: "column" }}>
-      <Table table={table} {...tableProps} />
+      <Table
+        table={table}
+        {...(showGuidance
+          ? {
+              rightPanel: QueryHistoryGuidance,
+              rightPanelProps: { resultsView: true },
+            }
+          : {})}
+        {...tableProps}
+      />
     </Box>
   );
 };

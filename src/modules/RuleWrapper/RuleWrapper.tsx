@@ -42,7 +42,12 @@ import useRightClickMenu from "@/hooks/useRightClickMenu";
 import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
 import { mergeSx } from "@/utils/helpers";
 import RuleAgeSelector from "@/components/RuleAgeSelector";
-import { isAgeFilter, isRuleLeaf, removeById } from "@/utils/rules";
+import {
+  isAgeFilter,
+  isRuleGroup,
+  isRuleLeaf,
+  removeById,
+} from "@/utils/rules";
 import useFeatures from "@/hooks/useFeatures";
 import Close from "@mui/icons-material/Close";
 
@@ -93,6 +98,8 @@ const RuleWrapper = ({
   }
 
   const {
+    select,
+    deselect,
     isSelected,
     toggleSelected,
     getNodeName,
@@ -101,6 +108,8 @@ const RuleWrapper = ({
     setQueryBuilderJson,
     setHovered,
   } = useQueryBuilder((qb) => ({
+    select: qb.select,
+    deselect: qb.deselect,
     isSelected: !!qb.selected[id],
     toggleSelected: qb.toggleSelected,
     getNodeName: qb.getNodeName,
@@ -139,8 +148,20 @@ const RuleWrapper = ({
       e.stopPropagation();
       window.getSelection()?.removeAllRanges();
       toggleSelected(id, !isShift);
+
+      const isMeta = e.metaKey;
+      if (isRuleGroup(node) && isMeta) {
+        const nextParent = !isSelected;
+        node.rules.forEach((r) => {
+          if (nextParent) {
+            select(r.id);
+          } else {
+            deselect(r.id);
+          }
+        });
+      }
     },
-    [id, toggleSelected],
+    [id, toggleSelected, isSelected, node, select, deselect],
   );
 
   const onMouseOver = (e: React.MouseEvent<HTMLDivElement>) => {
