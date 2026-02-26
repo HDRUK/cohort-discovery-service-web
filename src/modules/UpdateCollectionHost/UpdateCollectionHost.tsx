@@ -66,9 +66,11 @@ const UpdateCollectionHost = ({
     handleSubmit((values) => submitHostForm(values, false))();
 
   useSaveChanges({
-    enabled: true, //isDirty,
+    enabled: isDirty,
     entityName: selectedCollectionHost.name,
-    onSave: () => handleSubmit((v) => submitHostForm(v, true))(),
+    onSave: () => {
+      handleSubmit((v) => submitHostForm(v, false))();
+    },
   });
 
   return (

@@ -21,7 +21,7 @@ export function useSaveChanges({
   const confirm = useConfirm();
 
   const message = useMemo(
-    () => `You have unsaved changes to ${entityName}.`,
+    () => `Do you want to save your changes to ${entityName}`,
     [entityName],
   );
 
@@ -34,7 +34,7 @@ export function useSaveChanges({
     registerCloseGuard(async () => {
       const shouldSave = await confirm({
         title: "Unsaved changes",
-        props: { action: message },
+        description: message,
         confirmText: saveText,
         cancelText,
         confirmColor: "primary",

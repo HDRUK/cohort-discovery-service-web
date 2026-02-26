@@ -29,23 +29,23 @@ export const UpdatePanel = ({
   const { setBlocked } = useSwimLaneBlocker();
   const { confirmCloseIfNeeded } = useCloseGuard();
 
-  const handleLock = useCallback(async () => {
-    //const ok = await confirmCloseIfNeeded();
-    //if (!ok) return;
+  const handleClickaway = useCallback(async () => {
+    const ok = await confirmCloseIfNeeded();
+    if (!ok) return;
     onLockClick();
   }, [confirmCloseIfNeeded, onLockClick]);
 
   useEffect(() => {
     if (expandedRight) {
       setBlocked(true, () => {
-        void handleLock();
+        void handleClickaway();
       });
     } else {
       setBlocked(false);
     }
 
     return () => setBlocked(false);
-  }, [expandedRight, setBlocked, handleLock]);
+  }, [expandedRight, setBlocked, handleClickaway]);
 
   return (
     <ActionMenuSection
@@ -76,7 +76,7 @@ export const UpdatePanel = ({
               }}
               onClick={() => {
                 if (expandedRight) {
-                  void handleLock();
+                  onLockClick();
                 } else {
                   onUnlockClick();
                 }
