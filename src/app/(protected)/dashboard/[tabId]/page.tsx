@@ -5,7 +5,7 @@ import { routes } from "@/config/routes";
 import TabsShell from "@/components/TabsShell";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import { cookies } from "next/headers";
-import getQuery from "@/actions/getQuery";
+import getQuery from "@/actions/query/getQuery";
 import { capVarChar } from "@/utils/string";
 import { SearchParams } from "@/types/api";
 import QueryHistoryPage from "./components/QueryHistoryPage";

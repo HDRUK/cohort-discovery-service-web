@@ -32,17 +32,17 @@ import type {
 } from "@/types/rules";
 import type { UniqueIdentifier } from "@dnd-kit/core";
 
-import getConcepts from "@/actions/__mocks__/getConcepts";
+import getConcepts from "@/actions/concept/__mocks__/getConcepts";
 import { validateRuleTree } from "@/utils/rules";
 import { queryToText } from "@/utils/queryBuilder";
 
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { NotifyProvider } from "@/providers/NotifyProvider";
-import { getMockCollection } from "@/actions/__mocks__/getCollections";
-import { getMockWorkgroup } from "@/actions/__mocks__/getWorkgroups";
+import { getMockCollection } from "@/actions/collection/__mocks__/getCollections";
+import { getMockWorkgroup } from "@/actions/workgroup/__mocks__/getWorkgroups";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { getMockQuery } from "@/actions/__mocks__/getQueries";
+import { getMockQuery } from "@/actions/query/__mocks__/getQueries";
 
 import { useQueryBuilderStore } from "./queryBuilderStore";
 import { useStateManagementStore } from "@/store/stateManagementStore";

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import parseQuery from "@/actions/parseQuery";
+import parseQuery from "@/actions/query/parseQuery";
 import { queryToText } from "@/utils/queryBuilder";
 import {
   SizeCache,

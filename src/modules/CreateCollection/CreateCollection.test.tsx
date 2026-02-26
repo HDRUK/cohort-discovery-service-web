@@ -10,12 +10,12 @@ import {
 import userEvent from "@testing-library/user-event";
 import CreateCollection from "./CreateCollection";
 import { Custodian, CollectionHost } from "@/types/api";
-import getCustodian from "@/actions/__mocks__/getCustodian";
+import getCustodian from "@/actions/custodian/__mocks__/getCustodian";
 import MockDaphneStore from "@/store/MockDaphneStore";
-import { getMockCollection } from "@/actions/__mocks__/getCollections";
-import getCollectionHost from "@/actions/__mocks__/getCollectionHost";
+import { getMockCollection } from "@/actions/collection/__mocks__/getCollections";
+import getCollectionHost from "@/actions/collectionHost/__mocks__/getCollectionHost";
 import { useCustodianDataStore } from "@/store/custodianDataStore";
-jest.mock("@/actions/getCustodian");
+jest.mock("@/actions/custodian/getCustodian");
 
 const createCollection = jest.fn();
 const mockCustodian = getCustodian();

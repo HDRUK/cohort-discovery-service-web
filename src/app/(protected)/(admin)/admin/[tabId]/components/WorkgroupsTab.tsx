@@ -2,7 +2,7 @@ import WorkgroupsAdmin from "./WorkgroupsAdmin";
 import { CollectionsSearchParams } from "@/types/api";
 import { buildCollectionParams } from "@/utils/params";
 import { Box, Skeleton } from "@mui/material";
-import getAdminCollections from "@/actions/getAdminCollections";
+import getAdminCollections from "@/actions/collection/getAdminCollections";
 import { DEFAULT_PER_PAGE } from "@/config/defaults";
 
 export const WorkgroupsSkeleton = () => (

@@ -6,7 +6,7 @@ import { TokenUser, CombinedUser } from "@/types/api";
 import { RoleName } from "@/types/roles";
 import ProtectedPage from "./components/ProtectedPage";
 import getMe from "@/actions/getMe";
-import getCustodians from "@/actions/getCustodians";
+import getCustodians from "@/actions/custodian/getCustodians";
 import getFeatureFlags from "@/actions/getFeatureFlags";
 import { isStandalone } from "@/utils/modes";
 import { ErrorMode } from "@/lib/apiClient";
