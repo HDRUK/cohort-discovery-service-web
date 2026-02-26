@@ -1,6 +1,6 @@
 import { ApiResponse, Workgroup } from "@/types/api";
 
-import { getMockCollections } from "../collection/__mocks__/getCollections";
+import { getMockCollections } from "../../collection/__mocks__/getCollections";
 
 export const getMockWorkgroup = (
   rest?: Partial<Workgroup>,

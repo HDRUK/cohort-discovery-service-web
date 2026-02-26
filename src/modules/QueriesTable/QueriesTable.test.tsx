@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom";
 import { render, screen, fireEvent } from "@testing-library/react";
 import QueriesTable from "./QueriesTable";
-import { getMockQuery } from "@/actions/__mocks__/getQueries";
+import { getMockQuery } from "@/actions/query/__mocks__/getQueries";
 import { paginateData } from "@/utils/mock";
 import MockDaphneStore from "@/store/MockDaphneStore";
 jest.mock("@/actions/query/getQueries");

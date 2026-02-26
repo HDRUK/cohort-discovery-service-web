@@ -40,9 +40,9 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { NotifyProvider } from "@/providers/NotifyProvider";
 import { getMockCollection } from "@/actions/collection/__mocks__/getCollections";
-import { getMockWorkgroup } from "@/actions/__mocks__/getWorkgroups";
+import { getMockWorkgroup } from "@/actions/workgroup/__mocks__/getWorkgroups";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { getMockQuery } from "@/actions/__mocks__/getQueries";
+import { getMockQuery } from "@/actions/query/__mocks__/getQueries";
 
 import { useQueryBuilderStore } from "./queryBuilderStore";
 import { useStateManagementStore } from "@/store/stateManagementStore";

@@ -1,6 +1,6 @@
 import { EXAMPLE_1, EXAMPLE_2 } from "@/config/queryExamples";
 import { Query, ApiResponse, WithIncomplete, Paginated } from "@/types/api";
-import { mockTasks } from "./getTasks";
+import { mockTasks } from "../../task/__mocks__/getTasks";
 import { paginateData } from "@/utils/mock";
 
 export const getMockQuery = (rest?: Partial<Query>): Query => ({
