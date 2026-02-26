@@ -1,7 +1,7 @@
 import { QueryContext } from "@/types/context";
 import { ApiResponse, Collection, Distribution, ModelState } from "@/types/api";
 import { v4 as uuidv4 } from "uuid";
-import getCustodian from "./getCustodian";
+import getCustodian from "../../custodian/__mocks__/getCustodian";
 
 const getMockDistribution = (rest?: Partial<Distribution>): Distribution => ({
   id: 1,

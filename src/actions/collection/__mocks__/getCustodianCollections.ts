@@ -1,7 +1,7 @@
 import { ApiResponse, CollectionWithHosts, Paginated } from "@/types/api";
 import { getMockCollections } from "./getCollections";
 import { paginateData } from "@/utils/mock";
-import getCollectionHost from "./getCollectionHost";
+import getCollectionHost from "../../collectionHost/__mocks__/getCollectionHost";
 
 const getCustodianCollections = async (
   _custodianPid: string,

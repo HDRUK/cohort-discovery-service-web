@@ -2,7 +2,7 @@ import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import CollectionsTable, { CollectionsTableProps } from "./CollectionsTable";
 import getCustodianCollections from "@/actions/collection/getCustodianCollections";
-import getCustodian from "@/actions/__mocks__/getCustodian";
+import getCustodian from "@/actions/custodian/getCustodian";
 import MockDaphneStore from "@/store/MockDaphneStore";
 import { CollectionWithHosts, Paginated } from "@/types/api";
 jest.mock("@/actions/collection/getCustodianCollections");

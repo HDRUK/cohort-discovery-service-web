@@ -1,5 +1,5 @@
 import { ApiResponse, Task, Result } from "@/types/api";
-import { getMockCollections } from "./getCollections";
+import { getMockCollections } from "../collection/__mocks__/getCollections";
 
 const [mockCollection1, mockCollection2] = getMockCollections(2);
 

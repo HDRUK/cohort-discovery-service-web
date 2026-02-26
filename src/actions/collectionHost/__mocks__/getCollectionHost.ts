@@ -1,7 +1,7 @@
 import { CollectionHost } from "@/types/api";
 import { QueryContext } from "@/types/context";
 import { v4 as uuidv4 } from "uuid";
-import getCustodian from "./getCustodian";
+import getCustodian from "../../custodian/__mocks__/getCustodian";
 
 export const getCollectionHost = (
   rest?: Partial<CollectionHost>,
