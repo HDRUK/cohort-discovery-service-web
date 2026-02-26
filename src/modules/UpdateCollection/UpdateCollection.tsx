@@ -418,7 +418,7 @@ const UpdateCollection = ({
             <Stack>
               <FormLabel underlined>Task API_BASE_URL</FormLabel>
               <CopyableVariable
-                value={process.env.NEXT_PUBLIC_API_BASE_URL as string}
+                value={process.env.NEXT_PUBLIC_TASK_URL as string}
                 sx={{ mb: 2 }}
               />
             </Stack>
