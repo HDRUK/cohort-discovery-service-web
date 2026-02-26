@@ -87,7 +87,7 @@ const ThreePaneSwimLaneLayout = ({
       <SwimLane size={middleSize} {...middleProps}>
         {middle}
       </SwimLane>
-      <SwimLane enableBlocker={false} size={rightSize} {...rightProps}>
+      <SwimLane size={rightSize} {...rightProps}>
         {right}
       </SwimLane>
     </SwimLaneContainer>
