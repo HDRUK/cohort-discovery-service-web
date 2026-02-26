@@ -22,7 +22,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { revalidateCollections } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
 import FormDropdown from "@/components/FormDropdown";
-import DistributionStatus from "../DistrubutionStatus";
+import DistributionStatus from "../DistributionStatus";
 import useCustodianStore from "@/hooks/useCustodianStore";
 import { useLogDependencyChanges } from "@/utils/deps";
 import FormLabel from "@/components/FormLabel";
