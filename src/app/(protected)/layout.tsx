@@ -44,9 +44,9 @@ export default async function ProtectedLayout({
 
   if (errorCode === 404) {
     if (isStandalone(applicationMode)) {
-      notFound();
+      redirect("/403");
     }
-    redirect("/user-not-found");
+    redirect("/403?reason=user-not-found");
   }
 
   const roles = me.roles.map((r) => r.name) ?? [];
@@ -55,8 +55,9 @@ export default async function ProtectedLayout({
   const hasAdminAccess = roles.includes(RoleName.ADMIN);
   const hasTeamAccess = me.custodians.length > 0;
 
-  if (!(hasGeneralAccess || hasAdminAccess || hasTeamAccess)) {
-    forbidden();
+  if (!((hasGeneralAccess || hasAdminAccess) /*|| hasTeamAccess*/)) {
+    redirect("/403?reason=missing-role");
+    //forbidden();
   }
 
   const { data: flags } = await getFeatureFlags();

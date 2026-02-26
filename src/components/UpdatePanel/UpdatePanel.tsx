@@ -2,8 +2,9 @@ import { Box, Typography } from "@mui/material";
 import LockOutlineIcon from "@mui/icons-material/LockOutline";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import theme from "@/config/theme";
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import ActionMenuSection from "../ActionMenuSection";
+import { useSwimLaneBlocker } from "../SwimLane/SwimLane";
 
 type UpdatePanelProps = {
   label: string;
@@ -22,6 +23,20 @@ export const UpdatePanel = ({
   children,
   rightExtras,
 }: UpdatePanelProps) => {
+  const { setBlocked } = useSwimLaneBlocker();
+
+  useEffect(() => {
+    if (expandedRight) {
+      // block page, and when backdrop clicked -> lock/collapse
+      setBlocked(true, onLockClick);
+    } else {
+      setBlocked(false);
+    }
+
+    // if this panel unmounts while expanded, clean up
+    return () => setBlocked(false);
+  }, [expandedRight, onLockClick, setBlocked]);
+
   return (
     <ActionMenuSection
       title={
