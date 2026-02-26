@@ -55,9 +55,9 @@ export default async function ProtectedLayout({
   const hasAdminAccess = roles.includes(RoleName.ADMIN);
   const hasTeamAccess = me.custodians.length > 0;
 
-  if (!((hasGeneralAccess || hasAdminAccess) /*|| hasTeamAccess*/)) {
+  redirect("/403?reason=missing-role");
+  if (!(hasGeneralAccess || hasAdminAccess || hasTeamAccess)) {
     redirect("/403?reason=missing-role");
-    //forbidden();
   }
 
   const { data: flags } = await getFeatureFlags();
