@@ -9,13 +9,14 @@ import useSearchParams from "@/hooks/useSearchParams";
 import { capitaliseFirstLetter } from "@/utils/string";
 import useAdminStore from "@/hooks/useAdminStore";
 import { useThreePane } from "@/providers/ThreePaneProvider";
+import { useUserDataStore } from "@/hooks/userDataStore";
 
 const WorkgroupsLeftPanel = () => {
   const { expandedLeft, toggleLeft } = useThreePane();
 
   const selectedWorkgroup = useAdminStore((s) => s.selectedWorkgroup);
   const setSelectedWorkgroup = useAdminStore((s) => s.setSelectedWorkgroup);
-  const workgroups = useAdminStore((s) => s.workgroups);
+  const workgroups = useUserDataStore((s) => s.workgroups);
 
   const { getSearchParam, setSearchParam } =
     useSearchParams("workgroup_filter");

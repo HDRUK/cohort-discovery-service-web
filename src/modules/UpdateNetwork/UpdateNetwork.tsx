@@ -83,10 +83,10 @@ const UpdateNetwork = () => {
     [handleSubmit, submitForm],
   );
 
-  const onDiscard = useCallback(
-    () => reset(defaultValues),
-    [reset, defaultValues],
-  );
+  const onDiscard = useCallback(() => {
+    reset(defaultValues);
+    onClose?.();
+  }, [reset, onClose, defaultValues]);
 
   useSaveChanges<UpdateNetworkFormValues>({
     control,

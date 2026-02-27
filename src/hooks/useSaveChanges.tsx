@@ -65,7 +65,7 @@ export function useSaveChanges<TFieldValues extends FieldValues>({
         return true;
       } else if (result === "tertiary") {
         await onDiscard?.();
-        return true;
+        return false;
       }
       return false;
     });

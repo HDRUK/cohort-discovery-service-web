@@ -38,6 +38,8 @@ import { useAdminDataStore } from "@/store/adminDataStore";
 import UpdatePanel from "@/components/UpdatePanel";
 import { useThreePane } from "@/providers/ThreePaneProvider";
 import { useSaveChanges } from "@/hooks/useSaveChanges";
+import { useUserDataStore } from "@/hooks/userDataStore";
+import { useIsAdminSection } from "@/contexts/AdminSectionContext";
 
 const UpdateCollectionGuidance = maskClientTest(
   () => import("./UpdateCollectionGuidance"),
@@ -100,6 +102,7 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
   const { expandedRight, toggleRight: onClose } = useThreePane();
 
   const currentCustodian = useCustodianStore((s) => s.current.custodian);
+  const isAdmin = useIsAdminSection();
 
   const currentCollectionHosts = useCustodianStore(
     (s) => s.current.collectionHosts,
@@ -109,9 +112,7 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
   const updateCollectionAdmin = useAdminStore((s) => s.updateCollection);
   const updateCollectionStatus = useAdminStore((s) => s.updateCollectionStatus);
   const collectionHosts = useAdminDataStore((s) => s.collectionHosts);
-  const workgroups = useAdminDataStore((s) => s.workgroups);
-
-  const isAdmin = useMemo(() => !currentCustodian, [currentCustodian]);
+  const workgroups = useUserDataStore((s) => s.workgroups);
 
   const notify = useNotify();
 
@@ -261,10 +262,10 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
     [handleSubmit, submitForm],
   );
 
-  const onDiscard = useCallback(
-    () => reset(defaultValues),
-    [reset, defaultValues],
-  );
+  const onDiscard = useCallback(() => {
+    reset(defaultValues);
+    onClose();
+  }, [reset, onClose, defaultValues]);
 
   useSaveChanges<UpdateCollectionFormValues>({
     control,

@@ -7,12 +7,11 @@ import useCustodianStore from "@/hooks/useCustodianStore";
 import useUserStore from "@/hooks/useUserStore";
 import { useAdminDataStore } from "@/store/adminDataStore";
 import { checkIsAdmin } from "@/utils/user";
-import { Collection, CollectionHost, User, Workgroup } from "@/types/api";
+import { Collection, CollectionHost, User } from "@/types/api";
 
 type Props = {
   collections: Collection[];
   collectionHosts: CollectionHost[];
-  workgroups: Workgroup[];
   users: User[];
   children: React.ReactNode;
 };
@@ -26,7 +25,6 @@ const AdminSectionContext = createContext<AdminSectionValue | null>(null);
 export const AdminSectionProvider = ({
   collections,
   collectionHosts,
-  workgroups,
   users,
   children,
 }: Props) => {
@@ -34,7 +32,6 @@ export const AdminSectionProvider = ({
 
   const setCurrentCustodian = useCustodianStore((s) => s.current.setCustodian);
   const setCollectionHosts = useAdminDataStore((s) => s.setCollectionHosts);
-  const setWorkgroups = useAdminDataStore((s) => s.setWorkgroups);
   const setCollections = useAdminDataStore((s) => s.setAllAprovedCollections);
   const setUsers = useAdminDataStore((s) => s.setUsers);
 
@@ -52,10 +49,6 @@ export const AdminSectionProvider = ({
   useEffect(() => {
     setCollections(collections);
   }, [collections, setCollections]);
-
-  useEffect(() => {
-    setWorkgroups(workgroups);
-  }, [workgroups, setWorkgroups]);
 
   useEffect(() => {
     setUsers(users);

@@ -70,10 +70,10 @@ const UpdateCollectionHost = ({
     [notify, onClose, updateCollectionHost, selectedCollectionHost],
   );
 
-  const onDiscard = useCallback(
-    () => reset(defaultValues),
-    [reset, defaultValues],
-  );
+  const onDiscard = useCallback(() => {
+    reset(defaultValues);
+    onClose?.();
+  }, [reset, onClose, defaultValues]);
 
   const onSave = useCallback(() => {
     handleSubmit((v) => submitHostForm(v, false))();

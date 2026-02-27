@@ -105,10 +105,10 @@ const UpdateWorkgroup = () => {
   const onSave = (closeAfter = false) =>
     handleSubmit((values) => submitForm(values, closeAfter))();
 
-  const onDiscard = useCallback(
-    () => reset(defaultValues),
-    [reset, defaultValues],
-  );
+  const onDiscard = useCallback(() => {
+    reset(defaultValues);
+    onClose();
+  }, [reset, onClose, defaultValues]);
 
   const handleUnlockClick = () => {
     onClose?.();
