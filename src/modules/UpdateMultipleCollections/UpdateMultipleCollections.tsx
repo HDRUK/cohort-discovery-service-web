@@ -201,6 +201,30 @@ const UpdateMultipleCollections = ({
     });
   }, [workgroupValues, setValue]);
 
+  /*
+
+  Note - struggling to get this working with onDiscard 27/02/2026
+  - this needs some maintenance/re-write on Multiple functionality
+  - difficult to keep track of default values (so can be reset onDiscard)
+  - too many changing states and useEffects 
+
+  const onSave = () => {
+    handleSubmit((values) => submitForm(values, false))();
+  };
+
+  const onDiscard = useCallback(() => {
+    reset(defaultValues);
+    onClose?.();
+  }, [reset, defaultValues, onClose]);
+
+  useSaveChanges<UpdateCollectionFormValues>({
+    control,
+    entityName: collections.map((c) => c.name).join(" , "),
+    onSave,
+    onDiscard,
+  });
+  */
+
   return (
     <FormProvider {...formMethods}>
       <UpdatePanel
