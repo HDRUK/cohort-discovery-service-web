@@ -188,11 +188,16 @@ const UpdateMultipleCollections = ({
     });
   }, [workgroupValues, setValue]);
 
-  const onSave = () => handleSubmit((values) => submitForm(values, true))();
-  const onDiscard = useCallback(
-    () => reset(defaultValues),
-    [reset, defaultValues],
-  );
+  const onSave = () => {
+    console.log("called onSave in multiple");
+    handleSubmit((values) => submitForm(values, true))();
+  };
+  const onDiscard = useCallback(() => {
+    console.log("called reset");
+    reset(defaultValues);
+  }, [reset, defaultValues]);
+
+  console.log({ workgroups });
 
   useSaveChanges<UpdateCollectionFormValues>({
     control,

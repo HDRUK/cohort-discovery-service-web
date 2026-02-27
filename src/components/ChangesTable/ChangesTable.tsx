@@ -53,7 +53,6 @@ function formatValue(v: unknown): string {
   if (v === null || v === undefined) return "—";
   if (Array.isArray(v)) {
     if (v.length === 0) return "—";
-    // common “select options” shape
     if (v.every((x) => typeof x === "object" && x !== null && "label" in x)) {
       const labels = v
         .map((x) => (x as { label?: unknown }).label)
@@ -64,14 +63,12 @@ function formatValue(v: unknown): string {
       return preview ? `${preview}${more}` : `${v.length} items`;
     }
 
-    // primitives
     if (v.every((x) => ["string", "number", "boolean"].includes(typeof x))) {
       const preview = v.slice(0, 5).map(String).join(", ");
       const more = v.length > 5 ? ` +${v.length - 5} more` : "";
       return `${preview}${more}`;
     }
 
-    // fallback
     return `${v.length} items`;
   }
   if (typeof v === "string") return v === "" ? "(empty)" : v;
