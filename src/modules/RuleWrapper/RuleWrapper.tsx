@@ -101,6 +101,7 @@ const RuleWrapper = ({
     select,
     deselect,
     isSelected,
+    setSelected,
     toggleSelected,
     getNodeName,
     setNodeName,
@@ -110,6 +111,7 @@ const RuleWrapper = ({
   } = useQueryBuilder((qb) => ({
     select: qb.select,
     deselect: qb.deselect,
+    setSelected: qb.setSelected,
     isSelected: !!qb.selected[id],
     toggleSelected: qb.toggleSelected,
     getNodeName: qb.getNodeName,
@@ -147,7 +149,12 @@ const RuleWrapper = ({
       e.preventDefault();
       e.stopPropagation();
       window.getSelection()?.removeAllRanges();
-      toggleSelected(id, !isShift);
+
+      if (isShift) {
+        toggleSelected(id, false);
+      } else {
+        setSelected(id, true, true);
+      }
 
       const isMeta = e.metaKey;
       if (isRuleGroup(node) && isMeta) {
