@@ -1,23 +1,17 @@
 "use client";
-
 import { Chip, Box, FormGroup, FormControlLabel } from "@mui/material";
-import {
-  CollectionStatus,
-  CollectionWithHosts,
-  FrequencyMode,
-  UrlString,
-} from "@/types/api";
+import { CollectionStatus, CollectionWithHosts } from "@/types/api";
 import {
   Controller,
   FieldValues,
   FormProvider,
   useForm,
-  useWatch,
 } from "react-hook-form";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { revalidateCollections } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
 import useCustodianStore from "@/hooks/useCustodianStore";
+import { useLogDependencyChanges } from "@/utils/deps";
 import SquareCheckbox from "@/components/SquareCheckbox";
 import removeCollectionFromWorkgroups from "@/actions/workgroup/removeCollectionFromWorkgroups";
 import addCollectionToWorkgroups from "@/actions/workgroup/addCollectionToWorkgroups";
@@ -27,9 +21,8 @@ import UpdateMultipleCollectionsGuidance from "./UpdateMultipleCollectionsGuidan
 import { UpdateCollectionFormValues } from "@/types/forms";
 import { useAdminDataStore } from "@/store/adminDataStore";
 import UpdatePanel from "@/components/UpdatePanel";
-import { useThreePane } from "@/providers/ThreePaneProvider";
-//import { useSaveChanges } from "@/hooks/useSaveChanges";
 import { useUserDataStore } from "@/hooks/userDataStore";
+import { useThreePane } from "@/providers/ThreePaneProvider";
 
 export type UpdateMultipleCollectionProps = {
   collections: CollectionWithHosts[];
@@ -39,129 +32,108 @@ const UpdateMultipleCollections = ({
   collections,
 }: UpdateMultipleCollectionProps) => {
   const { expandedRight, toggleRight: onClose } = useThreePane();
-
   const currentCustodian = useCustodianStore((s) => s.current.custodian);
-  const workgroups = useUserDataStore((s) => s.workgroups);
 
+  const workgroups = useUserDataStore((s) => s.workgroups);
   const updateCollectionStatus = useAdminDataStore(
     (s) => s.updateCollectionStatus,
   );
+
   const notify = useNotify();
 
-  const collectionsHaveMatchingWorkgroups = useMemo(() => {
-    const first = (collections[0]?.workgroups?.map((wg) => wg.id) ?? [])
-      .slice()
-      .sort((a, b) => a - b);
-    return collections.every((c) => {
-      const ids = (c.workgroups?.map((wg) => wg.id) ?? [])
-        .slice()
-        .sort((a, b) => a - b);
-      return JSON.stringify(ids) === JSON.stringify(first);
-    });
-  }, [collections]);
-
-  const defaultWorkgroupNames = useMemo<string[]>(() => {
-    if (!collectionsHaveMatchingWorkgroups) return [];
-    return (collections[0]?.workgroups?.map((wg) => wg.name) ?? [])
-      .slice()
-      .sort();
-  }, [collections, collectionsHaveMatchingWorkgroups]);
-
-  const defaultValues = useMemo<UpdateCollectionFormValues>(() => {
-    return {
-      collection: {
-        name: "",
-        description: "",
-        url: "" as UrlString,
-        host_id: 0,
-        model_state: undefined,
-      },
-      config: {
-        frequency_mode: Number(FrequencyMode.WEEKLY),
-        run_time_frequency: 0,
-        run_time_hour: 0,
-        run_time_minute: 0,
-      },
-      workgroups: defaultWorkgroupNames,
-    };
-  }, [defaultWorkgroupNames]);
-
-  const formMethods = useForm<UpdateCollectionFormValues>({
-    defaultValues,
-    shouldUnregister: false,
-  });
+  const formMethods = useForm<UpdateCollectionFormValues>();
 
   const {
     control,
     handleSubmit,
-    //reset,
     formState: { isDirty },
   } = formMethods;
 
-  const selectedWorkgroupNames = useWatch({ name: "workgroups", control });
+  // Check that all collections have the same workgroups
+  const firstWorkgroups = (
+    collections[0].workgroups?.map((wg) => wg.id) || []
+  ).sort();
+
+  const collectionsHaveMatchingWorkgroups = collections.every((c) => {
+    const thisWorkgroups = (c.workgroups?.map((wg) => wg.id) || []).sort();
+    if (JSON.stringify(thisWorkgroups) != JSON.stringify(firstWorkgroups)) {
+      return false;
+    }
+    return true;
+  });
+
+  const [workgroupValues, setWorkgroupValues] = useState<Map<string, boolean>>(
+    () => {
+      const map = new Map<string, boolean>();
+
+      if (collectionsHaveMatchingWorkgroups) {
+        workgroups.forEach((wg) => {
+          map.set(
+            wg.name,
+            (collections[0].workgroups?.filter((cw) => cw.id === wg.id) || [])
+              .length > 0,
+          );
+        });
+      }
+      return map;
+    },
+  );
 
   const submitForm = useCallback(
     async (data: FieldValues, closeAfter = false) => {
-      const values = data as UpdateCollectionFormValues;
-
       if (isDirty) {
-        const selectedNames = new Set(values.workgroups ?? []);
-
-        const nameToId = new Map(
-          workgroups.map((wg) => [wg.name, wg.id] as const),
-        );
-
+        // for each collection, compare to what's selected, and run the add/removes required
         for (const c of collections) {
-          const currentNames = new Set((c.workgroups ?? []).map((w) => w.name));
-
-          const toAddNames = Array.from(selectedNames).filter(
-            (name) => !currentNames.has(name),
+          const cwNames = new Set((c.workgroups ?? []).map((w) => w.name));
+          const newWorkgroups = workgroups.filter(
+            (wg) => workgroupValues.get(wg.name) && !cwNames.has(wg.name),
           );
-          const toAddIds = toAddNames
-            .map((name) => nameToId.get(name))
-            .filter((id): id is number => typeof id === "number");
 
-          if (toAddIds.length > 0) {
+          if (newWorkgroups.length > 0) {
             await addCollectionToWorkgroups({
               id: c.id,
-              workgroup_ids: toAddIds,
+              workgroup_ids: newWorkgroups.map((wg) => wg.id),
             });
             notify.success(
-              `Add collection ${c.id} to workgroup${toAddNames.length > 1 ? "s" : ""} ${toAddNames.join(", ")}`,
+              `Add collection ${c.id} to workgroup${
+                newWorkgroups.length > 1 ? "s" : ""
+              } ${newWorkgroups.map((wg) => wg.name).join(", ")}`,
             );
           }
 
-          const toRemoveNames = Array.from(currentNames).filter(
-            (name) => !selectedNames.has(name),
+          const workgroupsToRemove = workgroups.filter(
+            (wg) => !workgroupValues.get(wg.name) && cwNames.has(wg.name),
           );
-          const toRemoveIds = toRemoveNames
-            .map((name) => nameToId.get(name))
-            .filter((id): id is number => typeof id === "number");
 
-          if (toRemoveIds.length > 0) {
+          if (workgroupsToRemove.length > 0) {
             await removeCollectionFromWorkgroups({
               id: c.id,
-              workgroup_ids: toRemoveIds,
+              workgroup_ids: workgroupsToRemove.map((wg) => wg.id),
             });
             notify.success(
-              `Removed collection ${c.id} from workgroup${toRemoveNames.length > 1 ? "s" : ""} ${toRemoveNames.join(", ")}`,
+              `Removed collection ${c.id} from workgroup${
+                workgroupsToRemove.length > 1 ? "s" : ""
+              } ${workgroupsToRemove.map((wg) => wg.name).join(", ")}`,
             );
           }
         }
 
-        const nextStateId = values.collection?.model_state?.state?.id;
         if (
-          nextStateId &&
-          collections[0]?.model_state?.state_id !== nextStateId
+          data.collection.model_state?.state.id &&
+          collections[0].model_state?.state_id !==
+            data.collection.model_state?.state.id
         ) {
           await updateCollectionStatus(
             collections.map((c) => c.id),
-            nextStateId,
+            data.collection.model_state.state.id,
           );
-
           notify.success(
-            `Transitioned collections (${collections.map((c) => c.name).join(", ")}) to status ${
-              CollectionStatus[nextStateId as CollectionStatus]
+            `Transitioned collections (${collections
+              .map((c) => c.name)
+              .join(", ")}) to status ${
+              CollectionStatus[
+                data.collection.model_state.state.id as CollectionStatus
+              ]
             }`,
           );
         }
@@ -169,7 +141,9 @@ const UpdateMultipleCollections = ({
         revalidateCollections(currentCustodian?.pid ?? undefined);
       }
 
-      if (closeAfter) onClose?.();
+      if (closeAfter) {
+        onClose?.();
+      }
     },
     [
       collections,
@@ -177,42 +151,55 @@ const UpdateMultipleCollections = ({
       isDirty,
       notify,
       onClose,
-      updateCollectionStatus,
       workgroups,
+      workgroupValues,
+      updateCollectionStatus,
     ],
   );
 
-  const handleLockClick = useCallback(() => {
-    return handleSubmit((values) => submitForm(values, true))();
-  }, [handleSubmit, submitForm]);
+  const handleEnter = useCallback(
+    () => handleSubmit((values) => submitForm(values, false))(),
+    [handleSubmit, submitForm],
+  );
+
+  const handleLockClick = useCallback(
+    () => handleSubmit((values) => submitForm(values, true))(),
+    [handleSubmit, submitForm],
+  );
 
   const handleUnlockClick = useCallback(() => {
     onClose?.();
   }, [onClose]);
 
-  /*
+  useLogDependencyChanges("UpdateMultipleCollections", {
+    collections,
+    ...formMethods,
+    currentCustodian,
+    handleEnter,
+    handleLockClick,
+    handleUnlockClick,
+    submitForm,
+  });
 
-  Note - struggling to get this working with onDiscard 27/02/2026
-  - this needs some maintenance/re-write 
-  - difficult to keep track of default values (so can be reset onDiscard)
-  - too many changing states and too little time to solved this 
-
-  const onSave = () => {
-    handleSubmit((values) => submitForm(values, false))();
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setWorkgroupValues((prev) => {
+      const updated = new Map(prev);
+      updated.set(event.target.name, event.target.checked);
+      return updated;
+    });
   };
 
-  const onDiscard = useCallback(() => {
-    reset(defaultValues);
-    onClose?.();
-  }, [reset, defaultValues, onClose]);
+  const { setValue } = formMethods;
 
-  useSaveChanges<UpdateCollectionFormValues>({
-    control,
-    entityName: collections.map((c) => c.name).join(" , "),
-    onSave,
-    onDiscard,
-  });
-  */
+  useEffect(() => {
+    const selectedWorkgroups = Array.from(workgroupValues.entries())
+      .filter(([_, checked]) => checked)
+      .map(([name]) => name);
+    setValue("workgroups", selectedWorkgroups, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  }, [workgroupValues, setValue]);
 
   return (
     <FormProvider {...formMethods}>
@@ -223,12 +210,12 @@ const UpdateMultipleCollections = ({
         onUnlockClick={handleUnlockClick}
       >
         <FormLabel underlined>Collection Status</FormLabel>
-
         <ManageMultipleCollectionsStatus
           collections={collections}
           expandedRight={expandedRight}
           key={`manage-multiple-colls-status-${collections
             .map((c) => c.id)
+            .sort()
             .join("-")}`}
         />
         <FormLabel underlined>Workgroup access</FormLabel>
@@ -240,58 +227,48 @@ const UpdateMultipleCollections = ({
             alignItems: "center",
           }}
         >
-          {collectionsHaveMatchingWorkgroups ? (
-            selectedWorkgroupNames.map((name) => (
-              <Chip color="secondary" label={name} key={`wg-chip-${name}`} />
-            ))
-          ) : (
-            <Box>
-              <Chip label={"MIXED"} key={"wg-chip-mixed"} />
-            </Box>
+          {collectionsHaveMatchingWorkgroups &&
+            Array.from(workgroupValues.entries()).map(
+              ([name, checked]) =>
+                checked && (
+                  <Chip
+                    color="secondary"
+                    label={name}
+                    key={`wg-chip-${name}`}
+                  />
+                ),
+            )}
+          {!collectionsHaveMatchingWorkgroups && !!collections && (
+            <Box>{<Chip label={"MIXED"} key={"wg-chip-mixed"} />}</Box>
           )}
         </Box>
         {expandedRight && (
           <>
             <Controller
               name="workgroups"
+              disabled={!expandedRight}
               control={control}
-              render={({ field }) => {
-                const value = field.value ?? [];
-
-                const setChecked = (name: string, checked: boolean) => {
-                  const next = checked
-                    ? Array.from(new Set([...value, name])).sort()
-                    : value.filter((x: string) => x !== name);
-                  field.onChange(next);
-                };
-
-                return (
-                  <FormGroup>
-                    <Box display="flex" flexDirection="column">
-                      {workgroups?.map((wg) => {
-                        const checked = value.includes(wg.name);
-                        return (
-                          <FormControlLabel
-                            key={`wg-checkbox-label-${wg.id}`}
-                            control={
-                              <SquareCheckbox
-                                checked={checked}
-                                name={wg.name}
-                                onChange={(e) =>
-                                  setChecked(wg.name, e.target.checked)
-                                }
-                              />
-                            }
-                            label={wg.name}
+              render={() => (
+                <FormGroup>
+                  <Box display="flex" flexDirection="column">
+                    {workgroups?.map((w) => (
+                      <FormControlLabel
+                        control={
+                          <SquareCheckbox
+                            checked={Boolean(workgroupValues.get(w.name))}
+                            key={`wg-checkbox-${w.name}`}
+                            name={w.name}
+                            onChange={handleChange}
                           />
-                        );
-                      })}
-                    </Box>
-                  </FormGroup>
-                );
-              }}
+                        }
+                        label={w.name}
+                        key={`wg-checkbox-label-${w.name}`}
+                      />
+                    ))}
+                  </Box>
+                </FormGroup>
+              )}
             />
-
             <UpdateMultipleCollectionsGuidance />
           </>
         )}
