@@ -1,12 +1,12 @@
 import { create } from "zustand";
-import createCollectionHost from "@/actions/createCollectionHost";
-import updateCollectionHost from "@/actions/updateCollectionHost";
-import deleteCollectionHost from "@/actions/deleteCollectionHost";
-import createCustodianCollection from "@/actions/createCustodianCollection";
-import createCollectionConfig from "@/actions/createCollectionConfig";
-import updateCollection from "@/actions/updateCollection";
-import updateCollectionConfig from "@/actions/updateCollectionConfig";
-import deleteCollection from "@/actions/deleteCollection";
+import createCollectionHost from "@/actions/collectionHost/createCollectionHost";
+import updateCollectionHost from "@/actions/collectionHost/updateCollectionHost";
+import deleteCollectionHost from "@/actions/collectionHost/deleteCollectionHost";
+import createCustodianCollection from "@/actions/collection/createCustodianCollection";
+import createCollectionConfig from "@/actions/collection/createCollectionConfig";
+import updateCollection from "@/actions/collection/updateCollection";
+import updateCollectionConfig from "@/actions/collection/updateCollectionConfig";
+import deleteCollection from "@/actions/collection/deleteCollection";
 import { revalidateCollections } from "@/actions/revalidate";
 import {
   Collection,
@@ -20,7 +20,7 @@ import {
   CollectionStatus,
 } from "@/types/api";
 import { emptyPaginated } from "@/utils/pagination";
-import transitionCollections from "@/actions/transitionCollections";
+import transitionCollections from "@/actions/collection/transitionCollections";
 
 export interface CustodianDataStoreState {
   current: {

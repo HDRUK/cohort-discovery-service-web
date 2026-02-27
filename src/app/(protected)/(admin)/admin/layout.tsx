@@ -1,7 +1,7 @@
-import getCollectionHosts from "@/actions/getCollectionHosts";
+import getCollectionHosts from "@/actions/collectionHost/getCollectionHosts";
 import AdminPage from "./components/AdminPage";
-import getAdminWorkgroups from "@/actions/getAdminWorkgroups";
-import getCollections from "@/actions/getCollections";
+import getAdminWorkgroups from "@/actions/workgroup/getAdminWorkgroups";
+import getCollections from "@/actions/collection/getCollections";
 import getUsersList from "@/actions/admin/getUsersList";
 
 const ProtectedAdminPageLayout = async ({

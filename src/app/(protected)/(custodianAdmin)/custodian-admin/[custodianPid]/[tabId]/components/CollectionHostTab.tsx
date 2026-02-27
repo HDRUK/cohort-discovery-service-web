@@ -1,6 +1,6 @@
 import { Box, Skeleton } from "@mui/material";
 import CollectionHostAdmin from "./CollectionHostAdmin";
-import getCustodianCollectionHosts from "@/actions/getCustodianCollectionHosts";
+import getCustodianCollectionHosts from "@/actions/collectionHost/getCustodianCollectionHosts";
 
 export const CollectionHostsSkeleton = () => (
   <Box sx={{ height: "100%", p: 2 }}>

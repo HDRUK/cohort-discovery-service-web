@@ -6,6 +6,7 @@ import {
   Stack,
   FormGroup,
   FormControlLabel,
+  Typography,
 } from "@mui/material";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import {
@@ -22,14 +23,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { revalidateCollections } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
 import FormDropdown from "@/components/FormDropdown";
-import DistributionStatus from "../DistrubutionStatus";
+import DistributionStatus from "../DistributionStatus";
 import useCustodianStore from "@/hooks/useCustodianStore";
 import { useLogDependencyChanges } from "@/utils/deps";
 import FormLabel from "@/components/FormLabel";
 import { maskClientTest } from "@/lib/maskClientTest";
 import useAdminStore from "@/hooks/useAdminStore";
-import removeCollectionFromWorkgroups from "@/actions/removeCollectionFromWorkgroups";
-import addCollectionToWorkgroups from "@/actions/addCollectionToWorkgroups";
+import removeCollectionFromWorkgroups from "@/actions/workgroup/removeCollectionFromWorkgroups";
+import addCollectionToWorkgroups from "@/actions/workgroup/addCollectionToWorkgroups";
 import SquareCheckbox from "@/components/SquareCheckbox";
 import ManageCollectionStatus from "@/modules/ManageCollectionStatus";
 import CopyableVariable from "@/components/CopyableVariable";
@@ -405,36 +406,48 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
             />
           */}
 
-          <FormTextField
-            labelUnderlined
-            copyable
-            disabled={!expandedRight}
-            readOnly={expandedRight}
-            value={collection.pid}
-            label="Collection ID"
-          />
-
-          <Controller
-            disabled={!expandedRight}
-            name="collection.url"
-            control={control}
-            rules={{ required: "URL is required" }}
-            render={({ field, fieldState: { error } }) => (
-              <FormTextField
-                copyable
-                {...field}
-                label="Link to Associated Dataset"
-                labelUnderlined
-                error={error}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    onSave();
-                  }
-                }}
+          <Box
+            sx={{
+              borderColor: "text.secondary",
+              borderWidth: 1,
+              borderStyle: "solid",
+              p: 1,
+            }}
+          >
+            <Typography
+              sx={{ color: "secondary.main", mb: 1, fontWeight: "bold" }}
+            >
+              You will need to copy the following credentials into your Bunny/
+              BC|Insight setup
+            </Typography>
+            <Stack>
+              <FormLabel underlined>Collection ID</FormLabel>
+              <CopyableVariable value={collection.pid} sx={{ mb: 2 }} />
+            </Stack>
+            <Stack>
+              <FormLabel underlined>Task API_BASE_URL</FormLabel>
+              <CopyableVariable
+                value={process.env.NEXT_PUBLIC_TASK_URL as string}
+                sx={{ mb: 2 }}
               />
+            </Stack>
+            {!isAdmin && (
+              <Stack>
+                <FormLabel underlined>Host Credentials</FormLabel>
+                Client ID
+                <CopyableVariable
+                  value={collection.host?.[0]?.client_id}
+                  sx={{ mb: 2 }}
+                />
+                Client Secret
+                <CopyableVariable
+                  hidden
+                  value={collection.host?.[0]?.client_secret}
+                  sx={{ mb: 2 }}
+                />
+              </Stack>
             )}
-          />
+          </Box>
 
           <Stack>
             <FormLabel underlined>Collection Connection</FormLabel>
@@ -471,41 +484,29 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
             />
           </Stack>
 
-          {!isAdmin && (
-            <Stack>
-              <FormLabel underlined>Host Credentials</FormLabel>
-              Client ID
-              <CopyableVariable value={collection.host?.[0]?.client_id} />
-              Client Secret
-              <CopyableVariable
-                hidden
-                value={collection.host?.[0]?.client_secret}
+          <Controller
+            disabled={!expandedRight}
+            name="collection.url"
+            control={control}
+            rules={{ required: "URL is required" }}
+            render={({ field, fieldState: { error } }) => (
+              <FormTextField
+                copyable
+                {...field}
+                label="Link to Associated Dataset"
+                labelUnderlined
+                error={error}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    onSave();
+                  }
+                }}
               />
-            </Stack>
-          )}
-        </ActionMenuSection>
-        <ActionMenuSection
-          gap={2}
-          title={"Collection Distributions"}
-          fixedExpanded
-          defaultExpanded
-          accordionSummarySx={{
-            mt: 2,
-          }}
-        >
-          <DistributionStatus
-            disabled={!expandedRight}
-            collection={collection}
-          />
-          <CollectionConfig<UpdateCollectionFormValues>
-            disabled={!expandedRight}
-            keepExpanded
-            frequencyFieldName={"config.frequency_mode"}
-            runTimeFrequencyFieldName={"config.run_time_frequency"}
-            runTimeHourFieldName={"config.run_time_hour"}
-            runTimeMinuteFieldName={"config.run_time_minute"}
+            )}
           />
         </ActionMenuSection>
+
         <ActionMenuSection
           gap={2}
           title={"Collection Info"}
@@ -551,6 +552,29 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
           />
           {/* supposed to also have supoprt contact / adminstractive contact */}
           <UpdateCollectionGuidance />
+        </ActionMenuSection>
+
+        <ActionMenuSection
+          gap={2}
+          title={"Collection Configuration"}
+          fixedExpanded
+          defaultExpanded
+          accordionSummarySx={{
+            mt: 2,
+          }}
+        >
+          <DistributionStatus
+            disabled={!expandedRight}
+            collection={collection}
+          />
+          <CollectionConfig<UpdateCollectionFormValues>
+            disabled={!expandedRight}
+            keepExpanded
+            frequencyFieldName={"config.frequency_mode"}
+            runTimeFrequencyFieldName={"config.run_time_frequency"}
+            runTimeHourFieldName={"config.run_time_hour"}
+            runTimeMinuteFieldName={"config.run_time_minute"}
+          />
         </ActionMenuSection>
       </FormProvider>
     </UpdatePanel>
