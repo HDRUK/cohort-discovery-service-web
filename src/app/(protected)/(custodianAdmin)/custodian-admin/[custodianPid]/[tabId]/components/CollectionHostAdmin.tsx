@@ -58,16 +58,16 @@ const CollectionHostAdmin = ({
   if (!custodian) return <Skeleton height={"100%"} />;
 
   return (
-    <ThreePaneProvider>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          height: "100%",
-        }}
-      >
-        <Title title="Host" subTitle="Create" />
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
+        height: "100%",
+      }}
+    >
+      <Title title="Host" subTitle="Create" />
+      <ThreePaneProvider>
         <ThreePaneSwimLaneLayout
           rightDisabled={noCollectionHosts}
           left={<CollectionHostLeftPanel custodianId={custodian.id} />}
@@ -86,8 +86,8 @@ const CollectionHostAdmin = ({
             />
           }
         />
-      </Box>
-    </ThreePaneProvider>
+      </ThreePaneProvider>
+    </Box>
   );
 };
 

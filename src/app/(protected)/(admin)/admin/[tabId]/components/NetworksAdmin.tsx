@@ -10,6 +10,7 @@ import { useAdminDataStore } from "@/store/adminDataStore";
 import NetworksLeftPanel from "./NetworksLeftPanel";
 import NetworksMiddlePanel from "./NetworksMiddlePanel";
 import NetworksRightPanel from "./NetworksRightPanel";
+import { ThreePaneProvider } from "@/providers/ThreePaneProvider";
 
 const NetworksAdmin = ({ networks }: { networks: Network[] }) => {
   const setNetworks = useAdminDataStore((s) => s.setNetworks);
@@ -40,24 +41,25 @@ const NetworksAdmin = ({ networks }: { networks: Network[] }) => {
       sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}
     >
       <Title title="Networks" subTitle="Management" />
-      <ThreePaneSwimLaneLayout
-        expandedSide={expandedSide}
-        rightDisabled={false}
-        left={
-          <NetworksLeftPanel
-            expandedLeft={expandedLeft}
-            onCreate={toggleExpandLeft}
-            onCancelCreate={toggleExpandLeft}
-          />
-        }
-        middle={<NetworksMiddlePanel />}
-        right={
-          <NetworksRightPanel
-            expandedRight={expandedRight}
-            onClose={() => toggleExpandRight()}
-          />
-        }
-      />
+      <ThreePaneProvider>
+        <ThreePaneSwimLaneLayout
+          rightDisabled={false}
+          left={
+            <NetworksLeftPanel
+              expandedLeft={expandedLeft}
+              onCreate={toggleExpandLeft}
+              onCancelCreate={toggleExpandLeft}
+            />
+          }
+          middle={<NetworksMiddlePanel />}
+          right={
+            <NetworksRightPanel
+              expandedRight={expandedRight}
+              onClose={() => toggleExpandRight()}
+            />
+          }
+        />
+      </ThreePaneProvider>
     </Box>
   );
 };

@@ -3,7 +3,7 @@ import { Stack } from "@mui/material";
 import CopyableVariable from "@/components/CopyableVariable";
 import { CollectionHost } from "@/types/api";
 import { Controller, FormProvider, useForm } from "react-hook-form";
-import { useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useNotify } from "@/providers/NotifyProvider";
 import FormTextField from "@/components/FormTextField";
 import FormLabel from "@/components/FormLabel";
@@ -26,16 +26,22 @@ const UpdateCollectionHost = ({
   const notify = useNotify();
   const updateCollectionHost = useCustodianStore((s) => s.updateCollectionHost);
 
-  const formMethods = useForm<CollectionHostFormValues>({
-    defaultValues: {
+  const defaultValues = useMemo(
+    () => ({
       hostName: selectedCollectionHost?.name,
-    },
+    }),
+    [selectedCollectionHost],
+  );
+
+  const formMethods = useForm<CollectionHostFormValues>({
+    defaultValues,
   });
 
   const {
     handleSubmit,
     control,
     setValue,
+    reset,
     formState: { errors, isDirty },
   } = formMethods;
 
@@ -48,29 +54,36 @@ const UpdateCollectionHost = ({
     }
   }, [selectedCollectionHost, setValue]);
 
-  const submitHostForm = async (
-    { hostName }: CollectionHostFormValues,
-    closeAfter = false,
-  ) => {
-    if (!selectedCollectionHost?.id) return;
+  const submitHostForm = useCallback(
+    async ({ hostName }: CollectionHostFormValues, closeAfter = false) => {
+      if (!selectedCollectionHost?.id) return;
 
-    if (hostName !== selectedCollectionHost.name) {
-      await updateCollectionHost(selectedCollectionHost.id, { name: hostName });
-      notify.success(`Updated host name ${hostName}`);
-    }
+      if (hostName !== selectedCollectionHost.name) {
+        await updateCollectionHost(selectedCollectionHost.id, {
+          name: hostName,
+        });
+        notify.success(`Updated host name ${hostName}`);
+      }
 
-    if (closeAfter) onClose?.();
-  };
+      if (closeAfter) onClose?.();
+    },
+    [notify, onClose, updateCollectionHost, selectedCollectionHost],
+  );
 
-  const handleEnter = () =>
-    handleSubmit((values) => submitHostForm(values, false))();
+  const onDiscard = useCallback(
+    () => reset(defaultValues),
+    [reset, defaultValues],
+  );
+
+  const onSave = useCallback(() => {
+    handleSubmit((v) => submitHostForm(v, false))();
+  }, [handleSubmit, submitHostForm]);
 
   useSaveChanges({
     enabled: isDirty,
     entityName: selectedCollectionHost.name,
-    onSave: () => {
-      handleSubmit((v) => submitHostForm(v, false))();
-    },
+    onSave,
+    onDiscard,
   });
 
   return (
@@ -99,7 +112,7 @@ const UpdateCollectionHost = ({
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
-                  handleEnter();
+                  onSave();
                 }
               }}
             />

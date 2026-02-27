@@ -39,6 +39,7 @@ import UpdatePanel from "@/components/UpdatePanel";
 import { useThreePane } from "@/providers/ThreePaneProvider";
 import { useCloseGuard } from "@/providers/CloseGuardProvider";
 import { useConfirm } from "@/hooks/useConfirm";
+import { useSaveChanges } from "@/hooks/useSaveChanges";
 
 const UpdateCollectionGuidance = maskClientTest(
   () => import("./UpdateCollectionGuidance"),
@@ -147,23 +148,6 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
     reset,
     formState: { isDirty, errors },
   } = formMethods;
-
-  const { registerCloseGuard } = useCloseGuard();
-  const confirm = useConfirm();
-
-  useEffect(() => {
-    registerCloseGuard(async () => {
-      if (!isDirty) return true;
-
-      return await confirm({
-        props: { action: `discard changes to ${collection.name}` },
-        confirmText: "Discard",
-        confirmColor: "warning",
-      });
-    });
-
-    return () => registerCloseGuard(null);
-  }, [isDirty, collection.name, confirm, registerCloseGuard]);
 
   const collectionCustodianPid = collection.custodian.pid;
 
@@ -278,10 +262,22 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
     ],
   );
 
-  const handleEnter = useCallback(
+  const onSave = useCallback(
     () => handleSubmit((values) => submitForm(values, false))(),
     [handleSubmit, submitForm],
   );
+
+  const onDiscard = useCallback(
+    () => reset(defaultValues),
+    [reset, defaultValues],
+  );
+
+  useSaveChanges({
+    enabled: isDirty,
+    entityName: collection.name,
+    onSave,
+    onDiscard,
+  });
 
   const { setValue } = formMethods;
 
@@ -316,13 +312,13 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
     >
       <FormProvider {...formMethods}>
         <FormLabel underlined>Collection Status</FormLabel>
-        {/*<ManageCollectionStatus
+        <ManageCollectionStatus
           collection={collection}
           expandedRight={expandedRight}
           key={collection.id}
           control={control}
           setValue={setValue}
-        />*/}
+        />
         {isAdmin && (
           <>
             <FormLabel underlined>Workgroup access</FormLabel>
@@ -433,7 +429,7 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
-                    handleEnter();
+                    onSave();
                   }
                 }}
               />

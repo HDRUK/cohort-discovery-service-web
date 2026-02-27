@@ -6,16 +6,20 @@ type Options = {
   enabled: boolean;
   entityName: string;
   onSave: () => Promise<void> | void;
+  onDiscard?: () => Promise<void> | void;
   saveText?: string;
   cancelText?: string;
+  discardText?: string;
 };
 
 export function useSaveChanges({
   enabled,
   entityName,
   onSave,
+  onDiscard,
   saveText = "Save",
   cancelText = "Cancel",
+  discardText = "Discard",
 }: Options) {
   const { registerCloseGuard } = useCloseGuard();
   const confirm = useConfirm();
@@ -32,20 +36,23 @@ export function useSaveChanges({
     }
 
     registerCloseGuard(async () => {
-      const shouldSave = await confirm({
+      const result = await confirm({
         title: "Unsaved changes",
         description: message,
         confirmText: saveText,
+        tertiaryText: discardText,
         cancelText,
         confirmColor: "primary",
       });
 
-      if (!shouldSave) {
-        return false;
+      if (result === "confirm") {
+        await onSave();
+        return true;
+      } else if (result === "tertiary") {
+        await onDiscard?.();
+        return true;
       }
-
-      await onSave();
-      return true;
+      return false;
     });
 
     return () => registerCloseGuard(null);
@@ -53,8 +60,10 @@ export function useSaveChanges({
     enabled,
     message,
     saveText,
+    discardText,
     cancelText,
     onSave,
+    onDiscard,
     confirm,
     registerCloseGuard,
   ]);

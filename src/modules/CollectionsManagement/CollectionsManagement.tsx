@@ -40,28 +40,28 @@ const CollectionsManagement = ({ isAdmin, collections }: Props) => {
   if (!isAdmin && !custodian) return <Skeleton height={"100%"} />;
 
   return (
-    <ThreePaneProvider>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          height: "100%",
-        }}
-      >
-        <Title title="Collections" subTitle="Management" />
-        <ControlledSearchBox<CollectionsSearchParams>
-          paramName="search_term"
-          placeholder="Search by collection name..."
-        />
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
+        height: "100%",
+      }}
+    >
+      <Title title="Collections" subTitle="Management" />
+      <ControlledSearchBox<CollectionsSearchParams>
+        paramName="search_term"
+        placeholder="Search by collection name..."
+      />
+      <ThreePaneProvider>
         <ThreePaneSwimLaneLayout
           rightDisabled={false}
           left={<CollectionsLeftPanel />}
           middle={<CollectionsTable />}
           right={<CollectionsRightPanel />}
         />
-      </Box>
-    </ThreePaneProvider>
+      </ThreePaneProvider>
+    </Box>
   );
 };
 

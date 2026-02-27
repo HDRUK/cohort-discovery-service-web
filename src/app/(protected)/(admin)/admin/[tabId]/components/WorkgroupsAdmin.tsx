@@ -15,6 +15,7 @@ import WorkgroupsLeftPanel from "./WorkgroupsLeftPanel";
 import WorkgroupsMiddlePanel from "./WorkgroupsMiddlePanel";
 import WorkgroupsRightPanel from "./WorkgroupsRightPanel";
 import { useAdminDataStore } from "@/store/adminDataStore";
+import { ThreePaneProvider } from "@/providers/ThreePaneProvider";
 
 const WorkgroupsAdmin = ({
   collections,
@@ -53,24 +54,26 @@ const WorkgroupsAdmin = ({
         paramName="search_term"
         placeholder="Search by collection name or username..."
       />
-      <ThreePaneSwimLaneLayout
-        expandedSide={expandedSide}
-        rightDisabled={false}
-        left={
-          <WorkgroupsLeftPanel
-            expandedLeft={expandedLeft}
-            onCreate={toggleExpandLeft}
-            onCancelCreate={toggleExpandLeft}
-          />
-        }
-        middle={<WorkgroupsMiddlePanel />}
-        right={
-          <WorkgroupsRightPanel
-            expandedRight={expandedRight}
-            onClose={() => toggleExpandRight()}
-          />
-        }
-      />
+      <ThreePaneProvider>
+        <ThreePaneSwimLaneLayout
+          expandedSide={expandedSide}
+          rightDisabled={false}
+          left={
+            <WorkgroupsLeftPanel
+              expandedLeft={expandedLeft}
+              onCreate={toggleExpandLeft}
+              onCancelCreate={toggleExpandLeft}
+            />
+          }
+          middle={<WorkgroupsMiddlePanel />}
+          right={
+            <WorkgroupsRightPanel
+              expandedRight={expandedRight}
+              onClose={() => toggleExpandRight()}
+            />
+          }
+        />
+      </ThreePaneProvider>
     </Box>
   );
 };
