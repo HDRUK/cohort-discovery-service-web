@@ -19,13 +19,12 @@ import { Controller, FormProvider, useForm } from "react-hook-form";
 import FormTextField from "@/components/FormTextField";
 import CollectionConfig from "@/components/CollectionConfig";
 import { UpdateCollectionFormValues } from "@/types/forms";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { revalidateCollections } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
 import FormDropdown from "@/components/FormDropdown";
 import DistributionStatus from "../DistributionStatus";
 import useCustodianStore from "@/hooks/useCustodianStore";
-import { useLogDependencyChanges } from "@/utils/deps";
 import FormLabel from "@/components/FormLabel";
 import { maskClientTest } from "@/lib/maskClientTest";
 import useAdminStore from "@/hooks/useAdminStore";
@@ -38,8 +37,6 @@ import ErrorHeader from "@/components/ErrorHeader";
 import { useAdminDataStore } from "@/store/adminDataStore";
 import UpdatePanel from "@/components/UpdatePanel";
 import { useThreePane } from "@/providers/ThreePaneProvider";
-import { useCloseGuard } from "@/providers/CloseGuardProvider";
-import { useConfirm } from "@/hooks/useConfirm";
 import { useSaveChanges } from "@/hooks/useSaveChanges";
 
 const UpdateCollectionGuidance = maskClientTest(
@@ -118,19 +115,17 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
 
   const notify = useNotify();
 
-  const [workgroupValues, setWorkgroupValues] = useState<Map<string, boolean>>(
-    () => {
-      const map = new Map<string, boolean>();
-      workgroups.forEach((wg) => {
-        map.set(
-          wg.name,
-          (collection.workgroups?.filter((cw) => cw.id === wg.id) || [])
-            .length > 0,
-        );
-      });
-      return map;
-    },
-  );
+  const workgroupValues = useMemo<Map<string, boolean>>(() => {
+    const map = new Map<string, boolean>();
+    workgroups.forEach((wg) => {
+      map.set(
+        wg.name,
+        (collection.workgroups?.filter((cw) => cw.id === wg.id) || []).length >
+          0,
+      );
+    });
+    return map;
+  }, [workgroups, collection.workgroups]);
 
   const defaultValues = useMemo(
     () => getDefaultValues(collection),
@@ -278,29 +273,6 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
     onDiscard,
   });
 
-  const { setValue } = formMethods;
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setWorkgroupValues((prev) => {
-      const updated = new Map(prev);
-      updated.set(event.target.name, event.target.checked);
-      return updated;
-    });
-  };
-
-  /* useEffect(() => {
-    const map = new Map<string, boolean>();
-    workgroups.forEach((wg) => {
-      map.set(
-        wg.name,
-        collection.workgroups?.some((cw) => cw.id === wg.id) ?? false,
-      );
-    });
-
-    firstUpdate.current = true;
-    setWorkgroupValues(map);
-  }, [collection.workgroups, workgroups, setWorkgroupValues]);*/
-
   return (
     <UpdatePanel
       label="Collection"
@@ -315,8 +287,6 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
           collection={collection}
           expandedRight={expandedRight}
           key={collection.id}
-          control={control}
-          setValue={setValue}
         />
         {isAdmin && (
           <>
