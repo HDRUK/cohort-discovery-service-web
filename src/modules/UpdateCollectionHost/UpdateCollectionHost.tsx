@@ -42,7 +42,7 @@ const UpdateCollectionHost = ({
     control,
     setValue,
     reset,
-    formState: { errors, isDirty },
+    formState: { errors },
   } = formMethods;
 
   useEffect(() => {
@@ -79,8 +79,8 @@ const UpdateCollectionHost = ({
     handleSubmit((v) => submitHostForm(v, false))();
   }, [handleSubmit, submitHostForm]);
 
-  useSaveChanges({
-    enabled: isDirty,
+  useSaveChanges<CollectionHostFormValues>({
+    control,
     entityName: selectedCollectionHost.name,
     onSave,
     onDiscard,

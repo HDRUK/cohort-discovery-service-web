@@ -273,8 +273,8 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
     [reset, defaultValues],
   );
 
-  useSaveChanges({
-    enabled: isDirty,
+  useSaveChanges<UpdateCollectionFormValues>({
+    control,
     entityName: collection.name,
     onSave,
     onDiscard,

@@ -1,36 +1,45 @@
 import { useEffect, useMemo } from "react";
 import { useCloseGuard } from "@/providers/CloseGuardProvider";
 import { useConfirm } from "@/hooks/useConfirm";
+import { Control, FieldValues, useFormState } from "react-hook-form";
+import { useChangedFieldValues } from "./useChangedFieldValues";
+import { Typography } from "@mui/material";
+import ChangesTable from "@/components/ChangesTable";
 
-type Options = {
-  enabled: boolean;
+type Options<TFieldValues extends FieldValues> = {
+  control: Control<TFieldValues>;
   entityName: string;
   onSave: () => Promise<void> | void;
   onDiscard?: () => Promise<void> | void;
   saveText?: string;
   cancelText?: string;
   discardText?: string;
+  showChanges?: boolean;
 };
 
-export function useSaveChanges({
-  enabled,
+export function useSaveChanges<TFieldValues extends FieldValues>({
+  control,
   entityName,
   onSave,
   onDiscard,
   saveText = "Save",
   cancelText = "Cancel",
   discardText = "Discard",
-}: Options) {
+  showChanges = true,
+}: Options<TFieldValues>) {
   const { registerCloseGuard } = useCloseGuard();
   const confirm = useConfirm();
 
+  const { isDirty } = useFormState<TFieldValues>({ control });
+  const changed = useChangedFieldValues<TFieldValues>({ control });
+
   const message = useMemo(
-    () => `Do you want to save your changes to ${entityName}`,
+    () => `Do you want to save your changes to "${entityName}"?`,
     [entityName],
   );
 
   useEffect(() => {
-    if (!enabled) {
+    if (!isDirty) {
       registerCloseGuard(null);
       return;
     }
@@ -38,11 +47,17 @@ export function useSaveChanges({
     registerCloseGuard(async () => {
       const result = await confirm({
         title: "Unsaved changes",
-        description: message,
+        description: (
+          <>
+            <Typography>{message}</Typography>
+            {showChanges && <ChangesTable changed={changed} />}
+          </>
+        ),
         confirmText: saveText,
         tertiaryText: discardText,
         cancelText,
         confirmColor: "primary",
+        maxWidth: "md",
       });
 
       if (result === "confirm") {
@@ -57,7 +72,9 @@ export function useSaveChanges({
 
     return () => registerCloseGuard(null);
   }, [
-    enabled,
+    changed,
+    showChanges,
+    isDirty,
     message,
     saveText,
     discardText,
