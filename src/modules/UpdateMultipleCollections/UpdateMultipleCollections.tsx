@@ -22,6 +22,7 @@ import { UpdateCollectionFormValues } from "@/types/forms";
 import { useAdminDataStore } from "@/store/adminDataStore";
 import UpdatePanel from "@/components/UpdatePanel";
 import { useThreePane } from "@/providers/ThreePaneProvider";
+import { useSaveChanges } from "@/hooks/useSaveChanges";
 
 export type UpdateMultipleCollectionProps = {
   collections: CollectionWithHosts[];
@@ -46,7 +47,8 @@ const UpdateMultipleCollections = ({
   const {
     control,
     handleSubmit,
-    formState: { isDirty },
+    reset,
+    formState: { isDirty, defaultValues },
   } = formMethods;
 
   // Check that all collections have the same workgroups
@@ -157,11 +159,6 @@ const UpdateMultipleCollections = ({
     ],
   );
 
-  const handleEnter = useCallback(
-    () => handleSubmit((values) => submitForm(values, false))(),
-    [handleSubmit, submitForm],
-  );
-
   const handleLockClick = useCallback(
     () => handleSubmit((values) => submitForm(values, true))(),
     [handleSubmit, submitForm],
@@ -170,17 +167,6 @@ const UpdateMultipleCollections = ({
   const handleUnlockClick = useCallback(() => {
     onClose?.();
   }, [onClose]);
-
-  ("UpdateMultipleCollections",
-    {
-      collections,
-      ...formMethods,
-      currentCustodian,
-      handleEnter,
-      handleLockClick,
-      handleUnlockClick,
-      submitForm,
-    });
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setWorkgroupValues((prev) => {
@@ -201,6 +187,19 @@ const UpdateMultipleCollections = ({
       shouldTouch: true,
     });
   }, [workgroupValues, setValue]);
+
+  const onSave = () => handleSubmit((values) => submitForm(values, true))();
+  const onDiscard = useCallback(
+    () => reset(defaultValues),
+    [reset, defaultValues],
+  );
+
+  useSaveChanges<UpdateCollectionFormValues>({
+    control,
+    entityName: collections.map((c) => c.name).join(" , "),
+    onSave,
+    onDiscard,
+  });
 
   return (
     <FormProvider {...formMethods}>
