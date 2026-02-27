@@ -116,8 +116,6 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
 
   const isAdmin = useMemo(() => !currentCustodian, [currentCustodian]);
 
-  const firstUpdate = useRef(true);
-
   const notify = useNotify();
 
   const [workgroupValues, setWorkgroupValues] = useState<Map<string, boolean>>(

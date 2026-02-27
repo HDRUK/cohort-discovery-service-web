@@ -8,15 +8,14 @@ import FormMultiSelect from "@/components/FormMultiSelect";
 import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
 import useAdminStore from "@/hooks/useAdminStore";
 import useUserStore from "@/hooks/useUserStore";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import UpdatePanel from "@/components/UpdatePanel";
+import { useThreePane } from "@/providers/ThreePaneProvider";
+import { useSaveChanges } from "@/hooks/useSaveChanges";
 
-export interface UpdateNetworkProps {
-  expandedRight: boolean;
-  onClose?: () => void;
-}
+const UpdateNetwork = () => {
+  const { expandedRight, toggleRight: onClose } = useThreePane();
 
-const UpdateNetwork = ({ expandedRight, onClose }: UpdateNetworkProps) => {
   const updateNetwork = useAdminStore((s) => s.updateNetwork);
   const networks = useAdminStore((s) => s.networks);
   const custodians = useUserStore((s) => s.custodians);
@@ -33,7 +32,12 @@ const UpdateNetwork = ({ expandedRight, onClose }: UpdateNetworkProps) => {
     },
   });
 
-  const { handleSubmit, control, reset } = formMethods;
+  const {
+    handleSubmit,
+    control,
+    reset,
+    formState: { defaultValues },
+  } = formMethods;
 
   useEffect(() => {
     if (!selectedNetwork) return;
@@ -53,29 +57,49 @@ const UpdateNetwork = ({ expandedRight, onClose }: UpdateNetworkProps) => {
     });
   }, [selectedNetwork, reset]);
 
-  const submitForm = async (data: UpdateNetworkFormValues) => {
-    if (!selectedNetwork) return;
-    await updateNetwork(selectedNetwork.id, {
-      name: data.name,
-      url: data.url,
-    });
-
-    if (data.custodians.length > 0) {
-      await addCustodiansToNetwork({
-        custodian_ids: data.custodians.map((c) => +c.value),
-        id: selectedNetwork.id,
+  const submitForm = useCallback(
+    async (data: UpdateNetworkFormValues, closeAfter = true) => {
+      if (!selectedNetwork) return;
+      await updateNetwork(selectedNetwork.id, {
+        name: data.name,
+        url: data.url,
       });
-    }
 
-    notify.success(`Updated network ${data.name}`);
-    onClose?.();
-  };
+      if (data.custodians.length > 0) {
+        await addCustodiansToNetwork({
+          custodian_ids: data.custodians.map((c) => +c.value),
+          id: selectedNetwork.id,
+        });
+      }
+
+      notify.success(`Updated network ${data.name}`);
+      if (closeAfter) onClose?.();
+    },
+    [notify, onClose, addCustodiansToNetwork, updateNetwork, selectedNetwork],
+  );
+
+  const onSave = useCallback(
+    (closeAfter = false) => handleSubmit((v) => submitForm(v, closeAfter))(),
+    [handleSubmit, submitForm],
+  );
+
+  const onDiscard = useCallback(
+    () => reset(defaultValues),
+    [reset, defaultValues],
+  );
+
+  useSaveChanges<UpdateNetworkFormValues>({
+    control,
+    entityName: selectedNetwork?.name ?? "",
+    onSave,
+    onDiscard,
+  });
 
   return (
     <UpdatePanel
       label="Network"
       expandedRight={expandedRight}
-      onLockClick={handleSubmit((v) => submitForm(v))}
+      onLockClick={() => onSave(true)}
       onUnlockClick={() => onClose?.()}
     >
       <FormProvider {...formMethods}>

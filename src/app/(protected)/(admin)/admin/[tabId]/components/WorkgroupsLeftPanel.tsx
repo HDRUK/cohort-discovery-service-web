@@ -8,18 +8,11 @@ import { useCallback, useEffect } from "react";
 import useSearchParams from "@/hooks/useSearchParams";
 import { capitaliseFirstLetter } from "@/utils/string";
 import useAdminStore from "@/hooks/useAdminStore";
+import { useThreePane } from "@/providers/ThreePaneProvider";
 
-type WorkgroupsLeftPanelProps = {
-  expandedLeft: boolean;
-  onCreate: () => void;
-  onCancelCreate: () => void;
-};
+const WorkgroupsLeftPanel = () => {
+  const { expandedLeft, toggleLeft } = useThreePane();
 
-const WorkgroupsLeftPanel = ({
-  expandedLeft,
-  onCreate,
-  onCancelCreate,
-}: WorkgroupsLeftPanelProps) => {
   const selectedWorkgroup = useAdminStore((s) => s.selectedWorkgroup);
   const setSelectedWorkgroup = useAdminStore((s) => s.setSelectedWorkgroup);
   const workgroups = useAdminStore((s) => s.workgroups);
@@ -57,12 +50,12 @@ const WorkgroupsLeftPanel = ({
     >
       <ActionMenuSection title={"Create"} defaultExpanded underline>
         <AddButton
-          onClick={onCreate}
+          onClick={toggleLeft}
           label={"Workgroup"}
           disabled={expandedLeft}
         />
 
-        {expandedLeft && <CreateWorkgroup onCancel={onCancelCreate} />}
+        {expandedLeft && <CreateWorkgroup onCancel={toggleLeft} />}
       </ActionMenuSection>
 
       <ActionMenuSection

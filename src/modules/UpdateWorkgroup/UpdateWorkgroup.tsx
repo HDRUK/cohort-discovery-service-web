@@ -3,20 +3,19 @@ import UpdatePanel from "@/components/UpdatePanel";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { UpdateWorkgroupFormValues } from "@/types/forms";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { revalidateAction } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
 import FormMultiSelect from "@/components/FormMultiSelect";
 import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
 import useAdminStore from "@/hooks/useAdminStore";
 import { TAG_CUSTODIAN_COLLECTION, TAG_WORKGROUP_ADMIN } from "@/config/tags";
+import { useThreePane } from "@/providers/ThreePaneProvider";
+import { useSaveChanges } from "@/hooks/useSaveChanges";
 
-export type UpdateWorkgroupProps = {
-  expandedRight: boolean;
-  onClose?: () => void;
-};
+const UpdateWorkgroup = () => {
+  const { expandedRight, toggleRight: onClose } = useThreePane();
 
-const UpdateWorkgroup = ({ expandedRight, onClose }: UpdateWorkgroupProps) => {
   const addCollectionsToWorkgroup = useAdminStore(
     (s) => s.addCollectionsToWorkgroup,
   );
@@ -37,7 +36,12 @@ const UpdateWorkgroup = ({ expandedRight, onClose }: UpdateWorkgroupProps) => {
     },
   });
 
-  const { control, handleSubmit, reset } = formMethods;
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { defaultValues },
+  } = formMethods;
 
   useEffect(() => {
     if (!selectedWorkgroup) return;
@@ -53,55 +57,76 @@ const UpdateWorkgroup = ({ expandedRight, onClose }: UpdateWorkgroupProps) => {
     });
   }, [selectedWorkgroup, reset]);
 
-  const submitForm = async (
-    data: UpdateWorkgroupFormValues,
-    closeAfter = false,
-  ) => {
-    if (!selectedWorkgroup?.id) return;
+  const submitForm = useCallback(
+    async (data: UpdateWorkgroupFormValues, closeAfter = false) => {
+      if (!selectedWorkgroup?.id) return;
 
-    const { id } = selectedWorkgroup;
+      const { id } = selectedWorkgroup;
 
-    if (data.users.length > 0) {
-      await addUsersToWorkgroup({
-        ids: data.users.map((c) => +c.value),
-        workgroup_id: id,
-      });
-      notify.success(`Updated workgroup users ${selectedWorkgroup?.name}`);
+      if (data.users.length > 0) {
+        await addUsersToWorkgroup({
+          ids: data.users.map((c) => +c.value),
+          workgroup_id: id,
+        });
+        notify.success(`Updated workgroup users ${selectedWorkgroup?.name}`);
 
-      revalidateAction(TAG_CUSTODIAN_COLLECTION);
-      revalidateAction(TAG_WORKGROUP_ADMIN);
-    }
+        revalidateAction(TAG_CUSTODIAN_COLLECTION);
+        revalidateAction(TAG_WORKGROUP_ADMIN);
+      }
 
-    if (data.collections.length > 0) {
-      await addCollectionsToWorkgroup({
-        ids: data.collections.map((c) => +c.value),
-        workgroup_id: id,
-      });
-      notify.success(
-        `Updated workgroup collections ${selectedWorkgroup?.name}`,
-      );
+      if (data.collections.length > 0) {
+        await addCollectionsToWorkgroup({
+          ids: data.collections.map((c) => +c.value),
+          workgroup_id: id,
+        });
+        notify.success(
+          `Updated workgroup collections ${selectedWorkgroup?.name}`,
+        );
 
-      revalidateAction(TAG_CUSTODIAN_COLLECTION);
-      revalidateAction(TAG_WORKGROUP_ADMIN);
-    }
+        revalidateAction(TAG_CUSTODIAN_COLLECTION);
+        revalidateAction(TAG_WORKGROUP_ADMIN);
+      }
 
-    reset();
-    if (closeAfter) {
-      onClose?.();
-    }
-  };
+      reset();
+      if (closeAfter) {
+        onClose?.();
+      }
+    },
+    [
+      notify,
+      selectedWorkgroup,
+      addCollectionsToWorkgroup,
+      addUsersToWorkgroup,
+      onClose,
+      reset,
+    ],
+  );
 
-  const handleLockClick = handleSubmit((values) => submitForm(values, true));
+  const onSave = (closeAfter = false) =>
+    handleSubmit((values) => submitForm(values, closeAfter))();
+
+  const onDiscard = useCallback(
+    () => reset(defaultValues),
+    [reset, defaultValues],
+  );
+
   const handleUnlockClick = () => {
     onClose?.();
   };
+
+  useSaveChanges<UpdateWorkgroupFormValues>({
+    control,
+    entityName: selectedWorkgroup?.name ?? "",
+    onSave,
+    onDiscard,
+  });
 
   return (
     <FormProvider {...formMethods}>
       <UpdatePanel
         label="Workgroup"
         expandedRight={expandedRight}
-        onLockClick={handleLockClick}
+        onLockClick={() => onSave(true)}
         onUnlockClick={handleUnlockClick}
       >
         <ActionMenuSection

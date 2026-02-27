@@ -6,10 +6,8 @@ import {
 } from "@/types/api";
 import { Box, Skeleton } from "@mui/material";
 import Title from "@/components/Title";
-import ThreePaneSwimLaneLayout, {
-  ExpandedSide,
-} from "@/modules/ThreePaneSwimLaneLayout";
-import { useEffect, useState } from "react";
+import ThreePaneSwimLaneLayout from "@/modules/ThreePaneSwimLaneLayout";
+import { useEffect } from "react";
 import ControlledSearchBox from "@/modules/ControlledSearchBox";
 import WorkgroupsLeftPanel from "./WorkgroupsLeftPanel";
 import WorkgroupsMiddlePanel from "./WorkgroupsMiddlePanel";
@@ -27,22 +25,6 @@ const WorkgroupsAdmin = ({
     setCollections(collections);
   }, [collections, setCollections]);
 
-  const [expandedSide, setExpandedSide] = useState<ExpandedSide | null>(null);
-  const expandedLeft = expandedSide === ExpandedSide.LEFT;
-  const expandedRight = expandedSide === ExpandedSide.RIGHT;
-
-  const toggleExpandLeft = () => {
-    setExpandedSide((prev) =>
-      prev === ExpandedSide.LEFT ? null : ExpandedSide.LEFT,
-    );
-  };
-
-  const toggleExpandRight = () => {
-    setExpandedSide((prev) =>
-      prev === ExpandedSide.RIGHT ? null : ExpandedSide.RIGHT,
-    );
-  };
-
   if (!collections) return <Skeleton height={"100%"} />;
 
   return (
@@ -57,20 +39,9 @@ const WorkgroupsAdmin = ({
       <ThreePaneProvider>
         <ThreePaneSwimLaneLayout
           rightDisabled={false}
-          left={
-            <WorkgroupsLeftPanel
-              expandedLeft={expandedLeft}
-              onCreate={toggleExpandLeft}
-              onCancelCreate={toggleExpandLeft}
-            />
-          }
+          left={<WorkgroupsLeftPanel />}
           middle={<WorkgroupsMiddlePanel />}
-          right={
-            <WorkgroupsRightPanel
-              expandedRight={expandedRight}
-              onClose={() => toggleExpandRight()}
-            />
-          }
+          right={<WorkgroupsRightPanel />}
         />
       </ThreePaneProvider>
     </Box>

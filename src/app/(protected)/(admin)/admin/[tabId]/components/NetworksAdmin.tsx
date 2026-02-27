@@ -2,10 +2,8 @@
 import { Network } from "@/types/api";
 import { Box, Skeleton } from "@mui/material";
 import Title from "@/components/Title";
-import ThreePaneSwimLaneLayout, {
-  ExpandedSide,
-} from "@/modules/ThreePaneSwimLaneLayout";
-import { useEffect, useState } from "react";
+import ThreePaneSwimLaneLayout from "@/modules/ThreePaneSwimLaneLayout";
+import { useEffect } from "react";
 import { useAdminDataStore } from "@/store/adminDataStore";
 import NetworksLeftPanel from "./NetworksLeftPanel";
 import NetworksMiddlePanel from "./NetworksMiddlePanel";
@@ -18,22 +16,6 @@ const NetworksAdmin = ({ networks }: { networks: Network[] }) => {
     setNetworks(networks);
   }, [networks, setNetworks]);
 
-  const [expandedSide, setExpandedSide] = useState<ExpandedSide | null>(null);
-  const expandedLeft = expandedSide === ExpandedSide.LEFT;
-  const expandedRight = expandedSide === ExpandedSide.RIGHT;
-
-  const toggleExpandLeft = () => {
-    setExpandedSide((prev) =>
-      prev === ExpandedSide.LEFT ? null : ExpandedSide.LEFT,
-    );
-  };
-
-  const toggleExpandRight = () => {
-    setExpandedSide((prev) =>
-      prev === ExpandedSide.RIGHT ? null : ExpandedSide.RIGHT,
-    );
-  };
-
   if (!networks) return <Skeleton height={"100%"} />;
 
   return (
@@ -44,20 +26,9 @@ const NetworksAdmin = ({ networks }: { networks: Network[] }) => {
       <ThreePaneProvider>
         <ThreePaneSwimLaneLayout
           rightDisabled={false}
-          left={
-            <NetworksLeftPanel
-              expandedLeft={expandedLeft}
-              onCreate={toggleExpandLeft}
-              onCancelCreate={toggleExpandLeft}
-            />
-          }
+          left={<NetworksLeftPanel />}
           middle={<NetworksMiddlePanel />}
-          right={
-            <NetworksRightPanel
-              expandedRight={expandedRight}
-              onClose={() => toggleExpandRight()}
-            />
-          }
+          right={<NetworksRightPanel />}
         />
       </ThreePaneProvider>
     </Box>
