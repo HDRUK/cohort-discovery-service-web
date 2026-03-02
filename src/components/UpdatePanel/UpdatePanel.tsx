@@ -7,7 +7,7 @@ import theme from "@/config/theme";
 import { ReactNode, useCallback, useEffect } from "react";
 import ActionMenuSection from "../ActionMenuSection";
 import { useSwimLaneBlocker } from "../SwimLane/SwimLane";
-import { useCloseGuard } from "@/providers/CloseGuardProvider"; // <- the provider from earlier (adjust path)
+import { useCloseGuard } from "@/providers/CloseGuardProvider";
 
 type UpdatePanelProps = {
   label: string;
