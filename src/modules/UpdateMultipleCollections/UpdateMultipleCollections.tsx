@@ -21,22 +21,20 @@ import UpdateMultipleCollectionsGuidance from "./UpdateMultipleCollectionsGuidan
 import { UpdateCollectionFormValues } from "@/types/forms";
 import { useAdminDataStore } from "@/store/adminDataStore";
 import UpdatePanel from "@/components/UpdatePanel";
+import { useUserDataStore } from "@/hooks/userDataStore";
+import { useThreePane } from "@/providers/ThreePaneProvider";
 
 export type UpdateMultipleCollectionProps = {
   collections: CollectionWithHosts[];
-  expandedRight: boolean;
-  expandedLeft: boolean;
-  onClose?: () => void;
 };
 
 const UpdateMultipleCollections = ({
   collections,
-  expandedRight,
-  onClose,
 }: UpdateMultipleCollectionProps) => {
+  const { expandedRight, toggleRight: onClose } = useThreePane();
   const currentCustodian = useCustodianStore((s) => s.current.custodian);
 
-  const workgroups = useAdminDataStore((s) => s.workgroups);
+  const workgroups = useUserDataStore((s) => s.workgroups);
   const updateCollectionStatus = useAdminDataStore(
     (s) => s.updateCollectionStatus,
   );
@@ -202,6 +200,30 @@ const UpdateMultipleCollections = ({
       shouldTouch: true,
     });
   }, [workgroupValues, setValue]);
+
+  /*
+
+  Note - struggling to get this working with onDiscard 27/02/2026
+  - this needs some maintenance/re-write on Multiple functionality
+  - difficult to keep track of default values (so can be reset onDiscard)
+  - too many changing states and useEffects 
+
+  const onSave = () => {
+    handleSubmit((values) => submitForm(values, false))();
+  };
+
+  const onDiscard = useCallback(() => {
+    reset(defaultValues);
+    onClose?.();
+  }, [reset, defaultValues, onClose]);
+
+  useSaveChanges<UpdateCollectionFormValues>({
+    control,
+    entityName: collections.map((c) => c.name).join(" , "),
+    onSave,
+    onDiscard,
+  });
+  */
 
   return (
     <FormProvider {...formMethods}>

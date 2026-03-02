@@ -35,6 +35,7 @@ import { Query } from "@/types/api";
 import ThreePaneSwimLaneLayout from "../ThreePaneSwimLaneLayout";
 import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
 import useRightClickMenu from "@/hooks/useRightClickMenu";
+import { ThreePaneProvider } from "@/providers/ThreePaneProvider";
 
 const QueryBuilder = ({
   query,
@@ -206,7 +207,7 @@ const QueryBuilder = ({
   ];
 
   return (
-    <>
+    <ThreePaneProvider>
       <ThreePaneSwimLaneLayout
         left={<ActionMenu />}
         middle={
@@ -254,7 +255,7 @@ const QueryBuilder = ({
         ignoreWhenInside='[data-draggable="true"]'
         onChange={onChangeSelection}
       />
-    </>
+    </ThreePaneProvider>
   );
 };
 

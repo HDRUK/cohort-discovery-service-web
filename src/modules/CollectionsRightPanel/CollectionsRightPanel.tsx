@@ -5,6 +5,7 @@ import UpdateMultipleCollections from "../UpdateMultipleCollections";
 import { maskClientTest } from "@/lib/maskClientTest";
 import { CollectionGuidanceProps } from "./CollectionsGuidance";
 import useUserStore from "@/hooks/useUserStore";
+import { useThreePane } from "@/providers/ThreePaneProvider";
 
 const CollectionGuidance = maskClientTest<CollectionGuidanceProps>(
   () => import("./CollectionsGuidance"),
@@ -12,10 +13,9 @@ const CollectionGuidance = maskClientTest<CollectionGuidanceProps>(
 
 type CollectionsRightPanelProps = Omit<UpdateCollectionProps, "collection">;
 
-const CollectionsRightPanel = ({
-  expandedLeft,
-  ...props
-}: CollectionsRightPanelProps) => {
+const CollectionsRightPanel = ({ ...props }: CollectionsRightPanelProps) => {
+  const { expandedLeft } = useThreePane();
+
   const selectedCollections = useUserStore((u) => u.selectedCollections);
   const count = selectedCollections?.length ?? 0;
 
@@ -29,7 +29,6 @@ const CollectionsRightPanel = ({
       <UpdateCollection
         collection={collection}
         key={`update-coll-${collection.id}`}
-        expandedLeft={expandedLeft}
         {...props}
       />
     );
@@ -40,7 +39,6 @@ const CollectionsRightPanel = ({
       <UpdateMultipleCollections
         collections={selectedCollections}
         key={JSON.stringify(selectedCollections.map((c) => c.id))}
-        expandedLeft={expandedLeft}
         {...props}
       />
     );

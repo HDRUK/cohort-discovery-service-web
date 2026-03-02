@@ -25,6 +25,7 @@ import {
   ConceptSet,
   DistributionType,
   CollectionWithHosts,
+  Workgroup,
 } from "@/types/api";
 import {
   TAG_COLLECTIONS_ADMIN,
@@ -80,6 +81,9 @@ export interface UserDataStoreState {
   removeConceptSet: (conceptSetId: number) => Promise<void>;
 
   deleteQueries: (pids: string[]) => Promise<void>;
+
+  workgroups: Workgroup[];
+  setWorkgroups: (workgroups: Workgroup[]) => void;
 }
 
 export const useUserDataStore = create<UserDataStoreState>((set) => ({
@@ -182,4 +186,11 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
     const user = useUserDataStore.getState().user;
     if (user) await revalidateAction(getUserQueryTag(user.id));
   },
+
+  workgroups: [],
+  setWorkgroups: (workgroups) =>
+    set((state) => ({
+      ...state,
+      workgroups,
+    })),
 }));

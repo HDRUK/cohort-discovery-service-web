@@ -3,20 +3,17 @@ import { Box } from "@mui/material";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import AddButton from "@/components/AddButton";
 import CreateCollectionHost from "@/modules/CreateCollectionHost";
+import { useThreePane } from "@/providers/ThreePaneProvider";
 
 type CollectionHostLeftPanelProps = {
   custodianId: number;
-  expandedLeft: boolean;
-  onCreateNewHost: () => void;
-  onCancelCreate: () => void;
 };
 
 const CollectionHostLeftPanel = ({
   custodianId,
-  expandedLeft,
-  onCreateNewHost,
-  onCancelCreate,
 }: CollectionHostLeftPanelProps) => {
+  const { expandedLeft, toggleLeft } = useThreePane();
+
   return (
     <Box
       sx={{
@@ -34,7 +31,7 @@ const CollectionHostLeftPanel = ({
         underline
       >
         <AddButton
-          onClick={onCreateNewHost}
+          onClick={toggleLeft}
           label={"Host"}
           disabled={expandedLeft}
         />
@@ -50,7 +47,7 @@ const CollectionHostLeftPanel = ({
         >
           <CreateCollectionHost
             custodianId={custodianId}
-            onCancel={onCancelCreate}
+            onCancel={toggleLeft}
           />
         </ActionMenuSection>
       )}
