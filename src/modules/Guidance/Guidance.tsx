@@ -290,9 +290,9 @@ const Guidance = () => {
   }
   if (!selectedNode) {
     return (
-      <ActionMenuSection title={"Tool Guidance"} fixedExpanded>
+      <Box textAlign="center">
         <ToolGuidance components={baseComponents} />
-      </ActionMenuSection>
+      </Box>
     );
   } else {
     if (isRuleLeaf(selectedNode)) {
