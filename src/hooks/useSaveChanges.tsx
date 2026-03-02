@@ -1,10 +1,15 @@
+// useSaveChanges.tsx
 import { useEffect, useMemo } from "react";
 import { useCloseGuard } from "@/providers/CloseGuardProvider";
 import { useConfirm } from "@/hooks/useConfirm";
 import { Control, FieldValues, useFormState } from "react-hook-form";
-import { useChangedFieldValues } from "./useChangedFieldValues";
+import { useChangedFieldValues, type Diffed } from "./useChangedFieldValues";
 import { Typography } from "@mui/material";
 import ChangesTable from "@/components/ChangesTable";
+
+type Ignore =
+  | string[] // exact or prefix paths
+  | ((path: string) => boolean);
 
 type Options<TFieldValues extends FieldValues> = {
   control: Control<TFieldValues>;
@@ -15,6 +20,7 @@ type Options<TFieldValues extends FieldValues> = {
   cancelText?: string;
   discardText?: string;
   showChanges?: boolean;
+  ignoreFields?: Ignore;
 };
 
 export function useSaveChanges<TFieldValues extends FieldValues>({
@@ -26,12 +32,15 @@ export function useSaveChanges<TFieldValues extends FieldValues>({
   cancelText = "Cancel",
   discardText = "Discard",
   showChanges = true,
+  ignoreFields,
 }: Options<TFieldValues>) {
   const { registerCloseGuard } = useCloseGuard();
   const confirm = useConfirm();
 
-  const { isDirty } = useFormState<TFieldValues>({ control });
-  const changed = useChangedFieldValues<TFieldValues>({ control });
+  const { changed, hasChanges } = useChangedFieldValues<TFieldValues>({
+    control,
+    ignoreFields,
+  });
 
   const message = useMemo(
     () => `Do you want to save your changes to "${entityName}"?`,
@@ -39,7 +48,7 @@ export function useSaveChanges<TFieldValues extends FieldValues>({
   );
 
   useEffect(() => {
-    if (!isDirty) {
+    if (!hasChanges) {
       registerCloseGuard(null);
       return;
     }
@@ -74,7 +83,7 @@ export function useSaveChanges<TFieldValues extends FieldValues>({
   }, [
     changed,
     showChanges,
-    isDirty,
+    hasChanges,
     message,
     saveText,
     discardText,
