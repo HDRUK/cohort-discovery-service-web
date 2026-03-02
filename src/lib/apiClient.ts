@@ -118,7 +118,7 @@ async function request<TResponse, TBody = undefined>(
   } catch (error) {
     if (error instanceof ApiError) {
       if (error.status === 404) notFound();
-      if (error.status === 403) redirect("/403?reason=no-token");
+      if (error.status === 403) redirect("/403");
       throw error;
     }
     throw await handleApiError(error);
