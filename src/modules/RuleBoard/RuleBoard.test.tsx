@@ -66,7 +66,11 @@ describe("QueryBuilder", () => {
     ruleHeadings.map((heading, i) => {
       const ruleCard = heading.closest('[data-testid="clickable-card"]');
       const scope = within(ruleCard as HTMLElement);
-      expect(scope.getByText(expectedTexts[i])).toBeInTheDocument();
+      expect(
+        scope.getByText(expectedTexts[i], {
+          exact: false,
+        }),
+      ).toBeInTheDocument();
     });
 
     const chip = screen.getByText("AND").closest(".MuiChip-root");
@@ -109,7 +113,11 @@ describe("QueryBuilder", () => {
     ruleHeadings.map((heading, i) => {
       const ruleCard = heading.closest('[data-testid="clickable-card"]');
       const scope = within(ruleCard as HTMLElement);
-      expect(scope.getByText(expectedTexts[i])).toBeInTheDocument();
+      expect(
+        scope.getByText(expectedTexts[i], {
+          exact: false,
+        }),
+      ).toBeInTheDocument();
       expect(scope.queryByTestId("ErrorIcon")).toBeInTheDocument();
     });
   });

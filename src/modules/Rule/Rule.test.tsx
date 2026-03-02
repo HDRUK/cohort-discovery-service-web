@@ -27,7 +27,7 @@ describe("Rule", () => {
       rule: {
         concept: {
           concept_id: 1234,
-          description: "Rule 1234",
+          description: "A test rule",
         },
       },
       ...opArgs,
@@ -55,7 +55,16 @@ describe("Rule", () => {
 
   it("renders the Rule card correctly", () => {
     renderComponent();
-    expect(screen.getByText("Rule 1234")).toBeInTheDocument();
+
+    // Updated matcher to reflect the new ConceptChip implementation
+    const conceptChipDescription = screen.getByText(/A test rule/i);
+    const conceptChipId = screen.getByText(/1234/i);
+    const conceptChipOmop = screen.getByText(/OMOP/i);
+
+    expect(conceptChipDescription).toBeInTheDocument();
+    expect(conceptChipId).toBeInTheDocument();
+    expect(conceptChipOmop).toBeInTheDocument();
+
     expect(screen.getByText("Include")).toBeInTheDocument();
     expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
     expect(screen.queryByTestId("ErrorIcon")).not.toBeInTheDocument();
@@ -63,7 +72,15 @@ describe("Rule", () => {
 
   it("renders the Rule card correctly when it is an exclusion", () => {
     renderComponent({ exclude: true });
-    expect(screen.getByText("Rule 1234")).toBeInTheDocument();
+
+    const conceptChipDescription = screen.getByText(/A test rule/i);
+    const conceptChipId = screen.getByText(/1234/i);
+    const conceptChipOmop = screen.getByText(/OMOP/i);
+
+    expect(conceptChipDescription).toBeInTheDocument();
+    expect(conceptChipId).toBeInTheDocument();
+    expect(conceptChipOmop).toBeInTheDocument();
+
     expect(screen.getByText("Exclude")).toBeInTheDocument();
   });
 
@@ -74,6 +91,7 @@ describe("Rule", () => {
 
   it("renders the Rule card correctly when concept is blank", async () => {
     renderComponent({ rule: { concept: null } });
+
     const searchInput = screen.queryByRole("textbox") as HTMLInputElement;
     expect(searchInput).toBeInTheDocument();
 

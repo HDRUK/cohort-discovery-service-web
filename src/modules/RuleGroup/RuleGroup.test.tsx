@@ -80,8 +80,16 @@ describe("Rule", () => {
 
     const scope = within(groupCard as HTMLInputElement);
 
-    expect(scope.getByText("Rule 1234")).toBeInTheDocument();
-    expect(scope.getByText("Rule 4321")).toBeInTheDocument();
+    expect(
+      scope.getByText("Rule 1234", {
+        exact: false,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      scope.getByText("Rule 4321", {
+        exact: false,
+      }),
+    ).toBeInTheDocument();
     expect(scope.getByText("AND")).toBeInTheDocument();
   });
 

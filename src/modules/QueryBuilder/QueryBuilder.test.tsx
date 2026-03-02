@@ -43,7 +43,9 @@ describe("QueryBuilder", () => {
 
     scope = within(groupRules[0] as HTMLInputElement);
     expect(
-      scope.getByText("Moderna - SARS-CoV-2 (COVID-19) vaccine"),
+      scope.getByText("Moderna - SARS-CoV-2 (COVID-19) vaccine", {
+        exact: false,
+      }),
     ).toBeInTheDocument();
 
     scope = within(groupRules[1] as HTMLInputElement);
@@ -51,7 +53,9 @@ describe("QueryBuilder", () => {
 
     scope = within(groupRules[2] as HTMLInputElement);
     expect(
-      scope.getByText("Pfizer - SARS-CoV-2 (COVID-19) vaccine"),
+      scope.getByText("Pfizer - SARS-CoV-2 (COVID-19) vaccine", {
+        exact: false,
+      }),
     ).toBeInTheDocument();
 
     const ruleHeadings = screen.getAllByRole("heading", { name: /rule/i });
@@ -67,7 +71,11 @@ describe("QueryBuilder", () => {
     ruleHeadings.slice(2).map((heading, i) => {
       const ruleCard = heading.closest('[data-testid="clickable-card"]');
       const scope = within(ruleCard as HTMLElement);
-      expect(scope.getByText(expectedTexts[i])).toBeInTheDocument();
+      expect(
+        scope.getByText(expectedTexts[i], {
+          exact: false,
+        }),
+      ).toBeInTheDocument();
       return;
     });
   });
@@ -81,7 +89,9 @@ describe("QueryBuilder", () => {
 
     const allRules = () => screen.getAllByTestId("sortable-rule");
     const indexOfRuleByText = (text: string) =>
-      allRules().findIndex((el) => within(el).queryByText(text));
+      allRules().findIndex((el) =>
+        within(el).queryByText(text, { exact: false }),
+      );
 
     const initialIndex = indexOfRuleByText(TARGET_TEXT);
     expect(initialIndex).toBeGreaterThanOrEqual(0);
@@ -119,6 +129,10 @@ describe("QueryBuilder", () => {
     expect(finalIndex).toBe(lastIndexAfter);
 
     const lastCard = allRules()[lastIndexAfter];
-    expect(within(lastCard).getByText(TARGET_TEXT)).toBeInTheDocument();
+    expect(
+      within(lastCard).getByText(TARGET_TEXT, {
+        exact: false,
+      }),
+    ).toBeInTheDocument();
   });
 });
