@@ -8,7 +8,7 @@ const createWorkgroup = async (
   payload: CreateWorkgroupPost,
 ): Promise<ApiResponse<Workgroup>> => {
   return await apiPost<ApiResponse<Workgroup>, CreateWorkgroupPost>(
-    API_ROUTES.adminWorkgroups,
+    API_ROUTES.workgroups,
     payload,
   );
 };

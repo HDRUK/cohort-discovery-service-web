@@ -1,5 +1,5 @@
 import { cookies, headers } from "next/headers";
-import { forbidden, redirect } from "next/navigation";
+import { forbidden, notFound, redirect } from "next/navigation";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import { TokenUser, CombinedUser } from "@/types/api";
@@ -10,6 +10,7 @@ import getCustodians from "@/actions/custodian/getCustodians";
 import getFeatureFlags from "@/actions/getFeatureFlags";
 import { isStandalone } from "@/utils/modes";
 import { ErrorMode } from "@/lib/apiClient";
+import getWorkgroups from "@/actions/workgroup/getWorkgroups";
 
 const applicationMode = process.env.APPLICATION_MODE;
 
@@ -44,9 +45,9 @@ export default async function ProtectedLayout({
 
   if (errorCode === 404) {
     if (isStandalone(applicationMode)) {
-      redirect("/403");
+      notFound();
     }
-    redirect("/403?reason=user-not-found");
+    redirect("/user-not-found");
   }
 
   const roles = me.roles.map((r) => r.name) ?? [];
@@ -61,6 +62,7 @@ export default async function ProtectedLayout({
 
   const { data: flags } = await getFeatureFlags();
   const { data: custodians } = await getCustodians();
+  const { data: workgroups } = await getWorkgroups();
 
   const combinedUser = { ...me, token_user: user } as unknown as CombinedUser;
 
@@ -68,6 +70,7 @@ export default async function ProtectedLayout({
     <ProtectedPage
       user={combinedUser}
       custodians={custodians}
+      workgroups={workgroups}
       featureFlags={flags}
     >
       {children}

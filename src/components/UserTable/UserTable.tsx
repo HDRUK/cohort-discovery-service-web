@@ -16,6 +16,7 @@ import { useTable } from "@/hooks/useTable";
 import dayjs from "dayjs";
 import { TableProps } from "../Table/Table";
 import { trueKeys } from "@/utils/numbers";
+import { useUserDataStore } from "@/hooks/userDataStore";
 
 export interface CollectionsTableProps extends TableProps {
   showPid?: boolean;
@@ -43,7 +44,7 @@ const UserTable = ({
     [rowSelection],
   );
 
-  const workgroups = useAdminStore((s) => s.workgroups);
+  const workgroups = useUserDataStore((s) => s.workgroups);
   const activeWorkgroup = workgroups.find((wg) => String(wg.id) === wg_filter);
 
   // may have been better for this to be BE logic

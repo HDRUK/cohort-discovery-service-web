@@ -64,9 +64,6 @@ export interface AdminDataStoreState {
   collectionHosts: CollectionHost[];
   setCollectionHosts: (collectionHosts: CollectionHost[]) => void;
 
-  workgroups: Workgroup[];
-  setWorkgroups: (workgroups: Workgroup[]) => void;
-
   networks: Network[];
   setNetworks: (networks: Network[]) => void;
 
@@ -150,13 +147,6 @@ export const useAdminDataStore = create<AdminDataStoreState>((set) => ({
     set((state) => ({
       ...state,
       collectionHosts,
-    })),
-
-  workgroups: [],
-  setWorkgroups: (workgroups) =>
-    set((state) => ({
-      ...state,
-      workgroups,
     })),
 
   networks: [],

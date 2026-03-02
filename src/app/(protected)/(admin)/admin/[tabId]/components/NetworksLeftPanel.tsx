@@ -8,18 +8,11 @@ import useSearchParams from "@/hooks/useSearchParams";
 import useAdminStore from "@/hooks/useAdminStore";
 import CreateNetwork from "@/modules/CreateNetwork";
 import { useConfirm } from "@/hooks/useConfirm";
+import { useThreePane } from "@/providers/ThreePaneProvider";
 
-type NetworksLeftPanelProps = {
-  expandedLeft: boolean;
-  onCreate: () => void;
-  onCancelCreate: () => void;
-};
+const NetworksLeftPanel = () => {
+  const { expandedLeft, toggleLeft } = useThreePane();
 
-const NetworksLeftPanel = ({
-  expandedLeft,
-  onCreate,
-  onCancelCreate,
-}: NetworksLeftPanelProps) => {
   const selectedNetwork = useAdminStore((s) => s.selectedNetwork);
   const setSelectedNetwork = useAdminStore((s) => s.setSelectedNetwork);
   const networks = useAdminStore((s) => s.networks);
@@ -59,13 +52,13 @@ const NetworksLeftPanel = ({
     >
       <ActionMenuSection title={"Create"} defaultExpanded underline>
         <AddButton
-          onClick={onCreate}
+          onClick={toggleLeft}
           label={"Network"}
           disabled={expandedLeft}
         />
 
         {expandedLeft && (
-          <CreateNetwork onCreate={onSelectNetwork} onCancel={onCancelCreate} />
+          <CreateNetwork onCreate={onSelectNetwork} onCancel={toggleLeft} />
         )}
       </ActionMenuSection>
 

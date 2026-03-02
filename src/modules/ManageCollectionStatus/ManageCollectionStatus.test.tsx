@@ -8,7 +8,7 @@ import {
   UrlString,
 } from "@/types/api";
 import { NotifyProvider } from "@/providers/NotifyProvider";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { UpdateCollectionFormValues } from "@/types/forms";
 import ConfirmProvider from "@/components/ConfirmProvider";
 
@@ -31,17 +31,15 @@ function TestHarness({ mockCollection }: { mockCollection: Collection }) {
     },
   });
 
-  const { control } = formMethods;
-
   return (
     <NotifyProvider>
       <ConfirmProvider>
-        <ManageCollectionStatus
-          collection={mockCollection}
-          expandedRight={true}
-          control={control}
-          setValue={jest.fn()}
-        />
+        <FormProvider {...formMethods}>
+          <ManageCollectionStatus
+            collection={mockCollection}
+            expandedRight={true}
+          />
+        </FormProvider>
       </ConfirmProvider>
     </NotifyProvider>
   );
