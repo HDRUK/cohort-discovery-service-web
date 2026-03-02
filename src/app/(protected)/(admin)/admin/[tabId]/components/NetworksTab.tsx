@@ -3,7 +3,7 @@ import { buildCollectionParams } from "@/utils/params";
 import { Box, Skeleton } from "@mui/material";
 import { DEFAULT_PER_PAGE } from "@/config/defaults";
 import NetworksAdmin from "./NetworksAdmin";
-import getNetworks from "@/actions/getNetworks";
+import getNetworks from "@/actions/network/getNetworks";
 
 export const WorkgroupsSkeleton = () => (
   <Box sx={{ height: "100%", p: 2 }}>

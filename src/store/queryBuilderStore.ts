@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import parseQuery from "@/actions/parseQuery";
+import parseQuery from "@/actions/query/parseQuery";
 import { queryToText } from "@/utils/queryBuilder";
 import {
   SizeCache,
@@ -13,7 +13,6 @@ import {
   createAgeFilter,
   createRule,
   createRuleGroup,
-  findById,
   isOperator,
   isRuleGroup,
   isRuleLeaf,
@@ -23,7 +22,7 @@ import {
   groupToRules,
 } from "@/utils/rules";
 import { UniqueIdentifier } from "@dnd-kit/core";
-import { removeFalseKeys, trueKeys } from "@/utils/numbers";
+import { removeFalseKeys } from "@/utils/numbers";
 import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
 import { DatasetErrors } from "@/utils/datasets";
 import { FeatureName } from "@/types/api";
@@ -90,11 +89,11 @@ export interface QueryBuilderStoreState {
   deselect: (id: UniqueIdentifier | UniqueIdentifier[]) => void;
   toggleSelected: (id: UniqueIdentifier, reset?: boolean) => void;
 
-  createNewNode: (kind: NodeKind, above?: boolean) => void;
-  createNewRule: (above?: boolean) => void;
-  createNewGroup: (above?: boolean) => void;
-  createNewOperator: (above?: boolean) => void;
-  createNewAgeFilter: (above?: boolean) => void;
+  createNewNode: (kind: NodeKind) => void;
+  createNewRule: () => void;
+  createNewGroup: () => void;
+  createNewOperator: () => void;
+  createNewAgeFilter: () => void;
 
   queryAsText: string;
   getQueryFromText: (input: string) => Promise<RuleGroupType>;
@@ -243,25 +242,10 @@ export const useQueryBuilderStore = create<QueryBuilderStoreState>(
       });
     },
 
-    createNewNode: (kind: NodeKind, above: boolean = true) => {
+    createNewNode: (kind: NodeKind) => {
       const fn = Creators[kind];
 
-      const {
-        selected,
-        queryBuilderJson,
-        setQueryBuilderJson,
-        setSelected,
-        boardIndex,
-      } = get();
-
-      const idsToAddTo = trueKeys(selected);
-      const allIds = Object.entries(boardIndex.itemsByGroup).flatMap(
-        ([k, v]) => [k, ...v],
-      );
-      const allSet = new Set(allIds);
-      const validIdsToAddTo = idsToAddTo.filter((id) =>
-        allSet.has(id as string),
-      );
+      const { queryBuilderJson, setQueryBuilderJson, setSelected } = get();
 
       const normaliseAdditions = (
         belowNeighbor?: RuleNodeType,
@@ -270,50 +254,27 @@ export const useQueryBuilderStore = create<QueryBuilderStoreState>(
         const additions = Array.isArray(produced) ? produced : [produced];
 
         const belowIsOperator = !!belowNeighbor && isOperator(belowNeighbor);
-        const firstIsOperator = isOperator(additions[0]);
+        const lastAdditionIsOperator = isOperator(
+          additions[additions.length - 1],
+        );
 
-        const needLeadingOperator =
-          !!belowNeighbor && !belowIsOperator && !firstIsOperator;
-        const skipFirstOperator = belowIsOperator && firstIsOperator;
+        const suffixWithOperator =
+          belowNeighbor && !belowIsOperator && !lastAdditionIsOperator;
 
-        return [
-          ...(needLeadingOperator ? [createOperator()] : []),
-          ...(skipFirstOperator && additions.length > 1
-            ? additions.slice(1)
-            : additions),
-        ];
+        return suffixWithOperator
+          ? [...additions, ...[createOperator()]]
+          : additions;
       };
 
-      if (validIdsToAddTo.length > 0) {
-        let updated = queryBuilderJson;
+      const firstNode = queryBuilderJson.rules[0];
+      const toPrepend = normaliseAdditions(firstNode);
 
-        for (const id of validIdsToAddTo) {
-          const leftNeighbor = findById(updated, id as string);
-          const toInsert = normaliseAdditions(leftNeighbor);
-          setSelected(toInsert[above ? toInsert.length - 1 : 0].id, true, true);
-
-          updated = updateById(updated, id as string, (node) => node, {
-            node: above ? toInsert.reverse() : toInsert,
-            position: above ? "before" : "after",
-          });
-        }
-
-        setQueryBuilderJson(updated);
-        return;
-      }
-
-      const lastNode =
-        queryBuilderJson.rules[queryBuilderJson.rules.length - 1];
-      const toAppend = normaliseAdditions(lastNode);
-
-      const rules = above
-        ? [...toAppend.reverse(), ...queryBuilderJson.rules]
-        : [...queryBuilderJson.rules, ...toAppend];
+      const rules = [...toPrepend, ...queryBuilderJson.rules];
 
       const updatedQuery = { ...queryBuilderJson, rules };
 
       setSelected(
-        toAppend.slice(0, 1).map((r) => r.id),
+        toPrepend.slice(0, 1).map((r) => r.id),
         true,
         true,
       );
@@ -321,13 +282,10 @@ export const useQueryBuilderStore = create<QueryBuilderStoreState>(
       setQueryBuilderJson(updatedQuery);
     },
 
-    createNewRule: (above = true) => get().createNewNode(NodeKind.RULE, above),
-    createNewGroup: (above = true) =>
-      get().createNewNode(NodeKind.GROUP, above),
-    createNewOperator: (above = true) =>
-      get().createNewNode(NodeKind.OPERATOR, above),
-    createNewAgeFilter: (above = true) =>
-      get().createNewNode(NodeKind.AGE_FILTER, above),
+    createNewRule: () => get().createNewNode(NodeKind.RULE),
+    createNewGroup: () => get().createNewNode(NodeKind.GROUP),
+    createNewOperator: () => get().createNewNode(NodeKind.OPERATOR),
+    createNewAgeFilter: () => get().createNewNode(NodeKind.AGE_FILTER),
 
     queryAsText: queryToText(DEFAULT_QUERY),
 

@@ -1,4 +1,4 @@
-import { ApiResponse, Code } from "../../../types/api";
+import { ApiResponse, Code } from "@/types/api";
 
 const getCodes = async (domain: string): Promise<ApiResponse<Code[]>> => {
   const codesByDomain: Record<string, Code[]> = {

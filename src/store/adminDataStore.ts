@@ -1,14 +1,14 @@
 import { create } from "zustand";
-import createCollection from "@/actions/createCollection";
-import deleteCollection from "@/actions/deleteCollection";
-import updateCollection from "@/actions/updateCollection";
-import createCollectionConfig from "@/actions/createCollectionConfig";
-import updateCollectionConfig from "@/actions/updateCollectionConfig";
-import createWorkgroup from "@/actions/createWorkgroup";
-import addCollectionsToWorkgroup from "@/actions/addCollectionsToWorkgroup";
-import removeCollectionsFromWorkgroup from "@/actions/removeCollectionsFromWorkgroup";
-import addCollectionToWorkgroups from "@/actions/addCollectionToWorkgroups";
-import removeCollectionFromWorkgroups from "@/actions/removeCollectionFromWorkgroups";
+import createCollection from "@/actions/collection/createCollection";
+import deleteCollection from "@/actions/collection/deleteCollection";
+import updateCollection from "@/actions/collection/updateCollection";
+import createCollectionConfig from "@/actions/collection/createCollectionConfig";
+import updateCollectionConfig from "@/actions/collection/updateCollectionConfig";
+import createWorkgroup from "@/actions/workgroup/createWorkgroup";
+import addCollectionsToWorkgroup from "@/actions/workgroup/addCollectionsToWorkgroup";
+import removeCollectionsFromWorkgroup from "@/actions/workgroup/removeCollectionsFromWorkgroup";
+import addCollectionToWorkgroups from "@/actions/workgroup/addCollectionToWorkgroups";
+import removeCollectionFromWorkgroups from "@/actions/workgroup/removeCollectionFromWorkgroups";
 import {
   revalidateAction,
   revalidateCollections,
@@ -40,14 +40,14 @@ import {
 } from "@/types/api";
 import { TAG_WORKGROUP_ADMIN, TAG_ADMIN_USERS } from "@/config/tags";
 import { emptyPaginated } from "@/utils/pagination";
-import addUsersToWorkgroup from "@/actions/addUsersToWorkgroup";
-import removeUserFromWorkgroup from "@/actions/removeUsersFromWorkgroup";
-import transitionCollections from "@/actions/transitionCollections";
-import createNetwork from "@/actions/createNetwork";
-import addCustodiansToNetwork from "@/actions/addCustodiansToNetwork";
-import deleteNetwork from "@/actions/deleteNetwork";
-import removeCustodiansFromNetwork from "@/actions/removeCustodiansFromNetwork";
-import updateNetwork from "@/actions/updateNetwork";
+import addUsersToWorkgroup from "@/actions/workgroup/addUsersToWorkgroup";
+import removeUserFromWorkgroup from "@/actions/workgroup/removeUsersFromWorkgroup";
+import transitionCollections from "@/actions/collection/transitionCollections";
+import createNetwork from "@/actions/network/createNetwork";
+import addCustodiansToNetwork from "@/actions/network/addCustodiansToNetwork";
+import deleteNetwork from "@/actions/network/deleteNetwork";
+import removeCustodiansFromNetwork from "@/actions/network/removeCustodiansFromNetwork";
+import updateNetwork from "@/actions/network/updateNetwork";
 
 export interface AdminDataStoreState {
   users: User[];

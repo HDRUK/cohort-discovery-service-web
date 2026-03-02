@@ -14,6 +14,7 @@ import {
   findById,
   findByIdWithNeighbors,
   getSelectedOrdered,
+  createAgeFilter,
 } from "@/utils/rules";
 import { useCallback, useMemo } from "react";
 
@@ -152,10 +153,10 @@ const useNodeActions = (
     );
   }, [id, queryBuilderJson, setQueryBuilderJson]);
 
-  const rules = node && isRuleGroup(node) ? node.rules : undefined;
+  const groupRules = node && isRuleGroup(node) ? node.rules : undefined;
   const handleCreateNewRule = useCallback(() => {
-    if (!rules) return;
-    const newRules = [createRule(), createOperator(), ...rules];
+    if (!groupRules) return;
+    const newRules = [createRule(), createOperator(), ...groupRules];
 
     setQueryBuilderJson(
       updateById(queryBuilderJson, id, (node) => ({
@@ -163,7 +164,31 @@ const useNodeActions = (
         rules: newRules,
       })),
     );
-  }, [id, rules, queryBuilderJson, setQueryBuilderJson]);
+  }, [id, groupRules, queryBuilderJson, setQueryBuilderJson]);
+
+  const handleCreateNewAgeFilter = useCallback(() => {
+    if (!groupRules) return;
+    const newRules = [createAgeFilter(), createOperator(), ...groupRules];
+
+    setQueryBuilderJson(
+      updateById(queryBuilderJson, id, (node) => ({
+        ...node,
+        rules: newRules,
+      })),
+    );
+  }, [id, groupRules, queryBuilderJson, setQueryBuilderJson]);
+
+  const handleCreateNewOperator = useCallback(() => {
+    if (!groupRules) return;
+    const newRules = [createOperator(), ...groupRules];
+
+    setQueryBuilderJson(
+      updateById(queryBuilderJson, id, (node) => ({
+        ...node,
+        rules: newRules,
+      })),
+    );
+  }, [id, groupRules, queryBuilderJson, setQueryBuilderJson]);
 
   const actions = [
     { action: handleDeleteRule, label: "Delete" },
@@ -176,8 +201,10 @@ const useNodeActions = (
       : []),
     ...(node && isRuleGroup(node)
       ? [
+          { action: handleCreateNewAgeFilter, label: "Add Age Filter" },
+          { action: handleCreateNewOperator, label: "Add Operator" },
           { action: handleCreateNewRule, label: "Add Rule" },
-          { action: handleCollapseGroup, label: "Collapse Group" },
+          { action: handleCollapseGroup, label: "Ungroup" },
         ]
       : []),
   ];

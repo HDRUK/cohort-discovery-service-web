@@ -2,7 +2,7 @@
 
 import { Paper, Typography } from "@mui/material";
 import MyDefinitions from "./components/MyDefinitions";
-import getConceptSets from "@/actions/getConceptSets";
+import getConceptSets from "@/actions/conceptSet/getConceptSets";
 
 export default async function ProfilePage() {
   const { data: conceptSets } = await getConceptSets();

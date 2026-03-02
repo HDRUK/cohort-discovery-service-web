@@ -22,7 +22,7 @@ import QueryResultsTable from "@/modules/QueryResultsTable";
 import QueryHistoryGuidance from "@/modules/QueryHistory/QueryHistoryGuidance";
 import { queryToText } from "@/utils/queryBuilder";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import getQueries from "@/actions/getQueries";
+import getQueries from "@/actions/query/getQueries";
 import { DEFAULT_INTERVAL } from "@/config/defaults";
 import { getQueryName } from "@/utils/query";
 import useSearchParams from "@/hooks/useSearchParams";

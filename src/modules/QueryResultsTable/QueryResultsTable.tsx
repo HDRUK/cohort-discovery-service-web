@@ -13,7 +13,7 @@ import useSearchParams from "@/hooks/useSearchParams";
 import { DEFAULT_INTERVAL, STATUS_LABELS } from "@/config/defaults";
 import Table from "../../components/Table";
 import { TableProps } from "../../components/Table/Table";
-import getQuery from "@/actions/getQuery";
+import getQuery from "@/actions/query/getQuery";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import QueryHistoryGuidance from "../QueryHistory";
 

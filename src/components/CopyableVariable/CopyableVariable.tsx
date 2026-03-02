@@ -12,12 +12,19 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { CopyAllOutlined } from "@mui/icons-material";
 import { useNotify } from "@/providers/NotifyProvider";
 
-interface CopyableVariableProps {
+interface CopyableVariableProps extends Omit<
+  React.ComponentProps<typeof Stack>,
+  "value"
+> {
   value: string | number;
   hidden?: boolean;
 }
 
-const CopyableVariable = ({ value, hidden = false }: CopyableVariableProps) => {
+const CopyableVariable = ({
+  value,
+  hidden = false,
+  ...rest
+}: CopyableVariableProps) => {
   const [show, setShow] = useState(!hidden);
   const notify = useNotify();
 
@@ -33,7 +40,7 @@ const CopyableVariable = ({ value, hidden = false }: CopyableVariableProps) => {
   };
 
   return (
-    <Stack direction="row" alignItems="center">
+    <Stack direction="row" alignItems="center" {...rest}>
       <TextField
         value={value}
         variant="filled"
