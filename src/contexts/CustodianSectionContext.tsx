@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo } from "react";
-import { forbidden } from "next/navigation";
+import { redirect } from "next/navigation";
 import { Paper } from "@mui/material";
 
 import SkeletonFull from "@/components/SkeletonFull";
@@ -43,7 +43,9 @@ export function CustodianSectionProvider({
     return pids.includes(custodian.pid);
   }, [user, custodian.pid]);
 
-  if (user && !allowed) forbidden();
+  if (user && !allowed) {
+    redirect("/403?reason=no-access-custodian");
+  }
 
   if (!user) {
     return (

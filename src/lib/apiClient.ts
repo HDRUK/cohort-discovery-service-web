@@ -3,7 +3,7 @@
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import { cookies } from "next/headers";
 import { ApiError } from "./https";
-import { notFound, forbidden } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { DEFAULT_REVALIDATE } from "@/config/defaults";
 import { getTokenUser } from "./auth";
 import { CacheOptions } from "@/types/api";
@@ -118,10 +118,7 @@ async function request<TResponse, TBody = undefined>(
   } catch (error) {
     if (error instanceof ApiError) {
       if (error.status === 404) notFound();
-      if (error.status === 403) {
-        console.log("here i ammmm");
-        forbidden();
-      }
+      if (error.status === 403) redirect("/403?reason=no-token");
       throw error;
     }
     throw await handleApiError(error);

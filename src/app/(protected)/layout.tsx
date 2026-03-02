@@ -1,5 +1,5 @@
 import { cookies, headers } from "next/headers";
-import { forbidden, notFound, redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import { TokenUser, CombinedUser } from "@/types/api";
@@ -27,7 +27,7 @@ export default async function ProtectedLayout({
       // No token — render the client SignIn component so users can sign in.
       redirect("/login");
     } else {
-      forbidden();
+      redirect("/403?reason=no-token");
     }
   }
 

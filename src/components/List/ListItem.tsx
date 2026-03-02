@@ -1,12 +1,16 @@
 import useRightClickMenu from "@/hooks/useRightClickMenu";
-import { ListItemButton, ListItemText } from "@mui/material";
+import {
+  ListItemButton,
+  ListItemText,
+  ListItem as MuiListItem,
+} from "@mui/material";
 import RightClickMenu from "../RightClickMenu/RightClickMenu";
 import { RightClickAction } from "@/hooks/useNodeActions";
 
 export interface ListItemType {
   id?: string | number;
   label: string;
-  onClick: () => void;
+  onClick?: () => void; // optional
   disabled?: boolean;
   rightClickActions?: RightClickAction[];
   selected?: boolean;
@@ -22,6 +26,19 @@ const ListItem = ({
 }: ListItemType) => {
   const { handleContextMenu, ...rightClickMenuMethods } = useRightClickMenu();
 
+  if (!onClick) {
+    return (
+      <MuiListItem
+        component="li"
+        disableGutters
+        sx={{ display: "list-item" }}
+        key={id ?? label}
+      >
+        <ListItemText sx={{ color: "text.primary" }} primary={label} />
+      </MuiListItem>
+    );
+  }
+
   return (
     <ListItemButton
       disabled={disabled}
@@ -30,6 +47,7 @@ const ListItem = ({
       onClick={onClick}
       onContextMenu={handleContextMenu}
       selected={selected}
+      sx={{ display: "list-item" }}
     >
       <ListItemText sx={{ color: "text.primary" }} primary={label} />
       {rightClickActions && (
