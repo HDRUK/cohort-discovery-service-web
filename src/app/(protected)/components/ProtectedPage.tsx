@@ -1,7 +1,7 @@
 "use client";
 
 import { CombinedUser, Custodian, FeatureFlag, Workgroup } from "@/types/api";
-import { forbidden } from "next/navigation";
+import { redirect } from "next/navigation";
 import { ReactNode, useEffect } from "react";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import useUserStore from "@/hooks/useUserStore";
@@ -36,7 +36,7 @@ const ProtectedPage = ({
     setWorkgroups(workgroups);
   }, [workgroups, setWorkgroups]);
 
-  if (!user) forbidden();
+  if (!user) redirect("/403?reason=no-token");
 
   return <>{children}</>;
 };
