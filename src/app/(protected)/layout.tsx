@@ -1,5 +1,5 @@
 import { cookies, headers } from "next/headers";
-import { forbidden, notFound, redirect } from "next/navigation";
+import { forbidden, redirect } from "next/navigation";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import { TokenUser, CombinedUser } from "@/types/api";

@@ -118,7 +118,10 @@ async function request<TResponse, TBody = undefined>(
   } catch (error) {
     if (error instanceof ApiError) {
       if (error.status === 404) notFound();
-      if (error.status === 403) forbidden();
+      if (error.status === 403) {
+        console.log("here i ammmm");
+        forbidden();
+      }
       throw error;
     }
     throw await handleApiError(error);
