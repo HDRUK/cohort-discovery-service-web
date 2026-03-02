@@ -15,9 +15,7 @@ export type Diffed<T> = T extends (infer U)[]
     ? { [K in keyof T]: Diffed<T[K]> }
     : DiffLeaf;
 
-export type Ignore =
-  | string[] // exact or prefix paths
-  | ((path: string) => boolean);
+export type Ignore = string[] | ((path: string) => boolean);
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -27,7 +25,6 @@ function shouldIgnorePath(path: string, ignore?: Ignore) {
   if (!ignore) return false;
   if (typeof ignore === "function") return ignore(path);
 
-  // Match exact OR subtree via dot/index prefix
   return ignore.some(
     (p) => path === p || path.startsWith(p + ".") || path.startsWith(p + "["),
   );

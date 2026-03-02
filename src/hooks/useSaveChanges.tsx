@@ -2,13 +2,9 @@ import { useEffect, useMemo } from "react";
 import { useCloseGuard } from "@/providers/CloseGuardProvider";
 import { useConfirm } from "@/hooks/useConfirm";
 import { Control, FieldValues } from "react-hook-form";
-import { useChangedFieldValues } from "./useChangedFieldValues";
+import { Ignore, useChangedFieldValues } from "./useChangedFieldValues";
 import { Typography } from "@mui/material";
 import ChangesTable from "@/components/ChangesTable";
-
-type Ignore =
-  | string[] // exact or prefix paths
-  | ((path: string) => boolean);
 
 type Options<TFieldValues extends FieldValues> = {
   control: Control<TFieldValues>;
