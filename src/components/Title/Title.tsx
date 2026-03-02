@@ -1,8 +1,8 @@
 import { Box, BoxProps, Typography } from "@mui/material";
 import { ReactNode } from "react";
 
-export interface TitleProps extends BoxProps {
-  title: string;
+export interface TitleProps extends Omit<BoxProps, "title"> {
+  title: string | ReactNode;
   subTitle?: number | string | ReactNode;
   children?: ReactNode;
   startIcon?: ReactNode;

@@ -135,6 +135,7 @@ const SearchConcepts = ({
               e.stopPropagation();
               e.preventDefault();
             }}
+            showCode
           />
         ))}
       </FormGroup>
