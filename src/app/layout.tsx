@@ -7,6 +7,7 @@ import TopMenu from "@/components/TopMenu";
 import HeaderBar from "@/components/HeaderBar";
 import { isStandalone } from "@/utils/modes";
 import Footer from "@/components/Footer";
+import ServerDefaultProvider from "@/providers/ServerDefaultProvider";
 
 const sourceSans = Source_Sans_3({
   variable: "--font-source-sans-3",
@@ -37,40 +38,46 @@ export default async function RootLayout({
     <ThemeRegistry>
       <html lang="en">
         <body className={`${sourceSans.variable} ${geistMono.variable}`}>
-          <Box>
-            <Box
-              sx={{ display: "flex", flexDirection: "column", height: "120vh" }}
-            >
-              {!hideNav && <HeaderBar standalone={standalone} />}
-
+          <ServerDefaultProvider>
+            <Box>
               <Box
                 sx={{
-                  py: hideNav ? 0 : 1,
-                  px: hideNav ? 0 : 2,
-                  bgcolor: "background.paper",
                   display: "flex",
                   flexDirection: "column",
-                  flex: 1,
-                  minHeight: 0,
+                  height: "120vh",
                 }}
               >
-                {!hideNav && <TopMenu standalone={standalone} />}
+                {!hideNav && <HeaderBar standalone={standalone} />}
 
                 <Box
-                  component="main"
                   sx={{
-                    flexGrow: 1,
-                    bgcolor: "secondary.main",
-                    p: 2,
-                    overflow: "auto",
+                    py: hideNav ? 0 : 1,
+                    px: hideNav ? 0 : 2,
+                    bgcolor: "background.paper",
+                    display: "flex",
+                    flexDirection: "column",
+                    flex: 1,
+                    minHeight: 0,
                   }}
                 >
-                  {children}
+                  {!hideNav && <TopMenu standalone={standalone} />}
+
+                  <Box
+                    component="main"
+                    sx={{
+                      flexGrow: 1,
+                      bgcolor: "secondary.main",
+                      p: 2,
+                      overflow: "auto",
+                    }}
+                  >
+                    {children}
+                  </Box>
                 </Box>
               </Box>
+              <Footer standalone={standalone} />
             </Box>
-            <Footer standalone={standalone} />
-          </Box>
+          </ServerDefaultProvider>
         </body>
       </html>
     </ThemeRegistry>
