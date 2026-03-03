@@ -124,7 +124,7 @@ const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
   useDebounce(liveInput, {
     delay: DEFAULT_SEARCH_PREFETCH,
     shouldApplyImmediately,
-    onSetValue: prefetchQuery,
+    onValueChange: prefetchQuery,
   });
 
   const { debounced: searchedValue, flush: flushSearchedValue } = useDebounce(
@@ -132,7 +132,7 @@ const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
     {
       delay: DEFAULT_SEARCH_WAIT_TIME,
       shouldApplyImmediately,
-      onSetValue: handleSearch,
+      onValueChange: handleSearch,
     },
   );
 
