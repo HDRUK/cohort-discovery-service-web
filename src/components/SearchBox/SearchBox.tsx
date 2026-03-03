@@ -87,7 +87,7 @@ const SearchBox = ({
 
   const rotatingPlaceholder = useRotatingPlaceholder(
     placeholders,
-    DEFAULT_SEACRH_SUGGESTION_ROTATION,
+    DEFAULT_SEARCH_SUGGESTION_ROTATION,
   );
 
   return (
