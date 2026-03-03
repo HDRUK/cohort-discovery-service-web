@@ -51,6 +51,7 @@ import { useCustodianDataStore } from "@/store/custodianDataStore";
 import { useAdminDataStore } from "@/store/adminDataStore";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import ConfirmProvider from "@/components/ConfirmProvider";
+import ServerDefaultProvider from "@/providers/ServerDefaultProvider";
 
 const queryClient = new QueryClient();
 
@@ -242,13 +243,15 @@ const MockDaphneStore = ({
   );
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <ConfirmProvider>
-          <NotifyProvider>{children}</NotifyProvider>
-        </ConfirmProvider>
-      </LocalizationProvider>
-    </QueryClientProvider>
+    <ServerDefaultProvider>
+      <QueryClientProvider client={queryClient}>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <ConfirmProvider>
+            <NotifyProvider>{children}</NotifyProvider>
+          </ConfirmProvider>
+        </LocalizationProvider>
+      </QueryClientProvider>
+    </ServerDefaultProvider>
   );
 };
 
