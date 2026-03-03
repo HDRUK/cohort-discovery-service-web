@@ -8,7 +8,7 @@ import { isRuleGroup } from "@/utils/rules";
 import { SortableContext } from "@dnd-kit/sortable";
 import { List, ListItem, ListItemButton, ListItemText } from "@mui/material";
 import EditableText from "@/components/EditableText";
-import { ID_REF_SUFFIX } from "@/config/defaults";
+import { DEFAULT_ID_REF_SUFFIX } from "@/config/defaults";
 import { listItemButtonSx, INDENT_STEP } from "./HierarchyItem.style";
 import InvalidRule from "../InvalidRule";
 import useRightClickMenu from "@/hooks/useRightClickMenu";
@@ -45,7 +45,7 @@ export const HierarchyItem = ({
     setNodeName: qb.setNodeName,
     hovered: qb.hovered,
   }));
-  const id = `${ID_REF_SUFFIX}-${node.id}`;
+  const id = `${DEFAULT_ID_REF_SUFFIX}-${node.id}`;
 
   const {
     setNodeRef,
@@ -164,7 +164,7 @@ export const HierarchyItem = ({
         {({ expanded }) => (
           <List disablePadding>
             <SortableContext
-              items={node.rules.map((r) => `${ID_REF_SUFFIX}-${r.id}`)}
+              items={node.rules.map((r) => `${DEFAULT_ID_REF_SUFFIX}-${r.id}`)}
               disabled={!expanded}
             >
               {!isDragging &&

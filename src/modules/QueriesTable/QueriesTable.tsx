@@ -23,12 +23,12 @@ import QueryHistoryGuidance from "@/modules/QueryHistory/QueryHistoryGuidance";
 import { queryToText } from "@/utils/queryBuilder";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import getQueries from "@/actions/query/getQueries";
-import { DEFAULT_INTERVAL } from "@/config/defaults";
 import { getQueryName } from "@/utils/query";
 import useSearchParams from "@/hooks/useSearchParams";
 import { buildQueryHistoryParams } from "@/utils/params";
 import useUserStore from "@/hooks/useUserStore";
 import { getUserQueryTag, TAG_QUERIES } from "@/config/tags";
+import { useDefaults } from "@/providers/DefaultProvider";
 
 interface QueriesTableProps {
   initialData: Paginated<Query>;
@@ -39,6 +39,7 @@ const QueriesTable = ({
   initialData,
   columnVisibility = { pid: false, "mrt-row-expand": false },
 }: QueriesTableProps) => {
+  const defaults = useDefaults();
   const { searchParams } = useSearchParams();
   const { setSelectedDatasets } = useQueryBuilder((qb) => ({
     setSelectedDatasets: qb.setSelectedDatasets,
@@ -69,7 +70,7 @@ const QueriesTable = ({
       return res.data;
     },
     initialData,
-    staleTime: 2 * DEFAULT_INTERVAL,
+    staleTime: 2 * defaults.tableRefresh,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
@@ -78,7 +79,7 @@ const QueriesTable = ({
       const hasIncomplete =
         data?.data.filter((q) => q.tasks.some((t) => !t.completed_at))
           ?.length ?? 0 > 0;
-      return hasIncomplete ? DEFAULT_INTERVAL : false;
+      return hasIncomplete ? defaults.tableRefresh : false;
     },
   });
   useEffect(() => {

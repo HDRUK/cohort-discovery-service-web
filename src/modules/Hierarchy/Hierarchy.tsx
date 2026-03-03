@@ -20,7 +20,7 @@ import { SortableContext } from "@dnd-kit/sortable";
 import { List } from "@mui/material";
 import { useCallback, useState } from "react";
 import HierarchyItem from "@/components/HierarchyItem";
-import { ID_REF_SUFFIX } from "@/config/defaults";
+import { DEFAULT_ID_REF_SUFFIX } from "@/config/defaults";
 import useHasMounted from "@/hooks/useHasMounted";
 import SkeletonFull from "@/components/SkeletonFull";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
@@ -83,7 +83,9 @@ export const Hierarchy = () => {
     >
       <List disablePadding>
         <SortableContext
-          items={queryBuilderJson.rules.map((r) => `${ID_REF_SUFFIX}-${r.id}`)}
+          items={queryBuilderJson.rules.map(
+            (r) => `${DEFAULT_ID_REF_SUFFIX}-${r.id}`,
+          )}
         >
           {rules.map((node: RuleNodeType) => (
             <HierarchyItem

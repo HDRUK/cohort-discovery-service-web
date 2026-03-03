@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { MAX_VARCHAR_LENGTH } from "@/config/defaults";
+import { DEFAULT_MAX_VARCHAR_LENGTH } from "@/config/defaults";
 
 function capitaliseFirstLetter(str: string) {
   if (!str) return "";
@@ -30,7 +30,11 @@ const getEnumLabel = <T extends Record<string, string | number>>(
   return pretty.charAt(0).toUpperCase() + pretty.slice(1);
 };
 
-const capVarChar = (s: string, max = MAX_VARCHAR_LENGTH, addDots = false) =>
+const capVarChar = (
+  s: string,
+  max = DEFAULT_MAX_VARCHAR_LENGTH,
+  addDots = false,
+) =>
   `${[...s].slice(0, max).join("")} ${s.length > max && addDots ? "..." : ""}`;
 
 const paramsToString = (params?: URLSearchParams | string) => {
