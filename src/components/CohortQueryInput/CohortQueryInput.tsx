@@ -7,11 +7,7 @@ import { useIsFetching, useQueryClient } from "@tanstack/react-query";
 
 import SearchBox from "../SearchBox";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import {
-  DEFAULT_SEARCH_PREFETCH,
-  DEFAULT_SEARCH_WAIT_TIME,
-  MAX_INVALID_REASONS,
-} from "@/config/defaults";
+
 import { useDebounce } from "@/hooks/useDebounce";
 import useSubmitQuery from "@/hooks/useSubmitQuery";
 import { RuleErrors } from "@/utils/rules";
@@ -19,6 +15,7 @@ import SubmitQueryButton from "@/components/SubmitQueryButton";
 import { EXAMPLES } from "@/config/queryExamples";
 import { Query } from "@/types/api";
 import SearchOverlay from "./SearchOverlay";
+import { useDefaults } from "@/providers/DefaultProvider";
 
 type FormValues = {
   cohortQueryInput: string;
@@ -28,6 +25,8 @@ const MIN_SEARCH_LENGTH = 3;
 const STALE_TIME = 60_000;
 
 const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
+  const defaults = useDefaults();
+
   const queryAsText = useQueryBuilder((qb) => qb.queryAsText);
   const getQueryFromText = useQueryBuilder((qb) => qb.getQueryFromText);
   const setQueryBuilderJson = useQueryBuilder((qb) => qb.setQueryBuilderJson);
@@ -122,7 +121,7 @@ const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
 
   // debounce live input at a shorter interval to prefetch it
   useDebounce(liveInput, {
-    delay: DEFAULT_SEARCH_PREFETCH,
+    delay: defaults.searchPrefetch,
     shouldApplyImmediately,
     onValueChange: prefetchQuery,
   });
@@ -130,7 +129,7 @@ const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
   const { debounced: searchedValue, flush: flushSearchedValue } = useDebounce(
     liveInput,
     {
-      delay: DEFAULT_SEARCH_WAIT_TIME,
+      delay: defaults.searchWaitTime,
       shouldApplyImmediately,
       onValueChange: handleSearch,
     },
@@ -164,11 +163,12 @@ const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
     if (errors.length > 0) {
       setFormError("cohortQueryInput", {
         message:
-          errors.slice(0, MAX_INVALID_REASONS).join(" ") ||
+          errors.slice(0, defaults.maxInvalidReasons).join(" ") ||
           "This query is invalid...",
       });
     }
   }, [
+    defaults,
     queryAsText,
     searchedValue,
     errors,
