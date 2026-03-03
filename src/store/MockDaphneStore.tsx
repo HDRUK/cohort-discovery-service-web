@@ -52,6 +52,7 @@ import { useAdminDataStore } from "@/store/adminDataStore";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import ConfirmProvider from "@/components/ConfirmProvider";
 import ServerDefaultProvider from "@/providers/ServerDefaultProvider";
+import { DefaultProvider } from "@/providers/DefaultProvider";
 
 const queryClient = new QueryClient();
 
@@ -243,7 +244,7 @@ const MockDaphneStore = ({
   );
 
   return (
-    <ServerDefaultProvider>
+    <DefaultProvider>
       <QueryClientProvider client={queryClient}>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <ConfirmProvider>
@@ -251,7 +252,7 @@ const MockDaphneStore = ({
           </ConfirmProvider>
         </LocalizationProvider>
       </QueryClientProvider>
-    </ServerDefaultProvider>
+    </DefaultProvider>
   );
 };
 
