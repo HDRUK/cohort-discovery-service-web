@@ -1,25 +1,41 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+type UseDebounceOptionsProps<T> = {
+  delay?: number;
+  shouldApplyImmediately?: (v: T) => boolean;
+  onValueChange?: (v: T) => void;
+};
 
 export const useDebounce = <T>(
   value: T,
-  delay = 100,
-  flushNow?: (v: T) => boolean,
-): T => {
+  {
+    delay = 100,
+    shouldApplyImmediately,
+    onValueChange,
+  }: UseDebounceOptionsProps<T>,
+) => {
   const [debounced, setDebounced] = useState(value);
 
+  const latestOnChange = useRef(onValueChange);
+  useEffect(() => {
+    latestOnChange.current = onValueChange;
+  }, [onValueChange]);
+
   const shouldFlush = useMemo(
-    () => (flushNow ? flushNow(value) : false),
-    [flushNow, value],
+    () => (shouldApplyImmediately ? shouldApplyImmediately(value) : false),
+    [shouldApplyImmediately, value],
   );
+
+  const flush = useCallback(() => {
+    setDebounced(value);
+    latestOnChange.current?.(value);
+  }, [value]);
 
   useEffect(() => {
     const ms = shouldFlush ? 0 : delay;
-    const id = globalThis.setTimeout(() => {
-      setDebounced(value);
-    }, ms);
-
+    const id = globalThis.setTimeout(flush, ms);
     return () => globalThis.clearTimeout(id);
-  }, [value, delay, shouldFlush]);
+  }, [delay, shouldFlush, flush]);
 
-  return debounced;
+  return { debounced, flush };
 };

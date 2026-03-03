@@ -3,16 +3,18 @@
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { Box } from "@mui/material";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useIsFetching, useQueryClient } from "@tanstack/react-query";
+
 import SearchBox from "../SearchBox";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import {
+  DEFAULT_SEARCH_PREFETCH,
   DEFAULT_SEARCH_WAIT_TIME,
   MAX_INVALID_REASONS,
 } from "@/config/defaults";
 import { useDebounce } from "@/hooks/useDebounce";
 import useSubmitQuery from "@/hooks/useSubmitQuery";
 import { RuleErrors } from "@/utils/rules";
-import useStateManagement from "@/hooks/useStateManagement";
 import SubmitQueryButton from "@/components/SubmitQueryButton";
 import { EXAMPLES } from "@/config/queryExamples";
 import { Query } from "@/types/api";
@@ -22,29 +24,24 @@ type FormValues = {
   cohortQueryInput: string;
 };
 
+const MIN_SEARCH_LENGTH = 3;
+const STALE_TIME = 60_000;
+
 const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
-  const {
-    queryAsText,
-    getQueryFromText,
-    resetQueryBuilderJson,
-    appendError,
-    errors = [],
-    warnings = [],
-  } = useQueryBuilder((qb) => ({
-    queryAsText: qb.queryAsText,
-    getQueryFromText: qb.getQueryFromText,
-    resetQueryBuilderJson: qb.resetQueryBuilderJson,
-    appendError: qb.appendError,
-    errors: qb.errors,
-    warnings: qb.queryBuilderJson.warnings,
-  }));
+  const queryAsText = useQueryBuilder((qb) => qb.queryAsText);
+  const getQueryFromText = useQueryBuilder((qb) => qb.getQueryFromText);
+  const setQueryBuilderJson = useQueryBuilder((qb) => qb.setQueryBuilderJson);
+  const resetQueryBuilderJson = useQueryBuilder(
+    (qb) => qb.resetQueryBuilderJson,
+  );
+  const appendError = useQueryBuilder((qb) => qb.appendError);
+  const errors = useQueryBuilder((qb) => qb.errors ?? []);
+  const warnings = useQueryBuilder((qb) => qb.queryBuilderJson.warnings ?? []);
 
   const { disabled } = useSubmitQuery();
+  const queryClient = useQueryClient();
 
-  const isLoading = useStateManagement((s) => s.isLoading);
-  const setIsLoading = useStateManagement((s) => s.setIsLoading);
-
-  const lastCommittedRef = useRef<string>(queryAsText);
+  const programmaticValueRef = useRef<string | null>(null);
 
   const {
     handleSubmit: handleSubmitSearch,
@@ -52,30 +49,10 @@ const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
     resetField,
     setError: setFormError,
     clearErrors: clearFormErrors,
-    formState: { isDirty, isLoading: isLoadingForm, isSubmitting },
+    formState: { isDirty },
   } = useForm<FormValues>({
-    defaultValues: {
-      cohortQueryInput: queryAsText,
-    },
+    defaultValues: { cohortQueryInput: queryAsText },
   });
-
-  const onSubmitSearch = useCallback(
-    async ({ cohortQueryInput }: FormValues) => {
-      const { rules } = await getQueryFromText(cohortQueryInput);
-      if (rules.length === 0) {
-        appendError(RuleErrors.NO_QUERY_FOUND);
-      }
-    },
-    [getQueryFromText, appendError],
-  );
-
-  const liveQuery = useWatch({ control, name: "cohortQueryInput" }) ?? "";
-  const debouncedQuery = useDebounce(
-    liveQuery,
-    DEFAULT_SEARCH_WAIT_TIME,
-    (v) => v.trim() === "",
-  );
-  const debouncedQueryRef = useRef(debouncedQuery);
 
   const resetQuery = useCallback(() => {
     clearFormErrors();
@@ -85,16 +62,101 @@ const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
       keepTouched: true,
       keepError: true,
     });
-  }, [queryAsText, resetQueryBuilderJson, clearFormErrors, resetField]);
+  }, [clearFormErrors, resetQueryBuilderJson, resetField, queryAsText]);
+
+  const prefetchQuery = useCallback(
+    (value: string) => {
+      const v = value.trim();
+      if (v.length < MIN_SEARCH_LENGTH) return;
+      if (v === programmaticValueRef.current) return;
+
+      queryClient.prefetchQuery({
+        queryKey: ["cohortRules", v],
+        queryFn: () => getQueryFromText(v),
+        staleTime: STALE_TIME,
+      });
+    },
+    [getQueryFromText, queryClient],
+  );
+
+  const handleSearch = useCallback(
+    async (raw: string) => {
+      const q = raw.trim();
+
+      if (programmaticValueRef.current === q) return;
+      if (q.length < MIN_SEARCH_LENGTH) return;
+
+      if (q === queryAsText) {
+        if (q === "") resetQuery();
+        return;
+      }
+
+      const queryJson = await queryClient.fetchQuery({
+        queryKey: ["cohortRules", q],
+        queryFn: () => getQueryFromText(q),
+        staleTime: STALE_TIME,
+      });
+
+      setQueryBuilderJson(queryJson);
+      if (queryJson.rules.length === 0) {
+        appendError(RuleErrors.NO_QUERY_FOUND);
+      }
+    },
+    [
+      appendError,
+      getQueryFromText,
+      queryAsText,
+      queryClient,
+      resetQuery,
+      setQueryBuilderJson,
+    ],
+  );
+
+  const liveInput = useWatch({
+    control,
+    name: "cohortQueryInput",
+    compute: (data: string) => data.trim(),
+  });
+
+  const shouldApplyImmediately = (v: string) => v.trim() === "";
+
+  // debounce live input at a shorter interval to prefetch it
+  useDebounce(liveInput, {
+    delay: DEFAULT_SEARCH_PREFETCH,
+    shouldApplyImmediately,
+    onValueChange: prefetchQuery,
+  });
+
+  const { debounced: searchedValue, flush: flushSearchedValue } = useDebounce(
+    liveInput,
+    {
+      delay: DEFAULT_SEARCH_WAIT_TIME,
+      shouldApplyImmediately,
+      onValueChange: handleSearch,
+    },
+  );
+
+  const isTyping = isDirty ? liveInput !== searchedValue : false;
+
+  const isFetchingCohortRules =
+    useIsFetching({ queryKey: ["cohortRules"] }) > 0;
+
+  const showLoader = isTyping || isFetchingCohortRules;
+
+  const lastSyncedQueryAsText = useRef<string | null>(null);
 
   useEffect(() => {
-    debouncedQueryRef.current = debouncedQuery;
-  }, [debouncedQuery]);
+    if (lastSyncedQueryAsText.current === queryAsText) return;
+    lastSyncedQueryAsText.current = queryAsText;
 
-  useEffect(() => {
     clearFormErrors();
+    const nextValue = (errors.length > 0 ? searchedValue : queryAsText).trim();
+
+    programmaticValueRef.current = nextValue;
+
     resetField("cohortQueryInput", {
-      defaultValue: errors.length > 0 ? debouncedQueryRef.current : queryAsText,
+      defaultValue: nextValue,
+      keepDirty: false,
       keepTouched: true,
       keepError: true,
     });
@@ -102,49 +164,37 @@ const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
     if (errors.length > 0) {
       setFormError("cohortQueryInput", {
         message:
-          errors?.slice(0, MAX_INVALID_REASONS).join(" ") ||
+          errors.slice(0, MAX_INVALID_REASONS).join(" ") ||
           "This query is invalid...",
       });
     }
-  }, [queryAsText, errors, resetField, setFormError, clearFormErrors]);
-
-  useEffect(() => {
-    if (isDirty || isLoadingForm || isSubmitting) setIsLoading(true);
-    else setIsLoading(false);
-  }, [setIsLoading, isDirty, isLoadingForm, isSubmitting]);
-
-  useEffect(() => {
-    const q = (debouncedQuery ?? "").trim();
-    if (q === lastCommittedRef.current) return;
-    lastCommittedRef.current = q;
-
-    if (q === queryAsText) {
-      if (q === "") resetQuery();
-      return;
-    }
-
-    handleSubmitSearch(onSubmitSearch, resetQuery)();
   }, [
     queryAsText,
-    debouncedQuery,
-    handleSubmitSearch,
-    onSubmitSearch,
-    resetQuery,
+    searchedValue,
+    errors,
+    resetField,
+    setFormError,
+    clearFormErrors,
   ]);
 
   const placeholders = Object.keys(EXAMPLES);
   const anchorRef = useRef<HTMLDivElement | null>(null);
   const [open, setOpen] = useState(false);
 
+  const onSubmit = useCallback(
+    (e?: React.BaseSyntheticEvent) =>
+      handleSubmitSearch(async ({ cohortQueryInput }) => {
+        await handleSearch(cohortQueryInput);
+        flushSearchedValue();
+      }, resetQuery)(e),
+    [handleSubmitSearch, handleSearch, resetQuery, flushSearchedValue],
+  );
+
   return (
     <Box
       component="form"
-      onSubmit={handleSubmitSearch(onSubmitSearch, resetQuery)}
-      sx={{
-        width: "95%",
-        overflow: "visible",
-        py: 1,
-      }}
+      onSubmit={onSubmit}
+      sx={{ width: "95%", overflow: "visible", py: 1 }}
     >
       <Controller
         name="cohortQueryInput"
@@ -168,22 +218,20 @@ const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
                 placeholders={placeholders}
                 fullWidth
                 variant="outlined"
-                loading={isLoading}
+                loading={showLoader}
                 warning={warnings.length > 0}
                 disabled={disabled || !!error}
                 showEndIcon={false}
-                onFocus={() => {
-                  setOpen(true);
-                }}
+                onFocus={() => setOpen(true)}
                 onBlur={() => {
                   field.onBlur();
                   setTimeout(() => setOpen(false), 150);
                 }}
                 onChange={(e) => {
+                  programmaticValueRef.current = null;
+
                   field.onChange(e);
-                  if (e.target.value) {
-                    setOpen(false);
-                  }
+                  if (e.target.value) setOpen(false);
                 }}
               />
               <SearchOverlay

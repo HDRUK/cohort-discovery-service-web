@@ -21,6 +21,7 @@ import {
   iconButtonSx,
 } from "./SearchBox.styles";
 import useRotatingPlaceholder from "@/hooks/useRotatingPlaceholder";
+import { DEFAULT_SEARCH_SUGGESTION_ROTATION } from "@/config/defaults";
 
 export type SearchBoxProps = Omit<TextFieldProps, "errors"> & {
   loading?: boolean;
@@ -84,7 +85,10 @@ const SearchBox = ({
 
   const STABLE_ID = "search-box";
 
-  const rotatingPlaceholder = useRotatingPlaceholder(placeholders, 1000);
+  const rotatingPlaceholder = useRotatingPlaceholder(
+    placeholders,
+    DEFAULT_SEARCH_SUGGESTION_ROTATION,
+  );
 
   return (
     <Box
@@ -114,6 +118,8 @@ const SearchBox = ({
               htmlInput: {
                 sx: getHtmlInputSx(collapsible, expanded),
                 id: STABLE_ID,
+                autoComplete: "off",
+                name: "search-box",
               },
               input: {
                 endAdornment: (
