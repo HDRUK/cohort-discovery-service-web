@@ -1,3 +1,5 @@
+"use server";
+
 import { ReactNode } from "react";
 import { DefaultProvider, DefaultConfig } from "./DefaultProvider";
 
@@ -7,7 +9,7 @@ const envInt = (raw: string | undefined): number | undefined => {
   return Number.isFinite(n) ? n : undefined;
 };
 
-export default function ServerDefaultProvider({
+export default async function ServerDefaultProvider({
   children,
 }: {
   children: ReactNode;
