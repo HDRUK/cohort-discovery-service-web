@@ -41,7 +41,6 @@ const FilterDatasets = () => {
         >
           <Chip
             variant={noDatasets ? "outlined" : "filled"}
-            // color={noDatasets ? "error" : undefined}
             disabled={noDatasets}
             onClick={() => {
               setOpen(!open);
