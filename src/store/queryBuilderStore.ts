@@ -96,7 +96,7 @@ export interface QueryBuilderStoreState {
   createNewAgeFilter: () => void;
 
   queryAsText: string;
-  getQueryFromText: (input: string) => Promise<RuleGroupType>;
+  getQueryFromText: (input: string, commit?: boolean) => Promise<RuleGroupType>;
 
   selectedDatasets: string[];
   setSelectedDatasets: (pids: string[]) => void;
@@ -378,7 +378,7 @@ export const useQueryBuilderStore = create<QueryBuilderStoreState>(
       });
     },
 
-    getQueryFromText: async (input: string) => {
+    getQueryFromText: async (input: string, commit = false) => {
       const cleanQuery = (queryString: string) => {
         const query = JSON.parse(queryString) as RuleGroupType;
         if (query.rules.length === 1 && isRuleGroup(query.rules[0])) {
@@ -389,7 +389,7 @@ export const useQueryBuilderStore = create<QueryBuilderStoreState>(
 
       const { data: newQueryString } = await parseQuery(input);
       const newQuery = cleanQuery(newQueryString);
-      return get().setQueryBuilderJson(newQuery);
+      return commit ? get().setQueryBuilderJson(newQuery) : newQuery;
     },
 
     validateRules: (root) => {
