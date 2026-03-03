@@ -41,11 +41,6 @@ const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
   const { disabled } = useSubmitQuery();
   const queryClient = useQueryClient();
 
-  const lastCommittedRef = useRef<string>(queryAsText);
-  const lastSubmittedRef = useRef<string>("");
-  // if we programmatically resetField to this value, DO NOT trigger prefetch/submit
-  // - this happened when a user changes the query manually
-  // - we dont want to fire a search on that
   const programmaticValueRef = useRef<string | null>(null);
 
   const {
@@ -72,19 +67,16 @@ const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
   const prefetchQuery = useCallback(
     (value: string) => {
       const v = value.trim();
-
       if (v.length < MIN_SEARCH_LENGTH) return;
-      if (v === lastCommittedRef.current) return; //skip if we already searched
-      if (v === programmaticValueRef.current) return; //skip if manually changed
+      if (v === programmaticValueRef.current) return;
 
-      console.log("prefetching", v);
       queryClient.prefetchQuery({
         queryKey: ["cohortRules", v],
         queryFn: () => getQueryFromText(v),
         staleTime: STALE_TIME,
       });
     },
-    [queryClient, getQueryFromText],
+    [getQueryFromText, queryClient],
   );
 
   const handleSearch = useCallback(
@@ -93,10 +85,6 @@ const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
 
       if (programmaticValueRef.current === q) return;
       if (q.length < MIN_SEARCH_LENGTH) return;
-      if (q === lastCommittedRef.current) return;
-
-      lastCommittedRef.current = q;
-      lastSubmittedRef.current = q;
 
       if (q === queryAsText) {
         if (q === "") resetQuery();
@@ -132,7 +120,7 @@ const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
 
   const shouldApplyImmediately = (v: string) => v.trim() === "";
 
-  //debounce live input at a shorter interval to prefetch it
+  // debounce live input at a shorter interval to prefetch it
   useDebounce(liveInput, {
     delay: DEFAULT_SEARCH_PREFETCH,
     shouldApplyImmediately,
@@ -165,7 +153,6 @@ const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
     const nextValue = (errors.length > 0 ? searchedValue : queryAsText).trim();
 
     programmaticValueRef.current = nextValue;
-    lastCommittedRef.current = nextValue;
 
     resetField("cohortQueryInput", {
       defaultValue: nextValue,
