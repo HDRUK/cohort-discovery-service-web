@@ -21,7 +21,7 @@ import {
   iconButtonSx,
 } from "./SearchBox.styles";
 import useRotatingPlaceholder from "@/hooks/useRotatingPlaceholder";
-import { DEFAULT_SEACRH_SUGGESTION_ROTATION } from "@/config/defaults";
+import { DEFAULT_SEARCH_SUGGESTION_ROTATION } from "@/config/defaults";
 
 export type SearchBoxProps = Omit<TextFieldProps, "errors"> & {
   loading?: boolean;
