@@ -100,7 +100,9 @@ const RuleAgeSelector = ({
 
   const [draftAge, setDraftAge] = useState<[number, number] | null>(null);
 
-  const sliderValue = draftAge ?? committedAge;
+  const sliderValue = useMemo(() => {
+    return draftAge ?? committedAge;
+  }, [draftAge, committedAge]);
 
   const handleCommitChange = () => {
     const [l, r] = draftAge ?? committedAge;
@@ -110,15 +112,64 @@ const RuleAgeSelector = ({
         if (isRuleLeaf(node)) {
           return {
             ...node,
-            ageConstraint: [l > minAge ? l : null, r < maxAge ? r : null],
+            ageConstraint: [
+              Math.min(l, r) > minAge ? Math.min(l, r) : null,
+              Math.max(l, r) < maxAge ? Math.max(l, r) : null,
+            ],
           };
         }
         if (isAgeFilter(node)) {
-          return { ...node, value: [l, r] };
+          return {
+            ...node,
+            value: [
+              Math.max(minAge, Math.min(l, r)),
+              Math.min(maxAge, Math.max(l, r)),
+            ],
+          };
         }
         return node;
       }),
     );
+  };
+
+  const handleInputChangeLeft = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setDraftAge([
+      event.target.value === "" ? 0 : Number(event.target.value),
+      sliderValue[1],
+    ]);
+  };
+
+  const handleBlurLeft = () => {
+    if (draftAge && draftAge[0] < minAge) {
+      setDraftAge([minAge, draftAge[1]]);
+    } else if (draftAge && draftAge[0] > maxAge) {
+      setDraftAge([maxAge, maxAge]);
+    } else if (draftAge && draftAge[1] < draftAge[0]) {
+      setDraftAge([draftAge[1], draftAge[0]]);
+    }
+    handleCommitChange();
+  };
+
+  const handleInputChangeRight = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setDraftAge([
+      sliderValue[0],
+      event.target.value === "" ? 0 : Number(event.target.value),
+    ]);
+  };
+
+  const handleBlurRight = () => {
+    if (draftAge && draftAge[1] < minAge) {
+      setDraftAge([minAge, minAge]);
+    } else if (draftAge && draftAge[1] > maxAge) {
+      setDraftAge([draftAge[0], maxAge]);
+    } else if (draftAge && draftAge[1] < draftAge[0]) {
+      setDraftAge([draftAge[1], draftAge[0]]);
+    }
+    handleCommitChange();
   };
 
   const ageConstraint: NullablePair<number> = useMemo(() => {
@@ -235,11 +286,11 @@ const RuleAgeSelector = ({
       {title && <CustomH1>{title}</CustomH1>}
 
       <Stack
-        direction="column"
+        direction="row"
         spacing={2}
         alignItems="center"
-        paddingX={2}
-        paddingBottom={4}
+        justifyItems="space-between"
+        paddingY={2}
       >
         {readOnly ? (
           <RuleAgeSelectorReadOnly
@@ -249,24 +300,67 @@ const RuleAgeSelector = ({
             maxAge={maxAge}
           />
         ) : (
-          <Slider
-            value={sliderValue}
-            min={minAge}
-            max={maxAge}
-            marks={marks}
-            onChange={(_e, newValue, activeThumb) => {
-              const next = newValue as number[];
+          <>
+            <TextField
+              value={sliderValue[0]}
+              size="small"
+              onChange={handleInputChangeLeft}
+              onBlur={handleBlurLeft}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleBlurLeft();
+                }
+              }}
+              slotProps={{
+                htmlInput: {
+                  step: 1,
+                  min: minAge,
+                  max: maxAge,
+                  type: "number",
+                  "aria-labelledby": "input-slider",
+                },
+              }}
+              sx={{ width: "20ch" }}
+            />
+            <Slider
+              value={sliderValue}
+              min={minAge}
+              max={maxAge}
+              onChange={(_e, newValue, activeThumb) => {
+                const next = newValue as number[];
 
-              const nextRange: [number, number] = uniDirectional
-                ? activeThumb === 0
-                  ? [next[0], maxAge]
-                  : [minAge, next[1]]
-                : [next[0], next[1]];
+                const nextRange: [number, number] = uniDirectional
+                  ? activeThumb === 0
+                    ? [next[0], maxAge]
+                    : [minAge, next[1]]
+                  : [next[0], next[1]];
 
-              setDraftAge(nextRange);
-            }}
-            onChangeCommitted={handleCommitChange}
-          />
+                setDraftAge(nextRange);
+              }}
+              onChangeCommitted={handleCommitChange}
+            />
+            <TextField
+              value={sliderValue[1]}
+              size="small"
+              onChange={handleInputChangeRight}
+              onBlur={handleBlurRight}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleBlurRight();
+                }
+              }}
+              slotProps={{
+                htmlInput: {
+                  step: 1,
+                  min: minAge,
+                  max: maxAge,
+                  type: "number",
+                  "aria-labelledby": "input-slider",
+                },
+              }}
+              sx={{ width: "20ch" }}
+            />
+          </>
         )}
       </Stack>
     </>
