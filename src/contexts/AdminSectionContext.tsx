@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo } from "react";
-import { forbidden } from "next/navigation";
+import { redirect } from "next/navigation";
 
 import useCustodianStore from "@/hooks/useCustodianStore";
 import useUserStore from "@/hooks/useUserStore";
@@ -36,7 +36,9 @@ export const AdminSectionProvider = ({
   const setUsers = useAdminDataStore((s) => s.setUsers);
 
   const isAdmin = checkIsAdmin(user);
-  if (user && !isAdmin) forbidden();
+  if (user && !isAdmin) {
+    redirect("/403?reason=no-admin-access");
+  }
 
   useEffect(() => {
     setCurrentCustodian(null);

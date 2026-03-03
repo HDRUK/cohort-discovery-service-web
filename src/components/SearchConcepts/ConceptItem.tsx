@@ -1,5 +1,12 @@
 import { Concept } from "@/types/api";
-import { Paper, FormControlLabel, Checkbox, PaperProps } from "@mui/material";
+import {
+  Paper,
+  FormControlLabel,
+  Checkbox,
+  PaperProps,
+  Box,
+  Typography,
+} from "@mui/material";
 import Title from "../Title";
 import { mapDomain } from "@/utils/domains";
 import { ChangeEvent, MouseEvent } from "react";
@@ -59,9 +66,17 @@ export const ConceptItem = ({
   showCode = false,
 }: ConceptItemProps) => {
   const id = concept.concept_id!;
-  const titleText = showCode
-    ? `${concept.description} [${id}]`
-    : concept.description;
+  const titleText = showCode ? (
+    <Typography>
+      {concept?.description} (
+      <Box component="span" sx={{ color: "grey.500" }}>
+        OMOP
+      </Box>{" "}
+      {id})
+    </Typography>
+  ) : (
+    concept.description
+  );
 
   const labelEl = (
     <Title

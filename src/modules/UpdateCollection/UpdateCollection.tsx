@@ -272,6 +272,11 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
     entityName: collection.name,
     onSave,
     onDiscard,
+    ignoreFields: [
+      "collection.host_id", // displays 'id' otherwise - will revisit this one
+      "collection.model_state.state_id", // used by 'request make active'
+      "collection.model_state.state.id", //may not be needed - for safety
+    ],
   });
 
   return (
