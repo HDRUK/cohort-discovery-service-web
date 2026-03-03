@@ -111,6 +111,8 @@ const MockDaphneStore = ({
       setQueryBuilderJson: (q: RuleGroupType) => validateRuleTree(q),
       resetQueryBuilderJson: NOOP,
       getQueryFromText: (_input: string) => RESOLVE(DEFAULT_QUERY),
+      previouslySelectedDatasets: [],
+      setPreviouslySelectedDatasets: NOOP,
       selectedDatasets: [],
       setSelectedDatasets: NOOP,
       queryName: "",
