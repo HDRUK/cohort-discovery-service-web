@@ -48,7 +48,7 @@ export default async function RootLayout({
                   height: "120vh",
                 }}
               >
-                <SupportPopOut />
+                {!standalone && <SupportPopOut />}
 
                 {!hideNav && <HeaderBar standalone={standalone} />}
 
