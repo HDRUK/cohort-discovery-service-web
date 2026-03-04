@@ -98,6 +98,9 @@ export interface QueryBuilderStoreState {
   queryAsText: string;
   getQueryFromText: (input: string, commit?: boolean) => Promise<RuleGroupType>;
 
+  previouslySelectedDatasets: string[];
+  setPreviouslySelectedDatasets: (pids: string[]) => void;
+
   selectedDatasets: string[];
   setSelectedDatasets: (pids: string[]) => void;
 
@@ -331,6 +334,15 @@ export const useQueryBuilderStore = create<QueryBuilderStoreState>(
           name,
         })),
       );
+    },
+
+    previouslySelectedDatasets: [],
+    setPreviouslySelectedDatasets: (pids) => {
+      set((state) => ({
+        ...state,
+
+        previouslySelectedDatasets: pids,
+      }));
     },
 
     selectedDatasets: [],

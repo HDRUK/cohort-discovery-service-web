@@ -183,17 +183,6 @@ const RuleAgeSelector = ({
     return [l === minAge ? null : l, r === maxAge ? null : r];
   }, [rule, minAge, maxAge]);
 
-  const marks = useMemo(() => {
-    const bins = 5;
-    const range = maxAge - minAge;
-    const step = range / (bins - 1);
-
-    return Array.from({ length: bins }, (_, i) => {
-      const value = Math.round(minAge + step * i);
-      return { value, label: value };
-    });
-  }, [minAge, maxAge]);
-
   if (!values) return null;
 
   const key = collapsibleGuidanceKey("RuleAgeSelector", selected);
