@@ -7,6 +7,7 @@ import TopMenu from "@/components/TopMenu";
 import HeaderBar from "@/components/HeaderBar";
 import { isStandalone } from "@/utils/modes";
 import Footer from "@/components/Footer";
+import SupportPopOut from "@/components/SupportPopOut/SupportPopOut";
 
 const sourceSans = Source_Sans_3({
   variable: "--font-source-sans-3",
@@ -41,6 +42,8 @@ export default async function RootLayout({
             <Box
               sx={{ display: "flex", flexDirection: "column", height: "120vh" }}
             >
+              <SupportPopOut />
+
               {!hideNav && <HeaderBar standalone={standalone} />}
 
               <Box
