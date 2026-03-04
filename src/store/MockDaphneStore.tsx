@@ -250,7 +250,9 @@ const MockDaphneStore = ({
       <QueryClientProvider client={queryClient}>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <ConfirmProvider>
-            <NotifyProvider>{children}</NotifyProvider>
+            <NotifyProvider>
+              <ServerDefaultProvider>{children}</ServerDefaultProvider>
+            </NotifyProvider>
           </ConfirmProvider>
         </LocalizationProvider>
       </QueryClientProvider>
