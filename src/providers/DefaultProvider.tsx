@@ -15,6 +15,10 @@ export type DefaultConfig = {
   searchPrefetch: number;
   searchWaitTime: number;
   searchSuggestionRotation: number;
+  serviceDeskUrl: string;
+  serviceDeskSupportSuffix: string;
+  serviceDeskReportBugSuffix: string;
+  supportUrl: string;
 };
 
 const DefaultContext = createContext<DefaultConfig | null>(null);
@@ -33,6 +37,10 @@ export const DefaultProvider = ({
       searchPrefetch: defaults.DEFAULT_SEARCH_PREFETCH,
       searchWaitTime: defaults.DEFAULT_SEARCH_WAIT_TIME,
       searchSuggestionRotation: defaults.DEFAULT_SEARCH_SUGGESTION_ROTATION,
+      serviceDeskUrl: "",
+      serviceDeskSupportSuffix: "",
+      serviceDeskReportBugSuffix: "",
+      supportUrl: "",
       ...overrides,
     }),
     [overrides],

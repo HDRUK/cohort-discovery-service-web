@@ -4,11 +4,14 @@ import { useCallback, useState } from "react";
 import { Button, Popover } from "@mui/material";
 import { SupportButton, SupportList } from "./SupportPopOut.styles";
 import theme from "@/config/theme";
-
-const CUSTOMER_PORTAL_SUPPORT_URL = `${process.env.NEXT_PUBLIC_SERVICE_DESK_URL}/${process.env.NEXT_PUBLIC_SERVICE_DESK_SUPPORT_SUFFIX}`;
-const CUSTOMER_PORTAL_REPORT_BUG_URL = `${process.env.NEXT_PUBLIC_SERVICE_DESK_URL}/${process.env.NEXT_PUBLIC_SERVICE_DESK_REPORT_BUG_SUFFIX}`;
+import { useDefaults } from "@/providers/DefaultProvider";
 
 const SupportPopOut = () => {
+  const defaults = useDefaults();
+
+  const CUSTOMER_PORTAL_SUPPORT_URL = `${defaults.serviceDeskUrl}/${defaults.serviceDeskSupportSuffix}`;
+  const CUSTOMER_PORTAL_REPORT_BUG_URL = `${defaults.serviceDeskUrl}/${defaults.serviceDeskReportBugSuffix}`;
+
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
   const handleClick = useCallback(

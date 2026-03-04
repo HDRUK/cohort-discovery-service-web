@@ -22,6 +22,11 @@ export default async function ServerDefaultProvider({
     searchSuggestionRotation: envInt(
       process.env.DEFAULT_SEARCH_SUGGESTION_ROTATION,
     ),
+    serviceDeskUrl: process.env.CONFIG_SERVICE_DESK_URL,
+    serviceDeskSupportSuffix: process.env.CONFIG_SERVICE_DESK_SUPPORT_SUFFIX,
+    serviceDeskReportBugSuffix:
+      process.env.CONFIG_SERVICE_DESK_REPORT_BUG_SUFFIX,
+    supportUrl: process.env.CONFIG_SUPPORT_URL,
   };
 
   return <DefaultProvider overrides={overrides}>{children}</DefaultProvider>;
