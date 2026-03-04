@@ -1,4 +1,4 @@
-import { createTheme, ThemeOptions } from "@mui/material/styles";
+import { createTheme, Theme, ThemeOptions } from "@mui/material/styles";
 import { tooltipClasses } from "@mui/material/Tooltip";
 
 export const themeOptions: ThemeOptions = {
@@ -32,6 +32,12 @@ export const themeOptions: ThemeOptions = {
       disabledBackground: "#F0F0F0",
     },
     tooltip: { main: "#475da7" },
+    yellowCustom: {
+      main: "#F4E751",
+      light: "#E9DB5D",
+      dark: "#A29415",
+      contrastText: "#3C3C3B",
+    },
   },
   zIndex: {
     drawer: 2,
@@ -172,6 +178,21 @@ export const themeOptions: ThemeOptions = {
             borderTopRightRadius: 0,
             borderBottomRightRadius: 0,
             my: "auto",
+          },
+        },
+        {
+          props: { color: "yellowCustom" },
+          style: {
+            root: ({ theme }: { theme: Theme }) => ({
+              color: theme.palette.yellowCustom?.contrastText,
+              borderColor: theme.palette.yellowCustom?.main,
+              "&:active": {
+                background: theme.palette.yellowCustom?.main,
+              },
+              "&:hover": {
+                background: theme.palette.yellowCustom?.main,
+              },
+            }),
           },
         },
       ],
