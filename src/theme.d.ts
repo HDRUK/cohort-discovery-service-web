@@ -10,7 +10,7 @@ declare module "@mui/material/styles" {
     highlight: Palette["primary"];
     table?: Palette["primary"];
     tooltip?: Palette["primary"];
-    yellowCustom?: PaletteOptions["primary"];
+    yellowCustom?: Palette["primary"];
   }
   interface PaletteOptions {
     tertiary?: PaletteOptions["primary"];
