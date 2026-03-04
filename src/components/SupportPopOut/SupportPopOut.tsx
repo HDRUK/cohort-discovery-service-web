@@ -5,8 +5,11 @@ import { Button, Popover } from "@mui/material";
 import { SupportButton, SupportList } from "./SupportPopOut.styles";
 import theme from "@/config/theme";
 import { useDefaults } from "@/providers/DefaultProvider";
+import useFeatures from "@/hooks/useFeatures";
 
 const SupportPopOut = () => {
+  const { hdrukTheme: hdrukThemeEnabled } = useFeatures();
+
   const defaults = useDefaults();
 
   const CUSTOMER_PORTAL_SUPPORT_URL = `${defaults.serviceDeskUrl}/${defaults.serviceDeskSupportSuffix}`;
@@ -24,6 +27,8 @@ const SupportPopOut = () => {
     },
     [anchorEl],
   );
+
+  if (!hdrukThemeEnabled) return;
 
   const handleClose = () => {
     setAnchorEl(null);

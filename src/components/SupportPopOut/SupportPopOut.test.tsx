@@ -1,9 +1,14 @@
 import SupportPopOut from "@/components/SupportPopOut";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { DefaultProvider } from "@/providers/DefaultProvider";
 
 describe("SupportPopOut", () => {
   it("should open support panel ", async () => {
-    render(<SupportPopOut />);
+    render(
+      <DefaultProvider>
+        <SupportPopOut />
+      </DefaultProvider>,
+    );
 
     const button = screen.getByText("Need support?");
     fireEvent.click(button);

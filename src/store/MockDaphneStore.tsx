@@ -51,7 +51,6 @@ import { useCustodianDataStore } from "@/store/custodianDataStore";
 import { useAdminDataStore } from "@/store/adminDataStore";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import ConfirmProvider from "@/components/ConfirmProvider";
-import ServerDefaultProvider from "@/providers/ServerDefaultProvider";
 import { DefaultProvider } from "@/providers/DefaultProvider";
 
 const queryClient = new QueryClient();
