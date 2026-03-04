@@ -1,3 +1,9 @@
+## [1.3.0](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.2.0...v1.3.0) (2026-03-04)
+
+### ✨ Features
+
+* **DP-0000:** License file ([f3dc38e](https://github.com/HDRUK/cohort-discovery-service-web/commit/f3dc38e86ed8dacc597a05129cdecc8691b19070)), closes [DP-0000](DP-0000)
+
 ## [1.2.0](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.1.0...v1.2.0) (2026-02-23)
 
 ### ✨ Features
