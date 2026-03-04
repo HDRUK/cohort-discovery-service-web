@@ -1,9 +1,9 @@
 "use server";
 
 import { getTagCodes } from "@/config/tags";
-import { apiGet } from "../../lib/apiClient";
-import { API_ROUTES } from "../../lib/apiRoutes";
-import { Code, ApiResponse } from "../../types/api";
+import { apiGet } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/apiRoutes";
+import { Code, ApiResponse } from "@/types/api";
 
 const getCodes = async (domain: string): Promise<ApiResponse<Code[]>> => {
   return await apiGet<ApiResponse<Code[]>>({

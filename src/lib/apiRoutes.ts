@@ -42,7 +42,7 @@ export const API_ROUTES = {
   detachConcept: (conceptSetId: number, conceptId: number) =>
     `${API_URL}/concept_sets/${conceptSetId}/detach/${conceptId}`,
   searchConcepts: `${API_URL}/omop/concepts/search`,
-  adminWorkgroups: `${API_URL}/workgroups`,
+  workgroups: `${API_URL}/workgroups`,
   authCallback: "http://localhost:8100/auth/callback",
   users: `${API_URL}/users`,
   user: (id: number) => `${API_URL}/users/${id}`,

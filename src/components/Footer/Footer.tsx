@@ -6,6 +6,11 @@ import useFeatures from "@/hooks/useFeatures";
 const GATEWAY_URL =
   process.env.NEXT_PUBLIC_LOGIN_URL ?? "https://www.hdruk.ac.uk/";
 
+// Note for future - this is a bit of an abuse of NEXT_PUBLIC_TASK_URL, and we should really have a
+// NEXT_PUBLIC_API_BASE_URL instead, but this avoids adding a new varied in about 4 repos and env stores,
+// so needs must at this time
+const API_BASE_URL = `${(process.env.NEXT_PUBLIC_TASK_URL ?? "http://localhost:8000/api").replace("/v1", "")}`;
+
 const Footer = ({ standalone }: { standalone: boolean }) => {
   const { hdrukTheme: hdrukThemeEnabled } = useFeatures();
   const links = [
@@ -34,7 +39,7 @@ const Footer = ({ standalone }: { standalone: boolean }) => {
           label: "Cookie notice",
         },
         {
-          href: `${GATEWAY_URL}/documentation`,
+          href: `${API_BASE_URL}/documentation`,
           label: "API docs",
         },
         {

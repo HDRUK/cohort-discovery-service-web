@@ -87,7 +87,15 @@ export const ConceptChip = ({
             ...chipSx,
           }}
           onClick={onClick && onClick}
-          label={concept?.description}
+          label={
+            <Typography>
+              {concept?.description} (
+              <Box component="span" sx={{ color: "grey.500" }}>
+                OMOP
+              </Box>{" "}
+              {concept.concept_id})
+            </Typography>
+          }
           variant="outlined"
         />
       </ParentWrapper>

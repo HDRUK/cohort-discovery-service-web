@@ -1,15 +1,16 @@
 import { cookies, headers } from "next/headers";
-import { forbidden, notFound, redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import { TokenUser, CombinedUser } from "@/types/api";
 import { RoleName } from "@/types/roles";
 import ProtectedPage from "./components/ProtectedPage";
 import getMe from "@/actions/getMe";
-import getCustodians from "@/actions/getCustodians";
+import getCustodians from "@/actions/custodian/getCustodians";
 import getFeatureFlags from "@/actions/getFeatureFlags";
 import { isStandalone } from "@/utils/modes";
 import { ErrorMode } from "@/lib/apiClient";
+import getWorkgroups from "@/actions/workgroup/getWorkgroups";
 
 const applicationMode = process.env.APPLICATION_MODE;
 
@@ -26,7 +27,7 @@ export default async function ProtectedLayout({
       // No token — render the client SignIn component so users can sign in.
       redirect("/login");
     } else {
-      forbidden();
+      redirect("/403?reason=no-token");
     }
   }
 
@@ -56,11 +57,12 @@ export default async function ProtectedLayout({
   const hasTeamAccess = me.custodians.length > 0;
 
   if (!(hasGeneralAccess || hasAdminAccess || hasTeamAccess)) {
-    forbidden();
+    redirect("/403?reason=missing-role");
   }
 
   const { data: flags } = await getFeatureFlags();
   const { data: custodians } = await getCustodians();
+  const { data: workgroups } = await getWorkgroups();
 
   const combinedUser = { ...me, token_user: user } as unknown as CombinedUser;
 
@@ -68,6 +70,7 @@ export default async function ProtectedLayout({
     <ProtectedPage
       user={combinedUser}
       custodians={custodians}
+      workgroups={workgroups}
       featureFlags={flags}
     >
       {children}

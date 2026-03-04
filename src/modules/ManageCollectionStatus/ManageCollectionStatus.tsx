@@ -4,32 +4,24 @@ import StatusChip from "@/components/StatusChip";
 import { useNotify } from "@/providers/NotifyProvider";
 import useCustodianStore from "@/hooks/useCustodianStore";
 import { Collection, CollectionStatus } from "@/types/api";
-import { UpdateCollectionFormValues } from "@/types/forms";
 import { getCollectionStatus } from "@/utils/colours";
 import { Box, Chip } from "@mui/material";
 import { useEffect, useState } from "react";
-import {
-  Control,
-  Controller,
-  FieldValues,
-  Path,
-  UseFormSetValue,
-} from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 import { useConfirm } from "@/hooks/useConfirm";
+import { UpdateCollectionFormValues } from "@/types/forms";
 
-interface ManageCollectionStatusProps<TFieldValues extends FieldValues> {
+interface ManageCollectionStatusProps {
   collection: Collection;
   expandedRight: boolean;
-  control: Control<TFieldValues>;
-  setValue: UseFormSetValue<UpdateCollectionFormValues>;
 }
 
-const ManageCollectionStatus = <TFieldValues extends FieldValues>({
+const ManageCollectionStatus = ({
   collection,
   expandedRight,
-  control,
-  setValue,
-}: ManageCollectionStatusProps<TFieldValues>) => {
+}: ManageCollectionStatusProps) => {
+  const { control, setValue } = useFormContext<UpdateCollectionFormValues>();
+
   const { currentCustodian } = useCustodianStore((custodianData) => ({
     currentCustodian: custodianData.current.custodian,
   }));
@@ -103,7 +95,7 @@ const ManageCollectionStatus = <TFieldValues extends FieldValues>({
 
       {expandedRight && initialStatusId !== CollectionStatus.DRAFT && (
         <Controller
-          name={"collection.model_state.state_id" as Path<TFieldValues>}
+          name={"collection.model_state.state_id"}
           control={control}
           render={({ field }) => (
             <FormRadioGroup

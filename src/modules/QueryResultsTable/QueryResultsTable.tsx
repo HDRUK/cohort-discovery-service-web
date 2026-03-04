@@ -10,12 +10,13 @@ import { useTable } from "../../hooks/useTable";
 import { formatNumber } from "@/utils/numbers";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import useSearchParams from "@/hooks/useSearchParams";
-import { DEFAULT_INTERVAL, STATUS_LABELS } from "@/config/defaults";
+import { DEFAULT_STATUS_LABELS } from "@/config/defaults";
 import Table from "../../components/Table";
 import { TableProps } from "../../components/Table/Table";
-import getQuery from "@/actions/getQuery";
+import getQuery from "@/actions/query/getQuery";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import QueryHistoryGuidance from "../QueryHistory";
+import { useDefaults } from "@/providers/DefaultProvider";
 
 interface QueryResultsTableProps {
   initialData: Query;
@@ -32,6 +33,7 @@ const QueryResultsTable = ({
   useTableProps,
   showGuidance = false,
 }: QueryResultsTableProps) => {
+  const defaults = useDefaults();
   const { setQueryName, setQueryBuilderJson } = useQueryBuilder((qb) => ({
     setQueryName: qb.setQueryName,
     setQueryBuilderJson: qb.setQueryBuilderJson,
@@ -57,14 +59,14 @@ const QueryResultsTable = ({
       return res.data;
     },
     initialData,
-    staleTime: 2 * DEFAULT_INTERVAL,
+    staleTime: 2 * defaults.tableRefresh,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     refetchInterval: (query) => {
       const data = query.state.data;
       const hasPending = data?.tasks?.some((t) => !t.completed_at);
-      return hasPending ? DEFAULT_INTERVAL : false;
+      return hasPending ? defaults.tableRefresh : false;
     },
   });
   useEffect(() => {
@@ -165,7 +167,7 @@ const QueryResultsTable = ({
           return "Failed";
         }
         const rawStatus = result?.status ?? "pending";
-        const displayStatus = STATUS_LABELS[rawStatus] ?? rawStatus;
+        const displayStatus = DEFAULT_STATUS_LABELS[rawStatus] ?? rawStatus;
         return displayStatus;
       },
       size: 100,

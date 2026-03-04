@@ -6,6 +6,7 @@ import {
   Stack,
   FormGroup,
   FormControlLabel,
+  Typography,
 } from "@mui/material";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import {
@@ -18,24 +19,27 @@ import { Controller, FormProvider, useForm } from "react-hook-form";
 import FormTextField from "@/components/FormTextField";
 import CollectionConfig from "@/components/CollectionConfig";
 import { UpdateCollectionFormValues } from "@/types/forms";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { revalidateCollections } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
 import FormDropdown from "@/components/FormDropdown";
-import DistributionStatus from "../DistrubutionStatus";
+import DistributionStatus from "../DistributionStatus";
 import useCustodianStore from "@/hooks/useCustodianStore";
-import { useLogDependencyChanges } from "@/utils/deps";
 import FormLabel from "@/components/FormLabel";
 import { maskClientTest } from "@/lib/maskClientTest";
 import useAdminStore from "@/hooks/useAdminStore";
-import removeCollectionFromWorkgroups from "@/actions/removeCollectionFromWorkgroups";
-import addCollectionToWorkgroups from "@/actions/addCollectionToWorkgroups";
+import removeCollectionFromWorkgroups from "@/actions/workgroup/removeCollectionFromWorkgroups";
+import addCollectionToWorkgroups from "@/actions/workgroup/addCollectionToWorkgroups";
 import SquareCheckbox from "@/components/SquareCheckbox";
 import ManageCollectionStatus from "@/modules/ManageCollectionStatus";
 import CopyableVariable from "@/components/CopyableVariable";
 import ErrorHeader from "@/components/ErrorHeader";
 import { useAdminDataStore } from "@/store/adminDataStore";
 import UpdatePanel from "@/components/UpdatePanel";
+import { useThreePane } from "@/providers/ThreePaneProvider";
+import { useSaveChanges } from "@/hooks/useSaveChanges";
+import { useUserDataStore } from "@/hooks/userDataStore";
+import { useIsAdminSection } from "@/contexts/AdminSectionContext";
 
 const UpdateCollectionGuidance = maskClientTest(
   () => import("./UpdateCollectionGuidance"),
@@ -43,9 +47,6 @@ const UpdateCollectionGuidance = maskClientTest(
 
 export type UpdateCollectionProps = {
   collection: CollectionWithHosts;
-  expandedRight: boolean;
-  expandedLeft: boolean;
-  onClose?: () => void;
 };
 
 const getDefaultValues = (collection: CollectionWithHosts | null) => {
@@ -97,12 +98,11 @@ const getDefaultValues = (collection: CollectionWithHosts | null) => {
   };
 };
 
-const UpdateCollection = ({
-  collection,
-  expandedRight,
-  onClose,
-}: UpdateCollectionProps) => {
+const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
+  const { expandedRight, toggleRight: onClose } = useThreePane();
+
   const currentCustodian = useCustodianStore((s) => s.current.custodian);
+  const isAdmin = useIsAdminSection();
 
   const currentCollectionHosts = useCustodianStore(
     (s) => s.current.collectionHosts,
@@ -112,26 +112,25 @@ const UpdateCollection = ({
   const updateCollectionAdmin = useAdminStore((s) => s.updateCollection);
   const updateCollectionStatus = useAdminStore((s) => s.updateCollectionStatus);
   const collectionHosts = useAdminDataStore((s) => s.collectionHosts);
-  const workgroups = useAdminDataStore((s) => s.workgroups);
-
-  const isAdmin = useMemo(() => !currentCustodian, [currentCustodian]);
-
-  const firstUpdate = useRef(true);
+  const workgroups = useUserDataStore((s) => s.workgroups);
 
   const notify = useNotify();
 
-  const [workgroupValues, setWorkgroupValues] = useState<Map<string, boolean>>(
-    () => {
-      const map = new Map<string, boolean>();
-      workgroups.forEach((wg) => {
-        map.set(
-          wg.name,
-          (collection.workgroups?.filter((cw) => cw.id === wg.id) || [])
-            .length > 0,
-        );
-      });
-      return map;
-    },
+  const workgroupValues = useMemo<Map<string, boolean>>(() => {
+    const map = new Map<string, boolean>();
+    workgroups.forEach((wg) => {
+      map.set(
+        wg.name,
+        (collection.workgroups?.filter((cw) => cw.id === wg.id) || []).length >
+          0,
+      );
+    });
+    return map;
+  }, [workgroups, collection.workgroups]);
+
+  const defaultValues = useMemo(
+    () => getDefaultValues(collection),
+    [collection],
   );
 
   const formMethods = useForm<UpdateCollectionFormValues>({
@@ -164,9 +163,11 @@ const UpdateCollection = ({
   const lastCollectionIdRef = useRef<number | null>(null);
   useEffect(() => {
     if (!collection) return;
-    //dont reset if the data just refreshed while editing
-    if (lastCollectionIdRef.current === collection.id) return;
+
+    const ref = lastCollectionIdRef.current;
+    if (ref === collection.id) return;
     lastCollectionIdRef.current = collection.id;
+    if (ref === null) return;
 
     reset(getDefaultValues(collection), {
       keepDirty: false,
@@ -187,66 +188,61 @@ const UpdateCollection = ({
         }
         notify.success(`Updated collection ${data.collection.name}`);
 
-        const cwNames = new Set(
+        const currentNames = new Set(
           (collection.workgroups ?? []).map((w) => w.name),
         );
 
-        const newWorkgroups = workgroups.filter(
-          (wg) => workgroupValues.get(wg.name) && !cwNames.has(wg.name),
+        const selectedNames = new Set((data.workgroups ?? []).map(String));
+
+        const toAdd = workgroups.filter(
+          (wg) => selectedNames.has(wg.name) && !currentNames.has(wg.name),
         );
 
-        if (newWorkgroups.length > 0) {
+        const toRemove = workgroups.filter(
+          (wg) => !selectedNames.has(wg.name) && currentNames.has(wg.name),
+        );
+
+        if (toAdd.length > 0) {
           await addCollectionToWorkgroups({
-            id: id,
-            workgroup_ids: newWorkgroups.map((wg) => wg.id),
+            id,
+            workgroup_ids: toAdd.map((wg) => wg.id),
           });
+
           notify.success(
             `Add collection "${name}" to workgroup${
-              newWorkgroups.length > 1 ? "s" : ""
-            } ${newWorkgroups.map((wg) => wg.name).join(", ")}`,
+              toAdd.length > 1 ? "s" : ""
+            } ${toAdd.map((wg) => wg.name).join(", ")}`,
           );
         }
 
-        const workgroupsToRemove = workgroups.filter(
-          (wg) => !workgroupValues.get(wg.name) && cwNames.has(wg.name),
-        );
-
-        if (workgroupsToRemove.length > 0) {
+        if (toRemove.length > 0) {
           await removeCollectionFromWorkgroups({
-            id: id,
-            workgroup_ids: workgroupsToRemove.map((wg) => wg.id),
+            id,
+            workgroup_ids: toRemove.map((wg) => wg.id),
           });
+
           notify.success(
             `Removed collection "${name}" from workgroup${
-              workgroupsToRemove.length > 1 ? "s" : ""
-            } ${workgroupsToRemove.map((wg) => wg.name).join(", ")}`,
+              toRemove.length > 1 ? "s" : ""
+            } ${toRemove.map((wg) => wg.name).join(", ")}`,
           );
         }
 
-        if (
-          data.collection.model_state?.state.id &&
-          collection.model_state?.state_id !==
-            data.collection.model_state?.state.id
-        ) {
-          await updateCollectionStatus(
-            id,
-            data.collection.model_state.state.id,
-          );
+        const nextStateId = data.collection.model_state?.state?.id;
+        if (nextStateId && collection.model_state?.state_id !== nextStateId) {
+          await updateCollectionStatus(id, nextStateId);
 
           notify.success(
             `Changed collection "${name}" to status ${
-              CollectionStatus[
-                data.collection.model_state.state.id as CollectionStatus
-              ]
+              CollectionStatus[nextStateId as CollectionStatus]
             }`,
           );
         }
+
         revalidateCollections(currentCustodian?.pid ?? undefined);
       }
 
-      if (closeAfter) {
-        onClose?.();
-      }
+      if (closeAfter) onClose?.();
     },
     [
       collection,
@@ -258,57 +254,30 @@ const UpdateCollection = ({
       updateCollectionStatus,
       onClose,
       workgroups,
-      workgroupValues,
     ],
   );
 
-  const handleEnter = useCallback(
+  const onSave = useCallback(
     () => handleSubmit((values) => submitForm(values, false))(),
     [handleSubmit, submitForm],
   );
 
-  const handleLockClick = useCallback(
-    () => handleSubmit((values) => submitForm(values, true))(),
-    [handleSubmit, submitForm],
-  );
+  const onDiscard = useCallback(() => {
+    reset(defaultValues);
+    onClose();
+  }, [reset, onClose, defaultValues]);
 
-  const { setValue } = formMethods;
-
-  const handleUnlockClick = useCallback(() => {
-    onClose?.();
-  }, [onClose]);
-
-  useLogDependencyChanges("UpdateCollection", {
-    collection,
-    collectionHosts,
-    ...formMethods,
-    currentCustodian,
-    getDefaultValues,
-    updateCollection,
-    handleEnter,
-    handleLockClick,
-    handleUnlockClick,
-    submitForm,
+  useSaveChanges<UpdateCollectionFormValues>({
+    control,
+    entityName: collection.name,
+    onSave,
+    onDiscard,
+    ignoreFields: [
+      "collection.host_id", // displays 'id' otherwise - will revisit this one
+      "collection.model_state.state_id", // used by 'request make active'
+      "collection.model_state.state.id", //may not be needed - for safety
+    ],
   });
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setWorkgroupValues((prev) => {
-      const updated = new Map(prev);
-      updated.set(event.target.name, event.target.checked);
-      return updated;
-    });
-  };
-
-  useEffect(() => {
-    const selectedWorkgroups = Array.from(workgroupValues.entries())
-      .filter(([_, checked]) => checked)
-      .map(([name]) => name);
-    setValue("workgroups", selectedWorkgroups.sort(), {
-      shouldDirty: !firstUpdate.current,
-      shouldTouch: !firstUpdate.current,
-    });
-    firstUpdate.current = false;
-  }, [workgroupValues, setValue]);
 
   return (
     <UpdatePanel
@@ -324,8 +293,6 @@ const UpdateCollection = ({
           collection={collection}
           expandedRight={expandedRight}
           key={collection.id}
-          control={control}
-          setValue={setValue}
         />
         {isAdmin && (
           <>
@@ -354,26 +321,43 @@ const UpdateCollection = ({
               <Controller
                 name="workgroups"
                 control={control}
-                render={() => (
-                  <FormGroup>
-                    <Box display="flex" flexDirection="column">
-                      {workgroups?.map((w) => (
-                        <FormControlLabel
-                          control={
-                            <SquareCheckbox
-                              checked={Boolean(workgroupValues.get(w.name))}
-                              key={`wg-checkbox-${w.name}`}
-                              name={w.name}
-                              onChange={handleChange}
-                            />
-                          }
-                          label={w.name}
-                          key={`wg-checkbox-label-${w.name}`}
-                        />
-                      ))}
-                    </Box>
-                  </FormGroup>
-                )}
+                render={({ field }) => {
+                  const selected = new Set(field.value ?? []);
+
+                  const toggle = (name: string) => (checked: boolean) => {
+                    const next = new Set(selected);
+                    if (checked) next.add(name);
+                    else next.delete(name);
+
+                    // IMPORTANT: onChange will mark dirty vs defaultValues automatically
+                    field.onChange(Array.from(next).sort());
+                  };
+
+                  return (
+                    <FormGroup>
+                      {workgroups.map((wg) => {
+                        const checked = selected.has(wg.name);
+
+                        return (
+                          <FormControlLabel
+                            key={wg.id}
+                            label={wg.name}
+                            control={
+                              <SquareCheckbox
+                                name={wg.name}
+                                checked={checked}
+                                onChange={(e) =>
+                                  toggle(wg.name)(e.target.checked)
+                                }
+                                disabled={!expandedRight}
+                              />
+                            }
+                          />
+                        );
+                      })}
+                    </FormGroup>
+                  );
+                }}
               />
             )}
           </>
@@ -396,36 +380,48 @@ const UpdateCollection = ({
             />
           */}
 
-          <FormTextField
-            labelUnderlined
-            copyable
-            disabled={!expandedRight}
-            readOnly={expandedRight}
-            value={collection.pid}
-            label="Collection ID"
-          />
-
-          <Controller
-            disabled={!expandedRight}
-            name="collection.url"
-            control={control}
-            rules={{ required: "URL is required" }}
-            render={({ field, fieldState: { error } }) => (
-              <FormTextField
-                copyable
-                {...field}
-                label="Link to Associated Dataset"
-                labelUnderlined
-                error={error}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleEnter();
-                  }
-                }}
+          <Box
+            sx={{
+              borderColor: "text.secondary",
+              borderWidth: 1,
+              borderStyle: "solid",
+              p: 1,
+            }}
+          >
+            <Typography
+              sx={{ color: "secondary.main", mb: 1, fontWeight: "bold" }}
+            >
+              You will need to copy the following credentials into your Bunny/
+              BC|Insight setup
+            </Typography>
+            <Stack>
+              <FormLabel underlined>Collection ID</FormLabel>
+              <CopyableVariable value={collection.pid} sx={{ mb: 2 }} />
+            </Stack>
+            <Stack>
+              <FormLabel underlined>Task API_BASE_URL</FormLabel>
+              <CopyableVariable
+                value={process.env.NEXT_PUBLIC_TASK_URL as string}
+                sx={{ mb: 2 }}
               />
+            </Stack>
+            {!isAdmin && (
+              <Stack>
+                <FormLabel underlined>Host Credentials</FormLabel>
+                Client ID
+                <CopyableVariable
+                  value={collection.host?.[0]?.client_id}
+                  sx={{ mb: 2 }}
+                />
+                Client Secret
+                <CopyableVariable
+                  hidden
+                  value={collection.host?.[0]?.client_secret}
+                  sx={{ mb: 2 }}
+                />
+              </Stack>
             )}
-          />
+          </Box>
 
           <Stack>
             <FormLabel underlined>Collection Connection</FormLabel>
@@ -462,41 +458,29 @@ const UpdateCollection = ({
             />
           </Stack>
 
-          {!isAdmin && (
-            <Stack>
-              <FormLabel underlined>Host Credentials</FormLabel>
-              Client ID
-              <CopyableVariable value={collection.host?.[0]?.client_id} />
-              Client Secret
-              <CopyableVariable
-                hidden
-                value={collection.host?.[0]?.client_secret}
+          <Controller
+            disabled={!expandedRight}
+            name="collection.url"
+            control={control}
+            rules={{ required: "URL is required" }}
+            render={({ field, fieldState: { error } }) => (
+              <FormTextField
+                copyable
+                {...field}
+                label="Link to Associated Dataset"
+                labelUnderlined
+                error={error}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    onSave();
+                  }
+                }}
               />
-            </Stack>
-          )}
-        </ActionMenuSection>
-        <ActionMenuSection
-          gap={2}
-          title={"Collection Distributions"}
-          fixedExpanded
-          defaultExpanded
-          accordionSummarySx={{
-            mt: 2,
-          }}
-        >
-          <DistributionStatus
-            disabled={!expandedRight}
-            collection={collection}
-          />
-          <CollectionConfig<UpdateCollectionFormValues>
-            disabled={!expandedRight}
-            keepExpanded
-            frequencyFieldName={"config.frequency_mode"}
-            runTimeFrequencyFieldName={"config.run_time_frequency"}
-            runTimeHourFieldName={"config.run_time_hour"}
-            runTimeMinuteFieldName={"config.run_time_minute"}
+            )}
           />
         </ActionMenuSection>
+
         <ActionMenuSection
           gap={2}
           title={"Collection Info"}
@@ -542,6 +526,29 @@ const UpdateCollection = ({
           />
           {/* supposed to also have supoprt contact / adminstractive contact */}
           <UpdateCollectionGuidance />
+        </ActionMenuSection>
+
+        <ActionMenuSection
+          gap={2}
+          title={"Collection Configuration"}
+          fixedExpanded
+          defaultExpanded
+          accordionSummarySx={{
+            mt: 2,
+          }}
+        >
+          <DistributionStatus
+            disabled={!expandedRight}
+            collection={collection}
+          />
+          <CollectionConfig<UpdateCollectionFormValues>
+            disabled={!expandedRight}
+            keepExpanded
+            frequencyFieldName={"config.frequency_mode"}
+            runTimeFrequencyFieldName={"config.run_time_frequency"}
+            runTimeHourFieldName={"config.run_time_hour"}
+            runTimeMinuteFieldName={"config.run_time_minute"}
+          />
         </ActionMenuSection>
       </FormProvider>
     </UpdatePanel>

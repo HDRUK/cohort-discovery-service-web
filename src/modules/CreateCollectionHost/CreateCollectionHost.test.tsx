@@ -3,7 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import CreateCollectionHost from "./CreateCollectionHost";
 import { Custodian } from "@/types/api";
-import getCustodian from "@/actions/__mocks__/getCustodian";
+import getCustodian from "@/actions/custodian/__mocks__/getCustodian";
 import { NotifyProvider } from "@/providers/NotifyProvider";
 import MockDaphneStore from "@/store/MockDaphneStore";
 

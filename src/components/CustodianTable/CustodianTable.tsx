@@ -5,7 +5,7 @@ import {
   MRT_RowSelectionState,
   type MRT_ColumnDef,
 } from "material-react-table";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Table from "@/components/Table";
 import useSearchParams from "@/hooks/useSearchParams";
 import { capitaliseFirstLetter } from "@/utils/string";
@@ -52,10 +52,6 @@ const CustodianTable = ({
     () => custodians.filter((c) => c.network?.id === activeNetwork?.id),
     [custodians, activeNetwork],
   );
-
-  useEffect(() => {
-    console.log({ hydratedCustodians }, "hydratedCustodians changed");
-  }, [hydratedCustodians]);
 
   const columns: MRT_ColumnDef<Custodian>[] = [
     {

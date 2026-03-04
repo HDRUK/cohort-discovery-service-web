@@ -101,6 +101,8 @@ const RuleWrapper = ({
     select,
     deselect,
     isSelected,
+    selected,
+    setSelected,
     toggleSelected,
     getNodeName,
     setNodeName,
@@ -110,6 +112,8 @@ const RuleWrapper = ({
   } = useQueryBuilder((qb) => ({
     select: qb.select,
     deselect: qb.deselect,
+    selected: qb.selected,
+    setSelected: qb.setSelected,
     isSelected: !!qb.selected[id],
     toggleSelected: qb.toggleSelected,
     getNodeName: qb.getNodeName,
@@ -147,7 +151,16 @@ const RuleWrapper = ({
       e.preventDefault();
       e.stopPropagation();
       window.getSelection()?.removeAllRanges();
-      toggleSelected(id, !isShift);
+
+      if (isShift) {
+        toggleSelected(id, false);
+      } else {
+        if (Object.keys(selected).length === 1 && isSelected) {
+          toggleSelected(id, true);
+        } else {
+          setSelected(id, true, true);
+        }
+      }
 
       const isMeta = e.metaKey;
       if (isRuleGroup(node) && isMeta) {
@@ -161,7 +174,16 @@ const RuleWrapper = ({
         });
       }
     },
-    [id, toggleSelected, isSelected, node, select, deselect],
+    [
+      id,
+      toggleSelected,
+      selected,
+      setSelected,
+      isSelected,
+      node,
+      select,
+      deselect,
+    ],
   );
 
   const onMouseOver = (e: React.MouseEvent<HTMLDivElement>) => {

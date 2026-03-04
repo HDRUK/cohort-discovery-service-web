@@ -20,9 +20,8 @@ import { capitaliseFirstLetter } from "@/utils/string";
 import { getDatetime } from "@/utils/date";
 import { formatNumber, trueKeys } from "@/utils/numbers";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { DEFAULT_INTERVAL } from "@/config/defaults";
-import getCustodianCollections from "@/actions/getCustodianCollections";
-import getAdminCollections from "@/actions/getAdminCollections";
+import getCustodianCollections from "@/actions/collection/getCustodianCollections";
+import getAdminCollections from "@/actions/collection/getAdminCollections";
 import { isEqualTask } from "@/utils/distributions";
 import { useLogDependencyChanges } from "@/utils/deps";
 import useAdminStore from "@/hooks/useAdminStore";
@@ -36,6 +35,7 @@ import {
 import { buildCollectionParams } from "@/utils/params";
 import StatusChip from "@/components/StatusChip";
 import { TableProps } from "../Table/Table";
+import { useDefaults } from "@/providers/DefaultProvider";
 
 export interface CollectionsTableProps extends TableProps {
   showPid?: boolean;
@@ -53,6 +53,7 @@ const CollectionsTable = ({
   deleteOverride,
   ...rest
 }: CollectionsTableProps) => {
+  const defaults = useDefaults();
   const { searchParams, getSearchParam } = useSearchParams("collection_filter");
   const filter_name = getSearchParam() || "all";
 
@@ -124,7 +125,7 @@ const CollectionsTable = ({
       return res.data;
     },
     initialData,
-    staleTime: 2 * refreshRate * DEFAULT_INTERVAL,
+    staleTime: 2 * refreshRate * defaults.tableRefresh,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
@@ -142,7 +143,7 @@ const CollectionsTable = ({
         ) ?? [];
 
       const hasIncomplete = runningCollections?.length > 0;
-      return hasIncomplete ? refreshRate * DEFAULT_INTERVAL : false;
+      return hasIncomplete ? refreshRate * defaults.tableRefresh : false;
     },
   });
 

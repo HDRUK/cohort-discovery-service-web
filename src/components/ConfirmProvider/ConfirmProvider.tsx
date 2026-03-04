@@ -14,7 +14,8 @@ import Modal from "@/components/Modal";
 type ConfirmTemplateProps = {
   action: string;
 };
-export type ConfirmFn = (options?: ConfirmOptions) => Promise<boolean>;
+export type ConfirmResult = "confirm" | "cancel" | "tertiary";
+export type ConfirmFn = (options?: ConfirmOptions) => Promise<ConfirmResult>;
 
 export const ConfirmContext = createContext<ConfirmFn | null>(null);
 
@@ -27,6 +28,9 @@ export type ConfirmOptions = {
   description?: React.ReactNode;
   confirmText?: string;
   cancelText?: string;
+
+  tertiaryText?: string;
+
   maxWidth?: Breakpoint;
 
   confirmColor?:
@@ -38,6 +42,9 @@ export type ConfirmOptions = {
     | "info"
     | "warning";
   confirmVariant?: "text" | "outlined" | "contained";
+
+  tertiaryColor?: ConfirmOptions["confirmColor"];
+  tertiaryVariant?: "text" | "outlined" | "contained";
 };
 
 function buildDefaultDescription(p?: ConfirmTemplateProps): React.ReactNode {
@@ -49,33 +56,42 @@ function buildDefaultDescription(p?: ConfirmTemplateProps): React.ReactNode {
 export function ConfirmProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [opts, setOpts] = useState<
-    Required<Omit<ConfirmOptions, "description" | "props" | "template">> & {
+    Required<
+      Omit<
+        ConfirmOptions,
+        "description" | "props" | "template" | "tertiaryText"
+      >
+    > & {
       description?: React.ReactNode;
       props?: ConfirmTemplateProps;
       template?: "default";
+      tertiaryText?: string;
     }
   >({
     title: "Confirm",
     confirmText: "Confirm",
     cancelText: "Cancel",
+    tertiaryText: undefined,
     maxWidth: "xs",
     confirmColor: "primary",
     confirmVariant: "contained",
+    tertiaryColor: "warning",
+    tertiaryVariant: "outlined",
     description: undefined,
     props: undefined,
     template: "default",
   });
 
-  const resolverRef = useRef<((value: boolean) => void) | null>(null);
+  const resolverRef = useRef<((value: ConfirmResult) => void) | null>(null);
 
-  const resolveAndClose = useCallback((value: boolean) => {
+  const resolveAndClose = useCallback((value: ConfirmResult) => {
     setOpen(false);
     resolverRef.current?.(value);
     resolverRef.current = null;
   }, []);
 
   const confirm = useCallback<ConfirmFn>((options) => {
-    if (resolverRef.current) resolverRef.current(false);
+    if (resolverRef.current) resolverRef.current("cancel");
 
     const nextProps = options?.props;
     const derivedDescription =
@@ -90,10 +106,14 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
       title: options?.title ?? prev.title ?? "Confirm",
       confirmText: options?.confirmText ?? prev.confirmText ?? "Confirm",
       cancelText: options?.cancelText ?? prev.cancelText ?? "Cancel",
+      tertiaryText: options?.tertiaryText ?? prev.tertiaryText, // NEW
       maxWidth: options?.maxWidth ?? prev.maxWidth ?? "xs",
       confirmColor: options?.confirmColor ?? prev.confirmColor ?? "primary",
       confirmVariant:
         options?.confirmVariant ?? prev.confirmVariant ?? "contained",
+      tertiaryColor: options?.tertiaryColor ?? prev.tertiaryColor ?? "warning",
+      tertiaryVariant:
+        options?.tertiaryVariant ?? prev.tertiaryVariant ?? "outlined",
       props: nextProps ?? prev.props,
       template: options?.template ?? prev.template,
       description: derivedDescription,
@@ -101,7 +121,7 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
 
     setOpen(true);
 
-    return new Promise<boolean>((resolve) => {
+    return new Promise<ConfirmResult>((resolve) => {
       resolverRef.current = resolve;
     });
   }, []);
@@ -114,7 +134,7 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
 
       <Modal
         open={open}
-        onClose={() => resolveAndClose(false)}
+        onClose={() => resolveAndClose("cancel")}
         title={opts.title}
         maxWidth={opts.maxWidth}
         showTitle
@@ -136,16 +156,31 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
               mt: 1,
             }}
           >
-            <Button variant="outlined" onClick={() => resolveAndClose(false)}>
+            <Button
+              variant="outlined"
+              onClick={() => resolveAndClose("cancel")}
+            >
               {opts.cancelText}
             </Button>
-            <Button
-              onClick={() => resolveAndClose(true)}
-              variant={opts.confirmVariant}
-              color={opts.confirmColor}
-            >
-              {opts.confirmText}
-            </Button>
+            <Box sx={{ display: "flex", gap: 1 }}>
+              {opts.tertiaryText ? (
+                <Button
+                  onClick={() => resolveAndClose("tertiary")}
+                  variant={opts.tertiaryVariant}
+                  color={opts.tertiaryColor}
+                >
+                  {opts.tertiaryText}
+                </Button>
+              ) : null}
+
+              <Button
+                onClick={() => resolveAndClose("confirm")}
+                variant={opts.confirmVariant}
+                color={opts.confirmColor}
+              >
+                {opts.confirmText}
+              </Button>
+            </Box>
           </Box>
         </Box>
       </Modal>

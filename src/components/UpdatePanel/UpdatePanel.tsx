@@ -1,9 +1,13 @@
+"use client";
+
 import { Box, Typography } from "@mui/material";
 import LockOutlineIcon from "@mui/icons-material/LockOutline";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import theme from "@/config/theme";
-import { ReactNode } from "react";
+import { ReactNode, useCallback, useEffect } from "react";
 import ActionMenuSection from "../ActionMenuSection";
+import { useSwimLaneBlocker } from "../SwimLane/SwimLane";
+import { useCloseGuard } from "@/providers/CloseGuardProvider";
 
 type UpdatePanelProps = {
   label: string;
@@ -22,6 +26,27 @@ export const UpdatePanel = ({
   children,
   rightExtras,
 }: UpdatePanelProps) => {
+  const { setBlocked } = useSwimLaneBlocker();
+  const { confirmCloseIfNeeded } = useCloseGuard();
+
+  const handleClickaway = useCallback(async () => {
+    const ok = await confirmCloseIfNeeded();
+    if (!ok) return;
+    onLockClick();
+  }, [confirmCloseIfNeeded, onLockClick]);
+
+  useEffect(() => {
+    if (expandedRight) {
+      setBlocked(true, () => {
+        void handleClickaway();
+      });
+    } else {
+      setBlocked(false);
+    }
+
+    return () => setBlocked(false);
+  }, [expandedRight, setBlocked, handleClickaway]);
+
   return (
     <ActionMenuSection
       title={
@@ -47,9 +72,7 @@ export const UpdatePanel = ({
                 ml: "auto",
                 borderRadius: 1,
                 p: 0.5,
-                "&:hover": {
-                  bgcolor: "grey.300",
-                },
+                "&:hover": { bgcolor: "grey.300" },
               }}
               onClick={() => {
                 if (expandedRight) {

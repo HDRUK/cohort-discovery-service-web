@@ -1,13 +1,13 @@
 import { create } from "zustand";
-import submitQuery from "@/actions/submitQuery";
-import rerunTask from "@/actions/rerunTask";
+import submitQuery from "@/actions/query/submitQuery";
+import rerunTask from "@/actions/task/rerunTask";
 import rerunDistributions from "@/actions/rerunDistributions";
-import createConceptSet from "@/actions/createConceptSet";
-import getConcepts from "@/actions/getConcepts";
-import attachConcepts from "@/actions/attachConcepts";
-import detachConcepts from "@/actions/detachConcepts";
-import deleteConceptSet from "@/actions/deleteConceptSet";
-import deleteQueries from "@/actions/deleteQueries";
+import createConceptSet from "@/actions/conceptSet/createConceptSet";
+import getConcepts from "@/actions/concept/getConcepts";
+import attachConcepts from "@/actions/concept/attachConcepts";
+import detachConcepts from "@/actions/concept/detachConcepts";
+import deleteConceptSet from "@/actions/conceptSet/deleteConceptSet";
+import deleteQueries from "@/actions/query/deleteQueries";
 import {
   revalidateAction,
   revalidateCustodian,
@@ -25,6 +25,7 @@ import {
   ConceptSet,
   DistributionType,
   CollectionWithHosts,
+  Workgroup,
 } from "@/types/api";
 import {
   TAG_COLLECTIONS_ADMIN,
@@ -80,6 +81,9 @@ export interface UserDataStoreState {
   removeConceptSet: (conceptSetId: number) => Promise<void>;
 
   deleteQueries: (pids: string[]) => Promise<void>;
+
+  workgroups: Workgroup[];
+  setWorkgroups: (workgroups: Workgroup[]) => void;
 }
 
 export const useUserDataStore = create<UserDataStoreState>((set) => ({
@@ -182,4 +186,11 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
     const user = useUserDataStore.getState().user;
     if (user) await revalidateAction(getUserQueryTag(user.id));
   },
+
+  workgroups: [],
+  setWorkgroups: (workgroups) =>
+    set((state) => ({
+      ...state,
+      workgroups,
+    })),
 }));

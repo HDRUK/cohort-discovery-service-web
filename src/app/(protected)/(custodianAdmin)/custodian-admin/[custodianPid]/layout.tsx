@@ -1,6 +1,6 @@
-import getCustodian from "@/actions/getCustodian";
-import CustodianPage from "./components/CustodianPage";
-import getCustodianCollectionHosts from "@/actions/getCustodianCollectionHosts";
+import getCustodian from "@/actions/custodian/getCustodian";
+import getCustodianCollectionHosts from "@/actions/collectionHost/getCustodianCollectionHosts";
+import { CustodianSectionProvider } from "@/contexts/CustodianSectionContext";
 
 type Params = Promise<{ custodianPid: string }>;
 
@@ -18,9 +18,12 @@ const ProtectedCustodianPageLayout = async ({
     await getCustodianCollectionHosts(custodianPid);
 
   return (
-    <CustodianPage custodian={custodian} collectionHosts={collectionHosts}>
+    <CustodianSectionProvider
+      custodian={custodian}
+      collectionHosts={collectionHosts}
+    >
       {children}
-    </CustodianPage>
+    </CustodianSectionProvider>
   );
 };
 

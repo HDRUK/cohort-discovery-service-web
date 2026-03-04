@@ -10,7 +10,7 @@ import userEvent from "@testing-library/user-event";
 import CreateWorkgroup from "./CreateWorkgroup";
 import { Collection } from "@/types/api";
 import MockDaphneStore from "@/store/MockDaphneStore";
-import { getMockCollections } from "@/actions/__mocks__/getCollections";
+import { getMockCollections } from "@/actions/collection/__mocks__/getCollections";
 
 const createWorkgroup = jest.fn();
 const addCollectionsToWorkgroup = jest.fn();

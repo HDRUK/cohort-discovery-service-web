@@ -1,8 +1,8 @@
 "use server";
 
-import { apiPost } from "../lib/apiClient";
-import { API_ROUTES } from "../lib/apiRoutes";
-import { ApiResponse, DistributionType, Query } from "../types/api";
+import { apiPost } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/apiRoutes";
+import { ApiResponse, DistributionType, Query } from "@/types/api";
 
 interface CreateDistributionPost {
   query_type: DistributionType;

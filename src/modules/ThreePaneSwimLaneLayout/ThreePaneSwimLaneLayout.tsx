@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 import SwimLane from "@/components/SwimLane";
 import SwimLaneContainer from "@/components/SwimLaneContainer";
 import { SwimLaneProps } from "@/components/SwimLane/SwimLane";
+import { useThreePane } from "@/providers/ThreePaneProvider";
 
 export enum ExpandedSide {
   LEFT = "left",
@@ -10,7 +11,6 @@ export enum ExpandedSide {
 }
 
 type ThreePaneSwimLaneLayoutProps = {
-  expandedSide?: ExpandedSide | null;
   rightDisabled?: boolean;
   panelWidth?: number;
   totalWidth?: number;
@@ -57,7 +57,6 @@ const getPanelSizes = (
 };
 
 const ThreePaneSwimLaneLayout = ({
-  expandedSide,
   rightDisabled = false,
   panelWidth = 2,
   totalWidth = 12,
@@ -68,6 +67,8 @@ const ThreePaneSwimLaneLayout = ({
   middleProps,
   rightProps,
 }: ThreePaneSwimLaneLayoutProps) => {
+  const { expandedSide } = useThreePane();
+
   const {
     left: leftSize,
     middle: middleSize,
@@ -87,7 +88,7 @@ const ThreePaneSwimLaneLayout = ({
       <SwimLane size={middleSize} {...middleProps}>
         {middle}
       </SwimLane>
-      <SwimLane size={rightSize} {...rightProps}>
+      <SwimLane enableBlocker={true} size={rightSize} {...rightProps}>
         {right}
       </SwimLane>
     </SwimLaneContainer>

@@ -80,8 +80,16 @@ describe("Rule", () => {
 
     const scope = within(groupCard as HTMLInputElement);
 
-    expect(scope.getByText("Rule 1234")).toBeInTheDocument();
-    expect(scope.getByText("Rule 4321")).toBeInTheDocument();
+    expect(
+      scope.getByText("Rule 1234", {
+        exact: false,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      scope.getByText("Rule 4321", {
+        exact: false,
+      }),
+    ).toBeInTheDocument();
     expect(scope.getByText("AND")).toBeInTheDocument();
   });
 
@@ -121,14 +129,21 @@ describe("Rule", () => {
     expect(removeById).toHaveBeenCalledWith(query, "group-1");
     expect(setQueryBuilderJson).toHaveBeenCalled();
 
-    /* // note: not functional yet 
     await userEvent.pointer({ keys: "[MouseRight]", target: groupCard });
 
     const convertButton = screen.getByRole("menuitem", {
-      name: /collapse group/i,
+      name: /ungroup/i,
     });
     expect(convertButton).toBeInTheDocument();
-    */
+    fireEvent.click(convertButton);
+
+    expect(updateById).toHaveBeenCalledWith(
+      query,
+      "group-1",
+      expect.any(Function),
+    );
+    expect(setQueryBuilderJson).toHaveBeenCalled();
+
     await userEvent.pointer({ keys: "[MouseRight]", target: groupCard });
 
     const addButton = screen.getByRole("menuitem", {

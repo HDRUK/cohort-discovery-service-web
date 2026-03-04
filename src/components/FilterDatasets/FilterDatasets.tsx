@@ -15,11 +15,13 @@ export const filterDatasetChipSx = {
 
 const FilterDatasets = () => {
   const hasMounted = useHasMounted();
-  const { selectedDatasets, open, setOpen } = useQueryBuilder((qb) => ({
-    selectedDatasets: qb.selectedDatasets,
-    open: qb.openSelectDatasetsPanel,
-    setOpen: qb.setOpenSelectDatasetsPanel,
-  }));
+  const { selectedDatasets, open, setOpen, setPreviouslySelectedDatasets } =
+    useQueryBuilder((qb) => ({
+      selectedDatasets: qb.selectedDatasets,
+      open: qb.openSelectDatasetsPanel,
+      setOpen: qb.setOpenSelectDatasetsPanel,
+      setPreviouslySelectedDatasets: qb.setPreviouslySelectedDatasets,
+    }));
 
   const noDatasets = selectedDatasets?.length === 0;
 
@@ -28,51 +30,54 @@ const FilterDatasets = () => {
   }
 
   return (
-    <Title title="Filter" subTitle="Collections">
-      <Tooltip
-        title={noDatasets ? DatasetErrors.NO_DATASETS : undefined}
-        variant="error"
-      >
-        <Chip
-          variant={noDatasets ? "outlined" : "filled"}
-          color={noDatasets ? "error" : undefined}
-          onClick={() => setOpen(!open)}
-          sx={{
-            bgcolor: open && !noDatasets ? "secondary.main" : "white",
-            color: open && !noDatasets ? "secondary.contrastText" : "inherit",
-            ...filterDatasetChipSx,
-          }}
-          label={
-            <Box
-              sx={{
-                width: "100%",
-                display: "flex",
-                alignItems: "baseline",
-                flexWrap: "nowrap",
-              }}
-            >
-              <Chip
-                label={selectedDatasets?.length ?? 0}
+    <Box display="flex" flexDirection="row" sx={{ gap: 2 }}>
+      <Typography alignContent="center" sx={{ color: "error.main" }}>
+        {noDatasets ? DatasetErrors.NO_DATASETS : undefined}
+      </Typography>
+      <Title title="Filter" subTitle="Collections">
+        <Tooltip
+          title={noDatasets ? DatasetErrors.NO_DATASETS : undefined}
+          variant="error"
+        >
+          <Chip
+            variant={noDatasets ? "outlined" : "filled"}
+            disabled={noDatasets}
+            onClick={() => {
+              setOpen(!open);
+              setPreviouslySelectedDatasets(selectedDatasets);
+            }}
+            sx={{
+              bgcolor: open && !noDatasets ? "secondary.main" : "white",
+              color: open && !noDatasets ? "secondary.contrastText" : "inherit",
+              ...filterDatasetChipSx,
+            }}
+            label={
+              <Box
                 sx={{
-                  bgcolor: noDatasets ? "error.main" : "background.default",
-                  color: noDatasets
-                    ? "error.contrastText"
-                    : "background.contrastText",
-                  borderRadius: 10,
-                  mr: 0.5,
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "baseline",
+                  flexWrap: "nowrap",
                 }}
-              />
-              <Typography
-                variant="body1"
-                color={noDatasets ? "error" : "inherit"}
               >
-                Selected
-              </Typography>
-            </Box>
-          }
-        />
-      </Tooltip>
-    </Title>
+                <Chip
+                  label={selectedDatasets?.length ?? 0}
+                  sx={{
+                    bgcolor: "background.default",
+                    color: "background.contrastText",
+                    borderRadius: 10,
+                    mr: 0.5,
+                  }}
+                />
+                <Typography variant="body1" color="inherit">
+                  Selected
+                </Typography>
+              </Box>
+            }
+          />
+        </Tooltip>
+      </Title>
+    </Box>
   );
 };
 

@@ -7,7 +7,7 @@ import Table from "./Table";
 import { MRT_ColumnDef } from "material-react-table";
 import { AvailableFormats } from "../DownloadButton/DownloadButton";
 import MockDaphneStore from "@/store/MockDaphneStore";
-jest.mock("@/actions/getCustodianCollections");
+jest.mock("@/actions/collection/getCustodianCollections");
 
 const handleDeleteRows = jest.fn();
 

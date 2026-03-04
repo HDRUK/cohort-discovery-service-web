@@ -12,6 +12,7 @@ import { useCallback, useMemo } from "react";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import {
+  createAgeFilter,
   createOperator,
   createRule,
   findById,
@@ -108,6 +109,34 @@ const Guidance = () => {
     return node;
   }, [queryBuilderJson, selectedIds]);
 
+  const handleCreateNewAgeFilterInGroup = useCallback(
+    (id: RuleGroupType["id"], rules: RuleGroupType["rules"]) => {
+      const newRules = [createAgeFilter(), createOperator(), ...rules];
+
+      setQueryBuilderJson(
+        updateById(queryBuilderJson, id, (node) => ({
+          ...node,
+          rules: newRules,
+        })),
+      );
+    },
+    [queryBuilderJson, setQueryBuilderJson],
+  );
+
+  const handleCreateNewOperatorInGroup = useCallback(
+    (id: RuleGroupType["id"], rules: RuleGroupType["rules"]) => {
+      const newRules = [createOperator(), ...rules];
+
+      setQueryBuilderJson(
+        updateById(queryBuilderJson, id, (node) => ({
+          ...node,
+          rules: newRules,
+        })),
+      );
+    },
+    [queryBuilderJson, setQueryBuilderJson],
+  );
+
   const handleCreateNewRuleInGroup = useCallback(
     (id: RuleGroupType["id"], rules: RuleGroupType["rules"]) => {
       const newRules = [createRule(), createOperator(), ...rules];
@@ -192,6 +221,18 @@ const Guidance = () => {
     const { id, rules } = group;
     return {
       ...baseComponents,
+      AddNewAgeFilterButton: (props: AddButtonProps) => (
+        <AddButton
+          {...props}
+          onClick={() => handleCreateNewAgeFilterInGroup(id, rules)}
+        />
+      ),
+      AddNewOperatorButton: (props: AddButtonProps) => (
+        <AddButton
+          {...props}
+          onClick={() => handleCreateNewOperatorInGroup(id, rules)}
+        />
+      ),
       AddNewRuleButton: (props: AddButtonProps) => (
         <AddButton
           {...props}
@@ -249,9 +290,9 @@ const Guidance = () => {
   }
   if (!selectedNode) {
     return (
-      <ActionMenuSection title={"Tool Guidance"} fixedExpanded>
+      <Box textAlign="center">
         <ToolGuidance components={baseComponents} />
-      </ActionMenuSection>
+      </Box>
     );
   } else {
     if (isRuleLeaf(selectedNode)) {

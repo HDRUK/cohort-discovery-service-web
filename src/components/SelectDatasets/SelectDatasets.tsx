@@ -7,6 +7,8 @@ import {
   AccordionDetails,
   Collapse,
   Paper,
+  Box,
+  Button,
 } from "@mui/material";
 import { useEffect, useRef } from "react";
 import Title from "../Title";
@@ -24,13 +26,23 @@ const SelectDatasets = ({
   initialSelection: string[];
   collections: Collection[];
 }) => {
-  const { selectedDatasets, setSelectedDatasets, open } = useQueryBuilder(
-    (qb) => ({
-      selectedDatasets: qb.selectedDatasets,
-      setSelectedDatasets: qb.setSelectedDatasets,
-      open: qb.openSelectDatasetsPanel,
-    }),
-  );
+  const {
+    selectedDatasets,
+    setSelectedDatasets,
+    open,
+    setOpen,
+    previouslySelectedDatasets,
+    setPreviouslySelectedDatasets,
+  } = useQueryBuilder((qb) => ({
+    selectedDatasets: qb.selectedDatasets,
+    setSelectedDatasets: qb.setSelectedDatasets,
+    open: qb.openSelectDatasetsPanel,
+    setOpen: qb.setOpenSelectDatasetsPanel,
+    previouslySelectedDatasets: qb.previouslySelectedDatasets,
+    setPreviouslySelectedDatasets: qb.setPreviouslySelectedDatasets,
+  }));
+
+  const noDatasets = selectedDatasets?.length === 0;
 
   const mountedRef = useRef(false);
   useEffect(() => {
@@ -110,6 +122,42 @@ const SelectDatasets = ({
             />
           ))}
         </AccordionDetails>
+
+        <Paper>
+          <Box
+            display="flex"
+            flexDirection="row"
+            justifyContent="space-between"
+            paddingX={3.75}
+            paddingY={2.5}
+          >
+            <Button
+              variant="contained"
+              sx={{ bgcolor: "white", color: "black", fontWeight: "normal" }}
+              onClick={() => {
+                setSelectedDatasets(previouslySelectedDatasets);
+                setOpen(!open);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              disabled={noDatasets}
+              variant="contained"
+              sx={{
+                bgcolor: "secondary.main",
+                color: "white",
+                fontWeight: "normal",
+              }}
+              onClick={() => {
+                setPreviouslySelectedDatasets(selectedDatasets);
+                setOpen(!open);
+              }}
+            >
+              Save and Close
+            </Button>
+          </Box>
+        </Paper>
       </Paper>
     </Collapse>
   );
