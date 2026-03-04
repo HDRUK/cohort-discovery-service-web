@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Button, Link, Popover } from "@mui/material";
+import { Button, Popover } from "@mui/material";
 import { usePathname } from "next/navigation";
 import { SupportButton, SupportList } from "./SupportPopOut.styles";
 import theme from "@/config/theme";
