@@ -307,9 +307,16 @@ const RuleAgeSelector = ({
                   max: maxAge,
                   type: "number",
                   "aria-labelledby": "input-slider",
+                  sx: { p: 0.5 },
                 },
               }}
-              sx={{ width: "20ch" }}
+              sx={{
+                maxWidth: "7ch",
+                flexShrink: 0,
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 1,
+                },
+              }}
             />
             <Slider
               value={sliderValue}
@@ -345,9 +352,16 @@ const RuleAgeSelector = ({
                   max: maxAge,
                   type: "number",
                   "aria-labelledby": "input-slider",
+                  sx: { p: 0.5 },
                 },
               }}
-              sx={{ width: "20ch" }}
+              sx={{
+                maxWidth: "7ch",
+                flexShrink: 0,
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 1,
+                },
+              }}
             />
           </>
         )}
