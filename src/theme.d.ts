@@ -10,6 +10,7 @@ declare module "@mui/material/styles" {
     highlight: Palette["primary"];
     table?: Palette["primary"];
     tooltip?: Palette["primary"];
+    yellowCustom?: Palette["primary"];
   }
   interface PaletteOptions {
     tertiary?: PaletteOptions["primary"];
@@ -17,6 +18,7 @@ declare module "@mui/material/styles" {
     highlight?: PaletteOptions["primary"];
     table?: PaletteOptions["primary"];
     tooltip?: PaletteOptions["primary"];
+    yellowCustom?: PaletteOptions["primary"];
   }
   interface TypographyVariants {
     guidance1: React.CSSProperties;
@@ -41,6 +43,7 @@ declare module "@mui/material/Button" {
   }
   interface ButtonPropsColorOverrides {
     tertiary: true;
+    yellowCustom: true;
   }
 }
 

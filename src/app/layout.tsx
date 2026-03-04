@@ -8,6 +8,7 @@ import HeaderBar from "@/components/HeaderBar";
 import { isStandalone } from "@/utils/modes";
 import Footer from "@/components/Footer";
 import ServerDefaultProvider from "@/providers/ServerDefaultProvider";
+import SupportPopOut from "@/components/SupportPopOut/SupportPopOut";
 
 const sourceSans = Source_Sans_3({
   variable: "--font-source-sans-3",
@@ -47,6 +48,8 @@ export default async function RootLayout({
                   height: "120vh",
                 }}
               >
+                {!standalone && <SupportPopOut />}
+
                 {!hideNav && <HeaderBar standalone={standalone} />}
 
                 <Box
