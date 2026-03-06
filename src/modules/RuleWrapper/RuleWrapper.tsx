@@ -186,18 +186,18 @@ const RuleWrapper = ({
     ],
   );
 
-  const onMouseOver = (e: React.MouseEvent<HTMLDivElement>) => {
+  const onMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     setShowHandle(true);
     setShowDelete(true);
   };
 
   const onMouseLeave = useCallback(() => {
-    if (showHandle && !isDragging && !isSelected) {
+    if (showHandle && !isDragging) {
       setShowHandle(false);
       setShowDelete(false);
     }
-  }, [showHandle, isDragging, isSelected, setShowHandle, setShowDelete]);
+  }, [showHandle, isDragging, setShowHandle, setShowDelete]);
 
   const onCardMouseOver = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
@@ -225,7 +225,7 @@ const RuleWrapper = ({
     valid,
     handleContextMenu,
     onMouseLeave,
-    onMouseOver,
+    onMouseEnter,
     onCardMouseOver,
     onCardMouseLeave,
     handleOnSelect,
@@ -249,7 +249,7 @@ const RuleWrapper = ({
       ref={setNodeRef}
       style={sortable ? style : {}}
       {...containerProps}
-      onMouseOver={onMouseOver}
+      onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       sx={containerSx(isSelected && !isDragging, containerProps?.sx)}
     >
