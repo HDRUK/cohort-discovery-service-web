@@ -2,12 +2,9 @@
 
 import { Paper, Stack } from "@mui/material";
 import { ReactNode, useMemo } from "react";
-import OperatorToggle from "./OpperatorToggle";
+import { SingleSidedOperator } from "@/types/rules";
 
-export enum SingleSidedOperator {
-  GREATER_THAN = "gt",
-  LESS_THAN = "lt",
-}
+import OperatorToggle from "./OperatorToggle";
 
 export type NullablePair<T> = [T | null, T | null];
 
@@ -22,7 +19,12 @@ export type SingleBoundSelectorProps<TStored, TUi = TStored> = {
 
   constraint: NullablePair<TStored>;
 
-  onConstraintChange: (next: NullablePair<TStored>) => void;
+  constraintOperator: SingleSidedOperator;
+
+  onConstraintChange: (
+    next: NullablePair<TStored>,
+    nextOperator: SingleSidedOperator,
+  ) => void;
 
   parse?: (stored: TStored | null) => TUi | null;
 
@@ -48,6 +50,7 @@ export type SingleBoundSelectorProps<TStored, TUi = TStored> = {
 function deriveOperatorAndValue<TStored, TUi>(
   constraint: NullablePair<TStored>,
   parse: (stored: TStored | null) => TUi | null,
+  constraintOperator: SingleSidedOperator,
 ): { operator: SingleSidedOperator; value: TUi | null } {
   const [left, right] = constraint;
 
@@ -61,13 +64,14 @@ function deriveOperatorAndValue<TStored, TUi>(
   if (right != null)
     return { operator: SingleSidedOperator.LESS_THAN, value: parse(right) };
 
-  return { operator: SingleSidedOperator.GREATER_THAN, value: null };
+  return { operator: constraintOperator, value: null };
 }
 
 export default function SingleBoundSelector<TStored, TUi = TStored>({
   title,
   children,
   constraint,
+  constraintOperator,
   onConstraintChange,
   parse,
   serialise,
@@ -89,8 +93,8 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
   );
 
   const { operator, value } = useMemo(
-    () => deriveOperatorAndValue(constraint, parseFn),
-    [parseFn, constraint],
+    () => deriveOperatorAndValue(constraint, parseFn, constraintOperator),
+    [parseFn, constraint, constraintOperator],
   );
 
   const handleOperatorChange = (
@@ -104,6 +108,7 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
       nextOperator === SingleSidedOperator.GREATER_THAN
         ? [stored, null]
         : [null, stored],
+      nextOperator,
     );
   };
 
@@ -113,6 +118,7 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
       operator === SingleSidedOperator.GREATER_THAN
         ? [stored, null]
         : [null, stored],
+      operator,
     );
   };
 

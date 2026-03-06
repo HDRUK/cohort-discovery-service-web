@@ -1,6 +1,5 @@
 import SingleBoundSelector from "./SingleBoundSelector";
-import { SingleSidedOperator, NullablePair } from "./SingleBoundSelector";
+import { NullablePair } from "./SingleBoundSelector";
 
-export { SingleSidedOperator };
 export type { NullablePair };
 export default SingleBoundSelector;

@@ -1,26 +1,22 @@
 "use client";
 
-import { Stack } from "@mui/material";
-import { ReactNode, useCallback, useMemo } from "react";
+import { ReactNode, useCallback } from "react";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { updateById } from "@/utils/rules";
-import { RuleLeafType } from "@/types/rules";
+import { RuleLeafType, SingleSidedOperator } from "@/types/rules";
 import dayjs, { Dayjs } from "dayjs";
 import {
   DatePicker,
   DatePickerProps,
   DatePickerSlotProps,
 } from "@mui/x-date-pickers/DatePicker";
-import { PickerValue } from "@mui/x-date-pickers/internals";
 import { CustomH1 } from "@/components/GuidanceHeaders";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import useFeatures from "@/hooks/useFeatures";
 import { getDomainVerbs } from "@/utils/omop";
 import { capitaliseFirstLetter } from "@/utils/string";
 
-import SingleBoundSelector, {
-  SingleSidedOperator,
-} from "@/components/SingleBoundSelector";
+import SingleBoundSelector from "@/components/SingleBoundSelector";
+import DoubleBoundSelector from "@/components/DoubleBoundSelector";
 import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
 
 export interface RuleTimeframeSelectorProps extends DatePickerProps {
@@ -54,38 +50,7 @@ const RuleTimeframeSelector = ({
 
   const { constrainForBunnyV1 } = useFeatures();
 
-  const [leftValue, rightValue] = useMemo<[Dayjs | null, Dayjs | null]>(() => {
-    const [start, end] = rule.timeConstraint ?? [null, null];
-    return [start ? dayjs(start) : null, end ? dayjs(end) : null];
-  }, [rule.timeConstraint]);
-
   const key = collapsibleGuidanceKey("RuleTimeframeSelector", selected);
-
-  const handleLeftChange = (value: PickerValue) => {
-    setSelectedGuidance(key, true);
-    setQueryBuilderJson(
-      updateById(queryBuilderJson, rule.id, (node) => ({
-        ...node,
-        timeConstraint: [
-          value?.toISOString() ?? null,
-          rightValue?.toISOString() ?? null,
-        ],
-      })),
-    );
-  };
-
-  const handleRightChange = (value: PickerValue) => {
-    setSelectedGuidance(key, true);
-    setQueryBuilderJson(
-      updateById(queryBuilderJson, rule.id, (node) => ({
-        ...node,
-        timeConstraint: [
-          leftValue?.toISOString() ?? null,
-          value?.toISOString() ?? null,
-        ],
-      })),
-    );
-  };
 
   const mergedSlotProps: DatePickerSlotProps<false> = {
     ...slotProps,
@@ -134,12 +99,16 @@ const RuleTimeframeSelector = ({
 
         <SingleBoundSelector<string, Dayjs>
           constraint={rule.timeConstraint}
-          onConstraintChange={(next) => {
+          constraintOperator={
+            rule.timeConstraintOperator ?? SingleSidedOperator.GREATER_THAN
+          }
+          onConstraintChange={(next, nextOperator) => {
             setSelectedGuidance(key, true);
             setQueryBuilderJson(
               updateById(queryBuilderJson, rule.id, (node) => ({
                 ...node,
                 timeConstraint: next,
+                timeConstraintOperator: nextOperator,
               })),
             );
           }}
@@ -172,19 +141,11 @@ const RuleTimeframeSelector = ({
   return (
     <>
       {title && <CustomH1>{title}</CustomH1>}
-      <Stack direction="row" spacing={2} alignItems="center">
-        <DatePicker
-          {...commonPickerProps}
-          value={leftValue}
-          onChange={handleLeftChange}
-        />
-        <ArrowForwardIcon />
-        <DatePicker
-          {...commonPickerProps}
-          value={rightValue}
-          onChange={handleRightChange}
-        />
-      </Stack>
+      <DoubleBoundSelector
+        rule={rule}
+        commonPickerProps={commonPickerProps}
+        guidanceKey={key}
+      />
       {children}
     </>
   );

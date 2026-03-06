@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ClickAwayListener, Collapse, Stack, Tooltip } from "@mui/material";
-import { SingleSidedOperator } from "./SingleBoundSelector";
+import { SingleSidedOperator } from "@/types/rules";
 import CircularIconButton from "../CircularIconButton";
 
 interface OperatorToggleProps {
