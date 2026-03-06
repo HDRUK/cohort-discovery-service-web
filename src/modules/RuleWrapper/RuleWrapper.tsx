@@ -225,7 +225,7 @@ const RuleWrapper = ({
     valid,
     handleContextMenu,
     onMouseLeave,
-    onMouseOver,
+    onMouseEnter,
     onCardMouseOver,
     onCardMouseLeave,
     handleOnSelect,
