@@ -7,6 +7,11 @@ export enum CombinatorType {
   FOLLOWED_BY = "followed_by",
 }
 
+export enum SingleSidedOperator {
+  GREATER_THAN = "gt",
+  LESS_THAN = "lt",
+}
+
 export type ConceptOperator = {
   //ageConstraint: string;
   //valueConstraint: string;
@@ -21,7 +26,9 @@ type Node = {
   warnings?: string[];
   name?: string;
   timeConstraint?: [string | null, string | null];
+  timeConstraintOperator?: SingleSidedOperator;
   ageConstraint?: [number | null, number | null];
+  ageConstraintOperator?: SingleSidedOperator;
 };
 
 export interface OperatorType extends Node {
@@ -36,8 +43,10 @@ export interface RuleLeafType extends Node {
   rule: ConceptOperator;
 }
 
-export interface AgeFilterType
-  extends Omit<Node, "exclude" | "timeConstraint" | "ageConstraint"> {
+export interface AgeFilterType extends Omit<
+  Node,
+  "exclude" | "timeConstraint" | "ageConstraint"
+> {
   value: [number, number];
 }
 
