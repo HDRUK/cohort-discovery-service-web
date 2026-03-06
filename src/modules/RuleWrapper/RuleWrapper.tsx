@@ -197,7 +197,7 @@ const RuleWrapper = ({
       setShowHandle(false);
       setShowDelete(false);
     }
-  }, [showHandle, isDragging, isSelected, setShowHandle, setShowDelete]);
+  }, [showHandle, isDragging, setShowHandle, setShowDelete]);
 
   const onCardMouseOver = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
