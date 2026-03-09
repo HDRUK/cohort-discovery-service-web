@@ -36,6 +36,7 @@ import ThreePaneSwimLaneLayout from "../ThreePaneSwimLaneLayout";
 import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
 import useRightClickMenu from "@/hooks/useRightClickMenu";
 import { ThreePaneProvider } from "@/providers/ThreePaneProvider";
+import { useLeaveConfirmation } from "@/hooks/useLeaveConfirmation";
 
 const QueryBuilder = ({
   query,
@@ -86,6 +87,8 @@ const QueryBuilder = ({
 
   const [active, setActive] = useState<Active | null>(null);
   const [activeNode, setActiveNode] = useState<RuleNodeType | null>(null);
+
+  useLeaveConfirmation(true);
 
   const onDragStart = (e: DragStartEvent) => {
     setActive(e.active);
