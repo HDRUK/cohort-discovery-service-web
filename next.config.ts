@@ -13,6 +13,23 @@ const nextConfig: NextConfig = {
   },
   transpilePackages: ["@faker-js/faker"],
   outputFileTracingRoot: path.join(__dirname, "../"),
+  async headers() {
+    if (process.env.NODE_ENV === "production") {
+      return [
+        {
+          source: "/(.*)",
+          headers: [
+            {
+              key: "Strict-Transport-Security",
+              value: "max-age=31536000; includeSubDomains; preload",
+            },
+          ],
+        },
+      ];
+    } else {
+      return [];
+    }
+  },
 };
 
 const withMDX = createMDX({
