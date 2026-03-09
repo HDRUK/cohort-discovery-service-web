@@ -88,7 +88,7 @@ const QueryBuilder = ({
   const [active, setActive] = useState<Active | null>(null);
   const [activeNode, setActiveNode] = useState<RuleNodeType | null>(null);
 
-  useLeaveConfirmation(true);
+  useLeaveConfirmation(queryBuilderJson.rules.length > 0);
 
   const onDragStart = (e: DragStartEvent) => {
     setActive(e.active);
