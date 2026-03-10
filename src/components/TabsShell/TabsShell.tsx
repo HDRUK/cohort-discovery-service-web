@@ -5,7 +5,7 @@ import { Box, BoxProps, Tab, IconButton, Typography } from "@mui/material";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
-import Link from "next/link";
+import GuardedLink from "@/components/GuardedLink";
 import CloseIcon from "@mui/icons-material/Close";
 
 import {
@@ -108,7 +108,7 @@ export default function TabsShell({
                         )}
                       </Typography>
                     }
-                    component={href ? Link : "a"}
+                    component={href ? GuardedLink : "a"}
                     href={href ?? undefined}
                     sx={mergeSx(
                       defaultTabSx,
