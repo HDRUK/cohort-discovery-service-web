@@ -8,7 +8,6 @@ import LaunchIcon from "@mui/icons-material/Launch";
 import { useEffect, useMemo } from "react";
 import { useTable } from "../../hooks/useTable";
 import { formatNumber } from "@/utils/numbers";
-import useQueryBuilder from "@/hooks/useQueryBuilder";
 import useSearchParams from "@/hooks/useSearchParams";
 import { DEFAULT_STATUS_LABELS } from "@/config/defaults";
 import Table from "../../components/Table";
@@ -34,11 +33,6 @@ const QueryResultsTable = ({
   showGuidance = false,
 }: QueryResultsTableProps) => {
   const defaults = useDefaults();
-  const { setQueryName, setQueryBuilderJson } = useQueryBuilder((qb) => ({
-    setQueryName: qb.setQueryName,
-    setQueryBuilderJson: qb.setQueryBuilderJson,
-    queryAsText: qb.queryAsText,
-  }));
 
   const queryKey = useMemo(
     () => [
@@ -73,15 +67,7 @@ const QueryResultsTable = ({
     qc.setQueryData(queryKey, initialData);
   }, [qc, queryKey, initialData]);
 
-  const { tasks, name, definition } = query;
-
-  useEffect(() => {
-    setQueryBuilderJson(definition);
-  }, [definition, setQueryBuilderJson]);
-
-  useEffect(() => {
-    setQueryName(name);
-  }, [name, setQueryName]);
+  const { tasks } = query;
 
   const columns: MRT_ColumnDef<Task>[] = [
     {
