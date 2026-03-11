@@ -15,12 +15,12 @@ import {
 
 const mockConcept1: Concept = {
   concept_id: 1234,
-  description: "Heart Disease",
+  name: "Heart Disease",
   category: "Condition",
   children: [
     {
       concept_id: 12345,
-      description: "Myocardial Infarction",
+      name: "Myocardial Infarction",
       category: "Condition",
     },
   ],
@@ -28,7 +28,7 @@ const mockConcept1: Concept = {
 
 const mockConcept2: Concept = {
   concept_id: 4321,
-  description: "COPD",
+  name: "COPD",
   category: "Condition",
 };
 

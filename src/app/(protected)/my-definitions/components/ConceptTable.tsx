@@ -21,9 +21,9 @@ const ConceptTable = ({ concepts, onDelete }: ConceptTableProps) => {
         size: 20,
       },
       {
-        id: "concept_description",
+        id: "name",
         header: "Description",
-        accessorFn: (row) => row.description,
+        accessorFn: (row) => row.name,
         size: 100,
       },
       {

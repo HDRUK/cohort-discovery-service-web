@@ -40,7 +40,7 @@ export const NoDomainSingleSelect: Story = {
     <MockDaphneStore>
       <Component
         multiple={false}
-        onClick={(c: Concept) => alert(`${c.description} clicked`)}
+        onClick={(c: Concept) => alert(`${c.name} clicked`)}
       />
     </MockDaphneStore>
   ),

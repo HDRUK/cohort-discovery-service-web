@@ -40,6 +40,7 @@ import { useThreePane } from "@/providers/ThreePaneProvider";
 import { useSaveChanges } from "@/hooks/useSaveChanges";
 import { useUserDataStore } from "@/hooks/userDataStore";
 import { useIsAdminSection } from "@/contexts/AdminSectionContext";
+import ToggleSynthetic from "@/components/ToggleSynthetic";
 
 const UpdateCollectionGuidance = maskClientTest(
   () => import("./UpdateCollectionGuidance"),
@@ -59,6 +60,7 @@ const getDefaultValues = (collection: CollectionWithHosts | null) => {
         host_id: 0,
         model_state: undefined,
         workgroups: [],
+        is_synthetic: false,
       },
       config: {
         frequency_mode: Number(FrequencyMode.WEEKLY),
@@ -77,6 +79,7 @@ const getDefaultValues = (collection: CollectionWithHosts | null) => {
     config,
     model_state,
     workgroups,
+    is_synthetic,
   } = collection;
   const [host] = hosts;
   return {
@@ -87,6 +90,7 @@ const getDefaultValues = (collection: CollectionWithHosts | null) => {
       host_id: host?.id ?? "",
       model_state: model_state,
       workgroups: workgroups,
+      is_synthetic: is_synthetic,
     },
     config: {
       frequency_mode: config.frequency_mode,
@@ -288,12 +292,16 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
       rightExtras={<ErrorHeader errors={errors} depth={2} editing />}
     >
       <FormProvider {...formMethods}>
+        <FormLabel underlined>Collection Type</FormLabel>
+        <ToggleSynthetic disabled={!expandedRight} />
+
         <FormLabel underlined>Collection Status</FormLabel>
         <ManageCollectionStatus
           collection={collection}
           expandedRight={expandedRight}
           key={collection.id}
         />
+
         {isAdmin && (
           <>
             <FormLabel underlined>Workgroup access</FormLabel>

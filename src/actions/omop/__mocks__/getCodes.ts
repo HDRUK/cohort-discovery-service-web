@@ -3,7 +3,7 @@ import { ApiResponse, Code } from "@/types/api";
 const getCodes = async (domain: string): Promise<ApiResponse<Code[]>> => {
   const codesByDomain: Record<string, Code[]> = {
     condition: [
-      { name: "319835", description: "Essential hypertension" },
+      { name: "319835", name: "Essential hypertension" },
       { name: "201826", description: "Type 2 diabetes mellitus" },
     ],
     drug: [
