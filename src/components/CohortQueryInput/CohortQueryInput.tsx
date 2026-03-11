@@ -11,7 +11,6 @@ import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { useDebounce } from "@/hooks/useDebounce";
 import useSubmitQuery from "@/hooks/useSubmitQuery";
 import { RuleErrors } from "@/utils/rules";
-import SubmitQueryButton from "@/components/SubmitQueryButton";
 import { EXAMPLES } from "@/config/queryExamples";
 import { Query } from "@/types/api";
 import SearchOverlay from "./SearchOverlay";
@@ -24,7 +23,15 @@ type FormValues = {
 const MIN_SEARCH_LENGTH = 3;
 const STALE_TIME = 60_000;
 
-const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
+type CohortQueryInputProps = {
+  queries: Query[];
+  syncFromQueryAsText?: boolean;
+};
+
+const CohortQueryInput = ({
+  queries,
+  syncFromQueryAsText = false,
+}: CohortQueryInputProps) => {
   const defaults = useDefaults();
 
   const queryAsText = useQueryBuilder((qb) => qb.queryAsText);
@@ -57,11 +64,17 @@ const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
     clearFormErrors();
     resetQueryBuilderJson(false);
     resetField("cohortQueryInput", {
-      defaultValue: queryAsText,
+      defaultValue: syncFromQueryAsText ? queryAsText : "",
       keepTouched: true,
       keepError: true,
     });
-  }, [clearFormErrors, resetQueryBuilderJson, resetField, queryAsText]);
+  }, [
+    clearFormErrors,
+    resetQueryBuilderJson,
+    resetField,
+    queryAsText,
+    syncFromQueryAsText,
+  ]);
 
   const prefetchQuery = useCallback(
     (value: string) => {
@@ -145,6 +158,8 @@ const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
   const lastSyncedQueryAsText = useRef<string | null>(null);
 
   useEffect(() => {
+    if (!syncFromQueryAsText) return;
+
     if (lastSyncedQueryAsText.current === queryAsText) return;
     lastSyncedQueryAsText.current = queryAsText;
 
@@ -168,6 +183,7 @@ const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
       });
     }
   }, [
+    syncFromQueryAsText,
     defaults,
     queryAsText,
     searchedValue,
@@ -245,7 +261,6 @@ const CohortQueryInput = ({ queries }: { queries: Query[] }) => {
                 }))}
               />
             </Box>
-            <SubmitQueryButton warning={warnings.length > 0} />
           </Box>
         )}
       />

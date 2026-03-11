@@ -13,10 +13,10 @@ import { cookies } from "next/headers";
 import { QUERY_BUILDER_GUIDANCE_COOKIE } from "@/config/internals";
 import QueryBuilderGuidanceWrapper from "./QueryBuilderGuidanceWrapper";
 import ShowJsonButton from "@/components/ShowJsonButton";
-import CohortErrors from "@/components/CohortErrors";
 import { buildQueryHistoryParams } from "@/utils/params";
 import getQueries from "@/actions/query/getQueries";
 import { DEFAULT_QUERIES_DROPDOWN_PER_PAGE } from "@/config/defaults";
+import CohortQueryPreview from "@/components/CohortQueryPreview";
 
 const NODE_ENV = process.env?.NODE_ENV;
 
@@ -72,21 +72,17 @@ const CohortBuilder = async (props: { query?: string }) => {
           display={"flex"}
           overflow={"hidden"}
         >
-          <Title
-            marginTop={1.5}
-            title="Cohort Builder"
-            subTitle="Natural Language"
-          />
-
           <Stack direction="column" spacing={1} sx={{ flex: 1, minWidth: 0 }}>
             <CohortQueryInput queries={userQueries.data} />
-            <CohortErrors />
+            <Box sx={{ overflow: "hidden" }}>
+              <Divider />
+            </Box>
           </Stack>
         </Stack>
 
-        <Box sx={{ overflow: "hidden" }}>
-          <Divider />
-        </Box>
+        <Title title="Query" subTitle="Preview" marginY={1}>
+          <CohortQueryPreview />
+        </Title>
 
         <Title title="Cohort Builder" subTitle="Query Rules" marginY={1}>
           {NODE_ENV === "development" && (
