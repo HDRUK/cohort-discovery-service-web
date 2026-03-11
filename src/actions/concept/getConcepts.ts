@@ -20,8 +20,6 @@ const getConcepts = async (
     ...(domain ? { domain } : {}),
   });
 
-  console.log(API_ROUTES.searchConcepts);
-
   const { data, message } = await apiGet<
     ApiResponse<Paginated<Partial<Concept>>>
   >({
