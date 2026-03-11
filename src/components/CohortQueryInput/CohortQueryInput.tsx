@@ -4,10 +4,9 @@ import { useForm, Controller, useWatch } from "react-hook-form";
 import { Box } from "@mui/material";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useIsFetching, useQueryClient } from "@tanstack/react-query";
-
 import SearchBox from "../SearchBox";
+import SearchIcon from "@mui/icons-material/Search";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-
 import { useDebounce } from "@/hooks/useDebounce";
 import useSubmitQuery from "@/hooks/useSubmitQuery";
 import { RuleErrors } from "@/utils/rules";
@@ -26,11 +25,13 @@ const STALE_TIME = 60_000;
 type CohortQueryInputProps = {
   queries: Query[];
   syncFromQueryAsText?: boolean;
+  resetOnSearch?: boolean;
 };
 
 const CohortQueryInput = ({
   queries,
   syncFromQueryAsText = false,
+  resetOnSearch = true,
 }: CohortQueryInputProps) => {
   const defaults = useDefaults();
 
@@ -113,8 +114,11 @@ const CohortQueryInput = ({
       if (queryJson.rules.length === 0) {
         appendError(RuleErrors.NO_QUERY_FOUND);
       }
+      if (resetOnSearch) resetField("cohortQueryInput", { defaultValue: "" });
     },
     [
+      resetOnSearch,
+      resetField,
       appendError,
       getQueryFromText,
       queryAsText,
@@ -210,7 +214,7 @@ const CohortQueryInput = ({
     <Box
       component="form"
       onSubmit={onSubmit}
-      sx={{ width: "95%", overflow: "visible", py: 1 }}
+      sx={{ width: "100%", overflow: "visible", py: 1 }}
     >
       <Controller
         name="cohortQueryInput"
@@ -228,6 +232,7 @@ const CohortQueryInput = ({
             <Box ref={anchorRef} sx={{ flex: 1 }}>
               <SearchBox
                 {...field}
+                startIcon={<SearchIcon fontSize="medium" sx={{ ml: 2 }} />}
                 collapsible={false}
                 error={isDirty ? false : !!error}
                 type="search"
