@@ -14,6 +14,7 @@ import { useEffect, useMemo } from "react";
 import ErrorHeader from "@/components/ErrorHeader";
 import { useUserDataStore } from "@/hooks/userDataStore";
 import { useAdminDataStore } from "@/store/adminDataStore";
+import ToggleSynthetic from "@/components/ToggleSynthetic";
 
 interface CreateCollectionProps {
   onCancel?: () => void;
@@ -42,6 +43,7 @@ const CreateCollection = ({ onCancel }: CreateCollectionProps) => {
         type: QueryContext.BUNNY,
         host_id: 0,
         status: true,
+        is_synthetic: false,
       },
       config: {
         collection_id: 0,
@@ -221,6 +223,12 @@ const CreateCollection = ({ onCancel }: CreateCollectionProps) => {
                 />
               )}
             />
+
+            <ToggleSynthetic
+              label={"Collection type"}
+              disabled={!selectedHostId}
+            />
+
             {/* // component disabled anyway, it should not be shown
             <Controller
               name="collection.type"

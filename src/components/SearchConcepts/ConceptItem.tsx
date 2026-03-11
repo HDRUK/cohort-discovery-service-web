@@ -6,6 +6,9 @@ import {
   PaperProps,
   Box,
   Typography,
+  Chip,
+  Stack,
+  Tooltip,
 } from "@mui/material";
 import Title from "../Title";
 import { mapDomain } from "@/utils/domains";
@@ -21,6 +24,7 @@ export interface ConceptItemProps {
   showDomain?: boolean;
   multiple?: boolean;
   showCode?: boolean;
+  showCounts?: boolean;
   handleClick: (id: number, e: ConceptSelectEvent) => void;
 }
 
@@ -64,18 +68,19 @@ export const ConceptItem = ({
   showDomain = true,
   multiple = false,
   showCode = false,
+  showCounts = false,
 }: ConceptItemProps) => {
   const id = concept.concept_id!;
   const titleText = showCode ? (
     <Typography>
-      {concept?.description} (
+      {concept.name} (
       <Box component="span" sx={{ color: "grey.500" }}>
         OMOP
       </Box>{" "}
       {id})
     </Typography>
   ) : (
-    concept.description
+    concept.name
   );
 
   const labelEl = (
@@ -112,6 +117,19 @@ export const ConceptItem = ({
         />
       ) : (
         labelEl
+      )}
+      {showCounts && (
+        <Stack sx={{ ml: "auto" }} gap={1} direction={"row"}>
+          <Tooltip title="Number of datasets present in">
+            <Chip color="success" label={concept.ncollections} />
+          </Tooltip>
+          <Tooltip title="Total number of counts for this concept">
+            <Chip
+              color="secondary"
+              label={Number(concept.count).toLocaleString()}
+            />
+          </Tooltip>
+        </Stack>
       )}
     </ConceptWrapper>
   );

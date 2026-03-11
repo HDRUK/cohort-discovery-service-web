@@ -27,7 +27,7 @@ describe("Rule", () => {
       rule: {
         concept: {
           concept_id: 1234,
-          description: "A test rule",
+          name: "A test rule",
         },
       },
       ...opArgs,

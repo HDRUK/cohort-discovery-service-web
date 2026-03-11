@@ -11,7 +11,7 @@ import {
   type MRT_ColumnDef,
 } from "material-react-table";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Tooltip, Typography } from "@mui/material";
+import { Stack, Tooltip, Typography } from "@mui/material";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import Table from "@/components/Table";
 import CopyableVariable from "../CopyableVariable";
@@ -36,6 +36,7 @@ import { buildCollectionParams } from "@/utils/params";
 import StatusChip from "@/components/StatusChip";
 import { TableProps } from "../Table/Table";
 import { useDefaults } from "@/providers/DefaultProvider";
+import SyntheticChip from "../SyntheticChip";
 
 export interface CollectionsTableProps extends TableProps {
   showPid?: boolean;
@@ -266,9 +267,14 @@ const CollectionsTable = ({
         id: "status",
         header: "Status",
         accessorFn: (row) => row.model_state?.state_id,
-        Cell: ({ cell }) => {
+        Cell: ({ cell, row }) => {
           const status = cell.getValue<CollectionStatus>();
-          return <StatusChip state_id={status} />;
+          return (
+            <Stack gap={1} direction={"row"}>
+              <StatusChip state_id={status} />{" "}
+              <SyntheticChip isSynthetic={!!row.original?.is_synthetic} />
+            </Stack>
+          );
         },
         size: 20,
         minSize: 20,

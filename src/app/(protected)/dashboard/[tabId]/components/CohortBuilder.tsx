@@ -18,8 +18,6 @@ import getQueries from "@/actions/query/getQueries";
 import { DEFAULT_QUERIES_DROPDOWN_PER_PAGE } from "@/config/defaults";
 import CohortQueryPreview from "@/components/CohortQueryPreview";
 
-const NODE_ENV = process.env?.NODE_ENV;
-
 const CohortBuilder = async (props: { query?: string }) => {
   const collections = await getUserCollections();
 
@@ -85,11 +83,9 @@ const CohortBuilder = async (props: { query?: string }) => {
         </Title>
 
         <Title title="Cohort Builder" subTitle="Query Rules" marginY={1}>
-          {NODE_ENV === "development" && (
-            <Box sx={{ ml: "auto" }}>
-              <ShowJsonButton />
-            </Box>
-          )}
+          <Box sx={{ ml: "auto" }}>
+            <ShowJsonButton />
+          </Box>
         </Title>
         <QueryBuilder query={query?.data} />
       </Box>

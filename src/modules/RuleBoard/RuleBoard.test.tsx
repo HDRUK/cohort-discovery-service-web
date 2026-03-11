@@ -15,7 +15,7 @@ describe("QueryBuilder", () => {
         rule: {
           concept: {
             concept_id: 1234,
-            description: "Rule 1234",
+            name: "Rule 1234",
             category: "cat-1",
           },
         },
@@ -29,7 +29,7 @@ describe("QueryBuilder", () => {
         rule: {
           concept: {
             concept_id: 4321,
-            description: "Rule 4321",
+            name: "Rule 4321",
             category: "cat-1",
           },
         },
@@ -84,7 +84,7 @@ describe("QueryBuilder", () => {
         rule: {
           concept: {
             concept_id: 1234,
-            description: "Rule 1234",
+            name: "Rule 1234",
             category: "cat-1",
           },
         },
@@ -94,7 +94,7 @@ describe("QueryBuilder", () => {
         rule: {
           concept: {
             concept_id: 4321,
-            description: "Rule 4321",
+            name: "Rule 4321",
             category: "cat-1",
           },
         },

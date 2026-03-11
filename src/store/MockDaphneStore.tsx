@@ -52,6 +52,9 @@ import { useAdminDataStore } from "@/store/adminDataStore";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import ConfirmProvider from "@/components/ConfirmProvider";
 import { DefaultProvider } from "@/providers/DefaultProvider";
+import { themeOptions } from "@/config/theme";
+import { HdrukUiProvider } from "@hdruk/ui";
+import { ThemeOptions } from "@mui/material";
 
 const queryClient = new QueryClient();
 
@@ -246,13 +249,15 @@ const MockDaphneStore = ({
 
   return (
     <DefaultProvider>
-      <QueryClientProvider client={queryClient}>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <ConfirmProvider>
-            <NotifyProvider>{children}</NotifyProvider>
-          </ConfirmProvider>
-        </LocalizationProvider>
-      </QueryClientProvider>
+      <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
+        <QueryClientProvider client={queryClient}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <ConfirmProvider>
+              <NotifyProvider>{children}</NotifyProvider>
+            </ConfirmProvider>
+          </LocalizationProvider>
+        </QueryClientProvider>
+      </HdrukUiProvider>
     </DefaultProvider>
   );
 };

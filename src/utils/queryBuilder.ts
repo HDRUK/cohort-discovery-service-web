@@ -85,7 +85,7 @@ const queryToText = (node: RuleGroupType) => {
 
     if (isSingleConcept(c)) {
       const verb = getVerb(c.category, exclude);
-      const desc = cleanDescription(c.description);
+      const desc = cleanDescription(c.name);
       return { verb, text: desc };
     }
 
@@ -93,7 +93,7 @@ const queryToText = (node: RuleGroupType) => {
       const texts =
         c.alternatives
           ?.filter((x) => !!x)
-          .map((x) => cleanDescription(x.description))
+          .map((x) => cleanDescription(x.name))
           .join(" or ") || "";
       const verb = getVerb(c.category, exclude);
       return { verb, text: texts };
