@@ -5,10 +5,10 @@ import { SearchBar } from "@hdruk/ui";
 import {
   Dispatch,
   SetStateAction,
-  useMemo,
   useState,
   useCallback,
   useRef,
+  useMemo,
 } from "react";
 import {
   Checkbox,
@@ -50,40 +50,67 @@ const SearchConcepts = ({
     ...(selected ?? {}),
   });
 
-  const [options, setOptions] = useState<Concept[]>([]);
+  const [nonSyntheticOptions, setNonSyntheticOptions] = useState<Concept[]>([]);
+  const [syntheticOptions, setSyntheticOptions] = useState<Concept[]>([]);
+  const [noOptionsFound, setNoOptionsFound] = useState(false);
 
-  const allSelected = useMemo(() => {
-    if (options?.length === 0) return false;
-    if (selected === undefined) return false;
-    return options.every((o) => selected[o.concept_id] === true);
-  }, [selected, options]);
+  const visibleOptions = useMemo(
+    () => [...nonSyntheticOptions, ...syntheticOptions],
+    [nonSyntheticOptions, syntheticOptions],
+  );
+
+  const allSelected =
+    visibleOptions.length > 0 &&
+    selected !== undefined &&
+    visibleOptions.every((o) => selected[o.concept_id] === true);
 
   const toggleSelectAll = useCallback(() => {
     setSelected?.((prev) => {
       const next = { ...prev };
-      options.forEach((o) => {
+      visibleOptions.forEach((o) => {
         next[o.concept_id] = !allSelected;
       });
       return next;
     });
-  }, [options, allSelected, setSelected]);
+  }, [visibleOptions, allSelected, setSelected]);
 
   const onSearch = useCallback(
     async (value: string) => {
-      if (value === lastQueryRef.current) return;
-      lastQueryRef.current = value;
+      const trimmedValue = value.trim();
 
-      if (!value) {
-        setOptions([]);
+      if (trimmedValue === lastQueryRef.current) return;
+      lastQueryRef.current = trimmedValue;
+
+      if (!trimmedValue) {
+        setNonSyntheticOptions([]);
+        setSyntheticOptions([]);
+        setNoOptionsFound(false);
         return;
       }
 
       setSelected?.({ ...initialSelectedRef.current });
 
-      const { data } = await searchForConcepts(value, domain);
-      setOptions((data as Concept[]) ?? []);
+      const { data } = await searchForConcepts(trimmedValue, domain);
+      const results = (data as Concept[]) ?? [];
+
+      const nonSynthetic: Concept[] = [];
+      const synthetic: Concept[] = [];
+
+      results.forEach((o) => {
+        const allSynthetic = o.all_synthetic ?? 0;
+
+        if (allSynthetic === 1) {
+          if (includeSynthetic) synthetic.push(o);
+        } else {
+          nonSynthetic.push(o);
+        }
+      });
+
+      setNonSyntheticOptions(nonSynthetic);
+      setSyntheticOptions(synthetic);
+      setNoOptionsFound(nonSynthetic.length + synthetic.length === 0);
     },
-    [domain, searchForConcepts, setSelected],
+    [domain, searchForConcepts, setSelected, includeSynthetic],
   );
 
   const handleToggle = useCallback(
@@ -113,30 +140,6 @@ const SearchConcepts = ({
     />
   );
 
-  const { nonSyntheticOptions, syntheticOptions, noOptionsFound } =
-    useMemo(() => {
-      const nonSynthetic: Concept[] = [];
-      const synthetic: Concept[] = [];
-
-      options.forEach((o) => {
-        const allSynthetic = o.all_synthetic ?? 0;
-
-        if (allSynthetic === 1 && includeSynthetic) {
-          synthetic.push(o);
-        } else {
-          nonSynthetic.push(o);
-        }
-      });
-
-      const noOptionsFound = nonSynthetic.length + synthetic.length === 0;
-
-      return {
-        nonSyntheticOptions: nonSynthetic,
-        syntheticOptions: synthetic,
-        noOptionsFound,
-      };
-    }, [options, includeSynthetic]);
-
   return (
     <Box>
       <SearchBar
@@ -150,20 +153,19 @@ const SearchConcepts = ({
         }
       />
       <FormGroup sx={{ mt: 2 }}>
-        {multiple && options?.length > 0 && (
+        {multiple && visibleOptions.length > 0 && (
           <>
             <FormControlLabel
-              key={"selectAll"}
               control={
                 <Checkbox checked={allSelected} onChange={toggleSelectAll} />
               }
-              label={"Select All"}
+              label="Select All"
             />
             <Divider />
           </>
         )}
-        {nonSyntheticOptions.length > 0 &&
-          nonSyntheticOptions.map(renderConceptItem)}
+
+        {nonSyntheticOptions.map(renderConceptItem)}
 
         {syntheticOptions.length > 0 && (
           <>

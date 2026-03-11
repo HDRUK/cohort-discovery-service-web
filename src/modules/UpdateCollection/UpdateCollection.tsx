@@ -12,7 +12,6 @@ import ActionMenuSection from "@/components/ActionMenuSection";
 import {
   CollectionStatus,
   CollectionWithHosts,
-  frequencyMap,
   FrequencyMode,
   UrlString,
 } from "@/types/api";
@@ -41,7 +40,6 @@ import { useThreePane } from "@/providers/ThreePaneProvider";
 import { useSaveChanges } from "@/hooks/useSaveChanges";
 import { useUserDataStore } from "@/hooks/userDataStore";
 import { useIsAdminSection } from "@/contexts/AdminSectionContext";
-import { getEnumLabel } from "@/utils/string";
 import ToggleSynthetic from "@/components/ToggleSynthetic";
 
 const UpdateCollectionGuidance = maskClientTest(
