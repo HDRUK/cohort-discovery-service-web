@@ -20,24 +20,14 @@ const QueryBuilder = ({
   query?: Query;
   errorOnDrag?: boolean;
 }) => {
-  const {
-    queryBuilderJson,
-    resetQueryBuilderJson,
-    setQueryBuilderJson,
-    select,
-    deselect,
-  } = useQueryBuilder((qb) => ({
-    resetQueryBuilderJson: qb.resetQueryBuilderJson,
-    queryBuilderJson: qb.queryBuilderJson,
-    setQueryBuilderJson: qb.setQueryBuilderJson,
-    select: qb.select,
-    deselect: qb.deselect,
-    selectedGuidance: qb.selectedGuidance,
-  }));
-
-  useEffect(() => {
-    resetQueryBuilderJson(true);
-  }, [resetQueryBuilderJson]);
+  const { queryBuilderJson, setQueryBuilderJson, select, deselect } =
+    useQueryBuilder((qb) => ({
+      queryBuilderJson: qb.queryBuilderJson,
+      setQueryBuilderJson: qb.setQueryBuilderJson,
+      select: qb.select,
+      deselect: qb.deselect,
+      selectedGuidance: qb.selectedGuidance,
+    }));
 
   useEffect(() => {
     if (query?.definition) {

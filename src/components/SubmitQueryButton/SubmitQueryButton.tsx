@@ -2,9 +2,14 @@
 
 import { Button } from "@mui/material";
 import useSubmitQuery from "@/hooks/useSubmitQuery";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 
 const SubmitQueryButton = ({ warning = false }: { warning: boolean }) => {
   const { submit, disabled } = useSubmitQuery();
+
+  const { resetQueryBuilderJson } = useQueryBuilder((qb) => ({
+    resetQueryBuilderJson: qb.resetQueryBuilderJson,
+  }));
 
   return (
     <Button
@@ -38,6 +43,7 @@ const SubmitQueryButton = ({ warning = false }: { warning: boolean }) => {
         event.stopPropagation();
         event.preventDefault();
         submit();
+        resetQueryBuilderJson(true);
       }}
     >
       Run Query
