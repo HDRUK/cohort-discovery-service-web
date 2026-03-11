@@ -20,7 +20,7 @@ export const NO_QUERY: RuleGroupType = {
       rule: {
         concept: {
           concept_id: 3955322,
-          description:
+          name:
             "Oxford, AstraZeneca - SARS-CoV-2 (COVID-19) vaccine AZD1222",
           category: "Drug",
           children: [],
@@ -83,8 +83,7 @@ export const EXAMPLE_1: RuleGroupType = {
       rule: {
         concept: {
           concept_id: 3955322,
-          description:
-            "Oxford, AstraZeneca - SARS-CoV-2 (COVID-19) vaccine AZD1222",
+          name: "Oxford, AstraZeneca - SARS-CoV-2 (COVID-19) vaccine AZD1222",
           category: "Drug",
           children: [],
         },
@@ -101,8 +100,7 @@ export const EXAMPLE_1: RuleGroupType = {
       rule: {
         concept: {
           concept_id: 3959231,
-          description:
-            "Close contact with confirmed COVID-19 case person/patient",
+          name: "Close contact with confirmed COVID-19 case person/patient",
           category: "Observation",
           children: [],
         },
@@ -120,8 +118,7 @@ export const EXAMPLE_1: RuleGroupType = {
       rule: {
         concept: {
           concept_id: 3955313,
-          description:
-            "SARS-CoV-2 antibody to nucleocapsid (N) protein present",
+          name: "SARS-CoV-2 antibody to nucleocapsid (N) protein present",
           category: "Measurement",
           children: [],
         },
@@ -142,20 +139,17 @@ export const EXAMPLE_1: RuleGroupType = {
           children: [
             {
               concept_id: 601163,
-              description:
-                "Chronic kidney disease stage 3 due to drug induced diabetes mellitus",
+              name: "Chronic kidney disease stage 3 due to drug induced diabetes mellitus",
               category: "Condition",
             },
             {
               concept_id: 37019193,
-              description:
-                "Anemia co-occurrent and due to chronic kidney disease stage 3",
+              name: "Anemia co-occurrent and due to chronic kidney disease stage 3",
               category: "Condition",
             },
             {
               concept_id: 43531653,
-              description:
-                "Chronic kidney disease stage 3 due to type 2 diabetes mellitus",
+              name: "Chronic kidney disease stage 3 due to type 2 diabetes mellitus",
               category: "Condition",
             },
             {
@@ -185,8 +179,7 @@ export const EXAMPLE_1: RuleGroupType = {
             },
             {
               concept_id: 45771075,
-              description:
-                "Chronic kidney disease stage 3 due to type 1 diabetes mellitus",
+              name: "Chronic kidney disease stage 3 due to type 1 diabetes mellitus",
               category: "Condition",
             },
           ],
@@ -245,8 +238,7 @@ export const EXAMPLE_2 = {
       rule: {
         concept: {
           concept_id: 3955322,
-          description:
-            "Oxford, AstraZeneca - SARS-CoV-2 (COVID-19) vaccine AZD1222",
+          name: "Oxford, AstraZeneca - SARS-CoV-2 (COVID-19) vaccine AZD1222",
           category: "Drug",
           children: [],
         },
@@ -263,8 +255,7 @@ export const EXAMPLE_2 = {
       rule: {
         concept: {
           concept_id: 3955322,
-          description:
-            "Oxford, AstraZeneca - SARS-CoV-2 (COVID-19) vaccine AZD1222",
+          name: "Oxford, AstraZeneca - SARS-CoV-2 (COVID-19) vaccine AZD1222",
           category: "Drug",
           children: [],
         },

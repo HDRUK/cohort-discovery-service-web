@@ -73,14 +73,14 @@ export const ConceptItem = ({
   const id = concept.concept_id!;
   const titleText = showCode ? (
     <Typography>
-      {concept?.description.slice(0, 100)} (
+      {concept.name} (
       <Box component="span" sx={{ color: "grey.500" }}>
         OMOP
       </Box>{" "}
       {id})
     </Typography>
   ) : (
-    concept.description
+    concept.name
   );
 
   const labelEl = (

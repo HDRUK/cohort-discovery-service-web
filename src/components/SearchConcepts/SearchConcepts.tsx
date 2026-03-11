@@ -119,9 +119,11 @@ const SearchConcepts = ({
       const synthetic: Concept[] = [];
 
       options.forEach((o) => {
-        if (o.all_synthetic === 1 && includeSynthetic) {
+        const allSynthetic = o.all_synthetic ?? 0;
+
+        if (allSynthetic === 1 && includeSynthetic) {
           synthetic.push(o);
-        } else if (o.all_synthetic === 0) {
+        } else {
           nonSynthetic.push(o);
         }
       });

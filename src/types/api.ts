@@ -435,8 +435,8 @@ export interface RemoveCustodiansFromNetworkPost {
 
 export interface Concept {
   concept_id: number;
-  name?: string;
-  description: string;
+  name: string;
+  // description: string; - comment out for now, may use it again
   category: string;
   children?: Concept[];
   alternatives?: Concept[];
