@@ -24,6 +24,7 @@ const FilterDatasets = () => {
     }));
 
   const noDatasets = selectedDatasets?.length === 0;
+  const disabled = noDatasets && open;
 
   if (!hasMounted) {
     return <FilterDatasetsSkeleton />;
@@ -41,7 +42,7 @@ const FilterDatasets = () => {
         >
           <Chip
             variant={noDatasets ? "outlined" : "filled"}
-            disabled={noDatasets}
+            disabled={disabled}
             onClick={() => {
               setOpen(!open);
               setPreviouslySelectedDatasets(selectedDatasets);
