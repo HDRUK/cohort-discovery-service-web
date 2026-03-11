@@ -283,16 +283,6 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
       "collection.model_state.state_id", // used by 'request make active'
       "collection.model_state.state.id", //may not be needed - for safety
     ],
-    getLabel: (path: string, value: string) => {
-      switch (path) {
-        case "config.frequency_mode":
-          return getEnumLabel(FrequencyMode, value);
-        case "config.run_time_frequency":
-          return frequencyMap["1"][0];
-        default:
-          return value;
-      }
-    },
   });
 
   return (

@@ -80,20 +80,8 @@ function formatValue(v: unknown): string {
   }
 }
 
-export type GetLabel = (path: string, value: string) => string;
-
-export const ChangesTable = ({
-  changed,
-  getLabel,
-}: {
-  changed: unknown;
-  getLabel?: GetLabel;
-}) => {
+export const ChangesTable = ({ changed }: { changed: unknown }) => {
   const data = useMemo<ChangeRow[]>(() => flattenChanged(changed), [changed]);
-  const labeler: GetLabel = useMemo(
-    () => getLabel ?? ((_, p) => p),
-    [getLabel],
-  );
 
   const columns = useMemo<MRT_ColumnDef<ChangeRow>[]>(
     () => [
@@ -104,15 +92,15 @@ export const ChangesTable = ({
       {
         accessorKey: "oldValue",
         header: "Old Value",
-        accessorFn: (row) => labeler(row.path, formatValue(row.oldValue)),
+        accessorFn: (row) => formatValue(row.oldValue),
       },
       {
         accessorKey: "newValue",
         header: "New Value",
-        accessorFn: (row) => labeler(row.path, formatValue(row.newValue)),
+        accessorFn: (row) => formatValue(row.newValue),
       },
     ],
-    [labeler],
+    [],
   );
 
   const table = useTable<ChangeRow>({
