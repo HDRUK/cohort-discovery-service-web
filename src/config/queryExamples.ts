@@ -45,7 +45,7 @@ export const EXAMPLE_1: RuleGroupType = {
           rule: {
             concept: {
               concept_id: 3955320,
-              description: "Moderna - SARS-CoV-2 (COVID-19) vaccine",
+              name: "Moderna - SARS-CoV-2 (COVID-19) vaccine",
               category: "Drug",
               children: [],
             },
@@ -63,7 +63,7 @@ export const EXAMPLE_1: RuleGroupType = {
           rule: {
             concept: {
               concept_id: 3955321,
-              description: "Pfizer - SARS-CoV-2 (COVID-19) vaccine",
+              name: "Pfizer - SARS-CoV-2 (COVID-19) vaccine",
               category: "Drug",
               children: [],
             },
@@ -137,7 +137,7 @@ export const EXAMPLE_1: RuleGroupType = {
       rule: {
         concept: {
           concept_id: 443597,
-          description: "Chronic kidney disease stage 3",
+          name: "Chronic kidney disease stage 3",
           category: "Condition",
           children: [
             {
@@ -160,27 +160,27 @@ export const EXAMPLE_1: RuleGroupType = {
             },
             {
               concept_id: 44782691,
-              description: "Chronic kidney disease stage 3 due to hypertension",
+              name: "Chronic kidney disease stage 3 due to hypertension",
               category: "Condition",
             },
             {
               concept_id: 44792230,
-              description: "Chronic kidney disease stage 3 with proteinuria",
+              name: "Chronic kidney disease stage 3 with proteinuria",
               category: "Condition",
             },
             {
               concept_id: 44792231,
-              description: "Chronic kidney disease stage 3 without proteinuria",
+              name: "Chronic kidney disease stage 3 without proteinuria",
               category: "Condition",
             },
             {
               concept_id: 45763854,
-              description: "Chronic kidney disease stage 3A",
+              name: "Chronic kidney disease stage 3A",
               category: "Condition",
             },
             {
               concept_id: 45763855,
-              description: "Chronic kidney disease stage 3B",
+              name: "Chronic kidney disease stage 3B",
               category: "Condition",
             },
             {
@@ -209,7 +209,7 @@ export const EXAMPLE_2 = {
           rule: {
             concept: {
               concept_id: 3955320,
-              description: "Moderna - SARS-CoV-2 (COVID-19) vaccine",
+              name: "Moderna - SARS-CoV-2 (COVID-19) vaccine",
               category: "Drug",
               children: [],
             },
@@ -226,7 +226,7 @@ export const EXAMPLE_2 = {
           rule: {
             concept: {
               concept_id: 3955320,
-              description: "Moderna - SARS-CoV-2 (COVID-19) vaccine",
+              name: "Moderna - SARS-CoV-2 (COVID-19) vaccine",
               category: "Drug",
               children: [],
             },

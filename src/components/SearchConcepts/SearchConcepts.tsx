@@ -19,6 +19,7 @@ import {
 } from "@mui/material";
 import { ConceptItem, ConceptItemProps } from "./ConceptItem";
 import useUserStore from "@/hooks/useUserStore";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 
 interface SlotProps {
   conceptItem: ConceptItemProps;
@@ -42,6 +43,7 @@ const SearchConcepts = ({
   multiple = false,
 }: SearchConceptsProps) => {
   const searchForConcepts = useUserStore((s) => s.searchForConcepts);
+  const includeSynthetic = useQueryBuilder((s) => s.includeSynthetic);
 
   const lastQueryRef = useRef<string>("");
   const initialSelectedRef = useRef<Record<number, boolean>>({
@@ -49,7 +51,6 @@ const SearchConcepts = ({
   });
 
   const [options, setOptions] = useState<Concept[]>([]);
-  const [noOptionsFound, setNoOptionsFound] = useState(false);
 
   const allSelected = useMemo(() => {
     if (options?.length === 0) return false;
@@ -74,7 +75,6 @@ const SearchConcepts = ({
 
       if (!value) {
         setOptions([]);
-        setNoOptionsFound(false);
         return;
       }
 
@@ -82,7 +82,6 @@ const SearchConcepts = ({
 
       const { data } = await searchForConcepts(value, domain);
       setOptions((data as Concept[]) ?? []);
-      setNoOptionsFound(data?.length === 0);
     },
     [domain, searchForConcepts, setSelected],
   );
@@ -96,6 +95,45 @@ const SearchConcepts = ({
     },
     [setSelected],
   );
+
+  const renderConceptItem = (c: Concept) => (
+    <ConceptItem
+      key={c.concept_id}
+      {...(slotProps?.conceptItem ?? {})}
+      multiple={multiple}
+      concept={c}
+      isSelected={!!selected?.[c.concept_id]}
+      handleClick={(id, e) => {
+        onClick?.(c);
+        handleToggle(id);
+        e.stopPropagation();
+        e.preventDefault();
+      }}
+      showCode
+    />
+  );
+
+  const { nonSyntheticOptions, syntheticOptions, noOptionsFound } =
+    useMemo(() => {
+      const nonSynthetic: Concept[] = [];
+      const synthetic: Concept[] = [];
+
+      options.forEach((o) => {
+        if (o.all_synthetic === 1 && includeSynthetic) {
+          synthetic.push(o);
+        } else if (o.all_synthetic === 0) {
+          nonSynthetic.push(o);
+        }
+      });
+
+      const noOptionsFound = nonSynthetic.length + synthetic.length === 0;
+
+      return {
+        nonSyntheticOptions: nonSynthetic,
+        syntheticOptions: synthetic,
+        noOptionsFound,
+      };
+    }, [options, includeSynthetic]);
 
   return (
     <Box>
@@ -122,22 +160,20 @@ const SearchConcepts = ({
             <Divider />
           </>
         )}
-        {options?.map((c) => (
-          <ConceptItem
-            {...(slotProps?.conceptItem ?? {})}
-            multiple={multiple}
-            key={c.concept_id}
-            concept={c}
-            isSelected={!!selected?.[c.concept_id]}
-            handleClick={(id, e) => {
-              onClick?.(c);
-              handleToggle(id);
-              e.stopPropagation();
-              e.preventDefault();
-            }}
-            showCode
-          />
-        ))}
+        {nonSyntheticOptions.length > 0 &&
+          nonSyntheticOptions.map(renderConceptItem)}
+
+        {syntheticOptions.length > 0 && (
+          <>
+            <Box sx={{ my: 1.5 }}>
+              <Divider sx={{ mb: 1 }} />
+              <Box sx={{ fontSize: 13, color: "text.secondary", px: 1 }}>
+                Concepts from synthetic collections
+              </Box>
+            </Box>
+            {syntheticOptions.map(renderConceptItem)}
+          </>
+        )}
       </FormGroup>
     </Box>
   );

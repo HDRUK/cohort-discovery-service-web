@@ -198,7 +198,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
                         }}
                       >
                         {" "}
-                        <InvalidRule reasons={[]} />{" "}
+                        <InvalidRule reasons={[]} />
                       </ConceptChip>
                     ))}
                 </>

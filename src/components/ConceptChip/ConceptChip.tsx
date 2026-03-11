@@ -2,6 +2,7 @@ import { Concept } from "@/types/api";
 import { Box, Chip, ChipProps, IconButton, Typography } from "@mui/material";
 import { DragIndicator } from "@mui/icons-material";
 import CancelIcon from "@mui/icons-material/Cancel";
+import SyntheticChip from "../SyntheticChip";
 
 const ParentWrapper = ({
   active,
@@ -68,6 +69,11 @@ export const ConceptChip = ({
         </IconButton>
       )}
       <ParentWrapper active={indicateIfParent && isParent}>
+        <SyntheticChip
+          isSynthetic={concept?.all_synthetic === 1}
+          title="This concept is only available in synthetic data"
+          sx={{ mr: 1 }}
+        />
         <Chip
           sx={{
             bgcolor: indicateIfParent && isParent ? "secondary.main" : "white",
@@ -89,7 +95,7 @@ export const ConceptChip = ({
           onClick={onClick && onClick}
           label={
             <Typography>
-              {concept?.description} (
+              {concept?.name} (
               <Box component="span" sx={{ color: "grey.500" }}>
                 OMOP
               </Box>{" "}

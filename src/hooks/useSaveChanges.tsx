@@ -2,21 +2,31 @@ import { useEffect, useMemo } from "react";
 import { useCloseGuard } from "@/providers/CloseGuardProvider";
 import { useConfirm } from "@/hooks/useConfirm";
 import { Control, FieldValues } from "react-hook-form";
-import { Ignore, useChangedFieldValues } from "./useChangedFieldValues";
+import {
+  ChangeFieldValuesProps,
+  useChangedFieldValues,
+} from "./useChangedFieldValues";
 import { Typography } from "@mui/material";
 import ChangesTable from "@/components/ChangesTable";
+import { GetLabel } from "@/components/ChangesTable/ChangesTable";
 
-type Options<TFieldValues extends FieldValues> = {
-  control: Control<TFieldValues>;
-  entityName: string;
-  onSave: () => Promise<void> | void;
-  onDiscard?: () => Promise<void> | void;
-  saveText?: string;
-  cancelText?: string;
-  discardText?: string;
-  showChanges?: boolean;
-  ignoreFields?: Ignore;
-};
+type ChangedFieldOptions<TFieldValues extends FieldValues> = Omit<
+  ChangeFieldValuesProps<TFieldValues>,
+  "control"
+>;
+
+type Options<TFieldValues extends FieldValues> =
+  ChangedFieldOptions<TFieldValues> & {
+    control: Control<TFieldValues>;
+    entityName: string;
+    onSave: () => Promise<void> | void;
+    onDiscard?: () => Promise<void> | void;
+    saveText?: string;
+    cancelText?: string;
+    discardText?: string;
+    showChanges?: boolean;
+    getLabel?: GetLabel;
+  };
 
 export function useSaveChanges<TFieldValues extends FieldValues>({
   control,
@@ -27,14 +37,15 @@ export function useSaveChanges<TFieldValues extends FieldValues>({
   cancelText = "Cancel",
   discardText = "Discard",
   showChanges = true,
-  ignoreFields,
+  getLabel,
+  ...rest
 }: Options<TFieldValues>) {
   const { registerCloseGuard } = useCloseGuard();
   const confirm = useConfirm();
 
   const { changed, hasChanges } = useChangedFieldValues<TFieldValues>({
     control,
-    ignoreFields,
+    ...rest,
   });
 
   const message = useMemo(
@@ -54,7 +65,9 @@ export function useSaveChanges<TFieldValues extends FieldValues>({
         description: (
           <>
             <Typography>{message}</Typography>
-            {showChanges && <ChangesTable changed={changed} />}
+            {showChanges && (
+              <ChangesTable changed={changed} getLabel={getLabel} />
+            )}
           </>
         ),
         confirmText: saveText,
@@ -87,5 +100,6 @@ export function useSaveChanges<TFieldValues extends FieldValues>({
     onDiscard,
     confirm,
     registerCloseGuard,
+    getLabel,
   ]);
 }

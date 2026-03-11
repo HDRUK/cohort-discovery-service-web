@@ -15,10 +15,12 @@ const getConcepts = async (
   const params = new URLSearchParams({
     page: String(page),
     per_page: String(per_page),
-    "description[]": searchTerm,
+    "concept_name[]": searchTerm,
     "concept_id[]": searchTerm,
     ...(domain ? { domain } : {}),
   });
+
+  console.log(API_ROUTES.searchConcepts);
 
   const { data, message } = await apiGet<
     ApiResponse<Paginated<Partial<Concept>>>

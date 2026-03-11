@@ -96,7 +96,13 @@ export interface QueryBuilderStoreState {
   createNewAgeFilter: () => void;
 
   queryAsText: string;
-  getQueryFromText: (input: string, commit?: boolean) => Promise<RuleGroupType>;
+  getQueryFromText: (
+    input: string,
+    options?: { commit?: boolean; ignoreSynthetic?: boolean },
+  ) => Promise<RuleGroupType>;
+
+  includeSynthetic: boolean;
+  setIncludeSynthetic: (includeSynthetic: boolean) => void;
 
   previouslySelectedDatasets: string[];
   setPreviouslySelectedDatasets: (pids: string[]) => void;
@@ -336,6 +342,14 @@ export const useQueryBuilderStore = create<QueryBuilderStoreState>(
       );
     },
 
+    includeSynthetic: false,
+    setIncludeSynthetic: (includeSynthetic) => {
+      set((state) => ({
+        ...state,
+        includeSynthetic,
+      }));
+    },
+
     previouslySelectedDatasets: [],
     setPreviouslySelectedDatasets: (pids) => {
       set((state) => ({
@@ -390,7 +404,13 @@ export const useQueryBuilderStore = create<QueryBuilderStoreState>(
       });
     },
 
-    getQueryFromText: async (input: string, commit = false) => {
+    getQueryFromText: async (
+      input: string,
+      {
+        commit = false,
+        ignoreSynthetic = false,
+      }: { commit?: boolean; ignoreSynthetic?: boolean } = {},
+    ) => {
       const cleanQuery = (queryString: string) => {
         const query = JSON.parse(queryString) as RuleGroupType;
         if (query.rules.length === 1 && isRuleGroup(query.rules[0])) {
@@ -398,8 +418,9 @@ export const useQueryBuilderStore = create<QueryBuilderStoreState>(
         }
         return query;
       };
-
-      const { data: newQueryString } = await parseQuery(input);
+      const { data: newQueryString } = await parseQuery(input, {
+        ignoreSynthetic,
+      });
       const newQuery = cleanQuery(newQueryString);
       return commit ? get().setQueryBuilderJson(newQuery) : newQuery;
     },

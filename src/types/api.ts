@@ -138,6 +138,7 @@ export interface Collection extends WithTimestamps {
   custodian: Custodian;
   custodian_id?: number;
   model_state: ModelState;
+  is_synthetic?: boolean;
 }
 
 export interface CollectionConfig {
@@ -347,6 +348,7 @@ export interface CreateCollectionPost {
   status?: boolean;
   pid: string;
   model_state?: ModelState;
+  is_synthetic?: boolean;
 }
 
 export interface UpdateCollectionPayload {
@@ -438,6 +440,9 @@ export interface Concept {
   category: string;
   children?: Concept[];
   alternatives?: Concept[];
+  ncollections?: number;
+  count?: number;
+  all_synthetic?: number;
 }
 
 export interface ConceptSet extends WithTimestamps {

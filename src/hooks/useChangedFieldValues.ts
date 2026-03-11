@@ -105,10 +105,15 @@ function pickDirtyDiff(
   return undefined;
 }
 
-export function useChangedFieldValues<TFieldValues extends FieldValues>(opts: {
+export type ChangeFieldValuesProps<TFieldValues extends FieldValues> = {
   control: Control<TFieldValues>;
   ignoreFields?: Ignore;
-}): { changed: DeepPartial<Diffed<TFieldValues>>; hasChanges: boolean } {
+  //mapValue?
+};
+
+export function useChangedFieldValues<TFieldValues extends FieldValues>(
+  opts: ChangeFieldValuesProps<TFieldValues>,
+): { changed: DeepPartial<Diffed<TFieldValues>>; hasChanges: boolean } {
   const { control, ignoreFields } = opts;
 
   const { dirtyFields, defaultValues } = useFormState({ control });
