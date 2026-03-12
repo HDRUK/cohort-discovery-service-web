@@ -144,7 +144,7 @@ const queryToText = (
         return `which occurred after ${fmt(low)}`;
       if (low == null && high != null)
         return `which occurred before ${fmt(high)}`;
-      return `which occurred between ${fmt(low)} and ${fmt(high!)}`;
+      return `which occurred between ${fmt(low!)} and ${fmt(high!)}`;
     }
 
     if (isDemographicCategory(category)) {
