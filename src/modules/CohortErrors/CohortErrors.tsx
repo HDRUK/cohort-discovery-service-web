@@ -20,7 +20,7 @@ const CohortErrors = () => {
   if (isLoading) return null;
 
   return (
-    <Stack gap={1} ml={2}>
+    <Stack ml={2}>
       <ExpandableIssueList
         title={`Error${errors.length > 1 ? "s" : ""}`}
         items={errors}
