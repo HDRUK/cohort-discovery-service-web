@@ -3,16 +3,16 @@ import ErrorIcon from "../ErrorIcon";
 
 const InvalidRule = ({
   reasons,
-  collapsed = false,
+  minimised = false,
   stackProps,
   innerStackProps,
 }: {
   reasons: string[];
-  collapsed?: boolean;
+  minimised?: boolean;
   stackProps?: StackProps;
   innerStackProps?: StackProps;
 }) => {
-  return collapsed ? (
+  return minimised ? (
     <ErrorIcon data-testid="ErrorIcon" />
   ) : (
     <Stack direction="column" gap={1} {...stackProps}>
