@@ -22,7 +22,7 @@ const CohortErrors = () => {
   return (
     <Stack gap={1} ml={2}>
       <ExpandableIssueList
-        title={`error${errors.length > 1 ? "s" : ""}`}
+        title={`Error${errors.length > 1 ? "s" : ""}`}
         items={errors}
         color="error"
         icon={<ErrorIcon />}
@@ -30,7 +30,7 @@ const CohortErrors = () => {
       />
 
       <ExpandableIssueList
-        title={`warning${warnings.length > 1 ? "s" : ""}`}
+        title={`Warning${warnings.length > 1 ? "s" : ""}`}
         items={warnings}
         color="warning"
         icon={<Warning color="warning" />}

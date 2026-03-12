@@ -34,15 +34,7 @@ const ListItem = ({
         sx={{ display: "list-item", p: 0 }}
         key={id ?? label}
       >
-        <ListItemText
-          sx={{ color: "text.primary" }}
-          primary={label}
-          slotProps={{
-            primary: {
-              fontWeight: "bold",
-            },
-          }}
-        />
+        <ListItemText sx={{ color: "text.primary" }} primary={label} />
       </MuiListItem>
     );
   }
