@@ -35,7 +35,7 @@ const QueryBuilder = ({
     }
   }, [query, setQueryBuilderJson]);
 
-  //useLeaveConfirmation(queryBuilderJson.rules.length > 0);
+  useLeaveConfirmation(queryBuilderJson.rules.length > 0);
 
   const onChangeSelection = useCallback(
     (ids: string[], deselectedIds: string[]) => {
