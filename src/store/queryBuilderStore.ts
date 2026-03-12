@@ -56,6 +56,7 @@ export interface QueryBuilderStoreState {
   setQueryBuilderJson: (
     query: RuleGroupType,
     validate?: boolean,
+    defaultInvalidText?: string,
   ) => RuleGroupType;
   resetQueryBuilderJson: (resetQueryName?: boolean) => void;
 
@@ -137,7 +138,7 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
   queryBuilderJson: validateRuleTree(DEFAULT_QUERY),
   resetQueryBuilderJson: (resetQueryName?: boolean) => {
     const { setQueryBuilderJson } = get();
-    setQueryBuilderJson(DEFAULT_QUERY);
+    setQueryBuilderJson(DEFAULT_QUERY, true, "");
 
     set((state) => ({
       ...state,
@@ -298,9 +299,17 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
 
   queryAsText: queryToText(DEFAULT_QUERY),
 
-  setQueryBuilderJson: (query, validate = true) => {
+  setQueryBuilderJson: (
+    query,
+    validate = true,
+    defaultInvalidText = "People who ...",
+  ) => {
     const updatedQuery = validate ? get().validateRules(query) : query;
-    const text = updatedQuery.valid ? queryToText(updatedQuery) : "";
+    const text = updatedQuery.valid
+      ? queryToText(updatedQuery)
+      : updatedQuery.rules.length === 0
+        ? ""
+        : defaultInvalidText;
 
     set((state) => ({
       ...state,
