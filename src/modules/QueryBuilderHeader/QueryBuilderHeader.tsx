@@ -1,10 +1,10 @@
 "use client";
 
-import useQueryBuilder from "@/hooks/useQueryBuilder";
-import { Stack } from "@mui/material";
-import useHasMounted from "@/hooks/useHasMounted";
+import { Box, Stack } from "@mui/material";
 import FilterDatasets from "@/components/FilterDatasets";
 import CohortQueryTitle from "@/components/CohortQueryTitle";
+import SelectDatasets from "@/components/SelectDatasets";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 
 export const filterDatasetChipSx = {
   borderRadius: 10,
@@ -13,15 +13,7 @@ export const filterDatasetChipSx = {
 };
 
 const QueryBuilderHeader = () => {
-  const hasMounted = useHasMounted();
-  const { selectedDatasets, open, setOpen, setPreviouslySelectedDatasets } =
-    useQueryBuilder((qb) => ({
-      selectedDatasets: qb.selectedDatasets,
-      open: qb.openSelectDatasetsPanel,
-      setOpen: qb.setOpenSelectDatasetsPanel,
-      setPreviouslySelectedDatasets: qb.setPreviouslySelectedDatasets,
-    }));
-
+  const open = useQueryBuilder((qb) => qb.openSelectDatasetsPanel);
   return (
     <>
       <Stack
@@ -30,14 +22,11 @@ const QueryBuilderHeader = () => {
         justifyContent="space-between"
         spacing={1}
       >
-        <CohortQueryTitle />
+        {open ? <Box /> : <CohortQueryTitle />}
 
         <FilterDatasets />
       </Stack>
-      {/*<SelectDatasets
-        initialSelection={initialSelection}
-        collections={collections.data}
-      />*/}
+      <SelectDatasets />
     </>
   );
 };

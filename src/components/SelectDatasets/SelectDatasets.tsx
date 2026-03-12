@@ -22,14 +22,15 @@ import { intersection } from "lodash";
 import ToggleAction from "../ToggleAction";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
+import { useUserDataStore } from "@/hooks/userDataStore";
 
-const SelectDatasets = ({
-  initialSelection,
-  collections,
-}: {
-  initialSelection: string[];
-  collections: Collection[];
-}) => {
+const SelectDatasets = () => {
+  const collections = useUserDataStore((s) => s.userCollections);
+  const initialSelection = useMemo(
+    () => collections.map((c) => c.pid),
+    [collections],
+  );
+
   const includeSynthetic = useQueryBuilder((qb) => qb.includeSynthetic);
   const setIncludeSynthetic = useQueryBuilder((qb) => qb.setIncludeSynthetic);
 
