@@ -26,7 +26,6 @@ const CohortErrors = () => {
         items={errors}
         color="error"
         icon={<ErrorIcon />}
-        helperText="Please resolve errors to run the query"
       />
 
       <ExpandableIssueList

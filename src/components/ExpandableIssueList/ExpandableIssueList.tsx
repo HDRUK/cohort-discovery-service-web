@@ -15,7 +15,7 @@ type ExpandableIssueListProps = {
   items: string[];
   color?: "error" | "warning";
   icon: React.ReactNode;
-  helperText: string;
+  helperText?: string;
 };
 
 const ExpandableIssueList = ({
@@ -76,12 +76,14 @@ const ExpandableIssueList = ({
             }))}
           />
 
-          <Typography
-            variant="body2"
-            color={color ? `${color}.main` : undefined}
-          >
-            {helperText}
-          </Typography>
+          {helperText && (
+            <Typography
+              variant="body2"
+              color={color ? `${color}.main` : undefined}
+            >
+              {helperText}
+            </Typography>
+          )}
         </Stack>
       </AccordionDetails>
     </Accordion>
