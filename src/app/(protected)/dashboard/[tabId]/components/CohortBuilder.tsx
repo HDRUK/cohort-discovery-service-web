@@ -17,10 +17,9 @@ import { buildQueryHistoryParams } from "@/utils/params";
 import getQueries from "@/actions/query/getQueries";
 import { DEFAULT_QUERIES_DROPDOWN_PER_PAGE } from "@/config/defaults";
 import CohortQueryPreview from "@/components/CohortQueryPreview";
+import QueryBuilderHeader from "@/modules/QueryBuilderHeader";
 
 const CohortBuilder = async (props: { query?: string }) => {
-  const collections = await getUserCollections();
-
   const cookieStore = await cookies();
   const query = props.query ? await getQuery(props.query) : null;
 
@@ -34,8 +33,6 @@ const CohortBuilder = async (props: { query?: string }) => {
     params: searchParamsObject,
   });
 
-  const initialSelection = collections.data.map((c) => c.pid);
-
   const cookie = cookieStore?.get(QUERY_BUILDER_GUIDANCE_COOKIE);
 
   return (
@@ -48,20 +45,7 @@ const CohortBuilder = async (props: { query?: string }) => {
         px={2}
         py={1}
       >
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="space-between"
-          spacing={1}
-        >
-          <CohortQueryTitle />
-          <FilterDatasets />
-        </Stack>
-
-        <SelectDatasets
-          initialSelection={initialSelection}
-          collections={collections.data}
-        />
+        <QueryBuilderHeader />
 
         <Stack
           direction="row"
