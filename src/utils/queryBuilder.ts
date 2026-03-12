@@ -62,16 +62,21 @@ const queryToText = (
     }
   };
 
-  const cleanDescription = (s: string) => {
+  const cleanDescription = (s: string, aggressive = false) => {
     if (!s) return s;
 
     let out = s.trim();
-
-    out = out.replace(/SARS[-–—]CoV[-–—]?2\s*\(COVID[-–—]?19\)/gi, "COVID-19");
-    out = out.replace(/\s*-\s*COVID-19\s*vaccine\b/gi, " COVID-19 vaccine");
-    out = out.replace(/\s*vaccine(?:\s+AZD\d+)?\b/gi, " vaccine");
-    out = out.replace(/\bperson\/patient\b/gi, "person");
-    out = out.replace(/\s*\(\s*\)/g, "");
+    if (aggressive) {
+      //dont use by default
+      out = out.replace(
+        /SARS[-–—]CoV[-–—]?2\s*\(COVID[-–—]?19\)/gi,
+        "COVID-19",
+      );
+      out = out.replace(/\s*-\s*COVID-19\s*vaccine\b/gi, " COVID-19 vaccine");
+      out = out.replace(/\s*vaccine(?:\s+AZD\d+)?\b/gi, " vaccine");
+      out = out.replace(/\bperson\/patient\b/gi, "person");
+      out = out.replace(/\s*\(\s*\)/g, "");
+    }
 
     return out.trim();
   };
