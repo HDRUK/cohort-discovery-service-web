@@ -2,7 +2,7 @@
 
 import { Stack, Typography } from "@mui/material";
 
-import CohortErrors from "@/components/CohortErrors";
+import CohortErrors from "@/modules/CohortErrors";
 import SubmitQueryButton from "@/components/SubmitQueryButton";
 
 import useQueryBuilder from "@/hooks/useQueryBuilder";

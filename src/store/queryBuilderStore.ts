@@ -1,4 +1,5 @@
-import { create } from "zustand";
+import { create, StateCreator } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 import parseQuery from "@/actions/query/parseQuery";
 import { queryToText } from "@/utils/queryBuilder";
 import {
@@ -125,320 +126,329 @@ export interface QueryBuilderStoreState {
   setSelectedGuidance: (id: string, value: boolean) => void;
 }
 
-export const useQueryBuilderStore = create<QueryBuilderStoreState>(
-  (set, get) => ({
-    queryName: "",
-    setQueryName: (name) =>
-      set((state) => ({
-        ...state,
-        queryName: name,
-      })),
+const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
+  queryName: "",
+  setQueryName: (name) =>
+    set((state) => ({
+      ...state,
+      queryName: name,
+    })),
 
-    queryBuilderJson: validateRuleTree(DEFAULT_QUERY),
-    resetQueryBuilderJson: (resetQueryName?: boolean) => {
-      const { setQueryBuilderJson } = get();
-      setQueryBuilderJson(DEFAULT_QUERY);
+  queryBuilderJson: validateRuleTree(DEFAULT_QUERY),
+  resetQueryBuilderJson: (resetQueryName?: boolean) => {
+    const { setQueryBuilderJson } = get();
+    setQueryBuilderJson(DEFAULT_QUERY);
 
-      set((state) => ({
-        ...state,
-        selected: {},
-        ...(resetQueryName ? { queryName: "" } : {}),
-      }));
-    },
+    set((state) => ({
+      ...state,
+      selected: {},
+      ...(resetQueryName ? { queryName: "" } : {}),
+    }));
+  },
 
-    errors: [],
-    setErrors: (queryBuilderJson, selectedDatasets) => {
-      const datasetsAreSelected = selectedDatasets.length > 0;
-      const datasetReasons = datasetsAreSelected
-        ? []
-        : [DatasetErrors.NO_DATASETS];
-      const qbReasons = queryBuilderJson.invalidReason ?? [];
-      const errors = [...datasetReasons, ...qbReasons];
+  errors: [],
+  setErrors: (queryBuilderJson, selectedDatasets) => {
+    const datasetsAreSelected = selectedDatasets.length > 0;
+    const datasetReasons = datasetsAreSelected
+      ? []
+      : [DatasetErrors.NO_DATASETS];
+    const qbReasons = queryBuilderJson.invalidReason ?? [];
+    const errors = [...datasetReasons, ...qbReasons];
 
-      set((state) => ({
-        ...state,
-        errors,
-      }));
-    },
-    appendError: (error) =>
-      set((state) => ({
-        ...state,
-        errors: [...state.errors, error],
-      })),
+    set((state) => ({
+      ...state,
+      errors,
+    }));
+  },
+  appendError: (error) =>
+    set((state) => ({
+      ...state,
+      errors: [...state.errors, error],
+    })),
 
-    boardIndex: buildIndexFromModel(DEFAULT_QUERY),
+  boardIndex: buildIndexFromModel(DEFAULT_QUERY),
 
-    sizeCache: {},
-    setSizeCache: (id, width, height) =>
-      set((state) => ({
-        ...state,
-        sizeCache: {
-          ...state.sizeCache,
-          [id]: { width, height },
-        },
-      })),
+  sizeCache: {},
+  setSizeCache: (id, width, height) =>
+    set((state) => ({
+      ...state,
+      sizeCache: {
+        ...state.sizeCache,
+        [id]: { width, height },
+      },
+    })),
 
-    hovered: {},
-    setHovered: async (id: UniqueIdentifier, reset: boolean = false) => {
-      set((state) => ({
-        ...state,
-        hovered: { [id]: !reset },
-      }));
-    },
+  hovered: {},
+  setHovered: async (id: UniqueIdentifier, reset: boolean = false) => {
+    set((state) => ({
+      ...state,
+      hovered: { [id]: !reset },
+    }));
+  },
 
-    helpTooltipOpen: true,
-    setHelpTooltipOpen: (open: boolean, durationMs: number = 0) => {
-      set((state) => ({
-        ...state,
-        helpTooltipOpen: open,
-      }));
+  helpTooltipOpen: true,
+  setHelpTooltipOpen: (open: boolean, durationMs: number = 0) => {
+    set((state) => ({
+      ...state,
+      helpTooltipOpen: open,
+    }));
 
-      if (open && durationMs > 0) {
-        setTimeout(() => {
-          set((state) => ({
-            ...state,
-            helpTooltipOpen: false,
-          }));
-        }, durationMs);
+    if (open && durationMs > 0) {
+      setTimeout(() => {
+        set((state) => ({
+          ...state,
+          helpTooltipOpen: false,
+        }));
+      }, durationMs);
+    }
+  },
+
+  selected: {},
+  setSelected: (id, nextValue = true, reset = false) => {
+    const ids = Array.isArray(id) ? id : [id];
+    const uniqueIds = Array.from(new Set(ids));
+
+    set((state) => {
+      const curr = reset ? {} : (state.selected ?? {});
+      let changed = false;
+
+      const nextSelected = { ...curr };
+
+      for (const key of uniqueIds) {
+        if (curr[key] !== nextValue) {
+          nextSelected[key] = nextValue;
+          changed = true;
+        }
       }
-    },
 
-    selected: {},
-    setSelected: (id, nextValue = true, reset = false) => {
-      const ids = Array.isArray(id) ? id : [id];
-      const uniqueIds = Array.from(new Set(ids));
+      if (!changed) return state;
 
-      set((state) => {
-        const curr = reset ? {} : (state.selected ?? {});
-        let changed = false;
-
-        const nextSelected = { ...curr };
-
-        for (const key of uniqueIds) {
-          if (curr[key] !== nextValue) {
-            nextSelected[key] = nextValue;
-            changed = true;
-          }
-        }
-
-        if (!changed) return state;
-
-        return {
-          ...state,
-          selected: nextSelected,
-        };
-      });
-    },
-    select: (id) => get().setSelected(id, true),
-    deselect: (id) => get().setSelected(id, false),
-    toggleSelected: (id, reset = true) => {
-      set((state) => {
-        const prevSelected = state.selected ?? {};
-        const isAlreadySelected = state.selected?.[id] === true;
-
-        return {
-          ...state,
-
-          selected: {
-            ...(reset
-              ? isAlreadySelected
-                ? removeFalseKeys(prevSelected)
-                : {}
-              : state.selected),
-            [id]: !(state.selected?.[id] ?? false),
-          },
-        };
-      });
-    },
-
-    createNewNode: (kind: NodeKind) => {
-      const fn = Creators[kind];
-
-      const { queryBuilderJson, setQueryBuilderJson, setSelected } = get();
-
-      const normaliseAdditions = (
-        belowNeighbor?: RuleNodeType,
-      ): RuleNodeType[] => {
-        const produced = fn();
-        const additions = Array.isArray(produced) ? produced : [produced];
-
-        const belowIsOperator = !!belowNeighbor && isOperator(belowNeighbor);
-        const lastAdditionIsOperator = isOperator(
-          additions[additions.length - 1],
-        );
-
-        const suffixWithOperator =
-          belowNeighbor && !belowIsOperator && !lastAdditionIsOperator;
-
-        return suffixWithOperator
-          ? [...additions, ...[createOperator()]]
-          : additions;
+      return {
+        ...state,
+        selected: nextSelected,
       };
+    });
+  },
+  select: (id) => get().setSelected(id, true),
+  deselect: (id) => get().setSelected(id, false),
+  toggleSelected: (id, reset = true) => {
+    set((state) => {
+      const prevSelected = state.selected ?? {};
+      const isAlreadySelected = state.selected?.[id] === true;
 
-      const firstNode = queryBuilderJson.rules[0];
-      const toPrepend = normaliseAdditions(firstNode);
+      return {
+        ...state,
 
-      const rules = [...toPrepend, ...queryBuilderJson.rules];
+        selected: {
+          ...(reset
+            ? isAlreadySelected
+              ? removeFalseKeys(prevSelected)
+              : {}
+            : state.selected),
+          [id]: !(state.selected?.[id] ?? false),
+        },
+      };
+    });
+  },
 
-      const updatedQuery = { ...queryBuilderJson, rules };
+  createNewNode: (kind: NodeKind) => {
+    const fn = Creators[kind];
 
-      setSelected(
-        toPrepend.slice(0, 1).map((r) => r.id),
-        true,
-        true,
+    const { queryBuilderJson, setQueryBuilderJson, setSelected } = get();
+
+    const normaliseAdditions = (
+      belowNeighbor?: RuleNodeType,
+    ): RuleNodeType[] => {
+      const produced = fn();
+      const additions = Array.isArray(produced) ? produced : [produced];
+
+      const belowIsOperator = !!belowNeighbor && isOperator(belowNeighbor);
+      const lastAdditionIsOperator = isOperator(
+        additions[additions.length - 1],
       );
 
-      setQueryBuilderJson(updatedQuery);
-    },
+      const suffixWithOperator =
+        belowNeighbor && !belowIsOperator && !lastAdditionIsOperator;
 
-    createNewRule: () => get().createNewNode(NodeKind.RULE),
-    createNewGroup: () => get().createNewNode(NodeKind.GROUP),
-    createNewOperator: () => get().createNewNode(NodeKind.OPERATOR),
-    createNewAgeFilter: () => get().createNewNode(NodeKind.AGE_FILTER),
+      return suffixWithOperator
+        ? [...additions, ...[createOperator()]]
+        : additions;
+    };
 
-    queryAsText: queryToText(DEFAULT_QUERY),
+    const firstNode = queryBuilderJson.rules[0];
+    const toPrepend = normaliseAdditions(firstNode);
 
-    setQueryBuilderJson: (query, validate = true) => {
-      const updatedQuery = validate ? get().validateRules(query) : query;
-      const text = updatedQuery.valid ? queryToText(updatedQuery) : "";
+    const rules = [...toPrepend, ...queryBuilderJson.rules];
 
-      set((state) => ({
-        ...state,
+    const updatedQuery = { ...queryBuilderJson, rules };
 
-        queryBuilderJson: updatedQuery,
-        boardIndex: buildIndexFromModel(updatedQuery),
-        ...(validate ? { queryAsText: text } : {}),
-      }));
+    setSelected(
+      toPrepend.slice(0, 1).map((r) => r.id),
+      true,
+      true,
+    );
 
-      get().setErrors(updatedQuery, get().selectedDatasets);
-      return updatedQuery;
-    },
+    setQueryBuilderJson(updatedQuery);
+  },
 
-    getNodeName: (node) => {
-      if (node.name) return node.name;
-      let name = "";
+  createNewRule: () => get().createNewNode(NodeKind.RULE),
+  createNewGroup: () => get().createNewNode(NodeKind.GROUP),
+  createNewOperator: () => get().createNewNode(NodeKind.OPERATOR),
+  createNewAgeFilter: () => get().createNewNode(NodeKind.AGE_FILTER),
 
-      if (!isAgeFilter(node) && node.exclude) name = "Excluded ";
+  queryAsText: queryToText(DEFAULT_QUERY),
 
-      if (isRuleGroup(node)) name += "Group";
-      else if (isRuleLeaf(node)) {
-        const c = node.rule?.concept;
-        const category = Array.isArray(c) ? c[0]?.category : c?.category;
-        name += `${category ?? "Blank"} rule`.trim();
-      } else if (isOperator(node))
-        name += `${node.combinator.toUpperCase()} operator`;
-      else if (isAgeFilter(node)) name += "Age Filter";
-      else name += "Unknown";
+  setQueryBuilderJson: (query, validate = true) => {
+    const updatedQuery = validate ? get().validateRules(query) : query;
+    const text = updatedQuery.valid ? queryToText(updatedQuery) : "";
 
-      return name;
-    },
+    set((state) => ({
+      ...state,
 
-    setNodeName: (node, name) => {
-      get().setQueryBuilderJson(
-        updateById(get().queryBuilderJson, node.id, (target) => ({
-          ...target,
-          name,
-        })),
-      );
-    },
+      queryBuilderJson: updatedQuery,
+      boardIndex: buildIndexFromModel(updatedQuery),
+      ...(validate ? { queryAsText: text } : {}),
+    }));
 
-    includeSynthetic: false,
-    setIncludeSynthetic: (includeSynthetic) => {
-      set((state) => ({
-        ...state,
-        includeSynthetic,
-      }));
-    },
+    get().setErrors(updatedQuery, get().selectedDatasets);
+    return updatedQuery;
+  },
 
-    previouslySelectedDatasets: [],
-    setPreviouslySelectedDatasets: (pids) => {
-      set((state) => ({
-        ...state,
+  getNodeName: (node) => {
+    if (node.name) return node.name;
+    let name = "";
 
-        previouslySelectedDatasets: pids,
-      }));
-    },
+    if (!isAgeFilter(node) && node.exclude) name = "Excluded ";
 
-    selectedDatasets: [],
-    setSelectedDatasets: (pids) => {
-      set((state) => ({
-        ...state,
+    if (isRuleGroup(node)) name += "Group";
+    else if (isRuleLeaf(node)) {
+      const c = node.rule?.concept;
+      const category = Array.isArray(c) ? c[0]?.category : c?.category;
+      name += `${category ?? "Blank"} rule`.trim();
+    } else if (isOperator(node))
+      name += `${node.combinator.toUpperCase()} operator`;
+    else if (isAgeFilter(node)) name += "Age Filter";
+    else name += "Unknown";
 
-        selectedDatasets: pids,
-      }));
-      get().setErrors(get().queryBuilderJson, pids);
-    },
+    return name;
+  },
 
-    openSelectDatasetsPanel: false,
-    setOpenSelectDatasetsPanel: (value) =>
-      set((state) => ({
-        ...state,
-
-        openSelectDatasetsPanel: value,
+  setNodeName: (node, name) => {
+    get().setQueryBuilderJson(
+      updateById(get().queryBuilderJson, node.id, (target) => ({
+        ...target,
+        name,
       })),
+    );
+  },
 
-    showDescendants: {},
-    setShowDescendants: (id, nextValue = true) => {
-      const ids = Array.isArray(id) ? id : [id];
-      const uniqueIds = Array.from(new Set(ids));
+  includeSynthetic: false,
+  setIncludeSynthetic: (includeSynthetic) => {
+    set((state) => ({
+      ...state,
+      includeSynthetic,
+    }));
+  },
 
-      set((state) => {
-        const curr = state.showDescendants ?? {};
-        let changed = false;
+  previouslySelectedDatasets: [],
+  setPreviouslySelectedDatasets: (pids) => {
+    set((state) => ({
+      ...state,
 
-        const next = { ...curr };
+      previouslySelectedDatasets: pids,
+    }));
+  },
 
-        for (const key of uniqueIds) {
-          if (curr[key] !== nextValue) {
-            next[key] = nextValue;
-            changed = true;
-          }
+  selectedDatasets: [],
+  setSelectedDatasets: (pids) => {
+    set((state) => ({
+      ...state,
+
+      selectedDatasets: pids,
+    }));
+    get().setErrors(get().queryBuilderJson, pids);
+  },
+
+  openSelectDatasetsPanel: false,
+  setOpenSelectDatasetsPanel: (value) =>
+    set((state) => ({
+      ...state,
+
+      openSelectDatasetsPanel: value,
+    })),
+
+  showDescendants: {},
+  setShowDescendants: (id, nextValue = true) => {
+    const ids = Array.isArray(id) ? id : [id];
+    const uniqueIds = Array.from(new Set(ids));
+
+    set((state) => {
+      const curr = state.showDescendants ?? {};
+      let changed = false;
+
+      const next = { ...curr };
+
+      for (const key of uniqueIds) {
+        if (curr[key] !== nextValue) {
+          next[key] = nextValue;
+          changed = true;
         }
+      }
 
-        if (!changed) return state;
+      if (!changed) return state;
 
-        return {
-          ...state,
-          showDescendants: next,
-        };
-      });
-    },
-
-    getQueryFromText: async (
-      input: string,
-      {
-        commit = false,
-        ignoreSynthetic = false,
-      }: { commit?: boolean; ignoreSynthetic?: boolean } = {},
-    ) => {
-      const cleanQuery = (queryString: string) => {
-        const query = JSON.parse(queryString) as RuleGroupType;
-        if (query.rules.length === 1 && isRuleGroup(query.rules[0])) {
-          return { ...query, rules: groupToRules(query.rules[0]) };
-        }
-        return query;
+      return {
+        ...state,
+        showDescendants: next,
       };
-      const { data: newQueryString } = await parseQuery(input, {
-        ignoreSynthetic,
-      });
-      const newQuery = cleanQuery(newQueryString);
-      return commit ? get().setQueryBuilderJson(newQuery) : newQuery;
-    },
+    });
+  },
 
-    validateRules: (root) => {
-      const featureFlags = useFeatureFlagsStore.getState().flags;
+  getQueryFromText: async (
+    input: string,
+    {
+      commit = false,
+      ignoreSynthetic = false,
+    }: { commit?: boolean; ignoreSynthetic?: boolean } = {},
+  ) => {
+    const cleanQuery = (queryString: string) => {
+      const query = JSON.parse(queryString) as RuleGroupType;
+      if (query.rules.length === 1 && isRuleGroup(query.rules[0])) {
+        return { ...query, rules: groupToRules(query.rules[0]) };
+      }
+      return query;
+    };
+    const { data: newQueryString } = await parseQuery(input, {
+      ignoreSynthetic,
+    });
+    const newQuery = cleanQuery(newQueryString);
+    return commit ? get().setQueryBuilderJson(newQuery) : newQuery;
+  },
 
-      return validateRuleTree(root, {
-        constrainForBunnyV1:
-          featureFlags?.[FeatureName.ConstrainForBunnyV1] || false,
-      });
-    },
+  validateRules: (root) => {
+    const featureFlags = useFeatureFlagsStore.getState().flags;
 
-    selectedGuidance: {},
-    setSelectedGuidance: (id: string, value: boolean) =>
-      set((state) => ({
-        ...state,
-        selectedGuidance: { [id]: value },
-      })),
+    return validateRuleTree(root, {
+      constrainForBunnyV1:
+        featureFlags?.[FeatureName.ConstrainForBunnyV1] || false,
+    });
+  },
+
+  selectedGuidance: {},
+  setSelectedGuidance: (id: string, value: boolean) =>
+    set((state) => ({
+      ...state,
+      selectedGuidance: { [id]: value },
+    })),
+});
+
+export const useQueryBuilderStore = create<QueryBuilderStoreState>()(
+  persist(state, {
+    name: "query-builder-preferences",
+    storage: createJSONStorage(() => localStorage),
+    partialize: (state) => ({
+      selectedDatasets: state.selectedDatasets,
+      includeSynthetic: state.includeSynthetic,
+    }),
   }),
 );
