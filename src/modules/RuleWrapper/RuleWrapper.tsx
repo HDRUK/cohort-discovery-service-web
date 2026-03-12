@@ -320,9 +320,6 @@ const RuleWrapper = ({
                             label={exclude == true ? "Exclude" : "Include"}
                           />
                         )}
-                        {!valid && (
-                          <InvalidRule reasons={invalidReason ?? []} />
-                        )}
                       </Box>
                       <Title
                         size={"small"}
@@ -360,7 +357,14 @@ const RuleWrapper = ({
             {type === "Rule" && (
               <>
                 <Divider variant="fullWidth" />
-                <Box height={40}></Box>
+                {!valid ? (
+                  <InvalidRule
+                    reasons={invalidReason ?? []}
+                    stackProps={{ sx: { pt: 1, pb: 1 } }}
+                  />
+                ) : (
+                  <Box height={40}></Box>
+                )}
               </>
             )}
           </Card>
