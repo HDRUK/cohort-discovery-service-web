@@ -60,7 +60,7 @@ describe("RuleOperator", () => {
   });
 
   it("shows warning icon when rule is invalid", () => {
-    renderComponent({ valid: false });
+    renderComponent({ valid: false, invalidReason: ["invalid reason 1"] });
     expect(screen.queryByTestId("ErrorIcon")).toBeInTheDocument();
   });
 

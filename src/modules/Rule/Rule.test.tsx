@@ -85,7 +85,10 @@ describe("Rule", () => {
   });
 
   it("renders the Rule card correctly when not valid", () => {
-    renderComponent({ valid: false });
+    renderComponent({
+      valid: false,
+      invalidReason: ["invalid reason 1"],
+    });
     expect(screen.queryByTestId("ErrorIcon")).toBeInTheDocument();
   });
 
