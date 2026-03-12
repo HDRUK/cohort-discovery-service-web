@@ -89,12 +89,7 @@ export default function Custom403() {
       </Typography>
 
       <List
-        component="ul"
-        sx={{
-          listStyleType: "disc",
-          pl: 4,
-          "& .MuiListItem-root": { display: "list-item" },
-        }}
+        bulleted
         items={messages.map(
           (msg, i) => ({ id: i, label: msg }) satisfies ListItemType,
         )}

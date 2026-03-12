@@ -31,10 +31,18 @@ const ListItem = ({
       <MuiListItem
         component="li"
         disableGutters
-        sx={{ display: "list-item" }}
+        sx={{ display: "list-item", p: 0 }}
         key={id ?? label}
       >
-        <ListItemText sx={{ color: "text.primary" }} primary={label} />
+        <ListItemText
+          sx={{ color: "text.primary" }}
+          primary={label}
+          slotProps={{
+            primary: {
+              fontWeight: "bold",
+            },
+          }}
+        />
       </MuiListItem>
     );
   }

@@ -35,6 +35,7 @@ export type SearchBoxProps = Omit<TextFieldProps, "errors"> & {
   actions?: React.ReactNode[];
   onClickEndAdornment?: () => void;
   endIcon?: React.ReactNode;
+  startIcon?: React.ReactNode;
   showEndIcon?: boolean;
   placeholders?: string[];
 };
@@ -52,6 +53,7 @@ const SearchBox = ({
   disabled,
   onClickEndAdornment,
   endIcon,
+  startIcon,
   showEndIcon = true,
   placeholders,
   ...rest
@@ -123,6 +125,9 @@ const SearchBox = ({
                 name: "search-box",
               },
               input: {
+                startAdornment: startIcon ? (
+                  <InputAdornment position="start">{startIcon}</InputAdornment>
+                ) : undefined,
                 endAdornment: (
                   <InputAdornment position="end" sx={inputAdornmentSx}>
                     {loading ? (
