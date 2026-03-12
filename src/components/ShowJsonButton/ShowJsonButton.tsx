@@ -7,6 +7,8 @@ import CopyableTextButton from "../CopyableTextButton";
 import useUserStore from "@/hooks/useUserStore";
 import { checkIsAdmin } from "@/utils/user";
 
+const NODE_ENV = process.env.NODE_ENV;
+
 const ShowJsonButton = () => {
   const { queryBuilderJson } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
@@ -14,7 +16,7 @@ const ShowJsonButton = () => {
   const user = useUserStore((st) => st.user);
   const isAdmin = checkIsAdmin(user);
 
-  if (!isAdmin) return;
+  if (!isAdmin && NODE_ENV !== "development") return;
 
   return (
     <ShowOnClick
