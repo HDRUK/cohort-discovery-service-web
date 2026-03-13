@@ -10,6 +10,7 @@ import CohortDiscoveryGuidanceMdx from "@/content/guidance/cohortDiscovery.mdx";
 import { baseComponents } from "@/modules/Guidance/Guidance";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import CloseIcon from "@mui/icons-material/Close";
+import { HelpIcon } from "@/icons/HelpIcon";
 import {
   Divider,
   GridProps,
@@ -31,6 +32,13 @@ const QueryBuilderGuidance = ({ onClose }: { onClose?: () => void }) => {
         </IconButton>
       ) : null,
     Divider: () => <Divider />,
+    HelpIcon: () => (
+      <HelpIcon
+        sx={(theme) => ({
+          color: theme.palette.tooltip?.main,
+        })}
+      />
+    ),
     SwimLaneContainer: (props: GridProps) => (
       <SwimLaneContainer
         {...props}

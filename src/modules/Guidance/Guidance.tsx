@@ -91,6 +91,7 @@ export const baseComponents = {
       {...props}
     />
   ),
+  Box: (props: BoxProps) => <Box {...props}></Box>,
 };
 
 const Guidance = () => {
@@ -168,7 +169,6 @@ const Guidance = () => {
   }
   const makeRuleComponents = (node: RuleLeafType) => ({
     ...baseComponents,
-    Box: (props: BoxProps) => <Box {...props}></Box>,
     CollapsibleGuidance: (props: GuidanceProps) => (
       <CollapsibleGuidance {...props}></CollapsibleGuidance>
     ),
@@ -211,7 +211,6 @@ const Guidance = () => {
   const makeOperatorComponents = (node: OperatorType) => ({
     ...baseComponents,
     ToggleOperator: () => <ToggleOperator operator={node} />,
-    Box: (props: BoxProps) => <Box {...props}></Box>,
     CollapsibleGuidance: (props: GuidanceProps) => (
       <CollapsibleGuidance {...props}></CollapsibleGuidance>
     ),
@@ -255,7 +254,6 @@ const Guidance = () => {
         overrideConstrainForBunny={true}
       />
     ),
-    Box: (props: BoxProps) => <Box {...props}></Box>,
   });
 
   const makeMultipleItemComponents = () => ({
@@ -269,7 +267,6 @@ const Guidance = () => {
     ConvertToGroupMenuItem: (props: ConvertToGroupMenuItemProps) => (
       <ConvertToGroupMenuItem {...props} selectedNode={selectedNode} />
     ),
-    Box: (props: BoxProps) => <Box {...props}></Box>,
   });
 
   if (selectedIds.length > 1) {
