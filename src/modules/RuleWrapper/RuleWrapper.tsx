@@ -354,7 +354,7 @@ const RuleWrapper = ({
               )}
 
             <RightClickMenu {...rightClickMenuMethods} actions={actions} />
-            {type === "Rule" && (
+            {(type === "Rule" || type === "Group") && (
               <>
                 <Divider variant="fullWidth" />
                 {!valid ? (

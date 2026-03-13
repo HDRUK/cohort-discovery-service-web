@@ -597,16 +597,7 @@ export function validateRuleTree(
     const groupIsValid =
       children.length >= minChildren && children.every((c) => getValid(c));
 
-    const reasonSet = new Set<string>(groupReasons);
-    for (const child of children) {
-      const childReasons: string[] | undefined = child.invalidReason;
-      if (childReasons) {
-        childReasons.forEach((r) => reasonSet.add(r));
-      }
-    }
-    const reasons = Array.from(reasonSet);
-
-    const invalidReason = groupIsValid ? undefined : reasons;
+    const invalidReason = groupIsValid ? undefined : groupReasons;
 
     const base = {
       ...validateNode(group),
