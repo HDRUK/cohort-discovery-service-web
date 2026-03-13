@@ -18,15 +18,15 @@ export interface ListItemType {
   rightClickActions?: RightClickAction[];
   selected?: boolean;
   slotProps?: {
-    root?: SlotProps<"div", {}, ListItemTextOwnerState>;
+    root?: SlotProps<"div", object, ListItemTextOwnerState>;
     primary?: SlotProps<
       React.ElementType<TypographyProps>,
-      {},
+      object,
       ListItemTextOwnerState
     >;
     secondary?: SlotProps<
       React.ElementType<TypographyProps>,
-      {},
+      object,
       ListItemTextOwnerState
     >;
   };
