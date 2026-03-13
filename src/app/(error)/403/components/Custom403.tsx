@@ -91,7 +91,16 @@ export default function Custom403() {
       <List
         bulleted
         items={messages.map(
-          (msg, i) => ({ id: i, label: msg }) satisfies ListItemType,
+          (msg, i) =>
+            ({
+              id: i,
+              label: msg,
+              slotProps: {
+                primary: {
+                  fontWeight: "bold",
+                },
+              },
+            }) satisfies ListItemType,
         )}
       />
 

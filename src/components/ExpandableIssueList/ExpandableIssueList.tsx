@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import {
   Accordion,
   AccordionDetails,
@@ -8,64 +7,62 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import List from "@/components/List";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
 type ExpandableIssueListProps = {
   title: string;
   items: string[];
   color?: "error" | "warning";
-  defaultExpanded?: boolean;
   icon: React.ReactNode;
-  helperText: string;
+  helperText?: string;
 };
 
 const ExpandableIssueList = ({
   title,
   items,
   color,
-  defaultExpanded = false,
   icon,
   helperText,
 }: ExpandableIssueListProps) => {
-  const [expanded, setExpanded] = useState(defaultExpanded);
-
   if (items.length === 0) return null;
 
-  return (
+  return items.length === 1 ? (
+    <Stack direction="row" gap={1} sx={{ my: 1 }}>
+      {icon}
+      {items.map((item) => (
+        <Typography key={item} variant="body1">
+          {item}
+        </Typography>
+      ))}
+    </Stack>
+  ) : (
     <Accordion
-      expanded={expanded}
-      onChange={() => setExpanded((s) => !s)}
       disableGutters
       sx={{
-        bgcolor: "background.default",
+        bgcolor: "inherit",
         boxShadow: "none",
         "&:before": { display: "none" },
       }}
     >
       <AccordionSummary
+        expandIcon={<ArrowDropDownIcon />}
         sx={{
           px: 0,
+          justifyContent: "flex-start",
           minHeight: "unset",
-          "& .MuiAccordionSummary-content": { my: 1 },
+          "& .MuiAccordionSummary-content": {
+            my: 1,
+            flexGrow: 0,
+          },
         }}
       >
         <Stack direction="row" gap={1} alignItems="center">
           {icon}
 
-          <Typography
-            variant="body1"
-            color={color ? `${color}.main` : undefined}
-          >
+          <Typography variant="body1">
             {items.length} {title}
           </Typography>
-
-          <ExpandMoreIcon
-            sx={{
-              transition: "0.2s",
-              transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
-            }}
-          />
         </Stack>
       </AccordionSummary>
 
@@ -75,15 +72,18 @@ const ExpandableIssueList = ({
             bulleted
             items={items.map((item) => ({
               label: item,
+              sx: { fontWeight: 1 },
             }))}
           />
 
-          <Typography
-            variant="body2"
-            color={color ? `${color}.main` : undefined}
-          >
-            {helperText}
-          </Typography>
+          {helperText && (
+            <Typography
+              variant="body2"
+              color={color ? `${color}.main` : undefined}
+            >
+              {helperText}
+            </Typography>
+          )}
         </Stack>
       </AccordionDetails>
     </Accordion>
