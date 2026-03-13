@@ -1,10 +1,13 @@
 <CollapsibleGuidance keyPrefix="RuleAgeSelector" title="Current Patient Age">
   <RuleAgeSelector />
-  <Box>
+  <Box sx={{ pb: 1}}>
     Define the patient age range by adjusting slider value.
+  </Box>
 
+  <Box sx={{ pb: 1}}>
+    This filters by the patient's current age across your query or group. For age at diagnosis, select the relevant rule block and refine from the right-hand panel.
+</Box>
     <Box sx={{ color: "error.main" }}>
       Age may be rounded ±1 year in some datasets, to either protect patient data or as specific day or month was not recorded.
     </Box>
-  </Box>
 </CollapsibleGuidance>
