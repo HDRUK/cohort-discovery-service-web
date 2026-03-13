@@ -30,7 +30,7 @@ const GuidanceModal = ({
       closeButtonSx={{ bgcolor: "#475DA7" }}
       maxWidth="lg"
     >
-      {true ? (
+      {showHeader ? (
         <Box display="flex" flexDirection="column">
           <QueryBuilderWelcome onClose={onClose} />
           <QueryBuilderGuidance />
