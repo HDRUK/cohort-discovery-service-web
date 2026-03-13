@@ -23,6 +23,7 @@ const ListItem = ({
   onClick,
   rightClickActions,
   selected,
+  ...props
 }: ListItemType) => {
   const { handleContextMenu, ...rightClickMenuMethods } = useRightClickMenu();
 
@@ -34,7 +35,11 @@ const ListItem = ({
         sx={{ display: "list-item", p: 0 }}
         key={id ?? label}
       >
-        <ListItemText sx={{ color: "text.primary" }} primary={label} />
+        <ListItemText
+          sx={{ color: "text.primary" }}
+          primary={label}
+          {...props}
+        />
       </MuiListItem>
     );
   }
@@ -49,7 +54,7 @@ const ListItem = ({
       selected={selected}
       sx={{ display: "list-item" }}
     >
-      <ListItemText sx={{ color: "text.primary" }} primary={label} />
+      <ListItemText sx={{ color: "text.primary" }} primary={label} {...props} />
       {rightClickActions && (
         <RightClickMenu
           {...rightClickMenuMethods}
