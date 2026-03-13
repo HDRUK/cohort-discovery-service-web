@@ -51,12 +51,17 @@ export const skeletonSx = (
 export const cardSx = (
   isSelected: boolean,
   valid: boolean,
+  isHighlighted: boolean,
 ): SxProps<Theme> => ({
   p: 2,
   border: 1,
   borderColor: valid ? "black" : "error.main",
   width: "100%",
-  bgcolor: isSelected ? "background.default" : "white",
+  bgcolor: isSelected
+    ? "background.default"
+    : isHighlighted
+      ? "highlight.main"
+      : "white",
   "&:hover": {
     bgcolor: isSelected ? "background.default" : "highlight.main",
   },

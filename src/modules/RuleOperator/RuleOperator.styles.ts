@@ -1,9 +1,16 @@
 import { Theme } from "@mui/material/styles";
 import { SxProps } from "@mui/system";
 
-export const cardSx = (selected: boolean): SxProps<Theme> => ({
+export const cardSx = (
+  selected: boolean,
+  isHighlighted: boolean,
+): SxProps<Theme> => ({
   border: 0,
-  bgcolor: selected ? undefined : "transparent",
+  bgcolor: selected
+    ? undefined
+    : isHighlighted
+      ? "highlight.main"
+      : "transparent",
   "&:hover": {
     bgcolor: selected ? undefined : "highlight.main",
     cursor: "pointer",

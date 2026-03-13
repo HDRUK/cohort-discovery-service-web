@@ -12,6 +12,8 @@ import ThreePaneSwimLaneLayout from "../ThreePaneSwimLaneLayout";
 import { ThreePaneProvider } from "@/providers/ThreePaneProvider";
 import { useLeaveConfirmation } from "@/hooks/useLeaveConfirmation";
 import RuleBoardWrapper from "@/modules/RuleBoardWrapper";
+import RuleBoard from "../RuleBoard";
+import { CohortBuilderProvider } from "@/providers/CohortBuilderProvider";
 
 const QueryBuilder = ({
   query,
@@ -35,7 +37,7 @@ const QueryBuilder = ({
     }
   }, [query, setQueryBuilderJson]);
 
-  useLeaveConfirmation(queryBuilderJson.rules.length > 0);
+  //useLeaveConfirmation(queryBuilderJson.rules.length > 0);
 
   const onChangeSelection = useCallback(
     (ids: string[], deselectedIds: string[]) => {
@@ -48,31 +50,33 @@ const QueryBuilder = ({
   const boardRef = useRef<HTMLDivElement>(null);
 
   return (
-    <ThreePaneProvider>
-      <ThreePaneSwimLaneLayout
-        left={<ActionMenu />}
-        middle={
-          queryBuilderJson?.rules && queryBuilderJson.rules.length > 0 ? (
-            <RuleBoardWrapper errorOnDrag={errorOnDrag} />
-          ) : (
-            <QueryBuilderSkeleton />
-          )
-        }
-        middleProps={{ ref: boardRef }}
-        right={<RuleMenu />}
-        rightDisabled={
-          !queryBuilderJson ||
-          (queryBuilderJson?.rules && queryBuilderJson.rules.length === 0)
-        }
-      />
-      <MarqueeSelection
-        containerRef={boardRef}
-        selectable='[data-selectable="true"]'
-        idAttr="data-id"
-        ignoreWhenInside='[data-draggable="true"]'
-        onChange={onChangeSelection}
-      />
-    </ThreePaneProvider>
+    <CohortBuilderProvider errorOnDrag={errorOnDrag}>
+      <ThreePaneProvider>
+        <ThreePaneSwimLaneLayout
+          left={<ActionMenu />}
+          middle={
+            queryBuilderJson?.rules && queryBuilderJson.rules.length > 0 ? (
+              <RuleBoard ruleGroup={queryBuilderJson} />
+            ) : (
+              <QueryBuilderSkeleton />
+            )
+          }
+          middleProps={{ ref: boardRef }}
+          right={<RuleMenu />}
+          rightDisabled={
+            !queryBuilderJson ||
+            (queryBuilderJson?.rules && queryBuilderJson.rules.length === 0)
+          }
+        />
+        <MarqueeSelection
+          containerRef={boardRef}
+          selectable='[data-selectable="true"]'
+          idAttr="data-id"
+          ignoreWhenInside='[data-draggable="true"]'
+          onChange={onChangeSelection}
+        />
+      </ThreePaneProvider>
+    </CohortBuilderProvider>
   );
 };
 
