@@ -361,14 +361,14 @@ const RuleWrapper = ({
             {(type === "Rule" || type === "Group") && (
               <>
                 {showFooter && <Divider variant="fullWidth" />}
-                {!valid ? (
-                  <InvalidRule
-                    reasons={invalidReason ?? []}
-                    stackProps={{ sx: { pt: 1, pb: 1 } }}
-                  />
-                ) : (
-                  <Box height={type === "Rule" && isSelected ? 40 : 0}></Box>
-                )}
+                <Box minHeight={type === "Rule" && isSelected ? 40 : 0}>
+                  {!valid && (
+                    <InvalidRule
+                      reasons={invalidReason ?? []}
+                      stackProps={{ sx: { pt: 1, pb: 1 } }}
+                    />
+                  )}
+                </Box>
               </>
             )}
           </Card>
