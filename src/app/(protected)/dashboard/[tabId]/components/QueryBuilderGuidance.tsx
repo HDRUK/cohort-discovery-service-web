@@ -42,7 +42,7 @@ const QueryBuilderGuidance = ({ onClose }: { onClose?: () => void }) => {
     SwimLaneContainer: (props: GridProps) => (
       <SwimLaneContainer
         {...props}
-        separatorNode={<ArrowForwardIcon color="secondary" sx={{ pt: 0 }} />}
+        separatorNode={<ArrowForwardIcon color="inherit" sx={{ mt: 3 }} />}
       />
     ),
     SwimLaneContent: (props: TypographyProps) => (
@@ -51,7 +51,7 @@ const QueryBuilderGuidance = ({ onClose }: { onClose?: () => void }) => {
     SwimLane: (props: SwimLaneProps) => (
       <SwimLane
         size={"grow"}
-        paperSx={{ bgcolor: "white", px: 0 }}
+        paperSx={{ bgcolor: "white", px: 0, mx: 1 }}
         {...props}
       />
     ),
