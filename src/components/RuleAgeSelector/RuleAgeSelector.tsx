@@ -24,6 +24,7 @@ import SingleBoundSelector, {
 } from "@/components/SingleBoundSelector";
 import { clamp } from "@/utils/numbers";
 import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
+import { useHover } from "@/providers/HoverProvider";
 
 export interface RuleAgeSelectorProps {
   children?: ReactNode;
@@ -85,15 +86,21 @@ const RuleAgeSelector = ({
     setQueryBuilderJson,
     setSelectedGuidance,
     selected,
+    isUniquelySelected,
   } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
     setSelectedGuidance: qb.setSelectedGuidance,
     selected: qb.selected,
+    isUniquelySelected:
+      !!qb.selected[rule.id] && Object.keys(qb.selected).length === 1,
   }));
 
+  console.log(selected);
   const flags = useFeatures();
   const { constrainForBunnyV1 } = flags;
+
+  const { isHovered, setHovered } = useHover();
 
   const values = isRuleLeaf(rule) ? rule.ageConstraint : rule.value;
 
@@ -193,7 +200,27 @@ const RuleAgeSelector = ({
 
   if (constrainForBunnyV1 && !overrideConstrainForBunny) {
     return (
-      <>
+      <div
+        onMouseEnter={() => {
+          if (isUniquelySelected) {
+            setHovered(true);
+          }
+        }}
+        onMouseLeave={() => {
+          if (isUniquelySelected) {
+            setHovered(false);
+          }
+        }}
+        style={{
+          border:
+            isHovered && isUniquelySelected
+              ? "2px solid blue"
+              : "1px solid gray",
+          borderRadius: "4px",
+          padding: "8px",
+          transition: "border-color 0.2s",
+        }}
+      >
         {title && <CustomH1>{title}</CustomH1>}
 
         <SingleBoundSelector<number>
@@ -274,12 +301,30 @@ const RuleAgeSelector = ({
           )}
         />
         {children}
-      </>
+      </div>
     );
   }
 
   return (
-    <>
+    <div
+      onMouseEnter={() => {
+        if (isUniquelySelected) {
+          setHovered(true);
+        }
+      }}
+      onMouseLeave={() => {
+        if (isUniquelySelected) {
+          setHovered(false);
+        }
+      }}
+      style={{
+        border:
+          isHovered && isUniquelySelected ? "2px solid blue" : "1px solid gray",
+        borderRadius: "4px",
+        padding: "8px",
+        transition: "border-color 0.2s",
+      }}
+    >
       {title && <CustomH1>{title}</CustomH1>}
 
       <Stack
@@ -374,7 +419,7 @@ const RuleAgeSelector = ({
           </>
         )}
       </Stack>
-    </>
+    </div>
   );
 };
 

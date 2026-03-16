@@ -12,6 +12,7 @@ import ThreePaneSwimLaneLayout from "../ThreePaneSwimLaneLayout";
 import { ThreePaneProvider } from "@/providers/ThreePaneProvider";
 import { useLeaveConfirmation } from "@/hooks/useLeaveConfirmation";
 import RuleBoardWrapper from "@/modules/RuleBoardWrapper";
+import { HoverProvider } from "@/providers/HoverProvider";
 
 const QueryBuilder = ({
   query,
@@ -49,29 +50,31 @@ const QueryBuilder = ({
 
   return (
     <ThreePaneProvider>
-      <ThreePaneSwimLaneLayout
-        left={<ActionMenu />}
-        middle={
-          queryBuilderJson?.rules && queryBuilderJson.rules.length > 0 ? (
-            <RuleBoardWrapper errorOnDrag={errorOnDrag} />
-          ) : (
-            <QueryBuilderSkeleton />
-          )
-        }
-        middleProps={{ ref: boardRef }}
-        right={<RuleMenu />}
-        rightDisabled={
-          !queryBuilderJson ||
-          (queryBuilderJson?.rules && queryBuilderJson.rules.length === 0)
-        }
-      />
-      <MarqueeSelection
-        containerRef={boardRef}
-        selectable='[data-selectable="true"]'
-        idAttr="data-id"
-        ignoreWhenInside='[data-draggable="true"]'
-        onChange={onChangeSelection}
-      />
+      <HoverProvider>
+        <ThreePaneSwimLaneLayout
+          left={<ActionMenu />}
+          middle={
+            queryBuilderJson?.rules && queryBuilderJson.rules.length > 0 ? (
+              <RuleBoardWrapper errorOnDrag={errorOnDrag} />
+            ) : (
+              <QueryBuilderSkeleton />
+            )
+          }
+          middleProps={{ ref: boardRef }}
+          right={<RuleMenu />}
+          rightDisabled={
+            !queryBuilderJson ||
+            (queryBuilderJson?.rules && queryBuilderJson.rules.length === 0)
+          }
+        />
+        <MarqueeSelection
+          containerRef={boardRef}
+          selectable='[data-selectable="true"]'
+          idAttr="data-id"
+          ignoreWhenInside='[data-draggable="true"]'
+          onChange={onChangeSelection}
+        />
+      </HoverProvider>
     </ThreePaneProvider>
   );
 };
