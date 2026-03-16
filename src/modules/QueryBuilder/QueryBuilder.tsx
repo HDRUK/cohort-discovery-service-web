@@ -11,7 +11,6 @@ import { Query } from "@/types/api";
 import ThreePaneSwimLaneLayout from "../ThreePaneSwimLaneLayout";
 import { ThreePaneProvider } from "@/providers/ThreePaneProvider";
 import { useLeaveConfirmation } from "@/hooks/useLeaveConfirmation";
-import RuleBoardWrapper from "@/modules/RuleBoardWrapper";
 import RuleBoard from "../RuleBoard";
 import { CohortBuilderProvider } from "@/providers/CohortBuilderProvider";
 
