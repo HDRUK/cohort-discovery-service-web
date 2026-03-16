@@ -10,6 +10,7 @@ import CohortDiscoveryGuidanceMdx from "@/content/guidance/cohortDiscovery.mdx";
 import { baseComponents } from "@/modules/Guidance/Guidance";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import CloseIcon from "@mui/icons-material/Close";
+import { HelpIcon } from "@/icons/HelpIcon";
 import {
   Divider,
   GridProps,
@@ -31,10 +32,17 @@ const QueryBuilderGuidance = ({ onClose }: { onClose?: () => void }) => {
         </IconButton>
       ) : null,
     Divider: () => <Divider />,
+    HelpIcon: () => (
+      <HelpIcon
+        sx={(theme) => ({
+          color: theme.palette.tooltip?.main,
+        })}
+      />
+    ),
     SwimLaneContainer: (props: GridProps) => (
       <SwimLaneContainer
         {...props}
-        separatorNode={<ArrowForwardIcon color="secondary" sx={{ pt: 0 }} />}
+        separatorNode={<ArrowForwardIcon color="inherit" sx={{ mt: 3 }} />}
       />
     ),
     SwimLaneContent: (props: TypographyProps) => (
@@ -43,7 +51,7 @@ const QueryBuilderGuidance = ({ onClose }: { onClose?: () => void }) => {
     SwimLane: (props: SwimLaneProps) => (
       <SwimLane
         size={"grow"}
-        paperSx={{ bgcolor: "white", px: 0 }}
+        paperSx={{ bgcolor: "white", px: 0, mx: 1 }}
         {...props}
       />
     ),

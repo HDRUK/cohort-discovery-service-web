@@ -26,7 +26,12 @@ const SwimLaneContainer = ({
       {childrenArray.map((child, index) => {
         const key = index;
 
-        return <React.Fragment key={key}>{child}</React.Fragment>;
+        return (
+          <React.Fragment key={key}>
+            {child}
+            {index < childrenArray.length - 1 ? separatorNode : null}
+          </React.Fragment>
+        );
       })}
     </Grid>
   );

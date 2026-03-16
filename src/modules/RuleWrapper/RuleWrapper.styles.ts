@@ -81,7 +81,7 @@ export const cardActionsSx: SxProps<Theme> = {
   borderColor: "divider",
   p: 0,
   m: 0,
-  pt: 1,
+  py: 1,
 };
 
 export const chipSx: SxProps<Theme> = {

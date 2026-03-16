@@ -217,6 +217,10 @@ const RuleWrapper = ({
 
   const nodeName = useMemo(() => getNodeName(node), [node, getNodeName]);
 
+  const showFooter =
+    (type === "Rule" && isSelected && !isAgeFilter(node)) ||
+    (!valid && (invalidReason ?? []).length > 0);
+
   useLogDependencyChanges("wrapper " + node.id, {
     isSelected,
     node,
@@ -316,9 +320,6 @@ const RuleWrapper = ({
                             label={exclude == true ? "Exclude" : "Include"}
                           />
                         )}
-                        {!valid && (
-                          <InvalidRule reasons={invalidReason ?? []} />
-                        )}
                       </Box>
                       <Title
                         size={"small"}
@@ -357,10 +358,17 @@ const RuleWrapper = ({
               )}
 
             <RightClickMenu {...rightClickMenuMethods} actions={actions} />
-            {type === "Rule" && (
+            {(type === "Rule" || type === "Group") && (
               <>
-                <Divider variant="fullWidth" />
-                <Box height={40}></Box>
+                {showFooter && <Divider variant="fullWidth" />}
+                <Box minHeight={type === "Rule" && isSelected ? 40 : 0}>
+                  {!valid && (
+                    <InvalidRule
+                      reasons={invalidReason ?? []}
+                      stackProps={{ sx: { pt: 1, pb: 1 } }}
+                    />
+                  )}
+                </Box>
               </>
             )}
           </Card>

@@ -2,7 +2,10 @@ import useRightClickMenu from "@/hooks/useRightClickMenu";
 import {
   ListItemButton,
   ListItemText,
+  ListItemTextOwnerState,
   ListItem as MuiListItem,
+  SlotProps,
+  TypographyProps,
 } from "@mui/material";
 import RightClickMenu from "../RightClickMenu/RightClickMenu";
 import { RightClickAction } from "@/hooks/useNodeActions";
@@ -14,6 +17,19 @@ export interface ListItemType {
   disabled?: boolean;
   rightClickActions?: RightClickAction[];
   selected?: boolean;
+  slotProps?: {
+    root?: SlotProps<"div", object, ListItemTextOwnerState>;
+    primary?: SlotProps<
+      React.ElementType<TypographyProps>,
+      object,
+      ListItemTextOwnerState
+    >;
+    secondary?: SlotProps<
+      React.ElementType<TypographyProps>,
+      object,
+      ListItemTextOwnerState
+    >;
+  };
 }
 
 const ListItem = ({
@@ -23,6 +39,7 @@ const ListItem = ({
   onClick,
   rightClickActions,
   selected,
+  slotProps,
 }: ListItemType) => {
   const { handleContextMenu, ...rightClickMenuMethods } = useRightClickMenu();
 
@@ -37,11 +54,7 @@ const ListItem = ({
         <ListItemText
           sx={{ color: "text.primary" }}
           primary={label}
-          slotProps={{
-            primary: {
-              fontWeight: "bold",
-            },
-          }}
+          slotProps={slotProps}
         />
       </MuiListItem>
     );
@@ -57,7 +70,11 @@ const ListItem = ({
       selected={selected}
       sx={{ display: "list-item" }}
     >
-      <ListItemText sx={{ color: "text.primary" }} primary={label} />
+      <ListItemText
+        sx={{ color: "text.primary" }}
+        primary={label}
+        slotProps={slotProps}
+      />
       {rightClickActions && (
         <RightClickMenu
           {...rightClickMenuMethods}

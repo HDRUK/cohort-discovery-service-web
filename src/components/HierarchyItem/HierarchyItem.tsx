@@ -134,7 +134,9 @@ export const HierarchyItem = ({
           />
         }
       />
-      {!node.valid ? <InvalidRule reasons={node.invalidReason || []} /> : <></>}
+      {!node.valid ? (
+        <InvalidRule minimised reasons={node.invalidReason || []} />
+      ) : null}
       <RightClickMenu {...rightClickMenuMethods} actions={actions} />
     </ListItemButton>
   );
