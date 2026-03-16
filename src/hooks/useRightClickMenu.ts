@@ -20,7 +20,7 @@ const useRightClickMenu = () => {
           : null,
       );
     },
-    [],
+    [setMenuPos],
   );
 
   const handleClose = () => setMenuPos(null);
