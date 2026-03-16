@@ -50,6 +50,7 @@ import {
 } from "@/utils/rules";
 import useFeatures from "@/hooks/useFeatures";
 import Close from "@mui/icons-material/Close";
+import useHoverable from "@/hooks/useHoverable";
 
 interface Action {
   action: () => void;
@@ -108,7 +109,6 @@ const RuleWrapper = ({
     setNodeName,
     queryBuilderJson,
     setQueryBuilderJson,
-    setHovered,
   } = useQueryBuilder((qb) => ({
     select: qb.select,
     deselect: qb.deselect,
@@ -120,7 +120,6 @@ const RuleWrapper = ({
     setNodeName: qb.setNodeName,
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
-    setHovered: qb.setHovered,
   }));
 
   const { constrainForBunnyV1 } = useFeatures();
@@ -141,6 +140,16 @@ const RuleWrapper = ({
       groupId,
     },
   });
+
+  const { setHoverRef, isHighlighted } = useHoverable<HTMLDivElement>(node.id);
+
+  const setCardRef = useCallback(
+    (el: HTMLDivElement) => {
+      anchorRef.current = el;
+      setHoverRef(el);
+    },
+    [anchorRef, setHoverRef],
+  );
 
   const [showHandle, setShowHandle] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
@@ -199,15 +208,6 @@ const RuleWrapper = ({
     }
   }, [showHandle, isDragging, setShowHandle, setShowDelete]);
 
-  const onCardMouseOver = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    setHovered(id);
-  };
-
-  const onCardMouseLeave = useCallback(() => {
-    setHovered(id, true);
-  }, [id, setHovered]);
-
   const { handleContextMenu, ...rightClickMenuMethods } = useRightClickMenu();
 
   const handleDelete = useCallback(() => {
@@ -230,8 +230,6 @@ const RuleWrapper = ({
     handleContextMenu,
     onMouseLeave,
     onMouseEnter,
-    onCardMouseOver,
-    onCardMouseLeave,
     handleOnSelect,
     showHandle,
     setNodeRef,
@@ -286,17 +284,15 @@ const RuleWrapper = ({
           />
         ) : (
           <Card
-            ref={anchorRef}
+            ref={setCardRef}
             data-id={id}
             data-selectable="true"
             data-draggable="true"
             component="div"
             data-testid="clickable-card"
-            sx={mergeSx(cardSx(isSelected, valid), cardPropsSx)}
+            sx={mergeSx(cardSx(isSelected, valid, isHighlighted), cardPropsSx)}
             onContextMenu={handleContextMenu}
             onClick={handleOnSelect}
-            onMouseOver={onCardMouseOver}
-            onMouseLeave={onCardMouseLeave}
             {...cardProps}
           >
             {!hideHeader && (
@@ -345,7 +341,11 @@ const RuleWrapper = ({
               (node.timeConstraint || node.ageConstraint) && (
                 <CardActions sx={cardActionsSx}>
                   {node.timeConstraint && (
-                    <RuleTimeframeSelector rule={node} readOnly />
+                    <RuleTimeframeSelector
+                      data-testid="rule-timeframe-selector"
+                      rule={node}
+                      readOnly
+                    />
                   )}
                   {node.ageConstraint && (
                     <RuleAgeSelector

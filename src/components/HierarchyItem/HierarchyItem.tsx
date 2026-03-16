@@ -16,6 +16,7 @@ import RightClickMenu from "../RightClickMenu/RightClickMenu";
 import useNodeActions from "@/hooks/useNodeActions";
 import { trueKeys } from "@/utils/numbers";
 import SquareRadio from "../SquareRadio";
+import useHoverable from "@/hooks/useHoverable";
 
 type HierarchyItemProps = {
   node: RuleNodeType;
@@ -35,7 +36,6 @@ export const HierarchyItem = ({
     selected,
     getNodeName,
     setNodeName,
-    hovered,
   } = useQueryBuilder((qb) => ({
     select: qb.select,
     deselect: qb.deselect,
@@ -43,7 +43,6 @@ export const HierarchyItem = ({
     selected: qb.selected,
     getNodeName: qb.getNodeName,
     setNodeName: qb.setNodeName,
-    hovered: qb.hovered,
   }));
   const id = `${DEFAULT_ID_REF_SUFFIX}-${node.id}`;
 
@@ -96,8 +95,11 @@ export const HierarchyItem = ({
   const { handleContextMenu, ...rightClickMenuMethods } = useRightClickMenu();
   const { actions } = useNodeActions(node);
 
+  const { setHoverRef, isHighlighted } = useHoverable<HTMLDivElement>(node.id);
+
   const content = (
     <ListItemButton
+      ref={setHoverRef}
       onClick={toggleCheckbox}
       onContextMenu={handleContextMenu}
       component="div"
@@ -107,7 +109,7 @@ export const HierarchyItem = ({
         isAbove,
         depth,
         selected[node.id],
-        !!hovered?.[node.id],
+        isHighlighted,
       )}
     >
       <SquareRadio

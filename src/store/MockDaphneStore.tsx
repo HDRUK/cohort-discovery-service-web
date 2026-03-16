@@ -55,6 +55,7 @@ import { DefaultProvider } from "@/providers/DefaultProvider";
 import { themeOptions } from "@/config/theme";
 import { HdrukUiProvider } from "@hdruk/ui";
 import { ThemeOptions } from "@mui/material";
+import { CohortBuilderProvider } from "@/providers/CohortBuilderProvider";
 
 const queryClient = new QueryClient();
 
@@ -251,11 +252,13 @@ const MockDaphneStore = ({
     <DefaultProvider>
       <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
         <QueryClientProvider client={queryClient}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <ConfirmProvider>
-              <NotifyProvider>{children}</NotifyProvider>
-            </ConfirmProvider>
-          </LocalizationProvider>
+          <CohortBuilderProvider>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <ConfirmProvider>
+                <NotifyProvider>{children}</NotifyProvider>
+              </ConfirmProvider>
+            </LocalizationProvider>
+          </CohortBuilderProvider>
         </QueryClientProvider>
       </HdrukUiProvider>
     </DefaultProvider>

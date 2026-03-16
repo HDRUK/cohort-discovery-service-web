@@ -1,37 +1,75 @@
 "use client";
+
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 import {
+  Active,
+  closestCorners,
   DndContext,
-  PointerSensor,
-  KeyboardSensor,
-  useSensor,
-  useSensors,
   DragEndEvent,
   DragOverEvent,
   DragStartEvent,
-  closestCorners,
-  Active,
+  KeyboardSensor,
   MeasuringStrategy,
+  PointerSensor,
+  useSensor,
+  useSensors,
 } from "@dnd-kit/core";
-
 import {
   restrictToVerticalAxis,
   restrictToWindowEdges,
 } from "@dnd-kit/modifiers";
 
-import RuleBoard from "@/modules/RuleBoard";
 import DragOverlay from "@/components/DragOverlay";
 import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
 import useRightClickMenu from "@/hooks/useRightClickMenu";
-import { useCallback, useState } from "react";
-import { findById, moveItemIntoGroup } from "@/utils/rules";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { RuleNodeType } from "@/types/rules";
+import { findById, moveItemIntoGroup } from "@/utils/rules";
 
-const RuleBoardWrapper = ({
-  errorOnDrag = false,
-}: {
+type Action = {
+  action: () => void;
+  label: string;
+};
+
+type CohortBuilderContextValue = {
+  active: Active | null;
+  activeNode: RuleNodeType | null;
+  handleContextMenu: (event: React.MouseEvent<HTMLElement>) => void;
+  actions: Action[];
+
+  hoveredKey: string | null;
+  setHoveredKey: (key: string | null) => void;
+};
+
+const CohortBuilderContext = createContext<CohortBuilderContextValue | null>(
+  null,
+);
+
+export const useCohortBuilderContext = () => {
+  const ctx = useContext(CohortBuilderContext);
+  if (!ctx) {
+    throw new Error(
+      "useCohortBuilderContext must be used within CohortBuilderProvider",
+    );
+  }
+  return ctx;
+};
+
+type CohortBuilderProviderProps = {
+  children: React.ReactNode;
   errorOnDrag?: boolean;
-}) => {
+};
+
+export const CohortBuilderProvider = ({
+  children,
+  errorOnDrag = false,
+}: CohortBuilderProviderProps) => {
   const {
     queryBuilderJson,
     setQueryBuilderJson,
@@ -48,7 +86,6 @@ const RuleBoardWrapper = ({
     createNewRule: qb.createNewRule,
     createNewAgeFilter: qb.createNewAgeFilter,
     createNewOperator: qb.createNewOperator,
-    selectedGuidance: qb.selectedGuidance,
   }));
 
   const sensors = useSensors(
@@ -58,25 +95,24 @@ const RuleBoardWrapper = ({
 
   const [active, setActive] = useState<Active | null>(null);
   const [activeNode, setActiveNode] = useState<RuleNodeType | null>(null);
+  const [hoveredKey, setHoveredKey] = useState<string | null>(null);
 
-  const onDragStart = (e: DragStartEvent) => {
-    setActive(e.active);
+  const onDragStart = useCallback(
+    (e: DragStartEvent) => {
+      setActive(e.active);
 
-    const node = findById(queryBuilderJson, e.active.id as string);
-    if (node) {
-      setActiveNode(node);
-    }
-  };
+      const node = findById(queryBuilderJson, e.active.id as string);
+      if (node) {
+        setActiveNode(node);
+      }
+    },
+    [queryBuilderJson],
+  );
 
   const onDragOver = useCallback(
     (e: DragOverEvent) => {
       const { over } = e;
-
-      if (!over) {
-        return;
-      }
-
-      if (!active) return;
+      if (!over || !active) return;
 
       const activeData = active.data.current;
       const overData = over.data.current;
@@ -85,10 +121,10 @@ const RuleBoardWrapper = ({
       const overGroupId = overData?.groupId;
 
       if (!overGroupId || !activeGroupId) return;
-
       if (activeData.id === overData.id) return;
+
       const groupItems = boardIndex?.itemsByGroup?.[overGroupId] ?? [];
-      let targetIndex = groupItems?.indexOf(overData.id);
+      let targetIndex = groupItems.indexOf(overData.id);
 
       targetIndex = targetIndex < 0 ? 0 : targetIndex;
 
@@ -101,17 +137,18 @@ const RuleBoardWrapper = ({
           targetIndex = overData.position;
         }
       }
+
       setQueryBuilderJson(
         moveItemIntoGroup(
           queryBuilderJson,
-          activeData?.id as string,
+          activeData.id as string,
           overGroupId,
           targetIndex,
         ),
         errorOnDrag,
       );
     },
-    [errorOnDrag, active, queryBuilderJson, boardIndex, setQueryBuilderJson],
+    [active, boardIndex, errorOnDrag, queryBuilderJson, setQueryBuilderJson],
   );
 
   const onDragEnd = useCallback(
@@ -130,10 +167,14 @@ const RuleBoardWrapper = ({
       const activeGroupId = activeData?.groupId;
       const overGroupId = overData?.groupId;
 
-      if (!overGroupId || !activeGroupId) return;
+      if (!overGroupId || !activeGroupId) {
+        setActiveNode(null);
+        setActive(null);
+        return;
+      }
 
       const groupItems = boardIndex.itemsByGroup[overGroupId] ?? [];
-      let targetIndex = groupItems?.indexOf(overData.id);
+      let targetIndex = groupItems.indexOf(overData.id);
 
       targetIndex = targetIndex < 0 ? 0 : targetIndex;
 
@@ -157,20 +198,35 @@ const RuleBoardWrapper = ({
       setActiveNode(null);
       setActive(null);
     },
-    [active, queryBuilderJson, boardIndex, setQueryBuilderJson],
+    [active, boardIndex, queryBuilderJson, setQueryBuilderJson],
   );
 
   const { handleContextMenu, ...rightClickMenuMethods } = useRightClickMenu();
 
-  const actions = [
-    { action: createNewAgeFilter, label: "Add Age Filter" },
-    { action: createNewRule, label: "Add Rule" },
-    { action: createNewGroup, label: "Add Group" },
-    { action: createNewOperator, label: "Add Operator" },
-  ];
+  const actions = useMemo<Action[]>(
+    () => [
+      { action: createNewAgeFilter, label: "Add Age Filter" },
+      { action: createNewRule, label: "Add Rule" },
+      { action: createNewGroup, label: "Add Group" },
+      { action: createNewOperator, label: "Add Operator" },
+    ],
+    [createNewAgeFilter, createNewRule, createNewGroup, createNewOperator],
+  );
+
+  const value = useMemo(
+    () => ({
+      active,
+      activeNode,
+      handleContextMenu,
+      actions,
+      hoveredKey,
+      setHoveredKey,
+    }),
+    [active, activeNode, handleContextMenu, actions, hoveredKey],
+  );
 
   return (
-    <>
+    <CohortBuilderContext.Provider value={value}>
       <DndContext
         sensors={sensors}
         onDragStart={onDragStart}
@@ -182,17 +238,10 @@ const RuleBoardWrapper = ({
           droppable: { strategy: MeasuringStrategy.Always },
         }}
       >
-        <RuleBoard
-          ruleGroup={queryBuilderJson}
-          onContextMenu={handleContextMenu}
-        >
-          <RightClickMenu {...rightClickMenuMethods} actions={actions} />
-        </RuleBoard>
-
+        {children}
+        <RightClickMenu {...rightClickMenuMethods} actions={actions} />
         <DragOverlay node={activeNode} />
       </DndContext>
-    </>
+    </CohortBuilderContext.Provider>
   );
 };
-
-export default RuleBoardWrapper;
