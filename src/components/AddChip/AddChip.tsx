@@ -21,6 +21,7 @@ const AddChip = ({
   onClick,
   disabled,
   hoverKey,
+  sx,
   ...rest
 }: AddChipProps) => {
   const { compact } = useActionMenuSection();
@@ -53,15 +54,24 @@ const AddChip = ({
       ) : (
         <Chip
           ref={setHoverRef}
+          variant="outlined"
           icon={loading ? <CircularProgress size={20} /> : <AddIcon />}
           disabled={isDisabled}
           onClick={handleClick}
           sx={{
+            ...sx,
             justifyContent: "flex-start",
             textAlign: "left",
+            py: 2,
+            pl: 1,
+            pr: 0.5,
             color: "text.primary",
-            backgroundColor: isHighlighted ? null : "white",
-            "&:hover": { backgroundColor: isHighlighted ? null : "white" },
+            backgroundColor: isHighlighted ? "grey.300" : "white",
+            borderColor: "text.secondary",
+            borderWidth: "1px",
+            "&.MuiChip-root:hover": {
+              backgroundColor: isHighlighted ? "grey.300" : "white",
+            },
           }}
           label={label}
           {...rest}
