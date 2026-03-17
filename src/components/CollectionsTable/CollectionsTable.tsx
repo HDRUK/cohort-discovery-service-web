@@ -225,17 +225,20 @@ const CollectionsTable = ({
         id: "last_demographic",
         header: "Last Distribution Demographics",
         accessorFn: (row) =>
-          row.latest_demographic?.task
-            ? getDatetime(row.latest_demographic.created_at)
+          row.latest_demographic_task?.completed_at
+            ? getDatetime(row.latest_demographic_task.completed_at)
             : "—",
         size: 50,
         minSize: 50,
         maxSize: 50,
         Cell: ({ cell, row }) => {
-          const counts = row.original.n_concepts || "-";
+          const counts = row.original.n_concepts;
+          const formattedCounts = formatNumber(counts);
           const date = cell.getValue<string>();
           return (
-            <Tooltip title={`Number of concepts = ${counts}`}>
+            <Tooltip
+              title={!!counts && `Number of concepts = ${formattedCounts}`}
+            >
               <Typography>{date}</Typography>
             </Tooltip>
           );
@@ -245,19 +248,20 @@ const CollectionsTable = ({
         id: "last_concept",
         header: "Last Distribution Concepts",
         accessorFn: (row) =>
-          row.latest_concept?.created_at
-            ? getDatetime(row.latest_concept.created_at)
+          row.latest_concept_task?.completed_at
+            ? getDatetime(row.latest_concept_task.completed_at)
             : "—",
         size: 50,
         minSize: 50,
         maxSize: 50,
         Cell: ({ cell, row }) => {
-          const counts = formatNumber(
-            row.original?.latest_demographic?.count ?? 0,
-          );
+          const counts = row.original?.latest_concept_task?.result?.count ?? 0;
+          const formattedCounts = formatNumber(counts);
           const date = cell.getValue<string>();
           return (
-            <Tooltip title={`Number of studies = ${counts}`}>
+            <Tooltip
+              title={!!counts && `Number of studies = ${formattedCounts}`}
+            >
               <Typography>{date}</Typography>
             </Tooltip>
           );

@@ -1,21 +1,16 @@
 import { Query, Task } from "@/types/api";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
-import { Button, CircularProgress } from "@mui/material";
+import { Button, CircularProgress, Tooltip } from "@mui/material";
 import { useCallback, useMemo, useState } from "react";
 
 interface ReRunButtonProps {
   task?: Task;
-  lastSuccessfullTask?: Task;
   onClick: () => Promise<Query>;
 }
 
-export const ReRunButton = ({
-  task,
-  lastSuccessfullTask,
-  onClick,
-}: ReRunButtonProps) => {
-  const [submittedTask, setSubmittedTask] = useState<Task | null>(null);
+export const ReRunButton = ({ task, onClick }: ReRunButtonProps) => {
+  const [submittedTask, setSubmittedTask] = useState<Task | null>(task ?? null);
 
   const handleClick = useCallback(async () => {
     setSubmittedTask(null);
@@ -26,7 +21,6 @@ export const ReRunButton = ({
   }, [onClick]);
 
   const submittedId = submittedTask?.id;
-  const lastSuccessId = lastSuccessfullTask?.id;
 
   const hasFailed = useMemo(
     () =>
@@ -36,8 +30,12 @@ export const ReRunButton = ({
     [task, submittedTask],
   );
 
+  const hasNoResult = submittedTask?.result === null;
+
   const isLoading =
-    !hasFailed && !!submittedId && submittedId !== lastSuccessId;
+    !hasFailed && !!submittedId && submittedTask.result === null;
+
+  console.log({ isLoading, hasFailed, hasNoResult, submittedTask });
 
   return (
     <Button
@@ -47,7 +45,6 @@ export const ReRunButton = ({
       onClick={handleClick}
       disabled={isLoading}
     >
-      {isLoading ? "Running" : "Run now"}
       {submittedTask && (
         <>
           {isLoading ? (
@@ -59,6 +56,7 @@ export const ReRunButton = ({
           )}
         </>
       )}
+      {isLoading ? "Running" : "Run now"}
     </Button>
   );
 };

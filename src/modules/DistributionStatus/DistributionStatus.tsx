@@ -6,6 +6,7 @@ import { ReRunButton } from "./ReRunButton";
 import { useLogDependencyChanges } from "@/utils/deps";
 import useUserStore from "@/hooks/useUserStore";
 import { useCallback } from "react";
+import LastDistributionChip from "./LastDistributionChip";
 
 const DistributionStatus = ({
   collection,
@@ -14,8 +15,8 @@ const DistributionStatus = ({
   collection: CollectionWithHosts;
   disabled?: boolean;
 }) => {
-  const demographic = collection.latest_demographic;
-  const concept = collection.latest_concept;
+  const latestDemographicTask = collection.latest_demographic_task;
+  const latestConceptTask = collection.latest_concept_task;
 
   const runDistributions = useUserStore((s) => s.runDistributions);
 
@@ -29,8 +30,6 @@ const DistributionStatus = ({
 
   useLogDependencyChanges("DistributionStatus", {
     collection,
-    demographic,
-    concept,
     handleRunDemographicsNow,
     handleRunConceptsNow,
   });
@@ -41,31 +40,21 @@ const DistributionStatus = ({
       <Box>
         <Typography variant="body2" component={"div"}>
           Demographics:{" "}
-          <Chip
-            label={`Last Distribution ${getDatetime(demographic?.created_at)}`}
+          <LastDistributionChip
+            task={latestDemographicTask}
+            onRunNow={handleRunDemographicsNow}
+            disabled={disabled}
           />
-          {!disabled && (
-            <ReRunButton
-              task={collection.latest_demographic_task}
-              lastSuccessfullTask={demographic?.task}
-              onClick={handleRunDemographicsNow}
-            />
-          )}
         </Typography>
       </Box>
       <Box>
         <Typography variant="body2" component={"div"}>
           Concepts:{" "}
-          <Chip
-            label={`Last Distribution ${getDatetime(concept?.created_at)}`}
+          <LastDistributionChip
+            task={latestConceptTask}
+            disabled={disabled}
+            onRunNow={handleRunConceptsNow}
           />
-          {!disabled && (
-            <ReRunButton
-              task={collection.latest_concept_task}
-              lastSuccessfullTask={concept?.task}
-              onClick={handleRunConceptsNow}
-            />
-          )}
         </Typography>
       </Box>
     </Stack>
