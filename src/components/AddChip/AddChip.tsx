@@ -8,16 +8,25 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import { useActionMenuSection } from "../ActionMenuSection";
 import { useState } from "react";
+import useHoverable from "@/hooks/useHoverable";
 
 export type AddChipProps = Omit<ChipProps, "action" | "onClick"> & {
   label: string;
   onClick: () => void | Promise<void>;
+  hoverKey?: string;
 };
 
-const AddChip = ({ label, onClick, disabled, ...rest }: AddChipProps) => {
+const AddChip = ({
+  label,
+  onClick,
+  disabled,
+  hoverKey,
+  ...rest
+}: AddChipProps) => {
   const { compact } = useActionMenuSection();
   const [loading, setLoading] = useState(false);
-
+  console.log("addchip", label);
+  const { setHoverRef, isHighlighted } = useHoverable<HTMLDivElement>(hoverKey);
   const handleClick = async (e: React.MouseEvent) => {
     if (loading) return;
     e.stopPropagation();
@@ -43,6 +52,7 @@ const AddChip = ({ label, onClick, disabled, ...rest }: AddChipProps) => {
         </Tooltip>
       ) : (
         <Chip
+          ref={setHoverRef}
           icon={loading ? <CircularProgress size={20} /> : <AddIcon />}
           disabled={isDisabled}
           onClick={handleClick}
@@ -50,6 +60,8 @@ const AddChip = ({ label, onClick, disabled, ...rest }: AddChipProps) => {
             justifyContent: "flex-start",
             textAlign: "left",
             color: "text.primary",
+            backgroundColor: isHighlighted ? null : "white",
+            "&:hover": { backgroundColor: isHighlighted ? null : "white" },
           }}
           label={label}
           {...rest}

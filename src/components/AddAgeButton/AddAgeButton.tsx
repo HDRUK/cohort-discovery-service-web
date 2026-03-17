@@ -12,6 +12,7 @@ import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
 
 interface AddAgeChipProps extends AddChipProps {
   rule: RuleLeafType;
+  hoverKey?: string;
 }
 
 const AddAgeButton = ({ rule, ...props }: AddAgeChipProps) => {

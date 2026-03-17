@@ -352,6 +352,7 @@ const RuleWrapper = ({
                     label="Add timeframe"
                     rule={node}
                     key="RuleTimeframeSelector"
+                    hoverKey={`rule-timeframe-${node.id}`}
                   />
                 )}
                 {node.ageConstraint ? (
@@ -365,6 +366,7 @@ const RuleWrapper = ({
                     label="Add age"
                     rule={node}
                     key="RuleAgeSelector"
+                    hoverKey={`rule-age-${node.id}`}
                   />
                 )}
               </CardActions>

@@ -178,19 +178,28 @@ const Guidance = () => {
     ),
     ShowDescendants: () => <ShowDescendants node={node} />,
     AddTimeFrameButton: (props: AddChipProps) => {
-      console.log(props);
       return (
         !node.timeConstraint && (
           <AddTimeFrameButton
             key="RuleTimeframeSelector"
             rule={node}
+            hoverKey={`rule-timeframe-${node.id}`}
             {...props}
           />
         )
       );
     },
-    AddAgeButton: (props: AddChipProps) =>
-      !node.ageConstraint && <AddAgeButton rule={node} {...props} />,
+    AddAgeButton: (props: AddChipProps) => {
+      return (
+        !node.ageConstraint && (
+          <AddAgeButton
+            rule={node}
+            hoverKey={`rule-age-${node.id}`}
+            {...props}
+          />
+        )
+      );
+    },
     RuleTimeframeSelector: (props: { title: string }) => (
       <RuleTimeframeSelector
         key="RuleTimeframeSelector"

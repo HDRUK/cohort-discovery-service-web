@@ -10,9 +10,10 @@ import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
 
 interface AddTimeframeChipProps extends AddChipProps {
   rule: RuleLeafType;
+  hoverKey?: string;
 }
 
-const AddTimeframeButton = ({ rule, ...props }: AddTimeframeChipProps) => {
+const AddTimeFrameButton = ({ rule, ...props }: AddTimeframeChipProps) => {
   const {
     queryBuilderJson,
     setQueryBuilderJson,
@@ -44,7 +45,7 @@ const AddTimeframeButton = ({ rule, ...props }: AddTimeframeChipProps) => {
     );
   };
 
-  return <AddChip {...props} onClick={() => onClick} />;
+  return <AddChip {...props} onClick={onClick} />;
 };
 
-export default AddTimeframeButton;
+export default AddTimeFrameButton;
