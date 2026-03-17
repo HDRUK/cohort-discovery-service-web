@@ -53,6 +53,7 @@ import Close from "@mui/icons-material/Close";
 import useHoverable from "@/hooks/useHoverable";
 import AddTimeframeButton from "@/components/AddTimeFrameButton";
 import AddAgeButton from "@/components/AddAgeButton";
+import DeleteAgeButton from "@/components/DeleteAgeButton";
 
 interface Action {
   action: () => void;
@@ -347,7 +348,7 @@ const RuleWrapper = ({
                     <RuleTimeframeSelector
                       data-testid="rule-timeframe-selector"
                       rule={node}
-                      readOnly
+                      readOnly={!isSelected}
                     />
                   ) : isSelected ? (
                     <AddTimeframeButton
@@ -361,9 +362,11 @@ const RuleWrapper = ({
                   {node.ageConstraint ? (
                     <RuleAgeSelector
                       rule={node}
-                      readOnly
+                      readOnly={!isSelected}
                       uniDirectional={constrainForBunnyV1}
-                    />
+                    >
+                      {isSelected && <DeleteAgeButton rule={node} />}
+                    </RuleAgeSelector>
                   ) : isSelected ? (
                     <AddAgeButton
                       label="Add age"

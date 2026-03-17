@@ -25,6 +25,7 @@ import SingleBoundSelector, {
 import { clamp } from "@/utils/numbers";
 import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
 import useHoverable from "@/hooks/useHoverable";
+import theme from "@/config/theme";
 
 export interface RuleAgeSelectorProps {
   children?: ReactNode;
@@ -86,11 +87,13 @@ const RuleAgeSelector = ({
     setQueryBuilderJson,
     setSelectedGuidance,
     selected,
+    setSelected,
   } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
     setSelectedGuidance: qb.setSelectedGuidance,
     selected: qb.selected,
+    setSelected: qb.setSelected,
   }));
 
   const flags = useFeatures();
@@ -199,9 +202,15 @@ const RuleAgeSelector = ({
     return (
       <div
         ref={setHoverRef}
+        onClick={(e) => {
+          e.stopPropagation();
+          setSelected(rule.id);
+        }}
         style={{
-          border: isHighlighted ? "2px solid blue" : "1px solid gray",
-          borderRadius: "4px",
+          display: "flex",
+          justifyItems: "flex-start",
+          backgroundColor: isHighlighted ? theme.palette.grey[300] : "inherit",
+          borderRadius: "12px",
           padding: "8px",
           transition: "border-color 0.2s",
         }}
@@ -293,9 +302,13 @@ const RuleAgeSelector = ({
   return (
     <div
       ref={setHoverRef}
+      onClick={(e) => {
+        e.stopPropagation();
+        setSelected(rule.id);
+      }}
       style={{
-        border: isHighlighted ? "2px solid blue" : "1px solid gray",
-        borderRadius: "4px",
+        backgroundColor: isHighlighted ? theme.palette.grey[300] : "inherit",
+        borderRadius: "12px",
         padding: "8px",
         transition: "border-color 0.2s",
       }}
