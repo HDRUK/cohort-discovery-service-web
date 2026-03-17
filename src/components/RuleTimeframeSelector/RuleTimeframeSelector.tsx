@@ -98,7 +98,7 @@ const RuleTimeframeSelector = ({
         {title && <CustomH1>{title}</CustomH1>}
 
         <SingleBoundSelector<string, Dayjs>
-          constraint={rule.timeConstraint}
+          constraint={rule.timeConstraint ?? []}
           constraintOperator={
             rule.timeConstraintOperator ?? SingleSidedOperator.GREATER_THAN
           }

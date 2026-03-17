@@ -6,15 +6,15 @@ import { updateById } from "@/utils/rules";
 import { isRuleLeaf } from "@/utils/rules";
 
 import { RuleLeafType } from "@/types/rules";
-import AddButton from "@/components/AddButton";
-import { AddButtonProps } from "@/components/AddButton/AddButton";
+import AddChip from "@/components/AddChip";
+import { AddChipProps } from "@/components/AddChip/AddChip";
 import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
 
-interface AddTimeFrameButtonProps extends AddButtonProps {
+interface AddAgeChipProps extends AddChipProps {
   rule: RuleLeafType;
 }
 
-const AddTimeFrameButton = ({ rule, ...props }: AddTimeFrameButtonProps) => {
+const AddAgeButton = ({ rule, ...props }: AddAgeChipProps) => {
   const {
     queryBuilderJson,
     setQueryBuilderJson,
@@ -46,7 +46,7 @@ const AddTimeFrameButton = ({ rule, ...props }: AddTimeFrameButtonProps) => {
     );
   };
 
-  return <AddButton {...props} onClick={onClick} />;
+  return <AddChip {...props} onClick={onClick} />;
 };
 
-export default AddTimeFrameButton;
+export default AddAgeButton;

@@ -39,7 +39,7 @@ const useHoverable = <T extends HTMLElement>(hoverKey?: string) => {
   return {
     setHoverRef,
     isHovered,
-    isHighlighted: hoverKey ? isHovered || hoveredKey === hoverKey : isHovered,
+    isHighlighted: hoverKey ? hoveredKey === hoverKey : isHovered,
   };
 };
 

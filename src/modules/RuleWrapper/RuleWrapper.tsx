@@ -51,6 +51,8 @@ import {
 import useFeatures from "@/hooks/useFeatures";
 import Close from "@mui/icons-material/Close";
 import useHoverable from "@/hooks/useHoverable";
+import AddTimeframeButton from "@/components/AddTimeFrameButton";
+import AddAgeButton from "@/components/AddAgeButton";
 
 interface Action {
   action: () => void;
@@ -337,25 +339,36 @@ const RuleWrapper = ({
               <CardContent>{render(node, anchorRef)}</CardContent>
             )}
 
-            {isRuleLeaf(node) &&
-              (node.timeConstraint || node.ageConstraint) && (
-                <CardActions sx={cardActionsSx}>
-                  {node.timeConstraint && (
-                    <RuleTimeframeSelector
-                      data-testid="rule-timeframe-selector"
-                      rule={node}
-                      readOnly
-                    />
-                  )}
-                  {node.ageConstraint && (
-                    <RuleAgeSelector
-                      rule={node}
-                      readOnly
-                      uniDirectional={constrainForBunnyV1}
-                    />
-                  )}
-                </CardActions>
-              )}
+            {isRuleLeaf(node) && type === "Rule" && (
+              <CardActions sx={cardActionsSx}>
+                {node.timeConstraint ? (
+                  <RuleTimeframeSelector
+                    data-testid="rule-timeframe-selector"
+                    rule={node}
+                    readOnly
+                  />
+                ) : (
+                  <AddTimeframeButton
+                    label="Add timeframe"
+                    rule={node}
+                    key="RuleTimeframeSelector"
+                  />
+                )}
+                {node.ageConstraint ? (
+                  <RuleAgeSelector
+                    rule={node}
+                    readOnly
+                    uniDirectional={constrainForBunnyV1}
+                  />
+                ) : (
+                  <AddAgeButton
+                    label="Add age"
+                    rule={node}
+                    key="RuleAgeSelector"
+                  />
+                )}
+              </CardActions>
+            )}
 
             <RightClickMenu {...rightClickMenuMethods} actions={actions} />
             {(type === "Rule" || type === "Group") && (

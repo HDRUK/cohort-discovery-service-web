@@ -24,6 +24,7 @@ import SingleBoundSelector, {
 } from "@/components/SingleBoundSelector";
 import { clamp } from "@/utils/numbers";
 import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
+import useHoverable from "@/hooks/useHoverable";
 
 export interface RuleAgeSelectorProps {
   children?: ReactNode;
@@ -94,6 +95,9 @@ const RuleAgeSelector = ({
 
   const flags = useFeatures();
   const { constrainForBunnyV1 } = flags;
+
+  const hoverKey = `rule-age-${rule.id}`;
+  const { setHoverRef, isHighlighted } = useHoverable<HTMLDivElement>(hoverKey);
 
   const values = isRuleLeaf(rule) ? rule.ageConstraint : rule.value;
 
@@ -193,7 +197,15 @@ const RuleAgeSelector = ({
 
   if (constrainForBunnyV1 && !overrideConstrainForBunny) {
     return (
-      <>
+      <div
+        ref={setHoverRef}
+        style={{
+          border: isHighlighted ? "2px solid blue" : "1px solid gray",
+          borderRadius: "4px",
+          padding: "8px",
+          transition: "border-color 0.2s",
+        }}
+      >
         {title && <CustomH1>{title}</CustomH1>}
 
         <SingleBoundSelector<number>
@@ -274,12 +286,20 @@ const RuleAgeSelector = ({
           )}
         />
         {children}
-      </>
+      </div>
     );
   }
 
   return (
-    <>
+    <div
+      ref={setHoverRef}
+      style={{
+        border: isHighlighted ? "2px solid blue" : "1px solid gray",
+        borderRadius: "4px",
+        padding: "8px",
+        transition: "border-color 0.2s",
+      }}
+    >
       {title && <CustomH1>{title}</CustomH1>}
 
       <Stack
@@ -374,7 +394,7 @@ const RuleAgeSelector = ({
           </>
         )}
       </Stack>
-    </>
+    </div>
   );
 };
 
