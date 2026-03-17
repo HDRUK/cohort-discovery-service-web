@@ -8,10 +8,11 @@ import AddChip from "@/components/AddChip";
 import { AddChipProps } from "@/components/AddChip/AddChip";
 import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
 
-interface AddTimeframeChipProps extends AddChipProps {
+type AddTimeframeChipProps = Omit<AddChipProps, "onClick"> & {
   rule: RuleLeafType;
   hoverKey?: string;
-}
+  onClick?: () => void;
+};
 
 const AddTimeFrameButton = ({ rule, ...props }: AddTimeframeChipProps) => {
   const {

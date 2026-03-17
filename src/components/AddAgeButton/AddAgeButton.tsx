@@ -10,10 +10,11 @@ import AddChip from "@/components/AddChip";
 import { AddChipProps } from "@/components/AddChip/AddChip";
 import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
 
-interface AddAgeChipProps extends AddChipProps {
+type AddAgeChipProps = Omit<AddChipProps, "onClick"> & {
   rule: RuleLeafType;
   hoverKey?: string;
-}
+  onClick?: () => void;
+};
 
 const AddAgeButton = ({ rule, ...props }: AddAgeChipProps) => {
   const {
