@@ -184,6 +184,7 @@ const Guidance = () => {
             key="RuleTimeframeSelector"
             rule={node}
             hoverKey={`rule-timeframe-${node.id}`}
+            disabled={!!node.ageConstraint}
             {...props}
           />
         )
@@ -195,6 +196,7 @@ const Guidance = () => {
           <AddAgeButton
             rule={node}
             hoverKey={`rule-age-${node.id}`}
+            disabled={!!node.timeConstraint}
             {...props}
           />
         )
