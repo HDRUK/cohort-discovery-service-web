@@ -339,38 +339,40 @@ const RuleWrapper = ({
               <CardContent>{render(node, anchorRef)}</CardContent>
             )}
 
-            {isRuleLeaf(node) && type === "Rule" && (
-              <CardActions sx={cardActionsSx}>
-                {node.timeConstraint ? (
-                  <RuleTimeframeSelector
-                    data-testid="rule-timeframe-selector"
-                    rule={node}
-                    readOnly
-                  />
-                ) : (
-                  <AddTimeframeButton
-                    label="Add timeframe"
-                    rule={node}
-                    key="RuleTimeframeSelector"
-                    hoverKey={`rule-timeframe-${node.id}`}
-                  />
-                )}
-                {node.ageConstraint ? (
-                  <RuleAgeSelector
-                    rule={node}
-                    readOnly
-                    uniDirectional={constrainForBunnyV1}
-                  />
-                ) : (
-                  <AddAgeButton
-                    label="Add age"
-                    rule={node}
-                    key="RuleAgeSelector"
-                    hoverKey={`rule-age-${node.id}`}
-                  />
-                )}
-              </CardActions>
-            )}
+            {isRuleLeaf(node) &&
+              type === "Rule" &&
+              (node.timeConstraint || node.ageConstraint || isSelected) && (
+                <CardActions sx={cardActionsSx}>
+                  {node.timeConstraint ? (
+                    <RuleTimeframeSelector
+                      data-testid="rule-timeframe-selector"
+                      rule={node}
+                      readOnly
+                    />
+                  ) : isSelected ? (
+                    <AddTimeframeButton
+                      label="Add timeframe"
+                      rule={node}
+                      key="RuleTimeframeSelector"
+                      hoverKey={`rule-timeframe-${node.id}`}
+                    />
+                  ) : null}
+                  {node.ageConstraint ? (
+                    <RuleAgeSelector
+                      rule={node}
+                      readOnly
+                      uniDirectional={constrainForBunnyV1}
+                    />
+                  ) : isSelected ? (
+                    <AddAgeButton
+                      label="Add age"
+                      rule={node}
+                      key="RuleAgeSelector"
+                      hoverKey={`rule-age-${node.id}`}
+                    />
+                  ) : null}
+                </CardActions>
+              )}
 
             <RightClickMenu {...rightClickMenuMethods} actions={actions} />
             {(type === "Rule" || type === "Group") && (
