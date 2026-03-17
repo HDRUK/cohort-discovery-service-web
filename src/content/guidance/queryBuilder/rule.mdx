@@ -27,9 +27,10 @@
 
 # Rule Parameters
 
-<AddTimeFrameButton label="Add timeframe" />
-
-<AddAgeButton label="Add age" />
+<Box display="flex" flexDirection="column" alignContent="flex-start" gap={1}>
+  <AddTimeFrameButton label="Add timeframe" />
+  <AddAgeButton label="Add age" />
+</Box>
 
 <CollapsibleGuidance keyPrefix="RuleTimeframeSelector" title={props.timeConstraint && `Timeframe of ${props.category} ${props.noun}`}>
   <RuleTimeframeSelector>
