@@ -28,6 +28,7 @@ import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
 import { DatasetErrors } from "@/utils/datasets";
 import { FeatureName } from "@/types/api";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
+import { mapDomain } from "@/utils/domains";
 
 export enum NodeKind {
   RULE = "RULE",
@@ -333,7 +334,7 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     else if (isRuleLeaf(node)) {
       const c = node.rule?.concept;
       const category = Array.isArray(c) ? c[0]?.category : c?.category;
-      name += `${category ?? "Blank"} rule`.trim();
+      name += `${mapDomain(category || "Blank")} rule`.trim();
     } else if (isOperator(node))
       name += `${node.combinator.toUpperCase()} operator`;
     else if (isAgeFilter(node)) name += "Age Filter";
