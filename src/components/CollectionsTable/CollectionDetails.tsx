@@ -46,6 +46,11 @@ const CollectionDetails = ({ pid }: { pid: string }) => {
         header: "ID",
       },
       {
+        accessorKey: "task.id",
+        header: "Task ID",
+        accessorFn: (row) => row.task.id,
+      },
+      {
         accessorKey: "task.completed_at",
         header: "Completed At",
         accessorFn: (row) => getDatetime(row.created_at),
