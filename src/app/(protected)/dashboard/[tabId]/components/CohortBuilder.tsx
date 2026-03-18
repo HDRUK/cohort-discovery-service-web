@@ -8,7 +8,6 @@ import Title from "@/components/Title";
 import { cookies } from "next/headers";
 import { QUERY_BUILDER_GUIDANCE_COOKIE } from "@/config/internals";
 import QueryBuilderGuidanceWrapper from "./QueryBuilderGuidanceWrapper";
-import ShowJsonButton from "@/components/ShowJsonButton";
 import { buildQueryHistoryParams } from "@/utils/params";
 import getQueries from "@/actions/query/getQueries";
 import { DEFAULT_QUERIES_DROPDOWN_PER_PAGE } from "@/config/defaults";
@@ -62,11 +61,6 @@ const CohortBuilder = async (props: { query?: string }) => {
           <CohortQueryPreview />
         </Title>
 
-        <Title title="Cohort Builder" subTitle="Query Rules" marginY={1}>
-          <Box sx={{ ml: "auto" }}>
-            <ShowJsonButton />
-          </Box>
-        </Title>
         <QueryBuilder query={query?.data} />
       </Box>
     </QueryBuilderGuidanceWrapper>
