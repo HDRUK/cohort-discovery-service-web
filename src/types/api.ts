@@ -124,6 +124,7 @@ export interface ModelState {
 export interface ResultFile extends WithTimestamps {
   id: number;
   status: string;
+  file_description: string;
   rows_processed: number;
   task: Task;
 }

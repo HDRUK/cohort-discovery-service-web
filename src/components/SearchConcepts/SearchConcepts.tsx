@@ -140,8 +140,6 @@ const SearchConcepts = ({
     />
   );
 
-  console.log({ nonSyntheticOptions, syntheticOptions });
-
   return (
     <Box>
       <SearchBar

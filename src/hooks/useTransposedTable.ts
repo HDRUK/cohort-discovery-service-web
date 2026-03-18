@@ -7,15 +7,15 @@ export interface TransposedTableRow {
   value: string | number | null;
 }
 
-type FormatterMap<T> = Partial<{
-  [K in keyof T]: (value: T[K], data: T) => string | number | null;
+type FormatterMap<T extends object> = Partial<{
+  [K in keyof T]: (value: T[K], data: T) => TransposedTableRow["value"];
 }>;
 
-type LabelMap<T> = Partial<{
+type LabelMap<T extends object> = Partial<{
   [K in keyof T]: string;
 }>;
 
-interface UseTransposedTableProps<T extends Record<string, any>> {
+interface UseTransposedTableProps<T extends object> {
   data?: T | null;
   include?: (keyof T)[];
   exclude?: (keyof T)[];
@@ -23,7 +23,23 @@ interface UseTransposedTableProps<T extends Record<string, any>> {
   formatters?: FormatterMap<T>;
 }
 
-export function useTransposedTable<T extends Record<string, any>>({
+const toDisplayValue = (value: unknown): TransposedTableRow["value"] => {
+  if (
+    typeof value === "string" ||
+    typeof value === "number" ||
+    value === null
+  ) {
+    return value;
+  }
+
+  if (value === undefined) {
+    return null;
+  }
+
+  return String(value);
+};
+
+export function useTransposedTable<T extends object>({
   data,
   include,
   exclude = [],
@@ -33,19 +49,19 @@ export function useTransposedTable<T extends Record<string, any>>({
   const tableData = useMemo<TransposedTableRow[]>(() => {
     if (!data) return [];
 
-    const keys = (include ?? Object.keys(data)) as (keyof T)[];
+    const keys = (include ?? (Object.keys(data) as (keyof T)[])).filter(
+      (key) => !exclude.includes(key),
+    );
 
-    return keys
-      .filter((key) => !exclude.includes(key))
-      .map((key) => {
-        const rawValue = data[key];
-        const formatter = formatters[key];
+    return keys.map((key) => {
+      const rawValue = data[key];
+      const formatter = formatters[key];
 
-        return {
-          field: labels[key] ?? String(key),
-          value: formatter ? formatter(rawValue, data) : (rawValue ?? null),
-        };
-      });
+      return {
+        field: labels[key] ?? String(key),
+        value: formatter ? formatter(rawValue, data) : toDisplayValue(rawValue),
+      };
+    });
   }, [data, include, exclude, labels, formatters]);
 
   const columns = useMemo<MRT_ColumnDef<TransposedTableRow>[]>(
