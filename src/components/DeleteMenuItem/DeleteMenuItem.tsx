@@ -17,7 +17,11 @@ const DeleteMenuItem = ({ label, action, ...rest }: DeleteMenuItemProps) => {
           sx={{
             justifyContent: "flex-start",
             textAlign: "left",
+            fontWeight: "normal",
             color: "text.primary",
+            "&:hover": {
+              backgroundColor: "text.secondary",
+            },
           }}
           {...rest}
         >
@@ -31,6 +35,9 @@ const DeleteMenuItem = ({ label, action, ...rest }: DeleteMenuItemProps) => {
             textAlign: "left",
             color: "text.primary",
             borderRadius: "100px",
+            "&:hover": {
+              backgroundColor: "text.secondary",
+            },
           }}
         >
           <DeleteIcon />

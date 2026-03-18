@@ -54,6 +54,7 @@ import useHoverable from "@/hooks/useHoverable";
 import AddTimeframeButton from "@/components/AddTimeFrameButton";
 import AddAgeButton from "@/components/AddAgeButton";
 import DeleteAgeButton from "@/components/DeleteAgeButton";
+import DeleteTimeFrameButton from "@/components/DeleteTimeFrameButton";
 
 interface Action {
   action: () => void;
@@ -349,7 +350,14 @@ const RuleWrapper = ({
                       data-testid="rule-timeframe-selector"
                       rule={node}
                       readOnly={!isSelected}
-                    />
+                      flex
+                    >
+                      {isSelected && (
+                        <Box sx={{ ml: 1 }}>
+                          <DeleteTimeFrameButton rule={node} />
+                        </Box>
+                      )}
+                    </RuleTimeframeSelector>
                   ) : isSelected ? (
                     <AddTimeframeButton
                       label="Add timeframe"
@@ -364,6 +372,7 @@ const RuleWrapper = ({
                       rule={node}
                       readOnly={!isSelected}
                       uniDirectional={constrainForBunnyV1}
+                      flex
                     >
                       {isSelected && <DeleteAgeButton rule={node} />}
                     </RuleAgeSelector>

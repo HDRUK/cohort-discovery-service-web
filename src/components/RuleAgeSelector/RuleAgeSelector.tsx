@@ -34,6 +34,7 @@ export interface RuleAgeSelectorProps {
   readOnly?: boolean;
   overrideConstrainForBunny?: boolean;
   uniDirectional?: boolean;
+  flex?: boolean;
 }
 
 export const RuleAgeSelectorReadOnly = ({
@@ -78,6 +79,7 @@ const RuleAgeSelector = ({
   overrideConstrainForBunny = false,
   uniDirectional = false,
   readOnly = false,
+  flex = false,
 }: RuleAgeSelectorProps) => {
   const minAge = MIN_AGE_FILTER;
   const maxAge = MAX_AGE_FILTER;
@@ -207,8 +209,10 @@ const RuleAgeSelector = ({
           setSelected(rule.id);
         }}
         style={{
-          display: "flex",
-          justifyItems: "flex-start",
+          ...(flex && {
+            display: "flex",
+            justifyItems: "flex-start",
+          }),
           backgroundColor: isHighlighted ? theme.palette.grey[300] : "inherit",
           borderRadius: "12px",
           padding: "8px",
@@ -307,6 +311,10 @@ const RuleAgeSelector = ({
         setSelected(rule.id);
       }}
       style={{
+        ...(flex && {
+          display: "flex",
+          justifyItems: "flex-start",
+        }),
         backgroundColor: isHighlighted ? theme.palette.grey[300] : "inherit",
         borderRadius: "12px",
         padding: "8px",

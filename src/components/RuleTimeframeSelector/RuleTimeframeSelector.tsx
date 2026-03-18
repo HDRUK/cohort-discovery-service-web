@@ -18,11 +18,14 @@ import { capitaliseFirstLetter } from "@/utils/string";
 import SingleBoundSelector from "@/components/SingleBoundSelector";
 import DoubleBoundSelector from "@/components/DoubleBoundSelector";
 import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
+import useHoverable from "@/hooks/useHoverable";
+import theme from "@/config/theme";
 
 export interface RuleTimeframeSelectorProps extends DatePickerProps {
   children?: ReactNode;
   rule: RuleLeafType;
   title?: string;
+  flex?: boolean;
 }
 
 const RuleTimeframeSelector = ({
@@ -34,6 +37,7 @@ const RuleTimeframeSelector = ({
   slotProps,
   readOnly,
   open,
+  flex = false,
   ...props
 }: RuleTimeframeSelectorProps) => {
   const {
@@ -41,14 +45,19 @@ const RuleTimeframeSelector = ({
     setQueryBuilderJson,
     setSelectedGuidance,
     selected,
+    setSelected,
   } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
     setSelectedGuidance: qb.setSelectedGuidance,
     selected: qb.selected,
+    setSelected: qb.setSelected,
   }));
 
   const { constrainForBunnyV1 } = useFeatures();
+
+  const hoverKey = `rule-timeframe-${rule.id}`;
+  const { setHoverRef, isHighlighted } = useHoverable<HTMLDivElement>(hoverKey);
 
   const key = collapsibleGuidanceKey("RuleTimeframeSelector", selected);
 
@@ -94,7 +103,23 @@ const RuleTimeframeSelector = ({
 
   if (constrainForBunnyV1) {
     return (
-      <>
+      <div
+        ref={setHoverRef}
+        onClick={(e) => {
+          e.stopPropagation();
+          setSelected(rule.id);
+        }}
+        style={{
+          ...(flex && {
+            display: "flex",
+            justifyItems: "flex-start",
+          }),
+          backgroundColor: isHighlighted ? theme.palette.grey[300] : "inherit",
+          borderRadius: "12px",
+          padding: "8px",
+          transition: "border-color 0.2s",
+        }}
+      >
         {title && <CustomH1>{title}</CustomH1>}
 
         <SingleBoundSelector<string, Dayjs>
@@ -134,12 +159,28 @@ const RuleTimeframeSelector = ({
           }
         />
         {children}
-      </>
+      </div>
     );
   }
 
   return (
-    <>
+    <div
+      ref={setHoverRef}
+      onClick={(e) => {
+        e.stopPropagation();
+        setSelected(rule.id);
+      }}
+      style={{
+        ...(flex && {
+          display: "flex",
+          justifyItems: "flex-start",
+        }),
+        backgroundColor: isHighlighted ? theme.palette.grey[300] : "inherit",
+        borderRadius: "12px",
+        padding: "8px",
+        transition: "border-color 0.2s",
+      }}
+    >
       {title && <CustomH1>{title}</CustomH1>}
       <DoubleBoundSelector
         rule={rule}
@@ -147,7 +188,7 @@ const RuleTimeframeSelector = ({
         guidanceKey={key}
       />
       {children}
-    </>
+    </div>
   );
 };
 
