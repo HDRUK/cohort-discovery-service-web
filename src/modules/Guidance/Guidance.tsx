@@ -39,6 +39,7 @@ import ShowDescendants from "@/content/guidance/components/ShowDescendants";
 import ToggleOperator from "@/content/guidance/components/ToggleOperator";
 import AddButton from "@/components/AddButton";
 import { AddButtonProps } from "@/components/AddButton/AddButton";
+import { AddChipProps } from "@/components/AddChip/AddChip";
 import AddTimeFrameButton from "@/components/AddTimeFrameButton";
 import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
 import { CustomH1, CustomH2 } from "@/components/GuidanceHeaders";
@@ -176,16 +177,31 @@ const Guidance = () => {
       <ToggleExclusion key="ToggleExclusion" node={node} />
     ),
     ShowDescendants: () => <ShowDescendants node={node} />,
-    AddTimeFrameButton: (props: AddButtonProps) =>
-      !node.timeConstraint && (
-        <AddTimeFrameButton
-          key="RuleTimeframeSelector"
-          rule={node}
-          {...props}
-        />
-      ),
-    AddAgeButton: (props: AddButtonProps) =>
-      !node.ageConstraint && <AddAgeButton rule={node} {...props} />,
+    AddTimeFrameButton: (props: AddChipProps) => {
+      return (
+        !node.timeConstraint && (
+          <AddTimeFrameButton
+            key="RuleTimeframeSelector"
+            rule={node}
+            hoverKey={`rule-timeframe-${node.id}`}
+            disabled={!!node.ageConstraint}
+            {...props}
+          />
+        )
+      );
+    },
+    AddAgeButton: (props: AddChipProps) => {
+      return (
+        !node.ageConstraint && (
+          <AddAgeButton
+            rule={node}
+            hoverKey={`rule-age-${node.id}`}
+            disabled={!!node.timeConstraint}
+            {...props}
+          />
+        )
+      );
+    },
     RuleTimeframeSelector: (props: { title: string }) => (
       <RuleTimeframeSelector
         key="RuleTimeframeSelector"

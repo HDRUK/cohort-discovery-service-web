@@ -27,9 +27,10 @@
 
 # Rule Parameters
 
-<AddTimeFrameButton label={`Add timeframe when ${props.category.toLowerCase()} was ${props.verb}`} />
-
-<AddAgeButton label={`Add age of patient when ${props.category.toLowerCase()} was ${props.verb}`} />
+<Box display="flex" flexDirection="column" gap={1} alignItems="flex-start">
+  <AddTimeFrameButton label="Add timeframe" />
+  <AddAgeButton label="Add age" />
+</Box>
 
 <CollapsibleGuidance keyPrefix="RuleTimeframeSelector" title={props.timeConstraint && `Timeframe of ${props.category} ${props.noun}`}>
   <RuleTimeframeSelector>
