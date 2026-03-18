@@ -26,7 +26,7 @@ const AddChip = ({
 }: AddChipProps) => {
   const { compact } = useActionMenuSection();
   const [loading, setLoading] = useState(false);
-  console.log("addchip", label);
+
   const { setHoverRef, isHighlighted } = useHoverable<HTMLDivElement>(hoverKey);
   const handleClick = async (e: React.MouseEvent) => {
     if (loading) return;

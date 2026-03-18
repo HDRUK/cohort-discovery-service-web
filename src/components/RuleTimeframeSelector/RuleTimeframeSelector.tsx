@@ -18,8 +18,7 @@ import { capitaliseFirstLetter } from "@/utils/string";
 import SingleBoundSelector from "@/components/SingleBoundSelector";
 import DoubleBoundSelector from "@/components/DoubleBoundSelector";
 import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
-import useHoverable from "@/hooks/useHoverable";
-import theme from "@/config/theme";
+import HoverableDiv from "@/components/HoverableDiv";
 
 export interface RuleTimeframeSelectorProps extends DatePickerProps {
   children?: ReactNode;
@@ -55,9 +54,6 @@ const RuleTimeframeSelector = ({
   }));
 
   const { constrainForBunnyV1 } = useFeatures();
-
-  const hoverKey = `rule-timeframe-${rule.id}`;
-  const { setHoverRef, isHighlighted } = useHoverable<HTMLDivElement>(hoverKey);
 
   const key = collapsibleGuidanceKey("RuleTimeframeSelector", selected);
 
@@ -103,22 +99,10 @@ const RuleTimeframeSelector = ({
 
   if (constrainForBunnyV1) {
     return (
-      <div
-        ref={setHoverRef}
-        onClick={(e) => {
-          e.stopPropagation();
-          setSelected(rule.id);
-        }}
-        style={{
-          ...(flex && {
-            display: "flex",
-            justifyItems: "flex-start",
-          }),
-          backgroundColor: isHighlighted ? theme.palette.grey[300] : "inherit",
-          borderRadius: "12px",
-          padding: "8px",
-          transition: "border-color 0.2s",
-        }}
+      <HoverableDiv
+        hoverKey={`rule-timeframe-${rule.id}`}
+        onClick={() => setSelected(rule.id)}
+        flex={flex}
       >
         {title && <CustomH1>{title}</CustomH1>}
 
@@ -159,27 +143,15 @@ const RuleTimeframeSelector = ({
           }
         />
         {children}
-      </div>
+      </HoverableDiv>
     );
   }
 
   return (
-    <div
-      ref={setHoverRef}
-      onClick={(e) => {
-        e.stopPropagation();
-        setSelected(rule.id);
-      }}
-      style={{
-        ...(flex && {
-          display: "flex",
-          justifyItems: "flex-start",
-        }),
-        backgroundColor: isHighlighted ? theme.palette.grey[300] : "inherit",
-        borderRadius: "12px",
-        padding: "8px",
-        transition: "border-color 0.2s",
-      }}
+    <HoverableDiv
+      hoverKey={`rule-timeframe-${rule.id}`}
+      onClick={() => setSelected(rule.id)}
+      flex={flex}
     >
       {title && <CustomH1>{title}</CustomH1>}
       <DoubleBoundSelector
@@ -188,7 +160,7 @@ const RuleTimeframeSelector = ({
         guidanceKey={key}
       />
       {children}
-    </div>
+    </HoverableDiv>
   );
 };
 

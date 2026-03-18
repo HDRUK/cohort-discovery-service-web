@@ -24,8 +24,7 @@ import SingleBoundSelector, {
 } from "@/components/SingleBoundSelector";
 import { clamp } from "@/utils/numbers";
 import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
-import useHoverable from "@/hooks/useHoverable";
-import theme from "@/config/theme";
+import HoverableDiv from "@/components/HoverableDiv";
 
 export interface RuleAgeSelectorProps {
   children?: ReactNode;
@@ -100,9 +99,6 @@ const RuleAgeSelector = ({
 
   const flags = useFeatures();
   const { constrainForBunnyV1 } = flags;
-
-  const hoverKey = `rule-age-${rule.id}`;
-  const { setHoverRef, isHighlighted } = useHoverable<HTMLDivElement>(hoverKey);
 
   const values = isRuleLeaf(rule) ? rule.ageConstraint : rule.value;
 
@@ -202,22 +198,10 @@ const RuleAgeSelector = ({
 
   if (constrainForBunnyV1 && !overrideConstrainForBunny) {
     return (
-      <div
-        ref={setHoverRef}
-        onClick={(e) => {
-          e.stopPropagation();
-          setSelected(rule.id);
-        }}
-        style={{
-          ...(flex && {
-            display: "flex",
-            justifyItems: "flex-start",
-          }),
-          backgroundColor: isHighlighted ? theme.palette.grey[300] : "inherit",
-          borderRadius: "12px",
-          padding: "8px",
-          transition: "border-color 0.2s",
-        }}
+      <HoverableDiv
+        hoverKey={`rule-age-${rule.id}`}
+        onClick={() => setSelected(rule.id)}
+        flex={flex}
       >
         {title && <CustomH1>{title}</CustomH1>}
 
@@ -299,27 +283,15 @@ const RuleAgeSelector = ({
           )}
         />
         {children}
-      </div>
+      </HoverableDiv>
     );
   }
 
   return (
-    <div
-      ref={setHoverRef}
-      onClick={(e) => {
-        e.stopPropagation();
-        setSelected(rule.id);
-      }}
-      style={{
-        ...(flex && {
-          display: "flex",
-          justifyItems: "flex-start",
-        }),
-        backgroundColor: isHighlighted ? theme.palette.grey[300] : "inherit",
-        borderRadius: "12px",
-        padding: "8px",
-        transition: "border-color 0.2s",
-      }}
+    <HoverableDiv
+      hoverKey={`rule-age-${rule.id}`}
+      onClick={() => setSelected(rule.id)}
+      flex={flex}
     >
       {title && <CustomH1>{title}</CustomH1>}
 
@@ -415,7 +387,7 @@ const RuleAgeSelector = ({
           </>
         )}
       </Stack>
-    </div>
+    </HoverableDiv>
   );
 };
 
