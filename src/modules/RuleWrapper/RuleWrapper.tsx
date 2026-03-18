@@ -44,6 +44,7 @@ import { mergeSx } from "@/utils/helpers";
 import RuleAgeSelector from "@/components/RuleAgeSelector";
 import {
   isAgeFilter,
+  isEmptyRule,
   isRuleGroup,
   isRuleLeaf,
   removeById,
@@ -343,6 +344,7 @@ const RuleWrapper = ({
 
             {isRuleLeaf(node) &&
               type === "Rule" &&
+              !isEmptyRule(node) &&
               (node.timeConstraint || node.ageConstraint || isSelected) && (
                 <CardActions sx={cardActionsSx}>
                   {node.timeConstraint ? (
