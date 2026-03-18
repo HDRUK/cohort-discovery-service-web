@@ -137,13 +137,7 @@ export interface Collection extends WithTimestamps {
   url: UrlString | null;
   type: QueryContext;
   last_active: string | null;
-  //latest_demographic?: Distribution;
-  //latest_concept?: Distribution;
   demographics?: Distribution[];
-  //latest_concept_task?: Task;
-  //latest_demographic_task?: Task;
-  //latest_successful_concept_task?: Task;
-  //latest_successful_demographic_task?: Task;
   latest_successful_demographic_result_file?: ResultFile | null;
   latest_successful_concept_result_file?: ResultFile | null;
 
