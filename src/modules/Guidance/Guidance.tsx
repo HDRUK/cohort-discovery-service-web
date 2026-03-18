@@ -340,6 +340,11 @@ const Guidance = () => {
             timeConstraint={selectedNode?.timeConstraint}
             ageConstraint={selectedNode?.ageConstraint}
             components={makeRuleComponents(selectedNode)}
+            showSelectors={
+              !["Gender", "Race"].includes(
+                selectedNode.rule.concept?.category || "",
+              )
+            }
           />
         </ActionMenuSection>
       );
