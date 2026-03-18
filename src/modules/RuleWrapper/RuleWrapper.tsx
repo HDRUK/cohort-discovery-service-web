@@ -394,7 +394,11 @@ const RuleWrapper = ({
             {(type === "Rule" || type === "Group") && (
               <>
                 {showFooter && <Divider variant="fullWidth" />}
-                <Box minHeight={type === "Rule" && isSelected ? 40 : 0}>
+                <Box
+                  minHeight={
+                    type === "Rule" && isSelected && !isAgeFilter(node) ? 40 : 0
+                  }
+                >
                   {!valid && (
                     <InvalidRule
                       reasons={invalidReason ?? []}
