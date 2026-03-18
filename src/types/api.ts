@@ -121,6 +121,13 @@ export interface ModelState {
   updated_at: string | null;
 }
 
+export interface ResultFile extends WithTimestamps {
+  id: number;
+  status: string;
+  rows_processed: number;
+  task: Task;
+}
+
 export interface Collection extends WithTimestamps {
   id: number;
   name: string;
@@ -132,8 +139,13 @@ export interface Collection extends WithTimestamps {
   //latest_demographic?: Distribution;
   //latest_concept?: Distribution;
   demographics?: Distribution[];
-  latest_concept_task?: Task;
-  latest_demographic_task?: Task;
+  //latest_concept_task?: Task;
+  //latest_demographic_task?: Task;
+  //latest_successful_concept_task?: Task;
+  //latest_successful_demographic_task?: Task;
+  latest_successful_demographic_result_file?: ResultFile | null;
+  latest_successful_concept_result_file?: ResultFile | null;
+
   n_concepts?: number;
   custodian: Custodian;
   custodian_id?: number;
@@ -154,6 +166,12 @@ export interface CollectionWithHosts extends Collection {
   host: CollectionHost[];
   config: CollectionConfig;
   workgroups?: Workgroup[];
+}
+
+export interface CollectionDetails extends WithTimestamps {
+  nconcepts: number;
+  demographics: Distribution[];
+  result_files: ResultFile[];
 }
 
 export interface Network extends WithTimestamps {
