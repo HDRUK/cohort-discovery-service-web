@@ -146,14 +146,19 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
                   <ConceptChip
                     indicateIfParent={showDescendants}
                     concept={concept}
-                    onDelete={() => clearConcept()}
+                    onDelete={(e: React.MouseEvent) => {
+                      e.stopPropagation();
+                      clearConcept();
+                    }}
                     onClick={
                       (concept?.children?.length ?? 0) > 0
                         ? (e: React.MouseEvent) => {
                             e.stopPropagation();
                             toggleShowDescendants();
                           }
-                        : undefined
+                        : (e: React.MouseEvent) => {
+                            e.stopPropagation();
+                          }
                     }
                   />
                   {showDescendants &&
