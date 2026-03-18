@@ -1,28 +1,19 @@
 "use client";
 
-import {
-  Collection,
-  CollectionStatus,
-  CollectionWithHosts,
-  Paginated,
-} from "@/types/api";
+import { Collection, CollectionStatus } from "@/types/api";
 import {
   MRT_RowSelectionState,
   type MRT_ColumnDef,
 } from "material-react-table";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Stack, Tooltip, Typography } from "@mui/material";
+import { Paper, Stack, Typography } from "@mui/material";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import Table from "@/components/Table";
 import CopyableVariable from "../CopyableVariable";
 import useSearchParams from "@/hooks/useSearchParams";
 import { capitaliseFirstLetter } from "@/utils/string";
 import { getDatetime } from "@/utils/date";
-import { formatNumber, trueKeys } from "@/utils/numbers";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import getCustodianCollections from "@/actions/collection/getCustodianCollections";
-import getAdminCollections from "@/actions/collection/getAdminCollections";
-import { isEqualTask } from "@/utils/distributions";
+import { trueKeys } from "@/utils/numbers";
 import { useLogDependencyChanges } from "@/utils/deps";
 import useAdminStore from "@/hooks/useAdminStore";
 import useCustodianStore from "@/hooks/useCustodianStore";
@@ -32,15 +23,14 @@ import {
   getTagCustodianCollection,
   TAG_COLLECTIONS_ADMIN,
 } from "@/config/tags";
-import { buildCollectionParams } from "@/utils/params";
 import StatusChip from "@/components/StatusChip";
 import { TableProps } from "../Table/Table";
-import { useDefaults } from "@/providers/DefaultProvider";
 import SyntheticChip from "../SyntheticChip";
+import CollectionDetails from "./CollectionDetails";
+import usePrefetchCollectionDetails from "./usePrefetchCollectionDetails";
 
 export interface CollectionsTableProps extends TableProps {
   showPid?: boolean;
-  refreshRate?: number;
   tableTitle?: string;
   tableSubTitle?: string;
   deleteOverride?: (ids: string[]) => Promise<void>;
@@ -48,13 +38,11 @@ export interface CollectionsTableProps extends TableProps {
 
 const CollectionsTable = ({
   showPid = false,
-  refreshRate = 5,
   tableTitle,
   tableSubTitle,
   deleteOverride,
   ...rest
 }: CollectionsTableProps) => {
-  const defaults = useDefaults();
   const { searchParams, getSearchParam } = useSearchParams("collection_filter");
   const filter_name = getSearchParam() || "all";
 
@@ -70,87 +58,10 @@ const CollectionsTable = ({
   const adminCollections = useAdminStore((s) => s.collections);
   const custodianCollections = useCustodianStore((s) => s.current.collections);
 
-  // initial data is fetch from the store to speed up rendering
-  // - fallsback to client side fetch if we need to refresh
-  // - may need further improvement here as it's still confusing to follow
-  //   where the initial data is set
-  const initialData = isAdmin ? adminCollections : custodianCollections;
+  //rely on server side data only
+  const collections = isAdmin ? adminCollections : custodianCollections;
 
   const notify = useNotify();
-
-  const queryKey = useMemo(
-    () => [
-      `collections-${
-        currentCustodian?.pid ? currentCustodian.pid : "admin"
-      }-${searchParams.toString()}`,
-    ],
-    [searchParams, currentCustodian],
-  );
-  const qc = useQueryClient();
-  const { data: collections } = useQuery<Paginated<CollectionWithHosts>>({
-    queryKey,
-    queryFn: async () => {
-      const workgroupFilter =
-        searchParams?.get("workgroup_filter") ?? undefined;
-      const searchTerm = searchParams?.get("search_term") ?? undefined;
-
-      const collectionFilter =
-        searchParams?.get("collection_filter") ?? undefined;
-
-      const collectionParams = {
-        page: Number(searchParams?.get("page")) ?? initialData.current_page,
-        per_page: Number(searchParams?.get("per_page")) ?? initialData.per_page,
-        ...(workgroupFilter
-          ? { workgroup_filter: Number(workgroupFilter) }
-          : {}),
-        ...(searchTerm ? { search_term: searchTerm } : {}),
-        ...(collectionFilter ? { collection_filter: collectionFilter } : {}),
-      };
-
-      const params = buildCollectionParams(collectionParams).toString();
-
-      const res =
-        currentCustodian?.pid && !isAdmin
-          ? await getCustodianCollections(currentCustodian.pid, {
-              params,
-              cacheOptions: {
-                useCache: false,
-              },
-            })
-          : await getAdminCollections({
-              params,
-              cacheOptions: {
-                useCache: false,
-              },
-            });
-      return res.data;
-    },
-    initialData,
-    staleTime: 2 * refreshRate * defaults.tableRefresh,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    refetchInterval: (query) => {
-      const data = query.state.data;
-      if (data?.total === 0) return false;
-
-      const runningCollections =
-        data?.data.filter(
-          (c) =>
-            !isEqualTask(
-              c?.latest_demographic_task,
-              c.latest_demographic?.task,
-            ) || !isEqualTask(c?.latest_concept_task, c.latest_concept?.task),
-        ) ?? [];
-
-      const hasIncomplete = runningCollections?.length > 0;
-      return hasIncomplete ? refreshRate * defaults.tableRefresh : false;
-    },
-  });
-
-  useEffect(() => {
-    qc.setQueryData(queryKey, initialData);
-  }, [qc, queryKey, initialData]);
 
   const selectedCollectionIds = useMemo(
     () => trueKeys(rowSelection ?? {}),
@@ -225,42 +136,32 @@ const CollectionsTable = ({
         id: "last_demographic",
         header: "Last Distribution Demographics",
         accessorFn: (row) =>
-          row.latest_demographic?.task
-            ? getDatetime(row.latest_demographic.created_at)
+          row.latest_successful_demographic_result_file?.updated_at
+            ? getDatetime(
+                row.latest_successful_demographic_result_file.updated_at,
+              )
             : "—",
         size: 50,
         minSize: 50,
         maxSize: 50,
-        Cell: ({ cell, row }) => {
-          const counts = row.original.n_concepts || "-";
+        Cell: ({ cell }) => {
           const date = cell.getValue<string>();
-          return (
-            <Tooltip title={`Number of concepts = ${counts}`}>
-              <Typography>{date}</Typography>
-            </Tooltip>
-          );
+          return <Typography>{date}</Typography>;
         },
       },
       {
         id: "last_concept",
         header: "Last Distribution Concepts",
         accessorFn: (row) =>
-          row.latest_concept?.created_at
-            ? getDatetime(row.latest_concept.created_at)
+          row.latest_successful_concept_result_file?.updated_at
+            ? getDatetime(row.latest_successful_concept_result_file.updated_at)
             : "—",
         size: 50,
         minSize: 50,
         maxSize: 50,
-        Cell: ({ cell, row }) => {
-          const counts = formatNumber(
-            row.original?.latest_demographic?.count ?? 0,
-          );
+        Cell: ({ cell }) => {
           const date = cell.getValue<string>();
-          return (
-            <Tooltip title={`Number of studies = ${counts}`}>
-              <Typography>{date}</Typography>
-            </Tooltip>
-          );
+          return <Typography>{date}</Typography>;
         },
       },
       {
@@ -284,7 +185,9 @@ const CollectionsTable = ({
     [showPid],
   );
 
-  const table = usePaginatedTable({
+  usePrefetchCollectionDetails({ pids: collections.data.map((c) => c.pid) });
+
+  const table = usePaginatedTable<Collection>({
     columns,
     data: collections.data,
     rowCount: collections.total,
@@ -293,6 +196,20 @@ const CollectionsTable = ({
     ...(setRowSelection && { onRowSelectionChange: setRowSelection }),
     ...(rowSelection && { state: { rowSelection } }),
     getRowId: (row) => String(row?.id),
+    ...(isAdmin && {
+      manualExpanding: true,
+      renderDetailPanel: ({ row }) => (
+        <Paper
+          elevation={1}
+          sx={{
+            p: 2,
+            bgcolor: "grey.100",
+          }}
+        >
+          <CollectionDetails pid={row.original.pid} />
+        </Paper>
+      ),
+    }),
   });
 
   const handleDeleteCollections = useCallback(
@@ -324,7 +241,6 @@ const CollectionsTable = ({
   );
 
   useLogDependencyChanges("collectionsTable", {
-    queryKey,
     table,
     filter_name,
     handleDeleteCollections,

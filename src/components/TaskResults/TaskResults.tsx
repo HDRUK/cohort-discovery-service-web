@@ -83,7 +83,7 @@ const TaskResults = ({ tasks }: TaskResultsProps) => {
         id: "coverage",
         header: "Coverage [%]",
         accessorFn: (row) => {
-          const total = row?.collection?.latest_demographic?.count || 0;
+          const total = row?.collection?.n_concepts || 0;
 
           const count = row.result?.count;
 
