@@ -56,6 +56,7 @@ import RuleAgeSelector from "@/components/RuleAgeSelector";
 import DeleteAgeButton from "@/components/DeleteAgeButton";
 import useFeatures from "@/hooks/useFeatures";
 import CollapsibleGuidance from "@/components/CollapsibleGuidance";
+import { mapDomainForGuidance } from "@/utils/domains";
 
 export const baseComponents = {
   a: ({ href, children }: LinkProps) => (
@@ -323,7 +324,12 @@ const Guidance = () => {
       );
 
       return (
-        <ActionMenuSection title={"Rule"} fixedExpanded>
+        <ActionMenuSection
+          title={`${capitaliseFirstLetter(
+            mapDomainForGuidance(selectedNode.rule.concept?.category || ""),
+          )} Rule`}
+          fixedExpanded
+        >
           <RuleGuidance
             category={capitaliseFirstLetter(
               selectedNode.rule.concept?.category || "",
