@@ -150,7 +150,19 @@ const SelectDatasets = () => {
   ).length;
   const noDatasets = nSelected === 0;
 
-  const handleToggleAll = () => alert("yo");
+  const handleToggleAll = () => {
+    const visiblePidList = Array.from(visiblePids);
+
+    if (nSelected > 0) {
+      const next = selectedDatasets.filter((pid) => !visiblePids.has(pid));
+      setSelectedDatasets(next);
+    } else {
+      const next = Array.from(
+        new Set([...selectedDatasets, ...visiblePidList]),
+      );
+      setSelectedDatasets(next);
+    }
+  };
 
   return (
     <Collapse in={open} timeout={300}>
