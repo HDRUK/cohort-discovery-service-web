@@ -332,7 +332,7 @@ const Guidance = () => {
         >
           <RuleGuidance
             category={capitaliseFirstLetter(
-              selectedNode.rule.concept?.category || "",
+              mapDomainForGuidance(selectedNode.rule.concept?.category || ""),
             )}
             verb={verb}
             verbPastTense={verbPastTense}
