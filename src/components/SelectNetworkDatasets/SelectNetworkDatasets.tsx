@@ -50,13 +50,7 @@ const SelectNetworkDatasets = ({
       disableGutters
       elevation={1}
       square
-      sx={{
-        bgcolor: "white",
-        m: 2,
-        border: 1,
-        borderRadius: 1,
-        borderColor: "lightgrey",
-      }}
+      sx={{ bgcolor: "white", mb: 1 }}
     >
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Title

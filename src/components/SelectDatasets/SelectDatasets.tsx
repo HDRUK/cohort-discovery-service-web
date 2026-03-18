@@ -10,7 +10,6 @@ import {
   Box,
   Button,
   Stack,
-  Accordion,
 } from "@mui/material";
 import { useEffect, useMemo, useRef } from "react";
 import Title from "../Title";
@@ -24,8 +23,6 @@ import ToggleAction from "../ToggleAction";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import { useUserDataStore } from "@/hooks/userDataStore";
-import SquareCheckbox from "../SquareCheckbox";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const SelectDatasets = () => {
   const collections = useUserDataStore((s) => s.userCollections);
@@ -150,20 +147,6 @@ const SelectDatasets = () => {
   ).length;
   const noDatasets = nSelected === 0;
 
-  const handleToggleAll = () => {
-    const visiblePidList = Array.from(visiblePids);
-
-    if (nSelected > 0) {
-      const next = selectedDatasets.filter((pid) => !visiblePids.has(pid));
-      setSelectedDatasets(next);
-    } else {
-      const next = Array.from(
-        new Set([...selectedDatasets, ...visiblePidList]),
-      );
-      setSelectedDatasets(next);
-    }
-  };
-
   return (
     <Collapse in={open} timeout={300}>
       <Paper
@@ -171,39 +154,25 @@ const SelectDatasets = () => {
           my: 2,
           bgcolor: "white",
           mb: 1000,
-          border: 1,
-          borderColor: "white",
         }}
       >
-        <Stack direction="row" gap={1} padding={1} marginX={2}>
-          <ToggleAction
-            size={25}
-            active={includeSynthetic}
-            onToggle={handleToggleIncludeSynthetic}
-            activeIcon={CheckIcon}
-            inactiveIcon={CloseIcon}
-          />
-          <Title
-            title="Include"
-            subTitle={"Synthetic Data Collections"}
-            useSeparator={false}
-          />
-        </Stack>
+        <AccordionSummary>
+          <Stack gap={3} width="100%">
+            <Stack direction="row" gap={1}>
+              <ToggleAction
+                size={25}
+                active={includeSynthetic}
+                onToggle={handleToggleIncludeSynthetic}
+                activeIcon={CheckIcon}
+                inactiveIcon={CloseIcon}
+              />
+              <Title
+                title="Include"
+                subTitle={"Synthetic Data Collections"}
+                useSeparator={false}
+              />
+            </Stack>
 
-        <Accordion
-          defaultExpanded
-          disableGutters
-          elevation={1}
-          square
-          sx={{
-            bgcolor: "white",
-            m: 2,
-            border: 1,
-            borderRadius: 1,
-            borderColor: "lightgrey",
-          }}
-        >
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Title
               title="All Collections"
               subTitle={`${nSelected}/${nTotal} Collections Selected`}
@@ -213,72 +182,63 @@ const SelectDatasets = () => {
                 justifyContent: "space-between",
                 width: "100%",
               }}
-              startIcon={
-                <SquareCheckbox
-                  checked={nSelected > 0}
-                  indeterminate={nSelected > 0 && nSelected !== nTotal}
-                  onChange={() => {
-                    handleToggleAll();
-                  }}
-                />
-              }
             >
               <RefreshButton component="div" tag={TAG_COLLECTIONS} />
             </Title>
-          </AccordionSummary>
-          <AccordionDetails
-            sx={{
-              p: 0,
-              display: "flex",
-              flexDirection: "column",
-              gap: 0.5,
-              mb: 2,
-            }}
-          >
-            {networkGroups.map((ng) => (
-              <SelectNetworkDatasets
-                key={ng.network?.id ?? "no-network"}
-                networkCollections={ng}
-              />
-            ))}
-          </AccordionDetails>
+          </Stack>
+        </AccordionSummary>
+        <AccordionDetails
+          sx={{
+            p: 0,
+            display: "flex",
+            flexDirection: "column",
+            gap: 0.5,
+            mb: 2,
+          }}
+        >
+          {networkGroups.map((ng) => (
+            <SelectNetworkDatasets
+              key={ng.network?.id ?? "no-network"}
+              networkCollections={ng}
+            />
+          ))}
+        </AccordionDetails>
 
-          <Paper>
-            <Box
-              display="flex"
-              flexDirection="row"
-              justifyContent="space-between"
-              paddingX={3.75}
-              paddingY={2.5}
+        <Paper>
+          <Box
+            display="flex"
+            flexDirection="row"
+            justifyContent="space-between"
+            paddingX={3.75}
+            paddingY={2.5}
+          >
+            <Button
+              variant="contained"
+              sx={{ bgcolor: "white", color: "black", fontWeight: "normal" }}
+              onClick={() => {
+                setSelectedDatasets(previouslySelectedDatasets);
+                setOpen(!open);
+              }}
             >
-              <Button
-                variant="contained"
-                sx={{ bgcolor: "white", color: "black", fontWeight: "normal" }}
-                onClick={() => {
-                  setSelectedDatasets(previouslySelectedDatasets);
-                  setOpen(!open);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                disabled={noDatasets}
-                variant="contained"
-                sx={{
-                  bgcolor: "secondary.main",
-                  color: "white",
-                  fontWeight: "normal",
-                }}
-                onClick={() => {
-                  setPreviouslySelectedDatasets(selectedDatasets);
-                  setOpen(!open);
-                }}
-              >
-                Save and Close
-              </Button>
-            </Box>
-          </Paper>
-        </Accordion>
+              Cancel
+            </Button>
+            <Button
+              disabled={noDatasets}
+              variant="contained"
+              sx={{
+                bgcolor: "secondary.main",
+                color: "white",
+                fontWeight: "normal",
+              }}
+              onClick={() => {
+                setPreviouslySelectedDatasets(selectedDatasets);
+                setOpen(!open);
+              }}
+            >
+              Save and Close
+            </Button>
+          </Box>
+        </Paper>
       </Paper>
     </Collapse>
   );
