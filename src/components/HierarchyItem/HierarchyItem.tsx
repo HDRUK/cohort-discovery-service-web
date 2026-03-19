@@ -22,12 +22,14 @@ type HierarchyItemProps = {
   node: RuleNodeType;
   groupId: string;
   depth?: number;
+  selectedIsGroup?: boolean;
 };
 
 export const HierarchyItem = ({
   node,
   groupId,
   depth = 0,
+  selectedIsGroup = false,
 }: HierarchyItemProps) => {
   const {
     select,
@@ -110,6 +112,7 @@ export const HierarchyItem = ({
         depth,
         selected[node.id],
         isHighlighted,
+        isOver && (isGroup || depth > 0) && selectedIsGroup,
       )}
     >
       <SquareRadio
@@ -178,6 +181,7 @@ export const HierarchyItem = ({
                     node={child}
                     groupId={node.id}
                     depth={depth + INDENT_STEP}
+                    selectedIsGroup={selectedIsGroup}
                   />
                 ))}
             </SortableContext>
