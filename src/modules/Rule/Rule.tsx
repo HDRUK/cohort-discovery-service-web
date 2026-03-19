@@ -3,7 +3,7 @@ import SearchConcepts from "@/components/SearchConcepts";
 import { Concept } from "@/types/api";
 import { useCallback } from "react";
 import ConceptChip from "@/components/ConceptChip";
-import { RuleLeafType } from "@/types/rules";
+import { RuleLeafType, SingleSidedOperator } from "@/types/rules";
 
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import {
@@ -82,6 +82,10 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
           return {
             ...node,
             rule: { ...node.rule, concept: null },
+            ageConstraint: undefined,
+            ageConstraintOperator: SingleSidedOperator.GREATER_THAN,
+            timeConstraint: undefined,
+            timeConstraintOperator: SingleSidedOperator.GREATER_THAN,
           };
         }
         return node;
@@ -142,14 +146,19 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
                   <ConceptChip
                     indicateIfParent={showDescendants}
                     concept={concept}
-                    onDelete={() => clearConcept()}
+                    onDelete={(e: React.MouseEvent) => {
+                      e.stopPropagation();
+                      clearConcept();
+                    }}
                     onClick={
                       (concept?.children?.length ?? 0) > 0
                         ? (e: React.MouseEvent) => {
                             e.stopPropagation();
                             toggleShowDescendants();
                           }
-                        : undefined
+                        : (e: React.MouseEvent) => {
+                            e.stopPropagation();
+                          }
                     }
                   />
                   {showDescendants &&
