@@ -1,7 +1,7 @@
 "use client";
 
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import { Collection, GroupedCollection, Network } from "../../types/api";
+import { GroupedCollection, Network } from "@/types/api";
 import {
   AccordionSummary,
   AccordionDetails,
@@ -58,32 +58,15 @@ const SelectDatasets = () => {
     }
   }, [selectedDatasets, initialSelection, setSelectedDatasets]);
 
-  const visibleCollections = useMemo(() => {
-    return includeSynthetic
-      ? collections
-      : collections.filter((c) => !c.is_synthetic);
-  }, [collections, includeSynthetic]);
-
-  const visiblePids = useMemo(() => {
-    return new Set(visibleCollections.map((c) => c.pid));
-  }, [visibleCollections]);
-
-  useEffect(() => {
-    const filtered = selectedDatasets.filter((pid) => visiblePids.has(pid));
-    if (filtered.length !== selectedDatasets.length) {
-      setSelectedDatasets(filtered);
-    }
-  }, [selectedDatasets, visiblePids, setSelectedDatasets]);
-
   const custodianGroups = useMemo(() => {
     return Object.values(
-      visibleCollections.reduce<Record<number, GroupedCollection>>((acc, c) => {
+      collections.reduce<Record<number, GroupedCollection>>((acc, c) => {
         const { custodian } = c;
         (acc[custodian.id] ??= { custodian, items: [] }).items.push(c);
         return acc;
       }, {}),
     );
-  }, [visibleCollections]);
+  }, [collections]);
 
   const networkGroups: NetworkGroupedCollections[] = useMemo(() => {
     return Object.values(
@@ -106,45 +89,26 @@ const SelectDatasets = () => {
 
   const handleToggleIncludeSynthetic = () => {
     if (!includeSynthetic) {
-      const selectedSet = new Set(selectedDatasets);
-
-      const custodiansById = collections.reduce<Record<number, Collection[]>>(
-        (acc, c) => {
-          (acc[c.custodian.id] ??= []).push(c);
-          return acc;
-        },
-        {},
-      );
-
-      const syntheticToAdd: string[] = [];
-
-      Object.values(custodiansById).forEach((custodianCollections) => {
-        const nonSynthetic = custodianCollections.filter(
-          (c) => !c.is_synthetic,
-        );
-        const synthetic = custodianCollections.filter((c) => c.is_synthetic);
-
-        const fullySelected =
-          nonSynthetic.length > 0 &&
-          nonSynthetic.every((c) => selectedSet.has(c.pid));
-
-        if (fullySelected) {
-          syntheticToAdd.push(...synthetic.map((c) => c.pid));
-        }
-      });
+      const syntheticsToAdd = collections
+        .filter((c) => c.is_synthetic)
+        .map((c) => c.pid);
 
       setSelectedDatasets(
-        Array.from(new Set([...selectedDatasets, ...syntheticToAdd])),
+        Array.from(new Set([...selectedDatasets, ...syntheticsToAdd])),
+      );
+    } else {
+      setSelectedDatasets(
+        collections
+          .filter((c) => selectedDatasets.includes(c.pid) && !c.is_synthetic)
+          .map((c) => c.pid),
       );
     }
 
     setIncludeSynthetic(!includeSynthetic);
   };
 
-  const nTotal = visibleCollections.length;
-  const nSelected = selectedDatasets.filter((pid) =>
-    visiblePids.has(pid),
-  ).length;
+  const nTotal = collections.length;
+  const nSelected = selectedDatasets.length;
   const noDatasets = nSelected === 0;
 
   return (
