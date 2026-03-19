@@ -174,6 +174,7 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
 
   searchForConcepts: async (searchTerm, domain) => {
     const { data } = await getConcepts(searchTerm, domain);
+    console.log({ data });
     return data;
   },
 

@@ -42,6 +42,7 @@ const SearchConcepts = ({
   slotProps,
   multiple = false,
 }: SearchConceptsProps) => {
+  const [isLoading, setIsLoading] = useState(false);
   const searchForConcepts = useUserStore((s) => s.searchForConcepts);
   const includeSynthetic = useQueryBuilder((s) => s.includeSynthetic);
 
@@ -82,12 +83,13 @@ const SearchConcepts = ({
       lastQueryRef.current = trimmedValue;
 
       if (!trimmedValue) {
+        setIsLoading(false);
         setNonSyntheticOptions([]);
         setSyntheticOptions([]);
         setNoOptionsFound(false);
         return;
       }
-
+      setIsLoading(true);
       setSelected?.({ ...initialSelectedRef.current });
 
       const { data } = await searchForConcepts(trimmedValue, domain);
@@ -105,12 +107,12 @@ const SearchConcepts = ({
           nonSynthetic.push(o);
         }
       });
-
+      setIsLoading(false);
       setNonSyntheticOptions(nonSynthetic);
       setSyntheticOptions(synthetic);
       setNoOptionsFound(nonSynthetic.length + synthetic.length === 0);
     },
-    [domain, searchForConcepts, setSelected, includeSynthetic],
+    [domain, searchForConcepts, setSelected, setIsLoading, includeSynthetic],
   );
 
   const handleToggle = useCallback(
@@ -143,6 +145,7 @@ const SearchConcepts = ({
   return (
     <Box>
       <SearchBar
+        loading={isLoading}
         onSearch={onSearch}
         filters={
           noOptionsFound ? (
