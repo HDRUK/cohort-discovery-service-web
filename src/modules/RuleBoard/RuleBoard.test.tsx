@@ -15,7 +15,7 @@ describe("QueryBuilder", () => {
         rule: {
           concept: {
             concept_id: 1234,
-            description: "Rule 1234",
+            name: "Rule 1234",
             category: "cat-1",
           },
         },
@@ -29,7 +29,7 @@ describe("QueryBuilder", () => {
         rule: {
           concept: {
             concept_id: 4321,
-            description: "Rule 4321",
+            name: "Rule 4321",
             category: "cat-1",
           },
         },
@@ -84,7 +84,7 @@ describe("QueryBuilder", () => {
         rule: {
           concept: {
             concept_id: 1234,
-            description: "Rule 1234",
+            name: "Rule 1234",
             category: "cat-1",
           },
         },
@@ -94,7 +94,7 @@ describe("QueryBuilder", () => {
         rule: {
           concept: {
             concept_id: 4321,
-            description: "Rule 4321",
+            name: "Rule 4321",
             category: "cat-1",
           },
         },
@@ -118,7 +118,9 @@ describe("QueryBuilder", () => {
           exact: false,
         }),
       ).toBeInTheDocument();
-      expect(scope.queryByTestId("ErrorIcon")).toBeInTheDocument();
+      // Each of the 2 rules should show RULE_NEEDS_OPERATOR and GROUP_NEEDS_OPERATORS,
+      // and the operator should show GROUP_CANNOT_END_WITH_AN_OPERATOR and GROUP_NEEDS_OPERATORS
+      expect(screen.queryAllByTestId("ErrorIcon")).toHaveLength(6);
     });
   });
 });

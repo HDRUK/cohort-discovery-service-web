@@ -17,7 +17,7 @@ import { removeById, updateById } from "@/utils/rules";
 
 const setQueryBuilderJson = jest.fn();
 
-describe("Rule", () => {
+describe("RuleGroup", () => {
   const renderComponent = (
     opArgs: Partial<RuleGroupType> = {},
     rest?: Partial<RuleGroupProps>,
@@ -30,7 +30,7 @@ describe("Rule", () => {
           rule: {
             concept: {
               concept_id: 1234,
-              description: "Rule 1234",
+              name: "Rule 1234",
             },
           },
         },
@@ -43,7 +43,7 @@ describe("Rule", () => {
           rule: {
             concept: {
               concept_id: 4321,
-              description: "Rule 4321",
+              name: "Rule 4321",
             },
           },
         },
@@ -103,12 +103,8 @@ describe("Rule", () => {
   });
 
   it("renders the RuleGroup card correctly when not valid", () => {
-    renderComponent({ valid: false });
-    const groupHeading = screen.getByRole("heading", { name: /group/i });
-    const headerEl = groupHeading.closest(".MuiCardHeader-root") as HTMLElement;
-    expect(headerEl).toBeInTheDocument();
-
-    expect(within(headerEl).queryByTestId("ErrorIcon")).toBeInTheDocument();
+    renderComponent({ valid: false, invalidReason: ["invalid reason 1"] });
+    expect(screen.queryByTestId("ErrorIcon")).toBeInTheDocument();
   });
 
   it("calls setQueryBuilderJson with updated state when actions are triggered", async () => {

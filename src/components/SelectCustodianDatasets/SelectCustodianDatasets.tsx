@@ -15,6 +15,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Title from "@/components/Title";
 import SquareCheckbox from "@/components/SquareCheckbox";
 import usePermissions from "@/hooks/usePermissions";
+import SyntheticChip from "../SyntheticChip";
 
 const SelectCustodianDatasets = ({
   custodianCollections,
@@ -58,7 +59,9 @@ const SelectCustodianDatasets = ({
 
     return (
       <Typography component="span">
+        <SyntheticChip isSynthetic={c.is_synthetic ?? false} sx={{ mr: 1 }} />
         <Typography component="span">{c.name}</Typography>
+
         {showState && (
           <Typography component="span" fontWeight={700}>
             {" "}

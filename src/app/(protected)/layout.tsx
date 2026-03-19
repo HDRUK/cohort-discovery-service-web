@@ -11,6 +11,7 @@ import getFeatureFlags from "@/actions/getFeatureFlags";
 import { isStandalone } from "@/utils/modes";
 import { ErrorMode } from "@/lib/apiClient";
 import getWorkgroups from "@/actions/workgroup/getWorkgroups";
+import getUserCollections from "@/actions/collection/getUserCollections";
 
 const applicationMode = process.env.APPLICATION_MODE;
 
@@ -63,12 +64,14 @@ export default async function ProtectedLayout({
   const { data: flags } = await getFeatureFlags();
   const { data: custodians } = await getCustodians();
   const { data: workgroups } = await getWorkgroups();
+  const { data: collections } = await getUserCollections();
 
   const combinedUser = { ...me, token_user: user } as unknown as CombinedUser;
 
   return (
     <ProtectedPage
       user={combinedUser}
+      collections={collections}
       custodians={custodians}
       workgroups={workgroups}
       featureFlags={flags}

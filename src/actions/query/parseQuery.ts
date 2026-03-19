@@ -6,11 +6,21 @@ import { ApiResponse } from "@/types/api";
 
 interface Payload {
   query: string;
+  ignore_synthetic?: boolean;
+  prefer_non_synthetic?: boolean;
 }
 
-const parseQuery = async (query: string): Promise<ApiResponse<string>> => {
+const parseQuery = async (
+  query: string,
+  options?: {
+    ignoreSynthetic?: boolean;
+    preferNonSynthetic?: boolean;
+  },
+): Promise<ApiResponse<string>> => {
   return await apiPost<ApiResponse<string>, Payload>(API_ROUTES.parseQuery, {
     query,
+    ignore_synthetic: options?.ignoreSynthetic,
+    prefer_non_synthetic: options?.preferNonSynthetic,
   });
 };
 

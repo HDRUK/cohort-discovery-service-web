@@ -9,7 +9,11 @@ import {
 } from "@mui/material";
 import { ReactNode, useMemo, useState } from "react";
 import { isAgeFilter, isRuleLeaf, updateById } from "@/utils/rules";
-import { AgeFilterType, RuleLeafType } from "@/types/rules";
+import {
+  AgeFilterType,
+  RuleLeafType,
+  SingleSidedOperator,
+} from "@/types/rules";
 import { CustomH1 } from "@/components/GuidanceHeaders";
 import { MAX_AGE_FILTER, MIN_AGE_FILTER } from "@/config/rules";
 import useFeatures from "@/hooks/useFeatures";
@@ -194,9 +198,12 @@ const RuleAgeSelector = ({
 
         <SingleBoundSelector<number>
           constraint={ageConstraint}
+          constraintOperator={
+            rule.ageConstraintOperator ?? SingleSidedOperator.GREATER_THAN
+          }
           readOnly={readOnly}
           anyLabel="Any age"
-          onConstraintChange={(next) => {
+          onConstraintChange={(next, nextOperator) => {
             setSelectedGuidance(key, true);
 
             setQueryBuilderJson(
@@ -213,6 +220,7 @@ const RuleAgeSelector = ({
                       left != null && left > minAge ? left : null,
                       right != null && right < maxAge ? right : null,
                     ],
+                    ageConstraintOperator: nextOperator,
                   };
                 }
 

@@ -3,26 +3,19 @@
 import { Box, Divider, Stack } from "@mui/material";
 import QueryBuilder from "@/modules/QueryBuilder";
 import CohortQueryInput from "@/components/CohortQueryInput";
-import SelectDatasets from "@/components/SelectDatasets";
-import getUserCollections from "@/actions/collection/getUserCollections";
-import CohortQueryTitle from "@/components/CohortQueryTitle";
-import FilterDatasets from "@/components/FilterDatasets/FilterDatasets";
 import getQuery from "@/actions/query/getQuery";
 import Title from "@/components/Title";
 import { cookies } from "next/headers";
 import { QUERY_BUILDER_GUIDANCE_COOKIE } from "@/config/internals";
 import QueryBuilderGuidanceWrapper from "./QueryBuilderGuidanceWrapper";
 import ShowJsonButton from "@/components/ShowJsonButton";
-import CohortErrors from "@/components/CohortErrors";
 import { buildQueryHistoryParams } from "@/utils/params";
 import getQueries from "@/actions/query/getQueries";
 import { DEFAULT_QUERIES_DROPDOWN_PER_PAGE } from "@/config/defaults";
-
-const NODE_ENV = process.env?.NODE_ENV;
+import CohortQueryPreview from "@/components/CohortQueryPreview";
+import QueryBuilderHeader from "@/modules/QueryBuilderHeader";
 
 const CohortBuilder = async (props: { query?: string }) => {
-  const collections = await getUserCollections();
-
   const cookieStore = await cookies();
   const query = props.query ? await getQuery(props.query) : null;
 
@@ -36,8 +29,6 @@ const CohortBuilder = async (props: { query?: string }) => {
     params: searchParamsObject,
   });
 
-  const initialSelection = collections.data.map((c) => c.pid);
-
   const cookie = cookieStore?.get(QUERY_BUILDER_GUIDANCE_COOKIE);
 
   return (
@@ -50,20 +41,7 @@ const CohortBuilder = async (props: { query?: string }) => {
         px={2}
         py={1}
       >
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="space-between"
-          spacing={1}
-        >
-          <CohortQueryTitle />
-          <FilterDatasets />
-        </Stack>
-
-        <SelectDatasets
-          initialSelection={initialSelection}
-          collections={collections.data}
-        />
+        <QueryBuilderHeader />
 
         <Stack
           direction="row"
@@ -72,28 +50,22 @@ const CohortBuilder = async (props: { query?: string }) => {
           display={"flex"}
           overflow={"hidden"}
         >
-          <Title
-            marginTop={1.5}
-            title="Cohort Builder"
-            subTitle="Natural Language"
-          />
-
           <Stack direction="column" spacing={1} sx={{ flex: 1, minWidth: 0 }}>
             <CohortQueryInput queries={userQueries.data} />
-            <CohortErrors />
+            <Box sx={{ overflow: "hidden" }}>
+              <Divider />
+            </Box>
           </Stack>
         </Stack>
 
-        <Box sx={{ overflow: "hidden" }}>
-          <Divider />
-        </Box>
+        <Title title="Query" subTitle="Preview" marginY={1}>
+          <CohortQueryPreview />
+        </Title>
 
         <Title title="Cohort Builder" subTitle="Query Rules" marginY={1}>
-          {NODE_ENV === "development" && (
-            <Box sx={{ ml: "auto" }}>
-              <ShowJsonButton />
-            </Box>
-          )}
+          <Box sx={{ ml: "auto" }}>
+            <ShowJsonButton />
+          </Box>
         </Title>
         <QueryBuilder query={query?.data} />
       </Box>

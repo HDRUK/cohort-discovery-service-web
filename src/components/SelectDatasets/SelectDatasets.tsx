@@ -9,8 +9,9 @@ import {
   Paper,
   Box,
   Button,
+  Stack,
 } from "@mui/material";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import Title from "../Title";
 import SelectNetworkDatasets, {
   NetworkGroupedCollections,
@@ -18,31 +19,33 @@ import SelectNetworkDatasets, {
 import RefreshButton from "../RefreshButton";
 import { TAG_COLLECTIONS } from "@/config/tags";
 import { intersection } from "lodash";
+import ToggleAction from "../ToggleAction";
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
+import { useUserDataStore } from "@/hooks/userDataStore";
 
-const SelectDatasets = ({
-  initialSelection,
-  collections,
-}: {
-  initialSelection: string[];
-  collections: Collection[];
-}) => {
-  const {
-    selectedDatasets,
-    setSelectedDatasets,
-    open,
-    setOpen,
-    previouslySelectedDatasets,
-    setPreviouslySelectedDatasets,
-  } = useQueryBuilder((qb) => ({
-    selectedDatasets: qb.selectedDatasets,
-    setSelectedDatasets: qb.setSelectedDatasets,
-    open: qb.openSelectDatasetsPanel,
-    setOpen: qb.setOpenSelectDatasetsPanel,
-    previouslySelectedDatasets: qb.previouslySelectedDatasets,
-    setPreviouslySelectedDatasets: qb.setPreviouslySelectedDatasets,
-  }));
+const SelectDatasets = () => {
+  const collections = useUserDataStore((s) => s.userCollections);
+  const initialSelection = useMemo(
+    () => collections.map((c) => c.pid),
+    [collections],
+  );
 
-  const noDatasets = selectedDatasets?.length === 0;
+  const includeSynthetic = useQueryBuilder((qb) => qb.includeSynthetic);
+  const setIncludeSynthetic = useQueryBuilder((qb) => qb.setIncludeSynthetic);
+
+  const selectedDatasets = useQueryBuilder((qb) => qb.selectedDatasets);
+  const setSelectedDatasets = useQueryBuilder((qb) => qb.setSelectedDatasets);
+
+  const open = useQueryBuilder((qb) => qb.openSelectDatasetsPanel);
+  const setOpen = useQueryBuilder((qb) => qb.setOpenSelectDatasetsPanel);
+
+  const previouslySelectedDatasets = useQueryBuilder(
+    (qb) => qb.previouslySelectedDatasets,
+  );
+  const setPreviouslySelectedDatasets = useQueryBuilder(
+    (qb) => qb.setPreviouslySelectedDatasets,
+  );
 
   const mountedRef = useRef(false);
   useEffect(() => {
@@ -55,33 +58,94 @@ const SelectDatasets = ({
     }
   }, [selectedDatasets, initialSelection, setSelectedDatasets]);
 
-  const custodianGroups = Object.values(
-    collections.reduce<Record<number, GroupedCollection>>((acc, c) => {
-      const { custodian } = c;
-      (acc[custodian.id] ??= { custodian, items: [] }).items.push(c);
-      return acc;
-    }, {}),
-  );
+  const visibleCollections = useMemo(() => {
+    return includeSynthetic
+      ? collections
+      : collections.filter((c) => !c.is_synthetic);
+  }, [collections, includeSynthetic]);
 
-  const networkGroups: NetworkGroupedCollections[] = Object.values(
-    custodianGroups.reduce<Record<string, NetworkGroupedCollections>>(
-      (acc, gc) => {
-        const network: Network | null = gc.custodian.network ?? null;
-        const key = network ? String(network.id) : "no-network";
+  const visiblePids = useMemo(() => {
+    return new Set(visibleCollections.map((c) => c.pid));
+  }, [visibleCollections]);
 
-        if (!acc[key]) {
-          acc[key] = { network, custodians: [] };
-        }
+  useEffect(() => {
+    const filtered = selectedDatasets.filter((pid) => visiblePids.has(pid));
+    if (filtered.length !== selectedDatasets.length) {
+      setSelectedDatasets(filtered);
+    }
+  }, [selectedDatasets, visiblePids, setSelectedDatasets]);
 
-        acc[key].custodians.push(gc);
+  const custodianGroups = useMemo(() => {
+    return Object.values(
+      visibleCollections.reduce<Record<number, GroupedCollection>>((acc, c) => {
+        const { custodian } = c;
+        (acc[custodian.id] ??= { custodian, items: [] }).items.push(c);
         return acc;
-      },
-      {},
-    ),
-  );
+      }, {}),
+    );
+  }, [visibleCollections]);
 
-  const nTotal = collections.length;
-  const nSelected = selectedDatasets.length;
+  const networkGroups: NetworkGroupedCollections[] = useMemo(() => {
+    return Object.values(
+      custodianGroups.reduce<Record<string, NetworkGroupedCollections>>(
+        (acc, gc) => {
+          const network: Network | null = gc.custodian.network ?? null;
+          const key = network ? String(network.id) : "no-network";
+
+          if (!acc[key]) {
+            acc[key] = { network, custodians: [] };
+          }
+
+          acc[key].custodians.push(gc);
+          return acc;
+        },
+        {},
+      ),
+    );
+  }, [custodianGroups]);
+
+  const handleToggleIncludeSynthetic = () => {
+    if (!includeSynthetic) {
+      const selectedSet = new Set(selectedDatasets);
+
+      const custodiansById = collections.reduce<Record<number, Collection[]>>(
+        (acc, c) => {
+          (acc[c.custodian.id] ??= []).push(c);
+          return acc;
+        },
+        {},
+      );
+
+      const syntheticToAdd: string[] = [];
+
+      Object.values(custodiansById).forEach((custodianCollections) => {
+        const nonSynthetic = custodianCollections.filter(
+          (c) => !c.is_synthetic,
+        );
+        const synthetic = custodianCollections.filter((c) => c.is_synthetic);
+
+        const fullySelected =
+          nonSynthetic.length > 0 &&
+          nonSynthetic.every((c) => selectedSet.has(c.pid));
+
+        if (fullySelected) {
+          syntheticToAdd.push(...synthetic.map((c) => c.pid));
+        }
+      });
+
+      setSelectedDatasets(
+        Array.from(new Set([...selectedDatasets, ...syntheticToAdd])),
+      );
+    }
+
+    setIncludeSynthetic(!includeSynthetic);
+  };
+
+  const nTotal = visibleCollections.length;
+  const nSelected = selectedDatasets.filter((pid) =>
+    visiblePids.has(pid),
+  ).length;
+  const noDatasets = nSelected === 0;
 
   return (
     <Collapse in={open} timeout={300}>
@@ -93,18 +157,35 @@ const SelectDatasets = ({
         }}
       >
         <AccordionSummary>
-          <Title
-            title="All Collections"
-            subTitle={`${nSelected}/${nTotal} Collections Selected`}
-            useSeparator={false}
-            wrapperSx={{
-              display: "flex",
-              justifyContent: "space-between",
-              width: "100%",
-            }}
-          >
-            <RefreshButton component="div" tag={TAG_COLLECTIONS} />
-          </Title>
+          <Stack gap={3} width="100%">
+            <Stack direction="row" gap={1}>
+              <ToggleAction
+                size={25}
+                active={includeSynthetic}
+                onToggle={handleToggleIncludeSynthetic}
+                activeIcon={CheckIcon}
+                inactiveIcon={CloseIcon}
+              />
+              <Title
+                title="Include"
+                subTitle={"Synthetic Data Collections"}
+                useSeparator={false}
+              />
+            </Stack>
+
+            <Title
+              title="All Collections"
+              subTitle={`${nSelected}/${nTotal} Collections Selected`}
+              useSeparator={false}
+              wrapperSx={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <RefreshButton component="div" tag={TAG_COLLECTIONS} />
+            </Title>
+          </Stack>
         </AccordionSummary>
         <AccordionDetails
           sx={{

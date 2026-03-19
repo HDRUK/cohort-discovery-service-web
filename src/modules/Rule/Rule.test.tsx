@@ -27,7 +27,7 @@ describe("Rule", () => {
       rule: {
         concept: {
           concept_id: 1234,
-          description: "A test rule",
+          name: "A test rule",
         },
       },
       ...opArgs,
@@ -85,7 +85,10 @@ describe("Rule", () => {
   });
 
   it("renders the Rule card correctly when not valid", () => {
-    renderComponent({ valid: false });
+    renderComponent({
+      valid: false,
+      invalidReason: ["invalid reason 1"],
+    });
     expect(screen.queryByTestId("ErrorIcon")).toBeInTheDocument();
   });
 

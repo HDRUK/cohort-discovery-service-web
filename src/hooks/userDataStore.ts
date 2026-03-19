@@ -26,6 +26,7 @@ import {
   DistributionType,
   CollectionWithHosts,
   Workgroup,
+  Collection,
 } from "@/types/api";
 import {
   TAG_COLLECTIONS_ADMIN,
@@ -38,6 +39,9 @@ import { useCustodianDataStore } from "@/store/custodianDataStore";
 export interface UserDataStoreState {
   user: CombinedUser | undefined | null;
   setUser: (user: CombinedUser | null) => void;
+
+  userCollections: Collection[];
+  setUserCollections: (collections: Collection[]) => void;
 
   custodians: Custodian[];
   setCustodians: (custodians: Custodian[]) => void;
@@ -92,6 +96,13 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
     set((state) => ({
       ...state,
       user,
+    })),
+
+  userCollections: [],
+  setUserCollections: (userCollections) =>
+    set((state) => ({
+      ...state,
+      userCollections,
     })),
 
   custodians: [],

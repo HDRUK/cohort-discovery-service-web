@@ -15,7 +15,6 @@ describe("SelectDatasets", () => {
 
   it("displays datasets", async () => {
     const collections = await getCollections();
-    const initialSelection = collections.data.map((c) => c.pid);
 
     render(
       <MockDaphneStore
@@ -23,12 +22,12 @@ describe("SelectDatasets", () => {
           queryBuilder: {
             openSelectDatasetsPanel: true,
           },
+          user: {
+            userCollections: collections.data,
+          },
         }}
       >
-        <SelectDatasets
-          collections={collections.data}
-          initialSelection={initialSelection}
-        />
+        <SelectDatasets />
       </MockDaphneStore>,
     );
 
@@ -48,12 +47,12 @@ describe("SelectDatasets", () => {
             openSelectDatasetsPanel: true,
             setSelectedDatasets,
           },
+          user: {
+            userCollections: collections.data,
+          },
         }}
       >
-        <SelectDatasets
-          collections={collections.data}
-          initialSelection={initialSelection}
-        />
+        <SelectDatasets />
       </MockDaphneStore>,
     );
     expect(setSelectedDatasets).toHaveBeenLastCalledWith(initialSelection);

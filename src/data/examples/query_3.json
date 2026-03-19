@@ -8,7 +8,6 @@
         "concept": {
           "concept_id": 37311061,
           "name": "COVID-19",
-          "description": "COVID-19",
           "category": "Condition",
           "children": [],
           "match_score": 99.7,
@@ -33,9 +32,8 @@
           "exclude": false,
           "rule": {
             "concept": {
-              "name": "3955320",
               "concept_id": 3955320,
-              "description": "Moderna - SARS-CoV-2 (COVID-19) vaccine",
+              "name": "Moderna - SARS-CoV-2 (COVID-19) vaccine",
               "category": "Drug",
               "children": []
             }
@@ -54,7 +52,6 @@
             "concept": {
               "concept_id": 3955321,
               "name": "Pfizer - SARS-CoV-2 (COVID-19) vaccine",
-              "description": "Pfizer - SARS-CoV-2 (COVID-19) vaccine",
               "category": "Drug",
               "children": [],
               "match_score": 98.2,

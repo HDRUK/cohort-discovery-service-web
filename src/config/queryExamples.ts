@@ -20,7 +20,7 @@ export const NO_QUERY: RuleGroupType = {
       rule: {
         concept: {
           concept_id: 3955322,
-          description:
+          name:
             "Oxford, AstraZeneca - SARS-CoV-2 (COVID-19) vaccine AZD1222",
           category: "Drug",
           children: [],
@@ -45,7 +45,7 @@ export const EXAMPLE_1: RuleGroupType = {
           rule: {
             concept: {
               concept_id: 3955320,
-              description: "Moderna - SARS-CoV-2 (COVID-19) vaccine",
+              name: "Moderna - SARS-CoV-2 (COVID-19) vaccine",
               category: "Drug",
               children: [],
             },
@@ -63,7 +63,7 @@ export const EXAMPLE_1: RuleGroupType = {
           rule: {
             concept: {
               concept_id: 3955321,
-              description: "Pfizer - SARS-CoV-2 (COVID-19) vaccine",
+              name: "Pfizer - SARS-CoV-2 (COVID-19) vaccine",
               category: "Drug",
               children: [],
             },
@@ -83,8 +83,7 @@ export const EXAMPLE_1: RuleGroupType = {
       rule: {
         concept: {
           concept_id: 3955322,
-          description:
-            "Oxford, AstraZeneca - SARS-CoV-2 (COVID-19) vaccine AZD1222",
+          name: "Oxford, AstraZeneca - SARS-CoV-2 (COVID-19) vaccine AZD1222",
           category: "Drug",
           children: [],
         },
@@ -101,8 +100,7 @@ export const EXAMPLE_1: RuleGroupType = {
       rule: {
         concept: {
           concept_id: 3959231,
-          description:
-            "Close contact with confirmed COVID-19 case person/patient",
+          name: "Close contact with confirmed COVID-19 case person/patient",
           category: "Observation",
           children: [],
         },
@@ -120,8 +118,7 @@ export const EXAMPLE_1: RuleGroupType = {
       rule: {
         concept: {
           concept_id: 3955313,
-          description:
-            "SARS-CoV-2 antibody to nucleocapsid (N) protein present",
+          name: "SARS-CoV-2 antibody to nucleocapsid (N) protein present",
           category: "Measurement",
           children: [],
         },
@@ -137,56 +134,52 @@ export const EXAMPLE_1: RuleGroupType = {
       rule: {
         concept: {
           concept_id: 443597,
-          description: "Chronic kidney disease stage 3",
+          name: "Chronic kidney disease stage 3",
           category: "Condition",
           children: [
             {
               concept_id: 601163,
-              description:
-                "Chronic kidney disease stage 3 due to drug induced diabetes mellitus",
+              name: "Chronic kidney disease stage 3 due to drug induced diabetes mellitus",
               category: "Condition",
             },
             {
               concept_id: 37019193,
-              description:
-                "Anemia co-occurrent and due to chronic kidney disease stage 3",
+              name: "Anemia co-occurrent and due to chronic kidney disease stage 3",
               category: "Condition",
             },
             {
               concept_id: 43531653,
-              description:
-                "Chronic kidney disease stage 3 due to type 2 diabetes mellitus",
+              name: "Chronic kidney disease stage 3 due to type 2 diabetes mellitus",
               category: "Condition",
             },
             {
               concept_id: 44782691,
-              description: "Chronic kidney disease stage 3 due to hypertension",
+              name: "Chronic kidney disease stage 3 due to hypertension",
               category: "Condition",
             },
             {
               concept_id: 44792230,
-              description: "Chronic kidney disease stage 3 with proteinuria",
+              name: "Chronic kidney disease stage 3 with proteinuria",
               category: "Condition",
             },
             {
               concept_id: 44792231,
-              description: "Chronic kidney disease stage 3 without proteinuria",
+              name: "Chronic kidney disease stage 3 without proteinuria",
               category: "Condition",
             },
             {
               concept_id: 45763854,
-              description: "Chronic kidney disease stage 3A",
+              name: "Chronic kidney disease stage 3A",
               category: "Condition",
             },
             {
               concept_id: 45763855,
-              description: "Chronic kidney disease stage 3B",
+              name: "Chronic kidney disease stage 3B",
               category: "Condition",
             },
             {
               concept_id: 45771075,
-              description:
-                "Chronic kidney disease stage 3 due to type 1 diabetes mellitus",
+              name: "Chronic kidney disease stage 3 due to type 1 diabetes mellitus",
               category: "Condition",
             },
           ],
@@ -209,7 +202,7 @@ export const EXAMPLE_2 = {
           rule: {
             concept: {
               concept_id: 3955320,
-              description: "Moderna - SARS-CoV-2 (COVID-19) vaccine",
+              name: "Moderna - SARS-CoV-2 (COVID-19) vaccine",
               category: "Drug",
               children: [],
             },
@@ -226,7 +219,7 @@ export const EXAMPLE_2 = {
           rule: {
             concept: {
               concept_id: 3955320,
-              description: "Moderna - SARS-CoV-2 (COVID-19) vaccine",
+              name: "Moderna - SARS-CoV-2 (COVID-19) vaccine",
               category: "Drug",
               children: [],
             },
@@ -245,8 +238,7 @@ export const EXAMPLE_2 = {
       rule: {
         concept: {
           concept_id: 3955322,
-          description:
-            "Oxford, AstraZeneca - SARS-CoV-2 (COVID-19) vaccine AZD1222",
+          name: "Oxford, AstraZeneca - SARS-CoV-2 (COVID-19) vaccine AZD1222",
           category: "Drug",
           children: [],
         },
@@ -263,8 +255,7 @@ export const EXAMPLE_2 = {
       rule: {
         concept: {
           concept_id: 3955322,
-          description:
-            "Oxford, AstraZeneca - SARS-CoV-2 (COVID-19) vaccine AZD1222",
+          name: "Oxford, AstraZeneca - SARS-CoV-2 (COVID-19) vaccine AZD1222",
           category: "Drug",
           children: [],
         },

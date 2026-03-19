@@ -186,18 +186,18 @@ const RuleWrapper = ({
     ],
   );
 
-  const onMouseOver = (e: React.MouseEvent<HTMLDivElement>) => {
+  const onMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     setShowHandle(true);
     setShowDelete(true);
   };
 
   const onMouseLeave = useCallback(() => {
-    if (showHandle && !isDragging && !isSelected) {
+    if (showHandle && !isDragging) {
       setShowHandle(false);
       setShowDelete(false);
     }
-  }, [showHandle, isDragging, isSelected, setShowHandle, setShowDelete]);
+  }, [showHandle, isDragging, setShowHandle, setShowDelete]);
 
   const onCardMouseOver = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
@@ -217,6 +217,10 @@ const RuleWrapper = ({
 
   const nodeName = useMemo(() => getNodeName(node), [node, getNodeName]);
 
+  const showFooter =
+    (type === "Rule" && isSelected && !isAgeFilter(node)) ||
+    (!valid && (invalidReason ?? []).length > 0);
+
   useLogDependencyChanges("wrapper " + node.id, {
     isSelected,
     node,
@@ -225,7 +229,7 @@ const RuleWrapper = ({
     valid,
     handleContextMenu,
     onMouseLeave,
-    onMouseOver,
+    onMouseEnter,
     onCardMouseOver,
     onCardMouseLeave,
     handleOnSelect,
@@ -249,7 +253,7 @@ const RuleWrapper = ({
       ref={setNodeRef}
       style={sortable ? style : {}}
       {...containerProps}
-      onMouseOver={onMouseOver}
+      onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       sx={containerSx(isSelected && !isDragging, containerProps?.sx)}
     >
@@ -320,9 +324,6 @@ const RuleWrapper = ({
                             label={exclude == true ? "Exclude" : "Include"}
                           />
                         )}
-                        {!valid && (
-                          <InvalidRule reasons={invalidReason ?? []} />
-                        )}
                       </Box>
                       <Title
                         size={"small"}
@@ -357,10 +358,17 @@ const RuleWrapper = ({
               )}
 
             <RightClickMenu {...rightClickMenuMethods} actions={actions} />
-            {type === "Rule" && (
+            {(type === "Rule" || type === "Group") && (
               <>
-                <Divider variant="fullWidth" />
-                <Box height={40}></Box>
+                {showFooter && <Divider variant="fullWidth" />}
+                <Box minHeight={type === "Rule" && isSelected ? 40 : 0}>
+                  {!valid && (
+                    <InvalidRule
+                      reasons={invalidReason ?? []}
+                      stackProps={{ sx: { pt: 1, pb: 1 } }}
+                    />
+                  )}
+                </Box>
               </>
             )}
           </Card>

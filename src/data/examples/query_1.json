@@ -6,9 +6,8 @@
       "exclude": false,
       "rule": {
         "concept": {
-          "name": "37311061",
           "concept_id": 37311061,
-          "description": "COVID-19",
+          "name": "COVID-19",
           "category": "Condition",
           "children": []
         }

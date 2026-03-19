@@ -4,10 +4,10 @@ import { Option } from "@/types/common";
 const codesToOption = (codes: Code[]): Option[] =>
   codes
     ?.filter((code) => code.name !== "0")
-    .sort((a, b) => a.description.localeCompare(b.description))
+    .sort((a, b) => a.name.localeCompare(b.name))
     .map((code) => ({
       name: code.name,
-      label: `${code.description} (${code.name}) `,
+      label: `${code.name} (${code.name}) `,
     }));
 
 const getDomainVerbs = (category: string) => {

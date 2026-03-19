@@ -604,7 +604,7 @@ export function validateRuleTree(
         childReasons.forEach((r) => reasonSet.add(r));
       }
     }
-    const reasons = Array.from(reasonSet);
+    const reasons = depth === 0 ? Array.from(reasonSet) : groupReasons;
 
     const invalidReason = groupIsValid ? undefined : reasons;
 
