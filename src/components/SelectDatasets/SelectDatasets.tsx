@@ -167,7 +167,7 @@ const SelectDatasets = () => {
                 inactiveIcon={CloseIcon}
               />
               <Title
-                title="Include"
+                title={includeSynthetic ? "Including" : "Excluding"}
                 subTitle={"Synthetic Data Collections"}
                 useSeparator={false}
               />
