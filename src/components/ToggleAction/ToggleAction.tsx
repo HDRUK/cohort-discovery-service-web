@@ -61,9 +61,7 @@ export const ToggleAction = ({
         <CircularIconButton
           component="div"
           disableRipple
-          onClick={() => {
-            if (active) onToggle();
-          }}
+          onClick={() => onToggle()}
           sx={{
             width: size,
             height: size,
@@ -96,9 +94,7 @@ export const ToggleAction = ({
         <CircularIconButton
           component="div"
           disableRipple
-          onClick={() => {
-            if (!active) onToggle();
-          }}
+          onClick={() => onToggle()}
           sx={{
             width: size,
             height: size,
