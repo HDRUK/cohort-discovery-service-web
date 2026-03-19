@@ -2,19 +2,19 @@
 
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 
-import { updateById } from "@/utils/rules";
-import { isRuleLeaf } from "@/utils/rules";
-
+import { isRuleLeaf, updateById } from "@/utils/rules";
 import { RuleLeafType } from "@/types/rules";
-import AddButton from "@/components/AddButton";
-import { AddButtonProps } from "@/components/AddButton/AddButton";
+import AddChip from "@/components/AddChip";
+import { AddChipProps } from "@/components/AddChip/AddChip";
 import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
 
-interface AddAgeButtonProps extends AddButtonProps {
+type AddTimeframeChipProps = Omit<AddChipProps, "onClick"> & {
   rule: RuleLeafType;
-}
+  hoverKey?: string;
+  onClick?: () => void;
+};
 
-const AddAgeButton = ({ rule, ...props }: AddAgeButtonProps) => {
+const AddTimeFrameButton = ({ rule, ...props }: AddTimeframeChipProps) => {
   const {
     queryBuilderJson,
     setQueryBuilderJson,
@@ -46,7 +46,7 @@ const AddAgeButton = ({ rule, ...props }: AddAgeButtonProps) => {
     );
   };
 
-  return <AddButton {...props} onClick={onClick} />;
+  return <AddChip {...props} onClick={onClick} />;
 };
 
-export default AddAgeButton;
+export default AddTimeFrameButton;

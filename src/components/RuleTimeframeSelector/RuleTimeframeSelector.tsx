@@ -18,11 +18,13 @@ import { capitaliseFirstLetter } from "@/utils/string";
 import SingleBoundSelector from "@/components/SingleBoundSelector";
 import DoubleBoundSelector from "@/components/DoubleBoundSelector";
 import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
+import HoverableDiv from "@/components/HoverableDiv";
 
 export interface RuleTimeframeSelectorProps extends DatePickerProps {
   children?: ReactNode;
   rule: RuleLeafType;
   title?: string;
+  flex?: boolean;
 }
 
 const RuleTimeframeSelector = ({
@@ -34,6 +36,7 @@ const RuleTimeframeSelector = ({
   slotProps,
   readOnly,
   open,
+  flex = false,
   ...props
 }: RuleTimeframeSelectorProps) => {
   const {
@@ -41,11 +44,13 @@ const RuleTimeframeSelector = ({
     setQueryBuilderJson,
     setSelectedGuidance,
     selected,
+    setSelected,
   } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
     setSelectedGuidance: qb.setSelectedGuidance,
     selected: qb.selected,
+    setSelected: qb.setSelected,
   }));
 
   const { constrainForBunnyV1 } = useFeatures();
@@ -94,11 +99,15 @@ const RuleTimeframeSelector = ({
 
   if (constrainForBunnyV1) {
     return (
-      <>
+      <HoverableDiv
+        hoverKey={`rule-timeframe-${rule.id}`}
+        onClick={() => setSelected(rule.id)}
+        flex={flex}
+      >
         {title && <CustomH1>{title}</CustomH1>}
 
         <SingleBoundSelector<string, Dayjs>
-          constraint={rule.timeConstraint}
+          constraint={rule.timeConstraint ?? []}
           constraintOperator={
             rule.timeConstraintOperator ?? SingleSidedOperator.GREATER_THAN
           }
@@ -134,12 +143,16 @@ const RuleTimeframeSelector = ({
           }
         />
         {children}
-      </>
+      </HoverableDiv>
     );
   }
 
   return (
-    <>
+    <HoverableDiv
+      hoverKey={`rule-timeframe-${rule.id}`}
+      onClick={() => setSelected(rule.id)}
+      flex={flex}
+    >
       {title && <CustomH1>{title}</CustomH1>}
       <DoubleBoundSelector
         rule={rule}
@@ -147,7 +160,7 @@ const RuleTimeframeSelector = ({
         guidanceKey={key}
       />
       {children}
-    </>
+    </HoverableDiv>
   );
 };
 

@@ -1,12 +1,10 @@
 {/**
   * @typedef Props
   * @property {string} category
-  * @property {string} verb
-  * @property {string} verbPastTense
-  * @property {string} noun
   *  OMOP domain name
   * @property {[string | null, string | null] | undefined} timeConstraint
   * @property {[number | null, number | null] | undefined} ageConstraint
+  * @property {boolean} showSelectors
   */}
 
 <CollapsibleGuidance keyPrefix="ToggleExclusion" title="Include/Exclude">
@@ -25,29 +23,40 @@
 
 */}
 
-# Rule Parameters
+# {props.showSelectors && <>Rule Parameters</>}
 
-<AddTimeFrameButton label={`Add timeframe when ${props.category.toLowerCase()} was ${props.verb}`} />
+<Box display="flex" flexDirection="column" gap={1} alignItems="flex-start">
+  {props.showSelectors &&
+    <>
+      <AddTimeFrameButton label="Add timeframe" />
+      <AddAgeButton label="Add age" />
+    </>
+  }
+</Box>
 
-<AddAgeButton label={`Add age of patient when ${props.category.toLowerCase()} was ${props.verb}`} />
+<Box>
+  {props.showSelectors &&
+    <>
+      <CollapsibleGuidance keyPrefix="RuleTimeframeSelector" title={props.timeConstraint && `Set Timeframe`}>
+        <RuleTimeframeSelector>
+          <DeleteTimeFrameButton label="Remove timeframe from this rule" />
+        </RuleTimeframeSelector>
+        <Box>
+          Set the timeframe when the {props.category.toLowerCase()} event occurred.
+        </Box>
+      </CollapsibleGuidance>
 
-<CollapsibleGuidance keyPrefix="RuleTimeframeSelector" title={props.timeConstraint && `Timeframe of ${props.category} ${props.noun}`}>
-  <RuleTimeframeSelector>
-    <DeleteTimeFrameButton label="Remove timeframe from this rule" />
-  </RuleTimeframeSelector>
-  <Box>
-    Set the time frame for this rule — the window when the {props.category.toLowerCase()} was {props.verb}.
-  </Box>
-</CollapsibleGuidance>
-
-<CollapsibleGuidance keyPrefix="RuleAgeSelector" title={props.ageConstraint && `Patient Age at ${props.category} ${props.noun}`}>
-  <RuleAgeSelector>
-    <DeleteAgeButton label="Remove age from this rule" />
-  </RuleAgeSelector>
-  <Box>
-    Define the patient age range by selecting an operand and typing in an age value.
-    <Box sx={{ color: "error.main" }}>
-      Age may be rounded ±1 year in some datasets, to either protect patient data or as specific day or month was not recorded.
-    </Box>
-  </Box>
-</CollapsibleGuidance>
+      <CollapsibleGuidance keyPrefix="RuleAgeSelector" title={props.ageConstraint && `Set Age`}>
+        <RuleAgeSelector>
+          <DeleteAgeButton label="Remove age from this rule" />
+        </RuleAgeSelector>
+        <Box>
+          Define the patient's age when the {props.category.toLowerCase()} event occurred.
+          <Box sx={{ color: "error.main" }}>
+            Age may be rounded ±1 year in some datasets, to either protect patient data or as specific day or month was not recorded.
+          </Box>
+        </Box>
+      </CollapsibleGuidance>
+    </>
+  }
+</Box>

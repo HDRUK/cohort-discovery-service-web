@@ -6,7 +6,8 @@ import CohortErrors from "@/modules/CohortErrors";
 import SubmitQueryButton from "@/components/SubmitQueryButton";
 
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import ClearQueryButton from "../ClearQueryButton";
+import ClearQueryButton from "@/components/ClearQueryButton";
+import ShowJsonButton from "@/components/ShowJsonButton";
 
 const CohortQueryPreview = () => {
   const warnings = useQueryBuilder((qb) => qb.queryBuilderJson.warnings ?? []);
@@ -27,6 +28,7 @@ const CohortQueryPreview = () => {
       <Stack gap={1} direction={"row"}>
         <ClearQueryButton />
         <SubmitQueryButton warning={warnings.length > 0} />
+        <ShowJsonButton />
       </Stack>
     </Stack>
   );

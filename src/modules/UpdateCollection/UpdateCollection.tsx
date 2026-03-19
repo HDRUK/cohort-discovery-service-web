@@ -26,7 +26,6 @@ import FormDropdown from "@/components/FormDropdown";
 import DistributionStatus from "../DistributionStatus";
 import useCustodianStore from "@/hooks/useCustodianStore";
 import FormLabel from "@/components/FormLabel";
-import { maskClientTest } from "@/lib/maskClientTest";
 import useAdminStore from "@/hooks/useAdminStore";
 import removeCollectionFromWorkgroups from "@/actions/workgroup/removeCollectionFromWorkgroups";
 import addCollectionToWorkgroups from "@/actions/workgroup/addCollectionToWorkgroups";
@@ -41,10 +40,6 @@ import { useSaveChanges } from "@/hooks/useSaveChanges";
 import { useUserDataStore } from "@/hooks/userDataStore";
 import { useIsAdminSection } from "@/contexts/AdminSectionContext";
 import ToggleSynthetic from "@/components/ToggleSynthetic";
-
-const UpdateCollectionGuidance = maskClientTest(
-  () => import("./UpdateCollectionGuidance"),
-);
 
 export type UpdateCollectionProps = {
   collection: CollectionWithHosts;
@@ -532,8 +527,6 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
               />
             )}
           />
-          {/* supposed to also have supoprt contact / adminstractive contact */}
-          <UpdateCollectionGuidance />
         </ActionMenuSection>
 
         <ActionMenuSection

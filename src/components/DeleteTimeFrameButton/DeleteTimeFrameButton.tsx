@@ -10,9 +10,12 @@ import DeleteMenuItem from "../DeleteMenuItem";
 import { DeleteMenuItemProps } from "../DeleteMenuItem/DeleteMenuItem";
 import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
 
-interface DeleteTimeFrameButtonProps extends DeleteMenuItemProps {
+type DeleteTimeFrameButtonProps = Omit<
+  DeleteMenuItemProps,
+  "action" | "label"
+> & {
   rule: RuleLeafType;
-}
+};
 
 const DeleteTimeFrameButton = ({
   rule,
