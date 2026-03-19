@@ -120,7 +120,12 @@ export const CohortBuilderProvider = ({
       const activeGroupId = activeData?.groupId;
       const overGroupId = overData?.groupId;
 
-      if (!overGroupId || !activeGroupId) return;
+      if (
+        !overGroupId ||
+        !activeGroupId ||
+        (activeData.type === "Group" && overGroupId !== activeGroupId)
+      )
+        return;
       if (activeData.id === overData.id) return;
 
       const groupItems = boardIndex?.itemsByGroup?.[overGroupId] ?? [];
@@ -167,7 +172,11 @@ export const CohortBuilderProvider = ({
       const activeGroupId = activeData?.groupId;
       const overGroupId = overData?.groupId;
 
-      if (!overGroupId || !activeGroupId) {
+      if (
+        !overGroupId ||
+        !activeGroupId ||
+        (activeData.type === "Group" && overGroupId !== activeGroupId)
+      ) {
         setActiveNode(null);
         setActive(null);
         return;

@@ -13,6 +13,7 @@ export const listItemButtonSx =
     depth: number,
     isSelected: boolean,
     isHovered: boolean,
+    isNotAllowed: boolean = false,
   ): SxProps<Theme> =>
   (theme) => ({
     color: theme.palette.text.primary,
@@ -40,7 +41,9 @@ export const listItemButtonSx =
         height: 3,
         top: isAbove ? 0 : "auto",
         bottom: isAbove ? "auto" : 0,
-        backgroundColor: theme.palette.primary.main,
+        backgroundColor: isNotAllowed
+          ? theme.palette.error.main
+          : theme.palette.primary.main,
         pointerEvents: "none",
       },
     }),

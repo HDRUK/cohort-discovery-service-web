@@ -1,7 +1,7 @@
 "use client";
 
 import { RuleNodeType } from "@/types/rules";
-import { moveItemIntoGroup } from "@/utils/rules";
+import { findById, isRuleGroup, moveItemIntoGroup } from "@/utils/rules";
 import {
   Active,
   DndContext,
@@ -37,20 +37,39 @@ export const Hierarchy = () => {
   const { rules } = queryBuilderJson;
 
   const [active, setActive] = useState<Active | null>(null);
+  const [activeNode, setActiveNode] = useState<RuleNodeType | null>(null);
   const hasMounted = useHasMounted();
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
   );
 
-  const onDragStart = ({ active }: DragStartEvent) => setActive(active);
+  const onDragStart = useCallback(
+    (e: DragStartEvent) => {
+      setActive(e.active);
+
+      const node = findById(
+        queryBuilderJson,
+        e.active.data.current?.id as string,
+      );
+
+      if (node) {
+        setActiveNode(node);
+      }
+    },
+    [queryBuilderJson],
+  );
 
   const onDragEnd = useCallback(
     ({ over }: DragEndEvent) => {
       if (!active) return;
+      if (!activeNode) return;
       if (!over) return;
 
       const overGroupId = over?.data?.current?.groupId as string;
+      const activeGroupId = active?.data?.current?.groupId as string;
+
+      if (isRuleGroup(activeNode) && overGroupId !== activeGroupId) return;
 
       const activeId = active?.data?.current?.id;
       const overId = over?.data?.current?.id;
@@ -66,8 +85,9 @@ export const Hierarchy = () => {
       );
 
       setActive(null);
+      setActiveNode(null);
     },
-    [active, boardIndex, queryBuilderJson, setQueryBuilderJson],
+    [active, activeNode, boardIndex, queryBuilderJson, setQueryBuilderJson],
   );
 
   if (!hasMounted) return <SkeletonFull sx={{ minHeight: 1000, mt: 1 }} />;
@@ -79,7 +99,10 @@ export const Hierarchy = () => {
       measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
-      onDragCancel={() => setActive(null)}
+      onDragCancel={() => {
+        setActive(null);
+        setActiveNode(null);
+      }}
     >
       <List disablePadding>
         <SortableContext
@@ -92,6 +115,7 @@ export const Hierarchy = () => {
               key={node.id}
               node={node}
               groupId={queryBuilderJson.id}
+              selectedIsGroup={(activeNode && isRuleGroup(activeNode)) ?? false}
             />
           ))}
         </SortableContext>
