@@ -15,8 +15,10 @@ const getConcepts = async (
   const params = new URLSearchParams({
     page: String(page),
     per_page: String(per_page),
-    "concept_name[]": searchTerm,
-    "concept_id[]": searchTerm,
+    //"concept_name[]": searchTerm,
+    //"concept_id[]": searchTerm,
+    description: searchTerm,
+    //concept_id: searchTerm,
     ...(domain ? { domain } : {}),
   });
 

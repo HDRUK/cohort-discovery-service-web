@@ -170,9 +170,7 @@ const SelectDatasets = () => {
         sx={{
           my: 2,
           bgcolor: "white",
-          mb: 1000,
           border: 1,
-          borderColor: "white",
         }}
       >
         <Stack direction="row" gap={1} padding={1} marginX={2}>

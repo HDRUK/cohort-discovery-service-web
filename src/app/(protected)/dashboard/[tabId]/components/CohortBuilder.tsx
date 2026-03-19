@@ -48,13 +48,10 @@ const CohortBuilder = async (props: { query?: string }) => {
           alignItems="flex-start"
           spacing={2}
           display={"flex"}
-          overflow={"hidden"}
         >
           <Stack direction="column" spacing={1} sx={{ flex: 1, minWidth: 0 }}>
             <CohortQueryInput queries={userQueries.data} />
-            <Box sx={{ overflow: "hidden" }}>
-              <Divider />
-            </Box>
+            <Divider />
           </Stack>
         </Stack>
 
