@@ -12,6 +12,7 @@ import { ReactNode, useEffect } from "react";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import useUserStore from "@/hooks/useUserStore";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
+import { WorkgroupNames } from "@/config/workgroups";
 
 interface ProtectedPageProps {
   user: CombinedUser;
@@ -42,7 +43,9 @@ const ProtectedPage = ({
 
   useEffect(() => {
     const workgroups = user.workgroups;
-    const defaultWg = workgroups?.find((wg) => wg.name === "DEFAULT");
+    const defaultWg = workgroups?.find(
+      (wg) => wg.name === WorkgroupNames.DEFAULT,
+    );
     const isOnlyInDefaultWg =
       workgroups?.length === 1 && defaultWg !== undefined;
 
@@ -54,8 +57,8 @@ const ProtectedPage = ({
   }, [user, setUser, setIncludeSynthetic]);
 
   useEffect(() => {
-    initialiseSelectedDatasets(collections);
     setCollections(collections);
+    initialiseSelectedDatasets(collections);
   }, [collections, setCollections, initialiseSelectedDatasets]);
 
   useEffect(() => {
