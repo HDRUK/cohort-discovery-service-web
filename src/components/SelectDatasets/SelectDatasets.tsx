@@ -10,6 +10,7 @@ import {
   Box,
   Button,
   Stack,
+  Accordion,
 } from "@mui/material";
 import { useEffect, useMemo, useRef } from "react";
 import Title from "../Title";
@@ -148,31 +149,49 @@ const SelectDatasets = () => {
   const noDatasets = nSelected === 0;
 
   return (
-    <Collapse in={open} timeout={300}>
+    <Collapse
+      in={open}
+      timeout={300}
+      sx={{
+        ...(open && {
+          mt: 2,
+          mb: 2,
+          flex: 1,
+          minHeight: 0,
+          overflow: "auto",
+        }),
+      }}
+    >
       <Paper
         sx={{
-          my: 2,
+          flex: 1,
+          minHeight: 0,
+          flexDirection: "column",
           bgcolor: "white",
-          border: 1,
         }}
       >
-        <AccordionSummary>
-          <Stack gap={3} width="100%">
-            <Stack direction="row" gap={1}>
-              <ToggleAction
-                size={25}
-                active={includeSynthetic}
-                onToggle={handleToggleIncludeSynthetic}
-                activeIcon={CheckIcon}
-                inactiveIcon={CloseIcon}
-              />
-              <Title
-                title="Include"
-                subTitle={"Synthetic Data Collections"}
-                useSeparator={false}
-              />
-            </Stack>
+        <Stack direction="row" gap={1} padding={2}>
+          <ToggleAction
+            size={25}
+            active={includeSynthetic}
+            onToggle={handleToggleIncludeSynthetic}
+            activeIcon={CheckIcon}
+            inactiveIcon={CloseIcon}
+          />
+          <Title
+            title="Include"
+            subTitle={"Synthetic Data Collections"}
+            useSeparator={false}
+          />
+        </Stack>
 
+        <Accordion
+          defaultExpanded
+          disableGutters
+          elevation={1}
+          sx={{ bgcolor: "white", mb: 1 }}
+        >
+          <AccordionSummary>
             <Title
               title="All Collections"
               subTitle={`${nSelected}/${nTotal} Collections Selected`}
@@ -185,24 +204,24 @@ const SelectDatasets = () => {
             >
               <RefreshButton component="div" tag={TAG_COLLECTIONS} />
             </Title>
-          </Stack>
-        </AccordionSummary>
-        <AccordionDetails
-          sx={{
-            p: 0,
-            display: "flex",
-            flexDirection: "column",
-            gap: 0.5,
-            mb: 2,
-          }}
-        >
-          {networkGroups.map((ng) => (
-            <SelectNetworkDatasets
-              key={ng.network?.id ?? "no-network"}
-              networkCollections={ng}
-            />
-          ))}
-        </AccordionDetails>
+          </AccordionSummary>
+          <AccordionDetails
+            sx={{
+              p: 0,
+              display: "flex",
+              flexDirection: "column",
+              gap: 0.5,
+              mb: 2,
+            }}
+          >
+            {networkGroups.map((ng) => (
+              <SelectNetworkDatasets
+                key={ng.network?.id ?? "no-network"}
+                networkCollections={ng}
+              />
+            ))}
+          </AccordionDetails>
+        </Accordion>
 
         <Paper>
           <Box
