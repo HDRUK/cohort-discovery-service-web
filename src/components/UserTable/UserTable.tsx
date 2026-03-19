@@ -17,6 +17,7 @@ import dayjs from "dayjs";
 import { TableProps } from "../Table/Table";
 import { trueKeys } from "@/utils/numbers";
 import { useUserDataStore } from "@/hooks/userDataStore";
+import { useIsAdminSection } from "@/contexts/AdminSectionContext";
 
 export interface CollectionsTableProps extends TableProps {
   showPid?: boolean;
@@ -34,6 +35,7 @@ const UserTable = ({
 }: CollectionsTableProps) => {
   const { getSearchParam } = useSearchParams("workgroup_filter");
   const wg_filter = getSearchParam();
+  const isAdmin = useIsAdminSection();
 
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
 
@@ -58,32 +60,48 @@ const UserTable = ({
     [users, wg_filter],
   );
 
-  const columns: MRT_ColumnDef<User>[] = [
-    {
-      id: "name",
-      header: "Name",
-      accessorFn: (row) => row.name,
-      size: 200,
-      minSize: 200,
-      maxSize: 200,
-    },
-    {
-      id: "created_at",
-      header: "Created",
-      accessorFn: (row) =>
-        row.created_at
-          ? dayjs(row.created_at).format("MMM D, YYYY HH:mm")
-          : "—",
-    },
-    {
-      id: "updated_at",
-      header: "Last Updated",
-      accessorFn: (row) =>
-        row.updated_at
-          ? dayjs(row.updated_at).format("MMM D, YYYY HH:mm")
-          : "—",
-    },
-  ];
+  const columns: MRT_ColumnDef<User>[] = useMemo(
+    () => [
+      {
+        id: "name",
+        header: "Name",
+        accessorFn: (row) => row.name,
+        size: 200,
+        minSize: 200,
+        maxSize: 200,
+      },
+      ...(isAdmin
+        ? [
+            {
+              id: "email",
+              header: "Email",
+              accessorFn: (row) => row.email,
+              size: 200,
+              minSize: 200,
+              maxSize: 200,
+            } as MRT_ColumnDef<User>,
+          ]
+        : []),
+
+      {
+        id: "created_at",
+        header: "Created",
+        accessorFn: (row) =>
+          row.created_at
+            ? dayjs(row.created_at).format("MMM D, YYYY HH:mm")
+            : "—",
+      },
+      {
+        id: "updated_at",
+        header: "Last Updated",
+        accessorFn: (row) =>
+          row.updated_at
+            ? dayjs(row.updated_at).format("MMM D, YYYY HH:mm")
+            : "—",
+      },
+    ],
+    [isAdmin],
+  );
 
   const table = useTable({
     columns,

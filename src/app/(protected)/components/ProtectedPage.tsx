@@ -11,6 +11,7 @@ import { redirect } from "next/navigation";
 import { ReactNode, useEffect } from "react";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import useUserStore from "@/hooks/useUserStore";
+import useQueryBuilder from "@/hooks/useQueryBuilder";
 
 interface ProtectedPageProps {
   user: CombinedUser;
@@ -34,14 +35,28 @@ const ProtectedPage = ({
   const setCustodians = useUserStore((s) => s.setCustodians);
   const setWorkgroups = useUserStore((s) => s.setWorkgroups);
   const setFlags = useFeatureFlagsStore((s) => s.setFlags);
+  const setIncludeSynthetic = useQueryBuilder((qb) => qb.setIncludeSynthetic);
+  const initialiseSelectedDatasets = useQueryBuilder(
+    (qb) => qb.initialiseSelectedDatasets,
+  );
 
   useEffect(() => {
+    const workgroups = user.workgroups;
+    const defaultWg = workgroups?.find((wg) => wg.name === "DEFAULT");
+    const isOnlyInDefaultWg =
+      workgroups?.length === 1 && defaultWg !== undefined;
+
     setUser(user);
-  }, [user, setUser]);
+
+    if (isOnlyInDefaultWg) {
+      setIncludeSynthetic(true);
+    }
+  }, [user, setUser, setIncludeSynthetic]);
 
   useEffect(() => {
+    initialiseSelectedDatasets(collections);
     setCollections(collections);
-  }, [collections, setCollections]);
+  }, [collections, setCollections, initialiseSelectedDatasets]);
 
   useEffect(() => {
     setCustodians(custodians);

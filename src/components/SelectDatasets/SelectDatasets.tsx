@@ -12,14 +12,13 @@ import {
   Stack,
   Accordion,
 } from "@mui/material";
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo } from "react";
 import Title from "../Title";
 import SelectNetworkDatasets, {
   NetworkGroupedCollections,
 } from "../SelectNetworkDatasets";
 import RefreshButton from "../RefreshButton";
 import { TAG_COLLECTIONS } from "@/config/tags";
-import { intersection } from "lodash";
 import ToggleAction from "../ToggleAction";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
@@ -27,13 +26,7 @@ import { useUserDataStore } from "@/hooks/userDataStore";
 
 const SelectDatasets = () => {
   const collections = useUserDataStore((s) => s.userCollections);
-  const initialSelection = useMemo(
-    () => collections.map((c) => c.pid),
-    [collections],
-  );
-
   const includeSynthetic = useQueryBuilder((qb) => qb.includeSynthetic);
-  const setIncludeSynthetic = useQueryBuilder((qb) => qb.setIncludeSynthetic);
 
   const selectedDatasets = useQueryBuilder((qb) => qb.selectedDatasets);
   const setSelectedDatasets = useQueryBuilder((qb) => qb.setSelectedDatasets);
@@ -47,17 +40,6 @@ const SelectDatasets = () => {
   const setPreviouslySelectedDatasets = useQueryBuilder(
     (qb) => qb.setPreviouslySelectedDatasets,
   );
-
-  const mountedRef = useRef(false);
-  useEffect(() => {
-    if (mountedRef.current) return;
-    mountedRef.current = true;
-    if (selectedDatasets.length === 0) {
-      setSelectedDatasets(initialSelection ?? []);
-    } else {
-      setSelectedDatasets(intersection(initialSelection, selectedDatasets));
-    }
-  }, [selectedDatasets, initialSelection, setSelectedDatasets]);
 
   const custodianGroups = useMemo(() => {
     return Object.values(
@@ -88,24 +70,12 @@ const SelectDatasets = () => {
     );
   }, [custodianGroups]);
 
+  const toggleIncludeSynthetic = useQueryBuilder(
+    (qb) => qb.toggleIncludeSynthetic,
+  );
+
   const handleToggleIncludeSynthetic = () => {
-    if (!includeSynthetic) {
-      const syntheticsToAdd = collections
-        .filter((c) => c.is_synthetic)
-        .map((c) => c.pid);
-
-      setSelectedDatasets(
-        Array.from(new Set([...selectedDatasets, ...syntheticsToAdd])),
-      );
-    } else {
-      setSelectedDatasets(
-        collections
-          .filter((c) => selectedDatasets.includes(c.pid) && !c.is_synthetic)
-          .map((c) => c.pid),
-      );
-    }
-
-    setIncludeSynthetic(!includeSynthetic);
+    toggleIncludeSynthetic(collections);
   };
 
   const nTotal = collections.length;
