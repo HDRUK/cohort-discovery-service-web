@@ -345,6 +345,7 @@ const RuleWrapper = ({
             {isRuleLeaf(node) &&
               type === "Rule" &&
               !isEmptyRule(node) &&
+              !["Gender", "Race"].includes(node.rule.concept?.category || "") &&
               (node.timeConstraint || node.ageConstraint || isSelected) && (
                 <CardActions sx={cardActionsSx}>
                   {node.timeConstraint ? (
