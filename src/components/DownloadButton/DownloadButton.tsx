@@ -68,6 +68,8 @@ const DownloadButton = ({
         justifyContent: "flex-start",
         textAlign: "left",
         color: "text.primary",
+        fontWeight: "normal",
+        fontSize: 14,
       }}
       size="large"
     >

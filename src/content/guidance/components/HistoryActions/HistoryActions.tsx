@@ -127,7 +127,18 @@ const HistoryActions = ({
       />
       {!resultsView && (
         <>
-          <DeleteMenuItem label="Delete" action={onDeleteClick} size="large" />
+          <DeleteMenuItem
+            label="Delete"
+            action={onDeleteClick}
+            size="large"
+            sx={{
+              justifyContent: "flex-start",
+              textAlign: "left",
+              color: "text.primary",
+              fontWeight: "normal",
+              fontSize: 14,
+            }}
+          />
           <Dialog open={dialogOpen}>
             <Box display="flex" justifyContent="right" padding={1}>
               <IconButton

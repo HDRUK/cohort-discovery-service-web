@@ -34,6 +34,8 @@ const ReRunButton = ({
           justifyContent: "flex-start",
           textAlign: "left",
           color: "text.primary",
+          fontWeight: "normal",
+          fontSize: 14,
         },
         startIcon: <CachedIcon fontSize={"small"} />,
       };
