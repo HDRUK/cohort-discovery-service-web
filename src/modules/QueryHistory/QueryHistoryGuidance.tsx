@@ -24,6 +24,7 @@ const QueryHistoryGuidance = (
       fixedExpanded
       scrollable
     >
+      {!empty && <CustomH1>Actions</CustomH1>}
       {empty &&
         !resultsView &&
         "Select a result row to edit a previous query, rerun it to generate updated results, download the output, or remove it from your list. You can also select multiple to bulk delete or download."}
