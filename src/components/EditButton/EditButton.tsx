@@ -23,6 +23,8 @@ const EditButton = ({ children, label, isIcon, ...rest }: EditButtonProps) => {
           justifyContent: "flex-start",
           textAlign: "left",
           color: "text.primary",
+          fontWeight: "normal",
+          fontSize: 14,
         },
         startIcon: <EditIcon fontSize={"small"} />,
       };

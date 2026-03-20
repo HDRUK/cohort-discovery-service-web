@@ -191,7 +191,10 @@ const QueryResultsTable = ({
         {...(showGuidance
           ? {
               rightPanel: QueryHistoryGuidance,
-              rightPanelProps: { resultsView: true },
+              rightPanelProps: {
+                resultsView: true,
+                currentResult: initialData.pid,
+              },
             }
           : {})}
         {...tableProps}

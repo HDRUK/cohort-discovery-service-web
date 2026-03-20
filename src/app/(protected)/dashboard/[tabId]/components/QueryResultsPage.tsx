@@ -38,7 +38,7 @@ const QueryResultsPageContent = async ({
       <QueryResultsTable
         initialData={queryData.data}
         initialSearchParams={searchParamsObject}
-        useTableProps={{ enableRowSelection: true }}
+        useTableProps={{ enableRowSelection: false }}
         tableProps={{
           leftAction: {
             searchProps: {
