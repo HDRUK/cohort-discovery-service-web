@@ -45,9 +45,11 @@ export interface TableProps {
   rightPanel?: (
     selectedIds: string[],
     resultsView?: boolean,
+    currentResult?: string,
   ) => React.ReactNode;
   rightPanelProps?: {
     resultsView?: boolean;
+    currentResult?: string;
   };
 }
 
@@ -161,7 +163,12 @@ const Table = <TData extends MRT_RowData>({
           )
         }
         right={
-          rightPanel && rightPanel(selectedRows, rightPanelProps?.resultsView)
+          rightPanel &&
+          rightPanel(
+            selectedRows,
+            rightPanelProps?.resultsView,
+            rightPanelProps?.currentResult,
+          )
         }
       />
     </Box>

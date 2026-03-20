@@ -34,9 +34,11 @@ import useQueryBuilder from "@/hooks/useQueryBuilder";
 const HistoryActions = ({
   multiple = false,
   selectedIds,
+  resultsView = false,
 }: {
   multiple: boolean;
   selectedIds: string[];
+  resultsView?: boolean;
 }) => {
   const { searchParams } = useSearchParams();
   const router = useRouter();
@@ -77,7 +79,7 @@ const HistoryActions = ({
 
   return (
     <Stack>
-      {!multiple && (
+      {!multiple && !resultsView && (
         <ReRunButton
           label="Re-run query"
           onClick={async () => {
@@ -123,53 +125,57 @@ const HistoryActions = ({
         formats={[AvailableFormats.JSON]}
         isIcon={false}
       />
-      <DeleteMenuItem label="Delete" action={onDeleteClick} size="large" />
-      <Dialog open={dialogOpen}>
-        <Box display="flex" justifyContent="right" padding={1}>
-          <IconButton
-            onClick={handleCancel}
-            size="small"
-            aria-label="close"
-            color="secondary"
-          >
-            <CloseIcon />
-          </IconButton>
-        </Box>
-        <Box
-          display="flex"
-          flexDirection="column"
-          justifyContent="center"
-          px={15}
-          pb={3}
-        >
-          <Typography textAlign="center">
-            Are you sure you want to delete{" "}
-            {multiple ? "these query results" : "this query result"}?
-          </Typography>
-          <DialogContent>
-            <FormControl>
-              <FormControlLabel
-                control={<Checkbox />}
-                checked={confirmationValue}
-                label="I understand this action is permanent"
-                onChange={handleConfirmationChange}
-              />
-            </FormControl>
-          </DialogContent>
-          <DialogActions sx={{ display: "flex", justifyContent: "center" }}>
-            <Button
-              disabled={!confirmationValue}
-              onClick={handleDelete}
-              variant="outlined"
+      {!resultsView && (
+        <>
+          <DeleteMenuItem label="Delete" action={onDeleteClick} size="large" />
+          <Dialog open={dialogOpen}>
+            <Box display="flex" justifyContent="right" padding={1}>
+              <IconButton
+                onClick={handleCancel}
+                size="small"
+                aria-label="close"
+                color="secondary"
+              >
+                <CloseIcon />
+              </IconButton>
+            </Box>
+            <Box
+              display="flex"
+              flexDirection="column"
+              justifyContent="center"
+              px={15}
+              pb={3}
             >
-              Yes
-            </Button>
-            <Button autoFocus onClick={handleCancel} color="secondary">
-              No
-            </Button>
-          </DialogActions>
-        </Box>
-      </Dialog>
+              <Typography textAlign="center">
+                Are you sure you want to delete{" "}
+                {multiple ? "these query results" : "this query result"}?
+              </Typography>
+              <DialogContent>
+                <FormControl>
+                  <FormControlLabel
+                    control={<Checkbox />}
+                    checked={confirmationValue}
+                    label="I understand this action is permanent"
+                    onChange={handleConfirmationChange}
+                  />
+                </FormControl>
+              </DialogContent>
+              <DialogActions sx={{ display: "flex", justifyContent: "center" }}>
+                <Button
+                  disabled={!confirmationValue}
+                  onClick={handleDelete}
+                  variant="outlined"
+                >
+                  Yes
+                </Button>
+                <Button autoFocus onClick={handleCancel} color="secondary">
+                  No
+                </Button>
+              </DialogActions>
+            </Box>
+          </Dialog>
+        </>
+      )}
     </Stack>
   );
 };
