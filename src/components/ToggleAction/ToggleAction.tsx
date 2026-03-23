@@ -60,10 +60,9 @@ export const ToggleAction = ({
       <Stack direction={"row"} gap={gap}>
         <CircularIconButton
           component="div"
+          data-testid="toggle-action-off"
           disableRipple
-          onClick={() => {
-            if (active) onToggle();
-          }}
+          onClick={() => onToggle()}
           sx={{
             width: size,
             height: size,
@@ -95,10 +94,9 @@ export const ToggleAction = ({
         </CircularIconButton>
         <CircularIconButton
           component="div"
+          data-testid="toggle-action-on"
           disableRipple
-          onClick={() => {
-            if (!active) onToggle();
-          }}
+          onClick={() => onToggle()}
           sx={{
             width: size,
             height: size,

@@ -24,6 +24,7 @@ import SingleBoundSelector, {
 } from "@/components/SingleBoundSelector";
 import { clamp } from "@/utils/numbers";
 import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
+import HoverableDiv from "@/components/HoverableDiv";
 
 export interface RuleAgeSelectorProps {
   children?: ReactNode;
@@ -32,6 +33,7 @@ export interface RuleAgeSelectorProps {
   readOnly?: boolean;
   overrideConstrainForBunny?: boolean;
   uniDirectional?: boolean;
+  flex?: boolean;
 }
 
 export const RuleAgeSelectorReadOnly = ({
@@ -76,6 +78,7 @@ const RuleAgeSelector = ({
   overrideConstrainForBunny = false,
   uniDirectional = false,
   readOnly = false,
+  flex = false,
 }: RuleAgeSelectorProps) => {
   const minAge = MIN_AGE_FILTER;
   const maxAge = MAX_AGE_FILTER;
@@ -85,11 +88,13 @@ const RuleAgeSelector = ({
     setQueryBuilderJson,
     setSelectedGuidance,
     selected,
+    setSelected,
   } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
     setSelectedGuidance: qb.setSelectedGuidance,
     selected: qb.selected,
+    setSelected: qb.setSelected,
   }));
 
   const flags = useFeatures();
@@ -193,7 +198,11 @@ const RuleAgeSelector = ({
 
   if (constrainForBunnyV1 && !overrideConstrainForBunny) {
     return (
-      <>
+      <HoverableDiv
+        hoverKey={`rule-age-${rule.id}`}
+        onClick={() => setSelected(rule.id)}
+        flex={flex}
+      >
         {title && <CustomH1>{title}</CustomH1>}
 
         <SingleBoundSelector<number>
@@ -274,12 +283,16 @@ const RuleAgeSelector = ({
           )}
         />
         {children}
-      </>
+      </HoverableDiv>
     );
   }
 
   return (
-    <>
+    <HoverableDiv
+      hoverKey={`rule-age-${rule.id}`}
+      onClick={() => setSelected(rule.id)}
+      flex={flex}
+    >
       {title && <CustomH1>{title}</CustomH1>}
 
       <Stack
@@ -374,7 +387,7 @@ const RuleAgeSelector = ({
           </>
         )}
       </Stack>
-    </>
+    </HoverableDiv>
   );
 };
 

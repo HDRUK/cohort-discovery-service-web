@@ -26,8 +26,11 @@ import { UniqueIdentifier } from "@dnd-kit/core";
 import { removeFalseKeys } from "@/utils/numbers";
 import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
 import { DatasetErrors } from "@/utils/datasets";
-import { FeatureName } from "@/types/api";
+import { Collection, FeatureName } from "@/types/api";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
+import { mapDomain } from "@/utils/domains";
+import { intersection } from "lodash";
+import { getAllowedDatasetIds } from "@/utils/collections";
 
 export enum NodeKind {
   RULE = "RULE",
@@ -111,6 +114,9 @@ export interface QueryBuilderStoreState {
 
   selectedDatasets: string[];
   setSelectedDatasets: (pids: string[]) => void;
+
+  initialiseSelectedDatasets: (collections: Collection[]) => void;
+  toggleIncludeSynthetic: (collections: Collection[]) => void;
 
   openSelectDatasetsPanel: boolean;
   setOpenSelectDatasetsPanel: (value: boolean) => void;
@@ -333,7 +339,7 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     else if (isRuleLeaf(node)) {
       const c = node.rule?.concept;
       const category = Array.isArray(c) ? c[0]?.category : c?.category;
-      name += `${category ?? "Blank"} rule`.trim();
+      name += `${mapDomain(category || "Blank")} rule`.trim();
     } else if (isOperator(node))
       name += `${node.combinator.toUpperCase()} operator`;
     else if (isAgeFilter(node)) name += "Age Filter";
@@ -357,6 +363,32 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
       ...state,
       includeSynthetic,
     }));
+  },
+
+  initialiseSelectedDatasets: (collections) => {
+    const { selectedDatasets, includeSynthetic } = get();
+    const allowedIds = getAllowedDatasetIds(collections, includeSynthetic);
+
+    set({
+      selectedDatasets:
+        selectedDatasets.length === 0
+          ? allowedIds
+          : intersection(allowedIds, selectedDatasets),
+    });
+  },
+
+  toggleIncludeSynthetic: (collections) => {
+    const { includeSynthetic, selectedDatasets } = get();
+    const nextIncludeSynthetic = !includeSynthetic;
+
+    const allowedIds = getAllowedDatasetIds(collections, nextIncludeSynthetic);
+
+    set({
+      includeSynthetic: nextIncludeSynthetic,
+      selectedDatasets: nextIncludeSynthetic
+        ? Array.from(new Set([...selectedDatasets, ...allowedIds]))
+        : selectedDatasets.filter((id) => allowedIds.includes(id)),
+    });
   },
 
   previouslySelectedDatasets: [],

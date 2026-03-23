@@ -6,6 +6,7 @@ import getCustodian from "@/actions/custodian/getCustodian";
 import MockDaphneStore from "@/store/MockDaphneStore";
 import { CollectionWithHosts, Paginated } from "@/types/api";
 jest.mock("@/actions/collection/getCustodianCollections");
+jest.mock("@/actions/collection/getCollectionDetails");
 jest.mock("@/actions/custodian/getCustodian");
 
 describe("CollectionsTable", () => {

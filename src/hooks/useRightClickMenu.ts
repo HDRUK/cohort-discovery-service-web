@@ -7,11 +7,12 @@ const useRightClickMenu = () => {
   } | null>(null);
 
   const handleContextMenu = useCallback(
-    (event: React.MouseEvent<HTMLDivElement>) => {
+    (event: React.MouseEvent<HTMLElement>) => {
       event.preventDefault();
       event.stopPropagation();
-      setMenuPos(
-        menuPos === null
+
+      setMenuPos((current) =>
+        current === null
           ? {
               mouseX: event.clientX + 2,
               mouseY: event.clientY - 6,
@@ -19,7 +20,7 @@ const useRightClickMenu = () => {
           : null,
       );
     },
-    [menuPos],
+    [setMenuPos],
   );
 
   const handleClose = () => setMenuPos(null);

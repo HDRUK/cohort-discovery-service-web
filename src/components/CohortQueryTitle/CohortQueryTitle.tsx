@@ -14,7 +14,7 @@ const CohortQueryTitle = () => {
 
   return (
     <Title
-      title={"New Query"}
+      title={"Query Name"}
       subTitle={
         <EditableText
           defaultValue={queryName || ""}

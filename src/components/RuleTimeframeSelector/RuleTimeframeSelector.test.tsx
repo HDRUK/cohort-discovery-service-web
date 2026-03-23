@@ -23,16 +23,18 @@ describe("RuleTimeframeSelector", () => {
     rule: {
       concept: {
         concept_id: 443597,
-        description: "Chronic kidney disease stage 3",
+        name: "Chronic kidney disease stage 3",
         category: "Condition",
       },
     },
   };
 
   it("returns null when rule.timeConstraint is not set", () => {
-    const { container } = renderComponent({ rule: baseRule, label: "Test" });
+    renderComponent({ rule: baseRule, label: "Test" });
 
-    expect(container.firstChild).toBeNull();
+    expect(
+      screen.queryByTestId("rule-timeframe-selector"),
+    ).not.toBeInTheDocument();
   });
 
   it("renders two DatePickers with values derived from rule.timeConstraint", () => {

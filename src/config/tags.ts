@@ -11,6 +11,8 @@ export const getCollectionHostTag = (custodianPid: string) =>
 export const getTagsUserCollections = (userId: string | number) =>
   `${TAG_COLLECTIONS_USER}-${userId}`;
 
+export const getTagCollection = (pid: string) => `${TAG_COLLECTIONS}-${pid}`;
+
 export const TAG_CUSTODIANS = "custodians";
 export const TAG_NETWORKS = "custodians-networks";
 

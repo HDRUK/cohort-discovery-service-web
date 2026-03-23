@@ -39,6 +39,7 @@ import ShowDescendants from "@/content/guidance/components/ShowDescendants";
 import ToggleOperator from "@/content/guidance/components/ToggleOperator";
 import AddButton from "@/components/AddButton";
 import { AddButtonProps } from "@/components/AddButton/AddButton";
+import { AddChipProps } from "@/components/AddChip/AddChip";
 import AddTimeFrameButton from "@/components/AddTimeFrameButton";
 import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
 import { CustomH1, CustomH2 } from "@/components/GuidanceHeaders";
@@ -55,6 +56,7 @@ import RuleAgeSelector from "@/components/RuleAgeSelector";
 import DeleteAgeButton from "@/components/DeleteAgeButton";
 import useFeatures from "@/hooks/useFeatures";
 import CollapsibleGuidance from "@/components/CollapsibleGuidance";
+import { mapDomainForGuidance } from "@/utils/domains";
 
 export const baseComponents = {
   a: ({ href, children }: LinkProps) => (
@@ -176,16 +178,31 @@ const Guidance = () => {
       <ToggleExclusion key="ToggleExclusion" node={node} />
     ),
     ShowDescendants: () => <ShowDescendants node={node} />,
-    AddTimeFrameButton: (props: AddButtonProps) =>
-      !node.timeConstraint && (
-        <AddTimeFrameButton
-          key="RuleTimeframeSelector"
-          rule={node}
-          {...props}
-        />
-      ),
-    AddAgeButton: (props: AddButtonProps) =>
-      !node.ageConstraint && <AddAgeButton rule={node} {...props} />,
+    AddTimeFrameButton: (props: AddChipProps) => {
+      return (
+        !node.timeConstraint && (
+          <AddTimeFrameButton
+            key="RuleTimeframeSelector"
+            rule={node}
+            hoverKey={`rule-timeframe-${node.id}`}
+            disabled={!!node.ageConstraint}
+            {...props}
+          />
+        )
+      );
+    },
+    AddAgeButton: (props: AddChipProps) => {
+      return (
+        !node.ageConstraint && (
+          <AddAgeButton
+            rule={node}
+            hoverKey={`rule-age-${node.id}`}
+            disabled={!!node.timeConstraint}
+            {...props}
+          />
+        )
+      );
+    },
     RuleTimeframeSelector: (props: { title: string }) => (
       <RuleTimeframeSelector
         key="RuleTimeframeSelector"
@@ -307,10 +324,15 @@ const Guidance = () => {
       );
 
       return (
-        <ActionMenuSection title={"Rule"} fixedExpanded>
+        <ActionMenuSection
+          title={`${capitaliseFirstLetter(
+            mapDomainForGuidance(selectedNode.rule.concept?.category || ""),
+          )} Rule`}
+          fixedExpanded
+        >
           <RuleGuidance
             category={capitaliseFirstLetter(
-              selectedNode.rule.concept?.category || "",
+              mapDomainForGuidance(selectedNode.rule.concept?.category || ""),
             )}
             verb={verb}
             verbPastTense={verbPastTense}
@@ -318,6 +340,11 @@ const Guidance = () => {
             timeConstraint={selectedNode?.timeConstraint}
             ageConstraint={selectedNode?.ageConstraint}
             components={makeRuleComponents(selectedNode)}
+            showSelectors={
+              !["Gender", "Race"].includes(
+                selectedNode.rule.concept?.category || "",
+              )
+            }
           />
         </ActionMenuSection>
       );

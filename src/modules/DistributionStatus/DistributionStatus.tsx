@@ -1,11 +1,13 @@
 import { CollectionWithHosts, DistributionType } from "@/types/api";
-import { getDatetime } from "@/utils/date";
-import { Box, Chip, Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import FormLabel from "@/components/FormLabel";
 import { ReRunButton } from "./ReRunButton";
 import { useLogDependencyChanges } from "@/utils/deps";
 import useUserStore from "@/hooks/useUserStore";
 import { useCallback } from "react";
+import LastDistributionChip from "./LastDistributionChip";
+import { revalidateAction, revalidateCustodian } from "@/actions/revalidate";
+import { TAG_COLLECTIONS_ADMIN } from "@/config/tags";
 
 const DistributionStatus = ({
   collection,
@@ -14,8 +16,9 @@ const DistributionStatus = ({
   collection: CollectionWithHosts;
   disabled?: boolean;
 }) => {
-  const demographic = collection.latest_demographic;
-  const concept = collection.latest_concept;
+  const latestDemographicFile =
+    collection.latest_successful_demographic_result_file;
+  const latestConceptFile = collection.latest_successful_concept_result_file;
 
   const runDistributions = useUserStore((s) => s.runDistributions);
 
@@ -27,10 +30,13 @@ const DistributionStatus = ({
     return await runDistributions(collection, DistributionType.GENERIC);
   }, [runDistributions, collection]);
 
+  const handleRefresh = () => {
+    revalidateCustodian(collection.custodian);
+    revalidateAction(TAG_COLLECTIONS_ADMIN);
+  };
+
   useLogDependencyChanges("DistributionStatus", {
     collection,
-    demographic,
-    concept,
     handleRunDemographicsNow,
     handleRunConceptsNow,
   });
@@ -41,31 +47,27 @@ const DistributionStatus = ({
       <Box>
         <Typography variant="body2" component={"div"}>
           Demographics:{" "}
-          <Chip
-            label={`Last Distribution ${getDatetime(demographic?.created_at)}`}
-          />
-          {!disabled && (
-            <ReRunButton
-              task={collection.latest_demographic_task}
-              lastSuccessfullTask={demographic?.task}
-              onClick={handleRunDemographicsNow}
-            />
-          )}
+          <LastDistributionChip file={latestDemographicFile}>
+            {!disabled && (
+              <ReRunButton
+                onClick={handleRunDemographicsNow}
+                onSuccess={handleRefresh}
+              />
+            )}
+          </LastDistributionChip>
         </Typography>
       </Box>
       <Box>
         <Typography variant="body2" component={"div"}>
           Concepts:{" "}
-          <Chip
-            label={`Last Distribution ${getDatetime(concept?.created_at)}`}
-          />
-          {!disabled && (
-            <ReRunButton
-              task={collection.latest_concept_task}
-              lastSuccessfullTask={concept?.task}
-              onClick={handleRunConceptsNow}
-            />
-          )}
+          <LastDistributionChip file={latestConceptFile}>
+            {!disabled && (
+              <ReRunButton
+                onClick={handleRunConceptsNow}
+                onSuccess={handleRefresh}
+              />
+            )}
+          </LastDistributionChip>
         </Typography>
       </Box>
     </Stack>

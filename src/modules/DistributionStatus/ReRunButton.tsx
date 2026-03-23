@@ -1,43 +1,61 @@
-import { Query, Task } from "@/types/api";
+import getTask from "@/actions/task/getTask";
+import { useDefaults } from "@/providers/DefaultProvider";
+import { Query } from "@/types/api";
+import { TaskStatus } from "@/types/tasks";
+import { getTaskStatus } from "@/utils/tasks";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import { Button, CircularProgress } from "@mui/material";
-import { useCallback, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface ReRunButtonProps {
-  task?: Task;
-  lastSuccessfullTask?: Task;
   onClick: () => Promise<Query>;
+  onSuccess?: () => void;
 }
 
-export const ReRunButton = ({
-  task,
-  lastSuccessfullTask,
-  onClick,
-}: ReRunButtonProps) => {
-  const [submittedTask, setSubmittedTask] = useState<Task | null>(null);
+export const ReRunButton = ({ onClick, onSuccess }: ReRunButtonProps) => {
+  const defaults = useDefaults();
+  const [submittedTaskPid, setSubmittedTaskPid] = useState<string | null>();
 
   const handleClick = useCallback(async () => {
-    setSubmittedTask(null);
+    setSubmittedTaskPid(null);
 
     const newQuery = await onClick();
-    const newTask = newQuery.tasks?.[0];
-    setSubmittedTask(newTask ?? null);
+    const newTask = newQuery.tasks?.[0] ?? null;
+
+    setSubmittedTaskPid(newTask?.pid ?? null);
   }, [onClick]);
 
-  const submittedId = submittedTask?.id;
-  const lastSuccessId = lastSuccessfullTask?.id;
+  const { data: taskResponse, isFetching } = useQuery({
+    queryKey: ["task", submittedTaskPid],
+    queryFn: () =>
+      getTask(submittedTaskPid!, { cacheOptions: { useCache: false } }),
+    enabled: !!submittedTaskPid,
+    refetchInterval: (query) => {
+      const task = query.state.data?.data;
+      if (!task) return defaults.tableRefresh;
+      const status = getTaskStatus(task);
+      return status === TaskStatus.PENDING ? defaults.tableRefresh : false;
+    },
+  });
 
-  const hasFailed = useMemo(
-    () =>
-      submittedTask?.id && task?.id && submittedTask?.id === task?.id
-        ? !!task.failed_at
-        : false,
-    [task, submittedTask],
-  );
+  const task = taskResponse?.data;
+  const taskStatus = task ? getTaskStatus(task) : null;
 
-  const isLoading =
-    !hasFailed && !!submittedId && submittedId !== lastSuccessId;
+  const isPending = taskStatus === TaskStatus.PENDING;
+  const isSuccessful = taskStatus === TaskStatus.SUCCESSFUL;
+  const hasFailed = taskStatus === TaskStatus.ERROR;
+  const isLoading = isFetching || isPending;
+
+  const hasCalledSuccessRef = useRef(false);
+
+  useEffect(() => {
+    if (isSuccessful && !hasCalledSuccessRef.current) {
+      hasCalledSuccessRef.current = true;
+      onSuccess?.();
+    }
+  }, [isSuccessful, onSuccess]);
 
   return (
     <Button
@@ -47,18 +65,18 @@ export const ReRunButton = ({
       onClick={handleClick}
       disabled={isLoading}
     >
-      {isLoading ? "Running" : "Run now"}
-      {submittedTask && (
+      {task && (
         <>
           {isLoading ? (
             <CircularProgress sx={{ mx: 1 }} size={15} />
           ) : hasFailed ? (
             <CloseIcon color="error" sx={{ mx: 1, fontSize: 20 }} />
-          ) : (
+          ) : isSuccessful ? (
             <CheckIcon color="success" sx={{ mx: 1, fontSize: 20 }} />
-          )}
+          ) : null}
         </>
       )}
+      {isPending ? "Running" : "Run now"}
     </Button>
   );
 };

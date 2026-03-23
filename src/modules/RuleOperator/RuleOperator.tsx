@@ -8,6 +8,7 @@ import { cardSx, rootSx, dividerSx, chipSx } from "./RuleOperator.styles";
 import InvalidRule from "@/components/InvalidRule";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import useNodeActions from "@/hooks/useNodeActions";
+import useHoverable from "@/hooks/useHoverable";
 
 export interface RuleOperatorProps extends Omit<
   RuleWrapperProps,
@@ -31,13 +32,14 @@ const RuleOperator = ({
   }));
 
   const { actions } = useNodeActions(operator);
+  const { isHighlighted } = useHoverable<HTMLDivElement>(id);
 
   return (
     <RuleWrapper
       useLeftDragPlaceHolder
       hideHeader
       cardProps={{
-        sx: cardSx(isSelected),
+        sx: cardSx(isSelected, isHighlighted),
       }}
       node={operator}
       type={"Operator"}
