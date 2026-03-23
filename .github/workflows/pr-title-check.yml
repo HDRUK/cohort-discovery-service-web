@@ -18,8 +18,9 @@ jobs:
           owner: HDRUK
           repositories: |
             ${{ github.event.repository.name }}
-      
+
       - name: Check PR Title Format
+        if: ${{ github.actor != 'dependabot[bot]' }}
         env:
           GITHUB_TOKEN: ${{ steps.generate-deployment-token.outputs.token }}
           PR_TITLE: ${{ github.event.pull_request.title }}
