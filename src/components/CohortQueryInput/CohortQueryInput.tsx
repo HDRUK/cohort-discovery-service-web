@@ -59,7 +59,7 @@ const CohortQueryInput = ({
     clearErrors: clearFormErrors,
     formState: { isDirty },
   } = useForm<FormValues>({
-    defaultValues: { cohortQueryInput: queryAsText },
+    defaultValues: { cohortQueryInput: syncFromQueryAsText ? queryAsText : "" },
   });
 
   const resetQuery = useCallback(() => {
