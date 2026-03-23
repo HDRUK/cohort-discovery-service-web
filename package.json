@@ -99,7 +99,7 @@
     "lodash-es": "^4.17.23",
     "playwright": "1.56.1",
     "preact": "^10.28.2",
-    "storybook": "^10.1.9",
+    "storybook": "^10.3.3",
     "ts-jest": "^29.4.1",
     "ts-node": "^10.9.2",
     "typescript": "^5",
