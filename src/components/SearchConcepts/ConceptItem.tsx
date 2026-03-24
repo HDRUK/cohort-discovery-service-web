@@ -86,7 +86,6 @@ export const ConceptItem = ({
   const labelEl = (
     <ConceptTitle
       size="small"
-      useSeparator={false}
       title={titleText}
       subTitle={showDomain ? mapDomain(concept.category) : ""}
       display={"flex"}

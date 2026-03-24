@@ -6,7 +6,6 @@ export interface TitleProps extends Omit<BoxProps, "title"> {
   subTitle?: number | string | ReactNode;
   children?: ReactNode;
   startIcon?: ReactNode;
-  useSeparator?: boolean;
   size?: "small" | "medium" | "large";
   wrapperSx?: BoxProps;
 }
@@ -16,7 +15,6 @@ const ConceptTitle = ({
   subTitle,
   children,
   startIcon,
-  useSeparator = true,
   size = "medium",
   wrapperSx,
   ...rest
@@ -40,10 +38,9 @@ const ConceptTitle = ({
         <Typography
           variant={titleVariant}
           component="span"
-          // noWrap
-          sx={{ overflow: "scroll", textOverflow: "", minWidth: 0 }}
+          sx={{ overflow: "scroll", minWidth: 0 }}
         >
-          {startIcon} {title} {useSeparator && subTitle && "/"}
+          {startIcon} {title}
         </Typography>
 
         {subTitle && (
@@ -51,7 +48,7 @@ const ConceptTitle = ({
             variant={subTitleVariant}
             component="span"
             noWrap
-            sx={{ flexShrink: 0, mx: 1 }}
+            sx={{ flexShrink: 0, ml: "10px" }}
           >
             {subTitle}
           </Typography>
