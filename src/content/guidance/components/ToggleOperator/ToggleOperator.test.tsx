@@ -2,7 +2,7 @@ import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import ToggleOperator from "./ToggleOperator";
-import MockDaphneStore from "@/store/MockDaphneStore";
+import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 import { CombinatorType } from "@/types/rules";
 import { v4 as uuidv4 } from "uuid";
 const setSelectedGuidance = jest.fn();
@@ -21,7 +21,7 @@ describe("ToggleOperator", () => {
     };
 
     render(
-      <MockDaphneStore
+      <MockCohortDiscoveryServiceStore
         overrides={{
           queryBuilder: {
             openSelectDatasetsPanel: true,
@@ -30,7 +30,7 @@ describe("ToggleOperator", () => {
         }}
       >
         <ToggleOperator operator={operator} />
-      </MockDaphneStore>,
+      </MockCohortDiscoveryServiceStore>,
     );
 
     let orRadio = screen.getByLabelText("OR") as HTMLInputElement;

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs";
 import { useState } from "react";
 import SearchConcepts from "./SearchConcepts";
 import type { Concept } from "@/types/api";
-import MockDaphneStore from "@/store/MockDaphneStore";
+import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 
 const meta: Meta<typeof SearchConcepts> = {
   title: "Components/SearchConcepts",
@@ -21,27 +21,27 @@ const Component = (props: React.ComponentProps<typeof SearchConcepts>) => {
 
 export const NoDomainMultipleSelect: Story = {
   render: () => (
-    <MockDaphneStore>
+    <MockCohortDiscoveryServiceStore>
       <Component multiple={true} />
-    </MockDaphneStore>
+    </MockCohortDiscoveryServiceStore>
   ),
 };
 
 export const ConditionMultipleSelect: Story = {
   render: () => (
-    <MockDaphneStore>
+    <MockCohortDiscoveryServiceStore>
       <Component multiple={true} domain="Condition" />
-    </MockDaphneStore>
+    </MockCohortDiscoveryServiceStore>
   ),
 };
 
 export const NoDomainSingleSelect: Story = {
   render: () => (
-    <MockDaphneStore>
+    <MockCohortDiscoveryServiceStore>
       <Component
         multiple={false}
         onClick={(c: Concept) => alert(`${c.name} clicked`)}
       />
-    </MockDaphneStore>
+    </MockCohortDiscoveryServiceStore>
   ),
 };

@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom";
 import { fireEvent, render, screen } from "@testing-library/react";
 import Rule, { RuleProps } from "./Rule";
-import MockDaphneStore from "@/store/MockDaphneStore";
+import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 import { RuleLeafType, RuleGroupType } from "@/types/rules";
 import userEvent from "@testing-library/user-event";
 
@@ -39,13 +39,13 @@ describe("Rule", () => {
     } as RuleGroupType;
 
     const rendered = render(
-      <MockDaphneStore
+      <MockCohortDiscoveryServiceStore
         overrides={{
           queryBuilder: { queryBuilderJson: query, setQueryBuilderJson },
         }}
       >
         <Rule {...rest} rule={rule} groupId="group-1" />
-      </MockDaphneStore>,
+      </MockCohortDiscoveryServiceStore>,
     );
     return {
       query,

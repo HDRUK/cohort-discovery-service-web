@@ -1,5 +1,5 @@
 {
-  "name": "daphne-web",
+  "name": "cohort-discovery-service-web",
   "version": "1.3.0",
   "private": true,
   "scripts": {

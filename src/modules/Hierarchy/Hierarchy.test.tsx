@@ -2,7 +2,7 @@ import "@testing-library/jest-dom";
 import { render, screen, within } from "@testing-library/react";
 import { Hierarchy } from "./Hierarchy";
 
-import MockDaphneStore from "@/store/MockDaphneStore";
+import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 import { CombinatorType, RuleGroupType, RuleNodeType } from "@/types/rules";
 import { validateRuleTree } from "@/utils/rules";
 const setQueryBuilderJson = jest.fn();
@@ -41,7 +41,7 @@ describe("QueryBuilder", () => {
       rules,
     }) as RuleGroupType;
     const rendered = render(
-      <MockDaphneStore
+      <MockCohortDiscoveryServiceStore
         overrides={{
           queryBuilder: {
             queryBuilderJson: group,
@@ -50,7 +50,7 @@ describe("QueryBuilder", () => {
         }}
       >
         <Hierarchy />
-      </MockDaphneStore>,
+      </MockCohortDiscoveryServiceStore>,
     );
     return rendered;
   };

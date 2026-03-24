@@ -3,7 +3,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import getCollections from "@/actions/collection/getCollections";
 import SelectDatasets from "./SelectDatasets";
-import MockDaphneStore from "@/store/MockDaphneStore";
+import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 
 jest.mock("@/actions/collection/getCollections");
 
@@ -21,7 +21,7 @@ describe("SelectDatasets", () => {
     const collections = await getCollections();
 
     render(
-      <MockDaphneStore
+      <MockCohortDiscoveryServiceStore
         overrides={{
           queryBuilder: {
             openSelectDatasetsPanel: true,
@@ -32,7 +32,7 @@ describe("SelectDatasets", () => {
         }}
       >
         <SelectDatasets />
-      </MockDaphneStore>,
+      </MockCohortDiscoveryServiceStore>,
     );
 
     collections.data.forEach((collection) => {
@@ -45,7 +45,7 @@ describe("SelectDatasets", () => {
     const user = userEvent.setup();
 
     render(
-      <MockDaphneStore
+      <MockCohortDiscoveryServiceStore
         overrides={{
           queryBuilder: {
             openSelectDatasetsPanel: true,
@@ -58,7 +58,7 @@ describe("SelectDatasets", () => {
         }}
       >
         <SelectDatasets />
-      </MockDaphneStore>,
+      </MockCohortDiscoveryServiceStore>,
     );
 
     const { pid, name } = collections.data[0];
@@ -76,7 +76,7 @@ describe("SelectDatasets", () => {
     const selected = collections.data.slice(0, 2).map((c) => c.pid);
 
     render(
-      <MockDaphneStore
+      <MockCohortDiscoveryServiceStore
         overrides={{
           queryBuilder: {
             openSelectDatasetsPanel: true,
@@ -88,7 +88,7 @@ describe("SelectDatasets", () => {
         }}
       >
         <SelectDatasets />
-      </MockDaphneStore>,
+      </MockCohortDiscoveryServiceStore>,
     );
 
     const matches = screen.queryAllByText(
@@ -103,7 +103,7 @@ describe("SelectDatasets", () => {
     const user = userEvent.setup();
 
     render(
-      <MockDaphneStore
+      <MockCohortDiscoveryServiceStore
         overrides={{
           queryBuilder: {
             openSelectDatasetsPanel: true,
@@ -116,7 +116,7 @@ describe("SelectDatasets", () => {
         }}
       >
         <SelectDatasets />
-      </MockDaphneStore>,
+      </MockCohortDiscoveryServiceStore>,
     );
 
     const toggle = screen.getByTestId("toggle-action-on");
@@ -130,7 +130,7 @@ describe("SelectDatasets", () => {
     const collections = await getCollections();
 
     render(
-      <MockDaphneStore
+      <MockCohortDiscoveryServiceStore
         overrides={{
           queryBuilder: {
             openSelectDatasetsPanel: true,
@@ -142,7 +142,7 @@ describe("SelectDatasets", () => {
         }}
       >
         <SelectDatasets />
-      </MockDaphneStore>,
+      </MockCohortDiscoveryServiceStore>,
     );
 
     expect(screen.getByText("Including")).toBeInTheDocument();
@@ -153,7 +153,7 @@ describe("SelectDatasets", () => {
     const collections = await getCollections();
 
     render(
-      <MockDaphneStore
+      <MockCohortDiscoveryServiceStore
         overrides={{
           queryBuilder: {
             openSelectDatasetsPanel: true,
@@ -165,7 +165,7 @@ describe("SelectDatasets", () => {
         }}
       >
         <SelectDatasets />
-      </MockDaphneStore>,
+      </MockCohortDiscoveryServiceStore>,
     );
 
     expect(screen.getByText("Excluding")).toBeInTheDocument();
@@ -178,7 +178,7 @@ describe("SelectDatasets", () => {
     const previous = collections.data.slice(0, 1).map((c) => c.pid);
 
     render(
-      <MockDaphneStore
+      <MockCohortDiscoveryServiceStore
         overrides={{
           queryBuilder: {
             openSelectDatasetsPanel: true,
@@ -193,7 +193,7 @@ describe("SelectDatasets", () => {
         }}
       >
         <SelectDatasets />
-      </MockDaphneStore>,
+      </MockCohortDiscoveryServiceStore>,
     );
 
     await user.click(screen.getByRole("button", { name: "Cancel" }));
@@ -208,7 +208,7 @@ describe("SelectDatasets", () => {
     const selected = collections.data.slice(0, 2).map((c) => c.pid);
 
     render(
-      <MockDaphneStore
+      <MockCohortDiscoveryServiceStore
         overrides={{
           queryBuilder: {
             openSelectDatasetsPanel: true,
@@ -222,7 +222,7 @@ describe("SelectDatasets", () => {
         }}
       >
         <SelectDatasets />
-      </MockDaphneStore>,
+      </MockCohortDiscoveryServiceStore>,
     );
 
     await user.click(screen.getByRole("button", { name: "Save and Close" }));
@@ -235,7 +235,7 @@ describe("SelectDatasets", () => {
     const collections = await getCollections();
 
     render(
-      <MockDaphneStore
+      <MockCohortDiscoveryServiceStore
         overrides={{
           queryBuilder: {
             openSelectDatasetsPanel: true,
@@ -247,7 +247,7 @@ describe("SelectDatasets", () => {
         }}
       >
         <SelectDatasets />
-      </MockDaphneStore>,
+      </MockCohortDiscoveryServiceStore>,
     );
 
     expect(
@@ -259,7 +259,7 @@ describe("SelectDatasets", () => {
     const collections = await getCollections();
 
     render(
-      <MockDaphneStore
+      <MockCohortDiscoveryServiceStore
         overrides={{
           queryBuilder: {
             openSelectDatasetsPanel: true,
@@ -271,7 +271,7 @@ describe("SelectDatasets", () => {
         }}
       >
         <SelectDatasets />
-      </MockDaphneStore>,
+      </MockCohortDiscoveryServiceStore>,
     );
 
     expect(

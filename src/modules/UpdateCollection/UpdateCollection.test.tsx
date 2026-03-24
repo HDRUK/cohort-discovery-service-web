@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import UpdateCollection from ".";
-import MockDaphneStore from "@/store/MockDaphneStore";
+import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 import { getMockCollection } from "@/actions/collection/__mocks__/getCollections";
 import { ThreePaneProvider } from "@/providers/ThreePaneProvider";
 import getCollectionHost from "@/actions/collectionHost/__mocks__/getCollectionHost";
@@ -49,7 +49,7 @@ describe("UpdateCollection", () => {
 
     const collectionHosts = [host1, host2];
     return render(
-      <MockDaphneStore
+      <MockCohortDiscoveryServiceStore
         overrides={{
           custodian: {
             current: {
@@ -75,7 +75,7 @@ describe("UpdateCollection", () => {
             </CloseGuardProvider>
           </SwimLane>
         </ThreePaneProvider>
-      </MockDaphneStore>,
+      </MockCohortDiscoveryServiceStore>,
     );
   };
 
