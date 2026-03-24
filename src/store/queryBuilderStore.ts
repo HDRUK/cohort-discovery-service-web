@@ -342,7 +342,7 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
       name += `${mapDomain(category || "Blank")} rule`.trim();
     } else if (isOperator(node))
       name += `${node.combinator.toUpperCase()} operator`;
-    else if (isAgeFilter(node)) name += "Age Filter";
+    else if (isAgeFilter(node)) name += "Age Rule";
     else name += "Unknown";
 
     return name;

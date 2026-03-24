@@ -46,10 +46,10 @@ const ActionMenu: React.FC = () => {
         defaultExpanded
         underline
       >
-        <AddButton onClick={createNewAgeFilter} label={"Add age filter"} />
         <AddButton onClick={createNewRule} label={"Add rule"} />
-        <AddButton onClick={createNewGroup} label={"Add group"} />
         <AddButton onClick={createNewOperator} label={"Add operator"} />
+        <AddButton onClick={createNewAgeFilter} label={"Add age rule"} />
+        <AddButton onClick={createNewGroup} label={"Add group"} />
       </ActionMenuSection>
       <ActionMenuSection
         title={"Hierarchy"}
