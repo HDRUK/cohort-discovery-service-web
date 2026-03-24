@@ -81,7 +81,7 @@ const RESOLVE = <T,>(v: T) => Promise.resolve(v);
 const DEFAULT_QUERY: RuleGroupType =
   process.env.NEXT_PUBLIC_USE_EXAMPLE_QUERY === "true" ? EXAMPLE_1 : NO_QUERY;
 
-const MockDaphneStore = ({
+const MockCohortDiscoveryServiceStore = ({
   overrides,
   children,
 }: PropsWithChildren<{ overrides?: SliceOverrides }>) => {
@@ -265,4 +265,4 @@ const MockDaphneStore = ({
   );
 };
 
-export default MockDaphneStore;
+export default MockCohortDiscoveryServiceStore;

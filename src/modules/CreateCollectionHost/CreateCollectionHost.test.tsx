@@ -5,9 +5,9 @@ import CreateCollectionHost from "./CreateCollectionHost";
 import { Custodian } from "@/types/api";
 import getCustodian from "@/actions/custodian/__mocks__/getCustodian";
 import { NotifyProvider } from "@/providers/NotifyProvider";
-import MockDaphneStore from "@/store/MockDaphneStore";
+import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 
-// --- Mock Daphne store ---
+// --- Mock CohortDiscoveryService store ---
 const createCollectionHost = jest.fn();
 const onCancel = jest.fn();
 
@@ -18,7 +18,7 @@ const renderCreateColllectionHost = (
 ) =>
   render(
     <NotifyProvider>
-      <MockDaphneStore
+      <MockCohortDiscoveryServiceStore
         overrides={{
           custodian: {
             createCollectionHost,
@@ -30,7 +30,7 @@ const renderCreateColllectionHost = (
           onCancel={onCancel}
           {...overrides}
         />
-      </MockDaphneStore>
+      </MockCohortDiscoveryServiceStore>
     </NotifyProvider>,
   );
 

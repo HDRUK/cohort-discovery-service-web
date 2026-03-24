@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import RuleGroup, { RuleGroupProps } from "./RuleGroup";
-import MockDaphneStore from "@/store/MockDaphneStore";
+import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 import { CombinatorType, RuleGroupType } from "@/types/rules";
 import userEvent from "@testing-library/user-event";
 
@@ -57,13 +57,13 @@ describe("RuleGroup", () => {
     } as RuleGroupType;
 
     const rendered = render(
-      <MockDaphneStore
+      <MockCohortDiscoveryServiceStore
         overrides={{
           queryBuilder: { queryBuilderJson: query, setQueryBuilderJson },
         }}
       >
         <RuleGroup {...rest} group={group} parentGroupId="outer-group" />
-      </MockDaphneStore>,
+      </MockCohortDiscoveryServiceStore>,
     );
     return {
       query,

@@ -3,7 +3,7 @@ import Rule from "./Rule";
 
 import { RuleLeafType } from "@/types/rules";
 import { Concept } from "@/types/api";
-import MockDaphneStore from "@/store/MockDaphneStore";
+import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 
 const mockConcept: Concept = {
   concept_id: 1234,
@@ -56,9 +56,9 @@ export const EmptyRuleThatIsSearchable: Story = {
     },
   },
   render: (args) => (
-    <MockDaphneStore>
+    <MockCohortDiscoveryServiceStore>
       <Rule {...args} />
-    </MockDaphneStore>
+    </MockCohortDiscoveryServiceStore>
   ),
 };
 

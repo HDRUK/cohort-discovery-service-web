@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import CollectionsTable, { CollectionsTableProps } from "./CollectionsTable";
 import getCustodianCollections from "@/actions/collection/getCustodianCollections";
 import getCustodian from "@/actions/custodian/getCustodian";
-import MockDaphneStore from "@/store/MockDaphneStore";
+import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 import { CollectionWithHosts, Paginated } from "@/types/api";
 jest.mock("@/actions/collection/getCustodianCollections");
 jest.mock("@/actions/collection/getCollectionDetails");
@@ -15,7 +15,7 @@ describe("CollectionsTable", () => {
     props?: CollectionsTableProps,
   ) =>
     render(
-      <MockDaphneStore
+      <MockCohortDiscoveryServiceStore
         overrides={{
           admin: {
             collections,
@@ -23,7 +23,7 @@ describe("CollectionsTable", () => {
         }}
       >
         <CollectionsTable {...props} />
-      </MockDaphneStore>,
+      </MockCohortDiscoveryServiceStore>,
     );
 
   const renderCollectionsTable = (
@@ -31,7 +31,7 @@ describe("CollectionsTable", () => {
     props?: CollectionsTableProps,
   ) =>
     render(
-      <MockDaphneStore
+      <MockCohortDiscoveryServiceStore
         overrides={{
           custodian: {
             current: {
@@ -42,7 +42,7 @@ describe("CollectionsTable", () => {
         }}
       >
         <CollectionsTable {...props} />
-      </MockDaphneStore>,
+      </MockCohortDiscoveryServiceStore>,
     );
 
   it("renders the correct column headers for admin", async () => {
