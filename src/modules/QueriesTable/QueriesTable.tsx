@@ -237,14 +237,7 @@ const QueriesTable = ({
         },
       }}
       rightAction={{
-        refreshProps: {
-          tag: user ? getUserQueryTag(user.id) : TAG_QUERIES,
-          label: "Refresh Queries",
-        },
         sortProps: { field: "name" },
-        deleteProps: {
-          onClick: deleteQueries,
-        },
       }}
       rightPanel={QueryHistoryGuidance}
     />

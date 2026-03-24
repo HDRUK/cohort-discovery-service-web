@@ -46,11 +46,6 @@ const QueryResultsPageContent = async ({
             },
           },
           rightAction: {
-            downloadProps: {
-              ids: [queryData.data.pid],
-              entity: "queries",
-              formats: [AvailableFormats.JSON],
-            },
             // sortProps: { field: "collection.name" },
             // **SC - disabling this for now because it uses query string for sorting order. But this is not scoped
             // to the tab, but to the whole page, meaning it's being incorrectly applied to the history page too,
