@@ -12,6 +12,7 @@ import ActionMenuSection from "@/components/ActionMenuSection";
 import {
   CollectionStatus,
   CollectionWithHosts,
+  frequencyMap,
   FrequencyMode,
   UrlString,
 } from "@/types/api";
@@ -36,10 +37,11 @@ import ErrorHeader from "@/components/ErrorHeader";
 import { useAdminDataStore } from "@/store/adminDataStore";
 import UpdatePanel from "@/components/UpdatePanel";
 import { useThreePane } from "@/providers/ThreePaneProvider";
-import { useSaveChanges } from "@/hooks/useSaveChanges";
+import { FieldConfigMap, useSaveChanges } from "@/hooks/useSaveChanges";
 import { useUserDataStore } from "@/hooks/userDataStore";
 import { useIsAdminSection } from "@/contexts/AdminSectionContext";
 import ToggleSynthetic from "@/components/ToggleSynthetic";
+import { getFrequencyModeKey } from "@/utils/frequency";
 
 export type UpdateCollectionProps = {
   collection: CollectionWithHosts;
@@ -107,8 +109,6 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
     (s) => s.current.collectionHosts,
   );
   const updateCollection = useCustodianStore((s) => s.updateCollection);
-
-  const updateCollectionAdmin = useAdminStore((s) => s.updateCollection);
   const updateCollectionStatus = useAdminStore((s) => s.updateCollectionStatus);
   const collectionHosts = useAdminDataStore((s) => s.collectionHosts);
   const workgroups = useUserDataStore((s) => s.workgroups);
@@ -166,7 +166,6 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
     const ref = lastCollectionIdRef.current;
     if (ref === collection.id) return;
     lastCollectionIdRef.current = collection.id;
-    if (ref === null) return;
 
     reset(getDefaultValues(collection), {
       keepDirty: false,
@@ -180,11 +179,8 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
 
       const { id, name } = collection;
       if (isDirty) {
-        if (currentCustodian) {
-          await updateCollection(id, data.collection, data.config);
-        } else {
-          await updateCollectionAdmin(id, data.collection, data.config);
-        }
+        lastCollectionIdRef.current = null;
+        await updateCollection(id, data.collection, data.config, false);
         notify.success(`Updated collection ${data.collection.name}`);
 
         const currentNames = new Set(
@@ -249,7 +245,6 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
       isDirty,
       notify,
       updateCollection,
-      updateCollectionAdmin,
       updateCollectionStatus,
       onClose,
       workgroups,
@@ -266,16 +261,52 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
     onClose();
   }, [reset, onClose, defaultValues]);
 
+  const fieldConfig = useMemo<FieldConfigMap>(
+    () => ({
+      "collection.host_id": {
+        label: "Host",
+        getValueLabel: (value) =>
+          allowedCollectionHosts.find((ch) => ch.id === value)?.name,
+      },
+      "collection.name": {
+        label: "Name",
+      },
+      "collection.description": {
+        label: "Description",
+      },
+      "collection.url": {
+        label: "Link to Associated Dataset",
+      },
+      "config.frequency_mode": {
+        label: "Frequency",
+        getValueLabel: (value) => getFrequencyModeKey(String(value)),
+      },
+      "config.run_time_frequency": {
+        label: "Run time Frequency",
+        getValueLabel: (value, id, table) => {
+          const frequencyMode = id
+            ? table?.getRow("config.frequency_mode")?.original?.[id]
+            : undefined;
+
+          return frequencyMap[String(frequencyMode) as FrequencyMode][
+            Number(value)
+          ];
+        },
+      },
+    }),
+    [allowedCollectionHosts],
+  );
+
   useSaveChanges<UpdateCollectionFormValues>({
     control,
     entityName: collection.name,
     onSave,
     onDiscard,
     ignoreFields: [
-      "collection.host_id", // displays 'id' otherwise - will revisit this one
-      "collection.model_state.state_id", // used by 'request make active'
-      "collection.model_state.state.id", //may not be needed - for safety
+      "collection.model_state.state_id",
+      "collection.model_state.state.id",
     ],
+    fieldConfig,
   });
 
   return (
@@ -286,6 +317,7 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
       onUnlockClick={() => onClose?.()}
       rightExtras={<ErrorHeader errors={errors} depth={2} editing />}
     >
+      {isDirty ? "dirty" : "not-dirty"}
       <FormProvider {...formMethods}>
         <FormLabel underlined>Collection Type</FormLabel>
         <ToggleSynthetic disabled={!expandedRight} />
@@ -332,7 +364,6 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
                     if (checked) next.add(name);
                     else next.delete(name);
 
-                    // IMPORTANT: onChange will mark dirty vs defaultValues automatically
                     field.onChange(Array.from(next).sort());
                   };
 
@@ -365,6 +396,7 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
             )}
           </>
         )}
+
         <ActionMenuSection
           gap={2}
           title={"Collection Credentials"}
@@ -374,15 +406,6 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
             mt: 2,
           }}
         >
-          {/* missing in the BE - ticket created
-            <FormTextField
-            value={collection.custodian.url}
-              copyable
-              label="Link to Custodian Page"
-              labelUnderlined
-            />
-          */}
-
           <Box
             sx={{
               borderColor: "text.secondary",
@@ -441,7 +464,7 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
                 <FormDropdown
                   {...field}
                   select
-                  label="Host"
+                  label={fieldConfig[field.name].label}
                   id={field.name}
                   error={error}
                   fullWidth
@@ -470,7 +493,7 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
               <FormTextField
                 copyable
                 {...field}
-                label="Link to Associated Dataset"
+                label={fieldConfig[field.name].label}
                 labelUnderlined
                 error={error}
                 onKeyDown={(e) => {
@@ -502,7 +525,7 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
               <FormTextField
                 {...field}
                 id={field.name}
-                label="Name"
+                label={fieldConfig[field.name].label}
                 error={error}
                 fullWidth
                 labelUnderlined
@@ -519,7 +542,7 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
               <FormTextField
                 {...field}
                 id={field.name}
-                label="Description"
+                label={fieldConfig[field.name].label}
                 error={error}
                 fullWidth
                 labelUnderlined
@@ -542,14 +565,7 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
             disabled={!expandedRight}
             collection={collection}
           />
-          <CollectionConfig<UpdateCollectionFormValues>
-            disabled={!expandedRight}
-            keepExpanded
-            frequencyFieldName={"config.frequency_mode"}
-            runTimeFrequencyFieldName={"config.run_time_frequency"}
-            runTimeHourFieldName={"config.run_time_hour"}
-            runTimeMinuteFieldName={"config.run_time_minute"}
-          />
+          <CollectionConfig disabled={!expandedRight} keepExpanded />
         </ActionMenuSection>
       </FormProvider>
     </UpdatePanel>

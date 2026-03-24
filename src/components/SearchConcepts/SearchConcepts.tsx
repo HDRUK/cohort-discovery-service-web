@@ -139,6 +139,7 @@ const SearchConcepts = ({
         e.preventDefault();
       }}
       showCode
+      showCounts
     />
   );
 

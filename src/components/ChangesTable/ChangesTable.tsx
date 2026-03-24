@@ -3,10 +3,11 @@ import { useMemo } from "react";
 import type { MRT_ColumnDef } from "material-react-table";
 import { useTable } from "@/hooks/useTable";
 import Table from "@/components/Table";
+import { FieldConfigMap } from "@/hooks/useSaveChanges";
 
 type DiffLeaf = { old: unknown; new: unknown };
 
-type ChangeRow = {
+export type ChangeRow = {
   path: string;
   oldValue: unknown;
   newValue: unknown;
@@ -80,33 +81,56 @@ function formatValue(v: unknown): string {
   }
 }
 
-export const ChangesTable = ({ changed }: { changed: unknown }) => {
+type ChangesTableProps = {
+  changed: unknown;
+  fieldConfig?: FieldConfigMap;
+};
+
+export const ChangesTable = ({ changed, fieldConfig }: ChangesTableProps) => {
   const data = useMemo<ChangeRow[]>(() => flattenChanged(changed), [changed]);
 
   const columns = useMemo<MRT_ColumnDef<ChangeRow>[]>(
     () => [
       {
-        accessorKey: "path",
+        id: "path",
         header: "Field",
+        accessorFn: (row) => fieldConfig?.[row.path]?.label ?? row.path,
       },
       {
-        accessorKey: "oldValue",
+        id: "oldValue",
         header: "Old Value",
-        accessorFn: (row) => formatValue(row.oldValue),
+        Cell: ({ row, table }) => {
+          return (
+            fieldConfig?.[row.original.path]?.getValueLabel?.(
+              row.original.oldValue,
+              "oldValue",
+              table,
+            ) ?? formatValue(row.original.oldValue)
+          );
+        },
       },
       {
-        accessorKey: "newValue",
+        id: "newValue",
         header: "New Value",
-        accessorFn: (row) => formatValue(row.newValue),
+        Cell: ({ row, table }) => {
+          return (
+            fieldConfig?.[row.original.path]?.getValueLabel?.(
+              row.original.newValue,
+              "newValue",
+              table,
+            ) ?? formatValue(row.original.newValue)
+          );
+        },
       },
     ],
-    [],
+    [fieldConfig],
   );
 
   const table = useTable<ChangeRow>({
     columns,
     data,
     enableRowSelection: false,
+    getRowId: (originalRow) => originalRow.path,
   });
 
   return (

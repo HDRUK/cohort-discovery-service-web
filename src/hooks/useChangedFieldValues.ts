@@ -7,7 +7,7 @@ import {
   useWatch,
 } from "react-hook-form";
 
-type DiffLeaf = { old: unknown; new: unknown };
+export type DiffLeaf = { old: unknown; new: unknown };
 
 export type Diffed<T> = T extends (infer U)[]
   ? Diffed<U>[]

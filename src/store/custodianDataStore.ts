@@ -52,6 +52,7 @@ export interface CustodianDataStoreState {
     id: number,
     payload: Partial<CreateCollectionPost>,
     payloadConfig: Partial<CreateCollectionConfigPost>,
+    refreshCache?: boolean,
   ) => Promise<Collection>;
   deleteCollection: (
     id: number | string,
@@ -125,12 +126,17 @@ export const useCustodianDataStore = create<CustodianDataStoreState>(
       return data;
     },
 
-    updateCollection: async (id, payload, payloadConfig) => {
+    updateCollection: async (
+      id,
+      payload,
+      payloadConfig,
+      refreshCache = true,
+    ) => {
       const { data } = await updateCollection(id, payload);
 
       const idConfig = data.config.id;
       await updateCollectionConfig(idConfig, payloadConfig);
-      await revalidateCollections(data.custodian.pid);
+      if (refreshCache) await revalidateCollections(data.custodian.pid);
       return data;
     },
 
