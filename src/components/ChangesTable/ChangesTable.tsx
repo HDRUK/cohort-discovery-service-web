@@ -99,28 +99,22 @@ export const ChangesTable = ({ changed, fieldConfig }: ChangesTableProps) => {
       {
         id: "oldValue",
         header: "Old Value",
-        Cell: ({ row, table }) => {
-          return (
-            fieldConfig?.[row.original.path]?.getValueLabel?.(
-              row.original.oldValue,
-              "oldValue",
-              table,
-            ) ?? formatValue(row.original.oldValue)
-          );
-        },
+        Cell: ({ row, table }) =>
+          fieldConfig?.[row.original.path]?.getValueLabel?.(
+            row.original.oldValue,
+            "oldValue",
+            table,
+          ) ?? formatValue(row.original.oldValue),
       },
       {
         id: "newValue",
         header: "New Value",
-        Cell: ({ row, table }) => {
-          return (
-            fieldConfig?.[row.original.path]?.getValueLabel?.(
-              row.original.newValue,
-              "newValue",
-              table,
-            ) ?? formatValue(row.original.newValue)
-          );
-        },
+        Cell: ({ row, table }) =>
+          fieldConfig?.[row.original.path]?.getValueLabel?.(
+            row.original.newValue,
+            "newValue",
+            table,
+          ) ?? formatValue(row.original.newValue),
       },
     ],
     [fieldConfig],
