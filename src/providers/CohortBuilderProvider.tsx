@@ -214,10 +214,10 @@ export const CohortBuilderProvider = ({
 
   const actions = useMemo<Action[]>(
     () => [
-      { action: createNewAgeFilter, label: "Add Age Filter" },
       { action: createNewRule, label: "Add Rule" },
-      { action: createNewGroup, label: "Add Group" },
       { action: createNewOperator, label: "Add Operator" },
+      { action: createNewAgeFilter, label: "Add Age Rule" },
+      { action: createNewGroup, label: "Add Group" },
     ],
     [createNewAgeFilter, createNewRule, createNewGroup, createNewOperator],
   );
