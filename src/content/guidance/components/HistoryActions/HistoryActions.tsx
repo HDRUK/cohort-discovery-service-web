@@ -65,8 +65,8 @@ const HistoryActions = ({
   const handleDelete = async () => {
     await deleteQueries(selectedIds);
     const openQueries = (searchParams.get("open_queries") || "")
-      .split(",")
-      .filter((q) => q && !(q in selectedIds));
+      .split(/,|%2C/)
+      .filter((q) => q && !selectedIds.includes(q));
     router.push(routes.dashboardHistory(openQueries));
     notify.success(`Deleted ${multiple ? "queries" : "query"}`);
     setDialogOpen(false);
