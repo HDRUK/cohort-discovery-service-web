@@ -26,8 +26,6 @@ import getQueries from "@/actions/query/getQueries";
 import { getQueryName } from "@/utils/query";
 import useSearchParams from "@/hooks/useSearchParams";
 import { buildQueryHistoryParams } from "@/utils/params";
-import useUserStore from "@/hooks/useUserStore";
-import { getUserQueryTag, TAG_QUERIES } from "@/config/tags";
 import { useDefaults } from "@/providers/DefaultProvider";
 
 interface QueriesTableProps {
@@ -44,9 +42,6 @@ const QueriesTable = ({
   const { setSelectedDatasets } = useQueryBuilder((qb) => ({
     setSelectedDatasets: qb.setSelectedDatasets,
   }));
-
-  const user = useUserStore((store) => store.user);
-  const deleteQueries = useUserStore((store) => store.deleteQueries);
 
   const qc = useQueryClient();
   const queryKey = useMemo(

@@ -9,7 +9,6 @@ import { queryToText } from "@/utils/queryBuilder";
 import { buildQueryHistoryParams } from "@/utils/params";
 import { QueryHistorySearchParams } from "@/types/api";
 import { getQueryName } from "@/utils/query";
-import { AvailableFormats } from "@/components/DownloadButton/DownloadButton";
 
 type PageSearchParams = Promise<QueryHistorySearchParams>;
 
