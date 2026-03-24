@@ -25,7 +25,6 @@ const ConceptTitle = ({
   const subTitleVariant =
     size === "small" ? "h6" : size === "medium" ? "h5" : "h3";
 
-  console.log("rest", rest);
   return (
     <Box
       sx={{
