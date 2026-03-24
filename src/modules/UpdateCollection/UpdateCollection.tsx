@@ -405,6 +405,15 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
             mt: 2,
           }}
         >
+          {/* missing in the BE - ticket created
+            <FormTextField
+            value={collection.custodian.url}
+              copyable
+              label="Link to Custodian Page"
+              labelUnderlined
+            />
+          */}
+
           <Box
             sx={{
               borderColor: "text.secondary",
