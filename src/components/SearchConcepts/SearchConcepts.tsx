@@ -156,31 +156,40 @@ const SearchConcepts = ({
         }
       />
       <FormGroup sx={{ mt: 2 }}>
-        {multiple && visibleOptions.length > 0 && (
-          <>
-            <FormControlLabel
-              control={
-                <Checkbox checked={allSelected} onChange={toggleSelectAll} />
-              }
-              label="Select All"
-            />
-            <Divider />
-          </>
-        )}
+        <Box
+          sx={{
+            maxHeight: "500px",
+            display: "flex",
+            flexDirection: "column",
+            overflowY: "scroll",
+          }}
+        >
+          {multiple && visibleOptions.length > 0 && (
+            <>
+              <FormControlLabel
+                control={
+                  <Checkbox checked={allSelected} onChange={toggleSelectAll} />
+                }
+                label="Select All"
+              />
+              <Divider />
+            </>
+          )}
 
-        {nonSyntheticOptions.map(renderConceptItem)}
+          {nonSyntheticOptions.map(renderConceptItem)}
 
-        {syntheticOptions.length > 0 && (
-          <>
-            <Box sx={{ my: 1.5 }}>
-              <Divider sx={{ mb: 1 }} />
-              <Box sx={{ fontSize: 13, color: "text.secondary", px: 1 }}>
-                Concepts from synthetic collections
+          {syntheticOptions.length > 0 && (
+            <>
+              <Box sx={{ my: 1.5 }}>
+                <Divider sx={{ mb: 1 }} />
+                <Box sx={{ fontSize: 13, color: "text.secondary", px: 1 }}>
+                  Concepts from synthetic collections
+                </Box>
               </Box>
-            </Box>
-            {syntheticOptions.map(renderConceptItem)}
-          </>
-        )}
+              {syntheticOptions.map(renderConceptItem)}
+            </>
+          )}
+        </Box>
       </FormGroup>
     </Box>
   );
