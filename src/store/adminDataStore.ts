@@ -102,6 +102,7 @@ export interface AdminDataStoreState {
   updateCollectionStatus: (
     idOrIds: number | number[],
     status: CollectionStatus,
+    refreshCache?: boolean,
   ) => Promise<void>;
 
   createNetwork: (payload: CreateNetworkPost) => Promise<Network>;
@@ -230,12 +231,12 @@ export const useAdminDataStore = create<AdminDataStoreState>((set) => ({
     await revalidateAction(TAG_WORKGROUP_ADMIN);
   },
 
-  updateCollectionStatus: async (idOrIds, status) => {
+  updateCollectionStatus: async (idOrIds, status, refreshCache = true) => {
     const state = CollectionStatus[status].toLowerCase();
     const ids = Array.isArray(idOrIds) ? idOrIds : [idOrIds];
 
     await transitionCollections(ids, { state });
-    await revalidateCollections();
+    if (refreshCache) await revalidateCollections();
   },
 
   createNetwork: async (payload: CreateNetworkPost) => {

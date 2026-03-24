@@ -387,8 +387,8 @@ export interface Workgroup {
   id: number;
   name: string;
   external_name?: string;
-  users: User[];
-  collections: Collection[];
+  users?: User[];
+  collections?: Collection[];
 }
 
 export interface CreateWorkgroupPost {

@@ -1,5 +1,11 @@
 import { QueryContext } from "@/types/context";
-import { ApiResponse, Collection, Distribution, ModelState } from "@/types/api";
+import {
+  ApiResponse,
+  Collection,
+  CollectionWithHosts,
+  Distribution,
+  ModelState,
+} from "@/types/api";
 import { v4 as uuidv4 } from "uuid";
 import getCustodian from "../../custodian/__mocks__/getCustodian";
 
@@ -53,9 +59,9 @@ const getMockModelState = (rest?: Partial<ModelState>): ModelState => {
 };
 
 export const getMockCollection = (
-  rest?: Partial<Collection>,
+  rest?: Partial<CollectionWithHosts>,
   count: number = 1213,
-): Collection => ({
+): CollectionWithHosts => ({
   id: 1,
   pid: uuidv4(),
   name: "Test Dataset #1",
