@@ -71,7 +71,7 @@ const CollectionConfig = ({
           <Chip
             color="secondary"
             variant="outlined"
-            label={frequencyLabels[runTime] ?? ""}
+            label={runTime != null ? (frequencyLabels[runTime] ?? "") : ""}
           />
         </Box>
 
@@ -84,14 +84,14 @@ const CollectionConfig = ({
               render={({ field, fieldState }) => (
                 <FormRadioGroup
                   {...field}
-                  onChange={(_event, value) => field.onChange(value)}
+                  onChange={(_event, value) => field.onChange(Number(value))}
                   id={field.name}
                   label="Frequency"
                   error={!!fieldState.error}
                   required
                   options={Object.entries(FrequencyMode).map(
                     ([key, value]) => ({
-                      value,
+                      value: Number(value),
                       label: capitaliseFirstLetter(key.toLowerCase()),
                     }),
                   )}

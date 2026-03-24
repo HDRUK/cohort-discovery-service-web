@@ -317,7 +317,6 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
       onUnlockClick={() => onClose?.()}
       rightExtras={<ErrorHeader errors={errors} depth={2} editing />}
     >
-      {isDirty ? "dirty" : "not-dirty"}
       <FormProvider {...formMethods}>
         <FormLabel underlined>Collection Type</FormLabel>
         <ToggleSynthetic disabled={!expandedRight} />

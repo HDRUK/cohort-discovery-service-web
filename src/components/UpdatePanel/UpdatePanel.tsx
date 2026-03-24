@@ -125,6 +125,9 @@ export const UpdatePanel = ({
 
                 {/* Foreground layer 2 */}
                 <CircularIconButton
+                  data-testid={
+                    expandedRight ? "save-panel-toggle" : "edit-panel-toggle"
+                  }
                   component="div"
                   sx={{
                     borderRadius: 10,
