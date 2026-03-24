@@ -10,7 +10,7 @@ import {
   Stack,
   Tooltip,
 } from "@mui/material";
-import Title from "../Title";
+import ConceptTitle from "../ConceptTitle";
 import { mapDomain } from "@/utils/domains";
 import { ChangeEvent, MouseEvent } from "react";
 
@@ -84,14 +84,16 @@ export const ConceptItem = ({
   );
 
   const labelEl = (
-    <Title
+    <ConceptTitle
       size="small"
       useSeparator={false}
       title={titleText}
       subTitle={showDomain ? mapDomain(concept.category) : ""}
       display={"flex"}
       justifyContent={"space-between"}
+      alignItems={"center"}
       width={"100%"}
+      wrapperSx={{ width: "100%", overflow: "auto", flexWrap: "wrap" }}
     />
   );
 
