@@ -47,7 +47,7 @@ const ConceptTitle = ({
             variant={subTitleVariant}
             component="span"
             noWrap
-            sx={{ flexShrink: 0, ml: "10px" }}
+            sx={{ flexShrink: 0, ml: 1.25 }}
           >
             {subTitle}
           </Typography>
