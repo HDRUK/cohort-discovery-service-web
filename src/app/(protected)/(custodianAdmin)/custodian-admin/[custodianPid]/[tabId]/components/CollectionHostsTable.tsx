@@ -1,7 +1,7 @@
 import { CollectionHost } from "@/types/api";
 import { useTable } from "@/hooks/useTable";
 import { MRT_ColumnDef, MRT_RowSelectionState } from "material-react-table";
-import { Box } from "@mui/material";
+import { Box, Chip } from "@mui/material";
 import { Dispatch, SetStateAction, useMemo } from "react";
 import Table from "@/components/Table";
 
@@ -23,6 +23,25 @@ const CollectionHostsTable = ({
       {
         accessorKey: "name",
         header: "Name",
+      },
+      {
+        accessorFn: (row) => row.collections,
+        header: "Associated Collections",
+        Cell: ({ row }) => {
+          return (
+            <Box display="flex" gap={1}>
+              {row.original.collections.map((c) => {
+                return (
+                  <Chip
+                    color="secondary"
+                    label={c.name}
+                    key={`${c.name}-${row.original.id}`}
+                  />
+                );
+              })}
+            </Box>
+          );
+        },
       },
     ],
     [],

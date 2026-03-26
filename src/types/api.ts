@@ -347,6 +347,7 @@ export interface CollectionHost {
   client_id: string;
   client_secret: string;
   custodian: Custodian;
+  collections: Collection[];
 }
 
 export type UrlString = `http${"s" | ""}://${string}`;
