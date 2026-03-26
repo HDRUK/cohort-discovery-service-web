@@ -119,12 +119,14 @@ const HistoryActions = ({
           size="large"
         />
       )}
-      <DownloadButton
-        ids={selectedIds}
-        entity="queries"
-        formats={[AvailableFormats.JSON]}
-        isIcon={false}
-      />
+      {!multiple && (
+        <DownloadButton
+          ids={selectedIds}
+          entity="queries"
+          formats={[AvailableFormats.JSON]}
+          isIcon={false}
+        />
+      )}
       {!resultsView && (
         <>
           <DeleteMenuItem
