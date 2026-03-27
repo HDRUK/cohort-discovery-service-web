@@ -9,7 +9,7 @@ import {
 } from "@/utils/rules";
 import { MAX_AGE_FILTER, MIN_AGE_FILTER } from "@/config/rules";
 import { UniqueIdentifier } from "@dnd-kit/core";
-import { getDomainVerbs } from "./omop";
+import { getDomainPhrase } from "./omop";
 
 type Piece = { verb?: string | null; text: string };
 
@@ -21,7 +21,7 @@ const queryToText = (
   const subject = "People who";
 
   const getVerb = (category: string, exclude = false): string => {
-    const domain = getDomainVerbs(category);
+    const domain = getDomainPhrase(category);
     return exclude ? domain.exclude : domain.include;
   };
 

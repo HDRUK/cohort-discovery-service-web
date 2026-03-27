@@ -12,13 +12,13 @@ import {
 } from "@mui/x-date-pickers/DatePicker";
 import { CustomH1 } from "@/components/GuidanceHeaders";
 import useFeatures from "@/hooks/useFeatures";
+import { getDomainPhrase } from "@/utils/omop";
 import { capitaliseFirstLetter } from "@/utils/string";
 
 import SingleBoundSelector from "@/components/SingleBoundSelector";
 import DoubleBoundSelector from "@/components/DoubleBoundSelector";
 import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
 import HoverableDiv from "@/components/HoverableDiv";
-import { getDomainVerbs } from "@/utils/omop";
 
 export interface RuleTimeframeSelectorProps extends DatePickerProps {
   children?: ReactNode;
@@ -81,7 +81,7 @@ const RuleTimeframeSelector = ({
     disableOpenPicker: readOnly ? true : false,
   };
 
-  const { verb } = getDomainVerbs(rule.rule.concept?.category);
+  const { verb } = getDomainPhrase(rule.rule.concept?.category);
 
   const parseIsoToDayjs = useCallback(
     (iso: string | null) => (iso ? dayjs(iso) : null),

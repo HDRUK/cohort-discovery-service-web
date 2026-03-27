@@ -1,6 +1,11 @@
 import { Code } from "@/types/api";
 import { Option } from "@/types/common";
-import { DEFAULT_DOMAIN_VERB, DOMAIN_VERBS, DomainVerb } from "@/types/omop";
+import {
+  DEFAULT_DOMAIN_PHRASE,
+  DOMAIN_PHRASES,
+  DomainPhrase,
+  OmopTableName,
+} from "@/types/omop";
 
 const codesToOption = (codes: Code[]): Option[] =>
   codes
@@ -11,9 +16,13 @@ const codesToOption = (codes: Code[]): Option[] =>
       label: `${code.name} (${code.name}) `,
     }));
 
-const getDomainVerbs = (category?: string): DomainVerb => {
-  if (!category) return DEFAULT_DOMAIN_VERB;
-  return DOMAIN_VERBS[category.toLowerCase()] ?? DEFAULT_DOMAIN_VERB;
+export const getDomainPhrase = (category?: string): DomainPhrase => {
+  if (!category) return DEFAULT_DOMAIN_PHRASE;
+
+  return (
+    DOMAIN_PHRASES[category.toLowerCase() as OmopTableName] ??
+    DEFAULT_DOMAIN_PHRASE
+  );
 };
 
-export { codesToOption, getDomainVerbs };
+export { codesToOption, getDomainPhrase };

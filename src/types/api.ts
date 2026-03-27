@@ -129,6 +129,17 @@ export interface ResultFile extends WithTimestamps {
   task: Task;
 }
 
+export interface CollectionMetadata {
+  created_at: string;
+  os: string | null;
+  bclink: string;
+  biobank: string;
+  datamodel: string;
+  protocol: string;
+  rounding: string;
+  threshold: string;
+}
+
 export interface Collection extends WithTimestamps {
   id: number;
   name: string;
@@ -140,7 +151,7 @@ export interface Collection extends WithTimestamps {
   demographics?: Distribution[];
   latest_successful_demographic_result_file?: ResultFile | null;
   latest_successful_concept_result_file?: ResultFile | null;
-
+  latest_metadata?: CollectionMetadata | null;
   n_concepts?: number;
   custodian: Custodian;
   custodian_id?: number;
