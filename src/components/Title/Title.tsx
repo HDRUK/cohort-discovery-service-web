@@ -66,21 +66,14 @@ const Title = ({
       sx={{
         display: "flex",
         overflow: "hidden",
-        width: "100%",
       }}
       {...wrapperSx}
     >
-      <Box
-        display="flex"
-        alignItems="baseline"
-        minWidth={0}
-        width="100%"
-        {...rest}
-      >
+      <Box display="flex" alignItems="baseline" {...rest}>
         <Typography
           variant={titleVariant}
           component="span"
-          sx={{ minWidth: 0, flex: 1, ...overflowStyles }}
+          sx={{ minWidth: 0, ...overflowStyles }}
         >
           {startIcon} {title} {useSeparator && subTitle && "/"}
         </Typography>
