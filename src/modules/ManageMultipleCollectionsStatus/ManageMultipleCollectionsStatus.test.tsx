@@ -105,7 +105,7 @@ describe("ManageCollectionStatus", () => {
 
   it("renders the component in REJECTED with correct initial status", () => {
     renderComponent([CollectionStatus.REJECTED, CollectionStatus.REJECTED]);
-    expect(screen.queryByText(/Draft/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Draft/i)).toBeInTheDocument();
     expect(screen.queryByText(/Pending/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Active/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Inactive/i)).not.toBeInTheDocument();

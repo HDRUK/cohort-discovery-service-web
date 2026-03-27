@@ -37,15 +37,18 @@ const ManageMultipleCollectionsStatus = ({
     collections[0].model_state?.state_id ?? -1,
   );
 
-  const destinationOptions = {
-    [CollectionStatus.DRAFT]: [] as CollectionStatus[],
-    [CollectionStatus.PENDING]: currentCustodian
-      ? ([] as CollectionStatus[])
-      : [CollectionStatus.ACTIVE, CollectionStatus.REJECTED],
+  const pendingDestinations: CollectionStatus[] = currentCustodian
+    ? []
+    : [CollectionStatus.ACTIVE, CollectionStatus.REJECTED];
+
+  const destinationOptions: Record<CollectionStatus, CollectionStatus[]> = {
+    [CollectionStatus.DRAFT]: [],
+    [CollectionStatus.PENDING]: pendingDestinations,
     [CollectionStatus.ACTIVE]: [CollectionStatus.DRAFT],
-    [CollectionStatus.REJECTED]: [] as CollectionStatus[],
-    [CollectionStatus.SUSPENDED]: [] as CollectionStatus[],
+    [CollectionStatus.REJECTED]: [CollectionStatus.DRAFT],
+    [CollectionStatus.SUSPENDED]: [],
   };
+
   const options = (
     destinationOptions[initialStatusId as CollectionStatus] || []
   ).concat([initialStatusId as CollectionStatus]);
