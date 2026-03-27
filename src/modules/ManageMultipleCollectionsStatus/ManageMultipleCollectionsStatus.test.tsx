@@ -10,6 +10,7 @@ import {
 import { NotifyProvider } from "@/providers/NotifyProvider";
 import { FormProvider, useForm } from "react-hook-form";
 import { UpdateCollectionFormValues } from "@/types/forms";
+import ConfirmProvider from "@/components/ConfirmProvider";
 
 function TestHarness({ mockCollections }: { mockCollections: Collection[] }) {
   const formMethods = useForm<UpdateCollectionFormValues>({
@@ -32,12 +33,14 @@ function TestHarness({ mockCollections }: { mockCollections: Collection[] }) {
 
   return (
     <NotifyProvider>
-      <FormProvider {...formMethods}>
-        <ManageMultipleCollectionsStatus
-          collections={mockCollections}
-          expandedRight={true}
-        />
-      </FormProvider>
+      <ConfirmProvider>
+        <FormProvider {...formMethods}>
+          <ManageMultipleCollectionsStatus
+            collections={mockCollections}
+            expandedRight={true}
+          />
+        </FormProvider>
+      </ConfirmProvider>
     </NotifyProvider>
   );
 }
