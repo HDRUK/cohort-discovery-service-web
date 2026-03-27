@@ -319,9 +319,7 @@ const Guidance = () => {
       }
 
       const category = selectedNode?.rule?.concept?.category || "";
-      const { verb, verbPastTense, noun } = getDomainVerbs(
-        category.toLowerCase(),
-      );
+      const { verb, past, noun } = getDomainVerbs(category);
 
       return (
         <ActionMenuSection
@@ -335,7 +333,7 @@ const Guidance = () => {
               mapDomainForGuidance(selectedNode.rule.concept?.category || ""),
             )}
             verb={verb}
-            verbPastTense={verbPastTense}
+            verbPastTense={past}
             noun={capitaliseFirstLetter(noun)}
             timeConstraint={selectedNode?.timeConstraint}
             ageConstraint={selectedNode?.ageConstraint}
