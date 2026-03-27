@@ -36,7 +36,7 @@ const UpdateNetwork = () => {
     handleSubmit,
     control,
     reset,
-    formState: { defaultValues },
+    formState: { defaultValues, isDirty },
   } = formMethods;
 
   useEffect(() => {
@@ -60,22 +60,31 @@ const UpdateNetwork = () => {
   const submitForm = useCallback(
     async (data: UpdateNetworkFormValues, closeAfter = true) => {
       if (!selectedNetwork) return;
-      await updateNetwork(selectedNetwork.id, {
-        name: data.name,
-        url: data.url,
-      });
-
-      if (data.custodians.length > 0) {
-        await addCustodiansToNetwork({
-          custodian_ids: data.custodians.map((c) => +c.value),
-          id: selectedNetwork.id,
+      if (isDirty) {
+        await updateNetwork(selectedNetwork.id, {
+          name: data.name,
+          url: data.url,
         });
-      }
 
-      notify.success(`Updated network ${data.name}`);
+        if (data.custodians.length > 0) {
+          await addCustodiansToNetwork({
+            custodian_ids: data.custodians.map((c) => +c.value),
+            id: selectedNetwork.id,
+          });
+        }
+
+        notify.success(`Updated network ${data.name}`);
+      }
       if (closeAfter) onClose?.();
     },
-    [notify, onClose, addCustodiansToNetwork, updateNetwork, selectedNetwork],
+    [
+      isDirty,
+      notify,
+      onClose,
+      addCustodiansToNetwork,
+      updateNetwork,
+      selectedNetwork,
+    ],
   );
 
   const onSave = useCallback(
