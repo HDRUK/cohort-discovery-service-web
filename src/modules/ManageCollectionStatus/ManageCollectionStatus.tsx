@@ -60,6 +60,14 @@ const ManageCollectionStatus = ({
 
   const confirm = useConfirm();
 
+  const handleAction = async () => {
+    await requestCollectionMadeActive(collection.id);
+    setSelectedStatusId(CollectionStatus.PENDING);
+    notify.success(
+      `Requested for collection "${collection.name}" to be made active`,
+    );
+  };
+
   return (
     <>
       {collection?.model_state?.state_id == CollectionStatus.DRAFT &&
@@ -67,13 +75,7 @@ const ManageCollectionStatus = ({
           <AddButton
             disabled={!expandedRight}
             label={"Request to make active"}
-            onClick={async () => {
-              await requestCollectionMadeActive(collection.id);
-              setSelectedStatusId(CollectionStatus.PENDING);
-              notify.success(
-                `Requested for collection "${collection.name}" to be made active`,
-              );
-            }}
+            onClick={handleAction}
           />
         )}
 
