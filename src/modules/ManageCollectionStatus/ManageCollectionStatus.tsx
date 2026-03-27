@@ -131,7 +131,9 @@ const ManageCollectionStatus = ({
                   confirmText: "Yes",
                   confirmColor: "success",
                 });
-                if (!ok) return;
+                if (!ok || ok === "cancel") {
+                  return;
+                }
                 field.onChange(next);
                 setSelectedStatusId(next);
               }}
