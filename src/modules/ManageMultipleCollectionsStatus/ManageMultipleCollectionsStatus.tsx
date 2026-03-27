@@ -67,7 +67,6 @@ const ManageMultipleCollectionsStatus = ({
   const handleAction = async () => {
     await requestCollectionMadeActive(collections.map((c) => c.id));
     setSelectedStatusId(CollectionStatus.PENDING);
-    setSelectedStatusId(CollectionStatus.PENDING);
     notify.success(
       `Requested for collections (${collections
         .map((c) => c.name)
