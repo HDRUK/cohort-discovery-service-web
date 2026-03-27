@@ -9,6 +9,7 @@ export interface TitleProps extends Omit<BoxProps, "title"> {
   useSeparator?: boolean;
   size?: "small" | "medium" | "large";
   wrapperSx?: BoxProps;
+  titleOverflow?: "ellipsis" | "scroll" | "wrap" | "visible";
 }
 
 const Title = ({
@@ -19,6 +20,7 @@ const Title = ({
   useSeparator = true,
   size = "medium",
   wrapperSx,
+  titleOverflow = "ellipsis",
   ...rest
 }: TitleProps) => {
   const titleVariant =
@@ -27,20 +29,58 @@ const Title = ({
   const subTitleVariant =
     size === "small" ? "h6" : size === "medium" ? "h5" : "h3";
 
+  let overflowStyles: React.CSSProperties = {};
+
+  switch (titleOverflow) {
+    case "ellipsis":
+      overflowStyles = {
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
+      };
+      break;
+
+    case "scroll":
+      overflowStyles = {
+        overflowX: "auto",
+        overflowY: "hidden",
+        whiteSpace: "nowrap",
+      };
+      break;
+
+    case "wrap":
+      overflowStyles = {
+        whiteSpace: "normal",
+        overflow: "visible",
+        wordBreak: "break-word",
+      };
+      break;
+
+    case "visible":
+    default:
+      overflowStyles = {};
+  }
+
   return (
     <Box
       sx={{
         display: "flex",
         overflow: "hidden",
+        width: "100%",
       }}
       {...wrapperSx}
     >
-      <Box display="flex" alignItems="baseline" {...rest}>
+      <Box
+        display="flex"
+        alignItems="baseline"
+        minWidth={0}
+        width="100%"
+        {...rest}
+      >
         <Typography
           variant={titleVariant}
           component="span"
-          noWrap
-          sx={{ overflow: "hidden", textOverflow: "ellipsis", minWidth: 0 }}
+          sx={{ minWidth: 0, flex: 1, ...overflowStyles }}
         >
           {startIcon} {title} {useSeparator && subTitle && "/"}
         </Typography>
