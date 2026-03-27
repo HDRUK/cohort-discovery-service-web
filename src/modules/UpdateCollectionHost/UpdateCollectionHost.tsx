@@ -1,10 +1,12 @@
 "use client";
 import { Stack } from "@mui/material";
+import { useRouter } from "next/navigation";
 import CopyableVariable from "@/components/CopyableVariable";
 import { CollectionHost } from "@/types/api";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useCallback, useEffect, useMemo } from "react";
 import { useNotify } from "@/providers/NotifyProvider";
+import AddButton from "@/components/AddButton";
 import FormTextField from "@/components/FormTextField";
 import FormLabel from "@/components/FormLabel";
 import ErrorHeader from "@/components/ErrorHeader";
@@ -12,6 +14,7 @@ import useCustodianStore from "@/hooks/useCustodianStore";
 import UpdatePanel from "@/components/UpdatePanel";
 import { useThreePane } from "@/providers/ThreePaneProvider";
 import { useSaveChanges } from "@/hooks/useSaveChanges";
+import { routes } from "@/config/routes";
 
 type CollectionHostFormValues = { hostName: string };
 
@@ -24,6 +27,7 @@ const UpdateCollectionHost = ({
 }: UpdateCollectionHostProps) => {
   const { expandedRight, toggleRight: onClose } = useThreePane();
   const notify = useNotify();
+  const router = useRouter();
   const updateCollectionHost = useCustodianStore((s) => s.updateCollectionHost);
 
   const defaultValues = useMemo(
@@ -95,6 +99,15 @@ const UpdateCollectionHost = ({
         onUnlockClick={() => onClose?.()}
         rightExtras={<ErrorHeader errors={errors} depth={1} editing />}
       >
+        <AddButton
+          disabled={!expandedRight}
+          label={"Create Collection for Host"}
+          onClick={async () => {
+            router.push(
+              routes.teamCollections(selectedCollectionHost.custodian.pid),
+            );
+          }}
+        />
         <Controller
           name="hostName"
           control={control}
