@@ -157,11 +157,6 @@ const UpdateMultipleCollections = ({
     ],
   );
 
-  const handleEnter = useCallback(
-    () => handleSubmit((values) => submitForm(values, false))(),
-    [handleSubmit, submitForm],
-  );
-
   const handleLockClick = useCallback(
     () => handleSubmit((values) => submitForm(values, true))(),
     [handleSubmit, submitForm],
@@ -175,7 +170,6 @@ const UpdateMultipleCollections = ({
     collections,
     ...formMethods,
     currentCustodian,
-    handleEnter,
     handleLockClick,
     handleUnlockClick,
     submitForm,
