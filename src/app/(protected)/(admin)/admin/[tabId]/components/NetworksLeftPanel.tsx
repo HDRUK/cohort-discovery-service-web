@@ -83,9 +83,10 @@ const NetworksLeftPanel = () => {
                     confirmText: "Delete",
                     confirmColor: "error",
                   });
-                  if (ok) {
-                    deleteNetwork(network.id);
+                  if (!ok || ok === "cancel") {
+                    return;
                   }
+                  deleteNetwork(network.id);
                 },
               },
             ],
