@@ -35,6 +35,7 @@ import {
 } from "@/config/tags";
 import { DEFAULT_QUERY, useQueryBuilderStore } from "@/store/queryBuilderStore";
 import { useCustodianDataStore } from "@/store/custodianDataStore";
+import { buildConceptSearchParams } from "@/utils/params";
 
 export interface UserDataStoreState {
   user: CombinedUser | undefined | null;
@@ -69,10 +70,11 @@ export interface UserDataStoreState {
 
   createConceptSet: (payload: CreateConceptSetPost) => Promise<void>;
 
-  searchForConcepts: (
-    searchTerm: string,
-    domain?: string,
-  ) => Promise<Paginated<Partial<Concept>>>;
+  searchForConcepts: (args: {
+    searchTerm: string;
+    perPage: number;
+    domain?: string;
+  }) => Promise<Paginated<Partial<Concept>>>;
 
   addConceptsToSet: (
     conceptSetId: number,
@@ -172,8 +174,15 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
     await revalidateUserAction(TAG_CONCEPT_SETS);
   },
 
-  searchForConcepts: async (searchTerm, domain) => {
-    const { data } = await getConcepts(searchTerm, domain);
+  searchForConcepts: async ({ searchTerm, perPage, domain }) => {
+    const params = buildConceptSearchParams({
+      search_term: searchTerm,
+      per_page: perPage,
+      domain,
+    }).toString();
+
+    const { data } = await getConcepts({ params });
+
     return data;
   },
 

@@ -1,12 +1,13 @@
 import {
   CollectionsSearchParams,
+  ConceptSearchParams,
   QueryHistorySearchParams,
   SearchParams,
   SearchParamValue,
 } from "@/types/api";
 
 export const buildSearchParams = <
-  T extends Record<string, SearchParamValue> = SearchParams
+  T extends Record<string, SearchParamValue> = SearchParams,
 >(
   params: Partial<T> = {},
 ): URLSearchParams => {
@@ -53,6 +54,21 @@ export const buildQueryHistoryParams = (
   const params = {
     ...rest,
     ...(search_term ? { ["name[]"]: search_term } : {}),
+  };
+
+  return buildSearchParams(params);
+};
+
+export const buildConceptSearchParams = (searchParams: ConceptSearchParams) => {
+  const { page, per_page, search_term: searchTerm } = searchParams ?? {};
+
+  const params = {
+    page,
+    per_page,
+    ...(searchTerm
+      ? { "concept_name[]": searchTerm, "concept_id[]": searchTerm }
+      : {}),
+    //domain
   };
 
   return buildSearchParams(params);

@@ -29,6 +29,10 @@ export interface QueryHistorySearchParams extends ApiSearchParams {
   open_queries?: string[];
 }
 
+export interface ConceptSearchParams extends ApiSearchParams {
+  domain?: string;
+}
+
 export interface CacheOptions {
   useCache?: boolean;
 }

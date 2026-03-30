@@ -1,6 +1,6 @@
 "use client";
 
-import { Concept } from "@/types/api";
+import { Concept, Paginated } from "@/types/api";
 import { SearchBar } from "@hdruk/ui";
 import {
   Dispatch,
@@ -16,10 +16,12 @@ import {
   FormGroup,
   Box,
   Divider,
+  Button,
 } from "@mui/material";
 import { ConceptItem, ConceptItemProps } from "./ConceptItem";
 import useUserStore from "@/hooks/useUserStore";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
+import { DEFAULT_CODES_PER_PAGE } from "@/config/defaults";
 
 interface SlotProps {
   conceptItem: ConceptItemProps;
@@ -45,6 +47,10 @@ const SearchConcepts = ({
   const [isLoading, setIsLoading] = useState(false);
   const searchForConcepts = useUserStore((s) => s.searchForConcepts);
   const includeSynthetic = useQueryBuilder((s) => s.includeSynthetic);
+
+  const [perPage, setPerPage] = useState(DEFAULT_CODES_PER_PAGE);
+  const [activeResult, setActiveResult] =
+    useState<Paginated<Partial<Concept>>>();
 
   const lastQueryRef = useRef<string>("");
   const initialSelectedRef = useRef<Record<number, boolean>>({
@@ -76,10 +82,10 @@ const SearchConcepts = ({
   }, [visibleOptions, allSelected, setSelected]);
 
   const onSearch = useCallback(
-    async (value: string) => {
+    async (value: string, force = false, customPerPage?: number) => {
       const trimmedValue = value.trim();
 
-      if (trimmedValue === lastQueryRef.current) return;
+      if (!force && trimmedValue === lastQueryRef.current) return;
       lastQueryRef.current = trimmedValue;
 
       if (!trimmedValue) {
@@ -89,10 +95,21 @@ const SearchConcepts = ({
         setNoOptionsFound(false);
         return;
       }
+
       setIsLoading(true);
       setSelected?.({ ...initialSelectedRef.current });
 
-      const { data } = await searchForConcepts(trimmedValue, domain);
+      const effectivePerPage = customPerPage ?? perPage;
+
+      const res = await searchForConcepts({
+        searchTerm: trimmedValue,
+        perPage: effectivePerPage,
+        domain,
+      });
+
+      setActiveResult(res);
+      const { data } = res;
+
       const results = (data as Concept[]) ?? [];
 
       const nonSynthetic: Concept[] = [];
@@ -107,12 +124,13 @@ const SearchConcepts = ({
           nonSynthetic.push(o);
         }
       });
+
       setIsLoading(false);
       setNonSyntheticOptions(nonSynthetic);
       setSyntheticOptions(synthetic);
       setNoOptionsFound(nonSynthetic.length + synthetic.length === 0);
     },
-    [domain, searchForConcepts, setSelected, setIsLoading, includeSynthetic],
+    [domain, searchForConcepts, setSelected, includeSynthetic, perPage],
   );
 
   const handleToggle = useCallback(
@@ -142,6 +160,13 @@ const SearchConcepts = ({
     />
   );
 
+  const handleShowMore = useCallback(() => {
+    const nextPerPage =
+      (activeResult?.per_page ?? perPage) + DEFAULT_CODES_PER_PAGE;
+    setPerPage(nextPerPage);
+    onSearch(lastQueryRef.current, true, nextPerPage);
+  }, [activeResult, perPage, setPerPage, onSearch]);
+
   return (
     <Box>
       <SearchBar
@@ -156,40 +181,43 @@ const SearchConcepts = ({
         }
       />
       <FormGroup sx={{ mt: 2 }}>
-        <Box
-          sx={{
-            maxHeight: "500px",
-            display: "flex",
-            flexDirection: "column",
-            overflowY: "scroll",
-          }}
-        >
-          {multiple && visibleOptions.length > 0 && (
-            <>
-              <FormControlLabel
-                control={
-                  <Checkbox checked={allSelected} onChange={toggleSelectAll} />
-                }
-                label="Select All"
-              />
-              <Divider />
-            </>
-          )}
-
-          {nonSyntheticOptions.map(renderConceptItem)}
-
-          {syntheticOptions.length > 0 && (
-            <>
-              <Box sx={{ my: 1.5 }}>
-                <Divider sx={{ mb: 1 }} />
-                <Box sx={{ fontSize: 13, color: "text.secondary", px: 1 }}>
-                  Concepts from synthetic collections
-                </Box>
+        {multiple && visibleOptions.length > 0 && (
+          <>
+            <FormControlLabel
+              control={
+                <Checkbox checked={allSelected} onChange={toggleSelectAll} />
+              }
+              label="Select All"
+            />
+            <Divider />
+          </>
+        )}
+        {nonSyntheticOptions.map(renderConceptItem)}
+        {syntheticOptions.length > 0 && (
+          <>
+            <Box sx={{ my: 1.5 }}>
+              <Divider sx={{ mb: 1 }} />
+              <Box sx={{ fontSize: 13, color: "text.secondary", px: 1 }}>
+                Concepts from synthetic collections
               </Box>
-              {syntheticOptions.map(renderConceptItem)}
-            </>
-          )}
-        </Box>
+            </Box>
+            {syntheticOptions.map(renderConceptItem)}
+          </>
+        )}
+        {activeResult && activeResult.per_page < activeResult.total && (
+          <Box>
+            <Button
+              variant="text"
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                handleShowMore();
+              }}
+            >
+              Show more ({activeResult.per_page} / {activeResult.total})
+            </Button>
+          </Box>
+        )}
       </FormGroup>
     </Box>
   );
