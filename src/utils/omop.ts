@@ -16,7 +16,7 @@ const codesToOption = (codes: Code[]): Option[] =>
       label: `${code.name} (${code.name}) `,
     }));
 
-export const getDomainPhrase = (category?: string): DomainPhrase => {
+const getDomainPhrase = (category?: string): DomainPhrase => {
   if (!category) return DEFAULT_DOMAIN_PHRASE;
 
   return (
