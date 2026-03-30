@@ -84,8 +84,10 @@ const SearchConcepts = ({
   const onSearch = useCallback(
     async (value: string, force = false, customPerPage?: number) => {
       const trimmedValue = value.trim();
+      const isNewSearch = trimmedValue !== lastQueryRef.current;
 
-      if (!force && trimmedValue === lastQueryRef.current) return;
+      if (!force && !isNewSearch) return;
+
       lastQueryRef.current = trimmedValue;
 
       if (!trimmedValue) {
@@ -96,10 +98,19 @@ const SearchConcepts = ({
         return;
       }
 
-      setIsLoading(true);
-      setSelected?.({ ...initialSelectedRef.current });
+      let effectivePerPage = perPage;
 
-      const effectivePerPage = customPerPage ?? perPage;
+      if (isNewSearch) {
+        effectivePerPage = DEFAULT_CODES_PER_PAGE;
+        setPerPage(DEFAULT_CODES_PER_PAGE);
+        setSelected?.({ ...initialSelectedRef.current });
+      }
+
+      if (customPerPage) {
+        effectivePerPage = customPerPage;
+      }
+
+      setIsLoading(true);
 
       const res = await searchForConcepts({
         searchTerm: trimmedValue,
@@ -108,16 +119,14 @@ const SearchConcepts = ({
       });
 
       setActiveResult(res);
-      const { data } = res;
 
-      const results = (data as Concept[]) ?? [];
+      const results = (res.data as Concept[]) ?? [];
 
       const nonSynthetic: Concept[] = [];
       const synthetic: Concept[] = [];
 
       results.forEach((o) => {
         const allSynthetic = o.all_synthetic ?? 0;
-
         if (allSynthetic === 1) {
           if (includeSynthetic) synthetic.push(o);
         } else {
@@ -145,7 +154,7 @@ const SearchConcepts = ({
 
   const renderConceptItem = (c: Concept) => (
     <ConceptItem
-      key={c.concept_id}
+      key={`${c.category}-${c.concept_id}`}
       {...(slotProps?.conceptItem ?? {})}
       multiple={multiple}
       concept={c}
