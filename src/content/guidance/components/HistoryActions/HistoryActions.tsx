@@ -95,7 +95,7 @@ const HistoryActions = ({
             );
           }}
           text="Re-run"
-          size="large"
+          size="medium"
         />
       )}
       {!multiple && (
@@ -116,7 +116,7 @@ const HistoryActions = ({
               routes.dashboardNewQuery(openQueries, `query=${result.data.pid}`),
             );
           }}
-          size="large"
+          size="medium"
         />
       )}
       {!multiple && (
@@ -132,7 +132,7 @@ const HistoryActions = ({
           <DeleteMenuItem
             label="Delete"
             action={onDeleteClick}
-            size="large"
+            size="medium"
             sx={{
               justifyContent: "flex-start",
               textAlign: "left",

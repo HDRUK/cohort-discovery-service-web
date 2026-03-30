@@ -71,7 +71,7 @@ const DownloadButton = ({
         fontWeight: "normal",
         fontSize: 14,
       }}
-      size="large"
+      size="medium"
     >
       Download
     </PositionedMenu>

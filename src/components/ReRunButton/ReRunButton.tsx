@@ -1,7 +1,7 @@
 "use client";
 
 import { IconButton, IconButtonProps, Button } from "@mui/material";
-import CachedIcon from "@mui/icons-material/Cached";
+import { ReRunIcon } from "@/icons/ReRunIcon";
 
 export interface ReRunButtonProps extends Omit<IconButtonProps, "onClick"> {
   tag?: string;
@@ -37,7 +37,7 @@ const ReRunButton = ({
           fontWeight: "normal",
           fontSize: 14,
         },
-        startIcon: <CachedIcon fontSize={"small"} />,
+        startIcon: <ReRunIcon fontSize={"small"} />,
       };
   return (
     <ButtonComponent
@@ -46,7 +46,7 @@ const ReRunButton = ({
       {...rest}
       variant={!text ? undefined : "text"}
     >
-      {!text && <CachedIcon />}
+      {!text && <ReRunIcon />}
       {text}
     </ButtonComponent>
   );

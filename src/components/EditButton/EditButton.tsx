@@ -1,4 +1,4 @@
-import EditIcon from "@mui/icons-material/Edit";
+import { EditIcon } from "@/icons/EditIcon";
 import { Button, IconButton, IconButtonProps } from "@mui/material";
 export interface EditButtonProps extends IconButtonProps {
   children?: React.ReactNode;
