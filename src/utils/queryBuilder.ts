@@ -7,9 +7,9 @@ import {
   isRuleLeaf,
   isSingleConcept,
 } from "@/utils/rules";
-import { mapDomain } from "./domains";
 import { MAX_AGE_FILTER, MIN_AGE_FILTER } from "@/config/rules";
 import { UniqueIdentifier } from "@dnd-kit/core";
+import { getDomainPhrase } from "./omop";
 
 type Piece = { verb?: string | null; text: string };
 
@@ -20,46 +20,9 @@ const queryToText = (
   const includeBrackets = options?.includeBrackets ?? false;
   const subject = "People who";
 
-  const getVerb = (category: string, exclude: boolean = false): string => {
-    if (exclude) {
-      switch (category) {
-        case "Drug":
-          return "did not receive";
-        case "Observation":
-          return "were not observed with";
-        case "Measurement":
-        case "Measured":
-          return "were not measured with";
-        case "Condition":
-          return "were not diagnosed with";
-        case "Race":
-          return "were not recorded as having race";
-        case "Gender":
-          return `were not recorded as having ${mapDomain(
-            "gender",
-          ).toLowerCase()}`;
-        default:
-          return "were not associated with";
-      }
-    }
-
-    switch (category) {
-      case "Drug":
-        return "received";
-      case "Observation":
-        return "were observed with";
-      case "Measurement":
-      case "Measured":
-        return "were measured with";
-      case "Condition":
-        return "were diagnosed with";
-      case "Race":
-        return "were recorded as having race";
-      case "Gender":
-        return `were recorded as having ${mapDomain("gender").toLowerCase()}`;
-      default:
-        return "were associated with";
-    }
+  const getVerb = (category: string, exclude = false): string => {
+    const domain = getDomainPhrase(category);
+    return exclude ? domain.exclude : domain.include;
   };
 
   const cleanDescription = (s: string, aggressive = false) => {

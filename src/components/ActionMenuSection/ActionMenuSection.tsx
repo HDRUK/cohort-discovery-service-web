@@ -18,11 +18,14 @@ import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { useElementSize } from "@/hooks/useElementSize";
 import { ActionMenuSectionContext } from "./ActionMenuSectionContext";
 
-export interface ActionMenuSectionProps
-  extends Omit<AccordionProps, "children" | "title"> {
+export interface ActionMenuSectionProps extends Omit<
+  AccordionProps,
+  "children" | "title"
+> {
   summary?: React.ReactNode;
   title?: React.ReactNode | string;
   shortTitle?: string | React.ReactNode;
+  boldTitle?: boolean;
   underline?: boolean;
   attributes?: DraggableAttributes;
   listeners?: SyntheticListenerMap;
@@ -44,6 +47,7 @@ const ActionMenuSection = ({
   id,
   title,
   shortTitle,
+  boldTitle = true,
   summary,
   children,
   underline = false,
@@ -175,7 +179,7 @@ const ActionMenuSection = ({
                   </Tooltip>
                 ) : (
                   <Typography
-                    variant="overline"
+                    variant={boldTitle ? "overline" : undefined}
                     color="text.secondary"
                     sx={{ width: "100%" }}
                   >

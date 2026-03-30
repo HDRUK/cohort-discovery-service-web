@@ -12,7 +12,7 @@ import {
 } from "@mui/x-date-pickers/DatePicker";
 import { CustomH1 } from "@/components/GuidanceHeaders";
 import useFeatures from "@/hooks/useFeatures";
-import { getDomainVerbs } from "@/utils/omop";
+import { getDomainPhrase } from "@/utils/omop";
 import { capitaliseFirstLetter } from "@/utils/string";
 
 import SingleBoundSelector from "@/components/SingleBoundSelector";
@@ -81,9 +81,7 @@ const RuleTimeframeSelector = ({
     disableOpenPicker: readOnly ? true : false,
   };
 
-  const { verb } = rule.rule.concept?.category
-    ? getDomainVerbs(rule.rule.concept?.category)
-    : { verb: "" };
+  const { verb } = getDomainPhrase(rule.rule.concept?.category);
 
   const parseIsoToDayjs = useCallback(
     (iso: string | null) => (iso ? dayjs(iso) : null),
