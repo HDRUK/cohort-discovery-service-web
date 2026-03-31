@@ -12,13 +12,10 @@ const updateFeatureFlag = async (
   name: string,
   payload: UpdateFeatureFlagPayload,
 ): Promise<ApiResponse<unknown>> => {
-  const res = await apiPut<ApiResponse<unknown>, UpdateFeatureFlagPayload>(
+  return await apiPut<ApiResponse<unknown>, UpdateFeatureFlagPayload>(
     API_ROUTES.feature(name),
     payload,
   );
-  console.log(res.data);
-
-  return res;
 };
 
 export default updateFeatureFlag;

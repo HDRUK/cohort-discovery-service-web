@@ -1,5 +1,8 @@
 export enum FeatureName {
   QueryBuilder = "query-builder",
+  QueryBuilderLeaveConfirm = "query-builder-use-leave-confirmation",
+  QueryBuilderShowConceptStats = "query-builder-show-concept-stats",
+
   ConstrainForBunnyV1 = "constrain-for-bunny-v1",
   QueryNlp = "query-nlp",
   InAppMessenger = "in-app-messenger",
@@ -11,8 +14,6 @@ export enum FeatureName {
   IntegratedSyncRolesEveryRequest = "integrated-sync-roles-every-request",
   IntegratedSyncCustodiansEveryRequest = "integrated-sync-custodians-every-request",
 
-  ShowConceptStats = "show-concept-stats",
-
   HdrukTheme = "hdruk-uk-theme",
 }
 
@@ -20,6 +21,7 @@ export type FeatureFlag = Record<FeatureName, boolean>;
 
 export const DEFAULT_FLAGS: FeatureFlag = {
   [FeatureName.QueryBuilder]: true,
+  [FeatureName.QueryBuilderLeaveConfirm]: true,
   [FeatureName.ConstrainForBunnyV1]: true,
   [FeatureName.QueryNlp]: true,
   [FeatureName.InAppMessenger]: false,
@@ -32,7 +34,7 @@ export const DEFAULT_FLAGS: FeatureFlag = {
   [FeatureName.IntegratedSyncRolesEveryRequest]: true,
   [FeatureName.IntegratedSyncCustodiansEveryRequest]: true,
 
-  [FeatureName.ShowConceptStats]: false,
+  [FeatureName.QueryBuilderShowConceptStats]: false,
 
   [FeatureName.HdrukTheme]: true,
 };

@@ -3,7 +3,8 @@
 import { TAG_FEATURE_FLAGS } from "@/config/tags";
 import { apiGet, CachedGetArgs } from "@/lib/apiClient";
 import { API_ROUTES } from "@/lib/apiRoutes";
-import { FeatureFlag, ApiResponse } from "@/types/api";
+import { ApiResponse } from "@/types/api";
+import { FeatureFlag } from "@/types/features";
 
 const getFeatureFlags = async (
   args?: Omit<CachedGetArgs, "url">,

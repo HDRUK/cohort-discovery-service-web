@@ -22,6 +22,7 @@ import { ConceptItem, ConceptItemProps } from "./ConceptItem";
 import useUserStore from "@/hooks/useUserStore";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { DEFAULT_CODES_PER_PAGE } from "@/config/defaults";
+import useFeatures from "@/hooks/useFeatures";
 
 interface SlotProps {
   conceptItem: ConceptItemProps;
@@ -155,6 +156,8 @@ const SearchConcepts = ({
     [setSelected],
   );
 
+  const { queryBuilderShowConceptStats } = useFeatures();
+
   const renderConceptItem = (c: Concept) => (
     <ConceptItem
       key={`${c.category}-${c.concept_id}`}
@@ -169,7 +172,7 @@ const SearchConcepts = ({
         e.preventDefault();
       }}
       showCode
-      showCounts={true}
+      showCounts={queryBuilderShowConceptStats}
     />
   );
 

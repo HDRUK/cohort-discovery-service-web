@@ -9,6 +9,10 @@ const useFeatures = () =>
 
       return {
         queryBuilder: flags[FeatureName.QueryBuilder],
+        queryBuilderLeaveConfirm: flags[FeatureName.QueryBuilderLeaveConfirm],
+        queryBuilderShowConceptStats:
+          flags[FeatureName.QueryBuilderShowConceptStats],
+
         constrainForBunnyV1: flags[FeatureName.ConstrainForBunnyV1],
         queryNlp: flags[FeatureName.QueryNlp],
         inAppMessenger: flags[FeatureName.InAppMessenger],
@@ -30,7 +34,7 @@ const useFeatures = () =>
         syncCustodiansEveryRequest:
           flags[FeatureName.IntegratedSyncCustodiansEveryRequest],
 
-        showConceptStats: flags[FeatureName.ShowConceptStats],
+        hdrukTheme: flags[FeatureName.HdrukTheme],
       };
     }),
   );
