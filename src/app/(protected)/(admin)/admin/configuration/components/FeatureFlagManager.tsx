@@ -24,5 +24,15 @@ export const FeatureFlagManager = () => {
       />
     ),
   });
-  return <Table table={featuresTables} />;
+  return (
+    <Table
+      table={featuresTables}
+      leftAction={{
+        titleProps: {
+          title: "Features",
+          subTitle: "Flags",
+        },
+      }}
+    />
+  );
 };

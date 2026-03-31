@@ -50,8 +50,8 @@ const HdrukHeader = () => {
           ...(checkIsAdmin(user)
             ? [
                 {
-                  label: "Feature Flags",
-                  href: routes.featureFlags,
+                  label: "Configuration",
+                  href: routes.config,
                 },
               ]
             : []),

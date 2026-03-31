@@ -1,8 +1,9 @@
-import { Box } from "@mui/material";
+import { Box, Divider, Stack } from "@mui/material";
 import { FeatureFlagManager } from "./components/FeatureFlagManager";
 import Title from "@/components/Title";
+import { DefaultsManager } from "./components/DefaultsManager";
 
-const FeatureFlagPage = async () => {
+const AdminConfigurationPage = async () => {
   return (
     <Box
       sx={{
@@ -15,19 +16,14 @@ const FeatureFlagPage = async () => {
         bgcolor: "background.default",
       }}
     >
-      <Title title="Admin" subTitle="Feature Flags" />
-      <Box
-        sx={{
-          maxWidth: 1000,
-          display: "flex",
-          alignItems: "center",
-          mx: "auto",
-        }}
-      >
+      <Title title="Admin" subTitle="Configuration" />
+      <Divider />
+      <Stack direction="row">
         <FeatureFlagManager />
-      </Box>
+        <DefaultsManager />
+      </Stack>
     </Box>
   );
 };
 
-export default FeatureFlagPage;
+export default AdminConfigurationPage;

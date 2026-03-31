@@ -43,5 +43,5 @@ export const routes = {
   teamHome: teamPath,
   teamHosts: (pid: string) => teamPath(pid, "hosts"),
   teamCollections: (pid: string) => teamPath(pid, "collections"),
-  featureFlags: adminPath("feature-flags"),
+  config: adminPath("configuration"),
 };
