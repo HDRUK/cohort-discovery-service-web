@@ -1,4 +1,4 @@
-import { DEFAULT_FLAGS, FeatureName } from "@/types/api";
+import { DEFAULT_FLAGS, FeatureName } from "@/types/features";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import { useShallow } from "zustand/react/shallow";
 

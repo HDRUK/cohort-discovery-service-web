@@ -1,7 +1,7 @@
 "use client";
 
 import { create } from "zustand";
-import { FeatureFlag } from "@/types/api";
+import { FeatureFlag } from "@/types/features";
 import getFeatureFlags from "@/actions/getFeatureFlags";
 import updateFeatureFlag from "@/actions/admin/updateFeatureFlag";
 

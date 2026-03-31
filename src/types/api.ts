@@ -507,6 +507,8 @@ export enum FeatureName {
   IntegratedSyncCustodiansEveryRequest = "integrated-sync-custodians-every-request",
 
   ShowConceptStats = "show-concept-stats",
+
+  HdrukTheme = "hdruk-uk-theme",
 }
 
 export type FeatureFlag = Record<FeatureName, boolean>;
@@ -526,6 +528,8 @@ export const DEFAULT_FLAGS: FeatureFlag = {
   [FeatureName.IntegratedSyncCustodiansEveryRequest]: true,
 
   [FeatureName.ShowConceptStats]: false,
+
+  [FeatureName.HdrukTheme]: true,
 };
 
 export type GroupedCollection = { custodian: Custodian; items: Collection[] };
