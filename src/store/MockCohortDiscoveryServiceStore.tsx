@@ -56,6 +56,8 @@ import { themeOptions } from "@/config/theme";
 import { HdrukUiProvider } from "@hdruk/ui";
 import { ThemeOptions } from "@mui/material";
 import { CohortBuilderProvider } from "@/providers/CohortBuilderProvider";
+import ApplicationModeProvider from "@/providers/ApplicationModeProvider";
+import { buildConceptSearchParams } from "@/utils/params";
 
 const queryClient = new QueryClient();
 
@@ -158,8 +160,15 @@ const MockCohortDiscoveryServiceStore = ({
       ) => RESOLVE<Query>(getMockQuery()),
       createConceptSet: (_payload: CreateConceptSetPost) =>
         RESOLVE<void>(undefined),
-      searchForConcepts: async (searchTerm: string, domain?: string) => {
-        const { data } = await getConcepts(searchTerm, domain);
+      searchForConcepts: async ({ searchTerm, perPage, domain }) => {
+        const params = buildConceptSearchParams({
+          search_term: searchTerm,
+          per_page: perPage,
+          domain,
+        }).toString();
+
+        const { data } = await getConcepts({ params });
+
         return data as Paginated<Partial<Concept>>;
       },
       addConceptsToSet: (_conceptSetId: number, _conceptIds: number[]) =>
@@ -249,19 +258,21 @@ const MockCohortDiscoveryServiceStore = ({
   );
 
   return (
-    <DefaultProvider>
-      <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
-        <QueryClientProvider client={queryClient}>
-          <CohortBuilderProvider>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <ConfirmProvider>
-                <NotifyProvider>{children}</NotifyProvider>
-              </ConfirmProvider>
-            </LocalizationProvider>
-          </CohortBuilderProvider>
-        </QueryClientProvider>
-      </HdrukUiProvider>
-    </DefaultProvider>
+    <ApplicationModeProvider>
+      <DefaultProvider>
+        <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
+          <QueryClientProvider client={queryClient}>
+            <CohortBuilderProvider>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <ConfirmProvider>
+                  <NotifyProvider>{children}</NotifyProvider>
+                </ConfirmProvider>
+              </LocalizationProvider>
+            </CohortBuilderProvider>
+          </QueryClientProvider>
+        </HdrukUiProvider>
+      </DefaultProvider>
+    </ApplicationModeProvider>
   );
 };
 

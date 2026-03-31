@@ -3,12 +3,19 @@ import { useState } from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import SearchConcepts from "./SearchConcepts";
+import ApplicationModeProvider from "@/providers/ApplicationModeProvider";
 jest.mock("@/actions/concept/getConcepts");
 
 function Wrapper(props: React.ComponentProps<typeof SearchConcepts>) {
   const [selected, setSelected] = useState<Record<number, boolean>>({});
   return (
-    <SearchConcepts {...props} selected={selected} setSelected={setSelected} />
+    <ApplicationModeProvider>
+      <SearchConcepts
+        {...props}
+        selected={selected}
+        setSelected={setSelected}
+      />
+    </ApplicationModeProvider>
   );
 }
 

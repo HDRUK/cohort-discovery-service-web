@@ -1,10 +1,27 @@
 import { ApiResponse, Concept, Paginated } from "@/types/api";
+import { CachedGetArgs } from "@/lib/apiClient";
 
 const getConcepts = async (
-  searchTerm: string,
-  domain?: string,
-): Promise<ApiResponse<Paginated<Concept>>> => {
-  const t = (searchTerm ?? "").toLowerCase();
+  args?: Omit<CachedGetArgs, "url">,
+): Promise<ApiResponse<Paginated<Partial<Concept>>>> => {
+  const rawParams = args?.params;
+
+  const params =
+    rawParams instanceof URLSearchParams
+      ? rawParams
+      : new URLSearchParams(typeof rawParams === "string" ? rawParams : "");
+
+  const searchTerms = [
+    ...params.getAll("concept_name[]"),
+    ...params.getAll("concept_id[]"),
+    ...params.getAll("concept_name"),
+    ...params.getAll("concept_id"),
+    ...params.getAll("search_term"),
+  ]
+    .filter(Boolean)
+    .map((term) => term.toLowerCase());
+
+  const domain = params.get("domain")?.toLowerCase();
 
   const concepts = [
     {
@@ -42,11 +59,7 @@ const getConcepts = async (
       name: "Type 2 diabetes mellitus",
       category: "Condition",
     },
-    {
-      concept_id: 254761,
-      name: "Cough",
-      category: "Condition",
-    },
+    { concept_id: 254761, name: "Cough", category: "Condition" },
     {
       concept_id: 255573,
       name: "Chronic obstructive pulmonary disease",
@@ -57,11 +70,7 @@ const getConcepts = async (
       name: "Hypertensive disorder",
       category: "Condition",
     },
-    {
-      concept_id: 317009,
-      name: "Asthma",
-      category: "Condition",
-    },
+    { concept_id: 317009, name: "Asthma", category: "Condition" },
     {
       concept_id: 319049,
       name: "Acute respiratory failure",
@@ -72,31 +81,11 @@ const getConcepts = async (
       name: "Congestive heart failure",
       category: "Condition",
     },
-    {
-      concept_id: 321588,
-      name: "Heart disease",
-      category: "Condition",
-    },
-    {
-      concept_id: 375557,
-      name: "Cerebral embolism",
-      category: "Condition",
-    },
-    {
-      concept_id: 433736,
-      name: "Obesity",
-      category: "Condition",
-    },
-    {
-      concept_id: 436409,
-      name: "Abnormal pupil",
-      category: "Condition",
-    },
-    {
-      concept_id: 441840,
-      name: "Clinical finding",
-      category: "Condition",
-    },
+    { concept_id: 321588, name: "Heart disease", category: "Condition" },
+    { concept_id: 375557, name: "Cerebral embolism", category: "Condition" },
+    { concept_id: 433736, name: "Obesity", category: "Condition" },
+    { concept_id: 436409, name: "Abnormal pupil", category: "Condition" },
+    { concept_id: 441840, name: "Clinical finding", category: "Condition" },
     {
       concept_id: 443597,
       name: "Chronic kidney disease stage 3",
@@ -112,21 +101,13 @@ const getConcepts = async (
       name: "Chronic kidney disease stage 4",
       category: "Condition",
     },
-    {
-      concept_id: 443883,
-      name: "Acute disease",
-      category: "Condition",
-    },
+    { concept_id: 443883, name: "Acute disease", category: "Condition" },
     {
       concept_id: 443961,
       name: "Anemia of chronic renal failure",
       category: "Condition",
     },
-    {
-      concept_id: 444100,
-      name: "Mood disorder",
-      category: "Condition",
-    },
+    { concept_id: 444100, name: "Mood disorder", category: "Condition" },
     {
       concept_id: 4013072,
       name: "O/E: inspection of blood NOS",
@@ -142,11 +123,7 @@ const getConcepts = async (
       name: "Chronic kidney disease stage 2",
       category: "Condition",
     },
-    {
-      concept_id: 4182210,
-      name: "Dementia",
-      category: "Condition",
-    },
+    { concept_id: 4182210, name: "Dementia", category: "Condition" },
     {
       concept_id: 36684857,
       name: "Metastatic non-small cell lung cancer",
@@ -177,11 +154,7 @@ const getConcepts = async (
       name: "Malignant hypertensive heart disease and chronic renal disease stage 3",
       category: "Condition",
     },
-    {
-      concept_id: 40480290,
-      name: "Goldendoodle",
-      category: "Condition",
-    },
+    { concept_id: 40480290, name: "Goldendoodle", category: "Condition" },
     {
       concept_id: 1075888,
       name: "Hypertension in chronic kidney disease stage 3 due to type 1 diabetes mellitus",
@@ -197,16 +170,8 @@ const getConcepts = async (
       name: "Hypoglycemia due to type 2 diabetes mellitus",
       category: "Condition",
     },
-    {
-      concept_id: 8507,
-      name: "MALE",
-      category: "Gender",
-    },
-    {
-      concept_id: 8532,
-      name: "FEMALE",
-      category: "Gender",
-    },
+    { concept_id: 8507, name: "MALE", category: "Gender" },
+    { concept_id: 8532, name: "FEMALE", category: "Gender" },
     {
       concept_id: 1075908,
       name: "Chronic kidney disease stage 3B due to type 2 diabetes mellitus",
@@ -260,11 +225,17 @@ const getConcepts = async (
   ];
 
   const data = concepts.filter((c) => {
-    const matchesSearch =
-      (c.name ?? "").toLowerCase().includes(t) ||
-      String(c.concept_id).includes(t);
+    const name = (c.name ?? "").toLowerCase();
+    const conceptId = String(c.concept_id);
+    const category = (c.category ?? "").toLowerCase();
 
-    const matchesDomain = domain ? c.category === domain : true;
+    const matchesSearch =
+      searchTerms.length === 0 ||
+      searchTerms.some(
+        (term) => name.includes(term) || conceptId.includes(term),
+      );
+
+    const matchesDomain = domain ? category === domain : true;
 
     return matchesSearch && matchesDomain;
   });
@@ -273,8 +244,8 @@ const getConcepts = async (
     message: "success",
     data: {
       data,
-      from: 1,
-      to: 1,
+      from: data.length ? 1 : 0,
+      to: data.length,
       current_page: 1,
       per_page: data.length,
       total: data.length,
