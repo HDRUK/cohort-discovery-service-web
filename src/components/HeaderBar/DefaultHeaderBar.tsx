@@ -6,17 +6,19 @@ import userIcon from "@/assets/user_logo.svg";
 import PositionedMenu, { PositionedMenuItem } from "../PositionedMenu";
 import { useRouter } from "next/navigation";
 import useUserStore from "@/hooks/useUserStore";
+import { useApplicationMode } from "@/providers/ApplicationModeProvider";
 
 const NEXT_PUBLIC_LOGIN_URL =
   process.env.NEXT_PUBLIC_LOGIN_URL ?? "https://healthdatagateway.org";
 
-const DefaultHeaderBar = ({ standalone = false }: { standalone: boolean }) => {
+const DefaultHeaderBar = () => {
   const router = useRouter();
   const user = useUserStore((s) => s.user);
   const setUser = useUserStore((s) => s.setUser);
+  const { isStandalone } = useApplicationMode();
 
   const links: PositionedMenuItem[] = [
-    ...(standalone
+    ...(isStandalone
       ? [
           {
             id: "logout",

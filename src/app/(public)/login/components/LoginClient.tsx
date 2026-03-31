@@ -5,15 +5,17 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import StandaloneLoginForm from "./StandaloneLoginForm";
 import Circles from "./Circles";
+import { useApplicationMode } from "@/providers/ApplicationModeProvider";
 
 const REDIRECT_URL = process?.env?.NEXT_PUBLIC_LOGIN_URL;
 
-const LoginClient = ({ standalone }: { standalone: boolean }) => {
+const LoginClient = () => {
+  const { isStandalone } = useApplicationMode();
   const router = useRouter();
   const [showForm, setShowForm] = useState(false);
 
   const onClick = () => {
-    if (!standalone) {
+    if (!isStandalone) {
       router.push(REDIRECT_URL || "");
       return;
     }

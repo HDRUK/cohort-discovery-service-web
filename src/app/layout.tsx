@@ -9,6 +9,7 @@ import { isStandalone } from "@/utils/modes";
 import Footer from "@/components/Footer";
 import ServerDefaultProvider from "@/providers/ServerDefaultProvider";
 import SupportPopOut from "@/components/SupportPopOut/SupportPopOut";
+import ApplicationModeProvider from "@/providers/ApplicationModeProvider";
 
 const sourceSans = Source_Sans_3({
   variable: "--font-source-sans-3",
@@ -36,53 +37,55 @@ export default async function RootLayout({
   const standalone = isStandalone(applicationMode);
 
   return (
-    <ThemeRegistry>
-      <html lang="en">
-        <body className={`${sourceSans.variable} ${geistMono.variable}`}>
-          <ServerDefaultProvider>
-            <Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  height: "120vh",
-                }}
-              >
-                {!standalone && <SupportPopOut />}
-
-                {!hideNav && <HeaderBar standalone={standalone} />}
-
+    <ApplicationModeProvider applicationMode={applicationMode}>
+      <ThemeRegistry>
+        <html lang="en">
+          <body className={`${sourceSans.variable} ${geistMono.variable}`}>
+            <ServerDefaultProvider>
+              <Box>
                 <Box
                   sx={{
-                    py: hideNav ? 0 : 1,
-                    px: hideNav ? 0 : 2,
-                    bgcolor: "background.paper",
                     display: "flex",
                     flexDirection: "column",
-                    flex: 1,
-                    minHeight: 0,
+                    height: "120vh",
                   }}
                 >
-                  {!hideNav && <TopMenu standalone={standalone} />}
+                  {!standalone && <SupportPopOut />}
+
+                  {!hideNav && <HeaderBar />}
 
                   <Box
-                    component="main"
                     sx={{
-                      flexGrow: 1,
-                      bgcolor: "secondary.main",
-                      p: 2,
-                      overflow: "auto",
+                      py: hideNav ? 0 : 1,
+                      px: hideNav ? 0 : 2,
+                      bgcolor: "background.paper",
+                      display: "flex",
+                      flexDirection: "column",
+                      flex: 1,
+                      minHeight: 0,
                     }}
                   >
-                    {children}
+                    {!hideNav && <TopMenu />}
+
+                    <Box
+                      component="main"
+                      sx={{
+                        flexGrow: 1,
+                        bgcolor: "secondary.main",
+                        p: 2,
+                        overflow: "auto",
+                      }}
+                    >
+                      {children}
+                    </Box>
                   </Box>
                 </Box>
+                <Footer />
               </Box>
-              <Footer standalone={standalone} />
-            </Box>
-          </ServerDefaultProvider>
-        </body>
-      </html>
-    </ThemeRegistry>
+            </ServerDefaultProvider>
+          </body>
+        </html>
+      </ThemeRegistry>
+    </ApplicationModeProvider>
   );
 }

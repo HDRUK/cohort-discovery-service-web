@@ -2,6 +2,7 @@
 
 import { Footer as HdrFooter } from "@hdruk/ui";
 import useFeatures from "@/hooks/useFeatures";
+import { useApplicationMode } from "@/providers/ApplicationModeProvider";
 
 const GATEWAY_URL =
   process.env.NEXT_PUBLIC_LOGIN_URL ?? "https://www.hdruk.ac.uk/";
@@ -11,8 +12,9 @@ const GATEWAY_URL =
 // so needs must at this time
 const API_BASE_URL = `${(process.env.NEXT_PUBLIC_TASK_URL ?? "http://localhost:8000/api").replace("/v1", "")}`;
 
-const Footer = ({ standalone }: { standalone: boolean }) => {
+const Footer = () => {
   const { hdrukTheme: hdrukThemeEnabled } = useFeatures();
+  const { isStandalone } = useApplicationMode();
   const links = [
     {
       title: "links1",
@@ -50,7 +52,7 @@ const Footer = ({ standalone }: { standalone: boolean }) => {
     },
   ];
 
-  if (!standalone && hdrukThemeEnabled) {
+  if (!isStandalone && hdrukThemeEnabled) {
     return <HdrFooter linkGroups={links} />;
   }
 };

@@ -1,9 +1,11 @@
 import { DEFAULT_FLAGS, FeatureName } from "@/types/features";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import { useShallow } from "zustand/react/shallow";
+import { useApplicationMode } from "@/providers/ApplicationModeProvider";
 
-const useFeatures = () =>
-  useFeatureFlagsStore(
+const useFeatures = () => {
+  const { isStandalone } = useApplicationMode();
+  return useFeatureFlagsStore(
     useShallow((st) => {
       const flags = { ...DEFAULT_FLAGS, ...(st.flags ?? {}) };
 
@@ -37,8 +39,10 @@ const useFeatures = () =>
           flags[FeatureName.IntegratedSyncCustodiansEveryRequest],
 
         hdrukTheme: flags[FeatureName.HdrukTheme],
+        manageWorkgroupsInternal: isStandalone,
       };
     }),
   );
+};
 
 export default useFeatures;
