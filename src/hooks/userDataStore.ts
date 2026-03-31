@@ -36,6 +36,7 @@ import {
 import { DEFAULT_QUERY, useQueryBuilderStore } from "@/store/queryBuilderStore";
 import { useCustodianDataStore } from "@/store/custodianDataStore";
 import { buildConceptSearchParams } from "@/utils/params";
+import searchConcepts from "@/actions/concept/searchConcepts";
 
 export interface UserDataStoreState {
   user: CombinedUser | undefined | null;
@@ -178,14 +179,13 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
   searchForConcepts: async ({ searchTerm, perPage, domain }) => {
     const { selectedDatasets } = useQueryBuilderStore.getState();
 
-    const params = buildConceptSearchParams({
-      search_term: searchTerm,
+    const { data } = await searchConcepts({
+      concept_name: [searchTerm],
+      concept_id: [searchTerm],
       per_page: perPage,
       domain,
       collections: selectedDatasets,
-    }).toString();
-
-    const { data } = await getConcepts({ params });
+    });
 
     return data;
   },
