@@ -71,6 +71,7 @@ export interface UserDataStoreState {
   createConceptSet: (payload: CreateConceptSetPost) => Promise<void>;
 
   searchForConcepts: (args: {
+    selectedDatasets?: string[];
     searchTerm: string;
     perPage: number;
     domain?: string;
@@ -92,7 +93,7 @@ export interface UserDataStoreState {
   setWorkgroups: (workgroups: Workgroup[]) => void;
 }
 
-export const useUserDataStore = create<UserDataStoreState>((set) => ({
+export const useUserDataStore = create<UserDataStoreState>((set, get) => ({
   user: null,
   setUser: (user) =>
     set((state) => ({
@@ -175,11 +176,16 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
   },
 
   searchForConcepts: async ({ searchTerm, perPage, domain }) => {
+    const { selectedDatasets } = useQueryBuilderStore.getState();
+
     const params = buildConceptSearchParams({
       search_term: searchTerm,
       per_page: perPage,
       domain,
+      collections: selectedDatasets,
     }).toString();
+
+    console.log({ selectedDatasets, params });
 
     const { data } = await getConcepts({ params });
 

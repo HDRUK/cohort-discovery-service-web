@@ -60,7 +60,13 @@ export const buildQueryHistoryParams = (
 };
 
 export const buildConceptSearchParams = (searchParams: ConceptSearchParams) => {
-  const { page, per_page, search_term: searchTerm } = searchParams ?? {};
+  const {
+    page,
+    per_page,
+    search_term: searchTerm,
+    domain,
+    collections,
+  } = searchParams ?? {};
 
   const params = {
     page,
@@ -68,7 +74,8 @@ export const buildConceptSearchParams = (searchParams: ConceptSearchParams) => {
     ...(searchTerm
       ? { "concept_name[]": searchTerm, "concept_id[]": searchTerm }
       : {}),
-    //domain
+    domain,
+    "collections[]": collections,
   };
 
   return buildSearchParams(params);

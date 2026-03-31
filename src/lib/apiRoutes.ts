@@ -48,6 +48,7 @@ export const API_ROUTES = {
   users: `${API_URL}/users`,
   user: (id: number) => `${API_URL}/users/${id}`,
   featureFlags: `${API_URL}/features`,
+  feature: (name: string) => `${API_URL}/features/${name}`,
 };
 
 export const GATEWAY_ROUTES = {

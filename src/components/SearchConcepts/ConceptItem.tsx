@@ -99,7 +99,21 @@ export const ConceptItem = ({
         flexWrap: "wrap",
       }}
       titleOverflow={"wrap"}
-    />
+    >
+      {showCounts && (
+        <Stack sx={{ ml: "auto" }} gap={1} direction={"row"}>
+          <Tooltip title="Number of datasets present in">
+            <Chip color="success" label={concept.ncollections} />
+          </Tooltip>
+          <Tooltip title="Total number of counts for this concept">
+            <Chip
+              color="secondary"
+              label={Number(concept.count).toLocaleString()}
+            />
+          </Tooltip>
+        </Stack>
+      )}
+    </Title>
   );
 
   return (
@@ -124,19 +138,6 @@ export const ConceptItem = ({
         />
       ) : (
         labelEl
-      )}
-      {showCounts && (
-        <Stack sx={{ ml: "auto" }} gap={1} direction={"row"}>
-          <Tooltip title="Number of datasets present in">
-            <Chip color="success" label={concept.ncollections} />
-          </Tooltip>
-          <Tooltip title="Total number of counts for this concept">
-            <Chip
-              color="secondary"
-              label={Number(concept.count).toLocaleString()}
-            />
-          </Tooltip>
-        </Stack>
       )}
     </ConceptWrapper>
   );

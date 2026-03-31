@@ -21,7 +21,8 @@ const getConcepts = async (
     ApiResponse<Paginated<Partial<Concept>>>
   >({
     url: API_ROUTES.searchConcepts,
-    //tags: getTagConcepts(domain),
+    tags: getTagConcepts(args?.params?.toString()),
+    cacheOptions: { useCache: false },
     ...args,
   });
 

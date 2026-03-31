@@ -5,6 +5,8 @@ import logo from "@/assets/logo.svg";
 import { Header } from "@hdruk/ui";
 import useUserStore from "@/hooks/useUserStore";
 import { type AnchorHTMLAttributes } from "react";
+import { checkIsAdmin } from "@/utils/user";
+import { routes } from "@/config/routes";
 
 const NEXT_PUBLIC_LOGIN_URL =
   process.env.NEXT_PUBLIC_LOGIN_URL ?? "https://healthdatagateway.org";
@@ -44,6 +46,16 @@ const HdrukHeader = () => {
           label: "My Profile",
           href: PROFILE_HREF,
         },
+        items: [
+          ...(checkIsAdmin(user)
+            ? [
+                {
+                  label: "Feature Flags",
+                  href: routes.featureFlags,
+                },
+              ]
+            : []),
+        ],
       }}
       linkComponent={HeaderLink}
       accountInitialsColour="#90D0EC"

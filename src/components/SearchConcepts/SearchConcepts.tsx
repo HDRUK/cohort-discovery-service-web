@@ -49,8 +49,9 @@ const SearchConcepts = ({
   const includeSynthetic = useQueryBuilder((s) => s.includeSynthetic);
 
   const [perPage, setPerPage] = useState(DEFAULT_CODES_PER_PAGE);
-  const [activeResult, setActiveResult] =
-    useState<Paginated<Partial<Concept>>>();
+  const [activeResult, setActiveResult] = useState<Paginated<
+    Partial<Concept>
+  > | null>(null);
 
   const lastQueryRef = useRef<string>("");
   const initialSelectedRef = useRef<Record<number, boolean>>({
@@ -92,6 +93,7 @@ const SearchConcepts = ({
 
       if (!trimmedValue) {
         setIsLoading(false);
+        setActiveResult(null);
         setNonSyntheticOptions([]);
         setSyntheticOptions([]);
         setNoOptionsFound(false);
@@ -118,8 +120,6 @@ const SearchConcepts = ({
         domain,
       });
 
-      setActiveResult(res);
-
       const results = (res.data as Concept[]) ?? [];
 
       const nonSynthetic: Concept[] = [];
@@ -134,10 +134,13 @@ const SearchConcepts = ({
         }
       });
 
-      setIsLoading(false);
+      const hasVisibleOptions = nonSynthetic.length + synthetic.length > 0;
+
       setNonSyntheticOptions(nonSynthetic);
       setSyntheticOptions(synthetic);
-      setNoOptionsFound(nonSynthetic.length + synthetic.length === 0);
+      setNoOptionsFound(!hasVisibleOptions);
+      setActiveResult(hasVisibleOptions ? res : null);
+      setIsLoading(false);
     },
     [domain, searchForConcepts, setSelected, includeSynthetic, perPage],
   );
@@ -166,6 +169,7 @@ const SearchConcepts = ({
         e.preventDefault();
       }}
       showCode
+      showCounts={true}
     />
   );
 
@@ -174,7 +178,7 @@ const SearchConcepts = ({
       (activeResult?.per_page ?? perPage) + DEFAULT_CODES_PER_PAGE;
     setPerPage(nextPerPage);
     onSearch(lastQueryRef.current, true, nextPerPage);
-  }, [activeResult, perPage, setPerPage, onSearch]);
+  }, [activeResult, perPage, onSearch]);
 
   return (
     <Box>

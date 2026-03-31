@@ -31,6 +31,7 @@ export interface QueryHistorySearchParams extends ApiSearchParams {
 
 export interface ConceptSearchParams extends ApiSearchParams {
   domain?: string;
+  collections?: string[];
 }
 
 export interface CacheOptions {
@@ -497,19 +498,34 @@ export enum FeatureName {
   ConstrainForBunnyV1 = "constrain-for-bunny-v1",
   QueryNlp = "query-nlp",
   InAppMessenger = "in-app-messenger",
-  ManageWorkgroupsInternal = "manage-workgroups-internal",
-  HdrukTheme = "hdruk-uk-theme",
+
+  IntegratedSyncWorkgroupsEveryRequest = "integrated-sync-workgroups-every-request",
+  IntegratedSyncWorkgroupsFirstLogin = "integrated-sync-workgroups-first-login",
+  IntegratedEnsureDefaultWgs = "integrated-ensure-default-wgs",
+  IntegratedSyncSdeWgsFromClaim = "integrated-sync-sde-wgs-from-claim",
+  IntegratedSyncRolesEveryRequest = "integrated-sync-roles-every-request",
+  IntegratedSyncCustodiansEveryRequest = "integrated-sync-custodians-every-request",
+
+  ShowConceptStats = "show-concept-stats",
 }
 
 export type FeatureFlag = Record<FeatureName, boolean>;
 
 export const DEFAULT_FLAGS: FeatureFlag = {
-  [FeatureName.QueryBuilder]: false,
-  [FeatureName.ConstrainForBunnyV1]: false,
-  [FeatureName.QueryNlp]: false,
+  [FeatureName.QueryBuilder]: true,
+  [FeatureName.ConstrainForBunnyV1]: true,
+  [FeatureName.QueryNlp]: true,
   [FeatureName.InAppMessenger]: false,
-  [FeatureName.ManageWorkgroupsInternal]: true,
-  [FeatureName.HdrukTheme]: true,
+
+  [FeatureName.IntegratedSyncWorkgroupsEveryRequest]: false,
+  [FeatureName.IntegratedSyncWorkgroupsFirstLogin]: true,
+  [FeatureName.IntegratedEnsureDefaultWgs]: true,
+  [FeatureName.IntegratedSyncSdeWgsFromClaim]: true,
+
+  [FeatureName.IntegratedSyncRolesEveryRequest]: true,
+  [FeatureName.IntegratedSyncCustodiansEveryRequest]: true,
+
+  [FeatureName.ShowConceptStats]: false,
 };
 
 export type GroupedCollection = { custodian: Custodian; items: Collection[] };

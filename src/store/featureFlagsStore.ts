@@ -1,17 +1,33 @@
+"use client";
+
 import { create } from "zustand";
 import { FeatureFlag } from "@/types/api";
+import getFeatureFlags from "@/actions/getFeatureFlags";
+import updateFeatureFlag from "@/actions/admin/updateFeatureFlag";
 
 export interface FeatureFlagsStoreState {
   flags: FeatureFlag | null;
   setFlags: (flags: FeatureFlag) => void;
+  refreshFlags: () => Promise<void>;
+  updateFlag: (name: string, enabled: boolean) => Promise<void>;
 }
 
-export interface FeatureFlagsStoreState {
-  flags: FeatureFlag | null;
-  setFlags: (flags: FeatureFlag) => void;
-}
+export const useFeatureFlagsStore = create<FeatureFlagsStoreState>(
+  (set, get) => ({
+    flags: null,
 
-export const useFeatureFlagsStore = create<FeatureFlagsStoreState>((set) => ({
-  flags: null,
-  setFlags: (flags) => set({ flags }),
-}));
+    setFlags: (flags) => set({ flags }),
+
+    refreshFlags: async () => {
+      const response = await getFeatureFlags({
+        cacheOptions: { useCache: false },
+      });
+      set({ flags: response.data });
+    },
+
+    updateFlag: async (name, enabled) => {
+      await updateFeatureFlag(name, { enabled });
+      get().refreshFlags();
+    },
+  }),
+);
