@@ -2,6 +2,7 @@ export enum FeatureName {
   QueryBuilder = "query-builder",
   QueryBuilderLeaveConfirm = "query-builder-use-leave-confirmation",
   QueryBuilderShowConceptStats = "query-builder-show-concept-stats",
+  QueryBuilderStatsInOrdering = "query-builder-use-stats-in-ordering",
 
   ConstrainForBunnyV1 = "constrain-for-bunny-v1",
   QueryNlp = "query-nlp",
@@ -22,6 +23,9 @@ export type FeatureFlag = Record<FeatureName, boolean>;
 export const DEFAULT_FLAGS: FeatureFlag = {
   [FeatureName.QueryBuilder]: true,
   [FeatureName.QueryBuilderLeaveConfirm]: true,
+  [FeatureName.QueryBuilderShowConceptStats]: false,
+  [FeatureName.QueryBuilderStatsInOrdering]: true,
+
   [FeatureName.ConstrainForBunnyV1]: true,
   [FeatureName.QueryNlp]: true,
   [FeatureName.InAppMessenger]: false,
@@ -33,8 +37,6 @@ export const DEFAULT_FLAGS: FeatureFlag = {
 
   [FeatureName.IntegratedSyncRolesEveryRequest]: true,
   [FeatureName.IntegratedSyncCustodiansEveryRequest]: true,
-
-  [FeatureName.QueryBuilderShowConceptStats]: false,
 
   [FeatureName.HdrukTheme]: true,
 };

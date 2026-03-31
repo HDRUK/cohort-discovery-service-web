@@ -12,6 +12,8 @@ const useFeatures = () =>
         queryBuilderLeaveConfirm: flags[FeatureName.QueryBuilderLeaveConfirm],
         queryBuilderShowConceptStats:
           flags[FeatureName.QueryBuilderShowConceptStats],
+        queryBuilderStatsInOrdering:
+          flags[FeatureName.QueryBuilderStatsInOrdering],
 
         constrainForBunnyV1: flags[FeatureName.ConstrainForBunnyV1],
         queryNlp: flags[FeatureName.QueryNlp],
