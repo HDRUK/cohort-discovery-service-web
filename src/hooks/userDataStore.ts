@@ -93,7 +93,7 @@ export interface UserDataStoreState {
   setWorkgroups: (workgroups: Workgroup[]) => void;
 }
 
-export const useUserDataStore = create<UserDataStoreState>((set, get) => ({
+export const useUserDataStore = create<UserDataStoreState>((set) => ({
   user: null,
   setUser: (user) =>
     set((state) => ({
@@ -184,8 +184,6 @@ export const useUserDataStore = create<UserDataStoreState>((set, get) => ({
       domain,
       collections: selectedDatasets,
     }).toString();
-
-    console.log({ selectedDatasets, params });
 
     const { data } = await getConcepts({ params });
 
