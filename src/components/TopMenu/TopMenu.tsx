@@ -13,14 +13,12 @@ import { HelpIcon } from "@/icons/HelpIcon";
 import HelpTooltip from "../HelpTooltip";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import theme from "@/config/theme";
+import { useApplicationMode } from "@/providers/ApplicationModeProvider";
 
-type TopMenuProps = {
-  standalone: boolean;
-};
-
-export default function TopMenu({ standalone }: TopMenuProps) {
+export default function TopMenu() {
   const pathname = usePathname();
   const user = useUserStore((s) => s.user);
+  const { isStandalone } = useApplicationMode();
 
   const [guidanceOpen, setGuidanceOpen] = useState(false);
   const { helpTooltipOpen, setHelpTooltipOpen } = useQueryBuilder((qb) => ({
@@ -55,7 +53,7 @@ export default function TopMenu({ standalone }: TopMenuProps) {
         route: routes.teamHome(uc.pid),
         page: null,
       })),
-      ...(user && standalone
+      ...(user && isStandalone
         ? [
             {
               id: routes.profile,
@@ -79,7 +77,7 @@ export default function TopMenu({ standalone }: TopMenuProps) {
     ];
 
     return baseTabs;
-  }, [standalone, user, userCustodians]);
+  }, [isStandalone, user, userCustodians]);
 
   const currentTabValue =
     tabs.find((tab) => {

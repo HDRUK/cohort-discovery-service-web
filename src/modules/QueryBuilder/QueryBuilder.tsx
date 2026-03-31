@@ -13,6 +13,7 @@ import { ThreePaneProvider } from "@/providers/ThreePaneProvider";
 import { useLeaveConfirmation } from "@/hooks/useLeaveConfirmation";
 import RuleBoard from "../RuleBoard";
 import { CohortBuilderProvider } from "@/providers/CohortBuilderProvider";
+import useFeatures from "@/hooks/useFeatures";
 
 const QueryBuilder = ({
   query,
@@ -21,6 +22,7 @@ const QueryBuilder = ({
   query?: Query;
   errorOnDrag?: boolean;
 }) => {
+  const { queryBuilderLeaveConfirm } = useFeatures();
   const { queryBuilderJson, setQueryBuilderJson, select, deselect } =
     useQueryBuilder((qb) => ({
       queryBuilderJson: qb.queryBuilderJson,
@@ -36,7 +38,9 @@ const QueryBuilder = ({
     }
   }, [query, setQueryBuilderJson]);
 
-  useLeaveConfirmation(queryBuilderJson.rules.length > 0);
+  useLeaveConfirmation(
+    queryBuilderLeaveConfirm && queryBuilderJson.rules.length > 0,
+  );
 
   const onChangeSelection = useCallback(
     (ids: string[], deselectedIds: string[]) => {

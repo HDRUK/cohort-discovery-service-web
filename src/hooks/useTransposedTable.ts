@@ -4,7 +4,7 @@ import { useTable } from "@/hooks/useTable";
 
 export interface TransposedTableRow {
   field: string;
-  value: string | number | null;
+  value: string | number | null | React.ReactNode;
 }
 
 type FormatterMap<T extends object> = Partial<{
@@ -15,12 +15,19 @@ type LabelMap<T extends object> = Partial<{
   [K in keyof T]: string;
 }>;
 
+type ValueFormatter<T extends object> = (
+  value: T[keyof T],
+  key: keyof T,
+  row: T,
+) => React.ReactNode;
+
 interface UseTransposedTableProps<T extends object> {
   data?: T | null;
   include?: (keyof T)[];
   exclude?: (keyof T)[];
   labels?: LabelMap<T>;
   formatters?: FormatterMap<T>;
+  valueFormatter?: ValueFormatter<T>;
 }
 
 const toDisplayValue = (value: unknown): TransposedTableRow["value"] => {
@@ -45,6 +52,7 @@ export function useTransposedTable<T extends object>({
   exclude = [],
   labels = {},
   formatters = {},
+  valueFormatter,
 }: UseTransposedTableProps<T>) {
   const tableData = useMemo<TransposedTableRow[]>(() => {
     if (!data) return [];
@@ -55,14 +63,18 @@ export function useTransposedTable<T extends object>({
 
     return keys.map((key) => {
       const rawValue = data[key];
-      const formatter = formatters[key];
+      const fieldFormatter = formatters[key];
 
       return {
         field: labels[key] ?? String(key),
-        value: formatter ? formatter(rawValue, data) : toDisplayValue(rawValue),
+        value: fieldFormatter
+          ? fieldFormatter(rawValue, data)
+          : valueFormatter
+            ? valueFormatter(rawValue, key, data)
+            : toDisplayValue(rawValue),
       };
     });
-  }, [data, include, exclude, labels, formatters]);
+  }, [data, include, exclude, labels, formatters, valueFormatter]);
 
   const columns = useMemo<MRT_ColumnDef<TransposedTableRow>[]>(
     () => [

@@ -42,7 +42,7 @@ const DistributionStatus = ({
     handleRunConceptsNow,
   });
 
-  const metadata = collection.latest_metadata;
+  const metadata = collection?.latest_metadata;
 
   return (
     <Stack spacing={1} height={"100%"} justifyContent={"center"}>

@@ -11,7 +11,11 @@ beforeEach(() => {
 
 const renderComponent = (props: RuleTimeframeSelectorProps) =>
   render(
-    <MockCohortDiscoveryServiceStore>
+    <MockCohortDiscoveryServiceStore
+      overrides={{
+        featureFlags: { flags: { "constrain-for-bunny-v1": false } },
+      }}
+    >
       <RuleTimeframeSelector {...props} />
     </MockCohortDiscoveryServiceStore>,
   );

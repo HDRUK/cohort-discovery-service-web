@@ -1,12 +1,15 @@
 import SupportPopOut from "@/components/SupportPopOut";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { DefaultProvider } from "@/providers/DefaultProvider";
+import ApplicationModeProvider from "@/providers/ApplicationModeProvider";
 
 describe("SupportPopOut", () => {
   it("should open support panel ", async () => {
     render(
       <DefaultProvider>
-        <SupportPopOut />
+        <ApplicationModeProvider>
+          <SupportPopOut />
+        </ApplicationModeProvider>
       </DefaultProvider>,
     );
 

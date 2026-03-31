@@ -29,6 +29,11 @@ export interface QueryHistorySearchParams extends ApiSearchParams {
   open_queries?: string[];
 }
 
+export interface ConceptSearchParams extends ApiSearchParams {
+  domain?: string;
+  collections?: string[];
+}
+
 export interface CacheOptions {
   useCache?: boolean;
 }
@@ -488,25 +493,5 @@ export interface SignInPost {
   email: string;
   password: string;
 }
-
-export enum FeatureName {
-  QueryBuilder = "query-builder",
-  ConstrainForBunnyV1 = "constrain-for-bunny-v1",
-  QueryNlp = "query-nlp",
-  InAppMessenger = "in-app-messenger",
-  ManageWorkgroupsInternal = "manage-workgroups-internal",
-  HdrukTheme = "hdruk-uk-theme",
-}
-
-export type FeatureFlag = Record<FeatureName, boolean>;
-
-export const DEFAULT_FLAGS: FeatureFlag = {
-  [FeatureName.QueryBuilder]: false,
-  [FeatureName.ConstrainForBunnyV1]: false,
-  [FeatureName.QueryNlp]: false,
-  [FeatureName.InAppMessenger]: false,
-  [FeatureName.ManageWorkgroupsInternal]: true,
-  [FeatureName.HdrukTheme]: true,
-};
 
 export type GroupedCollection = { custodian: Custodian; items: Collection[] };
