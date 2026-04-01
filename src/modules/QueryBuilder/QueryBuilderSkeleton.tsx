@@ -6,7 +6,9 @@ export const QueryBuilderSkeleton = () => (
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
+      alignSelf: "center",
       flexGrow: 1,
+      maxWidth: "700px",
     }}
   >
     <Typography textAlign="center" px={3} fontSize="large">
