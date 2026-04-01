@@ -32,7 +32,7 @@ import type {
 } from "@/types/rules";
 import type { UniqueIdentifier } from "@dnd-kit/core";
 
-import getConcepts from "@/actions/concept/__mocks__/getConcepts";
+import searchConcepts from "@/actions/concept/__mocks__/searchConcepts";
 import { validateRuleTree } from "@/utils/rules";
 import { queryToText } from "@/utils/queryBuilder";
 
@@ -161,13 +161,12 @@ const MockCohortDiscoveryServiceStore = ({
       createConceptSet: (_payload: CreateConceptSetPost) =>
         RESOLVE<void>(undefined),
       searchForConcepts: async ({ searchTerm, perPage, domain }) => {
-        const params = buildConceptSearchParams({
-          search_term: searchTerm,
+        const { data } = await searchConcepts({
+          concept_name: [searchTerm],
+          concept_id: [searchTerm],
           per_page: perPage,
           domain,
-        }).toString();
-
-        const { data } = await getConcepts({ params });
+        });
 
         return data as Paginated<Partial<Concept>>;
       },
