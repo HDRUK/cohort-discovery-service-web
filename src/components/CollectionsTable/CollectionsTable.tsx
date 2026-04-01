@@ -35,6 +35,7 @@ export interface CollectionsTableProps extends TableProps {
   tableTitle?: string;
   tableSubTitle?: string;
   deleteOverride?: (ids: string[]) => Promise<void>;
+  emptyMessageOverride?: string;
 }
 
 const CollectionsTable = ({
@@ -42,6 +43,7 @@ const CollectionsTable = ({
   tableTitle,
   tableSubTitle,
   deleteOverride,
+  emptyMessageOverride,
   ...rest
 }: CollectionsTableProps) => {
   const { searchParams, getSearchParam } = useSearchParams("collection_filter");
@@ -274,7 +276,10 @@ const CollectionsTable = ({
   return (
     <Table
       key="custodian-collection-table"
-      emptyMessage={"Collections will appear here when they are created"}
+      emptyMessage={
+        emptyMessageOverride ??
+        "Collections will appear here when they are created"
+      }
       table={table}
       leftAction={{
         titleProps: {
