@@ -57,7 +57,6 @@ import { HdrukUiProvider } from "@hdruk/ui";
 import { ThemeOptions } from "@mui/material";
 import { CohortBuilderProvider } from "@/providers/CohortBuilderProvider";
 import ApplicationModeProvider from "@/providers/ApplicationModeProvider";
-import { buildConceptSearchParams } from "@/utils/params";
 
 const queryClient = new QueryClient();
 

@@ -224,7 +224,7 @@ const searchConcepts = async (
 
   const filtered = concepts.filter((c) => {
     const name = (c.name ?? "").toLowerCase();
-    const conceptId = String(c.concept_id ?? "");
+    const conceptId = String(c.concept_id);
     const category = (c.category ?? "").toLowerCase();
 
     const matchesSearch =
