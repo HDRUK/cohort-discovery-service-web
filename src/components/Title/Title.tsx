@@ -65,7 +65,7 @@ const Title = ({
     <Box
       sx={{
         display: "flex",
-        overflow: "hidden",
+        overflow: "wrap",
       }}
       {...wrapperSx}
     >
