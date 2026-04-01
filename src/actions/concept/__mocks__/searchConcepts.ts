@@ -1,29 +1,27 @@
 import { ApiResponse, Concept, Paginated } from "@/types/api";
-import { CachedGetArgs } from "@/lib/apiClient";
 
-const getConcepts = async (
-  args?: Omit<CachedGetArgs, "url">,
+interface SearchConceptsBody {
+  concept_name?: string[];
+  concept_id?: string[];
+  domain?: string;
+  collections?: string[];
+  page?: number;
+  per_page?: number;
+  include_ancestors?: boolean;
+}
+
+const searchConcepts = async (
+  body: SearchConceptsBody = {},
 ): Promise<ApiResponse<Paginated<Partial<Concept>>>> => {
-  const rawParams = args?.params;
-
-  const params =
-    rawParams instanceof URLSearchParams
-      ? rawParams
-      : new URLSearchParams(typeof rawParams === "string" ? rawParams : "");
-
-  const searchTerms = [
-    ...params.getAll("concept_name[]"),
-    ...params.getAll("concept_id[]"),
-    ...params.getAll("concept_name"),
-    ...params.getAll("concept_id"),
-    ...params.getAll("search_term"),
-  ]
+  const searchTerms = [...(body.concept_name ?? []), ...(body.concept_id ?? [])]
     .filter(Boolean)
     .map((term) => term.toLowerCase());
 
-  const domain = params.get("domain")?.toLowerCase();
+  const domain = body.domain?.toLowerCase();
+  const page = body.page ?? 1;
+  const perPage = body.per_page ?? 20;
 
-  const concepts = [
+  const concepts: Partial<Concept>[] = [
     {
       concept_id: 262,
       name: "Emergency Room and Inpatient Visit",
@@ -224,9 +222,9 @@ const getConcepts = async (
     },
   ];
 
-  const data = concepts.filter((c) => {
+  const filtered = concepts.filter((c) => {
     const name = (c.name ?? "").toLowerCase();
-    const conceptId = String(c.concept_id);
+    const conceptId = String(c.concept_id ?? "");
     const category = (c.category ?? "").toLowerCase();
 
     const matchesSearch =
@@ -240,18 +238,21 @@ const getConcepts = async (
     return matchesSearch && matchesDomain;
   });
 
+  const start = (page - 1) * perPage;
+  const data = filtered.slice(start, start + perPage);
+
   return {
     message: "success",
     data: {
       data,
-      from: data.length ? 1 : 0,
-      to: data.length,
-      current_page: 1,
-      per_page: data.length,
-      total: data.length,
-      last_page: 1,
+      from: filtered.length ? start + 1 : 0,
+      to: start + data.length,
+      current_page: page,
+      per_page: perPage,
+      total: filtered.length,
+      last_page: Math.max(1, Math.ceil(filtered.length / perPage)),
     },
   };
 };
 
-export default getConcepts;
+export default searchConcepts;
