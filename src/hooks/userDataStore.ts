@@ -3,7 +3,6 @@ import submitQuery from "@/actions/query/submitQuery";
 import rerunTask from "@/actions/task/rerunTask";
 import rerunDistributions from "@/actions/rerunDistributions";
 import createConceptSet from "@/actions/conceptSet/createConceptSet";
-import getConcepts from "@/actions/concept/getConcepts";
 import attachConcepts from "@/actions/concept/attachConcepts";
 import detachConcepts from "@/actions/concept/detachConcepts";
 import deleteConceptSet from "@/actions/conceptSet/deleteConceptSet";
@@ -35,7 +34,7 @@ import {
 } from "@/config/tags";
 import { DEFAULT_QUERY, useQueryBuilderStore } from "@/store/queryBuilderStore";
 import { useCustodianDataStore } from "@/store/custodianDataStore";
-import { buildConceptSearchParams } from "@/utils/params";
+import searchConcepts from "@/actions/concept/searchConcepts";
 
 export interface UserDataStoreState {
   user: CombinedUser | undefined | null;
@@ -178,14 +177,13 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
   searchForConcepts: async ({ searchTerm, perPage, domain }) => {
     const { selectedDatasets } = useQueryBuilderStore.getState();
 
-    const params = buildConceptSearchParams({
-      search_term: searchTerm,
+    const { data } = await searchConcepts({
+      concept_name: [searchTerm],
+      concept_id: [searchTerm],
       per_page: perPage,
       domain,
       collections: selectedDatasets,
-    }).toString();
-
-    const { data } = await getConcepts({ params });
+    });
 
     return data;
   },

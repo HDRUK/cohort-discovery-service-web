@@ -4,7 +4,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import SearchConcepts from "./SearchConcepts";
 import ApplicationModeProvider from "@/providers/ApplicationModeProvider";
-jest.mock("@/actions/concept/getConcepts");
+jest.mock("@/actions/concept/searchConcepts");
 
 function Wrapper(props: React.ComponentProps<typeof SearchConcepts>) {
   const [selected, setSelected] = useState<Record<number, boolean>>({});
