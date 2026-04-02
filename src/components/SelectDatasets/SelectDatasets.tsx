@@ -12,7 +12,7 @@ import {
   Stack,
   Accordion,
 } from "@mui/material";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import Title from "../Title";
 import SelectNetworkDatasets, {
   NetworkGroupedCollections,
@@ -23,13 +23,16 @@ import ToggleAction from "../ToggleAction";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import { useUserDataStore } from "@/hooks/userDataStore";
+import SquareCheckbox from "../SquareCheckbox";
+import { addPids, removePids } from "@/utils/collections";
 
 const SelectDatasets = () => {
   const collections = useUserDataStore((s) => s.userCollections);
-  const includeSynthetic = useQueryBuilder((qb) => qb.includeSynthetic);
-
   const selectedDatasets = useQueryBuilder((qb) => qb.selectedDatasets);
   const setSelectedDatasets = useQueryBuilder((qb) => qb.setSelectedDatasets);
+  const hasSelectedSyntheticDatasets = useQueryBuilder(
+    (qb) => qb.hasSelectedSyntheticDatasets,
+  );
 
   const open = useQueryBuilder((qb) => qb.openSelectDatasetsPanel);
   const setOpen = useQueryBuilder((qb) => qb.setOpenSelectDatasetsPanel);
@@ -70,17 +73,59 @@ const SelectDatasets = () => {
     );
   }, [custodianGroups]);
 
-  const toggleIncludeSynthetic = useQueryBuilder(
-    (qb) => qb.toggleIncludeSynthetic,
+  const allPids = useMemo(() => collections.map((c) => c.pid), [collections]);
+
+  const allSyntheticPids = useMemo(
+    () =>
+      collections
+        .filter((collection) => collection.is_synthetic)
+        .map((c) => c.pid),
+    [collections],
   );
 
-  const handleToggleIncludeSynthetic = () => {
-    toggleIncludeSynthetic(collections);
-  };
+  const selectedSet = useMemo(
+    () => new Set(selectedDatasets),
+    [selectedDatasets],
+  );
+  const allPidSet = useMemo(() => new Set(allPids), [allPids]);
+  const allSyntheticPidSet = useMemo(
+    () => new Set(allSyntheticPids),
+    [allSyntheticPids],
+  );
 
-  const nTotal = collections.length;
-  const nSelected = selectedDatasets.length;
+  const nTotal = allPids.length;
+  const nSelected = allPids.filter((pid) => selectedSet.has(pid)).length;
+  const nSyntheticSelected = allSyntheticPids.filter((pid) =>
+    selectedSet.has(pid),
+  ).length;
+
   const noDatasets = nSelected === 0;
+  const allSelected = nTotal > 0 && nSelected === nTotal;
+  const allSyntheticSelected =
+    allSyntheticPids.length > 0 &&
+    nSyntheticSelected === allSyntheticPids.length;
+
+  const handleToggleIncludeSynthetic = useCallback(() => {
+    const next = allSyntheticSelected
+      ? removePids(selectedDatasets, allSyntheticPidSet)
+      : addPids(selectedDatasets, allSyntheticPids);
+
+    setSelectedDatasets(next);
+  }, [
+    allSyntheticSelected,
+    allSyntheticPidSet,
+    allSyntheticPids,
+    selectedDatasets,
+    setSelectedDatasets,
+  ]);
+
+  const handleToggleAll = useCallback(() => {
+    const next = allSelected
+      ? removePids(selectedDatasets, allPidSet)
+      : addPids(selectedDatasets, allPids);
+
+    setSelectedDatasets(next);
+  }, [allSelected, allPidSet, allPids, selectedDatasets, setSelectedDatasets]);
 
   return (
     <Collapse
@@ -107,13 +152,13 @@ const SelectDatasets = () => {
         <Stack direction="row" gap={1} padding={2}>
           <ToggleAction
             size={25}
-            active={includeSynthetic}
+            active={hasSelectedSyntheticDatasets}
             onToggle={handleToggleIncludeSynthetic}
             activeIcon={CheckIcon}
             inactiveIcon={CloseIcon}
           />
           <Title
-            title={includeSynthetic ? "Including" : "Excluding"}
+            title={hasSelectedSyntheticDatasets ? "Including" : "Excluding"}
             subTitle={"Synthetic Data Collections"}
             useSeparator={false}
           />
@@ -129,6 +174,15 @@ const SelectDatasets = () => {
             <Title
               title="All Collections"
               subTitle={`${nSelected}/${nTotal} Collections Selected`}
+              startIcon={
+                <SquareCheckbox
+                  checked={nSelected > 0}
+                  indeterminate={nSelected > 0 && nSelected !== nTotal}
+                  onChange={() => {
+                    handleToggleAll();
+                  }}
+                />
+              }
               useSeparator={false}
               wrapperSx={{
                 display: "flex",
@@ -145,7 +199,10 @@ const SelectDatasets = () => {
               display: "flex",
               flexDirection: "column",
               gap: 0.5,
-              mb: 2,
+              mb: 1,
+              mx: 3,
+              borderLeft: 1,
+              borderColor: "lightgrey",
             }}
           >
             {networkGroups.map((ng) => (

@@ -47,7 +47,9 @@ const SearchConcepts = ({
 }: SearchConceptsProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const searchForConcepts = useUserStore((s) => s.searchForConcepts);
-  const includeSynthetic = useQueryBuilder((s) => s.includeSynthetic);
+  const includeSynthetic = useQueryBuilder(
+    (qb) => qb.hasSelectedSyntheticDatasets,
+  );
 
   const [perPage, setPerPage] = useState(DEFAULT_CODES_PER_PAGE);
   const [activeResult, setActiveResult] = useState<Paginated<

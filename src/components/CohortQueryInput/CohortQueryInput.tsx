@@ -41,7 +41,9 @@ const CohortQueryInput = ({
   const resetQueryBuilderJson = useQueryBuilder(
     (qb) => qb.resetQueryBuilderJson,
   );
-  const includeSynthetic = useQueryBuilder((qb) => qb.includeSynthetic);
+  const includeSynthetic = useQueryBuilder(
+    (qb) => qb.hasSelectedSyntheticDatasets,
+  );
   const appendError = useQueryBuilder((qb) => qb.appendError);
   const errors = useQueryBuilder((qb) => qb.errors ?? []);
   const warnings = useQueryBuilder((qb) => qb.queryBuilderJson.warnings ?? []);
