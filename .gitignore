@@ -15,3 +15,7 @@ storybook-static
 coverage
 .yalc
 yalc.lock
+
+cypress/videos
+cypress/screenshots
+cypress/reports
