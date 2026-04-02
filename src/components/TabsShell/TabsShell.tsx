@@ -95,7 +95,7 @@ export default function TabsShell({
                         component="span"
                         sx={mergeSx(
                           { p: 0, m: 0 },
-                          +internalValue === +(id || i)
+                          internalValue.toString() === (id ?? i).toString()
                             ? { fontWeight: "600" }
                             : {},
                           disabled ? { display: "none" } : {},
