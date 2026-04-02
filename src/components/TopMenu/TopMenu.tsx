@@ -74,6 +74,13 @@ export default function TopMenu() {
             },
           ]
         : []),
+      {
+        id: routes.help,
+        label: "Help",
+        href: routes.help,
+        route: routes.help,
+        page: null,
+      },
     ];
 
     return baseTabs;
