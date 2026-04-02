@@ -35,10 +35,12 @@ import {
 import { DEFAULT_QUERY, useQueryBuilderStore } from "@/store/queryBuilderStore";
 import { useCustodianDataStore } from "@/store/custodianDataStore";
 import searchConcepts from "@/actions/concept/searchConcepts";
+import { WorkgroupNames } from "@/config/workgroups";
 
 export interface UserDataStoreState {
   user: CombinedUser | undefined | null;
   setUser: (user: CombinedUser | null) => void;
+  isOnlyInDefaultWorkgroup: boolean;
 
   userCollections: Collection[];
   setUserCollections: (collections: Collection[]) => void;
@@ -98,8 +100,11 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
     set((state) => ({
       ...state,
       user,
+      isOnlyInDefaultWorkgroup:
+        (user?.workgroups?.length ?? 0) === 1 &&
+        user?.workgroups?.[0]?.name === WorkgroupNames.DEFAULT,
     })),
-
+  isOnlyInDefaultWorkgroup: false,
   userCollections: [],
   setUserCollections: (userCollections) =>
     set((state) => ({

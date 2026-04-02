@@ -78,8 +78,7 @@ const SelectNetworkDatasets = ({
           gap: 0.5,
           mb: 1,
           mx: 3,
-          border: 1,
-          borderRadius: 1,
+          borderLeft: 1,
           borderColor: "lightgrey",
         }}
       >
