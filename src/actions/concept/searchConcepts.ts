@@ -17,8 +17,6 @@ interface SearchConceptsBody {
 const searchConcepts = async (
   body: SearchConceptsBody,
 ): Promise<ApiResponse<Paginated<Partial<Concept>>>> => {
-  console.log({ body });
-
   const { data, message } = await apiPost<
     ApiResponse<Paginated<Partial<Concept>>>,
     SearchConceptsBody
