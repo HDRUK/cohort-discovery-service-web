@@ -1,0 +1,9 @@
+{
+  "id": 1,
+  "pid": "cust-pid-1",
+  "name": "Test Custodian",
+  "external_custodian_id": "100",
+  "external_custodian_name": "External Test Custodian",
+  "created_at": "2025-01-01T00:00:00Z",
+  "updated_at": "2025-01-01T00:00:00Z"
+}

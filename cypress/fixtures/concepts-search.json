@@ -1,0 +1,26 @@
+{
+  "message": "success",
+  "data": [
+    {
+      "concept_id": 201826,
+      "name": "Type 2 diabetes mellitus",
+      "category": "Condition",
+      "ncollections": 2,
+      "count": 1420
+    },
+    {
+      "concept_id": 201254,
+      "name": "Type 1 diabetes mellitus",
+      "category": "Condition",
+      "ncollections": 1,
+      "count": 890
+    },
+    {
+      "concept_id": 44054006,
+      "name": "Diabetes mellitus",
+      "category": "Condition",
+      "ncollections": 2,
+      "count": 2310
+    }
+  ]
+}

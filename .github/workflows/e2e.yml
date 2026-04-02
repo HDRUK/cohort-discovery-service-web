@@ -1,0 +1,163 @@
+name: E2E Tests
+
+on:
+  pull_request:
+    branches:
+      - dev
+      - main
+      - "release/**"
+  push:
+    branches:
+      - dev
+  # Nightly run at 02:00 UTC – catches regressions not tied to a PR
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+# Skip duplicate runs: cancel in-progress for the same PR/branch
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # -----------------------------------------------------------------------
+  # Application config – fill in real values or override via repo secrets
+  # -----------------------------------------------------------------------
+  APPLICATION_MODE: standalone
+  API_BASE_URL: http://localhost:8100
+  NEXT_PUBLIC_LOGIN_URL: http://localhost:3000/login
+  NEXT_PUBLIC_TASK_URL: http://localhost:8100/api/v1
+  NEXT_PUBLIC_USE_EXAMPLE_QUERY: "false"
+  NEXT_PUBLIC_USE_DEBUG_LOGS: "false"
+  NODE_ENV: test
+  CYPRESS: "true"
+  APPLICATION_MODE: standalone
+
+  # -----------------------------------------------------------------------
+  # Cypress test-user credentials (used by login.cy.ts)
+  # The mock server accepts any non-empty credentials.
+  # Override via repo secrets for stricter checks.
+  # -----------------------------------------------------------------------
+  CYPRESS_USER_EMAIL: ${{ secrets.CYPRESS_USER_EMAIL || 'test@example.com' }}
+  CYPRESS_USER_PASSWORD: ${{ secrets.CYPRESS_USER_PASSWORD || 'password123' }}
+
+jobs:
+  e2e-tests:
+    name: Cypress E2E (${{ matrix.app_mode }})
+    runs-on: ubuntu-latest
+    # Only run on open (non-draft) PRs
+    if: ${{ github.event_name != 'pull_request' || (github.event.pull_request.state == 'open' && github.event.pull_request.draft == false) }}
+
+    strategy:
+      matrix:
+        app_mode: [standalone]
+        # Add 'integrated' here once an integrated-mode test environment is available
+      fail-fast: false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Cache Node modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            ~/.npm
+          key: e2e-node-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: e2e-node-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Cache Cypress binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: e2e-cypress-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: e2e-cypress-${{ runner.os }}-
+
+      - name: Build Next.js app
+        env:
+          APPLICATION_MODE: ${{ matrix.app_mode }}
+          CYPRESS: "true"
+        run: npm run build
+
+      - name: Start mock API server
+        run: |
+          nohup node cypress/support/mock-server.js > mock-api.log 2>&1 &
+          echo "Waiting for mock API..."
+          for i in $(seq 1 20); do
+            if curl -sf http://localhost:8100/health > /dev/null 2>&1; then
+              echo "Mock API is up."
+              break
+            fi
+            echo "  attempt $i..."
+            sleep 1
+          done
+
+      - name: Start Next.js server
+        env:
+          APPLICATION_MODE: ${{ matrix.app_mode }}
+          CYPRESS: "true"
+        run: |
+          nohup npm run start > next.log 2>&1 &
+          echo "Waiting for Next.js..."
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3000 > /dev/null 2>&1; then
+              echo "Next.js is up."
+              break
+            fi
+            echo "  attempt $i..."
+            sleep 2
+          done
+
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v6
+        with:
+          browser: chrome
+          headed: false
+          # App is already running – skip start
+          install: false
+        env:
+          APPLICATION_MODE: ${{ matrix.app_mode }}
+          CYPRESS_USER_EMAIL: ${{ env.CYPRESS_USER_EMAIL }}
+          CYPRESS_USER_PASSWORD: ${{ env.CYPRESS_USER_PASSWORD }}
+
+      - name: Upload screenshots on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-screenshots-${{ matrix.app_mode }}
+          path: cypress/screenshots
+          retention-days: 7
+
+      - name: Upload videos
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cypress-videos-${{ matrix.app_mode }}
+          path: cypress/videos
+          retention-days: 7
+
+      - name: Upload mock API log on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: mock-api-log-${{ matrix.app_mode }}
+          path: mock-api.log
+          retention-days: 3
+
+      - name: Upload Next.js log on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: next-log-${{ matrix.app_mode }}
+          path: next.log
+          retention-days: 3
