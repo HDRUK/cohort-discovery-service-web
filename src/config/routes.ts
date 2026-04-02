@@ -35,6 +35,7 @@ export const routes = {
   dashboardCodes: dashboardPath("codes"),
   profile: "/profile",
   definitions: "/my-definitions",
+  help: "/help",
   admin: adminPath(),
   adminUsers: adminPath("users"),
   adminWorkgroups: adminPath("workgroups"),
