@@ -68,7 +68,7 @@ export default function TopMenu() {
             {
               id: routes.admin,
               label: "Admin",
-              href: routes.adminCollections,
+              href: routes.adminWorkgroups,
               route: routes.admin,
               page: null,
             },

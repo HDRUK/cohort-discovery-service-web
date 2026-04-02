@@ -95,16 +95,13 @@ export const themeOptions: ThemeOptions = {
           color: theme.palette.text.primary,
           borderRadius: theme.shape.borderRadius,
           "&.Mui-selected": {
-            backgroundColor: theme.palette.highlight.main,
-            color: theme.palette.success.dark,
+            backgroundColor: "#EEEEEE",
             "&:hover": {
-              backgroundColor: theme.palette.success.light,
-              color: theme.palette.success.contrastText,
+              backgroundColor: "#EEEEEE",
             },
           },
           "&:hover": {
             backgroundColor: theme.palette.highlight.main,
-            color: theme.palette.success.dark,
           },
         }),
       },
