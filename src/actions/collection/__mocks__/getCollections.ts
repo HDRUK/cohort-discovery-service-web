@@ -75,14 +75,21 @@ export const getMockCollection = (
   demographics: getMockDemographics({ collection_id: 1, n: count }),
   custodian: getCustodian(),
   latest_concept: getMockDistribution({ collection_id: 1, count }),
+  is_synthetic: false,
   ...rest,
 });
 
-export const getMockCollections = (n: number = 2): Collection[] =>
+export const getMockCollections = (
+  n: number = 2,
+  synthetic?: boolean | number[],
+): Collection[] =>
   Array.from({ length: Math.max(0, n) }, (_, id) =>
     getMockCollection({
       id,
       name: `Test Dataset #${id + 1}`,
+      is_synthetic: Array.isArray(synthetic)
+        ? synthetic.includes(id)
+        : (synthetic ?? false),
       demographics: getMockDemographics({
         collection_id: id,
         n: id < 1 ? 1213 : 603,
