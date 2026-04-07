@@ -7,6 +7,16 @@
     "plugin:import/typescript"
   ],
   "plugins": ["import"],
+  "overrides": [
+    {
+      "files": ["cypress/**/*.ts", "cypress/**/*.js", "cypress.config.ts"],
+      "rules": {
+        "@typescript-eslint/no-namespace": "off",
+        "@typescript-eslint/no-require-imports": "off",
+        "comma-dangle": "off"
+      }
+    }
+  ],
   "rules": {
     "import/order": [
       "error",
