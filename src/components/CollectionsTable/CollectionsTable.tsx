@@ -128,7 +128,7 @@ const CollectionsTable = ({
       },
       {
         id: "last_active",
-        header: "Last Query",
+        header: "Last Ping",
         accessorFn: (row) =>
           row.last_active ? getDatetime(row.last_active) : "—",
         size: 50,
