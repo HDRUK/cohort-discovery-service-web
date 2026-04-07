@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom";
 import { fireEvent, render, screen } from "@testing-library/react";
 import RuleOperator, { RuleOperatorProps } from "./RuleOperator";
-import MockDaphneStore from "@/store/MockDaphneStore";
+import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 import { CombinatorType, OperatorType, RuleGroupType } from "@/types/rules";
 import userEvent from "@testing-library/user-event";
 
@@ -33,13 +33,13 @@ describe("RuleOperator", () => {
     } as RuleGroupType;
 
     const rendered = render(
-      <MockDaphneStore
+      <MockCohortDiscoveryServiceStore
         overrides={{
           queryBuilder: { queryBuilderJson: query, setQueryBuilderJson },
         }}
       >
         <RuleOperator {...rest} operator={operator} groupId="group-1" />
-      </MockDaphneStore>,
+      </MockCohortDiscoveryServiceStore>,
     );
     return {
       query,

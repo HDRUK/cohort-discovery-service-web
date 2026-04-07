@@ -2,7 +2,7 @@ import { render, screen, within } from "@testing-library/react";
 import RuleTimeframeSelector, {
   RuleTimeframeSelectorProps,
 } from "./RuleTimeframeSelector";
-import MockDaphneStore from "@/store/MockDaphneStore";
+import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 import dayjs from "dayjs";
 
 beforeEach(() => {
@@ -11,9 +11,13 @@ beforeEach(() => {
 
 const renderComponent = (props: RuleTimeframeSelectorProps) =>
   render(
-    <MockDaphneStore>
+    <MockCohortDiscoveryServiceStore
+      overrides={{
+        featureFlags: { flags: { "constrain-for-bunny-v1": false } },
+      }}
+    >
       <RuleTimeframeSelector {...props} />
-    </MockDaphneStore>,
+    </MockCohortDiscoveryServiceStore>,
   );
 
 describe("RuleTimeframeSelector", () => {

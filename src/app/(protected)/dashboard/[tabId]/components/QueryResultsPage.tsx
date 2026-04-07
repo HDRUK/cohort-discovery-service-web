@@ -9,7 +9,6 @@ import { queryToText } from "@/utils/queryBuilder";
 import { buildQueryHistoryParams } from "@/utils/params";
 import { QueryHistorySearchParams } from "@/types/api";
 import { getQueryName } from "@/utils/query";
-import { AvailableFormats } from "@/components/DownloadButton/DownloadButton";
 
 type PageSearchParams = Promise<QueryHistorySearchParams>;
 
@@ -38,7 +37,7 @@ const QueryResultsPageContent = async ({
       <QueryResultsTable
         initialData={queryData.data}
         initialSearchParams={searchParamsObject}
-        useTableProps={{ enableRowSelection: true }}
+        useTableProps={{ enableRowSelection: false }}
         tableProps={{
           leftAction: {
             searchProps: {
@@ -46,11 +45,6 @@ const QueryResultsPageContent = async ({
             },
           },
           rightAction: {
-            downloadProps: {
-              ids: [queryData.data.pid],
-              entity: "queries",
-              formats: [AvailableFormats.JSON],
-            },
             // sortProps: { field: "collection.name" },
             // **SC - disabling this for now because it uses query string for sorting order. But this is not scoped
             // to the tab, but to the whole page, meaning it's being incorrectly applied to the history page too,

@@ -28,6 +28,26 @@ export type UpdateMultipleCollectionProps = {
   collections: CollectionWithHosts[];
 };
 
+const getDefaultValues = (collection: CollectionWithHosts | null) => {
+  if (!collection) {
+    return {
+      collection: {
+        model_state: undefined,
+        workgroups: [],
+      },
+    };
+  }
+
+  const { model_state, workgroups } = collection;
+  return {
+    collection: {
+      model_state: model_state,
+      workgroups: workgroups,
+    },
+    workgroups: workgroups?.map((wg) => wg.name).sort(),
+  };
+};
+
 const UpdateMultipleCollections = ({
   collections,
 }: UpdateMultipleCollectionProps) => {
@@ -41,7 +61,9 @@ const UpdateMultipleCollections = ({
 
   const notify = useNotify();
 
-  const formMethods = useForm<UpdateCollectionFormValues>();
+  const formMethods = useForm<UpdateCollectionFormValues>({
+    defaultValues: getDefaultValues(collections[0]),
+  });
 
   const {
     control,
@@ -157,11 +179,6 @@ const UpdateMultipleCollections = ({
     ],
   );
 
-  const handleEnter = useCallback(
-    () => handleSubmit((values) => submitForm(values, false))(),
-    [handleSubmit, submitForm],
-  );
-
   const handleLockClick = useCallback(
     () => handleSubmit((values) => submitForm(values, true))(),
     [handleSubmit, submitForm],
@@ -175,7 +192,6 @@ const UpdateMultipleCollections = ({
     collections,
     ...formMethods,
     currentCustodian,
-    handleEnter,
     handleLockClick,
     handleUnlockClick,
     submitForm,

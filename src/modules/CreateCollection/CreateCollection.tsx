@@ -259,14 +259,7 @@ const CreateCollection = ({ onCancel }: CreateCollectionProps) => {
             fixedExpanded
             defaultExpanded
           >
-            <CollectionConfig<CreateCollectionFormValues>
-              keepExpanded
-              frequencyFieldName={"config.frequency_mode"}
-              runTimeFrequencyFieldName={"config.run_time_frequency"}
-              runTimeHourFieldName={"config.run_time_hour"}
-              runTimeMinuteFieldName={"config.run_time_minute"}
-              disabled={!selectedHostId}
-            />
+            <CollectionConfig keepExpanded disabled={!selectedHostId} />
           </ActionMenuSection>
         </Stack>
 

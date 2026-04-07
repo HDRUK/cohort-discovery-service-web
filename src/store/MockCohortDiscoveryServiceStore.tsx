@@ -32,7 +32,7 @@ import type {
 } from "@/types/rules";
 import type { UniqueIdentifier } from "@dnd-kit/core";
 
-import getConcepts from "@/actions/concept/__mocks__/getConcepts";
+import searchConcepts from "@/actions/concept/__mocks__/searchConcepts";
 import { validateRuleTree } from "@/utils/rules";
 import { queryToText } from "@/utils/queryBuilder";
 
@@ -56,6 +56,7 @@ import { themeOptions } from "@/config/theme";
 import { HdrukUiProvider } from "@hdruk/ui";
 import { ThemeOptions } from "@mui/material";
 import { CohortBuilderProvider } from "@/providers/CohortBuilderProvider";
+import ApplicationModeProvider from "@/providers/ApplicationModeProvider";
 
 const queryClient = new QueryClient();
 
@@ -81,7 +82,7 @@ const RESOLVE = <T,>(v: T) => Promise.resolve(v);
 const DEFAULT_QUERY: RuleGroupType =
   process.env.NEXT_PUBLIC_USE_EXAMPLE_QUERY === "true" ? EXAMPLE_1 : NO_QUERY;
 
-const MockDaphneStore = ({
+const MockCohortDiscoveryServiceStore = ({
   overrides,
   children,
 }: PropsWithChildren<{ overrides?: SliceOverrides }>) => {
@@ -158,8 +159,14 @@ const MockDaphneStore = ({
       ) => RESOLVE<Query>(getMockQuery()),
       createConceptSet: (_payload: CreateConceptSetPost) =>
         RESOLVE<void>(undefined),
-      searchForConcepts: async (searchTerm: string, domain?: string) => {
-        const { data } = await getConcepts(searchTerm, domain);
+      searchForConcepts: async ({ searchTerm, perPage, domain }) => {
+        const { data } = await searchConcepts({
+          concept_name: [searchTerm],
+          concept_id: [searchTerm],
+          per_page: perPage,
+          domain,
+        });
+
         return data as Paginated<Partial<Concept>>;
       },
       addConceptsToSet: (_conceptSetId: number, _conceptIds: number[]) =>
@@ -249,20 +256,22 @@ const MockDaphneStore = ({
   );
 
   return (
-    <DefaultProvider>
-      <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
-        <QueryClientProvider client={queryClient}>
-          <CohortBuilderProvider>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <ConfirmProvider>
-                <NotifyProvider>{children}</NotifyProvider>
-              </ConfirmProvider>
-            </LocalizationProvider>
-          </CohortBuilderProvider>
-        </QueryClientProvider>
-      </HdrukUiProvider>
-    </DefaultProvider>
+    <ApplicationModeProvider>
+      <DefaultProvider>
+        <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
+          <QueryClientProvider client={queryClient}>
+            <CohortBuilderProvider>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <ConfirmProvider>
+                  <NotifyProvider>{children}</NotifyProvider>
+                </ConfirmProvider>
+              </LocalizationProvider>
+            </CohortBuilderProvider>
+          </QueryClientProvider>
+        </HdrukUiProvider>
+      </DefaultProvider>
+    </ApplicationModeProvider>
   );
 };
 
-export default MockDaphneStore;
+export default MockCohortDiscoveryServiceStore;

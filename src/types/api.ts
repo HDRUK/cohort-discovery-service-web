@@ -29,6 +29,11 @@ export interface QueryHistorySearchParams extends ApiSearchParams {
   open_queries?: string[];
 }
 
+export interface ConceptSearchParams extends ApiSearchParams {
+  domain?: string;
+  collections?: string[];
+}
+
 export interface CacheOptions {
   useCache?: boolean;
 }
@@ -129,6 +134,17 @@ export interface ResultFile extends WithTimestamps {
   task: Task;
 }
 
+export interface CollectionMetadata {
+  created_at: string;
+  os: string | null;
+  bclink: string;
+  biobank: string;
+  datamodel: string;
+  protocol: string;
+  rounding: string;
+  threshold: string;
+}
+
 export interface Collection extends WithTimestamps {
   id: number;
   name: string;
@@ -140,7 +156,7 @@ export interface Collection extends WithTimestamps {
   demographics?: Distribution[];
   latest_successful_demographic_result_file?: ResultFile | null;
   latest_successful_concept_result_file?: ResultFile | null;
-
+  latest_metadata?: CollectionMetadata | null;
   n_concepts?: number;
   custodian: Custodian;
   custodian_id?: number;
@@ -347,6 +363,7 @@ export interface CollectionHost {
   client_id: string;
   client_secret: string;
   custodian: Custodian;
+  collections: Collection[];
 }
 
 export type UrlString = `http${"s" | ""}://${string}`;
@@ -387,8 +404,8 @@ export interface Workgroup {
   id: number;
   name: string;
   external_name?: string;
-  users: User[];
-  collections: Collection[];
+  users?: User[];
+  collections?: Collection[];
 }
 
 export interface CreateWorkgroupPost {
@@ -476,25 +493,5 @@ export interface SignInPost {
   email: string;
   password: string;
 }
-
-export enum FeatureName {
-  QueryBuilder = "query-builder",
-  ConstrainForBunnyV1 = "constrain-for-bunny-v1",
-  QueryNlp = "query-nlp",
-  InAppMessenger = "in-app-messenger",
-  ManageWorkgroupsInternal = "manage-workgroups-internal",
-  HdrukTheme = "hdruk-uk-theme",
-}
-
-export type FeatureFlag = Record<FeatureName, boolean>;
-
-export const DEFAULT_FLAGS: FeatureFlag = {
-  [FeatureName.QueryBuilder]: false,
-  [FeatureName.ConstrainForBunnyV1]: false,
-  [FeatureName.QueryNlp]: false,
-  [FeatureName.InAppMessenger]: false,
-  [FeatureName.ManageWorkgroupsInternal]: true,
-  [FeatureName.HdrukTheme]: true,
-};
 
 export type GroupedCollection = { custodian: Custodian; items: Collection[] };

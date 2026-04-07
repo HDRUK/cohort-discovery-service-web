@@ -8,6 +8,7 @@ import { useCallback } from "react";
 import LastDistributionChip from "./LastDistributionChip";
 import { revalidateAction, revalidateCustodian } from "@/actions/revalidate";
 import { TAG_COLLECTIONS_ADMIN } from "@/config/tags";
+import MetadataPanel from "@/components/MetadataPanel";
 
 const DistributionStatus = ({
   collection,
@@ -41,6 +42,8 @@ const DistributionStatus = ({
     handleRunConceptsNow,
   });
 
+  const metadata = collection?.latest_metadata;
+
   return (
     <Stack spacing={1} height={"100%"} justifyContent={"center"}>
       <FormLabel underlined> Distribution Status</FormLabel>
@@ -70,6 +73,8 @@ const DistributionStatus = ({
           </LastDistributionChip>
         </Typography>
       </Box>
+
+      {metadata && <MetadataPanel metadata={metadata} />}
     </Stack>
   );
 };

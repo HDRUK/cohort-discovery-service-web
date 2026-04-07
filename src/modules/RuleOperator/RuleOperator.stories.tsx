@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs";
 import RuleOperator from "./RuleOperator";
 
-import MockDaphneStore from "@/store/MockDaphneStore";
+import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 import { CombinatorType, OperatorType } from "@/types/rules";
 
 const mockOperator: OperatorType = {
@@ -36,13 +36,13 @@ const operators: OperatorType[] = [
 
 export const Default: Story = {
   render: () => (
-    <MockDaphneStore>
+    <MockCohortDiscoveryServiceStore>
       <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
         {operators.map((op) => (
           <RuleOperator key={op.id} operator={op} groupId="g1" />
         ))}
       </div>
-    </MockDaphneStore>
+    </MockCohortDiscoveryServiceStore>
   ),
 };
 export const InvalidRule: Story = {

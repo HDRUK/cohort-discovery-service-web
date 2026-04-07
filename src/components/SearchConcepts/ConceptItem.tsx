@@ -10,9 +10,9 @@ import {
   Stack,
   Tooltip,
 } from "@mui/material";
-import Title from "../Title";
 import { mapDomain } from "@/utils/domains";
 import { ChangeEvent, MouseEvent } from "react";
+import Title from "../Title";
 
 type ConceptSelectEvent =
   | ChangeEvent<HTMLInputElement>
@@ -91,8 +91,29 @@ export const ConceptItem = ({
       subTitle={showDomain ? mapDomain(concept.category) : ""}
       display={"flex"}
       justifyContent={"space-between"}
+      alignItems={"center"}
       width={"100%"}
-    />
+      wrapperSx={{
+        width: "100%",
+        overflow: "auto",
+        flexWrap: "wrap",
+      }}
+      titleOverflow={"wrap"}
+    >
+      {showCounts && (
+        <Stack sx={{ ml: "auto" }} gap={1} direction={"row"}>
+          <Tooltip title="Number of datasets present in">
+            <Chip color="success" label={concept.ncollections} />
+          </Tooltip>
+          <Tooltip title="Total number of counts for this concept">
+            <Chip
+              color="secondary"
+              label={Number(concept.count).toLocaleString()}
+            />
+          </Tooltip>
+        </Stack>
+      )}
+    </Title>
   );
 
   return (
@@ -117,19 +138,6 @@ export const ConceptItem = ({
         />
       ) : (
         labelEl
-      )}
-      {showCounts && (
-        <Stack sx={{ ml: "auto" }} gap={1} direction={"row"}>
-          <Tooltip title="Number of datasets present in">
-            <Chip color="success" label={concept.ncollections} />
-          </Tooltip>
-          <Tooltip title="Total number of counts for this concept">
-            <Chip
-              color="secondary"
-              label={Number(concept.count).toLocaleString()}
-            />
-          </Tooltip>
-        </Stack>
       )}
     </ConceptWrapper>
   );

@@ -10,6 +10,7 @@ import {
   type MRT_ColumnDef,
 } from "material-react-table";
 import { Grid, Paper, Typography } from "@mui/material";
+import LaunchIcon from "@mui/icons-material/Launch";
 import dayjs from "dayjs";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import { formatNumber } from "@/utils/numbers";
@@ -26,8 +27,6 @@ import getQueries from "@/actions/query/getQueries";
 import { getQueryName } from "@/utils/query";
 import useSearchParams from "@/hooks/useSearchParams";
 import { buildQueryHistoryParams } from "@/utils/params";
-import useUserStore from "@/hooks/useUserStore";
-import { getUserQueryTag, TAG_QUERIES } from "@/config/tags";
 import { useDefaults } from "@/providers/DefaultProvider";
 
 interface QueriesTableProps {
@@ -44,9 +43,6 @@ const QueriesTable = ({
   const { setSelectedDatasets } = useQueryBuilder((qb) => ({
     setSelectedDatasets: qb.setSelectedDatasets,
   }));
-
-  const user = useUserStore((store) => store.user);
-  const deleteQueries = useUserStore((store) => store.deleteQueries);
 
   const qc = useQueryClient();
   const queryKey = useMemo(
@@ -152,6 +148,14 @@ const QueriesTable = ({
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
   const [expanded, setExpanded] = useState<MRT_ExpandedState>({});
 
+  function openQueryResult(queryId: string): string {
+    const openQueries = (searchParams.get("open_queries") || "")
+      .split(/,|%2C/)
+      .concat(queryId)
+      .filter((q) => q !== "");
+    return routes.dashboardQueryResult(queryId, openQueries);
+  }
+
   const table = usePaginatedTable<Query>({
     columns,
     data: queries.data,
@@ -196,6 +200,11 @@ const QueriesTable = ({
           tableProps={{
             leftAction: {
               titleProps: {
+                startIcon: (
+                  <Link href={openQueryResult(row.original.pid)}>
+                    <LaunchIcon sx={{ ml: 0.25, verticalAlign: "middle" }} />
+                  </Link>
+                ),
                 title: `Query ${getQueryName(row.original)}`,
                 subTitle: "Results",
               },
@@ -237,14 +246,7 @@ const QueriesTable = ({
         },
       }}
       rightAction={{
-        refreshProps: {
-          tag: user ? getUserQueryTag(user.id) : TAG_QUERIES,
-          label: "Refresh Queries",
-        },
         sortProps: { field: "name" },
-        deleteProps: {
-          onClick: deleteQueries,
-        },
       }}
       rightPanel={QueryHistoryGuidance}
     />

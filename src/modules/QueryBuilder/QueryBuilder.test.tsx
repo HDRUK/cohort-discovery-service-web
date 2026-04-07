@@ -5,20 +5,20 @@ import QueryBuilder from "./QueryBuilder";
 
 import { getQueryJson } from "./__mocks__/getQueryJson";
 
-import MockDaphneStore from "@/store/MockDaphneStore";
+import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 const setQueryBuilderJson = jest.fn();
 
 describe("QueryBuilder", () => {
   const renderComponent = () => {
     const query = getQueryJson();
     const rendered = render(
-      <MockDaphneStore
+      <MockCohortDiscoveryServiceStore
         overrides={{
           queryBuilder: { queryBuilderJson: query, setQueryBuilderJson },
         }}
       >
         <QueryBuilder />
-      </MockDaphneStore>,
+      </MockCohortDiscoveryServiceStore>,
     );
     return rendered;
   };

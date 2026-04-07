@@ -18,6 +18,7 @@ import { useLogDependencyChanges } from "@/utils/deps";
 import useAdminStore from "@/hooks/useAdminStore";
 import useCustodianStore from "@/hooks/useCustodianStore";
 import useUserStore from "@/hooks/useUserStore";
+import { useConfirm } from "@/hooks/useConfirm";
 import { useNotify } from "@/providers/NotifyProvider";
 import {
   getTagCustodianCollection,
@@ -212,6 +213,20 @@ const CollectionsTable = ({
     }),
   });
 
+  const handleDeleteClick = async () => {
+    const ok = await confirm({
+      props: {
+        action: `delete the collection${selectedCollections.length > 1 ? "s" : ""} ${selectedCollections.map((c) => c.name).join(", ")}`,
+      },
+      confirmText: "Delete",
+      confirmColor: "error",
+    });
+    if (!ok || ok === "cancel") {
+      return;
+    }
+    handleDeleteCollections(selectedCollections.map((c) => c.id.toString()));
+  };
+
   const handleDeleteCollections = useCallback(
     async (ids: string[]) => {
       if (deleteOverride) {
@@ -254,6 +269,8 @@ const CollectionsTable = ({
     deleteCollectionAdmin,
   });
 
+  const confirm = useConfirm();
+
   return (
     <Table
       key="custodian-collection-table"
@@ -266,7 +283,9 @@ const CollectionsTable = ({
         },
       }}
       rightAction={{
-        deleteProps: { onClick: handleDeleteCollections },
+        deleteProps: {
+          onClick: handleDeleteClick,
+        },
         refreshProps: {
           tag:
             currentCustodian?.pid && !isAdmin

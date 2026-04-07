@@ -1,6 +1,6 @@
 "use client";
 
-import { Concept } from "@/types/api";
+import { Concept, Paginated } from "@/types/api";
 import { SearchBar } from "@hdruk/ui";
 import {
   Dispatch,
@@ -16,10 +16,13 @@ import {
   FormGroup,
   Box,
   Divider,
+  Button,
 } from "@mui/material";
 import { ConceptItem, ConceptItemProps } from "./ConceptItem";
 import useUserStore from "@/hooks/useUserStore";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
+import { DEFAULT_CODES_PER_PAGE } from "@/config/defaults";
+import useFeatures from "@/hooks/useFeatures";
 
 interface SlotProps {
   conceptItem: ConceptItemProps;
@@ -45,6 +48,11 @@ const SearchConcepts = ({
   const [isLoading, setIsLoading] = useState(false);
   const searchForConcepts = useUserStore((s) => s.searchForConcepts);
   const includeSynthetic = useQueryBuilder((s) => s.includeSynthetic);
+
+  const [perPage, setPerPage] = useState(DEFAULT_CODES_PER_PAGE);
+  const [activeResult, setActiveResult] = useState<Paginated<
+    Partial<Concept>
+  > | null>(null);
 
   const lastQueryRef = useRef<string>("");
   const initialSelectedRef = useRef<Record<number, boolean>>({
@@ -76,43 +84,66 @@ const SearchConcepts = ({
   }, [visibleOptions, allSelected, setSelected]);
 
   const onSearch = useCallback(
-    async (value: string) => {
+    async (value: string, force = false, customPerPage?: number) => {
       const trimmedValue = value.trim();
+      const isNewSearch = trimmedValue !== lastQueryRef.current;
 
-      if (trimmedValue === lastQueryRef.current) return;
+      if (!force && !isNewSearch) return;
+
       lastQueryRef.current = trimmedValue;
 
       if (!trimmedValue) {
         setIsLoading(false);
+        setActiveResult(null);
         setNonSyntheticOptions([]);
         setSyntheticOptions([]);
         setNoOptionsFound(false);
         return;
       }
-      setIsLoading(true);
-      setSelected?.({ ...initialSelectedRef.current });
 
-      const { data } = await searchForConcepts(trimmedValue, domain);
-      const results = (data as Concept[]) ?? [];
+      let effectivePerPage = perPage;
+
+      if (isNewSearch) {
+        effectivePerPage = DEFAULT_CODES_PER_PAGE;
+        setPerPage(DEFAULT_CODES_PER_PAGE);
+        setSelected?.({ ...initialSelectedRef.current });
+      }
+
+      if (customPerPage) {
+        effectivePerPage = customPerPage;
+      }
+
+      setIsLoading(true);
+
+      const res = await searchForConcepts({
+        searchTerm: trimmedValue,
+        perPage: effectivePerPage,
+        domain,
+      });
+
+      const results = (res.data as Concept[]) ?? [];
 
       const nonSynthetic: Concept[] = [];
       const synthetic: Concept[] = [];
 
       results.forEach((o) => {
         const allSynthetic = o.all_synthetic ?? 0;
-
         if (allSynthetic === 1) {
           if (includeSynthetic) synthetic.push(o);
         } else {
           nonSynthetic.push(o);
         }
       });
-      setIsLoading(false);
+
+      const hasVisibleOptions = nonSynthetic.length + synthetic.length > 0;
+
       setNonSyntheticOptions(nonSynthetic);
       setSyntheticOptions(synthetic);
-      setNoOptionsFound(nonSynthetic.length + synthetic.length === 0);
+      setNoOptionsFound(!hasVisibleOptions);
+      setActiveResult(hasVisibleOptions ? res : null);
+      setIsLoading(false);
     },
-    [domain, searchForConcepts, setSelected, setIsLoading, includeSynthetic],
+    [domain, searchForConcepts, setSelected, includeSynthetic, perPage],
   );
 
   const handleToggle = useCallback(
@@ -125,9 +156,11 @@ const SearchConcepts = ({
     [setSelected],
   );
 
+  const { queryBuilderShowConceptStats } = useFeatures();
+
   const renderConceptItem = (c: Concept) => (
     <ConceptItem
-      key={c.concept_id}
+      key={`${c.category}-${c.concept_id}`}
       {...(slotProps?.conceptItem ?? {})}
       multiple={multiple}
       concept={c}
@@ -139,8 +172,16 @@ const SearchConcepts = ({
         e.preventDefault();
       }}
       showCode
+      showCounts={queryBuilderShowConceptStats}
     />
   );
+
+  const handleShowMore = useCallback(() => {
+    const nextPerPage =
+      (activeResult?.per_page ?? perPage) + DEFAULT_CODES_PER_PAGE;
+    setPerPage(nextPerPage);
+    onSearch(lastQueryRef.current, true, nextPerPage);
+  }, [activeResult, perPage, onSearch]);
 
   return (
     <Box>
@@ -167,9 +208,7 @@ const SearchConcepts = ({
             <Divider />
           </>
         )}
-
         {nonSyntheticOptions.map(renderConceptItem)}
-
         {syntheticOptions.length > 0 && (
           <>
             <Box sx={{ my: 1.5 }}>
@@ -180,6 +219,20 @@ const SearchConcepts = ({
             </Box>
             {syntheticOptions.map(renderConceptItem)}
           </>
+        )}
+        {activeResult && activeResult.per_page < activeResult.total && (
+          <Box>
+            <Button
+              variant="text"
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                handleShowMore();
+              }}
+            >
+              Show more ({activeResult.per_page} / {activeResult.total})
+            </Button>
+          </Box>
         )}
       </FormGroup>
     </Box>

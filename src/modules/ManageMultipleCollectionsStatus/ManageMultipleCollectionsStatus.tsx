@@ -9,6 +9,7 @@ import { getCollectionStatus } from "@/utils/colours";
 import { Box, Chip } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
+import { useConfirm } from "@/hooks/useConfirm";
 
 interface ManageMultipleCollectionsStatusProps {
   collections: Collection[];
@@ -36,15 +37,18 @@ const ManageMultipleCollectionsStatus = ({
     collections[0].model_state?.state_id ?? -1,
   );
 
-  const destinationOptions = {
-    [CollectionStatus.DRAFT]: [] as CollectionStatus[],
-    [CollectionStatus.PENDING]: currentCustodian
-      ? ([] as CollectionStatus[])
-      : [CollectionStatus.ACTIVE, CollectionStatus.REJECTED],
+  const pendingDestinations: CollectionStatus[] = currentCustodian
+    ? []
+    : [CollectionStatus.ACTIVE, CollectionStatus.REJECTED];
+
+  const destinationOptions: Record<CollectionStatus, CollectionStatus[]> = {
+    [CollectionStatus.DRAFT]: [],
+    [CollectionStatus.PENDING]: pendingDestinations,
     [CollectionStatus.ACTIVE]: [CollectionStatus.DRAFT],
-    [CollectionStatus.REJECTED]: [] as CollectionStatus[],
-    [CollectionStatus.SUSPENDED]: [] as CollectionStatus[],
+    [CollectionStatus.REJECTED]: [CollectionStatus.DRAFT],
+    [CollectionStatus.SUSPENDED]: [],
   };
+
   const options = (
     destinationOptions[initialStatusId as CollectionStatus] || []
   ).concat([initialStatusId as CollectionStatus]);
@@ -56,6 +60,8 @@ const ManageMultipleCollectionsStatus = ({
     });
   }, [initialStatusId, selectedStatusId, setValue]);
 
+  const confirm = useConfirm();
+
   if (uniqueStates.length > 1) {
     return (
       <Box sx={{ mb: 1 }}>
@@ -66,7 +72,6 @@ const ManageMultipleCollectionsStatus = ({
 
   const handleAction = async () => {
     await requestCollectionMadeActive(collections.map((c) => c.id));
-    setSelectedStatusId(CollectionStatus.PENDING);
     setSelectedStatusId(CollectionStatus.PENDING);
     notify.success(
       `Requested for collections (${collections
@@ -105,9 +110,10 @@ const ManageMultipleCollectionsStatus = ({
         <Controller
           name={"collection.model_state.state_id"}
           control={control}
-          render={() => (
+          render={({ field }) => (
             <FormRadioGroup
               label=""
+              value={field.value}
               options={options
                 .filter((o) => o !== selectedStatusId) // don't show currently selected status as an option
                 .map((option) => {
@@ -121,8 +127,26 @@ const ManageMultipleCollectionsStatus = ({
                     value: option,
                   };
                 })}
-              onChange={(e) => {
-                setSelectedStatusId(Number(e.target.value));
+              onChange={async (e) => {
+                const next = Number(e.target.value);
+
+                if (next === selectedStatusId) return;
+
+                const option = getCollectionStatus(next);
+                const label = option.label ?? CollectionStatus[next];
+
+                const ok = await confirm({
+                  props: {
+                    action: `change the collection status of '${collections.map((c) => c.name).join("', '")}' to '${label}'`,
+                  },
+                  confirmText: "Yes",
+                  confirmColor: "success",
+                });
+                if (!ok || ok === "cancel") {
+                  return;
+                }
+                field.onChange(next);
+                setSelectedStatusId(next);
               }}
             />
           )}

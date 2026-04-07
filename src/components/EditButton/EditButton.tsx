@@ -1,4 +1,4 @@
-import EditIcon from "@mui/icons-material/Edit";
+import { EditIcon } from "@/icons/EditIcon";
 import { Button, IconButton, IconButtonProps } from "@mui/material";
 export interface EditButtonProps extends IconButtonProps {
   children?: React.ReactNode;
@@ -23,6 +23,8 @@ const EditButton = ({ children, label, isIcon, ...rest }: EditButtonProps) => {
           justifyContent: "flex-start",
           textAlign: "left",
           color: "text.primary",
+          fontWeight: "normal",
+          fontSize: 14,
         },
         startIcon: <EditIcon fontSize={"small"} />,
       };

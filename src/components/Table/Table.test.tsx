@@ -6,7 +6,7 @@ import { useTable } from "@/hooks/useTable";
 import Table from "./Table";
 import { MRT_ColumnDef } from "material-react-table";
 import { AvailableFormats } from "../DownloadButton/DownloadButton";
-import MockDaphneStore from "@/store/MockDaphneStore";
+import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 jest.mock("@/actions/collection/getCustodianCollections");
 
 const handleDeleteRows = jest.fn();
@@ -47,7 +47,7 @@ const TableWithState = () => {
   });
 
   return (
-    <MockDaphneStore>
+    <MockCohortDiscoveryServiceStore>
       <Table
         table={table}
         rightAction={{
@@ -59,7 +59,7 @@ const TableWithState = () => {
           },
         }}
       />
-    </MockDaphneStore>
+    </MockCohortDiscoveryServiceStore>
   );
 };
 

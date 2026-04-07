@@ -1,14 +1,18 @@
 "use server";
 
 import { TAG_FEATURE_FLAGS } from "@/config/tags";
-import { apiGet } from "@/lib/apiClient";
+import { apiGet, CachedGetArgs } from "@/lib/apiClient";
 import { API_ROUTES } from "@/lib/apiRoutes";
-import { FeatureFlag, ApiResponse } from "@/types/api";
+import { ApiResponse } from "@/types/api";
+import { FeatureFlag } from "@/types/features";
 
-const getFeatureFlags = async (): Promise<ApiResponse<FeatureFlag>> => {
+const getFeatureFlags = async (
+  args?: Omit<CachedGetArgs, "url">,
+): Promise<ApiResponse<FeatureFlag>> => {
   return await apiGet<ApiResponse<FeatureFlag>>({
     url: API_ROUTES.featureFlags,
     tags: [TAG_FEATURE_FLAGS],
+    ...args,
   });
 };
 

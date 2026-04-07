@@ -1,12 +1,7 @@
 "use client";
 
-import {
-  Collection,
-  CombinedUser,
-  Custodian,
-  FeatureFlag,
-  Workgroup,
-} from "@/types/api";
+import { Collection, CombinedUser, Custodian, Workgroup } from "@/types/api";
+import { FeatureFlag } from "@/types/features";
 import { redirect } from "next/navigation";
 import { ReactNode, useEffect } from "react";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";

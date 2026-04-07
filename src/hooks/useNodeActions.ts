@@ -201,9 +201,9 @@ const useNodeActions = (
       : []),
     ...(node && isRuleGroup(node)
       ? [
-          { action: handleCreateNewAgeFilter, label: "Add Age Filter" },
-          { action: handleCreateNewOperator, label: "Add Operator" },
           { action: handleCreateNewRule, label: "Add Rule" },
+          { action: handleCreateNewOperator, label: "Add Operator" },
+          { action: handleCreateNewAgeFilter, label: "Add Age Rule" },
           { action: handleCollapseGroup, label: "Ungroup" },
         ]
       : []),

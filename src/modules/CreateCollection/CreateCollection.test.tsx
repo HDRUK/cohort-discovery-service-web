@@ -11,7 +11,7 @@ import userEvent from "@testing-library/user-event";
 import CreateCollection from "./CreateCollection";
 import { Custodian, CollectionHost } from "@/types/api";
 import getCustodian from "@/actions/custodian/__mocks__/getCustodian";
-import MockDaphneStore from "@/store/MockDaphneStore";
+import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 import { getMockCollection } from "@/actions/collection/__mocks__/getCollections";
 import getCollectionHost from "@/actions/collectionHost/__mocks__/getCollectionHost";
 import { useCustodianDataStore } from "@/store/custodianDataStore";
@@ -50,7 +50,7 @@ const renderCreateCollection = (
     custodianDataOverides.current ?? {};
 
   return render(
-    <MockDaphneStore
+    <MockCohortDiscoveryServiceStore
       overrides={{
         custodian: {
           createCollection,
@@ -73,7 +73,7 @@ const renderCreateCollection = (
       }}
     >
       <CreateCollection {...overrides} />
-    </MockDaphneStore>,
+    </MockCohortDiscoveryServiceStore>,
   );
 };
 

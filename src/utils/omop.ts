@@ -1,5 +1,11 @@
 import { Code } from "@/types/api";
 import { Option } from "@/types/common";
+import {
+  DEFAULT_DOMAIN_PHRASE,
+  DOMAIN_PHRASES,
+  DomainPhrase,
+  OmopTableName,
+} from "@/types/omop";
 
 const codesToOption = (codes: Code[]): Option[] =>
   codes
@@ -10,45 +16,13 @@ const codesToOption = (codes: Code[]): Option[] =>
       label: `${code.name} (${code.name}) `,
     }));
 
-const getDomainVerbs = (category: string) => {
-  switch (category) {
-    case "condition":
-      return {
-        verb: "diagnosed",
-        verbPastTense: "was diagnosed",
-        noun: "diagnosis",
-      };
-    case "drug":
-      return {
-        verb: "taken",
-        verbPastTense: "was taken",
-        noun: "intake",
-      };
-    case "observation":
-      return {
-        verb: "observed",
-        verbPastTense: "was observed",
-        noun: "observation",
-      };
-    case "measurement":
-      return {
-        verb: "measured",
-        verbPastTense: "was measured",
-        noun: "measurement",
-      };
-    case "gender":
-      return {
-        verb: "recorded",
-        verbPastTense: "was recorded",
-        noun: "record",
-      };
-    default:
-      return {
-        verb: "recorded",
-        verbPastTense: "was recorded",
-        noun: "record",
-      };
-  }
+const getDomainPhrase = (category?: string): DomainPhrase => {
+  if (!category) return DEFAULT_DOMAIN_PHRASE;
+
+  return (
+    DOMAIN_PHRASES[category.toLowerCase() as OmopTableName] ??
+    DEFAULT_DOMAIN_PHRASE
+  );
 };
 
-export { codesToOption, getDomainVerbs };
+export { codesToOption, getDomainPhrase };

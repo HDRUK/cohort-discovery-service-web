@@ -8,8 +8,9 @@ import { CustomH1 } from "@/components/GuidanceHeaders";
 const QueryHistoryGuidance = (
   selectedIds: string[],
   resultsView: boolean = false,
+  currentResult: string = "",
 ) => {
-  const empty = !selectedIds.length;
+  const empty = !selectedIds.length && currentResult === "";
 
   const multiple = !empty && selectedIds.length > 1;
 
@@ -23,11 +24,19 @@ const QueryHistoryGuidance = (
       fixedExpanded
       scrollable
     >
+      {!empty && <CustomH1>Actions</CustomH1>}
       {empty &&
         !resultsView &&
         "Select a result row to edit a previous query, rerun it to generate updated results, download the output, or remove it from your list. You can also select multiple to bulk delete or download."}
       {!empty && !resultsView && (
         <HistoryActions multiple={multiple} selectedIds={selectedIds} />
+      )}
+      {!empty && resultsView && currentResult && (
+        <HistoryActions
+          multiple={multiple}
+          selectedIds={[currentResult]}
+          resultsView
+        />
       )}
       <CustomH1>Result Interpretation</CustomH1>
       Please note that results show rounded cohort counts not exact patient

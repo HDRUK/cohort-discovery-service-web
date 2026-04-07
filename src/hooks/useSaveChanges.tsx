@@ -5,6 +5,19 @@ import { Control, FieldValues } from "react-hook-form";
 import { Ignore, useChangedFieldValues } from "./useChangedFieldValues";
 import { Typography } from "@mui/material";
 import ChangesTable from "@/components/ChangesTable";
+import { MRT_TableInstance } from "material-react-table";
+import { ChangeRow } from "@/components/ChangesTable/ChangesTable";
+
+type FieldConfig = {
+  label?: string;
+  getValueLabel?: (
+    value: unknown,
+    id?: keyof ChangeRow,
+    table?: MRT_TableInstance<ChangeRow>,
+  ) => string | undefined;
+};
+
+export type FieldConfigMap = Record<string, FieldConfig>;
 
 type Options<TFieldValues extends FieldValues> = {
   control: Control<TFieldValues>;
@@ -16,6 +29,7 @@ type Options<TFieldValues extends FieldValues> = {
   discardText?: string;
   showChanges?: boolean;
   ignoreFields?: Ignore;
+  fieldConfig?: FieldConfigMap;
 };
 
 export function useSaveChanges<TFieldValues extends FieldValues>({
@@ -28,6 +42,7 @@ export function useSaveChanges<TFieldValues extends FieldValues>({
   discardText = "Discard",
   showChanges = true,
   ignoreFields,
+  fieldConfig,
 }: Options<TFieldValues>) {
   const { registerCloseGuard } = useCloseGuard();
   const confirm = useConfirm();
@@ -54,7 +69,9 @@ export function useSaveChanges<TFieldValues extends FieldValues>({
         description: (
           <>
             <Typography>{message}</Typography>
-            {showChanges && <ChangesTable changed={changed} />}
+            {showChanges && (
+              <ChangesTable changed={changed} fieldConfig={fieldConfig} />
+            )}
           </>
         ),
         confirmText: saveText,
@@ -77,6 +94,7 @@ export function useSaveChanges<TFieldValues extends FieldValues>({
     return () => registerCloseGuard(null);
   }, [
     changed,
+    fieldConfig,
     showChanges,
     hasChanges,
     message,

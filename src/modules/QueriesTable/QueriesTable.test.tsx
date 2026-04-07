@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import QueriesTable from "./QueriesTable";
 import { getMockQuery } from "@/actions/query/__mocks__/getQueries";
 import { paginateData } from "@/utils/mock";
-import MockDaphneStore from "@/store/MockDaphneStore";
+import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 jest.mock("@/actions/query/getQueries");
 
 describe("QueriesTable", () => {
@@ -35,9 +35,9 @@ describe("QueriesTable", () => {
   it("expands detail panel and shows natural language + TaskResults", async () => {
     const mockQueries = [getMockQuery()];
     render(
-      <MockDaphneStore>
+      <MockCohortDiscoveryServiceStore>
         <QueriesTable initialData={paginateData({ data: mockQueries })} />
-      </MockDaphneStore>,
+      </MockCohortDiscoveryServiceStore>,
     );
 
     const row = screen.getByText("Test Query").closest("tr");
