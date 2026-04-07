@@ -92,7 +92,7 @@ export default function Help() {
     ];
 
     return tabs;
-  }, [routes, VIDEOS]);
+  }, []);
 
   const currentTabValue =
     tabs.find((tab) => {
