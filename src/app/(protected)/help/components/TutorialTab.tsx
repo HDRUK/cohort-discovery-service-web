@@ -12,6 +12,8 @@ import {
 import { useState } from "react";
 import { IFrameWrapper } from "./IFrameWrapper";
 import { ArrowBack, PlayCircle } from "@mui/icons-material";
+import { redirect } from "next/navigation";
+import { routes } from "@/config/routes";
 
 export type Video = {
   id: string;
@@ -20,6 +22,7 @@ export type Video = {
   url: string;
   thumbnail?: string;
   categorisation: string;
+  href: string;
 };
 
 export type VideoLibrarySection = {
@@ -35,47 +38,47 @@ const TutorialTab = ({
   videoLibrarySection: VideoLibrarySection;
 }) => {
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
-
-  if (selectedVideo) {
-    return (
-      <Paper
-        sx={{
-          backgroundColor: "white",
-          border: 1,
-          borderWidth: "0.5px",
-          borderColor: "text.secondary",
-          p: 1,
-          my: 2,
-        }}
-      >
-        <Button
-          color="secondary"
-          variant="outlined"
-          sx={{ borderWidth: 0, "&.Mui-hover": { borderWidth: "0px" } }}
-          startIcon={<ArrowBack />}
-          onClick={() => {
-            setSelectedVideo(null);
-          }}
-        >
-          Go back to all tutorials
-        </Button>
-        <Typography variant="h4" sx={{ px: 1 }}>
-          {selectedVideo?.title}
-        </Typography>
-        <Typography sx={{ px: 1, pb: 2 }}>{selectedVideo?.text}</Typography>
-        <IFrameWrapper maxWidth="900px">
-          <iframe
-            loading="lazy"
-            title={selectedVideo.title}
-            src={selectedVideo.url}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-            style={{ border: "0" }}
-          ></iframe>
-        </IFrameWrapper>
-      </Paper>
-    );
-  }
+  console.log("TutorialTab");
+  //   if (selectedVideo) {
+  //     return (
+  //       <Paper
+  //         sx={{
+  //           backgroundColor: "white",
+  //           border: 1,
+  //           borderWidth: "0.5px",
+  //           borderColor: "text.secondary",
+  //           p: 1,
+  //           my: 2,
+  //         }}
+  //       >
+  //         <Button
+  //           color="secondary"
+  //           variant="outlined"
+  //           sx={{ borderWidth: 0, "&.Mui-hover": { borderWidth: "0px" } }}
+  //           startIcon={<ArrowBack />}
+  //           onClick={() => {
+  //             setSelectedVideo(null);
+  //           }}
+  //         >
+  //           Go back to all tutorials
+  //         </Button>
+  //         <Typography variant="h4" sx={{ px: 1 }}>
+  //           {selectedVideo?.title}
+  //         </Typography>
+  //         <Typography sx={{ px: 1, pb: 2 }}>{selectedVideo?.text}</Typography>
+  //         <IFrameWrapper maxWidth="900px">
+  //           <iframe
+  //             loading="lazy"
+  //             title={selectedVideo.title}
+  //             src={selectedVideo.url}
+  //             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  //             allowFullScreen
+  //             style={{ border: "0" }}
+  //           ></iframe>
+  //         </IFrameWrapper>
+  //       </Paper>
+  //     );
+  //   }
   return (
     <Grid
       container
@@ -90,6 +93,7 @@ const TutorialTab = ({
               onClick={() => {
                 console.log("clicked on a card!"); //TODO: open a modal or replace current page, with the detailed page of this one video
                 setSelectedVideo(v);
+                redirect(v.href);
               }}
             >
               <CardMedia component="img" alt={v.title} image={v.thumbnail} />
