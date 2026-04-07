@@ -19,7 +19,7 @@ describe("Admin – Users", () => {
 
   it("shows the section unavailable message", () => {
     cy.contains(/isn.t available yet/i, { timeout: 10000 }).should(
-      "be.visible"
+      "be.visible",
     );
   });
 

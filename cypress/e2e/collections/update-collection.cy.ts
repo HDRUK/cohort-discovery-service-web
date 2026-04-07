@@ -14,7 +14,7 @@ describe("Update collection", () => {
     // Selecting a row reveals the edit toggle in the right panel
     cy.contains("Test Dataset Alpha", { timeout: 15000 }).click();
     cy.get('[data-testid="edit-panel-toggle"]', { timeout: 10000 }).should(
-      "exist"
+      "exist",
     );
   });
 

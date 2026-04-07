@@ -18,7 +18,7 @@ describe("Custodian admin – Collections", () => {
 
   it("shows collection statuses", () => {
     cy.contains(/draft|active|pending/i, { timeout: 15000 }).should(
-      "be.visible"
+      "be.visible",
     );
   });
 });

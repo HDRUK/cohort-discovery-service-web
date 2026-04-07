@@ -8,6 +8,7 @@
  * Start: node cypress/support/mock-server.js
  */
 
+/* eslint-disable @typescript-eslint/no-require-imports */
 const http = require("http");
 const jwt = require("jsonwebtoken");
 const path = require("path");
@@ -161,7 +162,7 @@ async function handle(req, res) {
     if (adminTeams.length > 0) {
       const allCustodians = fixture("custodians").data;
       base.data.custodians = allCustodians.filter((c) =>
-        adminTeams.some((t) => t.id === c.id)
+        adminTeams.some((t) => t.id === c.id),
       );
     }
     return json(res, 200, base);

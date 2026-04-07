@@ -18,7 +18,7 @@ describe("Concept sets", () => {
 
   it("shows concepts attached to a set", () => {
     cy.contains("Type 2 diabetes mellitus", { timeout: 10000 }).should(
-      "be.visible"
+      "be.visible",
     );
   });
 
@@ -58,7 +58,7 @@ describe("Concept sets", () => {
       .first()
       .type("diabetes");
     cy.contains("Type 2 diabetes mellitus", { timeout: 10000 }).should(
-      "be.visible"
+      "be.visible",
     );
   });
 

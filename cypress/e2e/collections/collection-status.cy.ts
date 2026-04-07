@@ -10,7 +10,7 @@ describe("Collection status", () => {
 
   it("shows status chips or badges in the collection list", () => {
     cy.contains(/draft|active|pending|suspended/i, { timeout: 15000 }).should(
-      "be.visible"
+      "be.visible",
     );
   });
 
