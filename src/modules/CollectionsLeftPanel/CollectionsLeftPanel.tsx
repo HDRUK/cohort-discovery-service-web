@@ -86,7 +86,7 @@ const CollectionsLeftPanel = () => {
                 selected: searchParam === CollectionFilterStatus.PENDING,
               },
               {
-                label: "Suspended Collections",
+                label: "Offline Collections",
                 onClick: () =>
                   onSelectCollectionsStatus(CollectionFilterStatus.SUSPENDED),
                 selected: searchParam === CollectionFilterStatus.SUSPENDED,

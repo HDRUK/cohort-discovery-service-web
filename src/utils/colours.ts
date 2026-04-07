@@ -10,8 +10,14 @@ const statusColorMap: Record<CollectionStatus, ChipProps["color"]> = {
   [CollectionStatus.SUSPENDED]: "warning",
 };
 
+//temporary measure until we either change in the BE or use translations
+const statusLabelMap: Partial<Record<CollectionStatus, string>> = {
+  [CollectionStatus.SUSPENDED]: "Offline",
+};
+
 export const getCollectionStatus = (status: CollectionStatus) => {
-  const label = getEnumLabel(CollectionStatus, status);
+  const label =
+    statusLabelMap[status] ?? getEnumLabel(CollectionStatus, status);
   const color = statusColorMap[status];
   return { label, color };
 };
