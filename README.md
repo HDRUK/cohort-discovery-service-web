@@ -1,4 +1,4 @@
-# Cohort Discovery Service - Web
+# Cohort Discovery Service - Web.
 
 Frontend application for the Cohort Discovery Service, built with Next.js (App Router), React, and MUI.
 
