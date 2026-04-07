@@ -28,8 +28,13 @@ describe("Query Builder", () => {
   });
 
   it("can toggle the combinator between AND and OR", () => {
-    // The combinator toggle is rendered on the board – look for AND/OR button
-    cy.contains(/\bAND\b|\bOR\b/).should("be.visible");
+    // The AND/OR chip appears between two groups. Clicking "Add Group" a second time
+    // inserts an operator node between the two groups.
+    cy.contains(/add.*group/i).first().click();
+    cy.get("[data-testid='sortable-rule']", { timeout: 5000 }).should("exist");
+    cy.contains(/add.*group/i).first().click();
+    // AND/OR combinator is rendered as a MuiChip between the two groups
+    cy.get(".MuiChip-root").contains(/\bAND\b|\bOR\b/).should("be.visible");
   });
 
   it("shows a Submit / Run Query button", () => {

@@ -9,7 +9,7 @@ describe("Error pages", () => {
 
   it("renders the user-not-found page", () => {
     cy.visit("/user-not-found", { failOnStatusCode: false });
-    cy.contains(/user not found|not found/i).should("be.visible");
+    cy.contains(/user does not exist|user not found|not found/i).should("be.visible");
   });
 
   it("renders a 404 for an entirely unknown route", () => {

@@ -1,5 +1,6 @@
 {
-   "extends": [
+  "ignorePatterns": ["cypress/**/*", "cypress.config.ts"],
+  "extends": [
     "next",
     "next/core-web-vitals",
     "plugin:import/errors",

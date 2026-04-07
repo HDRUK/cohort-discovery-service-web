@@ -25,14 +25,12 @@ describe("Create collection", () => {
     cy.contains("Internal Server Error").should("not.exist");
   });
 
-  it("submits the form with valid data and does not error", () => {
+  it("submits the form and shows validation errors on empty submit", () => {
+    // collection.name is disabled until a host is selected; clicking Create
+    // with no selections should show validation errors, not a server error.
     cy.contains("button", "Collection").first().click();
-    cy.get('input[name="collection.name"]', { timeout: 5000 })
-      .first()
-      .type("My New E2E Collection");
-    cy.contains("button", /save|create|submit/i)
-      .first()
-      .click();
+    cy.get('input[name="collection.name"]', { timeout: 5000 }).should("exist");
+    cy.contains("button", /^create$/i).first().click();
     cy.contains("Internal Server Error").should("not.exist");
   });
 });

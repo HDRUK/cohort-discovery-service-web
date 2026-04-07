@@ -224,7 +224,9 @@ async function handle(req, res) {
   // Collections
   // -------------------------------------------------------------------------
   if (method === "GET" && pathname === "/api/v1/collections") {
-    return json(res, 200, fixture("collections-paginated"));
+    // Admin layout calls getCollections() expecting ApiResponse<Collection[]> (non-paginated).
+    // The paginated shape is served by /api/v1/admin/collections.
+    return json(res, 200, fixture("collections"));
   }
 
   if (method === "POST" && pathname === "/api/v1/collections") {

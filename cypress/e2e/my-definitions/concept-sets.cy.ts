@@ -23,17 +23,19 @@ describe("Concept sets", () => {
   });
 
   it("shows a button to create a new concept set", () => {
-    cy.contains(/create|new.*set|add.*set/i).should("be.visible");
+    // CreateConceptSet renders an IconButton with text " definition"
+    cy.contains("button", /definition/i).should("be.visible");
   });
 
   it("opens the create concept set form", () => {
-    cy.contains(/create|new.*set|add.*set/i).first().click();
-    cy.contains(/name/i).should("be.visible");
+    cy.contains("button", /definition/i).click();
+    // Form appears with a Name field
+    cy.get('input[name="name"]', { timeout: 5000 }).should("exist");
   });
 
   it("submits a new concept set with valid data", () => {
-    cy.contains(/create|new.*set|add.*set/i).first().click();
-    cy.get('input[name="name"], input[placeholder*="name" i]')
+    cy.contains("button", /definition/i).click();
+    cy.get('input[name="name"]', { timeout: 5000 })
       .first()
       .type("New E2E Concept Set");
     cy.contains("button", /save|create|submit/i)

@@ -30,7 +30,16 @@
           "updated_at": "2025-01-01T00:00:00Z"
         },
         "host": [],
-        "config": null
+        "config": {
+          "id": 1,
+          "collection_id": 1,
+          "enabled": 1,
+          "frequency_mode": 2,
+          "run_time_frequency": 1,
+          "run_time_hour": 0,
+          "run_time_minute": 0,
+          "type": "B"
+        }
       },
       {
         "id": 2,
@@ -60,7 +69,16 @@
           "updated_at": "2025-01-01T00:00:00Z"
         },
         "host": [],
-        "config": null
+        "config": {
+          "id": 2,
+          "collection_id": 2,
+          "enabled": 1,
+          "frequency_mode": 2,
+          "run_time_frequency": 1,
+          "run_time_hour": 0,
+          "run_time_minute": 0,
+          "type": "B"
+        }
       }
     ],
     "current_page": 1,
