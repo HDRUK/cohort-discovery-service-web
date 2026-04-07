@@ -1,0 +1,14 @@
+{
+  "message": "success",
+  "data": {
+    "id": 1,
+    "email": "test@example.com",
+    "name": "Test User",
+    "email_verified_at": "2025-01-01T00:00:00Z",
+    "created_at": "2025-01-01T00:00:00Z",
+    "updated_at": "2025-01-01T00:00:00Z",
+    "roles": [{ "id": 1, "name": "user", "created_at": "2025-01-01T00:00:00Z", "updated_at": "2025-01-01T00:00:00Z" }],
+    "custodians": [],
+    "workgroups": [{ "id": 1, "name": "Test Workgroup" }]
+  }
+}

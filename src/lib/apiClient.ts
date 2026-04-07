@@ -10,6 +10,7 @@ import { CacheOptions } from "@/types/api";
 import { paramsToString } from "@/utils/string";
 
 const baseURL = process.env.API_BASE_URL ?? "http://localhost:8100";
+const isCypress = process.env.CYPRESS === "true";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 
@@ -64,8 +65,8 @@ const buildCachedRequest = async ({
   ];
 
   const init: { cache?: RequestCache; next?: NextFetchRequestConfig } = {
-    cache: useCache ? "force-cache" : "no-store",
-    next: useCache ? { tags: allTags, revalidate } : undefined,
+    cache: useCache && !isCypress ? "force-cache" : "no-store",
+    next: useCache && !isCypress ? { tags: allTags, revalidate } : undefined,
   };
 
   return { finalUrl, init, tags: allTags };
