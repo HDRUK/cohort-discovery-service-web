@@ -31,7 +31,6 @@ env:
   NEXT_PUBLIC_USE_DEBUG_LOGS: "false"
   NODE_ENV: test
   CYPRESS: "true"
-  APPLICATION_MODE: standalone
 
   # -----------------------------------------------------------------------
   # Cypress test-user credentials (used by login.cy.ts)
