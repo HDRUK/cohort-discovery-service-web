@@ -136,6 +136,17 @@ const CollectionsTable = ({
         maxSize: 50,
       },
       {
+        id: "last_query",
+        header: "Last Query",
+        accessorFn: (row) =>
+          row.last_successful_query?.completed_at
+            ? getDatetime(row.last_successful_query.created_at)
+            : "—",
+        size: 50,
+        minSize: 50,
+        maxSize: 50,
+      },
+      {
         id: "last_demographic",
         header: "Last Distribution Demographics",
         accessorFn: (row) =>
