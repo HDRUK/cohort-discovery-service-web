@@ -8,6 +8,9 @@ const teamPath = (pid: string, subpath?: string) =>
 
 const adminPath = (subpath?: string) => `/admin${subpath ? `/${subpath}` : ""}`;
 
+const helpPath = (sectionId?: string, tutorialId?: string) =>
+  `/help${sectionId ? `/${sectionId}${tutorialId ? `/${tutorialId}` : ""}` : ""}`;
+
 export const routes = {
   dashboard: dashboardPath(),
   dashboardNewQuery: (openQueries?: string[], queryParams?: string) =>
@@ -35,7 +38,8 @@ export const routes = {
   dashboardCodes: dashboardPath("codes"),
   profile: "/profile",
   definitions: "/my-definitions",
-  help: "/help",
+  help: (sectionId?: string, tutorialId?: string) =>
+    helpPath(sectionId || "", sectionId ? tutorialId || "" : ""),
   admin: adminPath(),
   adminUsers: adminPath("users"),
   adminWorkgroups: adminPath("workgroups"),

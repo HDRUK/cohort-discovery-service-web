@@ -75,10 +75,10 @@ export default function TopMenu() {
           ]
         : []),
       {
-        id: routes.help,
+        id: routes.help(),
         label: "Help",
-        href: routes.help,
-        route: routes.help,
+        href: routes.help(),
+        route: routes.help(),
         page: null,
       },
     ];

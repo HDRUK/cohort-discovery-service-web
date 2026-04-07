@@ -1,3 +1,5 @@
+"use client";
+
 import { Box } from "@mui/material";
 import QueryBuilderGuidance from "@/app/(protected)/dashboard/[tabId]/components/QueryBuilderGuidance";
 import { IFrameWrapper } from "./IFrameWrapper";
