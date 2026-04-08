@@ -9,30 +9,57 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { IFrameWrapper } from "./IFrameWrapper";
 import { ArrowBack, PlayCircle } from "@mui/icons-material";
-import { redirect } from "next/navigation";
-import { routes } from "@/config/routes";
+import useSearchParams from "@/hooks/useSearchParams";
 
-export type Video = {
-  id: string;
-  title: string;
-  text?: string;
-  sectionId?: string;
-  url: string;
-  thumbnail?: string;
-  categorisation: string;
-  href: string;
-};
+import { Video } from "../[sectionId]/page";
 
-export type VideoLibrarySection = {
-  id: string;
-  sectionTitle: string;
-};
+const TutorialTab = ({ videos }: { videos: Video[] }) => {
+  const pathname = usePathname();
+  const { getSearchParam, setSearchParam } = useSearchParams("tutorial-id");
+  const tutorialId = getSearchParam();
 
-const TutorialTab = ({ label, videos }: { label: string; videos: Video[] }) => {
-  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
+  if (tutorialId) {
+    const video = videos.find((v) => v.id === tutorialId);
+    return (
+      <Paper
+        sx={{
+          backgroundColor: "white",
+          border: 1,
+          borderWidth: "0.5px",
+          borderColor: "text.secondary",
+          p: 1,
+          my: 2,
+        }}
+      >
+        <Button
+          color="secondary"
+          variant="outlined"
+          sx={{ borderWidth: 0, "&.Mui-hover": { borderWidth: "0px" } }}
+          startIcon={<ArrowBack />}
+          href={pathname}
+        >
+          Go back to all tutorials
+        </Button>
+        <Typography variant="h4" sx={{ px: 1 }}>
+          {video?.title}
+        </Typography>
+        <Typography sx={{ px: 1, pb: 2 }}>{video?.text}</Typography>
+        <IFrameWrapper maxWidth="900px">
+          <iframe
+            loading="lazy"
+            title={video?.title}
+            src={video?.url}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            style={{ border: "0" }}
+          ></iframe>
+        </IFrameWrapper>
+      </Paper>
+    );
+  }
 
   return (
     <Grid
@@ -46,9 +73,7 @@ const TutorialTab = ({ label, videos }: { label: string; videos: Video[] }) => {
           <Card variant="outlined" sx={{ p: 1 }}>
             <CardActionArea
               onClick={() => {
-                console.log("clicked on a card!"); //TODO: open a modal or replace current page, with the detailed page of this one video
-                setSelectedVideo(v);
-                redirect(v.href);
+                setSearchParam(v.id);
               }}
             >
               <CardMedia component="img" alt={v.title} image={v.thumbnail} />
