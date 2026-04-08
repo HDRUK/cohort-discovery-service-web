@@ -26,9 +26,7 @@ const HoverableDiv = ({
       ref={setHoverRef}
       onClick={(e) => {
         if (stopPropagation) e.stopPropagation();
-        if (onClick) {
-          onClick(e);
-        }
+        if (onClick) onClick(e);
       }}
       style={{
         ...(flex && {
