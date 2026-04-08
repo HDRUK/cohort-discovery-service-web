@@ -30,7 +30,7 @@ export const VIDEO_SECTIONS: VideoLibrarySection[] = [
   { id: "1", sectionTitle: "Query Building Tutorials" },
   { id: "2", sectionTitle: "Results Tutorials" },
   { id: "3", sectionTitle: "History Tutorials" },
-  { id: "4", sectionTitle: "Data Onboarding Tutorials" },
+  { id: "4", sectionTitle: "Collection Admin Tutorials" },
 ];
 
 // Note that we use "mqdefault.jpg" for each thumbnail in order to retrieve a 16:9 thumbnail that matches our video content.
@@ -54,7 +54,7 @@ export const VIDEOS: Video[] = [
       </>
     ),
     url: "https://www.youtube.com/embed/tqqSNy5VOFY?list=PLBI5k9SgYrIvz_h0hq83yFnTM4t9P569b&index=4&feature=oembed",
-    thumbnail: "https://img.youtube.com/vi/tqqSNy5VOFY/mqdefault.jpg",
+    thumbnail: "https://img.youtube.com/vi/tqqSNy5VOFY/maxresdefault.jpg",
     categorisation: "Beginner",
   },
   {
@@ -79,7 +79,7 @@ export const VIDEOS: Video[] = [
       </>
     ),
     url: "https://www.youtube.com/embed/oM3j3me6XvE?list=PLBI5k9SgYrIvz_h0hq83yFnTM4t9P569b&index=4&feature=oembed",
-    thumbnail: "https://img.youtube.com/vi/oM3j3me6XvE/mqdefault.jpg",
+    thumbnail: "https://img.youtube.com/vi/oM3j3me6XvE/maxresdefault.jpg",
     categorisation: "Advanced",
   },
   {
@@ -102,7 +102,7 @@ export const VIDEOS: Video[] = [
       </>
     ),
     url: "https://www.youtube.com/embed/jNN28Oh-v0s?list=PLBI5k9SgYrIvz_h0hq83yFnTM4t9P569b&index=4&feature=oembed",
-    thumbnail: "https://img.youtube.com/vi/jNN28Oh-v0s/mqdefault.jpg",
+    thumbnail: "https://img.youtube.com/vi/jNN28Oh-v0s/maxresdefault.jpg",
     categorisation: "Beginner",
   },
   {
@@ -119,7 +119,7 @@ export const VIDEOS: Video[] = [
       </>
     ),
     url: "https://www.youtube.com/embed/jNN28Oh-v0s?list=PLBI5k9SgYrIvz_h0hq83yFnTM4t9P569b&index=4&feature=oembed",
-    thumbnail: "https://img.youtube.com/vi/jNN28Oh-v0s/mqdefault.jpg",
+    thumbnail: "https://img.youtube.com/vi/jNN28Oh-v0s/maxresdefault.jpg",
     categorisation: "Beginner",
   },
   {
@@ -156,7 +156,7 @@ export const VIDEOS: Video[] = [
       </>
     ),
     url: "https://www.youtube.com/embed/EGBr0SGfnD8?list=PLBI5k9SgYrIvz_h0hq83yFnTM4t9P569b&index=1&feature=oembed",
-    thumbnail: "https://img.youtube.com/vi/EGBr0SGfnD8/mqdefault.jpg",
+    thumbnail: "https://img.youtube.com/vi/EGBr0SGfnD8/maxresdefault.jpg",
     categorisation: "Advanced",
   },
 ];
