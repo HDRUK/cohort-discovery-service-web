@@ -9,10 +9,23 @@ import TabsShell from "@/components/TabsShell";
 import { TabType } from "@/components/TabsShell/TabsShell";
 import OverviewTab from "../components/OverviewTab";
 import Title from "@/components/Title";
-import TutorialTab, {
-  Video,
-  VideoLibrarySection,
-} from "../components/TutorialTab";
+import TutorialTab from "../components/TutorialTab";
+
+export type Video = {
+  id: string;
+  title: string;
+  text?: string;
+  sectionId?: string;
+  url: string;
+  thumbnail?: string;
+  categorisation: string;
+  href: string;
+};
+
+export type VideoLibrarySection = {
+  id: string;
+  sectionTitle: string;
+};
 
 export function getVideoById(id: string) {
   const video = VIDEOS.find((v) => v.id === id);
@@ -43,6 +56,9 @@ export const VIDEOS: Video[] = [
     thumbnail: "https://img.youtube.com/vi/RNVqqCpgeZk/hqdefault.jpg",
     categorisation: "Beginner",
     href: routes.help(kebabCase("Query Building Tutorials"), "reorder-rules"),
+    // href: function () {
+    //       return routes.help(kebabCase("Query Building Tutorials"), this.id);
+    // },
   },
   {
     id: "reorder-rules2",
@@ -80,7 +96,6 @@ export default function Help() {
           label: section.sectionTitle,
           page: (
             <TutorialTab
-              label={section.sectionTitle}
               videos={VIDEOS.filter((v) => v.sectionId === section.id)}
             />
           ),
