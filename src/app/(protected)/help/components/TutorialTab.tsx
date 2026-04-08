@@ -19,6 +19,7 @@ export type Video = {
   id: string;
   title: string;
   text?: string;
+  sectionId?: string;
   url: string;
   thumbnail?: string;
   categorisation: string;
@@ -26,17 +27,11 @@ export type Video = {
 };
 
 export type VideoLibrarySection = {
+  id: string;
   sectionTitle: string;
-  videos: Video[];
 };
 
-const TutorialTab = ({
-  label,
-  videoLibrarySection,
-}: {
-  label: string;
-  videoLibrarySection: VideoLibrarySection;
-}) => {
+const TutorialTab = ({ label, videos }: { label: string; videos: Video[] }) => {
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
 
   return (
@@ -46,7 +41,7 @@ const TutorialTab = ({
       columns={{ xs: 4, sm: 8, md: 12 }}
       sx={{ m: 0, p: 0 }}
     >
-      {videoLibrarySection.videos.map((v, index) => (
+      {videos.map((v, index) => (
         <Grid key={index} size={{ xs: 2, sm: 4, md: 4 }}>
           <Card variant="outlined" sx={{ p: 1 }}>
             <CardActionArea

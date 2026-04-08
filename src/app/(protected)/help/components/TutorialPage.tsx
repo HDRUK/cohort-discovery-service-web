@@ -1,23 +1,12 @@
-import {
-  Box,
-  Button,
-  Card,
-  CardActionArea,
-  CardMedia,
-  Grid,
-  Paper,
-  Stack,
-  Typography,
-} from "@mui/material";
-import { useState } from "react";
+import { Button, Paper, Typography } from "@mui/material";
 import { IFrameWrapper } from "./IFrameWrapper";
-import { ArrowBack, PlayCircle } from "@mui/icons-material";
-import { redirect, usePathname } from "next/navigation";
-import { routes } from "@/config/routes";
-import { VIDEOS } from "../[sectionId]/page";
+import { ArrowBack } from "@mui/icons-material";
+import { usePathname } from "next/navigation";
+import { getVideoById } from "../[sectionId]/page";
 const TutorialPage = ({ tutorialId }: { tutorialId: string }) => {
   const pathname = usePathname();
 
+  const video = getVideoById(tutorialId);
   return (
     <Paper
       sx={{
@@ -39,20 +28,19 @@ const TutorialPage = ({ tutorialId }: { tutorialId: string }) => {
         Go back to all tutorials
       </Button>
       <Typography variant="h4" sx={{ px: 1 }}>
-        {/* {selectedVideo?.title} */}
-        {VIDEOS["1"].videos[0].title}
+        {video?.title}
       </Typography>
-      {/* <Typography sx={{ px: 1, pb: 2 }}>{selectedVideo?.text}</Typography>
+      <Typography sx={{ px: 1, pb: 2 }}>{video?.text}</Typography>
       <IFrameWrapper maxWidth="900px">
         <iframe
           loading="lazy"
-          title={selectedVideo.title}
-          src={selectedVideo.url}
+          title={video?.title}
+          src={video?.url}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
           style={{ border: "0" }}
         ></iframe>
-      </IFrameWrapper> */}
+      </IFrameWrapper>
     </Paper>
   );
 };

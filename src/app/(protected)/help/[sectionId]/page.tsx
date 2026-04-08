@@ -9,65 +9,64 @@ import TabsShell from "@/components/TabsShell";
 import { TabType } from "@/components/TabsShell/TabsShell";
 import OverviewTab from "../components/OverviewTab";
 import Title from "@/components/Title";
-import TutorialTab, { VideoLibrarySection } from "../components/TutorialTab";
+import TutorialTab, {
+  Video,
+  VideoLibrarySection,
+} from "../components/TutorialTab";
 
+export function getVideoById(id: string) {
+  const video = VIDEOS.find((v) => v.id === id);
+  return video;
+}
+
+export const VIDEO_SECTIONS: VideoLibrarySection[] = [
+  { id: "1", sectionTitle: "Query Building Tutorials" },
+  { id: "2", sectionTitle: "Results Tutorials" },
+];
 // TODO: actual content
-export const VIDEOS: Record<number, VideoLibrarySection> = {
-  1: {
-    sectionTitle: "Query Building Tutorials",
-    videos: [
-      {
-        id: "rename-query",
-        title: "How do I rename my query?",
-        url: "https://www.youtube.com/embed/yvFrnbXlqRk?feature=oembed",
-        thumbnail: "https://img.youtube.com/vi/yvFrnbXlqRk/hqdefault.jpg",
-        categorisation: "Beginner",
-        href: routes.help(
-          kebabCase("Query Building Tutorials"),
-          "rename-query",
-        ),
-      },
-      {
-        id: "reorder-rules",
-        title: "How do I re-order rules?",
-        text: "Click the box to the right of the query name, type your new name, and press Enter to save. To rename it again, hover over the name, double-click, edit, and press Enter.",
-        url: "https://www.youtube.com/embed/RNVqqCpgeZk?feature=oembed",
-        thumbnail: "https://img.youtube.com/vi/RNVqqCpgeZk/hqdefault.jpg",
-        categorisation: "Beginner",
-        href: routes.help(
-          kebabCase("Query Building Tutorials"),
-          "reorder-rules",
-        ),
-      },
-    ],
+export const VIDEOS: Video[] = [
+  {
+    id: "rename-query",
+    title: "How do I rename my query?",
+    sectionId: "1",
+    url: "https://www.youtube.com/embed/yvFrnbXlqRk?feature=oembed",
+    thumbnail: "https://img.youtube.com/vi/yvFrnbXlqRk/hqdefault.jpg",
+    categorisation: "Beginner",
+    href: routes.help(kebabCase("Query Building Tutorials"), "rename-query"),
   },
-  2: {
-    sectionTitle: "Results Tutorials",
-    videos: [
-      {
-        id: "reorder-rules2",
-        title: "How do I re-order rules?",
-        text: "Click the box to the right of the query name, type your new name, and press Enter to save. To rename it again, hover over the name, double-click, edit, and press Enter.",
-        url: "https://www.youtube.com/embed/RNVqqCpgeZk?feature=oembed",
-        thumbnail: "https://img.youtube.com/vi/RNVqqCpgeZk/hqdefault.jpg",
-        categorisation: "Beginner",
-        href: routes.help(kebabCase("Results Tutorials"), "reorder-rules2"),
-      },
-      {
-        id: "rename-query2",
-        title: "How do I rename my query?",
-        url: "https://www.youtube.com/embed/yvFrnbXlqRk?feature=oembed",
-        thumbnail: "https://img.youtube.com/vi/yvFrnbXlqRk/hqdefault.jpg",
-        categorisation: "Beginner",
-        href: routes.help(kebabCase("Results Tutorials"), "rename-query2"),
-      },
-    ],
+  {
+    id: "reorder-rules",
+    title: "How do I re-order rules?",
+    sectionId: "1",
+    text: "Click the box to the right of the query name, type your new name, and press Enter to save. To rename it again, hover over the name, double-click, edit, and press Enter.",
+    url: "https://www.youtube.com/embed/RNVqqCpgeZk?feature=oembed",
+    thumbnail: "https://img.youtube.com/vi/RNVqqCpgeZk/hqdefault.jpg",
+    categorisation: "Beginner",
+    href: routes.help(kebabCase("Query Building Tutorials"), "reorder-rules"),
   },
-};
+  {
+    id: "reorder-rules2",
+    title: "How do I re-order rules?",
+    sectionId: "2",
+    text: "Click the box to the right of the query name, type your new name, and press Enter to save. To rename it again, hover over the name, double-click, edit, and press Enter.",
+    url: "https://www.youtube.com/embed/RNVqqCpgeZk?feature=oembed",
+    thumbnail: "https://img.youtube.com/vi/RNVqqCpgeZk/hqdefault.jpg",
+    categorisation: "Beginner",
+    href: routes.help(kebabCase("Results Tutorials"), "reorder-rules2"),
+  },
+  {
+    id: "rename-query2",
+    title: "How do I rename my query?",
+    sectionId: "2",
+    url: "https://www.youtube.com/embed/yvFrnbXlqRk?feature=oembed",
+    thumbnail: "https://img.youtube.com/vi/yvFrnbXlqRk/hqdefault.jpg",
+    categorisation: "Beginner",
+    href: routes.help(kebabCase("Results Tutorials"), "rename-query2"),
+  },
+];
 
 export default function Help() {
   const pathname = usePathname();
-
   const tabs = useMemo<TabType[]>(() => {
     const tabs = [
       {
@@ -75,18 +74,17 @@ export default function Help() {
         page: <OverviewTab />,
         href: routes.help("overview"),
       },
-      ...Object.entries(VIDEOS).map((category) => {
-        //TODO: potentially rehash this VIDEOS object type as it's a bit unwieldy to do this
+      ...VIDEO_SECTIONS.map((section) => {
         return {
-          id: kebabCase(category[1].sectionTitle),
-          label: category[1].sectionTitle,
+          id: kebabCase(section.sectionTitle),
+          label: section.sectionTitle,
           page: (
             <TutorialTab
-              label={category[1].sectionTitle}
-              videoLibrarySection={category[1]}
+              label={section.sectionTitle}
+              videos={VIDEOS.filter((v) => v.sectionId === section.id)}
             />
           ),
-          href: routes.help(kebabCase(category[1].sectionTitle)),
+          href: routes.help(kebabCase(section.sectionTitle)),
         };
       }),
     ];
