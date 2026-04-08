@@ -1,10 +1,13 @@
 /**
  * Custodian admin – Collections tab.
  */
+import { routes } from "@/config/routes";
+import { CUSTODIAN_PID } from "../../support/test-constants";
+
 describe("Custodian admin – Collections", () => {
   beforeEach(() => {
-    cy.login("user", { custodianPid: "cust-pid-1" });
-    cy.visit("/custodian-admin/cust-pid-1/collections");
+    cy.login("user", { custodianPid: CUSTODIAN_PID });
+    cy.visit(routes.teamCollections(CUSTODIAN_PID));
     cy.contains("Collections", { timeout: 10000 }).should("be.visible");
   });
 

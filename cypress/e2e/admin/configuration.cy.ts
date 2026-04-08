@@ -1,10 +1,12 @@
 /**
  * Admin – Configuration page.
  */
+import { routes } from "@/config/routes";
+
 describe("Admin – Configuration", () => {
   beforeEach(() => {
     cy.login("admin", { isAdmin: true });
-    cy.visit("/admin/configuration");
+    cy.visit(routes.config);
   });
 
   it("renders the configuration page without errors", () => {

@@ -1,10 +1,12 @@
 /**
  * Query History tab – lists past queries, allows re-running them.
  */
+import { routes } from "@/config/routes";
+
 describe("Query History", () => {
   beforeEach(() => {
     cy.login();
-    cy.visit("/dashboard/query-history");
+    cy.visit(routes.dashboardHistory());
   });
 
   it("renders the query history page without errors", () => {

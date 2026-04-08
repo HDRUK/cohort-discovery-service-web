@@ -2,10 +2,12 @@
  * Dashboard shell navigation – tab switching, URL updates, and the
  * default redirect from /dashboard → /dashboard/new-query.
  */
+import { routes } from "@/config/routes";
+
 describe("Dashboard navigation", () => {
   beforeEach(() => {
     cy.login();
-    cy.visit("/dashboard");
+    cy.visit(routes.dashboard);
   });
 
   it("redirects /dashboard to /dashboard/new-query", () => {
@@ -13,18 +15,18 @@ describe("Dashboard navigation", () => {
   });
 
   it("renders the New Query tab as active by default", () => {
-    cy.visit("/dashboard/new-query");
+    cy.visit(routes.dashboardNewQuery());
     cy.contains("New Query").should("be.visible");
   });
 
   it("navigates to Query History tab and updates URL", () => {
-    cy.visit("/dashboard/new-query");
+    cy.visit(routes.dashboardNewQuery());
     cy.contains("Query History").click();
     cy.url().should("include", "/dashboard/query-history");
   });
 
   it("renders the Query History tab content", () => {
-    cy.visit("/dashboard/query-history");
+    cy.visit(routes.dashboardHistory());
     // The page should render without crashing – look for a container or heading
     cy.contains("Internal Server Error").should("not.exist");
   });
