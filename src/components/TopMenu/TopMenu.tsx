@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { usePathname } from "next/navigation";
+import { useEffect, useMemo } from "react";
+import { redirect, usePathname } from "next/navigation";
 
 import TabsShell from "@/components/TabsShell";
 import { routes } from "../../config/routes";
 import { TabType } from "../TabsShell/TabsShell";
-import GuidanceModal from "../GuidanceModal";
 import { checkIsAdmin } from "@/utils/user";
 import useUserStore from "@/hooks/useUserStore";
 import { HelpIcon } from "@/icons/HelpIcon";
@@ -20,7 +19,6 @@ export default function TopMenu() {
   const user = useUserStore((s) => s.user);
   const { isStandalone } = useApplicationMode();
 
-  const [guidanceOpen, setGuidanceOpen] = useState(false);
   const { helpTooltipOpen, setHelpTooltipOpen } = useQueryBuilder((qb) => ({
     helpTooltipOpen: qb.helpTooltipOpen,
     setHelpTooltipOpen: qb.setHelpTooltipOpen,
@@ -96,21 +94,12 @@ export default function TopMenu() {
     tabs[0]?.id ??
     0;
 
-  const handleGuidanceOpen = () => {
-    setGuidanceOpen(true);
-  };
-
-  const handleGuidanceClose = () => {
-    setGuidanceOpen(false);
-  };
-
   const handleTooltipClose = () => {
     setHelpTooltipOpen(false);
   };
 
   return (
     <>
-      <GuidanceModal open={guidanceOpen} onClose={handleGuidanceClose} />
       <TabsShell
         forceValue
         tabs={tabs}
@@ -140,7 +129,7 @@ export default function TopMenu() {
                 color: theme.palette.tooltip?.main,
                 mr: 2,
               }}
-              onClick={handleGuidanceOpen}
+              onClick={() => redirect(routes.help())}
             />
           </HelpTooltip>
         }
