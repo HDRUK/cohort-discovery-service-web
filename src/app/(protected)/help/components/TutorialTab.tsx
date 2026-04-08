@@ -69,7 +69,7 @@ const TutorialTab = ({ videos }: { videos: Video[] }) => {
     >
       {videos.map((v, index) => (
         <Grid key={index} size={{ xs: 2, sm: 4, md: 4 }}>
-          <Card variant="outlined" sx={{ p: 1, borderRadius: "20px" }}>
+          <Card variant="outlined" sx={{ p: 1, borderRadius: 2.5 }}>
             <CardActionArea
               onClick={() => {
                 setSearchParam(v.id);

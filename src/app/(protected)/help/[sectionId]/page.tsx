@@ -143,8 +143,8 @@ export default function Help() {
               bgcolor: theme.palette.secondary.main,
               opacity: 1,
               borderRadius: 0,
-              height: "2px",
-              paddingBottom: "2px",
+              height: 0.042,
+              paddingBottom: 0.042,
             },
           })}
         />
