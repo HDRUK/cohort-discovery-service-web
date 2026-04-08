@@ -110,7 +110,6 @@ export default function Help() {
   const currentTabValue =
     tabs.find((tab) => {
       const matchPath = tab?.route ?? tab.href;
-      console.log("here", matchPath, pathname);
       if (!matchPath) return false;
 
       return pathname === matchPath || pathname.startsWith(matchPath + "/");
@@ -118,14 +117,19 @@ export default function Help() {
     tabs[0]?.id ??
     0;
 
+  const currentTabName =
+    tabs.find((tab) => {
+      const matchPath = tab?.route ?? tab.href;
+      if (!matchPath) return "Overview Tutorials";
+
+      return pathname === matchPath || pathname.startsWith(matchPath + "/");
+    })?.label ??
+    tabs[0]?.label ??
+    "Overview Tutorials";
+
   return (
     <Paper sx={{ p: 2 }}>
-      <Title
-        title="General Guidance"
-        useSeparator
-        subTitle="Query Building Tutorials"
-      />
-      {/* Title is fixed, or follows subtab label? */}
+      <Title title="General Guidance" useSeparator subTitle={currentTabName} />
       <Paper sx={{ bgcolor: "white", py: 2, height: "100%" }}>
         <TabsShell
           tabs={tabs}
