@@ -15,7 +15,7 @@ const OverviewTab = () => {
             src="https://www.youtube.com/embed/yvFrnbXlqRk?feature=oembed"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
-            style={{ border: "0" }}
+            style={{ border: "0", borderRadius: "10px" }}
           ></iframe>
         </IFrameWrapper>
       </Box>
