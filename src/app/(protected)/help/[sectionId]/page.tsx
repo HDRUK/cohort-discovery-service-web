@@ -19,7 +19,6 @@ export type Video = {
   url: string;
   thumbnail?: string;
   categorisation: string;
-  href: string;
 };
 
 export type VideoLibrarySection = {
@@ -43,7 +42,6 @@ export const VIDEOS: Video[] = [
     url: "https://www.youtube.com/embed/yvFrnbXlqRk?feature=oembed",
     thumbnail: "https://img.youtube.com/vi/yvFrnbXlqRk/mqdefault.jpg",
     categorisation: "Beginner",
-    href: routes.help(kebabCase("Query Building Tutorials"), "rename-query"),
   },
   {
     id: "reorder-rules",
@@ -53,10 +51,6 @@ export const VIDEOS: Video[] = [
     url: "https://www.youtube.com/embed/RNVqqCpgeZk?feature=oembed",
     thumbnail: "https://img.youtube.com/vi/RNVqqCpgeZk/mqdefault.jpg",
     categorisation: "Advanced",
-    href: routes.help(kebabCase("Query Building Tutorials"), "reorder-rules"),
-    // href: function () {
-    //       return routes.help(kebabCase("Query Building Tutorials"), this.id);
-    // },
   },
   {
     id: "reorder-rules2",
@@ -66,7 +60,6 @@ export const VIDEOS: Video[] = [
     url: "https://www.youtube.com/embed/RNVqqCpgeZk?feature=oembed",
     thumbnail: "https://img.youtube.com/vi/RNVqqCpgeZk/mqdefault.jpg",
     categorisation: "Beginner",
-    href: routes.help(kebabCase("Results Tutorials"), "reorder-rules2"),
   },
   {
     id: "rename-query2",
@@ -75,7 +68,6 @@ export const VIDEOS: Video[] = [
     url: "https://www.youtube.com/embed/yvFrnbXlqRk?feature=oembed",
     thumbnail: "https://img.youtube.com/vi/yvFrnbXlqRk/mqdefault.jpg",
     categorisation: "Medium",
-    href: routes.help(kebabCase("Results Tutorials"), "rename-query2"),
   },
 ];
 
