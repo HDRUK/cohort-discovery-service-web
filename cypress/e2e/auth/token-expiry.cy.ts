@@ -3,10 +3,12 @@
  * Running with APPLICATION_MODE=standalone → unauthenticated requests
  * redirect to /login.
  */
+import { routes } from "@/config/routes";
+
 describe("Token expiry", () => {
   it("redirects to /login when no token is present", () => {
     cy.clearCookie("token");
-    cy.visit("/dashboard/new-query");
+    cy.visit(routes.dashboardNewQuery());
     cy.url({ timeout: 10000 }).should("include", "/login");
   });
 
@@ -24,7 +26,7 @@ describe("Token expiry", () => {
       // toward the logout/login flow. Avoid cy.visit() which can loop when the
       // Cypress cookie jar doesn't honour the logout Set-Cookie during redirect.
       cy.request({
-        url: "/dashboard/new-query",
+        url: routes.dashboardNewQuery(),
         followRedirect: false,
         failOnStatusCode: false,
       }).then((resp) => {
@@ -37,7 +39,7 @@ describe("Token expiry", () => {
 
   it("redirects unauthenticated access to /admin back to /login", () => {
     cy.clearCookie("token");
-    cy.visit("/admin/workgroups");
+    cy.visit(routes.adminWorkgroups);
     cy.url({ timeout: 10000 }).should("include", "/login");
   });
 });

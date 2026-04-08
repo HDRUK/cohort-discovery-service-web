@@ -1,12 +1,14 @@
 /**
  * Query Builder – add groups/rules, toggle operators, submit a query.
  */
+import { routes } from "@/config/routes";
+
 describe("Query Builder", () => {
   beforeEach(() => {
     cy.login();
     // Suppress the guidance modal so it does not block page elements
     cy.setCookie("queryBuilderGuidanceRead", "true");
-    cy.visit("/dashboard/new-query");
+    cy.visit(routes.dashboardNewQuery());
   });
 
   it("renders the query builder canvas", () => {

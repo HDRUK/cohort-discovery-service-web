@@ -1,6 +1,8 @@
 /**
  * Error pages – 403, user-not-found, and 404.
  */
+import { routes } from "@/config/routes";
+
 describe("Error pages", () => {
   it("renders the 403 Forbidden page directly", () => {
     cy.visit("/403", { failOnStatusCode: false });
@@ -19,7 +21,7 @@ describe("Error pages", () => {
 
   it("redirects unauthenticated access to protected routes to login", () => {
     cy.clearCookie("token");
-    cy.visit("/dashboard");
+    cy.visit(routes.dashboard);
     cy.url({ timeout: 10000 }).should("include", "/login");
   });
 });

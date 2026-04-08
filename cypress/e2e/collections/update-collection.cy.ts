@@ -3,10 +3,12 @@
  * Flow: click a table row → right panel shows UpdateCollection →
  *       click edit-panel-toggle to unlock → edit field → save.
  */
+import { routes } from "@/config/routes";
+
 describe("Update collection", () => {
   beforeEach(() => {
     cy.login("admin", { isAdmin: true });
-    cy.visit("/admin/collections");
+    cy.visit(routes.adminCollections);
     cy.contains("Collections", { timeout: 10000 }).should("be.visible");
   });
 
