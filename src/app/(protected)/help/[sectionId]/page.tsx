@@ -131,14 +131,14 @@ export default function Help() {
     "Overview Tutorials";
 
   return (
-    <Paper sx={{ py: 2, px: 4, borderRadius: 0 }}>
+    <Paper sx={{ py: 2, px: 4, borderRadius: 0, height: "100%" }}>
       <Title
         title="General Guidance"
         useSeparator
         subTitle={currentTabName}
         sx={{ mb: 2 }}
       />
-      <Paper sx={{ bgcolor: "white", py: 2, height: "100%" }}>
+      <Paper sx={{ bgcolor: "white", py: 2, height: "calc(100% - 50px)" }}>
         <TabsShell
           tabs={tabs}
           value={currentTabValue}

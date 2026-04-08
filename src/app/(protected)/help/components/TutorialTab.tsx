@@ -70,7 +70,7 @@ const TutorialTab = ({ videos }: { videos: Video[] }) => {
       container
       spacing={{ xs: 2, md: 3 }}
       columns={{ xs: 4, sm: 8, md: 12 }}
-      sx={{ m: 0, p: 0, pt: 2 }}
+      sx={{ m: 0, p: 0, pt: 2, overflowY: "scroll" }}
     >
       {videos.map((v, index) => (
         <Grid key={index} size={{ xs: 2, sm: 4, md: 4 }}>
@@ -80,7 +80,15 @@ const TutorialTab = ({ videos }: { videos: Video[] }) => {
                 setSearchParam(v.id);
               }}
             >
-              <CardMedia component="img" alt={v.title} image={v.thumbnail} />
+              <CardMedia
+                component="img"
+                alt={v.title}
+                image={v.thumbnail}
+                sx={{
+                  borderTopLeftRadius: "10px",
+                  borderTopRightRadius: "10px",
+                }}
+              />
               <Box display="flex" flexDirection="row" gap={1} sx={{ pt: 1 }}>
                 <PlayCircle
                   color="secondary"
