@@ -9,7 +9,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { usePathname } from "next/navigation";
+import { notFound, usePathname } from "next/navigation";
 import { IFrameWrapper } from "./IFrameWrapper";
 import { ArrowBack, PlayCircle } from "@mui/icons-material";
 import useSearchParams from "@/hooks/useSearchParams";
@@ -23,6 +23,9 @@ const TutorialTab = ({ videos }: { videos: Video[] }) => {
 
   if (tutorialId) {
     const video = videos.find((v) => v.id === tutorialId);
+    if (!video) {
+      return notFound();
+    }
     return (
       <Paper
         sx={{
