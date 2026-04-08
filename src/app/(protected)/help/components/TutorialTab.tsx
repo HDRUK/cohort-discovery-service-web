@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { notFound, usePathname } from "next/navigation";
 import { IFrameWrapper } from "./IFrameWrapper";
-import { ArrowBack, PlayCircle } from "@mui/icons-material";
+import { PlayCircle, West } from "@mui/icons-material";
 import useSearchParams from "@/hooks/useSearchParams";
 
 import { Video } from "../[sectionId]/page";
@@ -38,15 +38,17 @@ const TutorialTab = ({ videos }: { videos: Video[] }) => {
           my: 2,
         }}
       >
-        <Box display="flex" alignItems={"center"}>
-          <ArrowBack color="secondary" />
+        <Box display="flex" alignItems={"center"} sx={{ px: 1 }}>
+          <West color="secondary" sx={{ width: 14, height: 14, mr: 0.5 }} />
           <Link href={pathname}>Go back to all tutorials</Link>
         </Box>
-        <Typography variant="h4" sx={{ px: 1 }}>
+        <Typography variant="h4" sx={{ px: 1, pb: 1 }}>
           {video.title}
         </Typography>
-        <Typography sx={{ px: 1, pb: 2 }}>{video.text}</Typography>
-        <IFrameWrapper maxWidth="900px">
+        <Typography sx={{ px: 1, pb: 2, maxWidth: "700px" }}>
+          {video.text}
+        </Typography>
+        <IFrameWrapper maxWidth="1280px">
           <iframe
             loading="lazy"
             title={video.title}
