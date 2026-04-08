@@ -7,7 +7,7 @@ import {
   Stack,
   TextField,
 } from "@mui/material";
-import { ReactNode, useMemo, useState } from "react";
+import { ReactNode, useCallback, useMemo, useState } from "react";
 import { isAgeFilter, isRuleLeaf, updateById } from "@/utils/rules";
 import {
   AgeFilterType,
@@ -88,13 +88,13 @@ const RuleAgeSelector = ({
     setQueryBuilderJson,
     setSelectedGuidance,
     selected,
-    setSelected,
+    selectNodeWithModifiers,
   } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
     setSelectedGuidance: qb.setSelectedGuidance,
     selected: qb.selected,
-    setSelected: qb.setSelected,
+    selectNodeWithModifiers: qb.selectNodeWithModifiers,
   }));
 
   const flags = useFeatures();
@@ -192,6 +192,18 @@ const RuleAgeSelector = ({
     return [l === minAge ? null : l, r === maxAge ? null : r];
   }, [rule, minAge, maxAge]);
 
+  const handleSelect = useCallback(
+    (e: React.MouseEvent<Element>) => {
+      e.stopPropagation();
+
+      selectNodeWithModifiers(rule, {
+        shiftKey: e.shiftKey,
+        metaKey: e.metaKey,
+      });
+    },
+    [rule, selectNodeWithModifiers],
+  );
+
   if (!values) return null;
 
   const key = collapsibleGuidanceKey("RuleAgeSelector", selected);
@@ -200,9 +212,10 @@ const RuleAgeSelector = ({
     return (
       <HoverableDiv
         hoverKey={`rule-age-${rule.id}`}
-        onClick={() => setSelected(rule.id)}
+        onClick={handleSelect}
         flex={flex}
       >
+        {readOnly ? "read-only" : "not-read-only"}
         {title && <CustomH1>{title}</CustomH1>}
 
         <SingleBoundSelector<number>
@@ -290,9 +303,10 @@ const RuleAgeSelector = ({
   return (
     <HoverableDiv
       hoverKey={`rule-age-${rule.id}`}
-      onClick={() => setSelected(rule.id)}
+      onClick={handleSelect}
       flex={flex}
     >
+      {readOnly ? "read-only" : "not-read-only"}
       {title && <CustomH1>{title}</CustomH1>}
 
       <Stack

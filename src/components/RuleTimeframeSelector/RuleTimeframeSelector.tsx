@@ -44,13 +44,13 @@ const RuleTimeframeSelector = ({
     setQueryBuilderJson,
     setSelectedGuidance,
     selected,
-    setSelected,
+    selectNodeWithModifiers,
   } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
     setSelectedGuidance: qb.setSelectedGuidance,
     selected: qb.selected,
-    setSelected: qb.setSelected,
+    selectNodeWithModifiers: qb.selectNodeWithModifiers,
   }));
 
   const { constrainForBunnyV1 } = useFeatures();
@@ -93,13 +93,25 @@ const RuleTimeframeSelector = ({
     [],
   );
 
+  const handleSelect = useCallback(
+    (e: React.MouseEvent<Element>) => {
+      e.stopPropagation();
+
+      selectNodeWithModifiers(rule, {
+        shiftKey: e.shiftKey,
+        metaKey: e.metaKey,
+      });
+    },
+    [rule, selectNodeWithModifiers],
+  );
+
   if (!rule.timeConstraint) return null;
 
   if (constrainForBunnyV1) {
     return (
       <HoverableDiv
         hoverKey={`rule-timeframe-${rule.id}`}
-        onClick={() => setSelected(rule.id)}
+        onClick={handleSelect}
         flex={flex}
       >
         {title && <CustomH1>{title}</CustomH1>}
@@ -148,7 +160,7 @@ const RuleTimeframeSelector = ({
   return (
     <HoverableDiv
       hoverKey={`rule-timeframe-${rule.id}`}
-      onClick={() => setSelected(rule.id)}
+      onClick={handleSelect}
       flex={flex}
     >
       {title && <CustomH1>{title}</CustomH1>}

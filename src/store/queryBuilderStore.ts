@@ -43,6 +43,11 @@ export enum NodeKind {
 
 type NodeFactory = () => RuleNodeType | RuleNodeType[];
 
+type SelectNodeWithModifiersArgs = {
+  shiftKey?: boolean;
+  metaKey?: boolean;
+};
+
 export const Creators: Record<string, NodeFactory> = {
   [NodeKind.RULE]: createRule,
   [NodeKind.GROUP]: createRuleGroup,
@@ -95,6 +100,10 @@ export interface QueryBuilderStoreState {
   select: (id: UniqueIdentifier | UniqueIdentifier[]) => void;
   deselect: (id: UniqueIdentifier | UniqueIdentifier[]) => void;
   toggleSelected: (id: UniqueIdentifier, reset?: boolean) => void;
+  selectNodeWithModifiers: (
+    node: RuleNodeType,
+    modifiers?: SelectNodeWithModifiersArgs,
+  ) => void;
 
   createNewNode: (kind: NodeKind) => void;
   createNewRule: () => void;
@@ -259,6 +268,37 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
         },
       };
     });
+  },
+  selectNodeWithModifiers: (
+    node: RuleNodeType,
+    { shiftKey = false, metaKey = false }: SelectNodeWithModifiersArgs = {},
+  ) => {
+    const { selected, toggleSelected, setSelected, select, deselect } = get();
+
+    const id = node.id;
+    const isSelected = !!selected[id];
+
+    if (shiftKey) {
+      toggleSelected(id, false);
+    } else {
+      if (Object.keys(selected).length === 1 && isSelected) {
+        toggleSelected(id, true);
+      } else {
+        setSelected(id, true, true);
+      }
+    }
+
+    if (isRuleGroup(node) && metaKey) {
+      const nextParent = !isSelected;
+
+      node.rules.forEach((r) => {
+        if (nextParent) {
+          select(r.id);
+        } else {
+          deselect(r.id);
+        }
+      });
+    }
   },
 
   createNewNode: (kind: NodeKind) => {
