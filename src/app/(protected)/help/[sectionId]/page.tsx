@@ -36,14 +36,17 @@ export const VIDEO_SECTIONS: VideoLibrarySection[] = [
   { id: "1", sectionTitle: "Query Building Tutorials" },
   { id: "2", sectionTitle: "Results Tutorials" },
 ];
-// TODO: actual content
+
+// Note that we use "mqdefault.jpg" for each thumbnail in order to retrieve a 16:9 thumbnail that matches our video content.
+// hqdefault.jpg by contrast is typically 4:3
+
 export const VIDEOS: Video[] = [
   {
     id: "rename-query",
     title: "How do I rename my query?",
     sectionId: "1",
     url: "https://www.youtube.com/embed/yvFrnbXlqRk?feature=oembed",
-    thumbnail: "https://img.youtube.com/vi/yvFrnbXlqRk/hqdefault.jpg",
+    thumbnail: "https://img.youtube.com/vi/yvFrnbXlqRk/mqdefault.jpg",
     categorisation: "Beginner",
     href: routes.help(kebabCase("Query Building Tutorials"), "rename-query"),
   },
@@ -53,8 +56,8 @@ export const VIDEOS: Video[] = [
     sectionId: "1",
     text: "Click the box to the right of the query name, type your new name, and press Enter to save. To rename it again, hover over the name, double-click, edit, and press Enter.",
     url: "https://www.youtube.com/embed/RNVqqCpgeZk?feature=oembed",
-    thumbnail: "https://img.youtube.com/vi/RNVqqCpgeZk/hqdefault.jpg",
-    categorisation: "Beginner",
+    thumbnail: "https://img.youtube.com/vi/RNVqqCpgeZk/mqdefault.jpg",
+    categorisation: "Advanced",
     href: routes.help(kebabCase("Query Building Tutorials"), "reorder-rules"),
     // href: function () {
     //       return routes.help(kebabCase("Query Building Tutorials"), this.id);
@@ -66,7 +69,7 @@ export const VIDEOS: Video[] = [
     sectionId: "2",
     text: "Click the box to the right of the query name, type your new name, and press Enter to save. To rename it again, hover over the name, double-click, edit, and press Enter.",
     url: "https://www.youtube.com/embed/RNVqqCpgeZk?feature=oembed",
-    thumbnail: "https://img.youtube.com/vi/RNVqqCpgeZk/hqdefault.jpg",
+    thumbnail: "https://img.youtube.com/vi/RNVqqCpgeZk/mqdefault.jpg",
     categorisation: "Beginner",
     href: routes.help(kebabCase("Results Tutorials"), "reorder-rules2"),
   },
@@ -75,8 +78,8 @@ export const VIDEOS: Video[] = [
     title: "How do I rename my query?",
     sectionId: "2",
     url: "https://www.youtube.com/embed/yvFrnbXlqRk?feature=oembed",
-    thumbnail: "https://img.youtube.com/vi/yvFrnbXlqRk/hqdefault.jpg",
-    categorisation: "Beginner",
+    thumbnail: "https://img.youtube.com/vi/yvFrnbXlqRk/mqdefault.jpg",
+    categorisation: "Medium",
     href: routes.help(kebabCase("Results Tutorials"), "rename-query2"),
   },
 ];
