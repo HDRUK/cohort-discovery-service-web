@@ -26,11 +26,18 @@ const RefreshButton = ({
   showTooltip = false,
   ...rest
 }: RefreshButtonProps) => {
-  const title = !isProd || showTooltip ? label ?? tag : null;
+  const title = !isProd || showTooltip ? (label ?? tag) : null;
   return (
     <Tooltip title={title}>
       <Box display="flex" alignItems="center" gap={1}>
-        <IconButton onClick={() => revalidateAction(tag)} {...rest}>
+        <IconButton
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            revalidateAction(tag);
+          }}
+          {...rest}
+        >
           <RefreshIcon fontSize={"small"} />
         </IconButton>
         {text && <Typography variant="body2">{text}</Typography>}
