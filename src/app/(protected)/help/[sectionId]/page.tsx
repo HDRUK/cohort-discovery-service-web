@@ -27,11 +27,6 @@ export type VideoLibrarySection = {
   sectionTitle: string;
 };
 
-export function getVideoById(id: string) {
-  const video = VIDEOS.find((v) => v.id === id);
-  return video;
-}
-
 export const VIDEO_SECTIONS: VideoLibrarySection[] = [
   { id: "1", sectionTitle: "Query Building Tutorials" },
   { id: "2", sectionTitle: "Results Tutorials" },
