@@ -55,7 +55,11 @@ const TutorialTab = ({ videos }: { videos: Video[] }) => {
             src={video.url}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
-            style={{ border: "0" }}
+            style={{
+              border: "0",
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+            }}
           ></iframe>
         </IFrameWrapper>
       </Paper>
