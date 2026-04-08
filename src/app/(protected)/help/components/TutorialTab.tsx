@@ -74,21 +74,27 @@ const TutorialTab = ({ videos }: { videos: Video[] }) => {
     >
       {videos.map((v, index) => (
         <Grid key={index} size={{ xs: 2, sm: 4, md: 4 }}>
-          <Card variant="outlined" sx={{ p: 1 }}>
+          <Card variant="outlined" sx={{ p: 1, borderRadius: "20px" }}>
             <CardActionArea
               onClick={() => {
                 setSearchParam(v.id);
               }}
             >
               <CardMedia component="img" alt={v.title} image={v.thumbnail} />
-              <Box display="flex" flexDirection="row" gap={1}>
+              <Box display="flex" flexDirection="row" gap={1} sx={{ pt: 1 }}>
                 <PlayCircle
                   color="secondary"
-                  sx={{ height: "48px", width: "48px" }}
+                  sx={{ height: "33px", width: "33px" }}
                 />
                 <Stack>
-                  <Typography color="secondary">{v.title}</Typography>
-                  <Typography color="secondary">
+                  <Typography
+                    color="secondary"
+                    variant="body2"
+                    sx={{ lineHeight: "14px" }}
+                  >
+                    {v.title}
+                  </Typography>
+                  <Typography color="secondary" fontSize="12px">
                     {v.categorisation} {/* TODO: add video duration */}
                   </Typography>
                 </Stack>
