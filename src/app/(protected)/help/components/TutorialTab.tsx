@@ -1,10 +1,10 @@
 import {
   Box,
-  Button,
   Card,
   CardActionArea,
   CardMedia,
   Grid,
+  Link,
   Paper,
   Stack,
   Typography,
@@ -38,24 +38,19 @@ const TutorialTab = ({ videos }: { videos: Video[] }) => {
           my: 2,
         }}
       >
-        <Button
-          color="secondary"
-          variant="outlined"
-          sx={{ borderWidth: 0, "&.Mui-hover": { borderWidth: "0px" } }}
-          startIcon={<ArrowBack />}
-          href={pathname}
-        >
-          Go back to all tutorials
-        </Button>
+        <Box display="flex" alignItems={"center"}>
+          <ArrowBack color="secondary" />
+          <Link href={pathname}>Go back to all tutorials</Link>
+        </Box>
         <Typography variant="h4" sx={{ px: 1 }}>
-          {video?.title}
+          {video.title}
         </Typography>
-        <Typography sx={{ px: 1, pb: 2 }}>{video?.text}</Typography>
+        <Typography sx={{ px: 1, pb: 2 }}>{video.text}</Typography>
         <IFrameWrapper maxWidth="900px">
           <iframe
             loading="lazy"
-            title={video?.title}
-            src={video?.url}
+            title={video.title}
+            src={video.url}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
             style={{ border: "0" }}
