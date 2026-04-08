@@ -196,9 +196,12 @@ const RuleAgeSelector = ({
 
   if (constrainForBunnyV1 && !overrideConstrainForBunny) {
     return (
-      <HoverableDiv hoverKey={`rule-age-${rule.id}`} flex={flex}>
+      <HoverableDiv
+        stopPropagation={!readOnly}
+        hoverKey={`rule-age-${rule.id}`}
+        flex={flex}
+      >
         {title && <CustomH1>{title}</CustomH1>}
-
         <SingleBoundSelector<number>
           constraint={ageConstraint}
           constraintOperator={
@@ -282,9 +285,12 @@ const RuleAgeSelector = ({
   }
 
   return (
-    <HoverableDiv hoverKey={`rule-age-${rule.id}`} flex={flex}>
+    <HoverableDiv
+      stopPropagation={!readOnly}
+      hoverKey={`rule-age-${rule.id}`}
+      flex={flex}
+    >
       {title && <CustomH1>{title}</CustomH1>}
-
       <Stack
         direction="row"
         spacing={2}

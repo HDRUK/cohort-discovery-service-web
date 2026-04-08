@@ -8,12 +8,14 @@ export interface HoverableDivProps {
   children?: ReactNode;
   flex?: boolean;
   style?: React.CSSProperties;
+  stopPropagation?: boolean;
 }
 
 const HoverableDiv = ({
   hoverKey,
   onClick,
   children,
+  stopPropagation = false,
   flex = false,
   style = {},
 }: HoverableDivProps) => {
@@ -23,8 +25,8 @@ const HoverableDiv = ({
     <div
       ref={setHoverRef}
       onClick={(e) => {
+        if (stopPropagation) e.stopPropagation();
         if (onClick) {
-          e.stopPropagation();
           onClick(e);
         }
       }}

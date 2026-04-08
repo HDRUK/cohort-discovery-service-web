@@ -95,7 +95,11 @@ const RuleTimeframeSelector = ({
 
   if (constrainForBunnyV1) {
     return (
-      <HoverableDiv hoverKey={`rule-timeframe-${rule.id}`} flex={flex}>
+      <HoverableDiv
+        stopPropagation={!readOnly}
+        hoverKey={`rule-timeframe-${rule.id}`}
+        flex={flex}
+      >
         {title && <CustomH1>{title}</CustomH1>}
 
         <SingleBoundSelector<string, Dayjs>
@@ -140,7 +144,11 @@ const RuleTimeframeSelector = ({
   }
 
   return (
-    <HoverableDiv hoverKey={`rule-timeframe-${rule.id}`} flex={flex}>
+    <HoverableDiv
+      stopPropagation={!readOnly}
+      hoverKey={`rule-timeframe-${rule.id}`}
+      flex={flex}
+    >
       {title && <CustomH1>{title}</CustomH1>}
       <DoubleBoundSelector
         rule={rule}
