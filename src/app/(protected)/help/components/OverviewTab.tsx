@@ -7,7 +7,7 @@ import { IFrameWrapper } from "./IFrameWrapper";
 const OverviewTab = () => {
   return (
     <>
-      <Box display="flex" sx={{ justifyContent: "center" }}>
+      <Box display="flex" sx={{ justifyContent: "center", pt: 2 }}>
         <IFrameWrapper>
           <iframe
             loading="lazy"
