@@ -88,7 +88,7 @@ const TutorialTab = ({ videos }: { videos: Video[] }) => {
                 <Stack>
                   <Typography color="secondary">{v.title}</Typography>
                   <Typography color="secondary">
-                    {v.categorisation} 1 min
+                    {v.categorisation} {/* TODO: add video duration */}
                   </Typography>
                 </Stack>
               </Box>
