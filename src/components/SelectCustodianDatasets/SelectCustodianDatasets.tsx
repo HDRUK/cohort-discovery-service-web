@@ -16,6 +16,7 @@ import Title from "@/components/Title";
 import SquareCheckbox from "@/components/SquareCheckbox";
 import usePermissions from "@/hooks/usePermissions";
 import SyntheticChip from "../SyntheticChip";
+import { getCollectionStatus } from "@/utils/colours";
 
 const SelectCustodianDatasets = ({
   custodianCollections,
@@ -65,7 +66,7 @@ const SelectCustodianDatasets = ({
         {showState && (
           <Typography component="span" fontWeight={700}>
             {" "}
-            [{c.model_state.state.name}]
+            [{getCollectionStatus(c.model_state.state.id).label}]
           </Typography>
         )}
       </Typography>
