@@ -14,6 +14,7 @@ import LaunchIcon from "@mui/icons-material/Launch";
 import dayjs from "dayjs";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import { formatNumber } from "@/utils/numbers";
+import { getDatetime } from "@/utils/date";
 import Link from "next/link";
 import { Link as MuiLink } from "@mui/material";
 import { routes } from "@/config/routes";
@@ -121,8 +122,7 @@ const QueriesTable = ({
       header: "Started(UTC)",
       minSize: 80,
       maxSize: 80,
-      Cell: ({ cell }) =>
-        dayjs(cell.getValue<string>()).format("DD/MM/YYYY, HH:MM:ss"),
+      Cell: ({ cell }) => getDatetime(cell.getValue<string>()),
     },
     {
       id: "status",
