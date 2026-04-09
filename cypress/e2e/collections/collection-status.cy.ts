@@ -1,10 +1,12 @@
 /**
  * Collection status transitions – change status via dropdown/button.
  */
+import { routes } from "@/config/routes";
+
 describe("Collection status", () => {
   beforeEach(() => {
     cy.login("admin", { isAdmin: true });
-    cy.visit("/admin/collections");
+    cy.visit(routes.adminCollections);
     cy.contains("Collections", { timeout: 10000 }).should("be.visible");
   });
 

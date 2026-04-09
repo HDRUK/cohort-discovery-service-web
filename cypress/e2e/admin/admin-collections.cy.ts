@@ -1,10 +1,12 @@
 /**
  * Admin – Collections tab.
  */
+import { routes } from "@/config/routes";
+
 describe("Admin – Collections", () => {
   beforeEach(() => {
     cy.login("admin", { isAdmin: true });
-    cy.visit("/admin/collections");
+    cy.visit(routes.adminCollections);
     // Wait for the client component to mount and populate the Zustand store
     cy.contains("Collections", { timeout: 10000 }).should("be.visible");
   });

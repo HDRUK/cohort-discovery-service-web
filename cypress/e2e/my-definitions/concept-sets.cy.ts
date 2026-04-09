@@ -1,10 +1,12 @@
 /**
  * My Definitions page – concept set CRUD and concept search/attach/detach.
  */
+import { routes } from "@/config/routes";
+
 describe("Concept sets", () => {
   beforeEach(() => {
     cy.login();
-    cy.visit("/my-definitions");
+    cy.visit(routes.definitions);
   });
 
   it("renders the My Definitions page without errors", () => {

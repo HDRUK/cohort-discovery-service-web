@@ -3,10 +3,12 @@
  * DeleteButton is icon-only (no text) – identified by data-testid="DeleteIcon".
  * Clicking it always opens the confirm dialog; row selection is optional.
  */
+import { routes } from "@/config/routes";
+
 describe("Delete collection", () => {
   beforeEach(() => {
     cy.login("admin", { isAdmin: true });
-    cy.visit("/admin/collections");
+    cy.visit(routes.adminCollections);
     cy.contains("Collections", { timeout: 10000 }).should("be.visible");
   });
 

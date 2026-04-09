@@ -1,10 +1,12 @@
 /**
  * Admin – Workgroups tab.
  */
+import { routes } from "@/config/routes";
+
 describe("Admin – Workgroups", () => {
   beforeEach(() => {
     cy.login("admin", { isAdmin: true });
-    cy.visit("/admin/workgroups");
+    cy.visit(routes.adminWorkgroups);
     cy.contains("Internal Server Error").should("not.exist");
   });
 

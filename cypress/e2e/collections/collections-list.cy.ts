@@ -3,10 +3,12 @@
  * Collections are managed through the admin panel; there is no standalone
  * user-facing collections route on the dashboard.
  */
+import { routes } from "@/config/routes";
+
 describe("Collections list", () => {
   beforeEach(() => {
     cy.login("admin", { isAdmin: true });
-    cy.visit("/admin/collections");
+    cy.visit(routes.adminCollections);
   });
 
   it("renders the collections tab without errors", () => {

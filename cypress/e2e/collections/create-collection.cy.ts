@@ -1,10 +1,12 @@
 /**
  * Create collection – opens the create form, fills required fields, submits.
  */
+import { routes } from "@/config/routes";
+
 describe("Create collection", () => {
   beforeEach(() => {
     cy.login("admin", { isAdmin: true });
-    cy.visit("/admin/collections");
+    cy.visit(routes.adminCollections);
     cy.contains("Collections", { timeout: 10000 }).should("be.visible");
   });
 

@@ -3,10 +3,12 @@
  * User management is not yet implemented; the tab renders an UnderConstruction
  * notice instead of a real user list.
  */
+import { routes } from "@/config/routes";
+
 describe("Admin – Users", () => {
   beforeEach(() => {
     cy.login("admin", { isAdmin: true });
-    cy.visit("/admin/users");
+    cy.visit(routes.adminUsers);
   });
 
   it("renders the users tab without errors", () => {

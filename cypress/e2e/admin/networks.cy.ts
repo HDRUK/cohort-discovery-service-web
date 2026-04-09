@@ -1,10 +1,12 @@
 /**
  * Admin – Networks tab.
  */
+import { routes } from "@/config/routes";
+
 describe("Admin – Networks", () => {
   beforeEach(() => {
     cy.login("admin", { isAdmin: true });
-    cy.visit("/admin/networks");
+    cy.visit(routes.adminNetworks);
     cy.contains("Internal Server Error").should("not.exist");
   });
 

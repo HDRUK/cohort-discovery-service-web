@@ -1,10 +1,13 @@
 /**
  * Custodian admin – Hosts tab.
  */
+import { routes } from "@/config/routes";
+import { CUSTODIAN_PID } from "../../support/test-constants";
+
 describe("Custodian admin – Hosts", () => {
   beforeEach(() => {
-    cy.login("user", { custodianPid: "cust-pid-1" });
-    cy.visit("/custodian-admin/cust-pid-1/hosts");
+    cy.login("user", { custodianPid: CUSTODIAN_PID });
+    cy.visit(routes.teamHosts(CUSTODIAN_PID));
   });
 
   it("renders the hosts tab without errors", () => {
