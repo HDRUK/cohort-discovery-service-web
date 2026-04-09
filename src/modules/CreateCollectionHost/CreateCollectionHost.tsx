@@ -44,11 +44,12 @@ const CreateCollectionHost = ({
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "space-between",
+        justifyContent: "flex-start",
         mb: 5,
+        gap: 2,
       }}
     >
-      <Stack spacing={2} width={"70%"} height={"100%"}>
+      <Stack spacing={2} width={"70%"}>
         <Controller
           name="name"
           control={control}
