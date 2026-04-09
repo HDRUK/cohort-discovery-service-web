@@ -39,7 +39,8 @@ const useFeatures = () => {
           flags[FeatureName.IntegratedSyncCustodiansEveryRequest],
 
         hdrukTheme: flags[FeatureName.HdrukTheme],
-        manageWorkgroupsInternal: isStandalone,
+        manageWorkgroupsInternal:
+          isStandalone || flags[FeatureName.ManageWorkgroupsInternally],
       };
     }),
   );
