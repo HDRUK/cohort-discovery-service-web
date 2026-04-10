@@ -6,7 +6,7 @@ import { IFrameWrapper } from "./IFrameWrapper";
 
 const OverviewTab = () => {
   return (
-    <>
+    <Box sx={{ overflowY: "scroll", height: "auto" }}>
       <Box display="flex" sx={{ justifyContent: "center", pt: 2 }}>
         <IFrameWrapper>
           <iframe
@@ -20,7 +20,7 @@ const OverviewTab = () => {
         </IFrameWrapper>
       </Box>
       <QueryBuilderGuidance />
-    </>
+    </Box>
   );
 };
 

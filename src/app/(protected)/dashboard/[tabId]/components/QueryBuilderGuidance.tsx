@@ -67,7 +67,7 @@ const QueryBuilderGuidance = ({ onClose }: { onClose?: () => void }) => {
   };
 
   return (
-    <Paper sx={{ bgcolor: "white", p: 2, height: "100%" }}>
+    <Paper sx={{ bgcolor: "white", p: 2 }}>
       <CohortDiscoveryGuidanceMdx components={components} />
     </Paper>
   );

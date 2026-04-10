@@ -36,6 +36,7 @@ const TutorialTab = ({ videos }: { videos: Video[] }) => {
           p: 1,
           pt: 2,
           my: 2,
+          overflowY: "scroll",
         }}
       >
         <Box display="flex" alignItems={"center"} sx={{ px: 1 }}>
