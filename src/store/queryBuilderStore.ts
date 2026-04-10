@@ -130,6 +130,8 @@ export interface QueryBuilderStoreState {
     includeSynthetic: boolean,
   ) => void;
 
+  checkSelectedDatasets: (collections: Collection[]) => void;
+
   openSelectDatasetsPanel: boolean;
   setOpenSelectDatasetsPanel: (value: boolean) => void;
 
@@ -404,6 +406,18 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
   initialiseSelectedDatasets: (collections, includeSynthetic) => {
     const { selectedDatasets } = get();
     const allowedIds = getAllowedDatasetIds(collections, includeSynthetic);
+
+    const nextSelectedDatasets =
+      selectedDatasets.length === 0
+        ? allowedIds
+        : intersection(allowedIds, selectedDatasets);
+
+    get().setSelectedDatasets(nextSelectedDatasets);
+  },
+
+  checkSelectedDatasets: (collections) => {
+    const { selectedDatasets } = get();
+    const allowedIds = getAllowedDatasetIds(collections, true);
 
     const nextSelectedDatasets =
       selectedDatasets.length === 0
