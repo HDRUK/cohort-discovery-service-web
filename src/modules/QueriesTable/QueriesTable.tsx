@@ -28,6 +28,7 @@ import { getQueryName } from "@/utils/query";
 import useSearchParams from "@/hooks/useSearchParams";
 import { buildQueryHistoryParams } from "@/utils/params";
 import { useDefaults } from "@/providers/DefaultProvider";
+import { getDatetime } from "@/utils/date";
 
 interface QueriesTableProps {
   initialData: Paginated<Query>;
@@ -121,8 +122,7 @@ const QueriesTable = ({
       header: "Started(UTC)",
       minSize: 80,
       maxSize: 80,
-      Cell: ({ cell }) =>
-        dayjs(cell.getValue<string>()).format("DD/MM/YYYY, HH:MM:ss"),
+      Cell: ({ cell }) => getDatetime(cell.getValue<string>()),
     },
     {
       id: "status",
