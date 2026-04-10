@@ -42,7 +42,7 @@ const ProtectedPage = ({
     (qb) => qb.checkSelectedDatasets,
   );
 
-  const renderCount = useRef<number>(null);
+  const hasRendered = useRef(false);
 
   useEffect(() => {
     setUser(user);
@@ -65,10 +65,10 @@ const ProtectedPage = ({
   }, [featureFlags, setFlags]);
 
   useEffect(() => {
-    if (renderCount.current == null) {
+    if (!hasRendered.current) {
       initialiseSelectedDatasets(collections, isOnlyInDefaultWorkgroup);
     }
-    renderCount.current = 1;
+    hasRendered.current = true;
   }, [collections, initialiseSelectedDatasets, isOnlyInDefaultWorkgroup]);
 
   useEffect(() => {
