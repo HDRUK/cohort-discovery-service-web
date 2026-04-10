@@ -30,7 +30,7 @@ const TutorialTab = ({ videos }: { videos: Video[] }) => {
       <Paper
         sx={{
           backgroundColor: "white",
-          border: 1,
+          border: 2,
           borderWidth: "0.5px",
           borderColor: "text.secondary",
           p: 1,
@@ -71,7 +71,7 @@ const TutorialTab = ({ videos }: { videos: Video[] }) => {
       container
       spacing={{ xs: 2, md: 3 }}
       columns={{ xs: 4, sm: 8, md: 12 }}
-      sx={{ m: 0, p: 0, pt: 2, overflowY: "scroll" }}
+      sx={{ m: 0, p: 0, pt: 2 }}
     >
       {videos.map((v, index) => (
         <Grid key={index} size={{ xs: 2, sm: 4, md: 4 }}>

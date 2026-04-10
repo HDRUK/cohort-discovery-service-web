@@ -208,37 +208,36 @@ export default function Help() {
     "Overview Tutorials";
 
   return (
-    <Paper sx={{ py: 2, px: 4, borderRadius: 0, height: "100%" }}>
+    <Paper sx={{ py: 2, px: 4, borderRadius: 0 }}>
       <Title
         title="General Guidance"
         useSeparator
         subTitle={currentTabName}
         sx={{ mb: 2 }}
       />
-      <Paper sx={{ bgcolor: "white", py: 2, height: "calc(100% - 50px)" }}>
-        <TabsShell
-          tabs={tabs}
-          value={currentTabValue}
-          sx={{
-            backgroundColor: "white",
-          }}
-          tabListSx={(theme) => ({
-            px: 2,
-            "& .Mui-selected": {
-              bgcolor: "white !important",
-            },
-            "& .MuiTabs-indicator": {
-              top: 40,
-              bottom: 0,
-              bgcolor: theme.palette.secondary.main,
-              opacity: 1,
-              borderRadius: 0,
-              height: 0.042,
-              paddingBottom: 0.042,
-            },
-          })}
-        />
-      </Paper>
+
+      <TabsShell
+        tabs={tabs}
+        value={currentTabValue}
+        sx={{
+          backgroundColor: "white",
+        }}
+        tabListSx={(theme) => ({
+          px: 2,
+          "& .Mui-selected": {
+            bgcolor: "white !important",
+          },
+          "& .MuiTabs-indicator": {
+            top: 40,
+            bottom: 0,
+            bgcolor: theme.palette.secondary.main,
+            opacity: 1,
+            borderRadius: 0,
+            height: 0.042,
+            paddingBottom: 0.042,
+          },
+        })}
+      />
     </Paper>
   );
 }
