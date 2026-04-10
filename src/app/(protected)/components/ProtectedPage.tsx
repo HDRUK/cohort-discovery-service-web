@@ -3,7 +3,7 @@
 import { Collection, CombinedUser, Custodian, Workgroup } from "@/types/api";
 import { FeatureFlag } from "@/types/features";
 import { redirect } from "next/navigation";
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import useUserStore from "@/hooks/useUserStore";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
@@ -38,6 +38,11 @@ const ProtectedPage = ({
   const initialiseSelectedDatasets = useQueryBuilder(
     (qb) => qb.initialiseSelectedDatasets,
   );
+  const checkSelectedDatasets = useQueryBuilder(
+    (qb) => qb.checkSelectedDatasets,
+  );
+
+  const renderCount = useRef<number>(null);
 
   useEffect(() => {
     setUser(user);
@@ -60,14 +65,16 @@ const ProtectedPage = ({
   }, [featureFlags, setFlags]);
 
   useEffect(() => {
+    if (renderCount.current == null) {
+      initialiseSelectedDatasets(collections, isOnlyInDefaultWorkgroup);
+    }
+    renderCount.current = 1;
+  }, [collections, initialiseSelectedDatasets, isOnlyInDefaultWorkgroup]);
+
+  useEffect(() => {
     if (!currentUser) return;
-    initialiseSelectedDatasets(collections, isOnlyInDefaultWorkgroup);
-  }, [
-    currentUser,
-    collections,
-    isOnlyInDefaultWorkgroup,
-    initialiseSelectedDatasets,
-  ]);
+    checkSelectedDatasets(collections);
+  }, [collections, currentUser, checkSelectedDatasets]);
 
   if (!user) redirect("/403?reason=no-token");
 
