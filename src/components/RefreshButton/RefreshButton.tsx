@@ -13,10 +13,11 @@ import { revalidateAction } from "@/actions/revalidate";
 const isProd = process.env.NODE_ENV === "production";
 
 export interface RefreshButtonProps extends Omit<IconButtonProps, "onClick"> {
-  tag: string;
+  tag: string | string[];
   showTooltip?: boolean;
   label?: string;
   text?: string;
+  onRefreshed?: () => Promise<void> | void;
 }
 
 const RefreshButton = ({
@@ -24,17 +25,21 @@ const RefreshButton = ({
   label,
   text,
   showTooltip = false,
+  onRefreshed,
   ...rest
 }: RefreshButtonProps) => {
+  const tags = Array.isArray(tag) ? tag : [tag];
+  const uniqueTags = [...new Set(tags)];
   const title = !isProd || showTooltip ? (label ?? tag) : null;
   return (
     <Tooltip title={title}>
       <Box display="flex" alignItems="center" gap={1}>
         <IconButton
-          onClick={(e) => {
+          onClick={async (e) => {
             e.preventDefault();
             e.stopPropagation();
-            revalidateAction(tag);
+            await Promise.all(uniqueTags.map((t) => revalidateAction(t)));
+            await onRefreshed?.();
           }}
           {...rest}
         >

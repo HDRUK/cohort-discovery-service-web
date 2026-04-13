@@ -17,6 +17,8 @@ export enum FeatureName {
   IntegratedSyncCustodiansEveryRequest = "integrated-sync-custodians-every-request",
 
   HdrukTheme = "hdruk-uk-theme",
+
+  AdminMoreCollectionDetails = "admin-more-collection-details",
 }
 
 export type FeatureFlag = Record<FeatureName, boolean>;
@@ -42,4 +44,6 @@ export const DEFAULT_FLAGS: FeatureFlag = {
   [FeatureName.HdrukTheme]: true,
 
   [FeatureName.ManageWorkgroupsInternally]: true,
+
+  [FeatureName.AdminMoreCollectionDetails]: false,
 };

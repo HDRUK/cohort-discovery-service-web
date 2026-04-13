@@ -16,12 +16,11 @@ import { useTransposedTable } from "@/hooks/useTransposedTable";
 const CollectionDetails = ({ pid }: { pid: string }) => {
   const { data: details, isLoading } = useQuery<CollectionDetailsType>({
     queryKey: ["collectionDetails", pid],
-    queryFn: async () => {
-      const res = await getCollectionDetails(pid);
-      return res.data;
-    },
+    queryFn: async () => getCollectionDetails(pid),
     enabled: !!pid,
-    staleTime: 60 * 1000,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
 
   const detailsTable = useTransposedTable<CollectionDetailsType>({

@@ -41,6 +41,9 @@ const useFeatures = () => {
         hdrukTheme: flags[FeatureName.HdrukTheme],
         manageWorkgroupsInternal:
           isStandalone || flags[FeatureName.ManageWorkgroupsInternally],
+
+        adminMoreCollectionDetails:
+          flags[FeatureName.AdminMoreCollectionDetails],
       };
     }),
   );
