@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import getCollectionDetails from "@/actions/collection/getCollectionDetails";
+import { getCollectionDetailsBulk } from "@/actions/collection/getCollectionDetails";
 
 type Props = {
   pids: string[];
@@ -20,16 +20,7 @@ const usePrefetchCollectionDetails = ({ pids }: Props) => {
       );
 
       if (!missingPids.length) return;
-
-      const detailsMap = Object.fromEntries(
-        await Promise.all(
-          missingPids.map(async (pid) => {
-            const res = await getCollectionDetails(pid);
-            return [pid, res.data];
-          }),
-        ),
-      );
-
+      const detailsMap = await getCollectionDetailsBulk(missingPids);
       if (cancelled) return;
 
       for (const [pid, details] of Object.entries(detailsMap)) {

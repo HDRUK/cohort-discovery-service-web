@@ -34,7 +34,7 @@ export type CachedGetArgs = {
   tags?: string[];
   cacheOptions?: CacheOptions;
   includeUserTag?: boolean;
-  revalidate?: number;
+  revalidate?: number | false;
 };
 
 const buildCachedRequest = async ({

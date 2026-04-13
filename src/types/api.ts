@@ -181,6 +181,7 @@ export interface CollectionWithHosts extends Collection {
 }
 
 export interface CollectionDetails extends WithTimestamps {
+  pid: string;
   nconcepts: number;
   demographics: Distribution[];
   result_files: ResultFile[];

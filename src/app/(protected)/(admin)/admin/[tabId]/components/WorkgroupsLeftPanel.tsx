@@ -6,10 +6,10 @@ import AddButton from "@/components/AddButton";
 import CreateWorkgroup from "@/modules/CreateWorkgroup";
 import { useCallback, useEffect } from "react";
 import useSearchParams from "@/hooks/useSearchParams";
-import { capitaliseFirstLetter } from "@/utils/string";
 import useAdminStore from "@/hooks/useAdminStore";
 import { useThreePane } from "@/providers/ThreePaneProvider";
 import { useUserDataStore } from "@/hooks/userDataStore";
+import { formatWorkgroupName } from "@/utils/workgroups";
 
 const WorkgroupsLeftPanel = () => {
   const { expandedLeft, toggleLeft } = useThreePane();
@@ -67,7 +67,7 @@ const WorkgroupsLeftPanel = () => {
       >
         <List
           items={workgroups.map((workgroup) => ({
-            label: capitaliseFirstLetter(workgroup.name.toLowerCase()),
+            label: formatWorkgroupName(workgroup.name), //capitaliseFirstLetter(workgroup.name.toLowerCase()),
             onClick: () => onSelectWorkgroup(workgroup.id),
             selected: selectedWorkgroup?.id === workgroup.id,
           }))}
