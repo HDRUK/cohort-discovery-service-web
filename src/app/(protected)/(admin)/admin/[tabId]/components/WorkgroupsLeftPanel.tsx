@@ -67,7 +67,7 @@ const WorkgroupsLeftPanel = () => {
       >
         <List
           items={workgroups.map((workgroup) => ({
-            label: formatWorkgroupName(workgroup.name), //capitaliseFirstLetter(workgroup.name.toLowerCase()),
+            label: formatWorkgroupName(workgroup.name),
             onClick: () => onSelectWorkgroup(workgroup.id),
             selected: selectedWorkgroup?.id === workgroup.id,
           }))}
