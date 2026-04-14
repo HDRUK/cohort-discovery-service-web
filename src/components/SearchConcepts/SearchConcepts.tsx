@@ -87,7 +87,7 @@ const SearchConcepts = ({
 
   const onSearch = useCallback(
     async (value: string, force = false, customPerPage?: number) => {
-      const trimmedValue = value.trim();
+      const trimmedValue = value.trim().length < 3 ? "" : value.trim();
       const isNewSearch = trimmedValue !== lastQueryRef.current;
 
       if (!force && !isNewSearch) return;
@@ -197,6 +197,7 @@ const SearchConcepts = ({
             </Box>
           ) : null
         }
+        debounceMs={400}
       />
       <FormGroup sx={{ mt: 2 }}>
         {multiple && visibleOptions.length > 0 && (
