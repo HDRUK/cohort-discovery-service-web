@@ -19,8 +19,12 @@ const CohortQueryTitle = () => {
         <EditableText
           defaultValue={queryName || ""}
           onCommit={(name) => {
-            setQueryName(name);
-            notify.success("Query name saved");
+            if (name.length >= 3) {
+              setQueryName(name);
+              notify.success("Query name saved");
+            } else {
+              setQueryName("");
+            }
           }}
           showIcon
           typographyProps={{
