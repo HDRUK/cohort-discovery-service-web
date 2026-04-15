@@ -50,7 +50,7 @@ const QueryHistoryGuidance = (
         return of results.
       </Typography>
       <Typography>
-        <b>Completed</b> — The query has finished for this collection and the
+        <b>Successful</b> — The query has finished for this collection and the
         total count is finalised.
       </Typography>
       <Typography>
