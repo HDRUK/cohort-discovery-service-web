@@ -183,7 +183,7 @@ const UpdateWorkgroup = () => {
                   disabled={!expandedRight}
                   multiple
                   options={users.map((c) => ({
-                    label: c.name,
+                    label: `${c.name} (${c.email})`,
                     value: c.id as ValueType,
                   }))}
                   getChipLabel={(options, value) =>

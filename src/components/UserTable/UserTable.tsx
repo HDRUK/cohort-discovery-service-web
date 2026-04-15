@@ -12,12 +12,17 @@ import { capitaliseFirstLetter } from "@/utils/string";
 
 import useAdminStore from "@/hooks/useAdminStore";
 
-import { useTable } from "@/hooks/useTable";
 import dayjs from "dayjs";
 import { TableProps } from "../Table/Table";
 import { trueKeys } from "@/utils/numbers";
 import { useUserDataStore } from "@/hooks/userDataStore";
 import { useIsAdminSection } from "@/contexts/AdminSectionContext";
+import { usePaginatedTable } from "@/hooks/usePaginatedTable";
+import { DEFAULT_PER_PAGE, DEFAULT_USERS_PER_PAGE } from "@/config/defaults";
+import { TAG_ADMIN_USERS } from "@/config/tags";
+
+const PAGE_PARAM = "users_page";
+const PER_PAGE_PARAM = "users_per_page";
 
 export interface CollectionsTableProps extends TableProps {
   showPid?: boolean;
@@ -33,7 +38,7 @@ const UserTable = ({
   handleDelete,
   ...rest
 }: CollectionsTableProps) => {
-  const { getSearchParam } = useSearchParams("workgroup_filter");
+  const { getSearchParam, searchParams } = useSearchParams("workgroup_filter");
   const wg_filter = getSearchParam();
   const isAdmin = useIsAdminSection();
 
@@ -59,6 +64,19 @@ const UserTable = ({
       ),
     [users, wg_filter],
   );
+
+  const page = Math.max(1, parseInt(searchParams.get(PAGE_PARAM) || "1", 10));
+
+  const perPage = Math.max(
+    1,
+    parseInt(searchParams.get(PER_PAGE_PARAM) || String(DEFAULT_PER_PAGE), 10),
+  );
+
+  const paginatedHydratedUsers = useMemo(() => {
+    const start = (page - 1) * perPage;
+    const end = start + perPage;
+    return hydratedUsers.slice(start, end);
+  }, [hydratedUsers, page, perPage]);
 
   const columns: MRT_ColumnDef<User>[] = useMemo(
     () => [
@@ -103,10 +121,15 @@ const UserTable = ({
     [isAdmin],
   );
 
-  const table = useTable({
+  const table = usePaginatedTable<User>({
     columns,
-    data: hydratedUsers,
+    data: paginatedHydratedUsers,
+    rowCount: hydratedUsers.length,
+    perPageDefault: DEFAULT_USERS_PER_PAGE,
+    pageParam: PAGE_PARAM,
+    perPageParam: PER_PAGE_PARAM,
     enableSorting: false,
+    manualPagination: true,
     ...(setRowSelection && { onRowSelectionChange: setRowSelection }),
     ...(rowSelection && { state: { rowSelection } }),
     getRowId: (row) => String(row?.id),
@@ -128,6 +151,10 @@ const UserTable = ({
         deleteProps: {
           onClick: handleDelete,
           disabled: selectedUserIds.length === 0,
+        },
+        refreshProps: {
+          tag: TAG_ADMIN_USERS,
+          label: "Refresh Users",
         },
       }}
       {...rest}
