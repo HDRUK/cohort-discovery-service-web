@@ -19,6 +19,7 @@ import { useUserDataStore } from "@/hooks/userDataStore";
 import { useIsAdminSection } from "@/contexts/AdminSectionContext";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import { DEFAULT_PER_PAGE, DEFAULT_USERS_PER_PAGE } from "@/config/defaults";
+import { TAG_ADMIN_USERS } from "@/config/tags";
 
 const PAGE_PARAM = "users_page";
 const PER_PAGE_PARAM = "users_per_page";
@@ -150,6 +151,10 @@ const UserTable = ({
         deleteProps: {
           onClick: handleDelete,
           disabled: selectedUserIds.length === 0,
+        },
+        refreshProps: {
+          tag: TAG_ADMIN_USERS,
+          label: "Refresh Users",
         },
       }}
       {...rest}
