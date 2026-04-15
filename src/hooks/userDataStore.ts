@@ -181,7 +181,7 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
 
   searchForConcepts: async ({ searchTerm, perPage, domain }) => {
     const { selectedDatasets } = useQueryBuilderStore.getState();
-    console.log("called", searchTerm);
+
     const { data } = await searchConcepts({
       concept_name: [searchTerm],
       concept_id: [searchTerm],
@@ -189,7 +189,6 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
       domain,
       collections: selectedDatasets,
     });
-    console.log("done", searchTerm);
 
     return data;
   },
