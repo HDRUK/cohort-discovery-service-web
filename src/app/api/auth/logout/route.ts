@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
 
+const REDIRECT_URL = process?.env?.NEXT_PUBLIC_LOGIN_URL;
+
 export async function GET(req: NextRequest) {
-  const base = process.env.NEXT_PUBLIC_LOGIN_URL ?? req.url;
+  const base = REDIRECT_URL ?? req.url;
   const url = new URL("/login", base);
 
   const response = NextResponse.redirect(url);
