@@ -220,6 +220,7 @@ export interface Code {
 }
 
 export interface CodeStat extends Code {
+  id: number;
   pid: string;
   category: string;
   total_count: number;
