@@ -25,8 +25,8 @@
       "rule": {
         "concept": {
           "concept_id": 8532,
-          "name": "FEMALE",
-          "description": "FEMALE",
+          "name": "Female",
+          "description": "Female",
           "category": "Gender",
           "children": [],
           "match_score": 100,
@@ -35,8 +35,18 @@
           "alternatives": []
         }
       },
-      "valid": true,
-      "ageConstraint": [18, null]
+      "valid": true
+    },
+    {
+      "id": "1c3084cd-3c95-4abf-993e-a6c414c56fa1",
+      "combinator": "and",
+      "exclude": false,
+      "valid": true
+    },
+    {
+      "id": "fd7359ea-4e8a-435b-bc63-739a474b07f7",
+      "value": [18, null],
+      "valid": true
     }
   ],
   "constraints": {
