@@ -44,13 +44,11 @@ const RuleTimeframeSelector = ({
     setQueryBuilderJson,
     setSelectedGuidance,
     selected,
-    setSelected,
   } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
     setSelectedGuidance: qb.setSelectedGuidance,
     selected: qb.selected,
-    setSelected: qb.setSelected,
   }));
 
   const { constrainForBunnyV1 } = useFeatures();
@@ -98,8 +96,8 @@ const RuleTimeframeSelector = ({
   if (constrainForBunnyV1) {
     return (
       <HoverableDiv
+        stopPropagation={!readOnly}
         hoverKey={`rule-timeframe-${rule.id}`}
-        onClick={() => setSelected(rule.id)}
         flex={flex}
       >
         {title && <CustomH1>{title}</CustomH1>}
@@ -147,8 +145,8 @@ const RuleTimeframeSelector = ({
 
   return (
     <HoverableDiv
+      stopPropagation={!readOnly}
       hoverKey={`rule-timeframe-${rule.id}`}
-      onClick={() => setSelected(rule.id)}
       flex={flex}
     >
       {title && <CustomH1>{title}</CustomH1>}

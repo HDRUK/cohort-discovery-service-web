@@ -47,7 +47,9 @@ const SearchConcepts = ({
 }: SearchConceptsProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const searchForConcepts = useUserStore((s) => s.searchForConcepts);
-  const includeSynthetic = useQueryBuilder((s) => s.includeSynthetic);
+  const includeSynthetic = useQueryBuilder(
+    (qb) => qb.hasSelectedSyntheticDatasets,
+  );
 
   const [perPage, setPerPage] = useState(DEFAULT_CODES_PER_PAGE);
   const [activeResult, setActiveResult] = useState<Paginated<
@@ -85,7 +87,7 @@ const SearchConcepts = ({
 
   const onSearch = useCallback(
     async (value: string, force = false, customPerPage?: number) => {
-      const trimmedValue = value.trim();
+      const trimmedValue = value.trim().length < 3 ? "" : value.trim();
       const isNewSearch = trimmedValue !== lastQueryRef.current;
 
       if (!force && !isNewSearch) return;
@@ -195,6 +197,7 @@ const SearchConcepts = ({
             </Box>
           ) : null
         }
+        debounceMs={400}
       />
       <FormGroup sx={{ mt: 2 }}>
         {multiple && visibleOptions.length > 0 && (

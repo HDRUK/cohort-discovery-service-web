@@ -45,7 +45,6 @@ import RuleAgeSelector from "@/components/RuleAgeSelector";
 import {
   isAgeFilter,
   isEmptyRule,
-  isRuleGroup,
   isRuleLeaf,
   removeById,
 } from "@/utils/rules";
@@ -104,23 +103,15 @@ const RuleWrapper = ({
   }
 
   const {
-    select,
-    deselect,
     isSelected,
-    selected,
-    setSelected,
-    toggleSelected,
+    selectNodeWithModifiers,
     getNodeName,
     setNodeName,
     queryBuilderJson,
     setQueryBuilderJson,
   } = useQueryBuilder((qb) => ({
-    select: qb.select,
-    deselect: qb.deselect,
-    selected: qb.selected,
-    setSelected: qb.setSelected,
     isSelected: !!qb.selected[id],
-    toggleSelected: qb.toggleSelected,
+    selectNodeWithModifiers: qb.selectNodeWithModifiers,
     getNodeName: qb.getNodeName,
     setNodeName: qb.setNodeName,
     queryBuilderJson: qb.queryBuilderJson,
@@ -161,43 +152,16 @@ const RuleWrapper = ({
 
   const handleOnSelect = useCallback(
     (e: React.MouseEvent) => {
-      const isShift = e.shiftKey;
       e.preventDefault();
       e.stopPropagation();
       window.getSelection()?.removeAllRanges();
 
-      if (isShift) {
-        toggleSelected(id, false);
-      } else {
-        if (Object.keys(selected).length === 1 && isSelected) {
-          toggleSelected(id, true);
-        } else {
-          setSelected(id, true, true);
-        }
-      }
-
-      const isMeta = e.metaKey;
-      if (isRuleGroup(node) && isMeta) {
-        const nextParent = !isSelected;
-        node.rules.forEach((r) => {
-          if (nextParent) {
-            select(r.id);
-          } else {
-            deselect(r.id);
-          }
-        });
-      }
+      selectNodeWithModifiers(node, {
+        shiftKey: e.shiftKey,
+        metaKey: e.metaKey,
+      });
     },
-    [
-      id,
-      toggleSelected,
-      selected,
-      setSelected,
-      isSelected,
-      node,
-      select,
-      deselect,
-    ],
+    [node, selectNodeWithModifiers],
   );
 
   const onMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {

@@ -74,7 +74,7 @@ describe("ManageCollectionStatus", () => {
     expect(screen.queryByText(/Pending/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Active/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Rejected/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Suspended/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Offline/i)).not.toBeInTheDocument();
     expect(screen.getByText("Request to make active")).toBeInTheDocument();
   });
 
@@ -84,7 +84,7 @@ describe("ManageCollectionStatus", () => {
     expect(screen.queryByText(/Pending/i)).toBeInTheDocument();
     expect(screen.queryByText(/Active/i)).toBeInTheDocument();
     expect(screen.queryByText(/Rejected/i)).toBeInTheDocument();
-    expect(screen.queryByText(/Suspended/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Offline/i)).not.toBeInTheDocument();
     expect(
       screen.queryByText("Request to make active"),
     ).not.toBeInTheDocument();
@@ -97,7 +97,7 @@ describe("ManageCollectionStatus", () => {
     expect(screen.queryByText(/Active/)).toBeInTheDocument();
     expect(screen.queryByText(/Inactive/i)).toBeInTheDocument();
     expect(screen.queryByText(/Rejected/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Suspended/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Offline/i)).not.toBeInTheDocument();
     expect(
       screen.queryByText("Request to make active"),
     ).not.toBeInTheDocument();
@@ -110,7 +110,7 @@ describe("ManageCollectionStatus", () => {
     expect(screen.queryByText(/Active/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Inactive/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Rejected/i)).toBeInTheDocument();
-    expect(screen.queryByText(/Suspended/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Offline/i)).not.toBeInTheDocument();
     expect(
       screen.queryByText("Request to make active"),
     ).not.toBeInTheDocument();
@@ -123,7 +123,7 @@ describe("ManageCollectionStatus", () => {
     expect(screen.queryByText(/Active/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Inactive/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Rejected/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Suspended/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Offline/i)).toBeInTheDocument();
     expect(
       screen.queryByText("Request to make active"),
     ).not.toBeInTheDocument();
@@ -136,7 +136,7 @@ describe("ManageCollectionStatus", () => {
     expect(screen.queryByText(/Active/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Inactive/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Rejected/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Suspended/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Offline/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Mixed/i)).toBeInTheDocument();
     expect(
       screen.queryByText("Request to make active"),

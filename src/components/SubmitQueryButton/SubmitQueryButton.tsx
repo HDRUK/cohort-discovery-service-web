@@ -39,10 +39,10 @@ const SubmitQueryButton = ({ warning = false }: { warning: boolean }) => {
           backgroundColor: theme.palette.grey[200],
         },
       })}
-      onClick={(event) => {
+      onClick={async (event) => {
         event.stopPropagation();
         event.preventDefault();
-        submit();
+        await submit();
         resetQueryBuilderJson(true);
       }}
     >

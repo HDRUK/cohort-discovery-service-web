@@ -13,7 +13,7 @@ import {
   tabSx as defaultTabSx,
   tabHeaderSx as defaultTabHeaderSx,
   tabContentSx as defaultTabContentSx,
-  tabListSx,
+  tabListSx as defaultTabListSx,
   tabPanelSx,
 } from "./TabsShell.styles";
 import { useRouter } from "next/navigation";
@@ -36,6 +36,7 @@ type TabsShellProps = {
   sx?: BoxProps["sx"];
   tabSx?: BoxProps["sx"];
   tabHeaderSx?: BoxProps["sx"];
+  tabListSx?: BoxProps["sx"];
   tabContentSx?: BoxProps["sx"];
   forceValue?: boolean;
   endIcon?: React.ReactNode;
@@ -47,6 +48,7 @@ export default function TabsShell({
   sx,
   tabSx,
   tabHeaderSx,
+  tabListSx,
   tabContentSx,
   forceValue = false,
   endIcon = null,
@@ -76,7 +78,7 @@ export default function TabsShell({
           <TabList
             onChange={handleChange}
             allowScrollButtonsMobile
-            sx={tabListSx}
+            sx={mergeSx(defaultTabListSx, tabListSx)}
             variant="scrollable"
             scrollButtons="auto"
           >
@@ -89,9 +91,15 @@ export default function TabsShell({
                     key={id || label}
                     label={
                       <Typography
-                        sx={{ p: 0, m: 0 }}
                         variant="body1"
                         component="span"
+                        sx={mergeSx(
+                          { p: 0, m: 0 },
+                          internalValue.toString() === (id ?? i).toString()
+                            ? { fontWeight: "600" }
+                            : {},
+                          disabled ? { display: "none" } : {},
+                        )}
                       >
                         {label}
                         {onCloseHref && (

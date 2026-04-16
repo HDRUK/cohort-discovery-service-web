@@ -3,11 +3,10 @@
 import { Collection, CombinedUser, Custodian, Workgroup } from "@/types/api";
 import { FeatureFlag } from "@/types/features";
 import { redirect } from "next/navigation";
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import useUserStore from "@/hooks/useUserStore";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import { WorkgroupNames } from "@/config/workgroups";
 
 interface ProtectedPageProps {
   user: CombinedUser;
@@ -26,35 +25,32 @@ const ProtectedPage = ({
   workgroups,
   children,
 }: ProtectedPageProps) => {
+  const currentUser = useUserStore((s) => s.user);
   const setUser = useUserStore((s) => s.setUser);
+  const isOnlyInDefaultWorkgroup = useUserStore(
+    (s) => s.isOnlyInDefaultWorkgroup,
+  );
   const setCollections = useUserStore((s) => s.setUserCollections);
   const setCustodians = useUserStore((s) => s.setCustodians);
   const setWorkgroups = useUserStore((s) => s.setWorkgroups);
   const setFlags = useFeatureFlagsStore((s) => s.setFlags);
-  const setIncludeSynthetic = useQueryBuilder((qb) => qb.setIncludeSynthetic);
+
   const initialiseSelectedDatasets = useQueryBuilder(
     (qb) => qb.initialiseSelectedDatasets,
   );
+  const checkSelectedDatasets = useQueryBuilder(
+    (qb) => qb.checkSelectedDatasets,
+  );
+
+  const hasRendered = useRef(false);
 
   useEffect(() => {
-    const workgroups = user.workgroups;
-    const defaultWg = workgroups?.find(
-      (wg) => wg.name === WorkgroupNames.DEFAULT,
-    );
-    const isOnlyInDefaultWg =
-      workgroups?.length === 1 && defaultWg !== undefined;
-
     setUser(user);
-
-    if (isOnlyInDefaultWg) {
-      setIncludeSynthetic(true);
-    }
-  }, [user, setUser, setIncludeSynthetic]);
+  }, [user, setUser]);
 
   useEffect(() => {
     setCollections(collections);
-    initialiseSelectedDatasets(collections);
-  }, [collections, setCollections, initialiseSelectedDatasets]);
+  }, [collections, setCollections]);
 
   useEffect(() => {
     setCustodians(custodians);
@@ -67,6 +63,18 @@ const ProtectedPage = ({
   useEffect(() => {
     setFlags(featureFlags);
   }, [featureFlags, setFlags]);
+
+  useEffect(() => {
+    if (!hasRendered.current) {
+      initialiseSelectedDatasets(collections, isOnlyInDefaultWorkgroup);
+    }
+    hasRendered.current = true;
+  }, [collections, initialiseSelectedDatasets, isOnlyInDefaultWorkgroup]);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    checkSelectedDatasets(collections);
+  }, [collections, currentUser, checkSelectedDatasets]);
 
   if (!user) redirect("/403?reason=no-token");
 

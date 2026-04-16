@@ -32,6 +32,7 @@ import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import { intersection } from "lodash";
 import { getAllowedDatasetIds } from "@/utils/collections";
 import { getDomainPhrase } from "@/utils/omop";
+import { useUserDataStore } from "@/hooks/userDataStore";
 
 export enum NodeKind {
   RULE = "RULE",
@@ -41,6 +42,11 @@ export enum NodeKind {
 }
 
 type NodeFactory = () => RuleNodeType | RuleNodeType[];
+
+type SelectNodeWithModifiersArgs = {
+  shiftKey?: boolean;
+  metaKey?: boolean;
+};
 
 export const Creators: Record<string, NodeFactory> = {
   [NodeKind.RULE]: createRule,
@@ -94,6 +100,10 @@ export interface QueryBuilderStoreState {
   select: (id: UniqueIdentifier | UniqueIdentifier[]) => void;
   deselect: (id: UniqueIdentifier | UniqueIdentifier[]) => void;
   toggleSelected: (id: UniqueIdentifier, reset?: boolean) => void;
+  selectNodeWithModifiers: (
+    node: RuleNodeType,
+    modifiers?: SelectNodeWithModifiersArgs,
+  ) => void;
 
   createNewNode: (kind: NodeKind) => void;
   createNewRule: () => void;
@@ -107,17 +117,20 @@ export interface QueryBuilderStoreState {
     options?: { commit?: boolean; ignoreSynthetic?: boolean },
   ) => Promise<RuleGroupType>;
 
-  includeSynthetic: boolean;
-  setIncludeSynthetic: (includeSynthetic: boolean) => void;
-
   previouslySelectedDatasets: string[];
   setPreviouslySelectedDatasets: (pids: string[]) => void;
 
   selectedDatasets: string[];
   setSelectedDatasets: (pids: string[]) => void;
 
-  initialiseSelectedDatasets: (collections: Collection[]) => void;
-  toggleIncludeSynthetic: (collections: Collection[]) => void;
+  hasSelectedSyntheticDatasets: boolean;
+
+  initialiseSelectedDatasets: (
+    collections: Collection[],
+    includeSynthetic: boolean,
+  ) => void;
+
+  checkSelectedDatasets: (collections: Collection[]) => void;
 
   openSelectDatasetsPanel: boolean;
   setOpenSelectDatasetsPanel: (value: boolean) => void;
@@ -258,6 +271,37 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
       };
     });
   },
+  selectNodeWithModifiers: (
+    node: RuleNodeType,
+    { shiftKey = false, metaKey = false }: SelectNodeWithModifiersArgs = {},
+  ) => {
+    const { selected, toggleSelected, setSelected, select, deselect } = get();
+
+    const id = node.id;
+    const isSelected = !!selected[id];
+
+    if (shiftKey) {
+      toggleSelected(id, false);
+    } else {
+      if (Object.keys(selected).length === 1 && isSelected) {
+        toggleSelected(id, true);
+      } else {
+        setSelected(id, true, true);
+      }
+    }
+
+    if (isRuleGroup(node) && metaKey) {
+      const nextParent = !isSelected;
+
+      node.rules.forEach((r) => {
+        if (nextParent) {
+          select(r.id);
+        } else {
+          deselect(r.id);
+        }
+      });
+    }
+  },
 
   createNewNode: (kind: NodeKind) => {
     const fn = Creators[kind];
@@ -359,38 +403,28 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     );
   },
 
-  includeSynthetic: false,
-  setIncludeSynthetic: (includeSynthetic) => {
-    set((state) => ({
-      ...state,
-      includeSynthetic,
-    }));
-  },
-
-  initialiseSelectedDatasets: (collections) => {
-    const { selectedDatasets, includeSynthetic } = get();
+  initialiseSelectedDatasets: (collections, includeSynthetic) => {
+    const { selectedDatasets } = get();
     const allowedIds = getAllowedDatasetIds(collections, includeSynthetic);
 
-    set({
-      selectedDatasets:
-        selectedDatasets.length === 0
-          ? allowedIds
-          : intersection(allowedIds, selectedDatasets),
-    });
+    const nextSelectedDatasets =
+      selectedDatasets.length === 0
+        ? allowedIds
+        : intersection(allowedIds, selectedDatasets);
+
+    get().setSelectedDatasets(nextSelectedDatasets);
   },
 
-  toggleIncludeSynthetic: (collections) => {
-    const { includeSynthetic, selectedDatasets } = get();
-    const nextIncludeSynthetic = !includeSynthetic;
+  checkSelectedDatasets: (collections) => {
+    const { selectedDatasets } = get();
+    const allowedIds = getAllowedDatasetIds(collections, true);
 
-    const allowedIds = getAllowedDatasetIds(collections, nextIncludeSynthetic);
+    const nextSelectedDatasets =
+      selectedDatasets.length === 0
+        ? allowedIds
+        : intersection(allowedIds, selectedDatasets);
 
-    set({
-      includeSynthetic: nextIncludeSynthetic,
-      selectedDatasets: nextIncludeSynthetic
-        ? Array.from(new Set([...selectedDatasets, ...allowedIds]))
-        : selectedDatasets.filter((id) => allowedIds.includes(id)),
-    });
+    get().setSelectedDatasets(nextSelectedDatasets);
   },
 
   previouslySelectedDatasets: [],
@@ -402,13 +436,27 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     }));
   },
 
+  hasSelectedSyntheticDatasets: false,
   selectedDatasets: [],
   setSelectedDatasets: (pids) => {
+    const { userCollections } = useUserDataStore.getState();
+
+    const syntheticPids = userCollections
+      .filter((collection) => collection.is_synthetic)
+      .map((collection) => collection.pid);
+
+    const selectedSet = new Set(pids);
+
+    const hasSelectedSyntheticDatasets = syntheticPids.some((pid) =>
+      selectedSet.has(pid),
+    );
+
     set((state) => ({
       ...state,
-
       selectedDatasets: pids,
+      hasSelectedSyntheticDatasets,
     }));
+
     get().setErrors(get().queryBuilderJson, pids);
   },
 
@@ -491,7 +539,7 @@ export const useQueryBuilderStore = create<QueryBuilderStoreState>()(
     storage: createJSONStorage(() => localStorage),
     partialize: (state) => ({
       selectedDatasets: state.selectedDatasets,
-      includeSynthetic: state.includeSynthetic,
+      hasSelectedSyntheticDatasets: state.hasSelectedSyntheticDatasets,
     }),
   }),
 );

@@ -153,6 +153,7 @@ export interface Collection extends WithTimestamps {
   url: UrlString | null;
   type: QueryContext;
   last_active: string | null;
+  last_successful_query?: Task | null;
   demographics?: Distribution[];
   latest_successful_demographic_result_file?: ResultFile | null;
   latest_successful_concept_result_file?: ResultFile | null;
@@ -180,6 +181,7 @@ export interface CollectionWithHosts extends Collection {
 }
 
 export interface CollectionDetails extends WithTimestamps {
+  pid: string;
   nconcepts: number;
   demographics: Distribution[];
   result_files: ResultFile[];

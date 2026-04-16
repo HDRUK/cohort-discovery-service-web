@@ -1,0 +1,9 @@
+# Test infrastructure – not needed in the image
+cypress/
+cypress.config.ts
+
+# Dev/local artefacts
+.next/
+node_modules/
+*.log
+.env*.local

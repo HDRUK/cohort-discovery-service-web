@@ -22,12 +22,14 @@ export interface CustodianTableProps extends TableProps {
   tableTitle?: string;
   tableSubTitle?: string;
   handleDelete?: (ids: string[]) => Promise<void>;
+  emptyMessageOverride?: string;
 }
 
 const CustodianTable = ({
   tableTitle,
   tableSubTitle,
   handleDelete,
+  emptyMessageOverride,
   ...rest
 }: CustodianTableProps) => {
   const { getSearchParam } = useSearchParams("network_filter");
@@ -92,7 +94,10 @@ const CustodianTable = ({
   return (
     <Table
       key="admin-custodian-table"
-      emptyMessage="Custodians will appear here when they are added to this network"
+      emptyMessage={
+        emptyMessageOverride ??
+        "Custodians will appear here when they are added to this network"
+      }
       table={table}
       leftAction={{
         titleProps: {

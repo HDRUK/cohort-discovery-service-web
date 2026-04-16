@@ -1,0 +1,28 @@
+/**
+ * Query results tab – view counts per dataset after a query run.
+ * Uses a direct URL to simulate a result tab already being open.
+ */
+import { routes } from "@/config/routes";
+import { QUERY_PID } from "../../support/test-constants";
+
+describe("Query Results", () => {
+  beforeEach(() => {
+    cy.login();
+  });
+
+  it("renders a result tab for a known query pid", () => {
+    cy.visit(routes.dashboardQueryResult(QUERY_PID, [QUERY_PID]));
+    cy.contains("Internal Server Error").should("not.exist");
+  });
+
+  it("shows dataset count results from the API", () => {
+    cy.visit(routes.dashboardQueryResult(QUERY_PID, [QUERY_PID]));
+    // The mock returns counts of 723 and 421
+    cy.contains(/723|421/, { timeout: 10000 }).should("be.visible");
+  });
+
+  it("shows collection names alongside their counts", () => {
+    cy.visit(routes.dashboardQueryResult(QUERY_PID, [QUERY_PID]));
+    cy.contains("Test Dataset Alpha", { timeout: 10000 }).should("be.visible");
+  });
+});

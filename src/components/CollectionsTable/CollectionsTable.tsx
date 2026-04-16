@@ -21,6 +21,7 @@ import useUserStore from "@/hooks/useUserStore";
 import { useConfirm } from "@/hooks/useConfirm";
 import { useNotify } from "@/providers/NotifyProvider";
 import {
+  getTagCollection,
   getTagCustodianCollection,
   TAG_COLLECTIONS_ADMIN,
 } from "@/config/tags";
@@ -29,12 +30,16 @@ import { TableProps } from "../Table/Table";
 import SyntheticChip from "../SyntheticChip";
 import CollectionDetails from "./CollectionDetails";
 import usePrefetchCollectionDetails from "./usePrefetchCollectionDetails";
+import useFeatures from "@/hooks/useFeatures";
+import { useQueryClient } from "@tanstack/react-query";
+import { revalidateAction } from "@/actions/revalidate";
 
 export interface CollectionsTableProps extends TableProps {
   showPid?: boolean;
   tableTitle?: string;
   tableSubTitle?: string;
   deleteOverride?: (ids: string[]) => Promise<void>;
+  emptyMessageOverride?: string;
 }
 
 const CollectionsTable = ({
@@ -42,8 +47,10 @@ const CollectionsTable = ({
   tableTitle,
   tableSubTitle,
   deleteOverride,
+  emptyMessageOverride,
   ...rest
 }: CollectionsTableProps) => {
+  const { adminMoreCollectionDetails } = useFeatures();
   const { searchParams, getSearchParam } = useSearchParams("collection_filter");
   const filter_name = getSearchParam() || "all";
 
@@ -68,6 +75,8 @@ const CollectionsTable = ({
     () => trueKeys(rowSelection ?? {}),
     [rowSelection],
   );
+
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const newSelectedCollections = selectedCollectionIds
@@ -126,9 +135,20 @@ const CollectionsTable = ({
       },
       {
         id: "last_active",
-        header: "Last Query",
+        header: "Last Ping",
         accessorFn: (row) =>
           row.last_active ? getDatetime(row.last_active) : "—",
+        size: 50,
+        minSize: 50,
+        maxSize: 50,
+      },
+      {
+        id: "last_query",
+        header: "Last Query",
+        accessorFn: (row) =>
+          row.last_successful_query?.completed_at
+            ? getDatetime(row.last_successful_query.created_at)
+            : "—",
         size: 50,
         minSize: 50,
         maxSize: 50,
@@ -186,7 +206,9 @@ const CollectionsTable = ({
     [showPid],
   );
 
-  usePrefetchCollectionDetails({ pids: collections.data.map((c) => c.pid) });
+  usePrefetchCollectionDetails({
+    pids: adminMoreCollectionDetails ? collections.data.map((c) => c.pid) : [],
+  });
 
   const table = usePaginatedTable<Collection>({
     columns,
@@ -197,20 +219,21 @@ const CollectionsTable = ({
     ...(setRowSelection && { onRowSelectionChange: setRowSelection }),
     ...(rowSelection && { state: { rowSelection } }),
     getRowId: (row) => String(row?.id),
-    ...(isAdmin && {
-      manualExpanding: true,
-      renderDetailPanel: ({ row }) => (
-        <Paper
-          elevation={1}
-          sx={{
-            p: 2,
-            bgcolor: "grey.100",
-          }}
-        >
-          <CollectionDetails pid={row.original.pid} />
-        </Paper>
-      ),
-    }),
+    ...(isAdmin &&
+      adminMoreCollectionDetails && {
+        manualExpanding: true,
+        renderDetailPanel: ({ row }) => (
+          <Paper
+            elevation={1}
+            sx={{
+              p: 2,
+              bgcolor: "grey.100",
+            }}
+          >
+            <CollectionDetails pid={row.original.pid} />
+          </Paper>
+        ),
+      }),
   });
 
   const handleDeleteClick = async () => {
@@ -274,7 +297,10 @@ const CollectionsTable = ({
   return (
     <Table
       key="custodian-collection-table"
-      emptyMessage={"Collections will appear here when they are created"}
+      emptyMessage={
+        emptyMessageOverride ??
+        "Collections will appear here when they are created"
+      }
       table={table}
       leftAction={{
         titleProps: {
@@ -292,6 +318,18 @@ const CollectionsTable = ({
               ? getTagCustodianCollection(currentCustodian.pid)
               : TAG_COLLECTIONS_ADMIN,
           label: "Refresh Collections",
+          onRefreshed: async () => {
+            if (!adminMoreCollectionDetails) return;
+            const tags = collections.data.map((c) => getTagCollection(c.pid));
+            tags.map((t) => revalidateAction(t));
+            await queryClient.invalidateQueries({
+              queryKey: ["collectionDetails"],
+            });
+            await queryClient.refetchQueries({
+              queryKey: ["collectionDetails"],
+              type: "all",
+            });
+          },
         },
       }}
       {...rest}

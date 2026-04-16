@@ -1,0 +1,19 @@
+{
+  "message": "success",
+  "data": [
+    {
+      "id": 1,
+      "name": "Test Workgroup Alpha",
+      "external_name": "External Workgroup Alpha",
+      "users": [],
+      "collections": []
+    },
+    {
+      "id": 2,
+      "name": "Test Workgroup Beta",
+      "external_name": "External Workgroup Beta",
+      "users": [],
+      "collections": []
+    }
+  ]
+}

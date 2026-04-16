@@ -38,6 +38,7 @@ const NetworksMiddlePanel = () => {
                 } removed from network ${selectedNetwork.name}`,
               );
             }}
+            emptyMessageOverride="Network custodians will appear here when created or assigned"
             boxSxProps={{ minHeight: 300 }}
           />
         </Stack>
@@ -45,7 +46,7 @@ const NetworksMiddlePanel = () => {
       {!selectedNetwork && (
         <Box sx={{ mx: "auto", my: "auto" }}>
           <Typography variant="h5">
-            Collections will appear here when a network is selected
+            Network collections will appear here when a network is selected
           </Typography>
         </Box>
       )}

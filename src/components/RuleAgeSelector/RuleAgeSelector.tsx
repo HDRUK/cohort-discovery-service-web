@@ -88,13 +88,11 @@ const RuleAgeSelector = ({
     setQueryBuilderJson,
     setSelectedGuidance,
     selected,
-    setSelected,
   } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
     setSelectedGuidance: qb.setSelectedGuidance,
     selected: qb.selected,
-    setSelected: qb.setSelected,
   }));
 
   const flags = useFeatures();
@@ -199,12 +197,11 @@ const RuleAgeSelector = ({
   if (constrainForBunnyV1 && !overrideConstrainForBunny) {
     return (
       <HoverableDiv
+        stopPropagation={!readOnly}
         hoverKey={`rule-age-${rule.id}`}
-        onClick={() => setSelected(rule.id)}
         flex={flex}
       >
         {title && <CustomH1>{title}</CustomH1>}
-
         <SingleBoundSelector<number>
           constraint={ageConstraint}
           constraintOperator={
@@ -289,12 +286,11 @@ const RuleAgeSelector = ({
 
   return (
     <HoverableDiv
+      stopPropagation={!readOnly}
       hoverKey={`rule-age-${rule.id}`}
-      onClick={() => setSelected(rule.id)}
       flex={flex}
     >
       {title && <CustomH1>{title}</CustomH1>}
-
       <Stack
         direction="row"
         spacing={2}

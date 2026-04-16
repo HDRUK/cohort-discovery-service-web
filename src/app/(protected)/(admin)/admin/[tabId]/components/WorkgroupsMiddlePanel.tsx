@@ -49,6 +49,7 @@ const WorkgroupsMiddlePanel = () => {
                 } removed from workgroup ${selectedWorkgroup.name}`,
               );
             }}
+            emptyMessageOverride="Workgroup collections will appear here when created or assigned"
             boxSxProps={{ minHeight: 300 }}
           />
           {manageWorkgroupsInternal && (
@@ -76,7 +77,7 @@ const WorkgroupsMiddlePanel = () => {
       {!selectedWorkgroup && (
         <Box sx={{ mx: "auto", my: "auto" }}>
           <Typography variant="h5">
-            Collections will appear here when a workgroup is selected
+            Workgroup collections will appear here when a workgroup is selected
           </Typography>
         </Box>
       )}
