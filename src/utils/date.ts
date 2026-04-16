@@ -13,4 +13,13 @@ const getDatetime = (
   return parsed.format(format);
 };
 
-export { getDatetime };
+const getTimestamp = (date?: string): number => {
+  if (!date) return 0;
+
+  const parsed = dayjs(date);
+  if (!parsed.isValid()) return 0;
+
+  return parsed.valueOf();
+};
+
+export { getDatetime, getTimestamp };
