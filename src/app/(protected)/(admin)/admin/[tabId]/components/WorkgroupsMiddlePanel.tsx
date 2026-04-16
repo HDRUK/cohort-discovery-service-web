@@ -2,7 +2,7 @@
 
 import CollectionsTable from "@/components/CollectionsTable";
 import { Box, Stack, Typography } from "@mui/material";
-import { capitaliseFirstLetter } from "@/utils/string";
+import { formatWorkgroupName } from "@/utils/workgroups";
 import useAdminStore from "@/hooks/useAdminStore";
 import { useNotify } from "@/providers/NotifyProvider";
 import UserTable from "@/components/UserTable";
@@ -35,9 +35,7 @@ const WorkgroupsMiddlePanel = () => {
         <Stack gap={2}>
           <Box>
             <CollectionsTable
-              tableTitle={`${capitaliseFirstLetter(
-                selectedWorkgroup?.name.toLowerCase(),
-              )} Workgroup`}
+              tableTitle={`${formatWorkgroupName(selectedWorkgroup?.name)} Workgroup`}
               tableSubTitle="Collections"
               deleteOverride={async (ids: string[]) => {
                 await removeCollectionsFromWorkgroup({
@@ -57,9 +55,7 @@ const WorkgroupsMiddlePanel = () => {
           {manageWorkgroupsInternal && (
             <Box>
               <UserTable
-                tableTitle={`${capitaliseFirstLetter(
-                  selectedWorkgroup?.name.toLowerCase(),
-                )} Workgroup`}
+                tableTitle={`${formatWorkgroupName(selectedWorkgroup?.name)} Workgroup`}
                 tableSubTitle="Users"
                 handleDelete={async (ids: string[]) => {
                   await removeUsersFromWorkgroup({
