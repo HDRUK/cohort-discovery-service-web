@@ -21,11 +21,8 @@ import { useIsAdminSection } from "@/contexts/AdminSectionContext";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import { DEFAULT_PER_PAGE, DEFAULT_USERS_PER_PAGE } from "@/config/defaults";
 import { TAG_ADMIN_USERS } from "@/config/tags";
-<<<<<<< HEAD
 import { getTimestamp } from "@/utils/date";
 import { getLastName } from "@/utils/user";
-=======
->>>>>>> origin
 
 const PAGE_PARAM = "users_page";
 const PER_PAGE_PARAM = "users_per_page";
