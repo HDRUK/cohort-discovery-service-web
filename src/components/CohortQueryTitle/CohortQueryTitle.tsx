@@ -17,6 +17,7 @@ const CohortQueryTitle = () => {
       title={"Query Name"}
       subTitle={
         <EditableText
+          singleClick
           defaultValue={queryName || ""}
           onCommit={(name) => {
             if (name.length >= 3) {
