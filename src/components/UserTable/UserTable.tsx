@@ -21,8 +21,11 @@ import { useIsAdminSection } from "@/contexts/AdminSectionContext";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import { DEFAULT_PER_PAGE, DEFAULT_USERS_PER_PAGE } from "@/config/defaults";
 import { TAG_ADMIN_USERS } from "@/config/tags";
+<<<<<<< HEAD
 import { getTimestamp } from "@/utils/date";
 import { getLastName } from "@/utils/user";
+=======
+>>>>>>> origin
 
 const PAGE_PARAM = "users_page";
 const PER_PAGE_PARAM = "users_per_page";
@@ -172,12 +175,19 @@ const UserTable = ({
     perPageDefault: DEFAULT_USERS_PER_PAGE,
     pageParam: PAGE_PARAM,
     perPageParam: PER_PAGE_PARAM,
+<<<<<<< HEAD
     enableSorting: true,
     manualPagination: true,
     manualSorting: true,
     onSortingChange: setSorting,
     onRowSelectionChange: setRowSelection,
     state: { rowSelection, sorting },
+=======
+    enableSorting: false,
+    manualPagination: true,
+    ...(setRowSelection && { onRowSelectionChange: setRowSelection }),
+    ...(rowSelection && { state: { rowSelection } }),
+>>>>>>> origin
     getRowId: (row) => String(row?.id),
   });
 
