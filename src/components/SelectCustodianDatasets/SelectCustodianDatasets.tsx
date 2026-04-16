@@ -115,25 +115,27 @@ const SelectCustodianDatasets = ({
         }}
       >
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, p: 2 }}>
-          {custodianCollections.items.map((c) => (
-            <Chip
-              size="small"
-              variant="outlined"
-              sx={{ borderRadius: 10, py: 2 }}
-              key={c.id}
-              label={
-                <FormControlLabel
-                  control={
-                    <SquareCheckbox
-                      onChange={() => handleSelectDataset(c.pid)}
-                      checked={selectedDatasets.includes(c.pid)}
-                    />
-                  }
-                  label={<CollectionName c={c} />}
-                />
-              }
-            />
-          ))}
+          {custodianCollections.items
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((c) => (
+              <Chip
+                size="small"
+                variant="outlined"
+                sx={{ borderRadius: 10, py: 2 }}
+                key={c.id}
+                label={
+                  <FormControlLabel
+                    control={
+                      <SquareCheckbox
+                        onChange={() => handleSelectDataset(c.pid)}
+                        checked={selectedDatasets.includes(c.pid)}
+                      />
+                    }
+                    label={<CollectionName c={c} />}
+                  />
+                }
+              />
+            ))}
         </Box>
       </AccordionDetails>
     </Accordion>

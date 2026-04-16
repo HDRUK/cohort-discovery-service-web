@@ -82,12 +82,14 @@ const SelectNetworkDatasets = ({
           borderColor: "lightgrey",
         }}
       >
-        {networkCollections.custodians.map((gc) => (
-          <SelectCustodianDatasets
-            key={gc.custodian.id}
-            custodianCollections={gc}
-          />
-        ))}
+        {networkCollections.custodians
+          .sort((a, b) => a.custodian.name.localeCompare(b.custodian.name))
+          .map((gc) => (
+            <SelectCustodianDatasets
+              key={gc.custodian.id}
+              custodianCollections={gc}
+            />
+          ))}
       </AccordionDetails>
     </Accordion>
   );
