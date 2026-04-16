@@ -116,7 +116,11 @@ const SelectCustodianDatasets = ({
       >
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, p: 2 }}>
           {custodianCollections.items
-            .sort((a, b) => a.name.localeCompare(b.name))
+            .sort((a, b) => {
+              if (!a.is_synthetic && b.is_synthetic) return -1;
+              if (a.is_synthetic && !b.is_synthetic) return 1;
+              return a.name.localeCompare(b.name);
+            })
             .map((c) => (
               <Chip
                 size="small"
