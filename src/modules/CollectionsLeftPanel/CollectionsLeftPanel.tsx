@@ -65,7 +65,8 @@ const CollectionsLeftPanel = () => {
                 label: "All Collections",
                 onClick: () =>
                   onSelectCollectionsStatus(CollectionFilterStatus.ALL),
-                selected: searchParam === CollectionFilterStatus.ALL,
+                selected:
+                  searchParam === CollectionFilterStatus.ALL || !searchParam,
               },
               {
                 label: "Draft Collections",
