@@ -172,19 +172,12 @@ const UserTable = ({
     perPageDefault: DEFAULT_USERS_PER_PAGE,
     pageParam: PAGE_PARAM,
     perPageParam: PER_PAGE_PARAM,
-<<<<<<< HEAD
     enableSorting: true,
     manualPagination: true,
     manualSorting: true,
     onSortingChange: setSorting,
     onRowSelectionChange: setRowSelection,
     state: { rowSelection, sorting },
-=======
-    enableSorting: false,
-    manualPagination: true,
-    ...(setRowSelection && { onRowSelectionChange: setRowSelection }),
-    ...(rowSelection && { state: { rowSelection } }),
->>>>>>> origin
     getRowId: (row) => String(row?.id),
   });
 
