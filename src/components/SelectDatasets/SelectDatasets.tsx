@@ -205,12 +205,16 @@ const SelectDatasets = () => {
               borderColor: "lightgrey",
             }}
           >
-            {networkGroups.map((ng) => (
-              <SelectNetworkDatasets
-                key={ng.network?.id ?? "no-network"}
-                networkCollections={ng}
-              />
-            ))}
+            {networkGroups
+              .sort((a, b) =>
+                (a.network?.name ?? "").localeCompare(b.network?.name ?? ""),
+              )
+              .map((ng) => (
+                <SelectNetworkDatasets
+                  key={ng.network?.id ?? "no-network"}
+                  networkCollections={ng}
+                />
+              ))}
           </AccordionDetails>
         </Accordion>
 
