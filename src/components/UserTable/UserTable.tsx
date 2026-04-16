@@ -3,6 +3,7 @@
 import { User } from "@/types/api";
 import {
   MRT_RowSelectionState,
+  MRT_SortingState,
   type MRT_ColumnDef,
 } from "material-react-table";
 import { useMemo, useState } from "react";
@@ -20,6 +21,8 @@ import { useIsAdminSection } from "@/contexts/AdminSectionContext";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import { DEFAULT_PER_PAGE, DEFAULT_USERS_PER_PAGE } from "@/config/defaults";
 import { TAG_ADMIN_USERS } from "@/config/tags";
+import { getTimestamp } from "@/utils/date";
+import { getLastName } from "@/utils/user";
 
 const PAGE_PARAM = "users_page";
 const PER_PAGE_PARAM = "users_per_page";
@@ -45,6 +48,7 @@ const UserTable = ({
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
 
   const users = useAdminStore((s) => s.users);
+  const [sorting, setSorting] = useState<MRT_SortingState>([]);
 
   const selectedUserIds = useMemo(
     () => trueKeys(rowSelection ?? {}),
@@ -57,13 +61,51 @@ const UserTable = ({
   // may have been better for this to be BE logic
   // - we dont have a workgroup user filter on the BE now, so this will do
   // - noted for future improvement
-  const hydratedUsers = useMemo(
-    () =>
-      users.filter((u) =>
-        u.workgroups?.find((wg) => String(wg.id) === String(wg_filter)),
-      ),
-    [users, wg_filter],
-  );
+  const hydratedUsers = useMemo(() => {
+    const filtered = users.filter((u) =>
+      u.workgroups?.find((wg) => String(wg.id) === String(wg_filter)),
+    );
+
+    if (!sorting.length) {
+      return [...filtered].sort(
+        (a, b) => getTimestamp(b.created_at) - getTimestamp(a.created_at),
+      );
+    }
+
+    const { id, desc } = sorting[0];
+
+    return [...filtered].sort((a, b) => {
+      //note - as above - this is manual sorting as we load all users for admin purposes
+      // - we will likely switch the BE to do this
+      // - we have a small number of users and only we (admins) see this for now
+      switch (id) {
+        case "name": {
+          const aLast = getLastName(a.name);
+          const bLast = getLastName(b.name);
+
+          return desc ? bLast.localeCompare(aLast) : aLast.localeCompare(bLast);
+        }
+
+        case "email":
+          return desc
+            ? (b.email ?? "").localeCompare(a.email ?? "")
+            : (a.email ?? "").localeCompare(b.email ?? "");
+
+        case "created_at":
+          return desc
+            ? getTimestamp(b.created_at) - getTimestamp(a.created_at)
+            : getTimestamp(a.created_at) - getTimestamp(b.created_at);
+
+        case "updated_at":
+          return desc
+            ? getTimestamp(b.updated_at) - getTimestamp(a.updated_at)
+            : getTimestamp(a.updated_at) - getTimestamp(b.updated_at);
+
+        default:
+          return 0;
+      }
+    });
+  }, [users, wg_filter, sorting]);
 
   const page = Math.max(1, parseInt(searchParams.get(PAGE_PARAM) || "1", 10));
 
@@ -104,17 +146,19 @@ const UserTable = ({
       {
         id: "created_at",
         header: "Created",
-        accessorFn: (row) =>
-          row.created_at
-            ? dayjs(row.created_at).format("MMM D, YYYY HH:mm")
+        accessorFn: (row) => row.created_at ?? null,
+        Cell: ({ cell }) =>
+          cell.getValue<string | null>()
+            ? dayjs(cell.getValue<string>()).format("MMM D, YYYY HH:mm")
             : "—",
       },
       {
         id: "updated_at",
         header: "Last Updated",
-        accessorFn: (row) =>
-          row.updated_at
-            ? dayjs(row.updated_at).format("MMM D, YYYY HH:mm")
+        accessorFn: (row) => row.updated_at ?? null,
+        Cell: ({ cell }) =>
+          cell.getValue<string | null>()
+            ? dayjs(cell.getValue<string>()).format("MMM D, YYYY HH:mm")
             : "—",
       },
     ],
@@ -128,10 +172,12 @@ const UserTable = ({
     perPageDefault: DEFAULT_USERS_PER_PAGE,
     pageParam: PAGE_PARAM,
     perPageParam: PER_PAGE_PARAM,
-    enableSorting: false,
+    enableSorting: true,
     manualPagination: true,
-    ...(setRowSelection && { onRowSelectionChange: setRowSelection }),
-    ...(rowSelection && { state: { rowSelection } }),
+    manualSorting: true,
+    onSortingChange: setSorting,
+    onRowSelectionChange: setRowSelection,
+    state: { rowSelection, sorting },
     getRowId: (row) => String(row?.id),
   });
 
