@@ -137,7 +137,9 @@ const CollectionsTable = ({
         id: "last_ping",
         header: "Last Ping",
         accessorFn: (row) =>
-          row.last_active ? getDatetime(row.last_ping?.a?.updated_at) : "—",
+          row.last_ping?.a?.updated_at
+            ? getDatetime(row.last_ping.a.updated_at)
+            : "—",
         size: 50,
         minSize: 50,
         maxSize: 50,
