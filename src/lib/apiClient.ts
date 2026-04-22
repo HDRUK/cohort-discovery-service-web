@@ -1,11 +1,9 @@
 "use server";
 
-import { ACCESS_TOKEN_NAME } from "@/config/internals";
-import { cookies } from "next/headers";
 import { ApiError } from "./https";
 import { notFound, redirect } from "next/navigation";
 import { DEFAULT_REVALIDATE } from "@/config/defaults";
-import { getTokenUser } from "./auth";
+import { getAccessToken, getTokenUser } from "./auth";
 import { CacheOptions } from "@/types/api";
 import { paramsToString } from "@/utils/string";
 
@@ -87,8 +85,7 @@ async function request<TResponse, TBody = undefined>(
     errorMode = ErrorMode.THROW,
   } = options;
 
-  const cookieStore = await cookies();
-  const token = cookieStore.get(ACCESS_TOKEN_NAME)?.value;
+  const token = await getAccessToken();
 
   try {
     const response = await fetch(fullUrl, {

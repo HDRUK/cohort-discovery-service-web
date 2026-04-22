@@ -6,15 +6,25 @@ import { useState } from "react";
 import StandaloneLoginForm from "./StandaloneLoginForm";
 import Circles from "./Circles";
 import { useApplicationMode } from "@/providers/ApplicationModeProvider";
+import { signIn } from "next-auth/react";
 
 const REDIRECT_URL = process?.env?.NEXT_PUBLIC_LOGIN_URL;
 
-const LoginClient = () => {
+interface LoginClientProps {
+  oidcEnabled: boolean;
+}
+
+const LoginClient = ({ oidcEnabled }: LoginClientProps) => {
   const { isStandalone } = useApplicationMode();
   const router = useRouter();
   const [showForm, setShowForm] = useState(false);
 
-  const onClick = () => {
+  const onClick = async () => {
+    if (oidcEnabled) {
+      await signIn("oidc", { callbackUrl: "/" });
+      return;
+    }
+
     if (!isStandalone) {
       router.push(REDIRECT_URL || "");
       return;

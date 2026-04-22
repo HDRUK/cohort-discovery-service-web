@@ -1,8 +1,7 @@
-import { cookies, headers } from "next/headers";
+import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { ACCESS_TOKEN_NAME } from "@/config/internals";
-import { TokenUser, CombinedUser } from "@/types/api";
+import { CombinedUser } from "@/types/api";
 import { RoleName } from "@/types/roles";
 import ProtectedPage from "./components/ProtectedPage";
 import getMe from "@/actions/getMe";
@@ -12,6 +11,7 @@ import { isStandalone } from "@/utils/modes";
 import { ErrorMode } from "@/lib/apiClient";
 import getWorkgroups from "@/actions/workgroup/getWorkgroups";
 import getUserCollections from "@/actions/collection/getUserCollections";
+import { getAccessToken, getTokenUser } from "@/lib/auth";
 
 const applicationMode = process.env.APPLICATION_MODE;
 
@@ -20,12 +20,10 @@ export default async function ProtectedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(ACCESS_TOKEN_NAME)?.value;
+  const token = await getAccessToken();
   const decoded = token ? (jwt.decode(token) as JwtPayload) : undefined;
-  if (!token || !decoded) {
+  if (!token) {
     if (isStandalone(applicationMode)) {
-      // No token — render the client SignIn component so users can sign in.
       redirect("/login");
     } else {
       redirect("/403?reason=no-token");
@@ -35,11 +33,11 @@ export default async function ProtectedLayout({
   const h = await headers();
   const requestNow = h?.get("x-request-now");
   const now = requestNow !== null ? Math.floor(Number(requestNow)) : 0;
-  if (decoded.exp && now >= Math.floor(decoded.exp)) {
+  if (decoded?.exp && now >= Math.floor(decoded.exp)) {
     redirect("/api/auth/logout");
   }
 
-  const user = decoded.user as TokenUser;
+  const { user } = await getTokenUser();
 
   const { data: me, error } = await getMe({ errorMode: ErrorMode.RESULT });
   const { code: errorCode } = error ?? {};
