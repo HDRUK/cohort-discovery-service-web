@@ -6,7 +6,6 @@ import { useState } from "react";
 import StandaloneLoginForm from "./StandaloneLoginForm";
 import Circles from "./Circles";
 import { useApplicationMode } from "@/providers/ApplicationModeProvider";
-import { signIn } from "next-auth/react";
 
 const REDIRECT_URL = process?.env?.NEXT_PUBLIC_LOGIN_URL;
 
@@ -21,7 +20,7 @@ const LoginClient = ({ oidcEnabled }: LoginClientProps) => {
 
   const onClick = async () => {
     if (oidcEnabled) {
-      await signIn("oidc", { callbackUrl: "/" });
+      router.push("/auth/signin/oidc?callbackUrl=%2F");
       return;
     }
 
@@ -66,7 +65,7 @@ const LoginClient = ({ oidcEnabled }: LoginClientProps) => {
           minWidth: 150,
         }}
       >
-        Sign in
+        {oidcEnabled ? "Login with LS-AAI" : "Sign in"}
       </Button>
     </Circles>
   );
