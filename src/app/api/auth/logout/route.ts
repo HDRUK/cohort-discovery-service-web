@@ -5,7 +5,7 @@ const REDIRECT_URL = process?.env?.NEXT_PUBLIC_LOGIN_URL;
 
 export async function GET(req: NextRequest) {
   const origin = req.nextUrl.origin;
-  const signOutUrl = new URL("/api/auth/signout", origin);
+  const signOutUrl = new URL("/auth/signout", origin);
   signOutUrl.searchParams.set("callbackUrl", `${origin}/login`);
 
   const base = REDIRECT_URL ?? req.url;
