@@ -6,7 +6,6 @@ const REDIRECT_URL = process?.env?.NEXT_PUBLIC_LOGIN_URL;
 export async function GET(req: NextRequest) {
   const base = REDIRECT_URL ?? req.url;
   const url = new URL("/login", base);
-
   const response = NextResponse.redirect(url);
   // Delete via multiple strategies to handle domain-scoped cookies set by
   // different origins (e.g., Cypress test runner sets domain: "localhost").
