@@ -1,3 +1,20 @@
+## [1.4.0](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.3.0...v1.4.0) (2026-04-27)
+
+### ✨ Features
+
+* **DP-0000:** e2e tests - initial commit ([d8bb277](https://github.com/HDRUK/cohort-discovery-service-web/commit/d8bb2773064920331adb2b34e1183ca10a58b239)), closes [DP-0000](DP-0000)
+* **DP-328:** make use of exisitng urls (#321) ([0044564](https://github.com/HDRUK/cohort-discovery-service-web/commit/0044564c4a3931f263c9f316c6b9d0cc982bc3ae)), closes [DP-328](DP-328)
+* **DP-731:** Enable User Table sorting (#349) ([c99b7b2](https://github.com/HDRUK/cohort-discovery-service-web/commit/c99b7b27d6aca7af53fe63a1d07d3982c3b40567)), closes [DP-731](DP-731)
+
+### 🐛 Bug Fixes
+
+* **DP-682:** Rule selection bug (#323) ([2ab360e](https://github.com/HDRUK/cohort-discovery-service-web/commit/2ab360ef2b4bd757d555ce3db5a977fea5481b2e)), closes [DP-682](DP-682) [propagation](gation)
+* **DP-690:** User workgroup management accidentally disabled (#327) ([a7a5bb8](https://github.com/HDRUK/cohort-discovery-service-web/commit/a7a5bb83ad36e2ba1ac5e6b3d15d6f4273e09473)), closes [DP-690](DP-690) [propagation](gation)
+* **DP-708:** Use feature flag for collection details (#341) ([623166b](https://github.com/HDRUK/cohort-discovery-service-web/commit/623166b39b9c727a7d059654a12019f5a697d7dc)), closes [DP-708](DP-708)
+* **DP-715:** Report correct last activity (#343) ([a73fa7d](https://github.com/HDRUK/cohort-discovery-service-web/commit/a73fa7d693ce0cafeefb32ec55b71380b2e08bee)), closes [DP-715](DP-715)
+* **DP-724:** Update USER table [admin only] (#345) ([08c7241](https://github.com/HDRUK/cohort-discovery-service-web/commit/08c724119231ef263ce4089e3edc8228dfcca999)), closes [DP-724](DP-724)
+* **DP-738:** Last ping now showing (#350) ([98ae3b1](https://github.com/HDRUK/cohort-discovery-service-web/commit/98ae3b1845464a3bbc635981093fd41ac9035098)), closes [DP-738](DP-738)
+
 ## [1.3.0](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.2.0...v1.3.0) (2026-03-04)
 
 ### ✨ Features
