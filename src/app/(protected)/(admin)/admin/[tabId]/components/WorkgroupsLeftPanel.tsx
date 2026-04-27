@@ -25,7 +25,9 @@ const WorkgroupsLeftPanel = () => {
 
   useEffect(() => {
     const workgroup = workgroups.find((w) => String(w.id) === workgroupId);
-    setSelectedWorkgroup(workgroup ?? null);
+    setSelectedWorkgroup(
+      workgroup ?? (workgroups.length >= 1 ? workgroups[0] : null),
+    );
   }, [workgroups, workgroupId, setSelectedWorkgroup]);
 
   const onSelectWorkgroup = useCallback(

@@ -167,6 +167,7 @@ const QueriesTable = ({
     enableRowSelection: true,
     manualExpanding: true,
     enableExpanding: true,
+    getRowId: (row) => row?.pid,
     onRowSelectionChange: (updaterOrValue) => {
       setRowSelection((prev) => {
         const nextSelection =

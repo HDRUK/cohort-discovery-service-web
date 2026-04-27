@@ -145,6 +145,12 @@ export interface CollectionMetadata {
   threshold: string;
 }
 
+export interface Activity extends WithTimestamps {
+  id: number;
+  collection_id: number;
+  task_type: string;
+}
+
 export interface Collection extends WithTimestamps {
   id: number;
   name: string;
@@ -152,6 +158,10 @@ export interface Collection extends WithTimestamps {
   pid: string;
   url: UrlString | null;
   type: QueryContext;
+  last_ping?: {
+    a: Activity | null;
+    b: Activity | null;
+  };
   last_active: string | null;
   last_successful_query?: Task | null;
   demographics?: Distribution[];
@@ -210,6 +220,7 @@ export interface Code {
 }
 
 export interface CodeStat extends Code {
+  id: number;
   pid: string;
   category: string;
   total_count: number;

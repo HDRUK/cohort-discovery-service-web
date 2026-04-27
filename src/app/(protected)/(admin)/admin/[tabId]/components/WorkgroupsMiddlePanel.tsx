@@ -2,7 +2,7 @@
 
 import CollectionsTable from "@/components/CollectionsTable";
 import { Box, Stack, Typography } from "@mui/material";
-import { capitaliseFirstLetter } from "@/utils/string";
+import { formatWorkgroupName } from "@/utils/workgroups";
 import useAdminStore from "@/hooks/useAdminStore";
 import { useNotify } from "@/providers/NotifyProvider";
 import UserTable from "@/components/UserTable";
@@ -33,44 +33,44 @@ const WorkgroupsMiddlePanel = () => {
     >
       {!!selectedWorkgroup && (
         <Stack gap={2}>
-          <CollectionsTable
-            tableTitle={`${capitaliseFirstLetter(
-              selectedWorkgroup?.name.toLowerCase(),
-            )} Workgroup`}
-            tableSubTitle="Collections"
-            deleteOverride={async (ids: string[]) => {
-              await removeCollectionsFromWorkgroup({
-                ids: ids.map((id) => +id),
-                workgroup_id: selectedWorkgroup.id,
-              });
-              notify.success(
-                `${ids.length} Collection${
-                  ids.length > 1 ? "s" : ""
-                } removed from workgroup ${selectedWorkgroup.name}`,
-              );
-            }}
-            emptyMessageOverride="Workgroup collections will appear here when created or assigned"
-            boxSxProps={{ minHeight: 300 }}
-          />
-          {manageWorkgroupsInternal && (
-            <UserTable
-              tableTitle={`${capitaliseFirstLetter(
-                selectedWorkgroup?.name.toLowerCase(),
-              )} Workgroup`}
-              tableSubTitle="Users"
-              handleDelete={async (ids: string[]) => {
-                await removeUsersFromWorkgroup({
+          <Box>
+            <CollectionsTable
+              tableTitle={`${formatWorkgroupName(selectedWorkgroup?.name)} Workgroup`}
+              tableSubTitle="Collections"
+              deleteOverride={async (ids: string[]) => {
+                await removeCollectionsFromWorkgroup({
                   ids: ids.map((id) => +id),
                   workgroup_id: selectedWorkgroup.id,
                 });
                 notify.success(
-                  `${ids.length} Users${
+                  `${ids.length} Collection${
                     ids.length > 1 ? "s" : ""
                   } removed from workgroup ${selectedWorkgroup.name}`,
                 );
               }}
+              emptyMessageOverride="Workgroup collections will appear here when created or assigned"
               boxSxProps={{ minHeight: 300 }}
             />
+          </Box>
+          {manageWorkgroupsInternal && (
+            <Box>
+              <UserTable
+                tableTitle={`${formatWorkgroupName(selectedWorkgroup?.name)} Workgroup`}
+                tableSubTitle="Users"
+                handleDelete={async (ids: string[]) => {
+                  await removeUsersFromWorkgroup({
+                    ids: ids.map((id) => +id),
+                    workgroup_id: selectedWorkgroup.id,
+                  });
+                  notify.success(
+                    `${ids.length} Users${
+                      ids.length > 1 ? "s" : ""
+                    } removed from workgroup ${selectedWorkgroup.name}`,
+                  );
+                }}
+                boxSxProps={{ minHeight: 300 }}
+              />
+            </Box>
           )}
         </Stack>
       )}

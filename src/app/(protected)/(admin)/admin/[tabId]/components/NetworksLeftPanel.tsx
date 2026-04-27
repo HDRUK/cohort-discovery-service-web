@@ -24,7 +24,7 @@ const NetworksLeftPanel = () => {
 
   useEffect(() => {
     const network = networks.find((w) => String(w.id) === workgroupId);
-    setSelectedNetwork(network ?? null);
+    setSelectedNetwork(network ?? (networks.length >= 1 ? networks[0] : null));
   }, [networks, workgroupId, setSelectedNetwork]);
 
   const onSelectNetwork = useCallback(

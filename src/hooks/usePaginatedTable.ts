@@ -21,15 +21,20 @@ interface UsePaginatedTableOptions<TData extends MRT_RowData> extends Partial<
   perPageDefault: number;
   expandFirstRow?: boolean;
   getRowId?: (row: TData) => string;
+
+  pageParam?: string;
+  perPageParam?: string;
 }
 
-export function usePaginatedTable<TData extends { pid: string }>({
+export function usePaginatedTable<TData extends { id: number; pid?: string }>({
   columns,
   data,
   rowCount,
   perPageDefault,
   expandFirstRow = false,
-  getRowId = (row) => row?.pid,
+  getRowId = (row) => row?.pid ?? String(row?.id || ""),
+  pageParam = "page",
+  perPageParam = "per_page",
   state,
   initialState,
   ...rest
@@ -37,11 +42,11 @@ export function usePaginatedTable<TData extends { pid: string }>({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const page = parseInt(searchParams.get("page") || "1");
+  const page = parseInt(searchParams.get(pageParam) || "1");
   const resolvedPerPageDefault =
     perPageDefault > 0 ? perPageDefault : DEFAULT_PER_PAGE;
   const perPage = parseInt(
-    searchParams.get("per_page") || resolvedPerPageDefault.toString(),
+    searchParams.get(perPageParam) || resolvedPerPageDefault.toString(),
     10,
   );
   const rowsPerPageOptions = buildRowsPerPageOptions(resolvedPerPageDefault);
@@ -70,17 +75,24 @@ export function usePaginatedTable<TData extends { pid: string }>({
     const currentPerPage = pagination.pageSize.toString();
 
     if (
-      currentPage === searchParams.get("page") &&
-      currentPerPage === searchParams.get("per_page")
+      currentPage === searchParams.get(pageParam) &&
+      currentPerPage === searchParams.get(perPageParam)
     )
       return;
 
     const params = new URLSearchParams(searchParams.toString());
-    params.set("page", currentPage);
-    params.set("per_page", currentPerPage);
+    params.set(pageParam, currentPage);
+    params.set(perPageParam, currentPerPage);
 
     router.replace(`?${params.toString()}`);
-  }, [pagination.pageIndex, pagination.pageSize, router, searchParams]);
+  }, [
+    pagination.pageIndex,
+    pagination.pageSize,
+    router,
+    searchParams,
+    pageParam,
+    perPageParam,
+  ]);
 
   const firstRowId = getRowId(data?.[0]);
   const expanded = useMemo(() => {

@@ -19,6 +19,7 @@ export type EditableTextProps = {
   trim?: boolean;
   placeholder?: string;
   showIcon?: boolean;
+  singleClick?: boolean;
 };
 
 type FormValues = {
@@ -35,6 +36,7 @@ const EditableText = ({
   trim = true,
   placeholder,
   showIcon = false,
+  singleClick = false,
 }: EditableTextProps) => {
   const [editing, setEditing] = useState(!defaultValue);
   const [hovering, setHovering] = useState(false);
@@ -83,6 +85,11 @@ const EditableText = ({
   };
 
   const handleClick = (e: React.MouseEvent<HTMLSpanElement>) => {
+    if (singleClick) {
+      startEditing(e);
+      return;
+    }
+
     if (clickTimeoutRef.current !== null) {
       window.clearTimeout(clickTimeoutRef.current);
       clickTimeoutRef.current = null;

@@ -53,6 +53,7 @@ describe("CollectionsTable", () => {
     const columns = [
       "Name",
       "Last Ping",
+      "Last Query",
       "Last Distribution Demographics",
       "Last Distribution Concepts",
       "Status",

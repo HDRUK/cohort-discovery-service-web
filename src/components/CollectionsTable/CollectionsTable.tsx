@@ -134,10 +134,23 @@ const CollectionsTable = ({
         maxSize: 200,
       },
       {
-        id: "last_active",
+        id: "last_ping",
         header: "Last Ping",
         accessorFn: (row) =>
-          row.last_active ? getDatetime(row.last_active) : "—",
+          row.last_ping?.a?.updated_at
+            ? getDatetime(row.last_ping.a.updated_at)
+            : "—",
+        size: 50,
+        minSize: 50,
+        maxSize: 50,
+      },
+      {
+        id: "last_query",
+        header: "Last Query",
+        accessorFn: (row) =>
+          row.last_successful_query?.completed_at
+            ? getDatetime(row.last_successful_query.created_at)
+            : "—",
         size: 50,
         minSize: 50,
         maxSize: 50,
