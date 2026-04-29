@@ -80,7 +80,7 @@ const QueryResultsTable = ({
       Cell: ({ cell }) => {
         const { name, url } = cell.getValue<{ name: string; url: string }>();
         if (!url) {
-          return <span>{name}</span>;
+          return <span> {name} </span>;
         }
         return (
           <Link
@@ -114,7 +114,6 @@ const QueryResultsTable = ({
       Cell: ({ cell, row: { original } }) => {
         const result = cell.getValue<Result>();
         const { count, status } = result || {};
-
         if (status === "error" || original.failed_at) {
           return <ErrorIcon message={original.latest_run?.error_message} />;
         }
@@ -167,6 +166,10 @@ const QueryResultsTable = ({
   const { getSearchParam } = useSearchParams("sort");
   const currentSortDirection = getSearchParam()?.split(":")[1];
 
+  // ideally this would be done on the BE
+  // - made a note of this for the BE
+  // - we should definitely do this on the BE
+  //   if the results are to be paginated in the future
   const sortedTasks = useMemo(() => {
     if (!currentSortDirection) {
       return [...tasks].sort(
