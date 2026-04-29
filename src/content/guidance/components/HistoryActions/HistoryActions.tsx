@@ -44,12 +44,11 @@ const HistoryActions = ({
   const router = useRouter();
   const notify = useNotify();
   const {
-    deleteQueries,
     setQueryBuilderJson,
     setSelectedDatasets,
     setQueryName,
+    deleteQueries,
   } = useQueryBuilder((qb) => ({
-    resetQueryBuilderJson: qb.resetQueryBuilderJson,
     setSelectedDatasets: qb.setSelectedDatasets,
     setQueryBuilderJson: qb.setQueryBuilderJson,
     setQueryName: qb.setQueryName,
