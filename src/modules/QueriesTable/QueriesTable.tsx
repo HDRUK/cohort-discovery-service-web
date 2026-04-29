@@ -241,23 +241,21 @@ const QueriesTable = ({
 
   const selectedRows = useMemo(() => trueKeys(rowSelection), [rowSelection]);
 
-  const tableContent = (
-    <Table
-      table={table}
-      leftAction={{
-        searchProps: {
-          placeholder: "Search your historical queries...",
-        },
-      }}
-      rightAction={{
-        sortProps: { field: "name" },
-      }}
-    />
-  );
-
   return (
     <TwoPaneSwimLaneLayout
-      left={tableContent}
+      left={
+        <Table
+          table={table}
+          leftAction={{
+            searchProps: {
+              placeholder: "Search your historical queries...",
+            },
+          }}
+          rightAction={{
+            sortProps: { field: "name" },
+          }}
+        />
+      }
       right={<QueryHistoryGuidance selectedIds={selectedRows} />}
     />
   );
