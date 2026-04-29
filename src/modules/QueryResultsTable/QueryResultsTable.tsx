@@ -185,7 +185,16 @@ const QueryResultsTable = ({
   });
 
   return (
-    <Box sx={{ p: 2, gap: 2, display: "flex", flexDirection: "column" }}>
+    <Box
+      sx={{
+        p: 2,
+        gap: 2,
+        display: "flex",
+        flexDirection: "column",
+        flex: 1,
+        minHeight: 0,
+      }}
+    >
       <Table
         table={table}
         {...(showGuidance
