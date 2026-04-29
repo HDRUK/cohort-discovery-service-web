@@ -15,6 +15,7 @@ const CohortQueryPreview = () => {
 
   return (
     <Stack
+      gap={2}
       sx={{ p: 1 }}
       direction="row"
       justifyContent="space-between"
