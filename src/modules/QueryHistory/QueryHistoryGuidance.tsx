@@ -7,6 +7,7 @@ import { CustomH1 } from "@/components/GuidanceHeaders";
 
 interface QueryHistoryGuidanceProps {
   selectedIds?: string[];
+  onClear?: () => void;
   resultsView?: boolean;
   currentResult?: string;
 }
@@ -14,6 +15,7 @@ interface QueryHistoryGuidanceProps {
 const QueryHistoryGuidance = ({
   selectedIds = [],
   resultsView = false,
+  onClear,
   currentResult = "",
 }: QueryHistoryGuidanceProps) => {
   const empty = !selectedIds.length && currentResult === "";
@@ -34,12 +36,17 @@ const QueryHistoryGuidance = ({
         !resultsView &&
         "Select a result row to edit a previous query, rerun it to generate updated results, download the output, or remove it from your list. You can also select multiple to bulk delete or download."}
       {!empty && !resultsView && (
-        <HistoryActions multiple={multiple} selectedIds={selectedIds} />
+        <HistoryActions
+          multiple={multiple}
+          selectedIds={selectedIds}
+          onClear={onClear}
+        />
       )}
       {!empty && resultsView && currentResult && (
         <HistoryActions
           multiple={multiple}
           selectedIds={[currentResult]}
+          onClear={onClear}
           resultsView
         />
       )}
