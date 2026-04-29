@@ -2,7 +2,7 @@
 
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Query, Paginated } from "@/types/api";
 import {
   MRT_ExpandedState,
@@ -249,6 +249,14 @@ const QueriesTable = ({
 
   const selectedRows = useMemo(() => trueKeys(rowSelection), [rowSelection]);
 
+  const onClear = useCallback(async () => {
+    setShowSkeletonRefresh(true);
+    setRowSelection({});
+    setExpanded({});
+    await qc.refetchQueries({ queryKey, type: "active" });
+    setShowSkeletonRefresh(false);
+  }, [setShowSkeletonRefresh, setRowSelection, setExpanded, qc, queryKey]);
+
   if (isLoading || showSkeletonRefresh) return <QueriesTableSkeleton />;
 
   return (
@@ -267,16 +275,7 @@ const QueriesTable = ({
         />
       }
       right={
-        <QueryHistoryGuidance
-          selectedIds={selectedRows}
-          onClear={async () => {
-            setShowSkeletonRefresh(true);
-            setRowSelection({});
-            setExpanded({});
-            await qc.refetchQueries({ queryKey, type: "active" });
-            setShowSkeletonRefresh(false);
-          }}
-        />
+        <QueryHistoryGuidance selectedIds={selectedRows} onClear={onClear} />
       }
     />
   );
