@@ -17,7 +17,7 @@ const deleteQueries = async (pids: string[]): Promise<ApiResponse<Query>> => {
       keys: pids,
     },
   );
-  revalidateUserAction(TAG_QUERIES);
+  await revalidateUserAction(TAG_QUERIES);
   return res;
 };
 
