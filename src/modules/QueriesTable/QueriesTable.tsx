@@ -30,6 +30,7 @@ import useSearchParams from "@/hooks/useSearchParams";
 import { buildQueryHistoryParams } from "@/utils/params";
 import { useDefaults } from "@/providers/DefaultProvider";
 import TwoPaneSwimLaneLayout from "../TwoPaneSwimLaneLayout";
+import QueriesTableSkeleton from "./QueriesTableSkeleton";
 
 interface QueriesTableProps {
   initialData: Paginated<Query>;
@@ -51,7 +52,14 @@ const QueriesTable = ({
     () => [`queries-${searchParams.toString()}`],
     [searchParams],
   );
-  const { data: queries } = useQuery<Paginated<Query>>({
+
+  //refactor candidate
+  // - when do we show a loader (or not)
+  // - when cache is invalidated, when we do a client side refresh?
+  // - the SSR/CSR mix here has made this a little complex
+  const [showSkeletonRefresh, setShowSkeletonRefresh] = useState(false);
+
+  const { data: queries, isLoading } = useQuery<Paginated<Query>>({
     queryKey,
     queryFn: async () => {
       const searchParamsObject = buildQueryHistoryParams({
@@ -241,6 +249,8 @@ const QueriesTable = ({
 
   const selectedRows = useMemo(() => trueKeys(rowSelection), [rowSelection]);
 
+  if (isLoading || showSkeletonRefresh) return <QueriesTableSkeleton />;
+
   return (
     <TwoPaneSwimLaneLayout
       left={
@@ -256,7 +266,18 @@ const QueriesTable = ({
           }}
         />
       }
-      right={<QueryHistoryGuidance selectedIds={selectedRows} />}
+      right={
+        <QueryHistoryGuidance
+          selectedIds={selectedRows}
+          onClear={async () => {
+            setShowSkeletonRefresh(true);
+            setRowSelection({});
+            setExpanded({});
+            await qc.refetchQueries({ queryKey, type: "active" });
+            setShowSkeletonRefresh(false);
+          }}
+        />
+      }
     />
   );
 };

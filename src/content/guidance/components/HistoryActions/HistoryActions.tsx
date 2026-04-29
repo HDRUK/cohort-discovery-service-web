@@ -15,8 +15,6 @@ import {
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-
-import deleteQueries from "@/actions/query/deleteQueries";
 import getQuery from "@/actions/query/getQuery";
 import rerunQuery from "@/actions/query/rerunQuery";
 import DeleteMenuItem from "@/components/DeleteMenuItem";
@@ -34,22 +32,29 @@ import useQueryBuilder from "@/hooks/useQueryBuilder";
 const HistoryActions = ({
   multiple = false,
   selectedIds,
+  onClear,
   resultsView = false,
 }: {
   multiple: boolean;
   selectedIds: string[];
+  onClear?: () => void;
   resultsView?: boolean;
 }) => {
   const { searchParams } = useSearchParams();
   const router = useRouter();
   const notify = useNotify();
-  const { setQueryBuilderJson, setSelectedDatasets, setQueryName } =
-    useQueryBuilder((qb) => ({
-      resetQueryBuilderJson: qb.resetQueryBuilderJson,
-      setSelectedDatasets: qb.setSelectedDatasets,
-      setQueryBuilderJson: qb.setQueryBuilderJson,
-      setQueryName: qb.setQueryName,
-    }));
+  const {
+    deleteQueries,
+    setQueryBuilderJson,
+    setSelectedDatasets,
+    setQueryName,
+  } = useQueryBuilder((qb) => ({
+    resetQueryBuilderJson: qb.resetQueryBuilderJson,
+    setSelectedDatasets: qb.setSelectedDatasets,
+    setQueryBuilderJson: qb.setQueryBuilderJson,
+    setQueryName: qb.setQueryName,
+    deleteQueries: qb.deleteQueries,
+  }));
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [confirmationValue, setConfirmationValue] = useState(false);
@@ -64,6 +69,8 @@ const HistoryActions = ({
 
   const handleDelete = async () => {
     await deleteQueries(selectedIds);
+    onClear?.();
+
     const openQueries = (searchParams.get("open_queries") || "")
       .split(/,|%2C/)
       .filter((q) => q && !selectedIds.includes(q));

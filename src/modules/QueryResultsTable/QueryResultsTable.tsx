@@ -7,7 +7,7 @@ import ErrorIcon from "@/components/ErrorIcon";
 import LaunchIcon from "@mui/icons-material/Launch";
 import { useEffect, useMemo } from "react";
 import { useTable } from "../../hooks/useTable";
-import { formatNumber, trueKeys } from "@/utils/numbers";
+import { formatNumber } from "@/utils/numbers";
 import useSearchParams from "@/hooks/useSearchParams";
 import { DEFAULT_STATUS_LABELS } from "@/config/defaults";
 import Table from "../../components/Table";
@@ -185,10 +185,6 @@ const QueryResultsTable = ({
     ...useTableProps,
   });
 
-  const { rowSelection = {} } = table.getState();
-
-  const selectedRows = useMemo(() => trueKeys(rowSelection), [rowSelection]);
-
   const tableContent = <Table table={table} {...tableProps} />;
 
   return (
@@ -197,11 +193,7 @@ const QueryResultsTable = ({
         <TwoPaneSwimLaneLayout
           left={tableContent}
           right={
-            <QueryHistoryGuidance
-              selectedIds={selectedRows}
-              resultsView
-              currentResult={initialData.pid}
-            />
+            <QueryHistoryGuidance resultsView currentResult={initialData.pid} />
           }
         />
       ) : (

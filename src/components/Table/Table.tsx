@@ -96,7 +96,6 @@ const Table = <TData extends MRT_RowData>({
               <ControlledSearchBox {...searchProps} />
             )}
           </Grid>
-
           <Grid size={"auto"}>
             {rightAction && (
               <Box
@@ -136,7 +135,6 @@ const Table = <TData extends MRT_RowData>({
           </Grid>
         </Grid>
       )}
-
       {details && (
         <Box sx={{ pb: 1 }}>
           <Divider /> {details}
