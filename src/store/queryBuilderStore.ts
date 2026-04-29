@@ -33,9 +33,6 @@ import { intersection } from "lodash";
 import { getAllowedDatasetIds } from "@/utils/collections";
 import { getDomainPhrase } from "@/utils/omop";
 import { useUserDataStore } from "@/hooks/userDataStore";
-import deleteQueries from "@/actions/query/deleteQueries";
-import { TAG_QUERIES } from "@/config/tags";
-import { revalidateUserAction } from "@/actions/revalidate";
 
 export enum NodeKind {
   RULE = "RULE",
@@ -148,8 +145,6 @@ export interface QueryBuilderStoreState {
 
   selectedGuidance: Record<string, boolean>;
   setSelectedGuidance: (id: string, value: boolean) => void;
-
-  deleteQueries: (ids: string[]) => Promise<void>;
 }
 
 const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
@@ -536,11 +531,6 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
       ...state,
       selectedGuidance: { [id]: value },
     })),
-
-  deleteQueries: async (ids: string[]) => {
-    await deleteQueries(ids);
-    revalidateUserAction(TAG_QUERIES);
-  },
 });
 
 export const useQueryBuilderStore = create<QueryBuilderStoreState>()(

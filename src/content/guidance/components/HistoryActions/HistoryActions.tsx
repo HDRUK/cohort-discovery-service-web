@@ -28,6 +28,7 @@ import useSearchParams from "@/hooks/useSearchParams";
 import { useNotify } from "@/providers/NotifyProvider";
 import { useRouter } from "next/navigation";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
+import deleteQueries from "@/actions/query/deleteQueries";
 
 const HistoryActions = ({
   multiple = false,
@@ -43,17 +44,12 @@ const HistoryActions = ({
   const { searchParams } = useSearchParams();
   const router = useRouter();
   const notify = useNotify();
-  const {
-    setQueryBuilderJson,
-    setSelectedDatasets,
-    setQueryName,
-    deleteQueries,
-  } = useQueryBuilder((qb) => ({
-    setSelectedDatasets: qb.setSelectedDatasets,
-    setQueryBuilderJson: qb.setQueryBuilderJson,
-    setQueryName: qb.setQueryName,
-    deleteQueries: qb.deleteQueries,
-  }));
+  const { setQueryBuilderJson, setSelectedDatasets, setQueryName } =
+    useQueryBuilder((qb) => ({
+      setSelectedDatasets: qb.setSelectedDatasets,
+      setQueryBuilderJson: qb.setQueryBuilderJson,
+      setQueryName: qb.setQueryName,
+    }));
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [confirmationValue, setConfirmationValue] = useState(false);
