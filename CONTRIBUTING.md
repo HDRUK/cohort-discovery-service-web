@@ -4,7 +4,7 @@ This document describes the expected workflow and standards for contributions to
 
 ## Prerequisites
 
-- Node.js (use a current LTS locally; CI runs Node 20)
+- Node.js (use a current LTS locally; CI runs Node 22)
 - npm
 - Access to the Cohort Discovery Service API for local testing
 

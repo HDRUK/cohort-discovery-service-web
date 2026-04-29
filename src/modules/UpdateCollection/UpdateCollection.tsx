@@ -17,6 +17,7 @@ import {
   UrlString,
 } from "@/types/api";
 import { Controller, FormProvider, useForm } from "react-hook-form";
+import { REGEX_URL_NO_WWW } from "@/config/regex";
 import FormTextField from "@/components/FormTextField";
 import CollectionConfig from "@/components/CollectionConfig";
 import { UpdateCollectionFormValues } from "@/types/forms";
@@ -496,7 +497,13 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
             disabled={!expandedRight}
             name="collection.url"
             control={control}
-            rules={{ required: "URL is required" }}
+            rules={{
+              required: "URL is required",
+              pattern: {
+                value: REGEX_URL_NO_WWW,
+                message: "Enter a valid URL (including http(s):// )",
+              },
+            }}
             render={({ field, fieldState: { error } }) => (
               <FormTextField
                 copyable
