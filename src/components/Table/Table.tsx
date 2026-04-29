@@ -128,7 +128,7 @@ const Table = <TData extends MRT_RowData>({
                 {downloadProps && (
                   <DownloadButton
                     {...restDownloadProps}
-                    onClick={() => onDownloadClick?.(selectedRows)}
+                    onClick={() => onDownloadClick?.(selectedRows)} // note that this gets ignored by DownloadButton
                   />
                 )}
               </Box>
