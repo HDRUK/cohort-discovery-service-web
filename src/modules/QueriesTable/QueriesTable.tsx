@@ -13,7 +13,7 @@ import { Grid, Paper, Typography } from "@mui/material";
 import LaunchIcon from "@mui/icons-material/Launch";
 import dayjs from "dayjs";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
-import { formatNumber } from "@/utils/numbers";
+import { formatNumber, trueKeys } from "@/utils/numbers";
 import { getDatetime } from "@/utils/date";
 import Link from "next/link";
 import { Link as MuiLink } from "@mui/material";
@@ -29,6 +29,7 @@ import { getQueryName } from "@/utils/query";
 import useSearchParams from "@/hooks/useSearchParams";
 import { buildQueryHistoryParams } from "@/utils/params";
 import { useDefaults } from "@/providers/DefaultProvider";
+import TwoPaneSwimLaneLayout from "../TwoPaneSwimLaneLayout";
 
 interface QueriesTableProps {
   initialData: Paginated<Query>;
@@ -238,7 +239,9 @@ const QueriesTable = ({
     ),
   });
 
-  return (
+  const selectedRows = useMemo(() => trueKeys(rowSelection), [rowSelection]);
+
+  const tableContent = (
     <Table
       table={table}
       leftAction={{
@@ -249,7 +252,13 @@ const QueriesTable = ({
       rightAction={{
         sortProps: { field: "name" },
       }}
-      rightPanel={QueryHistoryGuidance}
+    />
+  );
+
+  return (
+    <TwoPaneSwimLaneLayout
+      left={tableContent}
+      right={<QueryHistoryGuidance selectedIds={selectedRows} />}
     />
   );
 };
