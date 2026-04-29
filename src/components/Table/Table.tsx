@@ -18,7 +18,6 @@ import Title, { TitleProps } from "@/components/Title";
 import ControlledSearchBox, {
   ControlledSearchBoxProps,
 } from "@/modules/ControlledSearchBox";
-import TwoPaneSwimLaneLayout from "@/modules/TwoPaneSwimLaneLayout";
 
 export interface TableProps {
   emptyMessage?: string;
@@ -42,15 +41,6 @@ export interface TableProps {
   };
   details?: React.ReactNode;
   boxSxProps?: BoxProps["sx"];
-  rightPanel?: (
-    selectedIds: string[],
-    resultsView?: boolean,
-    currentResult?: string,
-  ) => React.ReactNode;
-  rightPanelProps?: {
-    resultsView?: boolean;
-    currentResult?: string;
-  };
 }
 
 type DTableProps<TData extends MRT_RowData> = MaterialReactTableProps<TData> &
@@ -62,8 +52,6 @@ const Table = <TData extends MRT_RowData>({
   rightAction,
   details,
   boxSxProps,
-  rightPanel,
-  rightPanelProps,
   ...props
 }: DTableProps<TData>) => {
   const { table } = props;
@@ -108,6 +96,7 @@ const Table = <TData extends MRT_RowData>({
               <ControlledSearchBox {...searchProps} />
             )}
           </Grid>
+
           <Grid size={"auto"}>
             {rightAction && (
               <Box
@@ -147,30 +136,25 @@ const Table = <TData extends MRT_RowData>({
           </Grid>
         </Grid>
       )}
+
       {details && (
         <Box sx={{ pb: 1 }}>
           <Divider /> {details}
         </Box>
       )}
-      <TwoPaneSwimLaneLayout
-        left={
-          emptyMessage && nrows === 0 ? (
-            <Box sx={{ mx: "auto", my: "auto" }}>
-              <Typography variant="h5">{emptyMessage}</Typography>
-            </Box>
-          ) : (
-            <MaterialReactTable {...props} />
-          )
-        }
-        right={
-          rightPanel &&
-          rightPanel(
-            selectedRows,
-            rightPanelProps?.resultsView,
-            rightPanelProps?.currentResult,
-          )
-        }
-      />
+
+      {emptyMessage && nrows === 0 ? (
+        <Box
+          sx={{
+            mx: "auto",
+            my: "auto",
+          }}
+        >
+          <Typography variant="h5">{emptyMessage}</Typography>
+        </Box>
+      ) : (
+        <MaterialReactTable {...props} />
+      )}
     </Box>
   );
 };

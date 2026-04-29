@@ -5,13 +5,18 @@ import ActionMenuSection from "@/components/ActionMenuSection";
 import { Typography } from "@mui/material";
 import { CustomH1 } from "@/components/GuidanceHeaders";
 
-const QueryHistoryGuidance = (
-  selectedIds: string[],
-  resultsView: boolean = false,
-  currentResult: string = "",
-) => {
-  const empty = !selectedIds.length && currentResult === "";
+interface QueryHistoryGuidanceProps {
+  selectedIds?: string[];
+  resultsView?: boolean;
+  currentResult?: string;
+}
 
+const QueryHistoryGuidance = ({
+  selectedIds = [],
+  resultsView = false,
+  currentResult = "",
+}: QueryHistoryGuidanceProps) => {
+  const empty = !selectedIds.length && currentResult === "";
   const multiple = !empty && selectedIds.length > 1;
 
   return (
@@ -46,7 +51,7 @@ const QueryHistoryGuidance = (
       is for counts below 10.
       <CustomH1>Statuses</CustomH1>
       <Typography>
-        <b>Pending</b> — The query is currently running and are awaiting the
+        <b>Pending</b> — The query is currently running and is awaiting the
         return of results.
       </Typography>
       <Typography>

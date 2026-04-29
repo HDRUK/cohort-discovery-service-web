@@ -2,12 +2,12 @@
 
 import { Query, Task, Result } from "../../types/api";
 import { MRT_TableOptions, type MRT_ColumnDef } from "material-react-table";
-import { Box, CircularProgress, Link } from "@mui/material";
+import { CircularProgress, Link } from "@mui/material";
 import ErrorIcon from "@/components/ErrorIcon";
 import LaunchIcon from "@mui/icons-material/Launch";
 import { useEffect, useMemo } from "react";
 import { useTable } from "../../hooks/useTable";
-import { formatNumber } from "@/utils/numbers";
+import { formatNumber, trueKeys } from "@/utils/numbers";
 import useSearchParams from "@/hooks/useSearchParams";
 import { DEFAULT_STATUS_LABELS } from "@/config/defaults";
 import Table from "../../components/Table";
@@ -16,6 +16,7 @@ import getQuery from "@/actions/query/getQuery";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import QueryHistoryGuidance from "../QueryHistory";
 import { useDefaults } from "@/providers/DefaultProvider";
+import TwoPaneSwimLaneLayout from "@/modules/TwoPaneSwimLaneLayout";
 
 interface QueryResultsTableProps {
   initialData: Query;
@@ -184,22 +185,29 @@ const QueryResultsTable = ({
     ...useTableProps,
   });
 
+  const { rowSelection = {} } = table.getState();
+
+  const selectedRows = useMemo(() => trueKeys(rowSelection), [rowSelection]);
+
+  const tableContent = <Table table={table} {...tableProps} />;
+
   return (
-    <Box sx={{ p: 2, gap: 2, display: "flex", flexDirection: "column" }}>
-      <Table
-        table={table}
-        {...(showGuidance
-          ? {
-              rightPanel: QueryHistoryGuidance,
-              rightPanelProps: {
-                resultsView: true,
-                currentResult: initialData.pid,
-              },
-            }
-          : {})}
-        {...tableProps}
-      />
-    </Box>
+    <>
+      {showGuidance ? (
+        <TwoPaneSwimLaneLayout
+          left={tableContent}
+          right={
+            <QueryHistoryGuidance
+              selectedIds={selectedRows}
+              resultsView
+              currentResult={initialData.pid}
+            />
+          }
+        />
+      ) : (
+        tableContent
+      )}
+    </>
   );
 };
 
