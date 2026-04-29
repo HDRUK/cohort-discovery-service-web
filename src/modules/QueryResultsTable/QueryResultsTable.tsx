@@ -2,7 +2,7 @@
 
 import { Query, Task, Result } from "../../types/api";
 import { MRT_TableOptions, type MRT_ColumnDef } from "material-react-table";
-import { Box, CircularProgress, Link } from "@mui/material";
+import { CircularProgress, Link } from "@mui/material";
 import ErrorIcon from "@/components/ErrorIcon";
 import LaunchIcon from "@mui/icons-material/Launch";
 import { useEffect, useMemo } from "react";
@@ -189,16 +189,7 @@ const QueryResultsTable = ({
   const tableContent = <Table table={table} {...tableProps} />;
 
   return (
-    <Box
-      sx={{
-        p: 2,
-        gap: 2,
-        display: "flex",
-        flexDirection: "column",
-        flex: 1,
-        minHeight: 0,
-      }}
-    >
+    <>
       {showGuidance ? (
         <TwoPaneSwimLaneLayout
           left={tableContent}
@@ -213,7 +204,7 @@ const QueryResultsTable = ({
       ) : (
         tableContent
       )}
-    </Box>
+    </>
   );
 };
 
