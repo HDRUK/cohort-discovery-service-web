@@ -7,7 +7,7 @@ import ErrorIcon from "@/components/ErrorIcon";
 import LaunchIcon from "@mui/icons-material/Launch";
 import { useEffect, useMemo } from "react";
 import { useTable } from "../../hooks/useTable";
-import { formatNumber } from "@/utils/numbers";
+import { formatNumber, trueKeys } from "@/utils/numbers";
 import useSearchParams from "@/hooks/useSearchParams";
 import { DEFAULT_STATUS_LABELS } from "@/config/defaults";
 import Table from "../../components/Table";
@@ -16,6 +16,7 @@ import getQuery from "@/actions/query/getQuery";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import QueryHistoryGuidance from "../QueryHistory";
 import { useDefaults } from "@/providers/DefaultProvider";
+import TwoPaneSwimLaneLayout from "@/modules/TwoPaneSwimLaneLayout";
 
 interface QueryResultsTableProps {
   initialData: Query;
@@ -79,7 +80,7 @@ const QueryResultsTable = ({
       Cell: ({ cell }) => {
         const { name, url } = cell.getValue<{ name: string; url: string }>();
         if (!url) {
-          return <span> {name} </span>;
+          return <span>{name}</span>;
         }
         return (
           <Link
@@ -113,6 +114,7 @@ const QueryResultsTable = ({
       Cell: ({ cell, row: { original } }) => {
         const result = cell.getValue<Result>();
         const { count, status } = result || {};
+
         if (status === "error" || original.failed_at) {
           return <ErrorIcon message={original.latest_run?.error_message} />;
         }
@@ -165,10 +167,6 @@ const QueryResultsTable = ({
   const { getSearchParam } = useSearchParams("sort");
   const currentSortDirection = getSearchParam()?.split(":")[1];
 
-  // ideally this would be done on the BE
-  // - made a note of this for the BE
-  // - we should definitely do this on the BE
-  //   if the results are to be paginated in the future
   const sortedTasks = useMemo(() => {
     if (!currentSortDirection) {
       return [...tasks].sort(
@@ -184,6 +182,12 @@ const QueryResultsTable = ({
     ...useTableProps,
   });
 
+  const { rowSelection = {} } = table.getState();
+
+  const selectedRows = useMemo(() => trueKeys(rowSelection), [rowSelection]);
+
+  const tableContent = <Table table={table} {...tableProps} />;
+
   return (
     <Box
       sx={{
@@ -195,19 +199,20 @@ const QueryResultsTable = ({
         minHeight: 0,
       }}
     >
-      <Table
-        table={table}
-        {...(showGuidance
-          ? {
-              rightPanel: QueryHistoryGuidance,
-              rightPanelProps: {
-                resultsView: true,
-                currentResult: initialData.pid,
-              },
-            }
-          : {})}
-        {...tableProps}
-      />
+      {showGuidance ? (
+        <TwoPaneSwimLaneLayout
+          left={tableContent}
+          right={
+            <QueryHistoryGuidance
+              selectedIds={selectedRows}
+              resultsView
+              currentResult={initialData.pid}
+            />
+          }
+        />
+      ) : (
+        tableContent
+      )}
     </Box>
   );
 };
