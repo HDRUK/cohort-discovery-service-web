@@ -56,7 +56,7 @@ export const DOMAIN_PHRASES: Record<OmopTableName, DomainPhrase> = {
   [OmopTableName.Drug]: {
     verb: "take",
     past: "was taken",
-    noun: "intake",
+    noun: "medication",
     include: "received",
     exclude: "did not receive",
   },

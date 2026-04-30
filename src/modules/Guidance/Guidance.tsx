@@ -26,7 +26,6 @@ import {
   updateById,
 } from "@/utils/rules";
 import { trueKeys } from "@/utils/numbers";
-import { capitaliseFirstLetter } from "@/utils/string";
 import {
   AgeFilterType,
   OperatorType,
@@ -43,7 +42,7 @@ import { AddChipProps } from "@/components/AddChip/AddChip";
 import AddTimeFrameButton from "@/components/AddTimeFrameButton";
 import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
 import { CustomH1, CustomH2 } from "@/components/GuidanceHeaders";
-import { getDomainPhrase } from "@/utils/omop";
+import { getDomain, getDomainPhrase } from "@/utils/omop";
 import DeleteTimeFrameButton from "@/components/DeleteTimeFrameButton";
 import DeleteMenuItem, {
   DeleteMenuItemProps,
@@ -56,7 +55,6 @@ import RuleAgeSelector from "@/components/RuleAgeSelector";
 import DeleteAgeButton from "@/components/DeleteAgeButton";
 import useFeatures from "@/hooks/useFeatures";
 import CollapsibleGuidance from "@/components/CollapsibleGuidance";
-import { mapDomainForGuidance } from "@/utils/domains";
 
 export const baseComponents = {
   a: ({ href, children }: LinkProps) => (
@@ -318,23 +316,17 @@ const Guidance = () => {
         );
       }
 
-      const category = selectedNode?.rule?.concept?.category || "";
-      const { verb, past, noun } = getDomainPhrase(category);
+      const concept = selectedNode?.rule?.concept;
+      const category = concept?.category || "";
+      const { verb, past } = getDomainPhrase(category);
+      const domain = getDomain(concept);
 
       return (
-        <ActionMenuSection
-          title={`${capitaliseFirstLetter(
-            mapDomainForGuidance(selectedNode.rule.concept?.category || ""),
-          )} Rule`}
-          fixedExpanded
-        >
+        <ActionMenuSection title={`${domain} Rule`} fixedExpanded>
           <RuleGuidance
-            category={capitaliseFirstLetter(
-              mapDomainForGuidance(selectedNode.rule.concept?.category || ""),
-            )}
+            category={domain ?? ""}
             verb={verb}
             verbPastTense={past}
-            noun={capitaliseFirstLetter(noun)}
             timeConstraint={selectedNode?.timeConstraint}
             ageConstraint={selectedNode?.ageConstraint}
             components={makeRuleComponents(selectedNode)}

@@ -1,4 +1,4 @@
-import { Code } from "@/types/api";
+import { Code, Concept } from "@/types/api";
 import { Option } from "@/types/common";
 import {
   DEFAULT_DOMAIN_PHRASE,
@@ -6,6 +6,8 @@ import {
   DomainPhrase,
   OmopTableName,
 } from "@/types/omop";
+import { capitaliseFirstLetter } from "./string";
+import { DOMAIN_MAP } from "@/config/domains";
 
 const codesToOption = (codes: Code[]): Option[] =>
   codes
@@ -25,4 +27,22 @@ const getDomainPhrase = (category?: string): DomainPhrase => {
   );
 };
 
-export { codesToOption, getDomainPhrase };
+const getDomain = (
+  concept: Concept | Concept[] | null,
+  options: { useDefault?: boolean } = {},
+): string | undefined => {
+  const { useDefault = true } = options;
+
+  const domain = Array.isArray(concept)
+    ? concept[0]?.category
+    : concept?.category;
+
+  if (!domain && !useDefault) return undefined;
+
+  const { noun } = getDomainPhrase(domain);
+  const mapped = DOMAIN_MAP[noun] ?? noun;
+
+  return capitaliseFirstLetter(mapped);
+};
+
+export { codesToOption, getDomainPhrase, getDomain };

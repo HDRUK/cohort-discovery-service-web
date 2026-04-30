@@ -31,7 +31,7 @@ import { FeatureName } from "@/types/features";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import { intersection } from "lodash";
 import { getAllowedDatasetIds } from "@/utils/collections";
-import { getDomainPhrase } from "@/utils/omop";
+import { getDomain } from "@/utils/omop";
 import { useUserDataStore } from "@/hooks/userDataStore";
 
 export enum NodeKind {
@@ -383,9 +383,9 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     if (isRuleGroup(node)) name += "Group";
     else if (isRuleLeaf(node)) {
       const c = node.rule?.concept;
-      const category = Array.isArray(c) ? c[0]?.category : c?.category;
-      const { noun } = getDomainPhrase(category);
-      name += `${category ? noun : "Blank"} rule`.trim();
+      const noun = getDomain(c, { useDefault: false }) ?? "Blank";
+
+      name += `${noun} rule`.trim();
     } else if (isOperator(node))
       name += `${node.combinator.toUpperCase()} operator`;
     else if (isAgeFilter(node)) name += "Age Rule";
