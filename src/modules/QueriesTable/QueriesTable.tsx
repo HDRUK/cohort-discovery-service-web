@@ -19,13 +19,13 @@ import Link from "next/link";
 import { Link as MuiLink } from "@mui/material";
 import { routes } from "@/config/routes";
 import Table from "@/components/Table";
-import { getTasksStatus, getTotalAllTasks } from "@/utils/tasks";
+import { getTotalAllTasks } from "@/utils/tasks";
 import QueryResultsTable from "@/modules/QueryResultsTable";
 import QueryHistoryGuidance from "@/modules/QueryHistory/QueryHistoryGuidance";
 import { queryToText } from "@/utils/queryBuilder";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import getQueries from "@/actions/query/getQueries";
-import { getQueryName } from "@/utils/query";
+import { getQueryName, getQueryStatus } from "@/utils/query";
 import useSearchParams from "@/hooks/useSearchParams";
 import { buildQueryHistoryParams } from "@/utils/params";
 import { useDefaults } from "@/providers/DefaultProvider";
@@ -135,7 +135,7 @@ const QueriesTable = ({
     },
     {
       id: "status",
-      accessorFn: (row) => getTasksStatus(row.tasks),
+      accessorFn: (row) => getQueryStatus(row),
       header: "Status",
       minSize: 50,
       maxSize: 80,

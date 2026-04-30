@@ -24,19 +24,6 @@ export const getTaskStatus = (task: Task): TaskStatus => {
   return TaskStatus.PENDING;
 };
 
-export const getTasksStatus = (tasks: Task[] | Task): TaskStatus => {
-  const list = Array.isArray(tasks) ? tasks : [tasks];
-  if (list.length === 0) return TaskStatus.PENDING;
-
-  const statuses = list.map(getTaskStatus);
-
-  if (statuses.includes(TaskStatus.ERROR)) return TaskStatus.ERROR;
-
-  if (statuses.includes(TaskStatus.PENDING)) return TaskStatus.PENDING;
-
-  return TaskStatus.SUCCESSFUL;
-};
-
 export const getTotalAllTasks = (tasks: Task[]) => {
   if (tasks.every((t) => t.failed_at !== null)) return "-";
 
