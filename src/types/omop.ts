@@ -46,6 +46,13 @@ export const DOMAIN_PHRASES: Record<OmopTableName, DomainPhrase> = {
     include: "were recorded as being",
     exclude: "were not recorded as being",
   },
+  [OmopTableName.Gender]: {
+    verb: "record",
+    past: "was recorded",
+    noun: "sex",
+    include: "were recorded as being",
+    exclude: "were not recorded as being",
+  },
   [OmopTableName.Condition]: {
     verb: "diagnose",
     past: "was diagnosed",
@@ -56,7 +63,7 @@ export const DOMAIN_PHRASES: Record<OmopTableName, DomainPhrase> = {
   [OmopTableName.Drug]: {
     verb: "take",
     past: "was taken",
-    noun: "intake",
+    noun: "medication",
     include: "received",
     exclude: "did not receive",
   },
@@ -108,13 +115,6 @@ export const DOMAIN_PHRASES: Record<OmopTableName, DomainPhrase> = {
     noun: "specimen",
     include: "had a specimen collected",
     exclude: "did not have a specimen collected",
-  },
-  [OmopTableName.Gender]: {
-    verb: "record",
-    past: "was recorded",
-    noun: "gender",
-    include: "were recorded as being",
-    exclude: "were not recorded as being",
   },
   [OmopTableName.Race]: {
     verb: "record",

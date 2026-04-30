@@ -10,9 +10,9 @@ import {
   Stack,
   Tooltip,
 } from "@mui/material";
-import { mapDomain } from "@/utils/domains";
 import { ChangeEvent, MouseEvent } from "react";
 import Title from "../Title";
+import { getDomain } from "@/utils/omop";
 
 type ConceptSelectEvent =
   | ChangeEvent<HTMLInputElement>
@@ -88,7 +88,7 @@ export const ConceptItem = ({
       size="small"
       useSeparator={false}
       title={titleText}
-      subTitle={showDomain ? mapDomain(concept.category) : ""}
+      subTitle={showDomain ? getDomain(concept) : ""}
       display={"flex"}
       justifyContent={"space-between"}
       alignItems={"center"}
