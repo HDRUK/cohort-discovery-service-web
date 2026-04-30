@@ -42,7 +42,10 @@ const UserTable = ({
   ...rest
 }: CollectionsTableProps) => {
   const { getSearchParam, searchParams } = useSearchParams("workgroup_filter");
-  const wg_filter = getSearchParam();
+  const wgFilter = getSearchParam();
+  const searchTerm = (searchParams.get("search_term") || "")
+    .toLowerCase()
+    .trim();
   const isAdmin = useIsAdminSection();
 
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
@@ -56,15 +59,21 @@ const UserTable = ({
   );
 
   const workgroups = useUserDataStore((s) => s.workgroups);
-  const activeWorkgroup = workgroups.find((wg) => String(wg.id) === wg_filter);
+  const activeWorkgroup = workgroups.find((wg) => String(wg.id) === wgFilter);
 
   // may have been better for this to be BE logic
   // - we dont have a workgroup user filter on the BE now, so this will do
   // - noted for future improvement
   const hydratedUsers = useMemo(() => {
-    const filtered = users.filter((u) =>
-      u.workgroups?.find((wg) => String(wg.id) === String(wg_filter)),
+    let filtered = users.filter((u) =>
+      u.workgroups?.find((wg) => String(wg.id) === String(wgFilter)),
     );
+
+    if (searchTerm) {
+      filtered = filtered.filter((u) =>
+        (u.name ?? "").toLowerCase().includes(searchTerm),
+      );
+    }
 
     if (!sorting.length) {
       return [...filtered].sort(
@@ -105,7 +114,7 @@ const UserTable = ({
           return 0;
       }
     });
-  }, [users, wg_filter, sorting]);
+  }, [users, wgFilter, sorting, searchTerm]);
 
   const page = Math.max(1, parseInt(searchParams.get(PAGE_PARAM) || "1", 10));
 
