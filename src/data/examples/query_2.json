@@ -11,20 +11,20 @@
     },
     {
       "id": "d852d24b-de59-46b6-a66c-de9e4a532d50",
+      "exclude": false,
       "rule": {
         "concept": {
+          "concept_id": 201826,
           "name": "Type 2 diabetes mellitus",
           "category": "Condition",
-          "children": [],
-          "concept_id": 201826
+          "children": []
         }
-      },
-      "exclude": false
+      }
     },
     {
       "id": "09cd14b2-96aa-40e3-b2a4-d4d815f0f650",
-      "exclude": false,
-      "combinator": "and"
+      "combinator": "and",
+      "exclude": false
     },
     {
       "id": "2e542e7c-385a-4192-a93a-d596f94b0d7c",
