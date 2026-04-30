@@ -26,7 +26,6 @@ import {
   updateById,
 } from "@/utils/rules";
 import { trueKeys } from "@/utils/numbers";
-import { capitaliseFirstLetter } from "@/utils/string";
 import {
   AgeFilterType,
   OperatorType,
