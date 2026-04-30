@@ -319,16 +319,15 @@ const Guidance = () => {
 
       const concept = selectedNode?.rule?.concept;
       const category = concept?.category || "";
-      const { verb, past, noun } = getDomainPhrase(category);
+      const { verb, past } = getDomainPhrase(category);
       const domain = getDomain(concept);
 
       return (
         <ActionMenuSection title={`${domain} Rule`} fixedExpanded>
           <RuleGuidance
-            category={domain}
+            category={domain ?? ""}
             verb={verb}
             verbPastTense={past}
-            noun={capitaliseFirstLetter(noun)}
             timeConstraint={selectedNode?.timeConstraint}
             ageConstraint={selectedNode?.ageConstraint}
             components={makeRuleComponents(selectedNode)}

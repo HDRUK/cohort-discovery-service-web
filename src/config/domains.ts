@@ -1,9 +1,4 @@
-export const DOMAIN_GUIDANCE_MAP: Record<string, string> = {
-  drug: "Medication",
+export const DOMAIN_MAP: Record<string, string> = {
   gender: "Demographic",
   race: "Demographic",
-};
-
-export const DOMAIN_MAP: Record<string, string> = {
-  gender: "Sex",
 };
