@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useRef } from "react";
+import { Fragment, useRef } from "react";
 
 import Rule from "@/modules/Rule";
 import {
@@ -23,8 +23,6 @@ import useHasMounted from "@/hooks/useHasMounted";
 import RuleAgeFilter from "../RuleAgeFilter";
 import SkeletonFull from "@/components/SkeletonFull";
 import useStateManagement from "@/hooks/useStateManagement";
-import { useCohortBuilderContext } from "@/providers/CohortBuilderProvider";
-import { getScrollParent } from "@/utils/html";
 import useScrollToNode from "@/hooks/useScrollToNode";
 
 interface RuleBoardProps extends BoxProps {
