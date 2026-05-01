@@ -135,9 +135,6 @@ const SelectDatasets = () => {
         ...(open && {
           mt: 2,
           mb: 2,
-          flex: 1,
-          minHeight: 0,
-          overflow: "auto",
         }),
       }}
     >
@@ -168,7 +165,14 @@ const SelectDatasets = () => {
           defaultExpanded
           disableGutters
           elevation={1}
-          sx={{ bgcolor: "white", mb: 1 }}
+          sx={{
+            bgcolor: "white",
+            mb: 1,
+            maxHeight: 500,
+            display: "flex",
+            flexDirection: "column",
+            overflow: "auto",
+          }}
         >
           <AccordionSummary>
             <Title
