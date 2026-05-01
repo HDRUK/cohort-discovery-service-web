@@ -25,6 +25,7 @@ import SkeletonFull from "@/components/SkeletonFull";
 import useStateManagement from "@/hooks/useStateManagement";
 import { useCohortBuilderContext } from "@/providers/CohortBuilderProvider";
 import { getScrollParent } from "@/utils/html";
+import useScrollToNode from "@/hooks/useScrollToNode";
 
 interface RuleBoardProps extends BoxProps {
   ruleGroup: RuleGroupType;
@@ -64,40 +65,10 @@ const RuleBoard = ({
   const isLoading = useStateManagement((s) => s.isLoading);
   const hasMounted = useHasMounted();
 
-  const { getSortableNode, pendingScrollToNodeId, clearPendingScrollToNodeId } =
-    useCohortBuilderContext();
-
-  useEffect(() => {
-    if (!scrollable || !pendingScrollToNodeId) return;
-
-    const board = boardRef.current;
-    const container = getScrollParent(board);
-    const el = getSortableNode(pendingScrollToNodeId);
-
-    if (!container || !el) return;
-
-    const containerRect = container.getBoundingClientRect();
-    const elRect = el.getBoundingClientRect();
-
-    const top =
-      elRect.top -
-      containerRect.top +
-      container.scrollTop -
-      container.clientHeight / 2 +
-      elRect.height / 2;
-
-    container.scrollTo({
-      top,
-      behavior: "smooth",
-    });
-
-    clearPendingScrollToNodeId();
-  }, [
-    scrollable,
-    getSortableNode,
-    pendingScrollToNodeId,
-    clearPendingScrollToNodeId,
-  ]);
+  useScrollToNode({
+    enabled: scrollable,
+    boardRef,
+  });
 
   if (!hasMounted || isLoading) {
     return <SkeletonFull />;
