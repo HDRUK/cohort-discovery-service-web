@@ -9,21 +9,11 @@ import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { Box } from "@mui/material";
 import SkeletonFull from "@/components/SkeletonFull";
 import useStateManagement from "@/hooks/useStateManagement";
+import { useCohortBuilderContext } from "@/providers/CohortBuilderProvider";
 
 const ActionMenu: React.FC = () => {
-  const {
-    queryBuilderJson,
-    createNewGroup,
-    createNewRule,
-    createNewAgeFilter,
-    createNewOperator,
-  } = useQueryBuilder((qb) => ({
-    queryBuilderJson: qb.queryBuilderJson,
-    createNewGroup: qb.createNewGroup,
-    createNewRule: qb.createNewRule,
-    createNewAgeFilter: qb.createNewAgeFilter,
-    createNewOperator: qb.createNewOperator,
-  }));
+  const queryBuilderJson = useQueryBuilder((qb) => qb.queryBuilderJson);
+  const { actions } = useCohortBuilderContext();
 
   const isLoading = useStateManagement((s) => s.isLoading);
   if (isLoading) {
@@ -46,10 +36,9 @@ const ActionMenu: React.FC = () => {
         defaultExpanded
         underline
       >
-        <AddButton onClick={createNewRule} label={"Add rule"} />
-        <AddButton onClick={createNewOperator} label={"Add operator"} />
-        <AddButton onClick={createNewAgeFilter} label={"Add age rule"} />
-        <AddButton onClick={createNewGroup} label={"Add group"} />
+        {actions.map(({ action, label }) => (
+          <AddButton key={label} onClick={action} label={label} />
+        ))}
       </ActionMenuSection>
       <ActionMenuSection
         title={"Hierarchy"}

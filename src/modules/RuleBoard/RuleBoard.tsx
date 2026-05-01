@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment } from "react";
+import { Fragment, useRef } from "react";
 
 import Rule from "@/modules/Rule";
 import {
@@ -23,9 +23,11 @@ import useHasMounted from "@/hooks/useHasMounted";
 import RuleAgeFilter from "../RuleAgeFilter";
 import SkeletonFull from "@/components/SkeletonFull";
 import useStateManagement from "@/hooks/useStateManagement";
+import useScrollToNode from "@/hooks/useScrollToNode";
 
 interface RuleBoardProps extends BoxProps {
   ruleGroup: RuleGroupType;
+  scrollable?: boolean;
 }
 
 function renderRule(item: RuleNodeType, ruleGroupId: string) {
@@ -40,15 +42,31 @@ function renderRule(item: RuleNodeType, ruleGroupId: string) {
   }
 }
 
-const RuleBoard = ({ ruleGroup, children, ...rest }: RuleBoardProps) => {
+const RuleBoard = ({
+  ruleGroup,
+  children,
+  scrollable = false,
+  ...rest
+}: RuleBoardProps) => {
   const { rules, id } = ruleGroup;
   const { setNodeRef } = useDroppable({
     id,
     data: { type: "container", containerId: id },
   });
+  const boardRef = useRef<HTMLDivElement | null>(null);
+
+  const setBoardRef = (el: HTMLDivElement | null) => {
+    setNodeRef(el);
+    boardRef.current = el;
+  };
 
   const isLoading = useStateManagement((s) => s.isLoading);
   const hasMounted = useHasMounted();
+
+  useScrollToNode({
+    enabled: scrollable,
+    boardRef,
+  });
 
   if (!hasMounted || isLoading) {
     return <SkeletonFull />;
@@ -56,12 +74,10 @@ const RuleBoard = ({ ruleGroup, children, ...rest }: RuleBoardProps) => {
 
   return (
     <Box
-      ref={setNodeRef}
+      ref={setBoardRef}
       display="flex"
       flexDirection="column"
       gap={0}
-      flex={1}
-      minHeight={0}
       {...rest}
     >
       <DropSpacer id={`${id}::top`} position="top" groupId={id} />

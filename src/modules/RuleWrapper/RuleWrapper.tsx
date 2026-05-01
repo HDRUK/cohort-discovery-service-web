@@ -216,6 +216,7 @@ const RuleWrapper = ({
 
   return (
     <Box
+      rule-id={id}
       data-testid="sortable-rule"
       ref={setNodeRef}
       style={sortable ? style : {}}

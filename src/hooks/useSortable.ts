@@ -9,6 +9,7 @@ import { useElementSize } from "./useElementSize";
 import { quantise } from "@/utils/numbers";
 import { useDndContext } from "@dnd-kit/core";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
+import { useCohortBuilderContext } from "@/providers/CohortBuilderProvider";
 
 export interface UseSortablePlusReturn extends ReturnType<
   typeof useDndSortable
@@ -24,8 +25,17 @@ export interface UseSortablePlusReturn extends ReturnType<
 const useSortable = (args: UseSortableArguments): UseSortablePlusReturn => {
   const boardIndex = useQueryBuilder((s) => s.boardIndex);
 
-  const params = useDndSortable(args);
+  const { setNodeRef: setNodeRefDnd, ...params } = useDndSortable(args);
   const { over, active } = useDndContext();
+  const { registerSortableNode } = useCohortBuilderContext();
+
+  const setNodeRef = React.useCallback(
+    (node: HTMLElement | null) => {
+      setNodeRefDnd(node);
+      registerSortableNode(String(args.id), node);
+    },
+    [args.id, setNodeRefDnd, registerSortableNode],
+  );
 
   const isOver = useMemo(
     () => over?.id !== active?.id && over?.id === args.id,
@@ -79,6 +89,7 @@ const useSortable = (args: UseSortableArguments): UseSortablePlusReturn => {
 
   return {
     ...params,
+    setNodeRef,
     isLast,
     style,
     anchorRef,

@@ -59,7 +59,7 @@ const QueryBuilder = ({
           left={<ActionMenu />}
           middle={
             queryBuilderJson?.rules && queryBuilderJson.rules.length > 0 ? (
-              <RuleBoard ruleGroup={queryBuilderJson} />
+              <RuleBoard ruleGroup={queryBuilderJson} scrollable />
             ) : (
               <QueryBuilderSkeleton />
             )
