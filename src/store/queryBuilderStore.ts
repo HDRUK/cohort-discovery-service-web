@@ -105,11 +105,11 @@ export interface QueryBuilderStoreState {
     modifiers?: SelectNodeWithModifiersArgs,
   ) => void;
 
-  createNewNode: (kind: NodeKind) => void;
-  createNewRule: () => void;
-  createNewGroup: () => void;
-  createNewOperator: () => void;
-  createNewAgeFilter: () => void;
+  createNewNode: (kind: NodeKind) => RuleNodeType;
+  createNewRule: () => RuleNodeType;
+  createNewGroup: () => RuleNodeType;
+  createNewOperator: () => RuleNodeType;
+  createNewAgeFilter: () => RuleNodeType;
 
   queryAsText: string;
   getQueryFromText: (
@@ -303,16 +303,17 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     }
   },
 
-  createNewNode: (kind: NodeKind) => {
+  createNewNode: (kind: NodeKind): RuleNodeType => {
     const fn = Creators[kind];
 
     const { queryBuilderJson, setQueryBuilderJson, setSelected } = get();
 
     const normaliseAdditions = (
       belowNeighbor?: RuleNodeType,
-    ): RuleNodeType[] => {
+    ): { additions: RuleNodeType[]; primaryNode: RuleNodeType } => {
       const produced = fn();
       const additions = Array.isArray(produced) ? produced : [produced];
+      const primaryNode = additions[0];
 
       const belowIsOperator = !!belowNeighbor && isOperator(belowNeighbor);
       const lastAdditionIsOperator = isOperator(
@@ -322,13 +323,16 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
       const suffixWithOperator =
         belowNeighbor && !belowIsOperator && !lastAdditionIsOperator;
 
-      return suffixWithOperator
-        ? [...additions, ...[createOperator()]]
-        : additions;
+      return {
+        additions: suffixWithOperator
+          ? [...additions, createOperator()]
+          : additions,
+        primaryNode,
+      };
     };
 
     const firstNode = queryBuilderJson.rules[0];
-    const toPrepend = normaliseAdditions(firstNode);
+    const { additions: toPrepend, primaryNode } = normaliseAdditions(firstNode);
 
     const rules = [...toPrepend, ...queryBuilderJson.rules];
 
@@ -341,6 +345,7 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     );
 
     setQueryBuilderJson(updatedQuery);
+    return primaryNode;
   },
 
   createNewRule: () => get().createNewNode(NodeKind.RULE),
