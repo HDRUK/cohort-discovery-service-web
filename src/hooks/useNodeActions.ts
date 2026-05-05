@@ -202,7 +202,7 @@ const useNodeActions = (
     ...(node && isRuleGroup(node)
       ? [
           { action: handleCreateNewRule, label: "Add Rule" },
-          { action: handleCreateNewOperator, label: "Add Operator" },
+          { action: handleCreateNewOperator, label: "Add And/Or" },
           { action: handleCreateNewAgeFilter, label: "Add Age Rule" },
           { action: handleCollapseGroup, label: "Ungroup" },
         ]
