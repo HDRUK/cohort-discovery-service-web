@@ -534,6 +534,7 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     return validateRuleTree(root, {
       constrainForBunnyV1:
         featureFlags?.[FeatureName.ConstrainForBunnyV1] || false,
+      nestedGroups: featureFlags?.[FeatureName.NestedGroups] || false,
     });
   },
 
