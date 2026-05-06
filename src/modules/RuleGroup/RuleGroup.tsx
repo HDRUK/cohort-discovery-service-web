@@ -4,9 +4,6 @@ import RuleBoard from "../RuleBoard";
 import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import useNodeActions from "@/hooks/useNodeActions";
-import { Chip, Stack } from "@mui/material";
-import ConceptChip from "@/components/ConceptChip";
-import { isRuleLeaf } from "@/utils/rules";
 
 export interface RuleGroupProps extends Omit<
   RuleWrapperProps,
@@ -19,35 +16,6 @@ export interface RuleGroupProps extends Omit<
 
 const RuleGroup = ({ group, parentGroupId, ...rest }: RuleGroupProps) => {
   const { actions } = useNodeActions(group);
-  /*
-  return (
-    <RuleWrapper
-      node={group}
-      type="Group"
-      groupId={parentGroupId}
-      sortable={true}
-      render={() => (
-        <Stack>
-          {" "}
-          {group.rules.map((r) => {
-            if (isRuleLeaf(r)) {
-              return (
-                <ConceptChip
-                  draggable
-                  key={r.id}
-                  concept={r.rule.concept}
-                  onDelete={() => alert("ah")}
-                />
-              );
-            }
-          })}
-        </Stack>
-      )}
-      headerExtra={<> hi</>}
-      actions={actions}
-      {...rest}
-    />
-  );*/
 
   return (
     <RuleWrapper
