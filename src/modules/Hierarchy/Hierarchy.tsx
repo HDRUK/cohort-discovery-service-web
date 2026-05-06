@@ -24,6 +24,8 @@ import { DEFAULT_ID_REF_SUFFIX } from "@/config/defaults";
 import useHasMounted from "@/hooks/useHasMounted";
 import SkeletonFull from "@/components/SkeletonFull";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
+import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
+import { FeatureName } from "@/types/features";
 
 export const Hierarchy = () => {
   const { queryBuilderJson, setQueryBuilderJson, boardIndex } = useQueryBuilder(
@@ -69,7 +71,11 @@ export const Hierarchy = () => {
       const overGroupId = over?.data?.current?.groupId as string;
       const activeGroupId = active?.data?.current?.groupId as string;
 
-      if (isRuleGroup(activeNode) && overGroupId !== activeGroupId) return;
+      const featureFlags = useFeatureFlagsStore.getState().flags;
+
+      if (!featureFlags?.[FeatureName.NestedGroups]) {
+        if (isRuleGroup(activeNode) && overGroupId !== activeGroupId) return;
+      }
 
       const activeId = active?.data?.current?.id;
       const overId = over?.data?.current?.id;
