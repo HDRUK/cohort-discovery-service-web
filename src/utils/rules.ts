@@ -15,6 +15,7 @@ import { v4 as uuidv4 } from "uuid";
 
 export enum RuleErrors {
   EMPTY_RULE = "A rule cannot be empty.",
+  UNKNOWN_RULE = "A rule could not be found for the following term:",
   NO_NESTED_GROUPS = "Nested groups are not supported yet.",
   GROUP_OPERATORS_ARE_THE_SAME = "All operators within a group must be the same.",
   GROUP_CANNOT_START_WITH_AN_OPERATOR = "A group cannot start with an operator.",
@@ -125,8 +126,12 @@ export function groupToRules(
 
   return (normaliseExclude ? normaliseGroupExclude(group) : group).rules;
 }
+
+export const isUnknownRule = (rule: RuleLeafType): boolean =>
+  !!rule.rule.concept?.name && rule.rule.concept?.concept_id === null;
+
 export const isEmptyRule = (rule: RuleLeafType): boolean =>
-  rule.rule.concept === null;
+  rule.rule.concept === null || rule.rule.concept?.concept_id === null;
 
 export const isSingleConcept = (
   concept: Concept | null,
@@ -472,9 +477,15 @@ export function validateRuleTree(
     };
 
     let node = validateNode(leaf);
-    if (isEmptyRule(leaf)) {
+    if (isUnknownRule(leaf)) {
+      node = invalidateNode(
+        node,
+        `${RuleErrors.UNKNOWN_RULE} ${leaf.rule.concept?.name}`,
+      );
+    } else if (isEmptyRule(leaf)) {
       node = invalidateNode(node, RuleErrors.EMPTY_RULE);
     }
+
     if (isMultipleConcept(leaf.rule.concept)) {
       node = invalidateNode(node, RuleErrors.HAS_ALTERNATIVES);
     }
