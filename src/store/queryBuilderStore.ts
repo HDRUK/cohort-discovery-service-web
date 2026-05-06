@@ -361,13 +361,18 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     defaultInvalidText = "People who ...",
   ) => {
     const updatedQuery = validate ? get().validateRules(query) : query;
-    /*const text = updatedQuery.valid
-      ? queryToText(updatedQuery)
-      : updatedQuery.rules.length === 0
-        ? ""
-        : defaultInvalidText;*/
 
-    const text = queryToText(updatedQuery);
+    let text = "";
+
+    try {
+      const nextText = queryToText(updatedQuery);
+
+      if (typeof nextText === "string" && nextText.trim()) {
+        text = nextText;
+      }
+    } catch {
+      text = defaultInvalidText;
+    }
 
     set((state) => ({
       ...state,

@@ -141,8 +141,8 @@ const queryToText = (
 
     if (isSingleConcept(c)) {
       const verb = getVerb(c.category, exclude);
-      const desc = `${cleanDescription(c.name)}  ${
-        !rule.concept?.concept_id ? "[unknown]" : ""
+      const desc = `${cleanDescription(c.name)}${
+        !rule.concept?.concept_id ? " [unknown]" : ""
       }`;
       return { verb, text: desc, category: c.category };
     }
