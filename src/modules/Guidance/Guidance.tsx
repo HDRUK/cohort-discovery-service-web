@@ -13,6 +13,7 @@ import useQueryBuilder from "@/hooks/useQueryBuilder";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import {
   createAgeFilter,
+  createRuleGroup,
   createOperator,
   createRule,
   findById,
@@ -55,6 +56,8 @@ import RuleAgeSelector from "@/components/RuleAgeSelector";
 import DeleteAgeButton from "@/components/DeleteAgeButton";
 import useFeatures from "@/hooks/useFeatures";
 import CollapsibleGuidance from "@/components/CollapsibleGuidance";
+import { FeatureName } from "@/types/features";
+import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 
 export const baseComponents = {
   a: ({ href, children }: LinkProps) => (
@@ -110,6 +113,8 @@ const Guidance = () => {
     return node;
   }, [queryBuilderJson, selectedIds]);
 
+  const featureFlags = useFeatureFlagsStore.getState().flags;
+
   const handleCreateNewAgeFilterInGroup = useCallback(
     (id: RuleGroupType["id"], rules: RuleGroupType["rules"]) => {
       const newRules = [createAgeFilter(), createOperator(), ...rules];
@@ -141,6 +146,20 @@ const Guidance = () => {
   const handleCreateNewRuleInGroup = useCallback(
     (id: RuleGroupType["id"], rules: RuleGroupType["rules"]) => {
       const newRules = [createRule(), createOperator(), ...rules];
+
+      setQueryBuilderJson(
+        updateById(queryBuilderJson, id, (node) => ({
+          ...node,
+          rules: newRules,
+        })),
+      );
+    },
+    [queryBuilderJson, setQueryBuilderJson],
+  );
+
+  const handleCreateNewGroupInGroup = useCallback(
+    (id: RuleGroupType["id"], rules: RuleGroupType["rules"]) => {
+      const newRules = [createRuleGroup(), createOperator(), ...rules];
 
       setQueryBuilderJson(
         updateById(queryBuilderJson, id, (node) => ({
@@ -253,6 +272,12 @@ const Guidance = () => {
           onClick={() => handleCreateNewRuleInGroup(id, rules)}
         />
       ),
+      AddNewGroupButton: (props: AddButtonProps) => (
+        <AddButton
+          {...props}
+          onClick={() => handleCreateNewGroupInGroup(id, rules)}
+        />
+      ),
     };
   };
 
@@ -347,7 +372,12 @@ const Guidance = () => {
     } else if (isRuleGroup(selectedNode)) {
       return (
         <ActionMenuSection title={"Group"} fixedExpanded>
-          <GroupGuidance components={makeGroupComponents(selectedNode)} />
+          <GroupGuidance
+            components={makeGroupComponents(selectedNode)}
+            nestedGroupsEnabled={
+              featureFlags?.[FeatureName.NestedGroups] ?? false
+            }
+          />
         </ActionMenuSection>
       );
     } else if (isAgeFilter(selectedNode)) {
