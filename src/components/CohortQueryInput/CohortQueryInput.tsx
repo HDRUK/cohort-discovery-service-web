@@ -210,6 +210,7 @@ const CohortQueryInput = ({
 
   const shouldApplyImmediately = (v: string) => v.trim() === "";
 
+  // debounce live input at a shorter interval to prefetch it
   useDebounce(liveInput, {
     delay: defaults.searchPrefetch,
     shouldApplyImmediately,
@@ -316,7 +317,7 @@ const CohortQueryInput = ({
                   {...field}
                   startIcon={<SearchIcon fontSize="medium" sx={{ ml: 2 }} />}
                   collapsible={false}
-                  error={isDirty ? false : !!error}
+                  error={isDirty && !!error}
                   type="search"
                   placeholders={placeholders}
                   placeholderOverride={
