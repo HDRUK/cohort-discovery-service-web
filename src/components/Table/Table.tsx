@@ -93,7 +93,7 @@ const Table = <TData extends MRT_RowData>({
           <Grid size={"grow"}>
             {leftAction && titleProps && <Title {...titleProps} />}
             {leftAction && searchProps && (
-              <ControlledSearchBox {...searchProps} />
+              <ControlledSearchBox {...searchProps} submitOnChange />
             )}
           </Grid>
 
