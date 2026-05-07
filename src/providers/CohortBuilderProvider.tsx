@@ -162,7 +162,7 @@ export const CohortBuilderProvider = ({
 
       if (!overGroupId || !activeGroupId) return;
       if (
-        !featureFlags?.[FeatureName.NestedGroups] &&
+        !featureFlags?.[FeatureName.QueryBuilderAllowNestedGroups] &&
         activeData.type === "Group" &&
         overGroupId !== activeGroupId
       )

@@ -380,7 +380,7 @@ const Guidance = () => {
           <GroupGuidance
             components={makeGroupComponents(selectedNode)}
             nestedGroupsEnabled={
-              featureFlags?.[FeatureName.NestedGroups] ?? false
+              featureFlags?.[FeatureName.QueryBuilderAllowNestedGroups] ?? false
             }
           />
         </ActionMenuSection>

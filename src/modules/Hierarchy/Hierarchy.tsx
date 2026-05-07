@@ -73,7 +73,7 @@ export const Hierarchy = () => {
 
       const featureFlags = useFeatureFlagsStore.getState().flags;
 
-      if (!featureFlags?.[FeatureName.NestedGroups]) {
+      if (!featureFlags?.[FeatureName.QueryBuilderAllowNestedGroups]) {
         if (isRuleGroup(activeNode) && overGroupId !== activeGroupId) return;
       }
 
