@@ -57,8 +57,6 @@ import RuleAgeSelector from "@/components/RuleAgeSelector";
 import DeleteAgeButton from "@/components/DeleteAgeButton";
 import useFeatures from "@/hooks/useFeatures";
 import CollapsibleGuidance from "@/components/CollapsibleGuidance";
-import { FeatureName } from "@/types/features";
-import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 
 export const baseComponents = {
   a: ({ href, children }: LinkProps) => (
@@ -113,8 +111,6 @@ const Guidance = () => {
     const node = findById(queryBuilderJson, String(selectedIds[0]));
     return node;
   }, [queryBuilderJson, selectedIds]);
-
-  const featureFlags = useFeatureFlagsStore.getState().flags;
 
   const handleCreateNewAgeFilterInGroup = useCallback(
     (id: RuleGroupType["id"], rules: RuleGroupType["rules"]) => {
@@ -172,7 +168,7 @@ const Guidance = () => {
     [queryBuilderJson, setQueryBuilderJson],
   );
 
-  const { constrainForBunnyV1 } = useFeatures();
+  const { constrainForBunnyV1, queryBuilderAllowNestedGroups } = useFeatures();
 
   const handleDelete = useCallback(() => {
     const newQuery = selectedIds.reduce(
@@ -379,9 +375,7 @@ const Guidance = () => {
         <ActionMenuSection title={"Group"} fixedExpanded>
           <GroupGuidance
             components={makeGroupComponents(selectedNode)}
-            nestedGroupsEnabled={
-              featureFlags?.[FeatureName.QueryBuilderAllowNestedGroups] ?? false
-            }
+            nestedGroupsEnabled={queryBuilderAllowNestedGroups ?? false}
           />
         </ActionMenuSection>
       );
