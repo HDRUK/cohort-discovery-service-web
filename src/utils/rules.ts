@@ -525,20 +525,18 @@ export function validateRuleTree(
 
     const n = children.length;
 
-    // Bunny V1: All operators within a group must be the same
-    if (constrainForBunnyV1) {
-      const operatorNodes = children.filter((c) => isOperator(c));
-      if (operatorNodes.length > 1) {
-        const firstKind = getOperatorKind(operatorNodes[0]);
-        for (let i = 1; i < operatorNodes.length; i++) {
-          const current = operatorNodes[i];
-          const currentKind = getOperatorKind(current);
-          if (currentKind !== firstKind) {
-            const msg = RuleErrors.GROUP_OPERATORS_ARE_THE_SAME;
-            const idx = children.indexOf(current);
-            if (idx !== -1) {
-              children[idx] = invalidateNode(children[idx], msg);
-            }
+    // All operators within a group must be the same
+    const operatorNodes = children.filter((c) => isOperator(c));
+    if (operatorNodes.length > 1) {
+      const firstKind = getOperatorKind(operatorNodes[0]);
+      for (let i = 1; i < operatorNodes.length; i++) {
+        const current = operatorNodes[i];
+        const currentKind = getOperatorKind(current);
+        if (currentKind !== firstKind) {
+          const msg = RuleErrors.GROUP_OPERATORS_ARE_THE_SAME;
+          const idx = children.indexOf(current);
+          if (idx !== -1) {
+            children[idx] = invalidateNode(children[idx], msg);
           }
         }
       }
