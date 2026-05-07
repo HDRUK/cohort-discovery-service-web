@@ -525,8 +525,6 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
       ignoreSynthetic,
     });
 
-    console.log({ newQueryString });
-
     const newQuery = cleanQuery(newQueryString);
     return commit ? get().setQueryBuilderJson(newQuery) : newQuery;
   },
