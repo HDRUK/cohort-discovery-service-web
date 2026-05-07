@@ -32,7 +32,6 @@ import useRightClickMenu from "@/hooks/useRightClickMenu";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { RuleNodeType } from "@/types/rules";
 import { findById, moveItemIntoGroup } from "@/utils/rules";
-import { FeatureName } from "@/types/features";
 import useFeatures from "@/hooks/useFeatures";
 
 type Action = {
