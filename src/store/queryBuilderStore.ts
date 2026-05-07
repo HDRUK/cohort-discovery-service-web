@@ -524,7 +524,6 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     const { data: newQueryString } = await parseQuery(input, {
       ignoreSynthetic,
     });
-
     const newQuery = cleanQuery(newQueryString);
     return commit ? get().setQueryBuilderJson(newQuery) : newQuery;
   },
