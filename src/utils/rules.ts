@@ -390,11 +390,11 @@ export function validateRuleTree(
   root: RuleGroupType,
   options?: {
     constrainForBunnyV1: boolean;
-    nestedGroups: boolean;
+    allowNestedGroups: boolean;
   },
 ): RuleGroupType {
   const constrainForBunnyV1 = options?.constrainForBunnyV1 ?? false;
-  const nestedGroups = options?.nestedGroups ?? false;
+  const allowNestedGroups = options?.allowNestedGroups ?? false;
 
   const isContent = (n: RuleNodeType) =>
     isRuleLeaf(n) || isRuleGroup(n) || isAgeFilter(n);
@@ -510,7 +510,7 @@ export function validateRuleTree(
     const children = group.rules.map((child) => {
       if (isRuleGroup(child)) {
         // Bunny V1: no groups within groups
-        if (!nestedGroups && depth >= 1) {
+        if (!allowNestedGroups && depth >= 1) {
           return invalidateNode(child, RuleErrors.NO_NESTED_GROUPS);
         }
         return validateGroup(child, 2, depth + 1);
