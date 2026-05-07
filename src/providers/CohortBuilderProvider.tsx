@@ -32,8 +32,8 @@ import useRightClickMenu from "@/hooks/useRightClickMenu";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { RuleNodeType } from "@/types/rules";
 import { findById, moveItemIntoGroup } from "@/utils/rules";
-import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import { FeatureName } from "@/types/features";
+import useFeatures from "@/hooks/useFeatures";
 
 type Action = {
   action: () => void;
@@ -97,7 +97,7 @@ export const CohortBuilderProvider = ({
     createNewOperator: qb.createNewOperator,
   }));
 
-  const featureFlags = useFeatureFlagsStore.getState().flags;
+  const { queryBuilderAllowNestedGroups } = useFeatures();
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -162,7 +162,7 @@ export const CohortBuilderProvider = ({
 
       if (!overGroupId || !activeGroupId) return;
       if (
-        !featureFlags?.[FeatureName.QueryBuilderAllowNestedGroups] &&
+        !queryBuilderAllowNestedGroups &&
         activeData.type === "Group" &&
         overGroupId !== activeGroupId
       )
@@ -194,7 +194,14 @@ export const CohortBuilderProvider = ({
         errorOnDrag,
       );
     },
-    [active, boardIndex, errorOnDrag, queryBuilderJson, setQueryBuilderJson],
+    [
+      active,
+      boardIndex,
+      errorOnDrag,
+      queryBuilderJson,
+      setQueryBuilderJson,
+      queryBuilderAllowNestedGroups,
+    ],
   );
 
   const onDragEnd = useCallback(
