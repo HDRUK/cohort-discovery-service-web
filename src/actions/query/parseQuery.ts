@@ -17,6 +17,12 @@ const parseQuery = async (
     preferNonSynthetic?: boolean;
   },
 ): Promise<ApiResponse<string>> => {
+  console.log({
+    url: API_ROUTES.parseQuery,
+    query,
+    ignore_synthetic: options?.ignoreSynthetic,
+    prefer_non_synthetic: options?.preferNonSynthetic,
+  });
   return await apiPost<ApiResponse<string>, Payload>(API_ROUTES.parseQuery, {
     query,
     ignore_synthetic: options?.ignoreSynthetic,
