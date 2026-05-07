@@ -15,6 +15,7 @@ import SearchOverlay from "./SearchOverlay";
 import { useDefaults } from "@/providers/DefaultProvider";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import InlineChoiceButton from "./InlineChoiceButton";
+import { CombinatorType } from "@/types/rules";
 
 type FormValues = {
   cohortQueryInput: string;
@@ -102,8 +103,6 @@ const CohortQueryInput = ({
 
   const prefetchQuery = useCallback(
     (value: string) => {
-      if (requiresQueryModeChoice) return;
-
       const v = value.trim();
       if (v.length < MIN_SEARCH_LENGTH) return;
       if (v === programmaticValueRef.current) return;
@@ -115,14 +114,34 @@ const CohortQueryInput = ({
         staleTime: STALE_TIME,
       });
     },
-    [getQueryFromText, queryClient, includeSynthetic, requiresQueryModeChoice],
+    [getQueryFromText, queryClient, includeSynthetic],
   );
 
   const handleSearch = useCallback(
     async (raw: string) => {
+      const parseQueryInput = (raw: string) => {
+        const trimmed = raw.trim();
+
+        const match = trimmed.match(/^(and|or)\b\s*/i);
+        if (!match) {
+          return {
+            query: trimmed,
+            combinator: CombinatorType.AND,
+          };
+        }
+
+        return {
+          query: trimmed.slice(match[0].length).trim(),
+          combinator:
+            match[1].toLowerCase() === "or"
+              ? CombinatorType.OR
+              : CombinatorType.AND,
+        };
+      };
+
       if (requiresQueryModeChoice) return;
 
-      const q = raw.trim();
+      const { query: q, combinator } = parseQueryInput(raw);
 
       if (programmaticValueRef.current === q) return;
       if (q.length < MIN_SEARCH_LENGTH) return;
@@ -144,7 +163,7 @@ const CohortQueryInput = ({
           ...queryBuilderJson,
           rules: [
             ...queryJson.rules,
-            createOperator(),
+            createOperator(combinator),
             ...queryBuilderJson.rules,
           ],
           warnings: [
