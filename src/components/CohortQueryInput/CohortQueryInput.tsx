@@ -56,7 +56,7 @@ const CohortQueryInput = ({
   const queryClient = useQueryClient();
 
   const [queryMode, setQueryMode] = useState<QueryMode>(null);
-  const [open, setOpen] = useState(false);
+  const [openSearchOverlap, setOpenSearchOverlap] = useState(false);
 
   const programmaticValueRef = useRef<string | null>(null);
   const lastSyncedQueryAsText = useRef<string | null>(null);
@@ -86,7 +86,7 @@ const CohortQueryInput = ({
     clearFormErrors();
     resetQueryBuilderJson(false);
     setQueryMode(null);
-    setOpen(false);
+    setOpenSearchOverlap(false);
 
     resetField("cohortQueryInput", {
       defaultValue: syncFromQueryAsText ? queryAsText : "",
@@ -184,7 +184,7 @@ const CohortQueryInput = ({
       }
 
       setQueryMode(null);
-      setOpen(false);
+      setOpenSearchOverlap(false);
     },
     [
       requiresQueryModeChoice,
@@ -328,7 +328,7 @@ const CohortQueryInput = ({
                           onMouseDown={(e) => e.preventDefault()}
                           onClick={() => {
                             setQueryMode("fresh");
-                            setOpen(true);
+                            setOpenSearchOverlap(true);
                           }}
                         >
                           Start Fresh
@@ -339,7 +339,7 @@ const CohortQueryInput = ({
                           onMouseDown={(e) => e.preventDefault()}
                           onClick={() => {
                             setQueryMode("append");
-                            setOpen(true);
+                            setOpenSearchOverlap(true);
                           }}
                         >
                           Add
@@ -359,12 +359,12 @@ const CohortQueryInput = ({
                   onClickEndAdornment={onSubmit}
                   onFocus={() => {
                     if (!showChoicePrompt) {
-                      setOpen(true);
+                      setOpenSearchOverlap(true);
                     }
                   }}
                   onBlur={() => {
                     field.onBlur();
-                    setTimeout(() => setOpen(false), 150);
+                    setTimeout(() => setOpenSearchOverlap(false), 150);
                   }}
                   onChange={(e) => {
                     programmaticValueRef.current = null;
@@ -372,14 +372,14 @@ const CohortQueryInput = ({
                     field.onChange(e);
 
                     if (e.target.value) {
-                      setOpen(false);
+                      setOpenSearchOverlap(false);
                     }
                   }}
                 />
 
                 <SearchOverlay
                   queries={queries}
-                  open={!showChoicePrompt && open}
+                  open={!showChoicePrompt && openSearchOverlap}
                   anchorEl={anchorRef.current}
                   options={placeholders.map((label) => ({
                     label,
