@@ -141,6 +141,9 @@ const HistoryActions = ({
               color: "text.primary",
               fontWeight: "normal",
               fontSize: 14,
+              "&.MuiButton-root:hover": {
+                backgroundColor: "highlight.main",
+              },
             }}
           />
           <Dialog open={dialogOpen}>

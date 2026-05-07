@@ -50,6 +50,9 @@ const AddButton = ({ label, onClick, disabled, ...rest }: AddButtonProps) => {
             justifyContent: "flex-start",
             textAlign: "left",
             color: "text.primary",
+            "&.MuiButton-root:hover": {
+              backgroundColor: "highlight.main",
+            },
           }}
           {...rest}
         >
