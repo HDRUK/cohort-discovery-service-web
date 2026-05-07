@@ -1,23 +1,27 @@
 "use client";
 
 import { useForm, Controller, useWatch } from "react-hook-form";
-import { Box } from "@mui/material";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Box, Typography } from "@mui/material";
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { useIsFetching, useQueryClient } from "@tanstack/react-query";
 import SearchBox from "../SearchBox";
 import SearchIcon from "@mui/icons-material/Search";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { useDebounce } from "@/hooks/useDebounce";
-import useSubmitQuery from "@/hooks/useSubmitQuery";
-import { RuleErrors } from "@/utils/rules";
+import { createOperator, RuleErrors } from "@/utils/rules";
 import { EXAMPLES } from "@/config/queryExamples";
 import { Query } from "@/types/api";
 import SearchOverlay from "./SearchOverlay";
 import { useDefaults } from "@/providers/DefaultProvider";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import InlineChoiceButton from "./InlineChoiceButton";
+import { CombinatorType } from "@/types/rules";
 
 type FormValues = {
   cohortQueryInput: string;
 };
+
+type QueryMode = "fresh" | "append" | null;
 
 const MIN_SEARCH_LENGTH = 3;
 const STALE_TIME = 60_000;
@@ -37,6 +41,7 @@ const CohortQueryInput = ({
 
   const queryAsText = useQueryBuilder((qb) => qb.queryAsText);
   const getQueryFromText = useQueryBuilder((qb) => qb.getQueryFromText);
+  const queryBuilderJson = useQueryBuilder((qb) => qb.queryBuilderJson);
   const setQueryBuilderJson = useQueryBuilder((qb) => qb.setQueryBuilderJson);
   const resetQueryBuilderJson = useQueryBuilder(
     (qb) => qb.resetQueryBuilderJson,
@@ -48,10 +53,14 @@ const CohortQueryInput = ({
   const errors = useQueryBuilder((qb) => qb.errors ?? []);
   const warnings = useQueryBuilder((qb) => qb.queryBuilderJson.warnings ?? []);
 
-  const { disabled } = useSubmitQuery();
   const queryClient = useQueryClient();
 
+  const [queryMode, setQueryMode] = useState<QueryMode>(null);
+  const [openSearchOverlap, setOpenSearchOverlap] = useState(false);
+
   const programmaticValueRef = useRef<string | null>(null);
+  const lastSyncedQueryAsText = useRef<string | null>(null);
+  const anchorRef = useRef<HTMLDivElement | null>(null);
 
   const {
     handleSubmit: handleSubmitSearch,
@@ -59,14 +68,26 @@ const CohortQueryInput = ({
     resetField,
     setError: setFormError,
     clearErrors: clearFormErrors,
-    formState: { isDirty },
   } = useForm<FormValues>({
-    defaultValues: { cohortQueryInput: syncFromQueryAsText ? queryAsText : "" },
+    defaultValues: {
+      cohortQueryInput: syncFromQueryAsText ? queryAsText : "",
+    },
+    mode: "onChange",
   });
+
+  const hasExistingQuery = useMemo(
+    () => queryBuilderJson.rules.length > 0,
+    [queryBuilderJson.rules.length],
+  );
+
+  const requiresQueryModeChoice = hasExistingQuery && queryMode === null;
 
   const resetQuery = useCallback(() => {
     clearFormErrors();
     resetQueryBuilderJson(false);
+    setQueryMode(null);
+    setOpenSearchOverlap(false);
+
     resetField("cohortQueryInput", {
       defaultValue: syncFromQueryAsText ? queryAsText : "",
       keepTouched: true,
@@ -98,7 +119,29 @@ const CohortQueryInput = ({
 
   const handleSearch = useCallback(
     async (raw: string) => {
-      const q = raw.trim();
+      const parseQueryInput = (raw: string) => {
+        const trimmed = raw.trim();
+
+        const match = trimmed.match(/^(and|or)\b\s*/i);
+        if (!match) {
+          return {
+            query: trimmed,
+            combinator: CombinatorType.AND,
+          };
+        }
+
+        return {
+          query: trimmed.slice(match[0].length).trim(),
+          combinator:
+            match[1].toLowerCase() === "or"
+              ? CombinatorType.OR
+              : CombinatorType.AND,
+        };
+      };
+
+      if (requiresQueryModeChoice) return;
+
+      const { query: q, combinator } = parseQueryInput(raw);
 
       if (programmaticValueRef.current === q) return;
       if (q.length < MIN_SEARCH_LENGTH) return;
@@ -115,13 +158,36 @@ const CohortQueryInput = ({
         staleTime: STALE_TIME,
       });
 
-      setQueryBuilderJson(queryJson);
+      if (queryMode === "append") {
+        setQueryBuilderJson({
+          ...queryBuilderJson,
+          rules: [
+            ...queryJson.rules,
+            createOperator(combinator),
+            ...queryBuilderJson.rules,
+          ],
+          warnings: [
+            ...(queryBuilderJson.warnings ?? []),
+            ...(queryJson.warnings ?? []),
+          ],
+        });
+      } else {
+        setQueryBuilderJson(queryJson);
+      }
+
       if (queryJson.rules.length === 0) {
         appendError(RuleErrors.NO_QUERY_FOUND);
       }
-      if (resetOnSearch) resetField("cohortQueryInput", { defaultValue: "" });
+
+      if (resetOnSearch) {
+        resetField("cohortQueryInput", { defaultValue: "" });
+      }
+
+      setQueryMode(null);
+      setOpenSearchOverlap(false);
     },
     [
+      requiresQueryModeChoice,
       resetOnSearch,
       resetField,
       appendError,
@@ -131,6 +197,8 @@ const CohortQueryInput = ({
       resetQuery,
       setQueryBuilderJson,
       includeSynthetic,
+      queryMode,
+      queryBuilderJson,
     ],
   );
 
@@ -154,18 +222,10 @@ const CohortQueryInput = ({
     {
       delay: defaults.searchWaitTime,
       shouldApplyImmediately,
-      onValueChange: handleSearch,
     },
   );
 
-  const isTyping = isDirty ? liveInput !== searchedValue : false;
-
-  const isFetchingCohortRules =
-    useIsFetching({ queryKey: ["cohortRules"] }) > 0;
-
-  const showLoader = isTyping || isFetchingCohortRules;
-
-  const lastSyncedQueryAsText = useRef<string | null>(null);
+  const showLoader = useIsFetching({ queryKey: ["cohortRules"] }) > 0;
 
   useEffect(() => {
     if (!syncFromQueryAsText) return;
@@ -174,6 +234,7 @@ const CohortQueryInput = ({
     lastSyncedQueryAsText.current = queryAsText;
 
     clearFormErrors();
+
     const nextValue = (errors.length > 0 ? searchedValue : queryAsText).trim();
 
     programmaticValueRef.current = nextValue;
@@ -204,16 +265,26 @@ const CohortQueryInput = ({
   ]);
 
   const placeholders = Object.keys(EXAMPLES);
-  const anchorRef = useRef<HTMLDivElement | null>(null);
-  const [open, setOpen] = useState(false);
 
   const onSubmit = useCallback(
-    (e?: React.BaseSyntheticEvent) =>
-      handleSubmitSearch(async ({ cohortQueryInput }) => {
+    (e?: React.BaseSyntheticEvent) => {
+      if (requiresQueryModeChoice) {
+        e?.preventDefault?.();
+        return;
+      }
+
+      return handleSubmitSearch(async ({ cohortQueryInput }) => {
         await handleSearch(cohortQueryInput);
         flushSearchedValue();
-      }, resetQuery)(e),
-    [handleSubmitSearch, handleSearch, resetQuery, flushSearchedValue],
+      }, resetQuery)(e);
+    },
+    [
+      requiresQueryModeChoice,
+      handleSubmitSearch,
+      handleSearch,
+      resetQuery,
+      flushSearchedValue,
+    ],
   );
 
   return (
@@ -233,47 +304,93 @@ const CohortQueryInput = ({
             message: "Query must be at least 3 characters",
           },
         }}
-        render={({ field, fieldState: { error, isDirty } }) => (
-          <Box display="flex" flexDirection="row" sx={{ gap: 1 }}>
-            <Box ref={anchorRef} sx={{ flex: 1 }}>
-              <SearchBox
-                {...field}
-                startIcon={<SearchIcon fontSize="medium" sx={{ ml: 2 }} />}
-                collapsible={false}
-                error={isDirty ? false : !!error}
-                type="search"
-                placeholders={placeholders}
-                fullWidth
-                variant="outlined"
-                loading={showLoader}
-                warning={warnings.length > 0}
-                disabled={disabled || !!error}
-                showEndIcon={false}
-                onFocus={() => setOpen(true)}
-                onBlur={() => {
-                  field.onBlur();
-                  setTimeout(() => setOpen(false), 150);
-                }}
-                onChange={(e) => {
-                  programmaticValueRef.current = null;
+        render={({ field, fieldState: { error, isDirty } }) => {
+          const hasInput = String(field.value ?? "").trim().length > 0;
+          const showChoicePrompt = requiresQueryModeChoice && !hasInput;
 
-                  field.onChange(e);
-                  if (e.target.value) setOpen(false);
-                }}
-              />
-              <SearchOverlay
-                queries={queries}
-                open={open}
-                anchorEl={anchorRef.current}
-                options={placeholders.map((label) => ({
-                  label,
-                  value: EXAMPLES[label].id,
-                  rules: EXAMPLES[label],
-                }))}
-              />
+          const searchDisabled = showChoicePrompt || !!error || !hasInput;
+
+          return (
+            <Box display="flex" flexDirection="row" sx={{ gap: 1 }}>
+              <Box ref={anchorRef} sx={{ flex: 1 }}>
+                <SearchBox
+                  {...field}
+                  startIcon={<SearchIcon fontSize="medium" sx={{ ml: 2 }} />}
+                  collapsible={false}
+                  error={isDirty && !!error}
+                  type="search"
+                  placeholders={placeholders}
+                  placeholderOverride={
+                    showChoicePrompt ? (
+                      <Typography component="div">
+                        Do you want to{" "}
+                        <InlineChoiceButton
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => {
+                            setQueryMode("fresh");
+                            setOpenSearchOverlap(true);
+                          }}
+                        >
+                          Start Fresh
+                        </InlineChoiceButton>{" "}
+                        or{" "}
+                        <InlineChoiceButton
+                          sx={{ px: 0.5 }}
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => {
+                            setQueryMode("append");
+                            setOpenSearchOverlap(true);
+                          }}
+                        >
+                          Add
+                        </InlineChoiceButton>{" "}
+                        to the existing query?
+                      </Typography>
+                    ) : undefined
+                  }
+                  fullWidth
+                  variant="outlined"
+                  loading={showLoader}
+                  warning={warnings.length > 0}
+                  readOnly={showChoicePrompt}
+                  disabled={searchDisabled}
+                  showEndIcon
+                  endIcon={<ArrowForwardIcon />}
+                  onClickEndAdornment={onSubmit}
+                  onFocus={() => {
+                    if (!showChoicePrompt) {
+                      setOpenSearchOverlap(true);
+                    }
+                  }}
+                  onBlur={() => {
+                    field.onBlur();
+                    setTimeout(() => setOpenSearchOverlap(false), 150);
+                  }}
+                  onChange={(e) => {
+                    programmaticValueRef.current = null;
+
+                    field.onChange(e);
+
+                    if (e.target.value) {
+                      setOpenSearchOverlap(false);
+                    }
+                  }}
+                />
+
+                <SearchOverlay
+                  queries={queries}
+                  open={!showChoicePrompt && openSearchOverlap}
+                  anchorEl={anchorRef.current}
+                  options={placeholders.map((label) => ({
+                    label,
+                    value: EXAMPLES[label].id,
+                    rules: EXAMPLES[label],
+                  }))}
+                />
+              </Box>
             </Box>
-          </Box>
-        )}
+          );
+        }}
       />
     </Box>
   );

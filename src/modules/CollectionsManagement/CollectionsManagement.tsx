@@ -52,6 +52,7 @@ const CollectionsManagement = ({ isAdmin, collections }: Props) => {
       <ControlledSearchBox<CollectionsSearchParams>
         paramName="search_term"
         placeholder="Search by collection name..."
+        submitOnChange
       />
       <ThreePaneProvider>
         <ThreePaneSwimLaneLayout
