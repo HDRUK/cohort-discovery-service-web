@@ -256,7 +256,7 @@ export const CohortBuilderProvider = ({
       },
       {
         action: () => createAndScroll(createNewOperator),
-        label: "Add And/Or",
+        label: "Add and/or",
       },
       {
         action: () => createAndScroll(createNewAgeFilter),
