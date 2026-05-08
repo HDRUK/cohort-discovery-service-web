@@ -149,7 +149,7 @@ const CohortQueryInput = ({
           query: trimmed.slice(match[0].length).trim(),
           combinator: requestedCombinator,
           convertToGroup:
-            queryBuilderJson.rules.length > 0 &&
+            queryBuilderJson.rules.length > 1 &&
             requestedCombinator !== groupLevelCombinator,
         };
       };

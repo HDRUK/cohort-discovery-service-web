@@ -20,6 +20,7 @@ const SearchOverlay = ({ queries, options, anchorEl, open }: Props) => {
 
   return (
     <Popper
+      data-testid="search-overlay"
       open={open}
       anchorEl={anchorEl}
       placement="bottom-start"
@@ -27,6 +28,7 @@ const SearchOverlay = ({ queries, options, anchorEl, open }: Props) => {
       style={{ zIndex: 2000 }}
     >
       <Paper
+        data-testid="search-overlay-paper"
         sx={{
           width: anchorEl?.clientWidth,
           boxShadow: 3,
