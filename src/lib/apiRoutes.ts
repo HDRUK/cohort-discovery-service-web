@@ -7,6 +7,7 @@ export const API_ROUTES = {
   tasks: `${API_URL}/tasks`,
   getTask: (pid: string) => `${API_URL}/task/${pid}`,
   queries: `${API_URL}/queries`,
+  query: `${API_URL}/query`,
   deleteQueriesBulk: `${API_URL}/queries/delete/bulk`,
   rerunQuery: (id: string) => `${API_URL}/query/re-run/${id}`,
   parseQuery: `${API_URL}/parse-query`,
