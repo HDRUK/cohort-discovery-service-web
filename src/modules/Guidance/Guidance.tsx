@@ -42,7 +42,7 @@ import { AddChipProps } from "@/components/AddChip/AddChip";
 import AddTimeFrameButton from "@/components/AddTimeFrameButton";
 import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
 import { CustomH1, CustomH2 } from "@/components/GuidanceHeaders";
-import { getDomain, getDomainPhrase } from "@/utils/omop";
+import { getDomain, getDomainPastPhrase, getDomainPhrase } from "@/utils/omop";
 import DeleteTimeFrameButton from "@/components/DeleteTimeFrameButton";
 import DeleteMenuItem, {
   DeleteMenuItemProps,
@@ -318,7 +318,8 @@ const Guidance = () => {
 
       const concept = selectedNode?.rule?.concept;
       const category = concept?.category || "";
-      const { verb, past } = getDomainPhrase(category);
+      const { verb } = getDomainPhrase(category);
+      const past = getDomainPastPhrase(category);
       const domain = getDomain(concept);
 
       return (
