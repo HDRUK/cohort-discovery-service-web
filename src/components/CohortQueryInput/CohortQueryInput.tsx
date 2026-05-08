@@ -8,7 +8,12 @@ import SearchBox from "../SearchBox";
 import SearchIcon from "@mui/icons-material/Search";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { useDebounce } from "@/hooks/useDebounce";
-import { createOperator, RuleErrors } from "@/utils/rules";
+import {
+  createOperator,
+  createRuleGroup,
+  getFirstTopLevelCombinator,
+  RuleErrors,
+} from "@/utils/rules";
 import { EXAMPLES } from "@/config/queryExamples";
 import { Query } from "@/types/api";
 import SearchOverlay from "./SearchOverlay";
@@ -122,26 +127,36 @@ const CohortQueryInput = ({
       const parseQueryInput = (raw: string) => {
         const trimmed = raw.trim();
 
+        const groupLevelCombinator = getFirstTopLevelCombinator(
+          queryBuilderJson.rules,
+        );
+
         const match = trimmed.match(/^(and|or)\b\s*/i);
         if (!match) {
           return {
             query: trimmed,
-            combinator: CombinatorType.AND,
+            combinator: groupLevelCombinator,
+            convertToGroup: false,
           };
         }
 
+        const requestedCombinator =
+          match[1].toLowerCase() === "or"
+            ? CombinatorType.OR
+            : CombinatorType.AND;
+
         return {
           query: trimmed.slice(match[0].length).trim(),
-          combinator:
-            match[1].toLowerCase() === "or"
-              ? CombinatorType.OR
-              : CombinatorType.AND,
+          combinator: requestedCombinator,
+          convertToGroup:
+            queryBuilderJson.rules.length > 0 &&
+            requestedCombinator !== groupLevelCombinator,
         };
       };
 
       if (requiresQueryModeChoice) return;
 
-      const { query: q, combinator } = parseQueryInput(raw);
+      const { query: q, combinator, convertToGroup } = parseQueryInput(raw);
 
       if (programmaticValueRef.current === q) return;
       if (q.length < MIN_SEARCH_LENGTH) return;
@@ -159,12 +174,16 @@ const CohortQueryInput = ({
       });
 
       if (queryMode === "append") {
+        const existingRules = convertToGroup
+          ? [createRuleGroup(queryBuilderJson.rules)]
+          : queryBuilderJson.rules;
+
         setQueryBuilderJson({
           ...queryBuilderJson,
           rules: [
             ...queryJson.rules,
             createOperator(combinator),
-            ...queryBuilderJson.rules,
+            ...existingRules,
           ],
           warnings: [
             ...(queryBuilderJson.warnings ?? []),
