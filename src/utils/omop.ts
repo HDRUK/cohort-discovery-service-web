@@ -27,6 +27,12 @@ const getDomainPhrase = (category?: string): DomainPhrase => {
   );
 };
 
+const getPastPhrase = ({ pastPrefix, verbPast }: DomainPhrase): string =>
+  [pastPrefix, verbPast].filter(Boolean).join(" ");
+
+const getDomainPastPhrase = (category?: string): string =>
+  getPastPhrase(getDomainPhrase(category));
+
 const getDomain = (
   concept: Concept | Concept[] | null,
   options: { useDefault?: boolean } = {},
@@ -45,4 +51,4 @@ const getDomain = (
   return capitaliseFirstLetter(mapped);
 };
 
-export { codesToOption, getDomainPhrase, getDomain };
+export { codesToOption, getDomainPhrase, getDomainPastPhrase, getDomain };

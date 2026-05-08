@@ -160,6 +160,13 @@ export const isInGroup = (id: string, boardIndex: BoardIndex) => {
   return !boardContents?.includes(id);
 };
 
+export const getFirstTopLevelCombinator = (
+  rules: RuleNodeType[],
+): CombinatorType => {
+  const combinatorRule = rules.find((r) => isOperator(r));
+  return combinatorRule?.combinator ?? CombinatorType.AND;
+};
+
 export const findById = (
   root: RuleNodeType,
   id: string,

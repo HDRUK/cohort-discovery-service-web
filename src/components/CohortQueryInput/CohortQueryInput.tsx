@@ -8,7 +8,12 @@ import SearchBox from "../SearchBox";
 import SearchIcon from "@mui/icons-material/Search";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { useDebounce } from "@/hooks/useDebounce";
-import { createOperator, RuleErrors } from "@/utils/rules";
+import {
+  createOperator,
+  createRuleGroup,
+  getFirstTopLevelCombinator,
+  RuleErrors,
+} from "@/utils/rules";
 import { EXAMPLES } from "@/config/queryExamples";
 import { Query } from "@/types/api";
 import SearchOverlay from "./SearchOverlay";
@@ -16,12 +21,16 @@ import { useDefaults } from "@/providers/DefaultProvider";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import InlineChoiceButton from "./InlineChoiceButton";
 import { CombinatorType } from "@/types/rules";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 
 type FormValues = {
   cohortQueryInput: string;
 };
 
-type QueryMode = "fresh" | "append" | null;
+enum QueryMode {
+  FRESH = "fresh",
+  APPEND = "append",
+}
 
 const MIN_SEARCH_LENGTH = 3;
 const STALE_TIME = 60_000;
@@ -55,7 +64,7 @@ const CohortQueryInput = ({
 
   const queryClient = useQueryClient();
 
-  const [queryMode, setQueryMode] = useState<QueryMode>(null);
+  const [queryMode, setQueryMode] = useState<QueryMode | null>(null);
   const [openSearchOverlap, setOpenSearchOverlap] = useState(false);
 
   const programmaticValueRef = useRef<string | null>(null);
@@ -75,12 +84,33 @@ const CohortQueryInput = ({
     mode: "onChange",
   });
 
-  const hasExistingQuery = useMemo(
-    () => queryBuilderJson.rules.length > 0,
-    [queryBuilderJson.rules.length],
-  );
+  const isAppendMode = queryMode === QueryMode.APPEND;
 
-  const requiresQueryModeChoice = hasExistingQuery && queryMode === null;
+  const rulesKey = useMemo(
+    () => JSON.stringify(queryBuilderJson.rules),
+    [queryBuilderJson.rules],
+  );
+  const ruleCount = queryBuilderJson.rules.length;
+  const requiresQueryModeChoice = !!ruleCount && queryMode === null;
+
+  useEffect(() => {
+    /*
+     * Intentional exception to react-hooks/set-state-in-effect:
+     * queryMode/openSearchOverlap are transient local UI states tied to the
+     * current query builder contents.
+     *
+     * If the rules change outside this component (which they can do),
+     * the previous mode may no longer be valid.
+     * Resetting it forces the user back through the mode choice when
+     * requiresQueryModeChoice becomes true.
+     *
+     * Functional setters prevent redundant updates if already reset.
+     */
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setQueryMode((current) => (current === null ? current : null));
+
+    setOpenSearchOverlap((current) => (current ? false : current));
+  }, [rulesKey]);
 
   const resetQuery = useCallback(() => {
     clearFormErrors();
@@ -122,26 +152,36 @@ const CohortQueryInput = ({
       const parseQueryInput = (raw: string) => {
         const trimmed = raw.trim();
 
+        const groupLevelCombinator = getFirstTopLevelCombinator(
+          queryBuilderJson.rules,
+        );
+
         const match = trimmed.match(/^(and|or)\b\s*/i);
         if (!match) {
           return {
             query: trimmed,
-            combinator: CombinatorType.AND,
+            combinator: groupLevelCombinator,
+            convertToGroup: false,
           };
         }
 
+        const requestedCombinator =
+          match[1].toLowerCase() === "or"
+            ? CombinatorType.OR
+            : CombinatorType.AND;
+
         return {
           query: trimmed.slice(match[0].length).trim(),
-          combinator:
-            match[1].toLowerCase() === "or"
-              ? CombinatorType.OR
-              : CombinatorType.AND,
+          combinator: requestedCombinator,
+          convertToGroup:
+            queryBuilderJson.rules.length > 1 &&
+            requestedCombinator !== groupLevelCombinator,
         };
       };
 
       if (requiresQueryModeChoice) return;
 
-      const { query: q, combinator } = parseQueryInput(raw);
+      const { query: q, combinator, convertToGroup } = parseQueryInput(raw);
 
       if (programmaticValueRef.current === q) return;
       if (q.length < MIN_SEARCH_LENGTH) return;
@@ -158,13 +198,17 @@ const CohortQueryInput = ({
         staleTime: STALE_TIME,
       });
 
-      if (queryMode === "append") {
+      if (queryMode === QueryMode.APPEND) {
+        const existingRules = convertToGroup
+          ? [createRuleGroup(queryBuilderJson.rules)]
+          : queryBuilderJson.rules;
+
         setQueryBuilderJson({
           ...queryBuilderJson,
           rules: [
             ...queryJson.rules,
             createOperator(combinator),
-            ...queryBuilderJson.rules,
+            ...existingRules,
           ],
           warnings: [
             ...(queryBuilderJson.warnings ?? []),
@@ -310,6 +354,15 @@ const CohortQueryInput = ({
 
           const searchDisabled = showChoicePrompt || !!error || !hasInput;
 
+          const EndIcon = isAppendMode ? AddCircleIcon : ArrowForwardIcon;
+
+          const endIconSx = {
+            color: isAppendMode ? "success.main" : "inherit",
+          };
+
+          const showSearchOverlay =
+            !showChoicePrompt && !isAppendMode && openSearchOverlap;
+
           return (
             <Box display="flex" flexDirection="row" sx={{ gap: 1 }}>
               <Box ref={anchorRef} sx={{ flex: 1 }}>
@@ -327,7 +380,7 @@ const CohortQueryInput = ({
                         <InlineChoiceButton
                           onMouseDown={(e) => e.preventDefault()}
                           onClick={() => {
-                            setQueryMode("fresh");
+                            setQueryMode(QueryMode.FRESH);
                             setOpenSearchOverlap(true);
                           }}
                         >
@@ -338,8 +391,8 @@ const CohortQueryInput = ({
                           sx={{ px: 0.5 }}
                           onMouseDown={(e) => e.preventDefault()}
                           onClick={() => {
-                            setQueryMode("append");
-                            setOpenSearchOverlap(true);
+                            setQueryMode(QueryMode.APPEND);
+                            setOpenSearchOverlap(false);
                           }}
                         >
                           Add
@@ -355,10 +408,10 @@ const CohortQueryInput = ({
                   readOnly={showChoicePrompt}
                   disabled={searchDisabled}
                   showEndIcon
-                  endIcon={<ArrowForwardIcon />}
+                  endIcon={<EndIcon sx={endIconSx} />}
                   onClickEndAdornment={onSubmit}
                   onFocus={() => {
-                    if (!showChoicePrompt) {
+                    if (!showChoicePrompt && !isAppendMode) {
                       setOpenSearchOverlap(true);
                     }
                   }}
@@ -371,7 +424,7 @@ const CohortQueryInput = ({
 
                     field.onChange(e);
 
-                    if (e.target.value) {
+                    if (e.target.value || isAppendMode) {
                       setOpenSearchOverlap(false);
                     }
                   }}
@@ -379,7 +432,7 @@ const CohortQueryInput = ({
 
                 <SearchOverlay
                   queries={queries}
-                  open={!showChoicePrompt && openSearchOverlap}
+                  open={showSearchOverlay}
                   anchorEl={anchorRef.current}
                   options={placeholders.map((label) => ({
                     label,

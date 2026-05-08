@@ -137,7 +137,8 @@ const queryToText = (
     exclude: boolean,
   ): { verb: string | null; text: string | null; category?: string } => {
     const c = rule.concept;
-    if (!c) return { verb: null, text: null, category: undefined };
+
+    if (!c) return { verb: null, text: "[blank]", category: undefined };
 
     if (isSingleConcept(c)) {
       const verb = getVerb(c.category, exclude);

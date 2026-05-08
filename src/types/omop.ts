@@ -24,15 +24,20 @@ export enum OmopTableName {
 
 export type DomainPhrase = {
   verb: string;
-  past: string;
+  verbPast: string;
+  pastPrefix: string;
   noun: string;
   include: string;
   exclude: string;
 };
 
+export const getPastPhrase = ({ pastPrefix, verbPast }: DomainPhrase): string =>
+  [pastPrefix, verbPast].filter(Boolean).join(" ");
+
 export const DEFAULT_DOMAIN_PHRASE: DomainPhrase = {
   verb: "record",
-  past: "was recorded",
+  verbPast: "recorded",
+  pastPrefix: "was",
   noun: "record",
   include: "were associated with",
   exclude: "were not associated with",
@@ -41,91 +46,104 @@ export const DEFAULT_DOMAIN_PHRASE: DomainPhrase = {
 export const DOMAIN_PHRASES: Record<OmopTableName, DomainPhrase> = {
   [OmopTableName.Sex]: {
     verb: "record",
-    past: "was recorded",
+    verbPast: "recorded",
+    pastPrefix: "was",
     noun: "sex",
     include: "were recorded as being",
     exclude: "were not recorded as being",
   },
   [OmopTableName.Condition]: {
     verb: "diagnose",
-    past: "was diagnosed",
+    verbPast: "diagnosed",
+    pastPrefix: "was",
     noun: "diagnosis",
     include: "were diagnosed with",
     exclude: "were not diagnosed with",
   },
   [OmopTableName.Drug]: {
     verb: "take",
-    past: "was taken",
+    verbPast: "taken",
+    pastPrefix: "was",
     noun: "medication",
     include: "received",
     exclude: "did not receive",
   },
   [OmopTableName.Measurement]: {
     verb: "measure",
-    past: "was measured",
+    verbPast: "measured",
+    pastPrefix: "was",
     noun: "measurement",
     include: "were measured with",
     exclude: "were not measured with",
   },
   [OmopTableName.Observation]: {
     verb: "observe",
-    past: "was observed",
+    verbPast: "observed",
+    pastPrefix: "was",
     noun: "observation",
     include: "were observed with",
     exclude: "were not observed with",
   },
   [OmopTableName.Procedure]: {
     verb: "perform",
-    past: "was performed",
+    verbPast: "performed",
+    pastPrefix: "was",
     noun: "procedure",
     include: "underwent",
     exclude: "did not undergo",
   },
   [OmopTableName.Device]: {
     verb: "expose",
-    past: "was exposed",
+    verbPast: "exposed",
+    pastPrefix: "was",
     noun: "device",
     include: "were exposed to",
     exclude: "were not exposed to",
   },
   [OmopTableName.Visit]: {
     verb: "visit",
-    past: "had a visit",
+    verbPast: "visit",
+    pastPrefix: "had a",
     noun: "visit",
     include: "had",
     exclude: "did not have",
   },
   [OmopTableName.Death]: {
     verb: "die",
-    past: "died",
+    verbPast: "died",
+    pastPrefix: "",
     noun: "death",
     include: "died",
     exclude: "did not die",
   },
   [OmopTableName.Specimen]: {
     verb: "collect",
-    past: "was collected",
+    verbPast: "collected",
+    pastPrefix: "was",
     noun: "specimen",
     include: "had a specimen collected",
     exclude: "did not have a specimen collected",
   },
   [OmopTableName.Gender]: {
     verb: "record",
-    past: "was recorded",
+    verbPast: "recorded",
+    pastPrefix: "was",
     noun: "gender",
     include: "were recorded as being",
     exclude: "were not recorded as being",
   },
   [OmopTableName.Race]: {
     verb: "record",
-    past: "was recorded",
+    verbPast: "recorded",
+    pastPrefix: "was",
     noun: "race",
     include: "were recorded as being",
     exclude: "were not recorded as being",
   },
   [OmopTableName.Ethnicity]: {
     verb: "record",
-    past: "was recorded",
+    verbPast: "recorded",
+    pastPrefix: "was",
     noun: "ethnicity",
     include: "were recorded as being",
     exclude: "were not recorded as being",
