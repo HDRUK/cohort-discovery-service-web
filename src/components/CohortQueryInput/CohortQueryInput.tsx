@@ -254,6 +254,7 @@ const CohortQueryInput = ({
 
   const shouldApplyImmediately = (v: string) => v.trim() === "";
 
+  // debounce live input at a shorter interval to prefetch it
   useDebounce(liveInput, {
     delay: defaults.searchPrefetch,
     shouldApplyImmediately,
