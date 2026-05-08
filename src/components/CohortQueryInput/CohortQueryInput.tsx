@@ -91,7 +91,7 @@ const CohortQueryInput = ({
     [queryBuilderJson.rules],
   );
   const ruleCount = queryBuilderJson.rules.length;
-  const requiresQueryModeChoice = ruleCount && queryMode === null;
+  const requiresQueryModeChoice = !!ruleCount && queryMode === null;
 
   useEffect(() => {
     /*
@@ -353,10 +353,9 @@ const CohortQueryInput = ({
 
           const searchDisabled = showChoicePrompt || !!error || !hasInput;
 
-          const StartIcon = isAppendMode ? AddCircleIcon : SearchIcon;
+          const EndIcon = isAppendMode ? AddCircleIcon : ArrowForwardIcon;
 
-          const startIconSx = {
-            ml: 2,
+          const endIconSx = {
             color: isAppendMode ? "success.main" : "inherit",
           };
 
@@ -368,7 +367,7 @@ const CohortQueryInput = ({
               <Box ref={anchorRef} sx={{ flex: 1 }}>
                 <SearchBox
                   {...field}
-                  startIcon={<StartIcon fontSize="medium" sx={startIconSx} />}
+                  startIcon={<SearchIcon fontSize="medium" sx={{ ml: 2 }} />}
                   collapsible={false}
                   error={isDirty && !!error}
                   type="search"
@@ -408,7 +407,7 @@ const CohortQueryInput = ({
                   readOnly={showChoicePrompt}
                   disabled={searchDisabled}
                   showEndIcon
-                  endIcon={<ArrowForwardIcon />}
+                  endIcon={<EndIcon sx={endIconSx} />}
                   onClickEndAdornment={onSubmit}
                   onFocus={() => {
                     if (!showChoicePrompt && !isAppendMode) {
