@@ -1,3 +1,23 @@
+## [1.5.0](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.4.0...v1.5.0) (2026-05-11)
+
+### ✨ Features
+
+* **DP-711:** Separate Query status for Partial Results (#366) ([6ad2642](https://github.com/HDRUK/cohort-discovery-service-web/commit/6ad2642fd86f804905f32e519c815271e99e5b3a)), closes [DP-711](DP-711)
+* **DP-799:** Rule Builder auto scrolls to top of the builder container when rules are added (#369) ([9e62e70](https://github.com/HDRUK/cohort-discovery-service-web/commit/9e62e7056209f00d79535663151caca3f7a08a3c)), closes [DP-799](DP-799)
+* **DP-801:** Fixes for incomplete searches (#372) ([7c6f500](https://github.com/HDRUK/cohort-discovery-service-web/commit/7c6f500ca05b5bd5d8c5f266bbe04b6ba4e8f92d))
+
+### 🐛 Bug Fixes
+
+* **DP-747:** :airplane: Update the second query example (#368) ([3e0c633](https://github.com/HDRUK/cohort-discovery-service-web/commit/3e0c6332f57fb591af9fcd9e73284a65e20a32e7)), closes [DP-747](DP-747)
+* **DP-754:** Fixing the functionality for deleting queries (#363) ([59fe1c7](https://github.com/HDRUK/cohort-discovery-service-web/commit/59fe1c75c9bf65e9936ccde7af071eaf00a25dc0)), closes [DP-754](DP-754)
+* **DP-754:** Query results table scrollable  (#362) ([32e33cf](https://github.com/HDRUK/cohort-discovery-service-web/commit/32e33cfbf8d4b7ce53405c0b57b4c43f2062b7b3)), closes [DP-754](DP-754)
+* **DP-755:** Names for demographic and medication rules (#367) ([1fa58b5](https://github.com/HDRUK/cohort-discovery-service-web/commit/1fa58b570b1da4ab62399cbd07d7e35656f4c1dc)), closes [DP-755](DP-755)
+* **DP-762:** Add padding between text query and button (#364) ([9a518dc](https://github.com/HDRUK/cohort-discovery-service-web/commit/9a518dcda7a712e8232a2446bc66cde9e964f9d5)), closes [DP-762](DP-762)
+* **DP-768:** Enable user name search (#365) ([74dcae8](https://github.com/HDRUK/cohort-discovery-service-web/commit/74dcae8d055d4703c4a39f36952a0f07bab197fd)), closes [DP-768](DP-768)
+* **DP-778:** Select Datasets is a fixed height (#370) ([a29b305](https://github.com/HDRUK/cohort-discovery-service-web/commit/a29b3057ed1947f0d04eb4eb54f0f1fcbe2a9254))
+* **DP-803:** Appending to searchers (#374) ([f9dc873](https://github.com/HDRUK/cohort-discovery-service-web/commit/f9dc873218157e3f8de5c5dc4e51969721335df3)), closes [DP-803](DP-803)
+* **DP-819:** Search box behaviour with existing queries (#378) ([e832633](https://github.com/HDRUK/cohort-discovery-service-web/commit/e8326331f7983b3c4e60a90c1b07fddb668b6de7)), closes [DP-819](DP-819)
+
 ## [1.4.0](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.3.0...v1.4.0) (2026-04-27)
 
 ### ✨ Features
