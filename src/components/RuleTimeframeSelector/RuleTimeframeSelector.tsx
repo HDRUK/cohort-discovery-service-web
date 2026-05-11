@@ -79,7 +79,7 @@ const RuleTimeframeSelector = ({
     disableOpenPicker: readOnly ? true : false,
   };
 
-  const { verb } = getDomainPhrase(rule.rule.concept?.category);
+  const { verbPast } = getDomainPhrase(rule.rule.concept?.category);
 
   const parseIsoToDayjs = useCallback(
     (iso: string | null) => (iso ? dayjs(iso) : null),
@@ -101,7 +101,6 @@ const RuleTimeframeSelector = ({
         flex={flex}
       >
         {title && <CustomH1>{title}</CustomH1>}
-
         <SingleBoundSelector<string, Dayjs>
           constraint={rule.timeConstraint ?? []}
           constraintOperator={
@@ -120,7 +119,7 @@ const RuleTimeframeSelector = ({
           parse={parseIsoToDayjs}
           serialise={serialiseDayjsToIso}
           readOnly={readOnly}
-          anyLabel={`${capitaliseFirstLetter(verb)} at any time`}
+          anyLabel={`${capitaliseFirstLetter(verbPast)} at any time`}
           renderPicker={({ value, onChange }) => (
             <DatePicker
               {...commonPickerProps}
@@ -130,12 +129,12 @@ const RuleTimeframeSelector = ({
           )}
           renderReadOnlyLabel={({ operator, value }) =>
             value
-              ? `${capitaliseFirstLetter(verb)} ${
+              ? `${capitaliseFirstLetter(verbPast)} ${
                   operator === SingleSidedOperator.GREATER_THAN
                     ? "after"
                     : "before"
                 } ${value.format("MM-YYYY")}`
-              : `${capitaliseFirstLetter(verb)} at any time`
+              : `${capitaliseFirstLetter(verbPast)} at any time`
           }
         />
         {children}

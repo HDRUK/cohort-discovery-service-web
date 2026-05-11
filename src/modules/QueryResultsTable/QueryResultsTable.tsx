@@ -2,7 +2,7 @@
 
 import { Query, Task, Result } from "../../types/api";
 import { MRT_TableOptions, type MRT_ColumnDef } from "material-react-table";
-import { Box, CircularProgress, Link } from "@mui/material";
+import { CircularProgress, Link } from "@mui/material";
 import ErrorIcon from "@/components/ErrorIcon";
 import LaunchIcon from "@mui/icons-material/Launch";
 import { useEffect, useMemo } from "react";
@@ -16,6 +16,7 @@ import getQuery from "@/actions/query/getQuery";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import QueryHistoryGuidance from "../QueryHistory";
 import { useDefaults } from "@/providers/DefaultProvider";
+import TwoPaneSwimLaneLayout from "@/modules/TwoPaneSwimLaneLayout";
 
 interface QueryResultsTableProps {
   initialData: Query;
@@ -184,22 +185,21 @@ const QueryResultsTable = ({
     ...useTableProps,
   });
 
+  const tableContent = <Table table={table} {...tableProps} />;
+
   return (
-    <Box sx={{ p: 2, gap: 2, display: "flex", flexDirection: "column" }}>
-      <Table
-        table={table}
-        {...(showGuidance
-          ? {
-              rightPanel: QueryHistoryGuidance,
-              rightPanelProps: {
-                resultsView: true,
-                currentResult: initialData.pid,
-              },
-            }
-          : {})}
-        {...tableProps}
-      />
-    </Box>
+    <>
+      {showGuidance ? (
+        <TwoPaneSwimLaneLayout
+          left={tableContent}
+          right={
+            <QueryHistoryGuidance resultsView currentResult={initialData.pid} />
+          }
+        />
+      ) : (
+        tableContent
+      )}
+    </>
   );
 };
 

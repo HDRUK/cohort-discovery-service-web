@@ -30,6 +30,7 @@ const AdminUserList = ({ users }: { users: User[] }) => {
           width: "calc(100% - 60px)",
         }}
         placeholder="Search users..."
+        submitOnChange
       />
       <TabsShell
         tabs={[

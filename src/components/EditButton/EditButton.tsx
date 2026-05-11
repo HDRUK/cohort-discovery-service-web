@@ -25,6 +25,9 @@ const EditButton = ({ children, label, isIcon, ...rest }: EditButtonProps) => {
           color: "text.primary",
           fontWeight: "normal",
           fontSize: 14,
+          "&.MuiButton-root:hover": {
+            backgroundColor: "highlight.main",
+          },
         },
         startIcon: <EditIcon fontSize={"small"} />,
       };

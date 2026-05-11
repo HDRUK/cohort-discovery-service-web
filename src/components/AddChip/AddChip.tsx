@@ -66,11 +66,11 @@ const AddChip = ({
             pl: 1,
             pr: 0.5,
             color: "text.primary",
-            backgroundColor: isHighlighted ? "grey.300" : "white",
+            backgroundColor: isHighlighted ? "highlight.main" : "white",
             borderColor: "text.secondary",
             borderWidth: "1px",
             "&.MuiChip-root:hover": {
-              backgroundColor: isHighlighted ? "grey.300" : "white",
+              backgroundColor: isHighlighted ? "highlight.main" : "white",
             },
           }}
           label={label}

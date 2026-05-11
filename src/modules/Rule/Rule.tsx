@@ -18,7 +18,7 @@ import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import useNodeActions from "@/hooks/useNodeActions";
 import InvalidRule from "@/components/InvalidRule";
-import { mapDomain } from "@/utils/domains";
+import { getDomain } from "@/utils/omop";
 
 export interface RuleProps extends Omit<
   RuleWrapperProps,
@@ -33,11 +33,6 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     id,
     rule: { concept },
   } = rule;
-
-  const domain =
-    concept && Array.isArray(concept)
-      ? concept?.[0].category
-      : concept?.category;
 
   const {
     queryBuilderJson,
@@ -131,8 +126,8 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       groupId={groupId}
       sortable={true}
       headerExtra={
-        !isEmptyRule(rule) && domain ? (
-          <Chip variant="outlined" label={mapDomain(domain)} />
+        !isEmptyRule(rule) ? (
+          <Chip variant="outlined" label={getDomain(concept)} />
         ) : null
       }
       render={() => (

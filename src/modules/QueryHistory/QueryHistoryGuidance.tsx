@@ -5,13 +5,20 @@ import ActionMenuSection from "@/components/ActionMenuSection";
 import { Typography } from "@mui/material";
 import { CustomH1 } from "@/components/GuidanceHeaders";
 
-const QueryHistoryGuidance = (
-  selectedIds: string[],
-  resultsView: boolean = false,
-  currentResult: string = "",
-) => {
-  const empty = !selectedIds.length && currentResult === "";
+interface QueryHistoryGuidanceProps {
+  selectedIds?: string[];
+  onClear?: () => void;
+  resultsView?: boolean;
+  currentResult?: string;
+}
 
+const QueryHistoryGuidance = ({
+  selectedIds = [],
+  resultsView = false,
+  onClear,
+  currentResult = "",
+}: QueryHistoryGuidanceProps) => {
+  const empty = !selectedIds.length && currentResult === "";
   const multiple = !empty && selectedIds.length > 1;
 
   return (
@@ -29,12 +36,17 @@ const QueryHistoryGuidance = (
         !resultsView &&
         "Select a result row to edit a previous query, rerun it to generate updated results, download the output, or remove it from your list. You can also select multiple to bulk delete or download."}
       {!empty && !resultsView && (
-        <HistoryActions multiple={multiple} selectedIds={selectedIds} />
+        <HistoryActions
+          multiple={multiple}
+          selectedIds={selectedIds}
+          onClear={onClear}
+        />
       )}
       {!empty && resultsView && currentResult && (
         <HistoryActions
           multiple={multiple}
           selectedIds={[currentResult]}
+          onClear={onClear}
           resultsView
         />
       )}
@@ -46,7 +58,7 @@ const QueryHistoryGuidance = (
       is for counts below 10.
       <CustomH1>Statuses</CustomH1>
       <Typography>
-        <b>Pending</b> — The query is currently running and are awaiting the
+        <b>Pending</b> — The query is currently running and is awaiting the
         return of results.
       </Typography>
       <Typography>

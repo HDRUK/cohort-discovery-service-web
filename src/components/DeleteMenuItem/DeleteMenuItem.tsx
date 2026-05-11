@@ -20,7 +20,7 @@ const DeleteMenuItem = ({ label, action, ...rest }: DeleteMenuItemProps) => {
             fontWeight: "normal",
             color: "text.primary",
             "&:hover": {
-              backgroundColor: "text.secondary",
+              backgroundColor: "highlight.main",
             },
           }}
           {...rest}
@@ -36,7 +36,7 @@ const DeleteMenuItem = ({ label, action, ...rest }: DeleteMenuItemProps) => {
             color: "text.primary",
             borderRadius: "100px",
             "&:hover": {
-              backgroundColor: "text.secondary",
+              backgroundColor: "highlight.main",
             },
           }}
         >

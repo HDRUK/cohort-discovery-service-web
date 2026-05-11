@@ -15,8 +15,6 @@ import {
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-
-import deleteQueries from "@/actions/query/deleteQueries";
 import getQuery from "@/actions/query/getQuery";
 import rerunQuery from "@/actions/query/rerunQuery";
 import DeleteMenuItem from "@/components/DeleteMenuItem";
@@ -30,14 +28,17 @@ import useSearchParams from "@/hooks/useSearchParams";
 import { useNotify } from "@/providers/NotifyProvider";
 import { useRouter } from "next/navigation";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
+import deleteQueries from "@/actions/query/deleteQueries";
 
 const HistoryActions = ({
   multiple = false,
   selectedIds,
+  onClear,
   resultsView = false,
 }: {
   multiple: boolean;
   selectedIds: string[];
+  onClear?: () => void;
   resultsView?: boolean;
 }) => {
   const { searchParams } = useSearchParams();
@@ -45,7 +46,6 @@ const HistoryActions = ({
   const notify = useNotify();
   const { setQueryBuilderJson, setSelectedDatasets, setQueryName } =
     useQueryBuilder((qb) => ({
-      resetQueryBuilderJson: qb.resetQueryBuilderJson,
       setSelectedDatasets: qb.setSelectedDatasets,
       setQueryBuilderJson: qb.setQueryBuilderJson,
       setQueryName: qb.setQueryName,
@@ -64,6 +64,8 @@ const HistoryActions = ({
 
   const handleDelete = async () => {
     await deleteQueries(selectedIds);
+    onClear?.();
+
     const openQueries = (searchParams.get("open_queries") || "")
       .split(/,|%2C/)
       .filter((q) => q && !selectedIds.includes(q));
@@ -139,6 +141,9 @@ const HistoryActions = ({
               color: "text.primary",
               fontWeight: "normal",
               fontSize: 14,
+              "&.MuiButton-root:hover": {
+                backgroundColor: "highlight.main",
+              },
             }}
           />
           <Dialog open={dialogOpen}>

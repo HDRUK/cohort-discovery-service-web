@@ -12,9 +12,16 @@ import { useState } from "react";
 export type AddButtonProps = Omit<ButtonProps, "action" | "onClick"> & {
   label: string;
   onClick: () => void | Promise<void>;
+  buttonSx?: ButtonProps["sx"];
 };
 
-const AddButton = ({ label, onClick, disabled, ...rest }: AddButtonProps) => {
+const AddButton = ({
+  label,
+  onClick,
+  disabled,
+  buttonSx,
+  ...rest
+}: AddButtonProps) => {
   const { compact } = useActionMenuSection();
   const [loading, setLoading] = useState(false);
 
@@ -50,6 +57,10 @@ const AddButton = ({ label, onClick, disabled, ...rest }: AddButtonProps) => {
             justifyContent: "flex-start",
             textAlign: "left",
             color: "text.primary",
+            "&.MuiButton-root:hover": {
+              backgroundColor: "highlight.main",
+            },
+            ...buttonSx,
           }}
           {...rest}
         >

@@ -35,6 +35,7 @@ const WorkgroupsAdmin = ({
       <ControlledSearchBox<CollectionsSearchParams>
         paramName="search_term"
         placeholder="Search by collection name or username..."
+        submitOnChange
       />
       <ThreePaneProvider>
         <ThreePaneSwimLaneLayout

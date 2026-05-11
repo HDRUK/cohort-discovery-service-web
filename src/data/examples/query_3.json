@@ -32,13 +32,12 @@
           "exclude": false,
           "rule": {
             "concept": {
-              "concept_id": 3955320,
-              "name": "Moderna - SARS-CoV-2 (COVID-19) vaccine",
+              "concept_id": 37003518,
+              "name": "SARS-CoV-2 (COVID-19) vaccine, mRNA-1273 0.2 MG/ML Injectable Suspension",
               "category": "Drug",
               "children": []
             }
-          },
-          "valid": true
+          }
         },
         {
           "id": "2ca9902c-4538-49ce-915f-caee496ed330",
@@ -50,37 +49,12 @@
           "exclude": false,
           "rule": {
             "concept": {
-              "concept_id": 3955321,
-              "name": "Pfizer - SARS-CoV-2 (COVID-19) vaccine",
+              "concept_id": 37003436,
+              "name": "SARS-CoV-2 (COVID-19) vaccine, mRNA-BNT162b2 0.1 MG/ML Injectable Suspension",
               "category": "Drug",
-              "children": [],
-              "match_score": 98.2,
-              "tokens": [
-                "19",
-                "covid",
-                "pfizer",
-                "sars",
-                "cov",
-                "vaccine",
-                "2"
-              ],
-              "phrase_tokens": [
-                "pfizer sars",
-                "cov 2",
-                "sars cov",
-                "cov 2 covid",
-                "pfizer sars cov",
-                "sars cov 2",
-                "covid 19",
-                "2 covid 19",
-                "covid 19 vaccine",
-                "2 covid",
-                "19 vaccine"
-              ],
-              "alternatives": []
+              "children": []
             }
-          },
-          "valid": true
+          }
         }
       ],
       "valid": true

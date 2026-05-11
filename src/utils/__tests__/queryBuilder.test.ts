@@ -11,7 +11,7 @@ describe("queryToText", () => {
           id: uuidv4(),
           rule: {
             concept: {
-              concept_id: 0,
+              concept_id: 102,
               name: "Chronic laryngitis",
               category: "Condition",
             },
@@ -22,7 +22,7 @@ describe("queryToText", () => {
           id: uuidv4(),
           rule: {
             concept: {
-              concept_id: 0,
+              concept_id: 101,
               name: "Chronic kidney disease",
               category: "Condition",
             },
@@ -33,7 +33,7 @@ describe("queryToText", () => {
           id: uuidv4(),
           rule: {
             concept: {
-              concept_id: 0,
+              concept_id: 100,
               name: "Sickle cell-hemoglobin C disease",
               category: "Condition",
             },
@@ -55,7 +55,7 @@ describe("queryToText", () => {
           id: uuidv4(),
           rule: {
             concept: {
-              concept_id: 0,
+              concept_id: 100,
               name: "Chronic laryngitis",
               category: "Condition",
             },
@@ -78,7 +78,7 @@ describe("queryToText", () => {
           id: uuidv4(),
           rule: {
             concept: {
-              concept_id: 0,
+              concept_id: 100,
               name: "Type 2 diabetes mellitus",
               category: "Condition",
             },
@@ -101,7 +101,7 @@ describe("queryToText", () => {
           id: uuidv4(),
           rule: {
             concept: {
-              concept_id: 0,
+              concept_id: 101,
               name: "Chronic laryngitis",
               category: "Condition",
             },
@@ -113,7 +113,7 @@ describe("queryToText", () => {
           id: uuidv4(),
           rule: {
             concept: {
-              concept_id: 0,
+              concept_id: 102,
               name: "Sickle cell-hemoglobin C disease",
               category: "Condition",
             },
@@ -125,7 +125,7 @@ describe("queryToText", () => {
           id: uuidv4(),
           rule: {
             concept: {
-              concept_id: 0,
+              concept_id: 103,
               name: "Long Covid-19",
               category: "Observation",
             },
@@ -150,7 +150,7 @@ describe("queryToText", () => {
               id: uuidv4(),
               rule: {
                 concept: {
-                  concept_id: 0,
+                  concept_id: 101,
                   name: "Rubella IgG level",
                   category: "Measurement",
                 },
@@ -161,7 +161,7 @@ describe("queryToText", () => {
               id: uuidv4(),
               rule: {
                 concept: {
-                  concept_id: 0,
+                  concept_id: 102,
                   name: "Anti GA1 antibody level",
                   category: "Measurement",
                 },
@@ -185,7 +185,7 @@ describe("queryToText", () => {
           id: uuidv4(),
           rule: {
             concept: {
-              concept_id: 0,
+              concept_id: 99,
               name: "COVID-19 vaccine",
               category: "Drug",
             },
@@ -199,7 +199,7 @@ describe("queryToText", () => {
               id: uuidv4(),
               rule: {
                 concept: {
-                  concept_id: 0,
+                  concept_id: 101,
                   name: "Rubella IgG level",
                   category: "Measurement",
                 },
@@ -213,7 +213,7 @@ describe("queryToText", () => {
               id: uuidv4(),
               rule: {
                 concept: {
-                  concept_id: 0,
+                  concept_id: 102,
                   name: "Anti GA1 antibody level",
                   category: "Measurement",
                 },

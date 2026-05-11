@@ -7,7 +7,8 @@ import query3 from "@/data/examples/query_3.json";
 
 export const EXAMPLES: Record<string, RuleGroupType> = {
   "E.g. Women over 18 with Covid": query1 as RuleGroupType,
-  "E.g. Adults with diabetes and metformin": query2 as RuleGroupType,
+  "E.g. Adults with diabetes on insulin (glargine or detemir)":
+    query2 as RuleGroupType,
   "E.g. Covid and moderna or pfizer": query3 as RuleGroupType,
 };
 

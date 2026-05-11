@@ -137,22 +137,21 @@ const queryToText = (
     exclude: boolean,
   ): { verb: string | null; text: string | null; category?: string } => {
     const c = rule.concept;
-    if (!c) return { verb: null, text: null, category: undefined };
+
+    if (!c) return { verb: null, text: "[blank]", category: undefined };
 
     if (isSingleConcept(c)) {
       const verb = getVerb(c.category, exclude);
-      const desc = cleanDescription(c.name);
+      const desc = `${cleanDescription(c.name)}${
+        !rule.concept?.concept_id ? " [unknown]" : ""
+      }`;
       return { verb, text: desc, category: c.category };
     }
 
     if (isMultipleConcept(c)) {
-      const texts =
-        c.alternatives
-          ?.filter((x) => !!x)
-          .map((x) => cleanDescription(x.name))
-          .join(" or ") || "";
+      const text = `${cleanDescription(c.name)} [alternatives found]`;
       const verb = getVerb(c.category, exclude);
-      return { verb, text: texts, category: c.category };
+      return { verb, text, category: c.category };
     }
 
     return { verb: null, text: null, category: undefined };

@@ -188,6 +188,7 @@ const SearchConcepts = ({
   return (
     <Box>
       <SearchBar
+        placeholder="Term search..."
         loading={isLoading}
         onSearch={onSearch}
         filters={

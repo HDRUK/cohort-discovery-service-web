@@ -107,6 +107,7 @@ const UpdateCollectionHost = ({
               routes.teamCollections(selectedCollectionHost.custodian.pid),
             );
           }}
+          buttonSx={{ width: "fit-content" }}
         />
         <Controller
           name="hostName"

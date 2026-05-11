@@ -5,6 +5,7 @@ import React, {
   useCallback,
   useContext,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import {
@@ -45,6 +46,12 @@ type CohortBuilderContextValue = {
 
   hoveredKey: string | null;
   setHoveredKey: (key: string | null) => void;
+
+  registerSortableNode: (id: string, node: HTMLElement | null) => void;
+  getSortableNode: (id: string) => HTMLElement | undefined;
+
+  pendingScrollToNodeId: string | null;
+  clearPendingScrollToNodeId: () => void;
 };
 
 const CohortBuilderContext = createContext<CohortBuilderContextValue | null>(
@@ -96,6 +103,35 @@ export const CohortBuilderProvider = ({
   const [active, setActive] = useState<Active | null>(null);
   const [activeNode, setActiveNode] = useState<RuleNodeType | null>(null);
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
+
+  const sortableNodeRefs = useRef(new Map<string, HTMLElement>());
+
+  const registerSortableNode = useCallback(
+    (id: string, node: HTMLElement | null) => {
+      if (node) {
+        sortableNodeRefs.current.set(id, node);
+      } else {
+        sortableNodeRefs.current.delete(id);
+      }
+    },
+    [],
+  );
+
+  const getSortableNode = useCallback((id: string) => {
+    return sortableNodeRefs.current.get(id);
+  }, []);
+
+  const [pendingScrollToNodeId, setPendingScrollToNodeId] = useState<
+    string | null
+  >(null);
+
+  const createAndScroll = useCallback((create: () => RuleNodeType) => {
+    const created = create();
+
+    if (!created) return;
+
+    setPendingScrollToNodeId(created.id);
+  }, []);
 
   const onDragStart = useCallback(
     (e: DragStartEvent) => {
@@ -214,12 +250,30 @@ export const CohortBuilderProvider = ({
 
   const actions = useMemo<Action[]>(
     () => [
-      { action: createNewRule, label: "Add Rule" },
-      { action: createNewOperator, label: "Add Operator" },
-      { action: createNewAgeFilter, label: "Add Age Rule" },
-      { action: createNewGroup, label: "Add Group" },
+      {
+        action: () => createAndScroll(createNewRule),
+        label: "Add rule",
+      },
+      {
+        action: () => createAndScroll(createNewOperator),
+        label: "Add and/or",
+      },
+      {
+        action: () => createAndScroll(createNewAgeFilter),
+        label: "Add age rule",
+      },
+      {
+        action: () => createAndScroll(createNewGroup),
+        label: "Add group",
+      },
     ],
-    [createNewAgeFilter, createNewRule, createNewGroup, createNewOperator],
+    [
+      createAndScroll,
+      createNewAgeFilter,
+      createNewRule,
+      createNewGroup,
+      createNewOperator,
+    ],
   );
 
   const value = useMemo(
@@ -230,8 +284,22 @@ export const CohortBuilderProvider = ({
       actions,
       hoveredKey,
       setHoveredKey,
+      registerSortableNode,
+      getSortableNode,
+      pendingScrollToNodeId,
+      clearPendingScrollToNodeId: () => setPendingScrollToNodeId(null),
     }),
-    [active, activeNode, handleContextMenu, actions, hoveredKey],
+    [
+      active,
+      activeNode,
+      handleContextMenu,
+      actions,
+      hoveredKey,
+      registerSortableNode,
+      getSortableNode,
+      pendingScrollToNodeId,
+      setPendingScrollToNodeId,
+    ],
   );
 
   return (

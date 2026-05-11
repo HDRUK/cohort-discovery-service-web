@@ -31,7 +31,7 @@ import { FeatureName } from "@/types/features";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import { intersection } from "lodash";
 import { getAllowedDatasetIds } from "@/utils/collections";
-import { getDomainPhrase } from "@/utils/omop";
+import { getDomain } from "@/utils/omop";
 import { useUserDataStore } from "@/hooks/userDataStore";
 
 export enum NodeKind {
@@ -105,11 +105,11 @@ export interface QueryBuilderStoreState {
     modifiers?: SelectNodeWithModifiersArgs,
   ) => void;
 
-  createNewNode: (kind: NodeKind) => void;
-  createNewRule: () => void;
-  createNewGroup: () => void;
-  createNewOperator: () => void;
-  createNewAgeFilter: () => void;
+  createNewNode: (kind: NodeKind) => RuleNodeType;
+  createNewRule: () => RuleNodeType;
+  createNewGroup: () => RuleNodeType;
+  createNewOperator: () => RuleNodeType;
+  createNewAgeFilter: () => RuleNodeType;
 
   queryAsText: string;
   getQueryFromText: (
@@ -303,16 +303,17 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     }
   },
 
-  createNewNode: (kind: NodeKind) => {
+  createNewNode: (kind: NodeKind): RuleNodeType => {
     const fn = Creators[kind];
 
     const { queryBuilderJson, setQueryBuilderJson, setSelected } = get();
 
     const normaliseAdditions = (
       belowNeighbor?: RuleNodeType,
-    ): RuleNodeType[] => {
+    ): { additions: RuleNodeType[]; primaryNode: RuleNodeType } => {
       const produced = fn();
       const additions = Array.isArray(produced) ? produced : [produced];
+      const primaryNode = additions[0];
 
       const belowIsOperator = !!belowNeighbor && isOperator(belowNeighbor);
       const lastAdditionIsOperator = isOperator(
@@ -322,13 +323,16 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
       const suffixWithOperator =
         belowNeighbor && !belowIsOperator && !lastAdditionIsOperator;
 
-      return suffixWithOperator
-        ? [...additions, ...[createOperator()]]
-        : additions;
+      return {
+        additions: suffixWithOperator
+          ? [...additions, createOperator()]
+          : additions,
+        primaryNode,
+      };
     };
 
     const firstNode = queryBuilderJson.rules[0];
-    const toPrepend = normaliseAdditions(firstNode);
+    const { additions: toPrepend, primaryNode } = normaliseAdditions(firstNode);
 
     const rules = [...toPrepend, ...queryBuilderJson.rules];
 
@@ -341,6 +345,7 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     );
 
     setQueryBuilderJson(updatedQuery);
+    return primaryNode;
   },
 
   createNewRule: () => get().createNewNode(NodeKind.RULE),
@@ -356,11 +361,18 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     defaultInvalidText = "People who ...",
   ) => {
     const updatedQuery = validate ? get().validateRules(query) : query;
-    const text = updatedQuery.valid
-      ? queryToText(updatedQuery)
-      : updatedQuery.rules.length === 0
-        ? ""
-        : defaultInvalidText;
+
+    let text = "";
+
+    try {
+      const nextText = queryToText(updatedQuery);
+
+      if (typeof nextText === "string" && nextText.trim()) {
+        text = nextText;
+      }
+    } catch {
+      text = defaultInvalidText;
+    }
 
     set((state) => ({
       ...state,
@@ -383,9 +395,9 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     if (isRuleGroup(node)) name += "Group";
     else if (isRuleLeaf(node)) {
       const c = node.rule?.concept;
-      const category = Array.isArray(c) ? c[0]?.category : c?.category;
-      const { noun } = getDomainPhrase(category);
-      name += `${category ? noun : "Blank"} rule`.trim();
+      const noun = getDomain(c, { useDefault: false }) ?? "Blank";
+
+      name += `${noun} rule`.trim();
     } else if (isOperator(node))
       name += `${node.combinator.toUpperCase()} operator`;
     else if (isAgeFilter(node)) name += "Age Rule";

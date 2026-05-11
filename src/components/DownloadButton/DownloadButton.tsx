@@ -70,6 +70,9 @@ const DownloadButton = ({
         color: "text.primary",
         fontWeight: "normal",
         fontSize: 14,
+        "&.MuiButton-root:hover": {
+          backgroundColor: "highlight.main",
+        },
       }}
       size="medium"
     >
