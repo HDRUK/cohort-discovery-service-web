@@ -469,27 +469,42 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
                 validate: (value) =>
                   Number(value) > 0 || "Please select a valid collection host",
               }}
-              render={({ field, fieldState: { error } }) => (
-                <FormDropdown
-                  {...field}
-                  select
-                  label={fieldConfig[field.name].label}
-                  id={field.name}
-                  error={error}
-                  fullWidth
-                  required
-                  placeHolderOption={
-                    <MenuItem value={0} disabled>
-                      Select a collection host
-                    </MenuItem>
-                  }
-                  options={allowedCollectionHosts.map((ch) => ({
-                    label: ch.name,
-                    value: ch.id,
-                  }))}
-                  chipColor="secondary"
-                />
-              )}
+              render={({ field, fieldState: { error } }) => {
+                if (expandedRight) {
+                  return (
+                    <FormDropdown
+                      {...field}
+                      select
+                      label={fieldConfig[field.name].label}
+                      id={field.name}
+                      error={error}
+                      fullWidth
+                      required
+                      placeHolderOption={
+                        <MenuItem value={0} disabled>
+                          Select a collection host
+                        </MenuItem>
+                      }
+                      options={allowedCollectionHosts.map((ch) => ({
+                        label: ch.name,
+                        value: ch.id,
+                      }))}
+                      chipColor="secondary"
+                    />
+                  );
+                }
+
+                return (
+                  <Chip
+                    label={
+                      allowedCollectionHosts.find((ch) => ch.id === field.value)
+                        ?.name
+                    }
+                    color="secondary"
+                    sx={{ width: "fit-content" }}
+                  />
+                );
+              }}
             />
           </Stack>
 

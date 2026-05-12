@@ -88,6 +88,7 @@ const ManageMultipleCollectionsStatus = ({
             disabled={!expandedRight}
             label={"Request to make active"}
             onClick={handleAction}
+            buttonSx={{ width: "fit-content" }}
           />
         )}
       {/* Only show a chip if initial status is not DRAFT */}
