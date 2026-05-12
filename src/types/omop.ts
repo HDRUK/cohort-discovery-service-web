@@ -38,7 +38,7 @@ export const DEFAULT_DOMAIN_PHRASE: DomainPhrase = {
   verb: "record",
   verbPast: "recorded",
   pastPrefix: "was",
-  noun: "record",
+  noun: "blank",
   include: "were associated with",
   exclude: "were not associated with",
 };

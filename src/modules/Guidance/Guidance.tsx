@@ -6,6 +6,7 @@ import OperatorGuidance from "@/content/guidance/queryBuilder/operator.mdx";
 import GroupGuidance from "@/content/guidance/queryBuilder/group.mdx";
 import AgeFilterGuidance from "@/content/guidance/queryBuilder/ageFilter.mdx";
 import EmptyRuleGuidance from "@/content/guidance/queryBuilder/emptyRule.mdx";
+import ExclusionGuidance from "@/content/guidance/queryBuilder/exclusionGuidance.mdx";
 import MultipleItemGuidance from "@/content/guidance/queryBuilder/multipleItem.mdx";
 import { Box, BoxProps, Link, LinkProps, TypographyProps } from "@mui/material";
 import { useCallback, useMemo } from "react";
@@ -173,7 +174,10 @@ const Guidance = () => {
       <CollapsibleGuidance {...props}></CollapsibleGuidance>
     ),
     ToggleExclusion: () => (
-      <ToggleExclusion key="ToggleExclusion" node={node} />
+      <CollapsibleGuidance keyPrefix="ToggleExclusion" title="Include/Exclude">
+        <ToggleExclusion key="ToggleExclusion" node={node} />
+        <ExclusionGuidance />
+      </CollapsibleGuidance>
     ),
     ShowDescendants: () => <ShowDescendants node={node} />,
     AddTimeFrameButton: (props: AddChipProps) => {
@@ -311,7 +315,7 @@ const Guidance = () => {
       if (isEmptyRule(selectedNode)) {
         return (
           <ActionMenuSection title={"Search Categories"} fixedExpanded>
-            <EmptyRuleGuidance components={baseComponents} />
+            <EmptyRuleGuidance components={makeRuleComponents(selectedNode)} />
           </ActionMenuSection>
         );
       }
