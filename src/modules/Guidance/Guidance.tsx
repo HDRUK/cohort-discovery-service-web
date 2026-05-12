@@ -308,14 +308,6 @@ const Guidance = () => {
     );
   } else {
     if (isRuleLeaf(selectedNode)) {
-      if (isEmptyRule(selectedNode)) {
-        return (
-          <ActionMenuSection title={"Search Categories"} fixedExpanded>
-            <EmptyRuleGuidance components={baseComponents} />
-          </ActionMenuSection>
-        );
-      }
-
       const concept = selectedNode?.rule?.concept;
       const category = concept?.category || "";
       const { verb } = getDomainPhrase(category);
@@ -337,6 +329,9 @@ const Guidance = () => {
               )
             }
           />
+          {isEmptyRule(selectedNode) && (
+            <EmptyRuleGuidance components={baseComponents} />
+          )}
         </ActionMenuSection>
       );
     } else if (isOperator(selectedNode)) {
