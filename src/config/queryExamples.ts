@@ -34,6 +34,81 @@ export const NO_QUERY: RuleGroupType = {
 };
 
 export const EXAMPLE_1: RuleGroupType = {
+  id: "84205427-c40f-41bf-a977-46639652de12",
+  rules: [
+    {
+      id: "4ecaf150-4139-4713-9006-35523b8e33bd",
+      exclude: false,
+      rule: {
+        concept: {
+          concept_id: 37311061,
+          name: "COVID-19",
+          description: "COVID-19",
+          category: "Condition",
+          children: [],
+          ncollections: 2,
+          all_synthetic: 0,
+          match_score: 100.73972077083992,
+          tokens: ["19", "covid"],
+          phrase_tokens: ["covid 19"],
+          alternatives: [
+            {
+              concept_id: 605554,
+              name: "Acute COVID-19",
+              description: "Acute COVID-19",
+              category: "Condition",
+              children: [],
+              ncollections: 2,
+              all_synthetic: 0,
+            },
+            {
+              concept_id: 37311060,
+              name: "Suspected COVID-19",
+              description: "Suspected COVID-19",
+              category: "Observation",
+              children: [],
+              ncollections: 2,
+              all_synthetic: 0,
+            },
+            {
+              concept_id: 608511,
+              name: "QCovid risk calculator",
+              description: "QCovid risk calculator",
+              category: "Measurement",
+              children: [],
+              ncollections: 2,
+              all_synthetic: 0,
+            },
+            {
+              concept_id: 703443,
+              name: "COVID-19 severity scale",
+              description: "COVID-19 severity scale",
+              category: "Measurement",
+              children: [],
+              ncollections: 2,
+              all_synthetic: 0,
+            },
+          ],
+        },
+      },
+      valid: false,
+      invalidReason: [
+        "The term has alternatives, please select the intended concept in the rule block(s) below.",
+      ],
+    },
+  ],
+  constraints: {
+    ageConstraint: [null, null],
+    timeConstraint: [null, null],
+  },
+  warnings: [],
+  valid: false,
+  invalidReason: [
+    "The term has alternatives, please select the intended concept in the rule block(s) below.",
+  ],
+};
+
+export const EXAMPLE_11: RuleGroupType = {
   id: uuidv4(),
   rules: [
     {
