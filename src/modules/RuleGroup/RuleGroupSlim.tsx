@@ -3,9 +3,9 @@ import { RuleGroupType } from "@/types/rules";
 import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import useNodeActions from "@/hooks/useNodeActions";
-import { Stack } from "@mui/material";
+import { Chip, Stack } from "@mui/material";
 import ConceptChip from "@/components/ConceptChip";
-import { isRuleLeaf } from "@/utils/rules";
+import { isEmptyRule, isOperator, isRuleLeaf } from "@/utils/rules";
 
 export interface RuleGroupProps extends Omit<
   RuleWrapperProps,
@@ -18,6 +18,15 @@ export interface RuleGroupProps extends Omit<
 
 const RuleGroupSlim = ({ group, parentGroupId, ...rest }: RuleGroupProps) => {
   const { actions } = useNodeActions(group);
+  const groupOperators = group.rules
+    .filter((r) => isOperator(r))
+    .map((op) => op.combinator);
+
+  const allOperatorsSame = groupOperators.every(
+    (op) => op === groupOperators[0],
+  );
+
+  const groupOperator = allOperatorsSame ? groupOperators[0] : "Mixed";
 
   return (
     <RuleWrapper
@@ -29,7 +38,7 @@ const RuleGroupSlim = ({ group, parentGroupId, ...rest }: RuleGroupProps) => {
         <Stack>
           {" "}
           {group.rules.map((r) => {
-            if (isRuleLeaf(r)) {
+            if (isRuleLeaf(r) && !isEmptyRule(r)) {
               return (
                 <ConceptChip
                   draggable
@@ -42,7 +51,9 @@ const RuleGroupSlim = ({ group, parentGroupId, ...rest }: RuleGroupProps) => {
           })}
         </Stack>
       )}
-      headerExtra={<> hi</>}
+      headerExtra={
+        <Chip variant="outlined" label={groupOperator.toUpperCase()} />
+      }
       actions={actions}
       {...rest}
     />

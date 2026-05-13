@@ -32,6 +32,22 @@ export enum RuleErrors {
   NO_QUERY_FOUND = "No valid query could be found for your search term.",
 }
 
+export const insertMissingOperators = (
+  rules: Array<RuleNodeType>,
+  combinator: CombinatorType = CombinatorType.OR,
+): Array<RuleNodeType> =>
+  rules.reduce<Array<RuleNodeType>>((acc, rule) => {
+    const previous = acc.at(-1);
+
+    if (previous && !isOperator(previous) && !isOperator(rule)) {
+      acc.push(createOperator(combinator));
+    }
+
+    acc.push(rule);
+
+    return acc;
+  }, []);
+
 export const createRule = (
   rule: ConceptOperator = { concept: null },
   exclude = false,
@@ -44,10 +60,11 @@ export const createRule = (
 export const createRuleGroup = (
   rules: Array<RuleNodeType> = [createRule(), createOperator(), createRule()],
   exclude = false,
+  combinator: CombinatorType = CombinatorType.OR,
 ): RuleGroupType => ({
   id: uuidv4(),
   exclude,
-  rules,
+  rules: insertMissingOperators(rules, combinator),
 });
 
 export const createOperator = (
@@ -130,8 +147,13 @@ export function groupToRules(
 export const isUnknownRule = (rule: RuleLeafType): boolean =>
   !!rule.rule.concept?.name && rule.rule.concept?.concept_id === null;
 
-export const isEmptyRule = (rule: RuleLeafType): boolean =>
-  rule.rule.concept === null || rule.rule.concept?.concept_id === null;
+export const isEmptyRule = (
+  rule: RuleLeafType,
+): rule is RuleLeafType & {
+  rule: RuleLeafType["rule"] & {
+    concept: null | { concept_id: null };
+  };
+} => rule.rule.concept === null || rule.rule.concept?.concept_id === null;
 
 export const isSingleConcept = (
   concept: Concept | null,

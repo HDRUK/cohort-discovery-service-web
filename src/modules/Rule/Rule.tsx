@@ -171,7 +171,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
                 </>
               )}
               {isMultipleConcept(concept) && (
-                <SelectMultipleConcepts concept={concept} />
+                <SelectMultipleConcepts id={id} concept={concept} />
               )}
             </>
           )}
