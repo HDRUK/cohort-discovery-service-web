@@ -99,10 +99,10 @@ const SelectDatasets = () => {
 
   const allSyntheticPids = useMemo(
     () =>
-      filteredCollections
+      collections
         .filter((collection) => collection.is_synthetic)
         .map((c) => c.pid),
-    [filteredCollections],
+    [collections],
   );
 
   const selectedSet = useMemo(
