@@ -238,7 +238,7 @@ const SelectDatasets = () => {
           >
             <Box sx={{ mx: 2 }}>
               <SearchBox
-                placeholder="Search Collections..."
+                placeholder="I'm looking for..."
                 collapsible={false}
                 inputBgColor="background.default"
                 onChange={handleSearch}
