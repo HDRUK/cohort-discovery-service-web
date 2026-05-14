@@ -10,7 +10,6 @@ import deleteQueries from "@/actions/query/deleteQueries";
 import {
   revalidateAction,
   revalidateCustodian,
-  revalidateUserAction,
 } from "@/actions/revalidate";
 import {
   ApiResponse,
@@ -27,11 +26,7 @@ import {
   Workgroup,
   Collection,
 } from "@/types/api";
-import {
-  TAG_COLLECTIONS_ADMIN,
-  TAG_CONCEPT_SETS,
-  getUserQueryTag,
-} from "@/config/tags";
+import { TAG_COLLECTIONS_ADMIN, getUserQueryTag } from "@/config/tags";
 import { DEFAULT_QUERY, useQueryBuilderStore } from "@/store/queryBuilderStore";
 import { useCustodianDataStore } from "@/store/custodianDataStore";
 import searchConcepts from "@/actions/concept/searchConcepts";
@@ -136,7 +131,6 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
       queryName,
       selectedDatasets,
     );
-    await revalidateUserAction("queries");
 
     if (reset) {
       useQueryBuilderStore.getState().setQueryBuilderJson(DEFAULT_QUERY);
@@ -148,7 +142,7 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
   rerunTask: async (id) => {
     await rerunTask(id);
     const custodian = useCustodianDataStore.getState().current.custodian;
-    if (custodian) revalidateCustodian(custodian);
+    if (custodian) await revalidateCustodian(custodian);
   },
 
   selectedCollections: [],
@@ -161,9 +155,10 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
   runDistributions: async (collection, query_type) => {
     const { pid, custodian } = collection;
     const res = await rerunDistributions(pid, { query_type });
-
-    revalidateCustodian(custodian);
-    revalidateAction(TAG_COLLECTIONS_ADMIN);
+    await Promise.all([
+      revalidateCustodian(custodian),
+      revalidateAction(TAG_COLLECTIONS_ADMIN),
+    ]);
     return res.data;
   },
 
@@ -176,7 +171,6 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
 
   createConceptSet: async (payload) => {
     await createConceptSet(payload);
-    await revalidateUserAction(TAG_CONCEPT_SETS);
   },
 
   searchForConcepts: async ({ searchTerm, perPage, domain }) => {
@@ -195,17 +189,14 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
 
   addConceptsToSet: async (conceptSetId, conceptIds) => {
     await attachConcepts(conceptSetId, conceptIds);
-    await revalidateUserAction(TAG_CONCEPT_SETS);
   },
 
   removeConceptsFromSet: async (conceptSetId, conceptIds) => {
     await detachConcepts(conceptSetId, conceptIds);
-    await revalidateUserAction(TAG_CONCEPT_SETS);
   },
 
   removeConceptSet: async (conceptSetId) => {
     await deleteConceptSet(conceptSetId);
-    await revalidateUserAction(TAG_CONCEPT_SETS);
   },
 
   deleteQueries: async (pids) => {

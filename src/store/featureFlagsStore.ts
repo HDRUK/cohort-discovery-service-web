@@ -4,8 +4,6 @@ import { create } from "zustand";
 import { FeatureFlag } from "@/types/features";
 import getFeatureFlags from "@/actions/getFeatureFlags";
 import updateFeatureFlag from "@/actions/admin/updateFeatureFlag";
-import { TAG_FEATURE_FLAGS } from "@/config/tags";
-import { revalidateAction } from "@/actions/revalidate";
 
 export interface FeatureFlagsStoreState {
   flags: FeatureFlag | null;
@@ -27,8 +25,7 @@ export const useFeatureFlagsStore = create<FeatureFlagsStoreState>(
 
     updateFlag: async (name, enabled) => {
       await updateFeatureFlag(name, { enabled });
-      revalidateAction(TAG_FEATURE_FLAGS);
-      get().refreshFlags();
+      await get().refreshFlags();
     },
   }),
 );
