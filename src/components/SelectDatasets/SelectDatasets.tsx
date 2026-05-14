@@ -46,6 +46,9 @@ const SelectDatasets = () => {
     (qb) => qb.setPreviouslySelectedDatasets,
   );
 
+  //refactor candidate to use an endpoint to search for collections
+  // - we always want to be aware of all user accessible collections though
+  //   that's why we can just filter these on the FE
   const [searchTerm, setSearchTerm] = useState<string>();
 
   const { debounced: debouncedSearchTerm } = useDebounce(searchTerm, {});
