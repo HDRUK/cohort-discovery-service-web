@@ -12,7 +12,7 @@ import {
   Stack,
   Accordion,
 } from "@mui/material";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import Title from "../Title";
 import SelectNetworkDatasets, {
   NetworkGroupedCollections,
@@ -25,6 +25,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useUserDataStore } from "@/hooks/userDataStore";
 import SquareCheckbox from "../SquareCheckbox";
 import { addPids, removePids } from "@/utils/collections";
+import SearchBox from "../SearchBox";
+import { useDebounce } from "@/hooks/useDebounce";
 
 const SelectDatasets = () => {
   const collections = useUserDataStore((s) => s.userCollections);
@@ -44,15 +46,32 @@ const SelectDatasets = () => {
     (qb) => qb.setPreviouslySelectedDatasets,
   );
 
+  const [searchTerm, setSearchTerm] = useState<string>();
+
+  const { debounced: debouncedSearchTerm } = useDebounce(searchTerm, {});
+
+  const filteredCollections = useMemo(() => {
+    const searchTerm = debouncedSearchTerm?.trim().toLowerCase();
+    if (searchTerm && searchTerm.length > 2) {
+      return collections.filter((c) =>
+        c.name.toLowerCase().includes(searchTerm),
+      );
+    }
+    return collections;
+  }, [collections, debouncedSearchTerm]);
+
   const custodianGroups = useMemo(() => {
     return Object.values(
-      collections.reduce<Record<number, GroupedCollection>>((acc, c) => {
-        const { custodian } = c;
-        (acc[custodian.id] ??= { custodian, items: [] }).items.push(c);
-        return acc;
-      }, {}),
+      filteredCollections.reduce<Record<number, GroupedCollection>>(
+        (acc, c) => {
+          const { custodian } = c;
+          (acc[custodian.id] ??= { custodian, items: [] }).items.push(c);
+          return acc;
+        },
+        {},
+      ),
     );
-  }, [collections]);
+  }, [filteredCollections]);
 
   const networkGroups: NetworkGroupedCollections[] = useMemo(() => {
     return Object.values(
@@ -77,10 +96,10 @@ const SelectDatasets = () => {
 
   const allSyntheticPids = useMemo(
     () =>
-      collections
+      filteredCollections
         .filter((collection) => collection.is_synthetic)
         .map((c) => c.pid),
-    [collections],
+    [filteredCollections],
   );
 
   const selectedSet = useMemo(
@@ -126,6 +145,11 @@ const SelectDatasets = () => {
 
     setSelectedDatasets(next);
   }, [allSelected, allPidSet, allPids, selectedDatasets, setSelectedDatasets]);
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+  };
 
   return (
     <Collapse
@@ -209,6 +233,14 @@ const SelectDatasets = () => {
               borderColor: "lightgrey",
             }}
           >
+            <Box sx={{ mx: 2 }}>
+              <SearchBox
+                placeholder="Search Collections..."
+                collapsible={false}
+                inputBgColor="background.default"
+                onChange={handleSearch}
+              />
+            </Box>
             {networkGroups
               .sort((a, b) =>
                 (a.network?.name ?? "").localeCompare(b.network?.name ?? ""),
