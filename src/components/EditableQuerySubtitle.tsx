@@ -1,14 +1,10 @@
 "use client";
 
 import updateQuery from "@/actions/query/updateQuery";
-import { revalidateAction } from "@/actions/revalidate";
 import EditableText from "@/components/EditableText";
-import { getTagQuery, TAG_QUERIES } from "@/config/tags";
 
 async function setQueryName(id: number, pid: string, name: string) {
-  await updateQuery(id, { name });
-  revalidateAction(TAG_QUERIES);
-  revalidateAction(getTagQuery(pid));
+  await updateQuery(id, pid, { name });
 }
 
 export default function EditableQuerySubtitle({
