@@ -3,6 +3,7 @@
 import { apiDelete } from "@/lib/apiClient";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { RemoveCollectionsFromWorkgroupPost, ApiResponse } from "@/types/api";
+import { revalidateWorkgroupAndCollections } from "@/actions/revalidate";
 
 const removeCollectionsFromWorkgroup = async (
   payload: RemoveCollectionsFromWorkgroupPost,
@@ -14,6 +15,7 @@ const removeCollectionsFromWorkgroup = async (
       ),
     ),
   );
+  await revalidateWorkgroupAndCollections();
 };
 
 export default removeCollectionsFromWorkgroup;
