@@ -29,17 +29,20 @@ import { useNotify } from "@/providers/NotifyProvider";
 import { useRouter } from "next/navigation";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import deleteQueries from "@/actions/query/deleteQueries";
+import RenameButton from "@/components/RenameButton";
 
 const HistoryActions = ({
   multiple = false,
   selectedIds,
   onClear,
   resultsView = false,
+  onRenaming,
 }: {
   multiple: boolean;
   selectedIds: string[];
   onClear?: () => void;
   resultsView?: boolean;
+  onRenaming?: (queryId: string | null) => void;
 }) => {
   const { searchParams } = useSearchParams();
   const router = useRouter();
@@ -97,6 +100,16 @@ const HistoryActions = ({
             );
           }}
           text="Re-run"
+          size="medium"
+        />
+      )}
+      {!multiple && !resultsView && (
+        <RenameButton
+          label="Rename query"
+          onClick={(isEditing) =>
+            onRenaming?.(isEditing ? selectedIds[0] : null)
+          }
+          text="Rename"
           size="medium"
         />
       )}
