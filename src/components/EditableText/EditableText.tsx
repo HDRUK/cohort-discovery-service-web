@@ -59,11 +59,9 @@ const EditableText = ({
     resetField("value", { defaultValue });
   }, [defaultValue, resetField]);
 
-  useEffect(() => {
-    if (editingProp !== undefined && editingProp !== editing) {
-      setEditing(editingProp);
-    }
-  }, [editingProp, editing]);
+  if (editingProp !== undefined && editingProp !== editing) {
+    setEditing(editingProp);
+  }
 
   useEffect(() => {
     if (editing) {
