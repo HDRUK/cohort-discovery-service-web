@@ -33,10 +33,7 @@ import TwoPaneSwimLaneLayout from "../TwoPaneSwimLaneLayout";
 import QueriesTableSkeleton from "./QueriesTableSkeleton";
 import EditableText from "@/components/EditableText";
 import updateQuery from "@/actions/query/updateQuery";
-import { revalidateAction } from "@/actions/revalidate";
-import { getTagQuery, TAG_QUERIES } from "@/config/tags";
 import { useNotify } from "@/providers/NotifyProvider";
-import { set } from "lodash";
 
 interface QueriesTableProps {
   initialData: Paginated<Query>;
@@ -177,9 +174,7 @@ const QueriesTable = ({
   }
 
   async function setQueryName(id: number, pid: string, name: string) {
-    await updateQuery(id, { name });
-    revalidateAction(TAG_QUERIES);
-    revalidateAction(getTagQuery(pid));
+    await updateQuery(id, pid, { name });
   }
 
   const handleRenameQuery = async (newName: string) => {
