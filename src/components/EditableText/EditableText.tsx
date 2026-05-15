@@ -22,6 +22,7 @@ export type EditableTextProps = {
   placeholder?: string;
   showIcon?: boolean;
   singleClick?: boolean;
+  editing?: boolean;
 };
 
 type FormValues = {
@@ -39,6 +40,7 @@ const EditableText = ({
   placeholder,
   showIcon = false,
   singleClick = false,
+  editing: editingProp,
 }: EditableTextProps) => {
   const [editing, setEditing] = useState(!defaultValue);
   const [hovering, setHovering] = useState(false);
@@ -58,6 +60,12 @@ const EditableText = ({
   }, [defaultValue, resetField]);
 
   useEffect(() => {
+    if (editingProp !== undefined && editingProp !== editing) {
+      setEditing(editingProp);
+    }
+  }, [editingProp, editing]);
+
+  useEffect(() => {
     if (editing) {
       inputRef.current?.focus();
       if (autoSelect) inputRef.current?.select();
@@ -71,19 +79,25 @@ const EditableText = ({
 
   const startEditing = (e: React.SyntheticEvent) => {
     stop(e);
-    setEditing(true);
+    if (editingProp === undefined) {
+      setEditing(true);
+    }
   };
 
   const commit = ({ value }: FormValues) => {
     onCommit(trim ? value.trim() : value);
     if (value) {
-      setEditing(false);
+      if (editingProp === undefined) {
+        setEditing(false);
+      }
     }
   };
 
   const cancel = () => {
     resetField("value", { defaultValue });
-    setEditing(false);
+    if (editingProp === undefined) {
+      setEditing(false);
+    }
   };
 
   const handleClick = (e: React.MouseEvent<HTMLSpanElement>) => {
@@ -102,6 +116,14 @@ const EditableText = ({
     clickTimeoutRef.current = window.setTimeout(() => {
       clickTimeoutRef.current = null;
     }, CLICK_DELAY);
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (commitOnBlur) {
+      handleSubmit(commit)(e);
+    } else {
+      cancel();
+    }
   };
 
   const displayText = defaultValue || placeholder || "";
@@ -155,7 +177,7 @@ const EditableText = ({
                     cancel();
                   }
                 }}
-                onBlur={commitOnBlur ? handleSubmit(commit) : cancel}
+                onBlur={handleBlur}
                 {...textFieldProps}
                 slotProps={{
                   ...textFieldProps?.slotProps,
