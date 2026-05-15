@@ -261,6 +261,20 @@ const QueriesTable = ({
                       component: "span",
                       variant: "h4",
                     }}
+                    textFieldProps={{
+                      placeholder: "Edit query name here",
+                      variant: "standard",
+                      size: "small",
+                      slotProps: {
+                        input: {
+                          sx: (theme) => ({
+                            fontSize: theme.typography.h4.fontSize,
+                            fontWeight: theme.typography.h4.fontWeight,
+                            lineHeight: theme.typography.h4.lineHeight,
+                          }),
+                        },
+                      },
+                    }}
                   />
                 ),
                 subTitle: "Results",
