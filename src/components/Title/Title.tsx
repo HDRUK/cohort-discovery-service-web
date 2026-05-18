@@ -73,7 +73,12 @@ const Title = ({
         <Typography
           variant={titleVariant}
           component="span"
-          sx={{ minWidth: 0, ...overflowStyles }}
+          sx={{
+            minWidth: 0,
+            ...overflowStyles,
+            display: "flex",
+            gap: 1,
+          }}
         >
           {startIcon} {title} {useSeparator && subTitle && "/"}
         </Typography>

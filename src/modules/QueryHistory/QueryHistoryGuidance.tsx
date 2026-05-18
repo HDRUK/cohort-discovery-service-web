@@ -10,6 +10,7 @@ interface QueryHistoryGuidanceProps {
   onClear?: () => void;
   resultsView?: boolean;
   currentResult?: string;
+  onRenaming?: (queryId: string | null) => void;
 }
 
 const QueryHistoryGuidance = ({
@@ -17,6 +18,7 @@ const QueryHistoryGuidance = ({
   resultsView = false,
   onClear,
   currentResult = "",
+  onRenaming,
 }: QueryHistoryGuidanceProps) => {
   const empty = !selectedIds.length && currentResult === "";
   const multiple = !empty && selectedIds.length > 1;
@@ -34,12 +36,13 @@ const QueryHistoryGuidance = ({
       {!empty && <CustomH1>Actions</CustomH1>}
       {empty &&
         !resultsView &&
-        "Select a result row to edit a previous query, rerun it to generate updated results, download the output, or remove it from your list. You can also select multiple to bulk delete or download."}
+        "Select a result row to edit a previous query, rename it, rerun it to generate updated results, download the output, or remove it from your list. You can also select multiple to bulk delete or download."}
       {!empty && !resultsView && (
         <HistoryActions
           multiple={multiple}
           selectedIds={selectedIds}
           onClear={onClear}
+          onRenaming={onRenaming}
         />
       )}
       {!empty && resultsView && currentResult && (
@@ -48,6 +51,7 @@ const QueryHistoryGuidance = ({
           selectedIds={[currentResult]}
           onClear={onClear}
           resultsView
+          onRenaming={onRenaming}
         />
       )}
       <CustomH1>Result Interpretation</CustomH1>
