@@ -31,7 +31,16 @@ import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
 import useRightClickMenu from "@/hooks/useRightClickMenu";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { RuleNodeType } from "@/types/rules";
-import { findById, moveItemIntoGroup } from "@/utils/rules";
+
+// isRuleGroup and isRuleLeaf are tiny utility functions (in utils/rules.ts) that check if a node has a rules array (group) or a rule property (leaf rule).
+// We need them in createAndScroll.
+import {
+  findById,
+  isRuleGroup,
+  isRuleLeaf,
+  moveItemIntoGroup,
+} from "@/utils/rules";
+
 import useFeatures from "@/hooks/useFeatures";
 
 type Action = {
@@ -52,6 +61,10 @@ type CohortBuilderContextValue = {
   getSortableNode: (id: string) => HTMLElement | undefined;
 
   pendingScrollToNodeId: string | null;
+
+  // Previously the context only exposed clearPendingScrollToNodeId (which sets it to null).
+  // To let the right-click "Add Rule" path on groups also write to the signal, we expose the full setter.
+  setPendingScrollToNodeId: (id: string | null) => void;
   clearPendingScrollToNodeId: () => void;
 };
 
@@ -133,7 +146,14 @@ export const CohortBuilderProvider = ({
 
     if (!created) return;
 
-    setPendingScrollToNodeId(created.id);
+    // DP-722: the shared scroll/focus signal normally targets the newly created node itself.
+    // For "Add group", that would target the group card, but we want to focus the first rule's "Term search..." input inside the new group.
+    // So we redirect the signal to that top rule instead, and other add actions still target the created node as usual.
+    const target = isRuleGroup(created)
+      ? (created.rules.find(isRuleLeaf) ?? created)
+      : created;
+
+    setPendingScrollToNodeId(target.id);
   }, []);
 
   const onDragStart = useCallback(
@@ -298,6 +318,7 @@ export const CohortBuilderProvider = ({
       registerSortableNode,
       getSortableNode,
       pendingScrollToNodeId,
+      setPendingScrollToNodeId,
       clearPendingScrollToNodeId: () => setPendingScrollToNodeId(null),
     }),
     [

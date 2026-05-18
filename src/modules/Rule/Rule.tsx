@@ -1,7 +1,7 @@
 import { Chip, Box } from "@mui/material";
 import SearchConcepts from "@/components/SearchConcepts";
 import { Concept } from "@/types/api";
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import ConceptChip from "@/components/ConceptChip";
 import { RuleLeafType, SingleSidedOperator } from "@/types/rules";
 
@@ -19,6 +19,7 @@ import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import useNodeActions from "@/hooks/useNodeActions";
 import InvalidRule from "@/components/InvalidRule";
 import { getDomain } from "@/utils/omop";
+import { useCohortBuilderContext } from "@/providers/CohortBuilderProvider";
 
 export interface RuleProps extends Omit<
   RuleWrapperProps,
@@ -119,6 +120,21 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
 
   const { actions } = useNodeActions(rule);
 
+  // DP-722: auto-focus the "Term search..." input when this rule block is newly created.
+  // We piggyback on the existing "pendingScrollToNodeId" signal.
+  // Only this Rule component reacts to it, because groups and operators do not render this search input.
+  const { pendingScrollToNodeId } = useCohortBuilderContext();
+  const searchBoxRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (pendingScrollToNodeId !== id) return;
+
+    const input =
+      searchBoxRef.current?.querySelector<HTMLInputElement>("input");
+    // preventScroll lets the existing smooth-scroll-to-new-node animation run uninterrupted.
+    input?.focus({ preventScroll: true });
+  }, [pendingScrollToNodeId, id]);
+
   return (
     <RuleWrapper
       node={rule}
@@ -131,7 +147,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
         ) : null
       }
       render={() => (
-        <Box py={1}>
+        <Box py={1} ref={searchBoxRef}>
           {isEmptyRule(rule) ? (
             <SearchConcepts onClick={onClick} />
           ) : (
