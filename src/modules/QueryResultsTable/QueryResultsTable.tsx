@@ -60,7 +60,7 @@ const QueryResultsTable = ({
     refetchOnReconnect: false,
     refetchInterval: (query) => {
       const data = query.state.data;
-      const hasPending = data?.tasks?.some((t) => !t.completed_at && !t.failed_at);
+      const hasPending = data?.tasks?.some((t) => !t.completed_at);
       return hasPending ? defaults.tableRefresh : false;
     },
   });

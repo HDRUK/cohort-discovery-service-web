@@ -24,6 +24,7 @@ import Modal from "@/components/Modal";
 import CodeBlock from "@/components/CodeBlock";
 import { useChangedFieldValues } from "@/hooks/useChangedFieldValues";
 import { useConfirm } from "@/hooks/useConfirm";
+import { tryParseJson } from "@/utils/helpers";
 
 interface CollectionRow {
   collectionPid: string;
@@ -157,13 +158,7 @@ const AddRegressionTestDialog = ({
     handleFormSubmit,
   ]);
 
-  const parsedJson = (() => {
-    try {
-      return JSON.parse(jsonText);
-    } catch {
-      return null;
-    }
-  })();
+  const parsedJson = tryParseJson(jsonText);
 
   return (
     <Modal
