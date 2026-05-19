@@ -18,7 +18,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import FormatIndentIncreaseIcon from "@mui/icons-material/FormatIndentIncrease";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
-import { CollectionWithHosts, RegressionTest } from "@/types/api";
+import { CollectionWithHosts, RegressionTest, RegressionTestCollectionInput } from "@/types/api";
 import { RuleGroupType } from "@/types/rules";
 import Modal from "@/components/Modal";
 import CodeBlock from "@/components/CodeBlock";
@@ -42,7 +42,7 @@ interface AddRegressionTestDialogProps {
   onSubmit: (values: {
     name: string;
     query_definition: RuleGroupType;
-    collections: { pid: string; expected_result: number | null }[];
+    collections: RegressionTestCollectionInput[];
   }) => void;
   collections: CollectionWithHosts[];
   initial?: RegressionTest;

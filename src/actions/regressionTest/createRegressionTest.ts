@@ -2,7 +2,7 @@
 
 import { apiPost } from "@/lib/apiClient";
 import { API_ROUTES } from "@/lib/apiRoutes";
-import { ApiResponse, RegressionTest } from "@/types/api";
+import { ApiResponse, RegressionTest, RegressionTestCollectionInput } from "@/types/api";
 import { RuleGroupType } from "@/types/rules";
 import { revalidateUserAction } from "@/actions/revalidate";
 import { TAG_REGRESSION_TESTS } from "@/config/tags";
@@ -10,7 +10,7 @@ import { TAG_REGRESSION_TESTS } from "@/config/tags";
 interface CreateRegressionTestBody {
   name: string;
   query_definition: RuleGroupType;
-  collections: { pid: string; expected_result: number | null }[];
+  collections: RegressionTestCollectionInput[];
 }
 
 const createRegressionTest = async (

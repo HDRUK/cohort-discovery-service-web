@@ -288,6 +288,11 @@ export interface RegressionTest {
   collections: RegressionTestCollection[];
 }
 
+export interface RegressionTestCollectionInput {
+  pid: string;
+  expected_result: number | null;
+}
+
 export interface RunRegressionTestResponse {
   task_count: number;
   task_pids: string[];

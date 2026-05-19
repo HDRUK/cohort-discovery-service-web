@@ -22,6 +22,7 @@ import {
   CollectionWithHosts,
   RegressionTest,
   RegressionTestCollection,
+  RegressionTestCollectionInput,
 } from "@/types/api";
 import { useTable } from "@/hooks/useTable";
 import Table from "@/components/Table";
@@ -136,7 +137,7 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
   const handleDialogSubmit = async (values: {
     name: string;
     query_definition: RuleGroupType;
-    collections: { pid: string; expected_result: number | null }[];
+    collections: RegressionTestCollectionInput[];
   }) => {
     if (editing) {
       await updateRegressionTest(editing.pid, {
