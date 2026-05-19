@@ -259,6 +259,40 @@ export interface Query {
   tasks: Task[];
 }
 
+export interface RegressionTestTask {
+  pid: string;
+  created_at: string;
+  completed_at: string | null;
+  failed_at: string | null;
+  result: { count: number; status: string } | null;
+}
+
+export interface RegressionTestCollection {
+  pid: string;
+  name: string;
+  expected_result: number | null;
+  run_count: number;
+  last_run_at: string | null;
+  pass_rate: number | null;
+  last_passed: boolean | null;
+  tasks: RegressionTestTask[];
+}
+
+export interface RegressionTest {
+  id: number;
+  pid: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+  query: { pid: string; name: string; definition: RuleGroupType };
+  collections: RegressionTestCollection[];
+}
+
+export interface RunRegressionTestResponse {
+  task_count: number;
+  task_pids: string[];
+}
+
 export interface Token {
   federated_token: string;
   type: string;

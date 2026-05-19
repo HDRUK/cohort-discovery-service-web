@@ -44,6 +44,10 @@ export const API_ROUTES = {
   detachConcept: (conceptSetId: number, conceptId: number) =>
     `${API_URL}/concept_sets/${conceptSetId}/detach/${conceptId}`,
   searchConcepts: `${API_URL}/omop/concepts/search`,
+  regressionTests: `${API_URL}/regression-tests`,
+  regressionTestsAdmin: `${API_URL}/admin/regression-tests`,
+  regressionTest: (pid: string) => `${API_URL}/regression-tests/${pid}`,
+  runRegressionTest: (pid: string) => `${API_URL}/regression-tests/${pid}/run`,
   workgroups: `${API_URL}/workgroups`,
   authCallback: "http://localhost:8100/auth/callback",
   users: `${API_URL}/users`,

@@ -88,7 +88,7 @@ const QueriesTable = ({
     refetchInterval: (query) => {
       const data = query.state.data;
       const hasIncomplete =
-        data?.data.filter((q) => q.tasks.some((t) => !t.completed_at))
+        data?.data.filter((q) => q.tasks.some((t) => !t.completed_at && !t.failed_at))
           ?.length ?? 0 > 0;
       return hasIncomplete ? defaults.tableRefresh : false;
     },

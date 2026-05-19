@@ -49,4 +49,5 @@ export const routes = {
   teamHosts: (pid: string) => teamPath(pid, "hosts"),
   teamCollections: (pid: string) => teamPath(pid, "collections"),
   config: adminPath("configuration"),
+  adminRegression: adminPath("regression"),
 };

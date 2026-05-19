@@ -22,4 +22,14 @@ const getTimestamp = (date?: string): number => {
   return parsed.valueOf();
 };
 
-export { getDatetime, getTimestamp };
+const getDurationSeconds = (
+  start?: string | null,
+  end?: string | null,
+): string | null => {
+  const s = getTimestamp(start ?? undefined);
+  const e = getTimestamp(end ?? undefined);
+  if (!s || !e) return null;
+  return `${((e - s) / 1000).toFixed(1)}s`;
+};
+
+export { getDatetime, getTimestamp, getDurationSeconds };
