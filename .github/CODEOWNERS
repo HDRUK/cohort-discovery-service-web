@@ -1,0 +1,30 @@
+# CODEOWNERS
+# Each line is a file pattern followed by one or more owners.
+# Order matters — last matching pattern takes precedence.
+# Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# ====================
+# Default — catch-all
+# ====================
+*                               @HDRUK/tech-team-frontend
+
+# ====================
+# CI / DevOps
+# ====================
+.github/                        @HDRUK/tech-team-devops @HDRUK/tech-team-frontend @HDRUK/tech-team-backend
+docker-compose*.yml             @HDRUK/tech-team-devops
+Dockerfile*                     @HDRUK/tech-team-devops
+.env.example                    @HDRUK/tech-team-devops
+
+# ====================
+# Dependencies
+# ====================
+package.json                    @HDRUK/tech-team-frontend @HDRUK/tech-team-devops
+package-lock.json               @HDRUK/tech-team-frontend @HDRUK/tech-team-devops
+
+# ====================
+# Docs
+# ====================
+README.md                       @HDRUK/tech-team-frontend
+docs/                           @HDRUK/tech-team-frontend
+*.md                            @HDRUK/tech-team-frontend
