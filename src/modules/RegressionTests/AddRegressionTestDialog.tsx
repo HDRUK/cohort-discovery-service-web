@@ -101,6 +101,29 @@ const AddRegressionTestDialog = ({
     }
   }, [open, initial, reset]);
 
+  const handleFormSubmit = useCallback(
+    async (values: FormValues) => {
+      let parsed: RuleGroupType;
+      try {
+        parsed = JSON.parse(jsonText) as RuleGroupType;
+      } catch {
+        setJsonError("Invalid JSON");
+        return;
+      }
+
+      onSubmit({
+        name: values.name,
+        query_definition: parsed,
+        collections: values.collections.map((c) => ({
+          pid: c.collectionPid,
+          expected_result: c.expectedResult,
+        })),
+      });
+      onClose();
+    },
+    [onSubmit, onClose, jsonText],
+  );
+
   const handleClose = useCallback(async () => {
     const isDirty = hasChanges || jsonText !== initialJsonText;
     if (!isDirty) {
@@ -123,27 +146,16 @@ const AddRegressionTestDialog = ({
     } else if (result === "tertiary") {
       onClose();
     }
-  }, [hasChanges, jsonText, initialJsonText, initial, confirm, onClose, handleSubmit, handleFormSubmit]);
-
-  const handleFormSubmit = async (values: FormValues) => {
-    let parsed: RuleGroupType;
-    try {
-      parsed = JSON.parse(jsonText) as RuleGroupType;
-    } catch {
-      setJsonError("Invalid JSON");
-      return;
-    }
-
-    onSubmit({
-      name: values.name,
-      query_definition: parsed,
-      collections: values.collections.map((c) => ({
-        pid: c.collectionPid,
-        expected_result: c.expectedResult,
-      })),
-    });
-    onClose();
-  };
+  }, [
+    hasChanges,
+    jsonText,
+    initialJsonText,
+    initial,
+    confirm,
+    onClose,
+    handleSubmit,
+    handleFormSubmit,
+  ]);
 
   const parsedJson = (() => {
     try {
@@ -169,10 +181,7 @@ const AddRegressionTestDialog = ({
         </Button>
       }
     >
-      <Box
-        component="form"
-        onSubmit={handleSubmit(handleFormSubmit)}
-      >
+      <Box component="form" onSubmit={handleSubmit(handleFormSubmit)}>
         <Stack spacing={2}>
           <TextField
             label="Name"
@@ -223,7 +232,9 @@ const AddRegressionTestDialog = ({
                     disabled={!jsonText || jsonPreview}
                     onClick={() => {
                       try {
-                        setJsonText(JSON.stringify(JSON.parse(jsonText), null, 2));
+                        setJsonText(
+                          JSON.stringify(JSON.parse(jsonText), null, 2),
+                        );
                         setJsonError(null);
                       } catch {
                         setJsonError("Invalid JSON");
@@ -301,9 +312,7 @@ const AddRegressionTestDialog = ({
                             {...params}
                             label="Collection"
                             size="small"
-                            error={
-                              !!errors.collections?.[index]?.collectionPid
-                            }
+                            error={!!errors.collections?.[index]?.collectionPid}
                             helperText={
                               errors.collections?.[index]?.collectionPid
                                 ?.message
