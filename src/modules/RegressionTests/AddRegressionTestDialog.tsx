@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Button,
   Stack,
@@ -56,7 +56,6 @@ const AddRegressionTestDialog = ({
   initial,
   initialJsonText = "",
 }: AddRegressionTestDialogProps) => {
-  const formRef = useRef<HTMLFormElement>(null);
   const confirm = useConfirm();
 
   const [jsonText, setJsonText] = useState(initialJsonText);
@@ -120,11 +119,11 @@ const AddRegressionTestDialog = ({
       tertiaryVariant: "outlined",
     });
     if (result === "confirm") {
-      formRef.current?.requestSubmit();
+      handleSubmit(handleFormSubmit)();
     } else if (result === "tertiary") {
       onClose();
     }
-  }, [hasChanges, jsonText, initialJsonText, initial, confirm, onClose, formRef]);
+  }, [hasChanges, jsonText, initialJsonText, initial, confirm, onClose, handleSubmit, handleFormSubmit]);
 
   const handleFormSubmit = async (values: FormValues) => {
     let parsed: RuleGroupType;
@@ -164,7 +163,7 @@ const AddRegressionTestDialog = ({
       additionalActions={
         <Button
           variant="outlined"
-          onClick={() => formRef.current?.requestSubmit()}
+          onClick={() => handleSubmit(handleFormSubmit)()}
         >
           {initial ? "Save" : "Add"}
         </Button>
@@ -172,7 +171,6 @@ const AddRegressionTestDialog = ({
     >
       <Box
         component="form"
-        ref={formRef as React.Ref<HTMLDivElement>}
         onSubmit={handleSubmit(handleFormSubmit)}
       >
         <Stack spacing={2}>
