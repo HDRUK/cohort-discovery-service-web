@@ -34,7 +34,7 @@ import runRegressionTest from "@/actions/regressionTest/runRegressionTest";
 import PassFailChip from "./PassFailChip";
 import AddRegressionTestDialog from "./AddRegressionTestDialog";
 import CollectionTaskHistory from "./CollectionTaskHistory";
-import TestPoller from "./TestPoller";
+import useTaskPolling from "@/hooks/useTaskPolling";
 
 // testPid → set of still-pending taskPids
 type RunStates = Record<string, Set<string>>;
@@ -157,6 +157,8 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
     },
     [queryClient],
   );
+
+  useTaskPolling(runStates, handleTaskComplete);
 
   const columns = useMemo(
     (): MRT_ColumnDef<FlatRow>[] => [
@@ -391,17 +393,6 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
       </Stack>
 
       <Table table={table} emptyMessage="No regression tests configured" />
-
-      {/* Mount one TestPoller per pending task */}
-      {Object.entries(runStates).flatMap(([testPid, taskPids]) =>
-        Array.from(taskPids).map((taskPid) => (
-          <TestPoller
-            key={taskPid}
-            taskPid={taskPid}
-            onComplete={(tp) => handleTaskComplete(testPid, tp)}
-          />
-        )),
-      )}
 
       <AddRegressionTestDialog
         key={`${editing?.pid ?? "new"}-${dialogOpen}`}

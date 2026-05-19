@@ -3,13 +3,15 @@
 import { TAG_REGRESSION_TESTS } from "@/config/tags";
 import { apiGet } from "@/lib/apiClient";
 import { API_ROUTES } from "@/lib/apiRoutes";
-import { ApiResponse, RegressionTest } from "@/types/api";
+import { ApiResponse, CacheOptions, RegressionTest } from "@/types/api";
 
-const getRegressionTests = async (): Promise<ApiResponse<RegressionTest[]>> => {
+const getRegressionTests = async (
+  cacheOptions: CacheOptions = { useCache: false },
+): Promise<ApiResponse<RegressionTest[]>> => {
   return await apiGet<ApiResponse<RegressionTest[]>>({
     url: API_ROUTES.regressionTestsAdmin,
     tags: [TAG_REGRESSION_TESTS],
-    cacheOptions: { useCache: false },
+    cacheOptions,
   });
 };
 

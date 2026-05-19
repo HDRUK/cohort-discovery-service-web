@@ -52,6 +52,7 @@ export const getTagQuery = (pid: string) => `query-${pid}`;
 export const getTagsQuery = (pid: string) => ["query", getTagQuery(pid)];
 
 export const TAG_REGRESSION_TESTS = "regression-tests";
+export const TAG_REGRESSION_TASK = "regression-task";
 export const getTagRegressionTest = (pid: string) =>
   `regression-test-${pid}`;
 
