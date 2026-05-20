@@ -14,56 +14,31 @@ const useScrollToNode = ({ enabled, boardRef }: UseScrollToNodeArgs) => {
   useEffect(() => {
     if (!enabled || !pendingScrollToNodeId) return;
 
-    let frameId = 0;
-    let attempts = 0;
-    const maxAttempts = 10;
+    const board = boardRef.current;
+    const container = getScrollParent(board);
+    const el = getSortableNode(pendingScrollToNodeId);
 
-    const tryScrollAndFocus = () => {
-      const board = boardRef.current;
-      const container = getScrollParent(board);
-      const el = getSortableNode(pendingScrollToNodeId);
+    if (!container || !el) return;
 
-      if (!container || !el) {
-        if (attempts++ < maxAttempts) {
-          frameId = requestAnimationFrame(tryScrollAndFocus);
-          return;
-        }
+    const input = el.querySelector<HTMLInputElement>("input");
+    const containerRect = container.getBoundingClientRect();
+    const elRect = el.getBoundingClientRect();
 
-        clearPendingScrollToNodeId();
-        return;
-      }
+    const top =
+      elRect.top -
+      containerRect.top +
+      container.scrollTop -
+      container.clientHeight / 2 +
+      elRect.height / 2;
 
-      const containerRect = container.getBoundingClientRect();
-      const elRect = el.getBoundingClientRect();
+    container.scrollTo({
+      top,
+      behavior: "smooth",
+    });
 
-      const top =
-        elRect.top -
-        containerRect.top +
-        container.scrollTop -
-        container.clientHeight / 2 +
-        elRect.height / 2;
+    input?.focus({ preventScroll: true });
 
-      container.scrollTo({
-        top,
-        behavior: "smooth",
-      });
-
-      const input = el.querySelector<HTMLInputElement>("input");
-
-      if (!input && attempts++ < maxAttempts) {
-        frameId = requestAnimationFrame(tryScrollAndFocus);
-        return;
-      }
-
-      input?.focus({ preventScroll: true });
-      clearPendingScrollToNodeId();
-    };
-
-    tryScrollAndFocus();
-
-    return () => {
-      cancelAnimationFrame(frameId);
-    };
+    clearPendingScrollToNodeId();
   }, [
     enabled,
     boardRef,
