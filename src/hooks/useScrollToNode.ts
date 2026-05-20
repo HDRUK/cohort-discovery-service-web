@@ -14,31 +14,56 @@ const useScrollToNode = ({ enabled, boardRef }: UseScrollToNodeArgs) => {
   useEffect(() => {
     if (!enabled || !pendingScrollToNodeId) return;
 
-    const board = boardRef.current;
-    const container = getScrollParent(board);
-    const el = getSortableNode(pendingScrollToNodeId);
+    let frameId = 0;
+    let attempts = 0;
+    const maxAttempts = 10;
 
-    if (!container || !el) return;
+    const tryScrollAndFocus = () => {
+      const board = boardRef.current;
+      const container = getScrollParent(board);
+      const el = getSortableNode(pendingScrollToNodeId);
 
-    const input = el.querySelector<HTMLInputElement>("input");
-    const containerRect = container.getBoundingClientRect();
-    const elRect = el.getBoundingClientRect();
+      if (!container || !el) {
+        if (attempts++ < maxAttempts) {
+          frameId = requestAnimationFrame(tryScrollAndFocus);
+          return;
+        }
 
-    const top =
-      elRect.top -
-      containerRect.top +
-      container.scrollTop -
-      container.clientHeight / 2 +
-      elRect.height / 2;
+        clearPendingScrollToNodeId();
+        return;
+      }
 
-    container.scrollTo({
-      top,
-      behavior: "smooth",
-    });
+      const containerRect = container.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
 
-    input?.focus({ preventScroll: true });
-    
-    clearPendingScrollToNodeId();
+      const top =
+        elRect.top -
+        containerRect.top +
+        container.scrollTop -
+        container.clientHeight / 2 +
+        elRect.height / 2;
+
+      container.scrollTo({
+        top,
+        behavior: "smooth",
+      });
+
+      const input = el.querySelector<HTMLInputElement>("input");
+
+      if (!input && attempts++ < maxAttempts) {
+        frameId = requestAnimationFrame(tryScrollAndFocus);
+        return;
+      }
+
+      input?.focus({ preventScroll: true });
+      clearPendingScrollToNodeId();
+    };
+
+    tryScrollAndFocus();
+
+    return () => {
+      cancelAnimationFrame(frameId);
+    };
   }, [
     enabled,
     boardRef,
