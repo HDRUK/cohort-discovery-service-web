@@ -7,4 +7,12 @@ const mergeSx = (
   return [base, ...overrides] as SxProps<Theme>;
 };
 
-export { mergeSx };
+const tryParseJson = (text: string): unknown => {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+};
+
+export { mergeSx, tryParseJson };

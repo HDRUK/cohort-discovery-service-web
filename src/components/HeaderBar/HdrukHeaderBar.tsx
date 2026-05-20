@@ -53,6 +53,10 @@ const HdrukHeader = () => {
                   label: "Configuration",
                   href: routes.config,
                 },
+                {
+                  label: "Regression Tests",
+                  href: routes.adminRegression,
+                },
               ]
             : []),
         ],
