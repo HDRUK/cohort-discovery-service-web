@@ -175,37 +175,41 @@ const useNodeActions = (
 
       return newRule;
     });
-  }, [
-    createAndScroll,
-    id,
-    groupRules,
-    queryBuilderJson,
-    setQueryBuilderJson,
-  ]);
+  }, [createAndScroll, id, groupRules, queryBuilderJson, setQueryBuilderJson]);
 
   const handleCreateNewAgeFilter = useCallback(() => {
     if (!groupRules) return;
-    const newRules = [createAgeFilter(), createOperator(), ...groupRules];
+    createAndScroll(() => {
+      const newAgeFilter = createAgeFilter();
+      const newRules = [newAgeFilter, createOperator(), ...groupRules];
 
-    setQueryBuilderJson(
-      updateById(queryBuilderJson, id, (node) => ({
-        ...node,
-        rules: newRules,
-      })),
-    );
-  }, [id, groupRules, queryBuilderJson, setQueryBuilderJson]);
+      setQueryBuilderJson(
+        updateById(queryBuilderJson, id, (node) => ({
+          ...node,
+          rules: newRules,
+        })),
+      );
+
+      return newAgeFilter;
+    });
+  }, [createAndScroll, id, groupRules, queryBuilderJson, setQueryBuilderJson]);
 
   const handleCreateNewOperator = useCallback(() => {
     if (!groupRules) return;
-    const newRules = [createOperator(), ...groupRules];
+    createAndScroll(() => {
+      const newOperator = createOperator();
+      const newRules = [newOperator, ...groupRules];
 
-    setQueryBuilderJson(
-      updateById(queryBuilderJson, id, (node) => ({
-        ...node,
-        rules: newRules,
-      })),
-    );
-  }, [id, groupRules, queryBuilderJson, setQueryBuilderJson]);
+      setQueryBuilderJson(
+        updateById(queryBuilderJson, id, (node) => ({
+          ...node,
+          rules: newRules,
+        })),
+      );
+
+      return newOperator;
+    });
+  }, [createAndScroll, id, groupRules, queryBuilderJson, setQueryBuilderJson]);
 
   const actions = [
     { action: handleDeleteRule, label: "Delete" },

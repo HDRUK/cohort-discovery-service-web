@@ -147,8 +147,6 @@ export const CohortBuilderProvider = ({
 
     if (!created) return;
 
-    // The shared scroll/focus signal usually targets the newly created node.
-    // When doing "Add group", we want to target the first inner rule so that we can focus its input instead of the group card.
     const target = isRuleGroup(created)
       ? (created.rules.find(isRuleLeaf) ?? created)
       : created;
