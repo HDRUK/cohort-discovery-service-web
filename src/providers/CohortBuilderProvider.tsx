@@ -59,12 +59,9 @@ type CohortBuilderContextValue = {
 
   registerSortableNode: (id: string, node: HTMLElement | null) => void;
   getSortableNode: (id: string) => HTMLElement | undefined;
+  createAndScroll: (create: () => RuleNodeType) => RuleNodeType | undefined;
 
   pendingScrollToNodeId: string | null;
-
-  // Previously the context only exposed clearPendingScrollToNodeId (which sets it to null).
-  // To let the right-click "Add Rule" path on groups also write to the signal, we expose the full setter.
-  setPendingScrollToNodeId: (id: string | null) => void;
   clearPendingScrollToNodeId: () => void;
 };
 
@@ -146,14 +143,14 @@ export const CohortBuilderProvider = ({
 
     if (!created) return;
 
-    // DP-722: the shared scroll/focus signal normally targets the newly created node itself.
-    // For "Add group", that would target the group card, but we want to focus the first rule's "Term search..." input inside the new group.
-    // So we redirect the signal to that top rule instead, and other add actions still target the created node as usual.
+    // The shared scroll/focus signal usually targets the newly created node.
+    // When doing "Add group", we want to target the first inner rule so that we can focus its input instead of the group card.
     const target = isRuleGroup(created)
       ? (created.rules.find(isRuleLeaf) ?? created)
       : created;
 
     setPendingScrollToNodeId(target.id);
+    return created;
   }, []);
 
   const onDragStart = useCallback(
@@ -317,8 +314,8 @@ export const CohortBuilderProvider = ({
       setHoveredKey,
       registerSortableNode,
       getSortableNode,
+      createAndScroll,
       pendingScrollToNodeId,
-      setPendingScrollToNodeId,
       clearPendingScrollToNodeId: () => setPendingScrollToNodeId(null),
     }),
     [
@@ -329,8 +326,8 @@ export const CohortBuilderProvider = ({
       hoveredKey,
       registerSortableNode,
       getSortableNode,
+      createAndScroll,
       pendingScrollToNodeId,
-      setPendingScrollToNodeId,
     ],
   );
 
