@@ -59,6 +59,7 @@ type CohortBuilderContextValue = {
 
   registerSortableNode: (id: string, node: HTMLElement | null) => void;
   getSortableNode: (id: string) => HTMLElement | undefined;
+  createAndScroll: (create: () => RuleNodeType) => RuleNodeType | undefined;
 
   pendingScrollToNodeId: string | null;
   clearPendingScrollToNodeId: () => void;
