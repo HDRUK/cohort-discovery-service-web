@@ -20,6 +20,7 @@ const useScrollToNode = ({ enabled, boardRef }: UseScrollToNodeArgs) => {
 
     if (!container || !el) return;
 
+    const input = el.querySelector<HTMLInputElement>("input");
     const containerRect = container.getBoundingClientRect();
     const elRect = el.getBoundingClientRect();
 
@@ -35,6 +36,8 @@ const useScrollToNode = ({ enabled, boardRef }: UseScrollToNodeArgs) => {
       behavior: "smooth",
     });
 
+    input?.focus({ preventScroll: true });
+    
     clearPendingScrollToNodeId();
   }, [
     enabled,

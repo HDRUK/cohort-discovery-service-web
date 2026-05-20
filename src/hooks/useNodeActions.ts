@@ -44,8 +44,7 @@ const useNodeActions = (
     }),
   );
 
-  // DP-722: lets us hand the just-created rule's id to the scroll+focus signal so the right-click "Add Rule" path matches the Insert menu's behaviour.
-  const { setPendingScrollToNodeId } = useCohortBuilderContext();
+  const { createAndScroll } = useCohortBuilderContext();
 
   const selectedNodeIds = useMemo(
     () => getSelectedOrdered(selected, queryBuilderJson),
@@ -163,24 +162,25 @@ const useNodeActions = (
   // Right-click group action that adds a new rule at the top of a group.
   const handleCreateNewRule = useCallback(() => {
     if (!groupRules) return;
-    // DP-722: keep a reference to the inserted rule so we can point the shared scroll/focus signal at this exact rule after the state update.
-    const newRule = createRule();
-    const newRules = [newRule, createOperator(), ...groupRules];
+    createAndScroll(() => {
+      const newRule = createRule();
+      const newRules = [newRule, createOperator(), ...groupRules];
 
-    setQueryBuilderJson(
-      updateById(queryBuilderJson, id, (node) => ({
-        ...node,
-        rules: newRules,
-      })),
-    );
-    // DP-722: trigger the same scroll-and-focus flow as the Insert menu.
-    setPendingScrollToNodeId(newRule.id);
+      setQueryBuilderJson(
+        updateById(queryBuilderJson, id, (node) => ({
+          ...node,
+          rules: newRules,
+        })),
+      );
+
+      return newRule;
+    });
   }, [
+    createAndScroll,
     id,
     groupRules,
     queryBuilderJson,
     setQueryBuilderJson,
-    setPendingScrollToNodeId,
   ]);
 
   const handleCreateNewAgeFilter = useCallback(() => {
