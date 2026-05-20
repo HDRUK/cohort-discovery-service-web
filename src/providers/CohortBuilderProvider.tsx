@@ -5,7 +5,6 @@ import React, {
   useCallback,
   useContext,
   useMemo,
-  useRef,
   useState,
 } from "react";
 import {
@@ -117,22 +116,29 @@ export const CohortBuilderProvider = ({
   const [activeNode, setActiveNode] = useState<RuleNodeType | null>(null);
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
 
-  const sortableNodeRefs = useRef(new Map<string, HTMLElement>());
+  const [sortableNodes, setSortableNodes] = useState(
+    () => new Map<string, HTMLElement>(),
+  );
 
   const registerSortableNode = useCallback(
     (id: string, node: HTMLElement | null) => {
-      if (node) {
-        sortableNodeRefs.current.set(id, node);
-      } else {
-        sortableNodeRefs.current.delete(id);
-      }
+      setSortableNodes((prev) => {
+        const next = new Map(prev);
+        if (node) {
+          next.set(id, node);
+        } else {
+          next.delete(id);
+        }
+        return next;
+      });
     },
     [],
   );
 
-  const getSortableNode = useCallback((id: string) => {
-    return sortableNodeRefs.current.get(id);
-  }, []);
+  const getSortableNode = useCallback(
+    (id: string) => sortableNodes.get(id),
+    [sortableNodes],
+  );
 
   const [pendingScrollToNodeId, setPendingScrollToNodeId] = useState<
     string | null
