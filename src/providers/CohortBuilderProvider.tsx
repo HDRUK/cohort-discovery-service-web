@@ -31,8 +31,6 @@ import useRightClickMenu from "@/hooks/useRightClickMenu";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { RuleNodeType } from "@/types/rules";
 
-// isRuleGroup and isRuleLeaf are tiny utility functions (in utils/rules.ts) that check if a node has a rules array (group) or a rule property (leaf rule).
-// We need them in createAndScroll.
 import {
   findById,
   isRuleGroup,
