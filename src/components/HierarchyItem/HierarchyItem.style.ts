@@ -31,6 +31,12 @@ export const listItemButtonSx =
       : isHovered
         ? "highlight.main"
         : "none",
+    "&.Mui-focusVisible": {
+      bgcolor: isSelected ? "background.default" : "transparent",
+    },
+    "&.Mui-focusVisible:hover": {
+      bgcolor: isSelected ? "background.default" : "highlight.main",
+    },
 
     ...(isOver && {
       "&::after": {
