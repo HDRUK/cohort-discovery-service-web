@@ -31,6 +31,9 @@ import { buildQueryHistoryParams } from "@/utils/params";
 import { useDefaults } from "@/providers/DefaultProvider";
 import TwoPaneSwimLaneLayout from "../TwoPaneSwimLaneLayout";
 import QueriesTableSkeleton from "./QueriesTableSkeleton";
+import EditableText from "@/components/EditableText";
+import updateQuery from "@/actions/query/updateQuery";
+import { useNotify } from "@/providers/NotifyProvider";
 
 interface QueriesTableProps {
   initialData: Paginated<Query>;
@@ -52,6 +55,8 @@ const QueriesTable = ({
     () => [`queries-${searchParams.toString()}`],
     [searchParams],
   );
+
+  const notify = useNotify();
 
   //refactor candidate
   // - when do we show a loader (or not)
@@ -156,6 +161,9 @@ const QueriesTable = ({
 
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
   const [expanded, setExpanded] = useState<MRT_ExpandedState>({});
+  const [renamingQueryId, setRenamingQueryId] = useState<string | null>(null);
+
+  const selectedRows = useMemo(() => trueKeys(rowSelection), [rowSelection]);
 
   function openQueryResult(queryId: string): string {
     const openQueries = (searchParams.get("open_queries") || "")
@@ -164,6 +172,27 @@ const QueriesTable = ({
       .filter((q) => q !== "");
     return routes.dashboardQueryResult(queryId, openQueries);
   }
+
+  async function setQueryName(id: number, pid: string, name: string) {
+    await updateQuery(id, pid, { name });
+  }
+
+  const handleRenameQuery = async (newName: string) => {
+    setRenamingQueryId(null);
+    const initialDataQuery = queries.data.find(
+      (q) => q.pid === renamingQueryId,
+    );
+
+    if (
+      initialDataQuery &&
+      newName &&
+      newName !== getQueryName(initialDataQuery)
+    ) {
+      await setQueryName(initialDataQuery.id, initialDataQuery.pid, newName);
+      qc.refetchQueries({ queryKey: [`queries`], type: "active" });
+      notify.success("Query renamed successfully");
+    }
+  };
 
   const table = usePaginatedTable<Query>({
     columns,
@@ -215,7 +244,34 @@ const QueriesTable = ({
                     <LaunchIcon sx={{ ml: 0.25, verticalAlign: "middle" }} />
                   </Link>
                 ),
-                title: `Query ${getQueryName(row.original)}`,
+                title: (
+                  <EditableText
+                    defaultValue={getQueryName(row.original)}
+                    onCommit={handleRenameQuery}
+                    autoSelect
+                    placeholder="Enter query name"
+                    editing={renamingQueryId === row.original.pid}
+                    commitOnBlur={true}
+                    typographyProps={{
+                      component: "span",
+                      variant: "h4",
+                    }}
+                    textFieldProps={{
+                      placeholder: "Edit query name here",
+                      variant: "standard",
+                      size: "small",
+                      slotProps: {
+                        input: {
+                          sx: (theme) => ({
+                            fontSize: theme.typography.h4.fontSize,
+                            fontWeight: theme.typography.h4.fontWeight,
+                            lineHeight: theme.typography.h4.lineHeight,
+                          }),
+                        },
+                      },
+                    }}
+                  />
+                ),
                 subTitle: "Results",
               },
             },
@@ -247,8 +303,6 @@ const QueriesTable = ({
     ),
   });
 
-  const selectedRows = useMemo(() => trueKeys(rowSelection), [rowSelection]);
-
   const onClear = useCallback(async () => {
     setShowSkeletonRefresh(true);
     setRowSelection({});
@@ -275,7 +329,11 @@ const QueriesTable = ({
         />
       }
       right={
-        <QueryHistoryGuidance selectedIds={selectedRows} onClear={onClear} />
+        <QueryHistoryGuidance
+          selectedIds={selectedRows}
+          onClear={onClear}
+          onRenaming={setRenamingQueryId}
+        />
       }
     />
   );

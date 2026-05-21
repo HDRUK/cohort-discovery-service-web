@@ -7,6 +7,7 @@ export const API_ROUTES = {
   tasks: `${API_URL}/tasks`,
   getTask: (pid: string) => `${API_URL}/task/${pid}`,
   queries: `${API_URL}/queries`,
+  query: `${API_URL}/query`,
   deleteQueriesBulk: `${API_URL}/queries/delete/bulk`,
   rerunQuery: (id: string) => `${API_URL}/query/re-run/${id}`,
   parseQuery: `${API_URL}/parse-query`,
@@ -43,6 +44,10 @@ export const API_ROUTES = {
   detachConcept: (conceptSetId: number, conceptId: number) =>
     `${API_URL}/concept_sets/${conceptSetId}/detach/${conceptId}`,
   searchConcepts: `${API_URL}/omop/concepts/search`,
+  regressionTests: `${API_URL}/regression-tests`,
+  regressionTestsAdmin: `${API_URL}/admin/regression-tests`,
+  regressionTest: (pid: string) => `${API_URL}/regression-tests/${pid}`,
+  runRegressionTest: (pid: string) => `${API_URL}/regression-tests/${pid}/run`,
   workgroups: `${API_URL}/workgroups`,
   authCallback: "http://localhost:8100/auth/callback",
   users: `${API_URL}/users`,

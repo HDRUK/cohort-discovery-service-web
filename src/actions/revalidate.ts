@@ -4,12 +4,14 @@ import {
   getCollectionHostTag,
   getCustodianTag,
   getTagCustodianCollection,
+  TAG_ADMIN_USERS,
   TAG_COLLECTION_HOSTS,
   TAG_COLLECTIONS,
   TAG_COLLECTIONS_ADMIN,
   TAG_COLLECTIONS_USER,
   TAG_CUSTODIANS,
   TAG_NETWORKS,
+  TAG_WORKGROUP_ADMIN,
 } from "@/config/tags";
 import { getTokenUser } from "@/lib/auth";
 import { Custodian } from "@/types/api";
@@ -26,13 +28,15 @@ export const revalidateUserAction = async (tagName: string) => {
 };
 
 export const revalidateCustodianByPid = async (custodianPid: string) => {
-  revalidateAction(getTagCustodianCollection(custodianPid));
+  await revalidateAction(getTagCustodianCollection(custodianPid));
 };
 
 export const revalidateCustodian = async (custodian: Custodian) => {
   const { pid } = custodian;
-  revalidateAction(getCustodianTag(pid));
-  revalidateCustodianByPid(pid);
+  await Promise.all([
+    revalidateAction(getCustodianTag(pid)),
+    revalidateCustodianByPid(pid),
+  ]);
 };
 
 export const revalidateCollections = async (
@@ -52,8 +56,18 @@ export const revalidateCollections = async (
       : []),
   ]);
 
-export const revalidateNetworks = async () => {
-  await revalidateAction(TAG_NETWORKS);
-  await revalidateAction(TAG_CUSTODIANS);
-  await revalidateCollections();
-};
+export const revalidateWorkgroupAndCollections = async (
+  includeUsers = false,
+) =>
+  Promise.all([
+    revalidateAction(TAG_WORKGROUP_ADMIN),
+    revalidateCollections(),
+    ...(includeUsers ? [revalidateAction(TAG_ADMIN_USERS)] : []),
+  ]);
+
+export const revalidateNetworks = async () =>
+  Promise.all([
+    revalidateAction(TAG_NETWORKS),
+    revalidateAction(TAG_CUSTODIANS),
+    revalidateCollections(),
+  ]);

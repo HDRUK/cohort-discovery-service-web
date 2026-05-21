@@ -47,7 +47,14 @@ export const getUserQueryTag = (id: string | number) => {
   return `${TAG_QUERIES}-${id}`;
 };
 
-export const getTagsQuery = (pid: string) => ["query", `query-${pid}`];
+export const getTagQuery = (pid: string) => `query-${pid}`;
+
+export const getTagsQuery = (pid: string) => ["query", getTagQuery(pid)];
+
+export const TAG_REGRESSION_TESTS = "regression-tests";
+export const TAG_REGRESSION_TASK = "regression-task";
+export const getTagRegressionTest = (pid: string) =>
+  `regression-test-${pid}`;
 
 export const TAG_USERS = "users";
 export const TAG_ADMIN_USERS = "admin-users";

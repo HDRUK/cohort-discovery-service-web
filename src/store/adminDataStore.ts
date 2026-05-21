@@ -1,19 +1,13 @@
 import { create } from "zustand";
-import createCollection from "@/actions/collection/createCollection";
+import createCollectionWithConfig from "@/actions/collection/createCollectionWithConfig";
+import updateCollectionWithConfig from "@/actions/collection/updateCollectionWithConfig";
 import deleteCollection from "@/actions/collection/deleteCollection";
-import updateCollection from "@/actions/collection/updateCollection";
-import createCollectionConfig from "@/actions/collection/createCollectionConfig";
-import updateCollectionConfig from "@/actions/collection/updateCollectionConfig";
 import createWorkgroup from "@/actions/workgroup/createWorkgroup";
 import addCollectionsToWorkgroup from "@/actions/workgroup/addCollectionsToWorkgroup";
 import removeCollectionsFromWorkgroup from "@/actions/workgroup/removeCollectionsFromWorkgroup";
 import addCollectionToWorkgroups from "@/actions/workgroup/addCollectionToWorkgroups";
 import removeCollectionFromWorkgroups from "@/actions/workgroup/removeCollectionFromWorkgroups";
-import {
-  revalidateAction,
-  revalidateCollections,
-  revalidateNetworks,
-} from "@/actions/revalidate";
+import { revalidateWorkgroupAndCollections } from "@/actions/revalidate";
 import {
   Collection,
   CreateCollectionPost,
@@ -38,7 +32,6 @@ import {
   RemoveCustodiansFromNetworkPost,
   UpdateNetworkPost,
 } from "@/types/api";
-import { TAG_WORKGROUP_ADMIN, TAG_ADMIN_USERS } from "@/config/tags";
 import { emptyPaginated } from "@/utils/pagination";
 import addUsersToWorkgroup from "@/actions/workgroup/addUsersToWorkgroup";
 import removeUserFromWorkgroup from "@/actions/workgroup/removeUsersFromWorkgroup";
@@ -158,111 +151,70 @@ export const useAdminDataStore = create<AdminDataStoreState>((set) => ({
     })),
 
   createCollection: async (payload, payloadConfig) => {
-    const { data } = await createCollection(payload);
-
-    await createCollectionConfig({
-      ...payloadConfig,
-      collection_id: data.id,
-    });
-
-    await revalidateCollections(data.custodian.pid);
-
-    return data;
+    return await createCollectionWithConfig(payload, payloadConfig);
   },
 
   updateCollection: async (id, payload, payloadConfig) => {
-    const { data } = await updateCollection(id, payload);
-    await updateCollectionConfig(data.config.id, payloadConfig);
-
-    await revalidateCollections(data.custodian.pid);
-
-    return data;
+    return await updateCollectionWithConfig(id, payload, payloadConfig);
   },
 
   deleteCollection: async (id) => {
     await deleteCollection(id);
-    await revalidateCollections();
   },
 
   createWorkgroup: async (payload) => {
-    const { data } = await createWorkgroup(payload);
-    await revalidateAction(TAG_WORKGROUP_ADMIN);
-    return data;
+    return await createWorkgroup(payload);
   },
 
   addCollectionsToWorkgroup: async (payload) => {
-    const data = await addCollectionsToWorkgroup(payload);
-    await revalidateAction(TAG_WORKGROUP_ADMIN);
-    await revalidateCollections();
-    return data.map((d) => d.data);
+    return await addCollectionsToWorkgroup(payload);
   },
 
   removeCollectionsFromWorkgroup: async (payload) => {
     await removeCollectionsFromWorkgroup(payload);
-    await revalidateCollections();
-    await revalidateAction(TAG_WORKGROUP_ADMIN);
   },
 
   addUsersToWorkgroup: async (payload) => {
-    const data = await addUsersToWorkgroup(payload);
-    await revalidateAction(TAG_WORKGROUP_ADMIN);
-    await revalidateCollections();
-    await revalidateAction(TAG_ADMIN_USERS);
-    return data.map((d) => d.data);
+    return await addUsersToWorkgroup(payload);
   },
 
   removeUsersFromWorkgroup: async (payload) => {
     await removeUserFromWorkgroup(payload);
-    await revalidateCollections();
-    await revalidateAction(TAG_WORKGROUP_ADMIN);
-    await revalidateAction(TAG_ADMIN_USERS);
   },
 
   addCollectionToWorkgroups: async (payload) => {
     const data = await addCollectionToWorkgroups(payload);
-    await revalidateAction(TAG_WORKGROUP_ADMIN);
-    await revalidateCollections();
+    await revalidateWorkgroupAndCollections();
     return data.map((d) => d.data);
   },
 
   removeCollectionFromWorkgroups: async (payload) => {
     await removeCollectionFromWorkgroups(payload);
-    await revalidateCollections();
-    await revalidateAction(TAG_WORKGROUP_ADMIN);
+    await revalidateWorkgroupAndCollections();
   },
 
   updateCollectionStatus: async (idOrIds, status, refreshCache = true) => {
     const state = CollectionStatus[status].toLowerCase();
     const ids = Array.isArray(idOrIds) ? idOrIds : [idOrIds];
-
-    await transitionCollections(ids, { state });
-    if (refreshCache) await revalidateCollections();
+    await transitionCollections(ids, { state }, undefined, refreshCache);
   },
 
   createNetwork: async (payload: CreateNetworkPost) => {
-    const { data } = await createNetwork(payload);
-    await revalidateNetworks();
-    return data;
+    return await createNetwork(payload);
   },
   updateNetwork: async (id: number, payload: UpdateNetworkPost) => {
     await updateNetwork(id, payload);
-    await revalidateNetworks();
   },
   deleteNetwork: async (id: number) => {
     await deleteNetwork(id);
-    await revalidateNetworks();
   },
   addCustodiansToNetwork: async (payload: AddCustodiansToNetworkPost) => {
-    const res = await addCustodiansToNetwork(payload);
-    await revalidateNetworks();
-    return res.map((r) => r.data);
+    return await addCustodiansToNetwork(payload);
   },
   removeCustodiansFromNetwork: async (
     payload: RemoveCustodiansFromNetworkPost,
   ) => {
-    const res = await removeCustodiansFromNetwork(payload);
-    await revalidateNetworks();
-    return res.map((r) => r.data);
+    return await removeCustodiansFromNetwork(payload);
   },
 
   selectedWorkgroup: null,

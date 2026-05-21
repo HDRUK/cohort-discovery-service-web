@@ -1,9 +1,16 @@
+{/**
+  * @typedef Props
+  * @property {boolean} nestedGroupsEnabled
+  */}
+
 Groups are used to combine conditions with AND/OR logic, making complex cohort definitions easier to build and understand.
 
 # Group Actions
 
-<AddNewAgeFilterButton label="Add new age rule to group"/>
-
 <AddNewRuleButton label="Add new rule to group"/>
 
-<AddNewOperatorButton label="Add new operator to group"/>
+<AddNewOperatorButton label="Add new and/or to group"/>
+
+<AddNewAgeFilterButton label="Add new age rule to group"/>
+
+{props.nestedGroupsEnabled ? <AddNewGroupButton label="Add new subgroup to group"/> : null}

@@ -5,6 +5,8 @@ export enum FeatureName {
   QueryBuilderStatsInOrdering = "query-builder-use-stats-in-ordering",
 
   ConstrainForBunnyV1 = "constrain-for-bunny-v1",
+  QueryBuilderAllowNestedGroups = "query-builder-allow-nested-groups",
+  FlattenNestedGroups = "flatten-nested-groups",
   QueryNlp = "query-nlp",
   InAppMessenger = "in-app-messenger",
   ManageWorkgroupsInternally = "manage-workgroups-internally",
@@ -30,6 +32,8 @@ export const DEFAULT_FLAGS: FeatureFlag = {
   [FeatureName.QueryBuilderStatsInOrdering]: true,
 
   [FeatureName.ConstrainForBunnyV1]: true,
+  [FeatureName.QueryBuilderAllowNestedGroups]: false,
+  [FeatureName.FlattenNestedGroups]: false,
   [FeatureName.QueryNlp]: true,
   [FeatureName.InAppMessenger]: false,
 

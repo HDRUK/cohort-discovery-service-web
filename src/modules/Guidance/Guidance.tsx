@@ -6,6 +6,7 @@ import OperatorGuidance from "@/content/guidance/queryBuilder/operator.mdx";
 import GroupGuidance from "@/content/guidance/queryBuilder/group.mdx";
 import AgeFilterGuidance from "@/content/guidance/queryBuilder/ageFilter.mdx";
 import EmptyRuleGuidance from "@/content/guidance/queryBuilder/emptyRule.mdx";
+import ExclusionGuidance from "@/content/guidance/queryBuilder/exclusionGuidance.mdx";
 import MultipleItemGuidance from "@/content/guidance/queryBuilder/multipleItem.mdx";
 import { Box, BoxProps, Link, LinkProps, TypographyProps } from "@mui/material";
 import { useCallback, useMemo } from "react";
@@ -13,6 +14,7 @@ import useQueryBuilder from "@/hooks/useQueryBuilder";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import {
   createAgeFilter,
+  createRuleGroup,
   createOperator,
   createRule,
   findById,
@@ -152,7 +154,21 @@ const Guidance = () => {
     [queryBuilderJson, setQueryBuilderJson],
   );
 
-  const { constrainForBunnyV1 } = useFeatures();
+  const handleCreateNewGroupInGroup = useCallback(
+    (id: RuleGroupType["id"], rules: RuleGroupType["rules"]) => {
+      const newRules = [createRuleGroup(), createOperator(), ...rules];
+
+      setQueryBuilderJson(
+        updateById(queryBuilderJson, id, (node) => ({
+          ...node,
+          rules: newRules,
+        })),
+      );
+    },
+    [queryBuilderJson, setQueryBuilderJson],
+  );
+
+  const { constrainForBunnyV1, queryBuilderAllowNestedGroups } = useFeatures();
 
   const handleDelete = useCallback(() => {
     const newQuery = selectedIds.reduce(
@@ -173,7 +189,10 @@ const Guidance = () => {
       <CollapsibleGuidance {...props}></CollapsibleGuidance>
     ),
     ToggleExclusion: () => (
-      <ToggleExclusion key="ToggleExclusion" node={node} />
+      <CollapsibleGuidance keyPrefix="ToggleExclusion" title="Include/Exclude">
+        <ToggleExclusion key="ToggleExclusion" node={node} />
+        <ExclusionGuidance />
+      </CollapsibleGuidance>
     ),
     ShowDescendants: () => <ShowDescendants node={node} />,
     AddTimeFrameButton: (props: AddChipProps) => {
@@ -253,6 +272,12 @@ const Guidance = () => {
           onClick={() => handleCreateNewRuleInGroup(id, rules)}
         />
       ),
+      AddNewGroupButton: (props: AddButtonProps) => (
+        <AddButton
+          {...props}
+          onClick={() => handleCreateNewGroupInGroup(id, rules)}
+        />
+      ),
     };
   };
 
@@ -311,7 +336,7 @@ const Guidance = () => {
       if (isEmptyRule(selectedNode)) {
         return (
           <ActionMenuSection title={"Search Categories"} fixedExpanded>
-            <EmptyRuleGuidance components={baseComponents} />
+            <EmptyRuleGuidance components={makeRuleComponents(selectedNode)} />
           </ActionMenuSection>
         );
       }
@@ -348,7 +373,10 @@ const Guidance = () => {
     } else if (isRuleGroup(selectedNode)) {
       return (
         <ActionMenuSection title={"Group"} fixedExpanded>
-          <GroupGuidance components={makeGroupComponents(selectedNode)} />
+          <GroupGuidance
+            components={makeGroupComponents(selectedNode)}
+            nestedGroupsEnabled={queryBuilderAllowNestedGroups ?? false}
+          />
         </ActionMenuSection>
       );
     } else if (isAgeFilter(selectedNode)) {

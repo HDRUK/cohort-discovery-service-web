@@ -18,6 +18,9 @@ const useFeatures = () => {
           flags[FeatureName.QueryBuilderStatsInOrdering],
 
         constrainForBunnyV1: flags[FeatureName.ConstrainForBunnyV1],
+        queryBuilderAllowNestedGroups:
+          flags[FeatureName.QueryBuilderAllowNestedGroups],
+        flattenNestedGroups: flags[FeatureName.FlattenNestedGroups],
         queryNlp: flags[FeatureName.QueryNlp],
         inAppMessenger: flags[FeatureName.InAppMessenger],
 

@@ -32,6 +32,7 @@ import useRightClickMenu from "@/hooks/useRightClickMenu";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { RuleNodeType } from "@/types/rules";
 import { findById, moveItemIntoGroup } from "@/utils/rules";
+import useFeatures from "@/hooks/useFeatures";
 
 type Action = {
   action: () => void;
@@ -95,6 +96,8 @@ export const CohortBuilderProvider = ({
     createNewOperator: qb.createNewOperator,
   }));
 
+  const { queryBuilderAllowNestedGroups } = useFeatures();
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
     useSensor(KeyboardSensor),
@@ -156,10 +159,11 @@ export const CohortBuilderProvider = ({
       const activeGroupId = activeData?.groupId;
       const overGroupId = overData?.groupId;
 
+      if (!overGroupId || !activeGroupId) return;
       if (
-        !overGroupId ||
-        !activeGroupId ||
-        (activeData.type === "Group" && overGroupId !== activeGroupId)
+        !queryBuilderAllowNestedGroups &&
+        activeData.type === "Group" &&
+        overGroupId !== activeGroupId
       )
         return;
       if (activeData.id === overData.id) return;
@@ -189,7 +193,14 @@ export const CohortBuilderProvider = ({
         errorOnDrag,
       );
     },
-    [active, boardIndex, errorOnDrag, queryBuilderJson, setQueryBuilderJson],
+    [
+      active,
+      boardIndex,
+      errorOnDrag,
+      queryBuilderJson,
+      setQueryBuilderJson,
+      queryBuilderAllowNestedGroups,
+    ],
   );
 
   const onDragEnd = useCallback(

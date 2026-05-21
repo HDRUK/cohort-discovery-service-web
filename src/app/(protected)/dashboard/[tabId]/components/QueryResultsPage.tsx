@@ -9,6 +9,7 @@ import { queryToText } from "@/utils/queryBuilder";
 import { buildQueryHistoryParams } from "@/utils/params";
 import { QueryHistorySearchParams } from "@/types/api";
 import { getQueryName } from "@/utils/query";
+import EditableQuerySubtitle from "@/components/EditableQuerySubtitle";
 
 type PageSearchParams = Promise<QueryHistorySearchParams>;
 
@@ -31,7 +32,16 @@ const QueryResultsPageContent = async ({
 
   return (
     <>
-      <Title title={"Query Results"} subTitle={getQueryName(queryData.data)} />
+      <Title
+        title={"Query Results"}
+        subTitle={
+          <EditableQuerySubtitle
+            defaultValue={getQueryName(queryData.data)}
+            queryId={queryData.data.id}
+            queryPid={queryData.data.pid}
+          />
+        }
+      />
       {queryToText(queryData.data.definition)}
       <Divider />
       <QueryResultsTable

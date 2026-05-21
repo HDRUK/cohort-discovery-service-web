@@ -397,9 +397,11 @@ export function validateRuleTree(
   root: RuleGroupType,
   options?: {
     constrainForBunnyV1: boolean;
+    allowNestedGroups: boolean;
   },
 ): RuleGroupType {
   const constrainForBunnyV1 = options?.constrainForBunnyV1 ?? false;
+  const allowNestedGroups = options?.allowNestedGroups ?? false;
 
   const isContent = (n: RuleNodeType) =>
     isRuleLeaf(n) || isRuleGroup(n) || isAgeFilter(n);
@@ -515,7 +517,7 @@ export function validateRuleTree(
     const children = group.rules.map((child) => {
       if (isRuleGroup(child)) {
         // Bunny V1: no groups within groups
-        if (constrainForBunnyV1 && depth >= 1) {
+        if (!allowNestedGroups && depth >= 1) {
           return invalidateNode(child, RuleErrors.NO_NESTED_GROUPS);
         }
         return validateGroup(child, 2, depth + 1);
@@ -530,20 +532,18 @@ export function validateRuleTree(
 
     const n = children.length;
 
-    // Bunny V1: All operators within a group must be the same
-    if (constrainForBunnyV1) {
-      const operatorNodes = children.filter((c) => isOperator(c));
-      if (operatorNodes.length > 1) {
-        const firstKind = getOperatorKind(operatorNodes[0]);
-        for (let i = 1; i < operatorNodes.length; i++) {
-          const current = operatorNodes[i];
-          const currentKind = getOperatorKind(current);
-          if (currentKind !== firstKind) {
-            const msg = RuleErrors.GROUP_OPERATORS_ARE_THE_SAME;
-            const idx = children.indexOf(current);
-            if (idx !== -1) {
-              children[idx] = invalidateNode(children[idx], msg);
-            }
+    // All operators within a group must be the same
+    const operatorNodes = children.filter((c) => isOperator(c));
+    if (operatorNodes.length > 1) {
+      const firstKind = getOperatorKind(operatorNodes[0]);
+      for (let i = 1; i < operatorNodes.length; i++) {
+        const current = operatorNodes[i];
+        const currentKind = getOperatorKind(current);
+        if (currentKind !== firstKind) {
+          const msg = RuleErrors.GROUP_OPERATORS_ARE_THE_SAME;
+          const idx = children.indexOf(current);
+          if (idx !== -1) {
+            children[idx] = invalidateNode(children[idx], msg);
           }
         }
       }

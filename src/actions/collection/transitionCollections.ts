@@ -3,11 +3,14 @@
 import { apiPut } from "@/lib/apiClient";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { Collection, TransitionCollectionPut, ApiResponse } from "@/types/api";
+import { revalidateCollections } from "@/actions/revalidate";
 
 const transitionCollections = async (
   ids: number[],
   payload: TransitionCollectionPut,
-): Promise<ApiResponse<Collection>[]> =>
+  custodianPid?: string,
+  refreshCache = true,
+): Promise<void> => {
   await Promise.all(
     ids.map((id) =>
       apiPut<ApiResponse<Collection>, TransitionCollectionPut>(
@@ -16,4 +19,6 @@ const transitionCollections = async (
       ),
     ),
   );
+  if (refreshCache) await revalidateCollections(custodianPid);
+};
 export default transitionCollections;

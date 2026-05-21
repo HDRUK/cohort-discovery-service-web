@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import getCollections from "@/actions/collection/getCollections";
 import { getMockCollections } from "@/actions/collection/__mocks__/getCollections";
@@ -300,5 +300,43 @@ describe("SelectDatasets", () => {
     expect(
       screen.getByRole("button", { name: "Save and Close" }),
     ).toBeEnabled();
+  });
+
+  it("filters datasets by search term", async () => {
+    const collections = await getCollections();
+    const user = userEvent.setup();
+
+    const visibleCollection = collections.data[0];
+    const hiddenCollection = collections.data.find(
+      (c) => c.pid !== visibleCollection.pid,
+    )!;
+
+    render(
+      <MockCohortDiscoveryServiceStore
+        overrides={{
+          queryBuilder: {
+            openSelectDatasetsPanel: true,
+          },
+          user: {
+            userCollections: collections.data,
+          },
+        }}
+      >
+        <SelectDatasets />
+      </MockCohortDiscoveryServiceStore>,
+    );
+
+    expect(screen.getByText(visibleCollection.name)).toBeInTheDocument();
+    expect(screen.getByText(hiddenCollection.name)).toBeInTheDocument();
+
+    await user.type(
+      screen.getByPlaceholderText("I'm looking for..."),
+      visibleCollection.name,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(visibleCollection.name)).toBeInTheDocument();
+      expect(screen.queryByText(hiddenCollection.name)).not.toBeInTheDocument();
+    });
   });
 });

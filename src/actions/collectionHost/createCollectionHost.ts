@@ -8,12 +8,14 @@ import {
   ApiResponse,
 } from "@/types/api";
 import { CollectionHostFormValues } from "@/types/forms";
+import { revalidateCollections } from "@/actions/revalidate";
 
 const createCollectionHost = async (
   custodian_id: number,
   { name, context }: CollectionHostFormValues,
-): Promise<ApiResponse<CollectionHost>> => {
-  return await apiPost<ApiResponse<CollectionHost>, CreateCollectionHostPost>(
+  custodianPid?: string,
+): Promise<void> => {
+  await apiPost<ApiResponse<CollectionHost>, CreateCollectionHostPost>(
     API_ROUTES.collectionHosts,
     {
       name,
@@ -21,6 +23,7 @@ const createCollectionHost = async (
       custodian_id,
     },
   );
+  if (custodianPid) await revalidateCollections(custodianPid);
 };
 
 export default createCollectionHost;

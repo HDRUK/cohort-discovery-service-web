@@ -2,12 +2,9 @@ import { create } from "zustand";
 import createCollectionHost from "@/actions/collectionHost/createCollectionHost";
 import updateCollectionHost from "@/actions/collectionHost/updateCollectionHost";
 import deleteCollectionHost from "@/actions/collectionHost/deleteCollectionHost";
-import createCustodianCollection from "@/actions/collection/createCustodianCollection";
-import createCollectionConfig from "@/actions/collection/createCollectionConfig";
-import updateCollection from "@/actions/collection/updateCollection";
-import updateCollectionConfig from "@/actions/collection/updateCollectionConfig";
+import createCustodianCollectionWithConfig from "@/actions/collection/createCustodianCollectionWithConfig";
+import updateCollectionWithConfig from "@/actions/collection/updateCollectionWithConfig";
 import deleteCollection from "@/actions/collection/deleteCollection";
-import { revalidateCollections } from "@/actions/revalidate";
 import {
   Collection,
   Custodian,
@@ -94,63 +91,48 @@ export const useCustodianDataStore = create<CustodianDataStoreState>(
         })),
     },
     createCollectionHost: async (custodianId, payload) => {
-      await createCollectionHost(custodianId, payload);
       const currentCustodian = get().current.custodian;
-      if (currentCustodian?.id === custodianId) {
-        await revalidateCollections(currentCustodian.pid);
-      }
+      const pid =
+        currentCustodian?.id === custodianId ? currentCustodian.pid : undefined;
+      await createCollectionHost(custodianId, payload, pid);
     },
 
     updateCollectionHost: async (id, payload) => {
-      await updateCollectionHost(id, payload);
       const currentCustodian = get().current.custodian;
-      await revalidateCollections(currentCustodian?.pid);
+      await updateCollectionHost(id, payload, currentCustodian?.pid);
     },
 
     deleteCollectionHost: async (id) => {
-      await deleteCollectionHost(id);
       const currentCustodian = get().current.custodian;
-      await revalidateCollections(currentCustodian?.pid);
+      await deleteCollectionHost(id, currentCustodian?.pid);
     },
 
     createCollection: async (custodianPid, payload, payloadConfig) => {
-      const { data } = await createCustodianCollection(custodianPid, payload);
-
-      await createCollectionConfig({
-        ...payloadConfig,
-        collection_id: data.id,
-      });
-
-      await revalidateCollections(custodianPid);
-
-      return data;
+      return await createCustodianCollectionWithConfig(
+        custodianPid,
+        payload,
+        payloadConfig,
+      );
     },
 
-    updateCollection: async (
-      id,
-      payload,
-      payloadConfig,
-      refreshCache = true,
-    ) => {
-      const { data } = await updateCollection(id, payload);
-
-      const idConfig = data.config.id;
-      await updateCollectionConfig(idConfig, payloadConfig);
-      if (refreshCache) await revalidateCollections(data.custodian.pid);
-      return data;
+    updateCollection: async (id, payload, payloadConfig, refreshCache = true) => {
+      return await updateCollectionWithConfig(
+        id,
+        payload,
+        payloadConfig,
+        refreshCache,
+      );
     },
 
     deleteCollection: async (id, custodianPid) => {
-      await deleteCollection(id);
-      await revalidateCollections(custodianPid);
+      await deleteCollection(id, custodianPid);
     },
 
     requestCollectionMadeActive: async (idOrIds: number | number[]) => {
       const currentCustodian = get().current.custodian;
       const ids = Array.isArray(idOrIds) ? idOrIds : [idOrIds];
       const state = CollectionStatus[CollectionStatus.PENDING].toLowerCase();
-      await transitionCollections(ids, { state });
-      await revalidateCollections(currentCustodian?.pid);
+      await transitionCollections(ids, { state }, currentCustodian?.pid);
     },
 
     toggleCollectionActive: async (collection: CollectionWithHosts) => {
@@ -162,23 +144,23 @@ export const useCustodianDataStore = create<CustodianDataStoreState>(
 
       switch (stateId) {
         case CollectionStatus.ACTIVE:
-          // ACTIVE -> DRAFT
           nextState = CollectionStatus[CollectionStatus.DRAFT].toLowerCase();
           break;
 
         case CollectionStatus.DRAFT:
-          // DRAFT -> PENDING
           nextState = CollectionStatus[CollectionStatus.PENDING].toLowerCase();
           break;
 
         default:
-          // fallback
           nextState = CollectionStatus[CollectionStatus.PENDING].toLowerCase();
           break;
       }
 
-      await transitionCollections([collection.id], { state: nextState });
-      await revalidateCollections(currentCustodian?.pid);
+      await transitionCollections(
+        [collection.id],
+        { state: nextState },
+        currentCustodian?.pid,
+      );
 
       return nextState;
     },
