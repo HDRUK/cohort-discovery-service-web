@@ -25,4 +25,5 @@ jobs:
       tag_version: ${{ github.event.inputs.tag_version }}
       chart_path: chart/cohort-web/Chart.yaml
       git_ref: main
+      run_scan: true
     secrets: inherit
