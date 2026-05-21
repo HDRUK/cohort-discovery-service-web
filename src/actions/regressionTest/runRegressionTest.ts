@@ -8,12 +8,14 @@ const runRegressionTest = async (
   pid: string,
   collectionPid?: string,
 ): Promise<ApiResponse<RunRegressionTestResponse>> => {
-  return apiPost<
-    ApiResponse<RunRegressionTestResponse>,
-    { collection_pid: string } | undefined
-  >(
+  if (collectionPid) {
+    return apiPost<ApiResponse<RunRegressionTestResponse>, undefined>(
+      API_ROUTES.runRegressionTestSingle(pid, collectionPid),
+    );
+  }
+
+  return apiPost<ApiResponse<RunRegressionTestResponse>, undefined>(
     API_ROUTES.runRegressionTest(pid),
-    collectionPid ? { collection_pid: collectionPid } : undefined,
   );
 };
 
