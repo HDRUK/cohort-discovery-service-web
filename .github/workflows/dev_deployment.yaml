@@ -9,7 +9,7 @@ on:
 jobs:
   setup-standalone:
     runs-on: ubuntu-latest
-    environment: dev
+    environment: dev-standalone
     outputs:
       docker_build_args: ${{ steps.args.outputs.docker_build_args }}
     steps:
@@ -29,7 +29,7 @@ jobs:
     uses: HDRUK/github-actions-templates/.github/workflows/docker-build.yaml@main
     with:
       chart_path: chart/cohort-web/Chart.yaml
-      environment: dev
+      environment: dev-standalone
       docker_build_args: ${{ needs.setup-standalone.outputs.docker_build_args }}
     secrets: inherit
 
@@ -37,27 +37,26 @@ jobs:
     needs: build-standalone
     uses: HDRUK/github-actions-templates/.github/workflows/deploy-release.yml@main
     with:
-      env: dev
+      env: dev-standalone
       chart_path: chart/cohort-web/Chart.yaml
       git_ref: dev
     secrets: inherit
 
   setup-integrated:
     runs-on: ubuntu-latest
-    environment: dev
+    environment: dev-integrated
     outputs:
       docker_build_args: ${{ steps.args.outputs.docker_build_args }}
     steps:
       - id: args
         run: |
           ARGS=""
-          ARGS+="--build-arg API_BASE_URL=${{ vars.API_BASE_URL }} "
-          ARGS+="--build-arg NEXT_PUBLIC_LOGIN_URL=${{ vars.NEXT_PUBLIC_LOGIN_URL }} "
-          ARGS+="--build-arg NEXT_PUBLIC_USE_DEBUG_LOGS=${{ vars.NEXT_PUBLIC_USE_DEBUG_LOGS }} "
-          ARGS+="--build-arg NEXT_PUBLIC_TASK_URL=${{ vars.NEXT_PUBLIC_TASK_URL }} "
-          ARGS+="--build-arg NEXT_PUBLIC_USE_EXAMPLE_QUERY=${{ vars.NEXT_PUBLIC_USE_EXAMPLE_QUERY }} "
-          ARGS+="--build-arg APPLICATION_MODE=${{ vars.APPLICATION_MODE }} "
-          ARGS+="--build-arg INT_SERVICE_NAME=INT_SERVICE_NAME  "
+          ARGS+="--build-arg API_BASE_URL=${{ vars.INT_API_BASE_URL }} "
+          ARGS+="--build-arg NEXT_PUBLIC_LOGIN_URL=${{ vars.INT_NEXT_PUBLIC_LOGIN_URL }} "
+          ARGS+="--build-arg NEXT_PUBLIC_USE_DEBUG_LOGS=${{ vars.INT_NEXT_PUBLIC_USE_DEBUG_LOGS }} "
+          ARGS+="--build-arg NEXT_PUBLIC_TASK_URL=${{ vars.INT_NEXT_PUBLIC_TASK_URL }} "
+          ARGS+="--build-arg NEXT_PUBLIC_USE_EXAMPLE_QUERY=${{ vars.INT_NEXT_PUBLIC_USE_EXAMPLE_QUERY }} "
+          ARGS+="--build-arg APPLICATION_MODE=${{ vars.INT_APPLICATION_MODE }} "
           echo "docker_build_args=$ARGS" >> "$GITHUB_OUTPUT"
 
   build-integrated:
@@ -65,7 +64,7 @@ jobs:
     uses: HDRUK/github-actions-templates/.github/workflows/docker-build.yaml@main
     with:
       chart_path: chart/cohort-web/Chart.yaml
-      environment: dev
+      environment: dev-integrated
       docker_build_args: ${{ needs.setup-integrated.outputs.docker_build_args }}
     secrets: inherit
 
@@ -73,7 +72,7 @@ jobs:
     needs: build-integrated
     uses: HDRUK/github-actions-templates/.github/workflows/deploy-release.yml@main
     with:
-      env: dev
+      env: dev-integrated
       chart_path: chart/cohort-web/Chart.yaml
       git_ref: dev
     secrets: inherit
