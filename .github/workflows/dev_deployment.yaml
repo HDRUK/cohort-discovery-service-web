@@ -37,7 +37,7 @@ jobs:
     needs: build-standalone
     uses: HDRUK/github-actions-templates/.github/workflows/deploy-release.yml@main
     with:
-      env: dev-standalone
+      env: dev
       chart_path: chart/cohort-web/Chart.yaml
       git_ref: dev
     secrets: inherit
@@ -72,7 +72,7 @@ jobs:
     needs: build-integrated
     uses: HDRUK/github-actions-templates/.github/workflows/deploy-release.yml@main
     with:
-      env: dev-integrated
+      env: dev
       chart_path: chart/cohort-web/Chart.yaml
       git_ref: dev
     secrets: inherit
