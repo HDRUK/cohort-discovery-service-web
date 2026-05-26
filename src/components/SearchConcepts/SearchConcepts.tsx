@@ -37,6 +37,8 @@ interface SearchConceptsProps {
   slotProps?: SlotProps;
 }
 
+const SEARCH_RESULTS_MAX_HEIGHT = 420;
+
 const SearchConcepts = ({
   domain,
   selected,
@@ -200,7 +202,19 @@ const SearchConcepts = ({
         }
         debounceMs={400}
       />
-      <FormGroup sx={{ mt: 2 }}>
+      <FormGroup
+        data-testid="search-concepts-results"
+        sx={{
+          alignItems: "stretch",
+          flexDirection: "column",
+          flexWrap: "nowrap",
+          maxHeight: SEARCH_RESULTS_MAX_HEIGHT,
+          mt: 2,
+          overflowX: "hidden",
+          overflowY: "auto",
+          pr: 1,
+        }}
+      >
         {multiple && visibleOptions.length > 0 && (
           <>
             <FormControlLabel
