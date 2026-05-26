@@ -238,21 +238,21 @@ const SearchConcepts = ({
             {syntheticOptions.map(renderConceptItem)}
           </>
         )}
-        {activeResult && activeResult.per_page < activeResult.total && (
-          <Box>
-            <Button
-              variant="text"
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                handleShowMore();
-              }}
-            >
-              Show more ({activeResult.per_page} / {activeResult.total})
-            </Button>
-          </Box>
-        )}
       </FormGroup>
+      {activeResult && activeResult.per_page < activeResult.total && (
+        <Box sx={{ mt: 1 }}>
+          <Button
+            variant="text"
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              handleShowMore();
+            }}
+          >
+            Show more ({activeResult.per_page} / {activeResult.total})
+          </Button>
+        </Box>
+      )}
     </Box>
   );
 };
