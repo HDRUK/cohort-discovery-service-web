@@ -5,7 +5,6 @@ import React, {
   useCallback,
   useContext,
   useMemo,
-  useRef,
   useState,
 } from "react";
 import {
@@ -31,7 +30,14 @@ import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
 import useRightClickMenu from "@/hooks/useRightClickMenu";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { RuleNodeType } from "@/types/rules";
-import { findById, moveItemIntoGroup } from "@/utils/rules";
+
+import {
+  findById,
+  isRuleGroup,
+  isRuleLeaf,
+  moveItemIntoGroup,
+} from "@/utils/rules";
+
 import useFeatures from "@/hooks/useFeatures";
 
 type Action = {
@@ -50,6 +56,7 @@ type CohortBuilderContextValue = {
 
   registerSortableNode: (id: string, node: HTMLElement | null) => void;
   getSortableNode: (id: string) => HTMLElement | undefined;
+  createAndScroll: (create: () => RuleNodeType) => RuleNodeType | undefined;
 
   pendingScrollToNodeId: string | null;
   clearPendingScrollToNodeId: () => void;
@@ -107,22 +114,29 @@ export const CohortBuilderProvider = ({
   const [activeNode, setActiveNode] = useState<RuleNodeType | null>(null);
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
 
-  const sortableNodeRefs = useRef(new Map<string, HTMLElement>());
+  const [sortableNodes, setSortableNodes] = useState(
+    () => new Map<string, HTMLElement>(),
+  );
 
   const registerSortableNode = useCallback(
     (id: string, node: HTMLElement | null) => {
-      if (node) {
-        sortableNodeRefs.current.set(id, node);
-      } else {
-        sortableNodeRefs.current.delete(id);
-      }
+      setSortableNodes((prev) => {
+        const next = new Map(prev);
+        if (node) {
+          next.set(id, node);
+        } else {
+          next.delete(id);
+        }
+        return next;
+      });
     },
     [],
   );
 
-  const getSortableNode = useCallback((id: string) => {
-    return sortableNodeRefs.current.get(id);
-  }, []);
+  const getSortableNode = useCallback(
+    (id: string) => sortableNodes.get(id),
+    [sortableNodes],
+  );
 
   const [pendingScrollToNodeId, setPendingScrollToNodeId] = useState<
     string | null
@@ -133,7 +147,12 @@ export const CohortBuilderProvider = ({
 
     if (!created) return;
 
-    setPendingScrollToNodeId(created.id);
+    const target = isRuleGroup(created)
+      ? (created.rules.find(isRuleLeaf) ?? created)
+      : created;
+
+    setPendingScrollToNodeId(target.id);
+    return created;
   }, []);
 
   const onDragStart = useCallback(
@@ -297,6 +316,7 @@ export const CohortBuilderProvider = ({
       setHoveredKey,
       registerSortableNode,
       getSortableNode,
+      createAndScroll,
       pendingScrollToNodeId,
       clearPendingScrollToNodeId: () => setPendingScrollToNodeId(null),
     }),
@@ -308,8 +328,8 @@ export const CohortBuilderProvider = ({
       hoveredKey,
       registerSortableNode,
       getSortableNode,
+      createAndScroll,
       pendingScrollToNodeId,
-      setPendingScrollToNodeId,
     ],
   );
 

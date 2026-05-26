@@ -20,9 +20,12 @@ const useTaskPolling = (
         refetchOnMount: false,
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
-        refetchInterval: (query: { state: { data?: Awaited<ReturnType<typeof getTask>> } }) => {
+        refetchInterval: (query: {
+          state: { data?: Awaited<ReturnType<typeof getTask>> };
+        }) => {
           const task = query.state.data?.data;
-          if (!task?.completed_at && !task?.failed_at) return DEFAULT_REFRESH_TABLE;
+          if (!task?.completed_at && !task?.failed_at)
+            return DEFAULT_REFRESH_TABLE;
           if (notifiedRef.current.has(taskPid)) return false;
           notifiedRef.current.add(taskPid);
           onComplete(key, taskPid);

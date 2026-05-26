@@ -1,3 +1,15 @@
+## [1.6.0](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.5.0...v1.6.0) (2026-05-21)
+
+### ✨ Features
+
+* **DP-222:** Enable Filtering of Selecting Collections (#388) ([cd59a70](https://github.com/HDRUK/cohort-discovery-service-web/commit/cd59a700b62006ddd1d9c82e3b8467c4e9c25b2f)), closes [DP-222](DP-222)
+* **DP-823:** 🤖 Improving performance for QueryHistory and other routes (#389) ([ceb8877](https://github.com/HDRUK/cohort-discovery-service-web/commit/ceb8877917c8dc0d7b9b11020882f8db6a9195fa)), closes [DP-823](DP-823)
+* **DP-833:** Regression testing suite for admin (#390) ([f7b7cf9](https://github.com/HDRUK/cohort-discovery-service-web/commit/f7b7cf92f44f612cb9a3815fe87c977ec84b82a6)), closes [DP-833](DP-833)
+
+### 🐛 Bug Fixes
+
+* **DP-800:** Allow user to modify include/exclude on an empty rule (#382) ([d0e02b9](https://github.com/HDRUK/cohort-discovery-service-web/commit/d0e02b9025c39d97c5543a4beb1e229a38f701e8)), closes [DP-800](DP-800)
+
 ## [1.5.0](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.4.0...v1.5.0) (2026-05-11)
 
 ### ✨ Features

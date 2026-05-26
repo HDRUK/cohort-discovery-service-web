@@ -99,6 +99,11 @@ export const HierarchyItem = ({
 
   const { setHoverRef, isHighlighted } = useHoverable<HTMLDivElement>(node.id);
 
+  const handleRenameCommit = (name: string) => {
+    setNodeName(node, name);
+    deselect(node.id);
+  };
+
   const content = (
     <ListItemButton
       ref={setHoverRef}
@@ -126,7 +131,7 @@ export const HierarchyItem = ({
         primary={
           <EditableText
             defaultValue={nodeName}
-            onCommit={(name) => setNodeName(node, name)}
+            onCommit={handleRenameCommit}
             typographyProps={{
               component: "span",
             }}

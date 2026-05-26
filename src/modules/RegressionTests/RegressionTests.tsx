@@ -15,7 +15,7 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { RuleGroupType } from "@/types/rules";
 import { MRT_ColumnDef } from "material-react-table";
@@ -34,6 +34,7 @@ import updateRegressionTest from "@/actions/regressionTest/updateRegressionTest"
 import deleteRegressionTest from "@/actions/regressionTest/deleteRegressionTest";
 import runRegressionTest from "@/actions/regressionTest/runRegressionTest";
 import PassFailChip from "./PassFailChip";
+import EditableExpected from "./EditableExpected";
 import AddRegressionTestDialog from "./AddRegressionTestDialog";
 import useTaskPolling from "@/hooks/useTaskPolling";
 import { useConfirmBool } from "@/hooks/useConfirm";
@@ -60,11 +61,26 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
 
   const tests = useMemo(() => data?.data ?? [], [data]);
 
+  const apiInProgressStates = useMemo((): RunStates => {
+    const result: RunStates = {};
+    for (const test of tests) {
+      for (const col of test.collections) {
+        const task = col.tasks[0];
+        if (task && !task.completed_at && !task.failed_at) {
+          result[`${test.pid}::${col.pid}`] = new Set([task.pid]);
+        }
+      }
+    }
+    return result;
+  }, [tests]);
+
   const rows = useMemo(
     (): TableRow[] =>
       tests.flatMap((test): TableRow[] => [
         { kind: "test", test },
-        ...test.collections.map((col): TableRow => ({ kind: "collection", test, col })),
+        ...test.collections.map(
+          (col): TableRow => ({ kind: "collection", test, col }),
+        ),
       ]),
     [tests],
   );
@@ -82,47 +98,47 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
   );
 
   const handleRun = useCallback(async (testPid: string, colPid?: string) => {
-    const key = colPid ?? testPid;
-    try {
-      const res = await runRegressionTest(testPid, colPid);
-      if (res.error || !res.data?.task_pids?.length) return;
-      setRunStates((prev) => ({
-        ...prev,
-        [key]: new Set(res.data.task_pids),
-      }));
-    } catch {
-      // silently fail
-    }
+    const key = colPid ? `${testPid}::${colPid}` : testPid;
+    const res = await runRegressionTest(testPid, colPid);
+    if (res.error || !res.data?.task_pids?.length) return;
+    setRunStates((prev) => ({
+      ...prev,
+      [key]: new Set(res.data.task_pids),
+    }));
   }, []);
 
-  const handleTaskComplete = useCallback((key: string, taskPid: string) => {
-    setRunStates((prev) => {
-      const pending = new Set(prev[key]);
-      pending.delete(taskPid);
-      if (pending.size === 0) {
-        const next = { ...prev };
-        delete next[key];
-        return next;
-      }
-      return { ...prev, [key]: pending };
-    });
-  }, []);
-
-  const runStateKeysRef = useRef<string[]>([]);
-  useEffect(() => {
-    const currentKeys = Object.keys(runStates);
-    const justCompleted = runStateKeysRef.current.filter(
-      (k) => !currentKeys.includes(k),
-    );
-    runStateKeysRef.current = currentKeys;
-    if (justCompleted.length > 0) {
+  const handleTaskComplete = useCallback(
+    (key: string, taskPid: string) => {
+      setRunStates((prev) => {
+        const pending = new Set(prev[key]);
+        pending.delete(taskPid);
+        if (pending.size === 0) {
+          const next = { ...prev };
+          delete next[key];
+          return next;
+        }
+        return { ...prev, [key]: pending };
+      });
       queryClient.invalidateQueries({ queryKey: ["regression-tests"] });
+    },
+    [queryClient],
+  );
+
+  // Merge local (user-initiated) run states with API-derived in-progress states
+  const effectiveRunStates = useMemo((): RunStates => {
+    const merged: RunStates = { ...apiInProgressStates };
+    for (const [key, pids] of Object.entries(runStates)) {
+      merged[key] = pids;
     }
-  }, [runStates, queryClient]);
+    return merged;
+  }, [runStates, apiInProgressStates]);
 
   const handleRunAll = () => {
     tests.forEach((t) => {
-      if (!runStates[t.pid]) handleRun(t.pid);
+      const anyRunning =
+        !!effectiveRunStates[t.pid] ||
+        t.collections.some((c) => !!effectiveRunStates[`${t.pid}::${c.pid}`]);
+      if (!anyRunning) handleRun(t.pid);
     });
   };
 
@@ -182,7 +198,21 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
     [queryClient],
   );
 
-  useTaskPolling(runStates, handleTaskComplete);
+  const handleUpdateExpected = useCallback(
+    async (test: RegressionTest, colPid: string, expected: number | null) => {
+      await updateRegressionTest(test.pid, {
+        collections: test.collections.map((c) =>
+          c.pid === colPid
+            ? { pid: c.pid, expected_result: expected }
+            : { pid: c.pid, expected_result: c.expected_result },
+        ),
+      });
+      queryClient.invalidateQueries({ queryKey: ["regression-tests"] });
+    },
+    [queryClient],
+  );
+
+  useTaskPolling(effectiveRunStates, handleTaskComplete);
 
   const columns = useMemo(
     (): MRT_ColumnDef<TableRow>[] => [
@@ -214,13 +244,11 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
         size: 100,
         Cell: ({ row }) => {
           if (row.original.kind !== "collection") return null;
-          const expected = row.original.col.expected_result;
-          if (expected === null || expected === undefined) return <>—</>;
+          const { test, col } = row.original;
           return (
-            <Chip
-              label={expected.toLocaleString()}
-              size="small"
-              variant="outlined"
+            <EditableExpected
+              col={col}
+              onSave={(val) => handleUpdateExpected(test, col.pid, val)}
             />
           );
         },
@@ -277,11 +305,7 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
         Cell: ({ row }) => {
           if (row.original.kind !== "collection") return null;
           const n = row.original.col.run_count;
-          return n > 0 ? (
-            <Typography variant="body2">{n}</Typography>
-          ) : (
-            <>—</>
-          );
+          return n > 0 ? <Typography variant="body2">{n}</Typography> : <>—</>;
         },
       },
       {
@@ -322,13 +346,16 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
           if (row.original.kind === "test") {
             const { test } = row.original;
             const anyRunning =
-              !!runStates[test.pid] ||
-              test.collections.some((c) => !!runStates[c.pid]);
+              !!effectiveRunStates[test.pid] ||
+              test.collections.some((c) => !!effectiveRunStates[`${test.pid}::${c.pid}`]);
             return anyRunning ? <CircularProgress size={16} /> : null;
           }
-          const { col } = row.original;
-          if (!!runStates[col.pid]) return <CircularProgress size={16} />;
-          return <PassFailChip value={col.last_passed} />;
+          const { test, col } = row.original;
+          if (!!effectiveRunStates[`${test.pid}::${col.pid}`])
+            return <CircularProgress size={16} />;
+          const latestTask = col.tasks[0];
+          const passValue = latestTask?.failed_at ? false : col.last_passed;
+          return <PassFailChip value={passValue} />;
         },
       },
       {
@@ -340,8 +367,10 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
           if (row.original.kind === "test") {
             const { test } = row.original;
             const anyRunning =
-              !!runStates[test.pid] ||
-              test.collections.some((c) => !!runStates[c.pid]);
+              !!effectiveRunStates[test.pid] ||
+              test.collections.some(
+                (c) => !!effectiveRunStates[`${test.pid}::${c.pid}`],
+              );
             return (
               <Stack direction="row" alignItems="center" spacing={0.5}>
                 <Tooltip title="Run all collections">
@@ -373,7 +402,9 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
           }
 
           const { test, col } = row.original;
-          const isRunning = !!runStates[col.pid] || !!runStates[test.pid];
+          const isRunning =
+            !!effectiveRunStates[`${test.pid}::${col.pid}`] ||
+            !!effectiveRunStates[test.pid];
           return (
             <Stack direction="row" alignItems="center" spacing={0.5}>
               <Tooltip title="Run this collection">
@@ -400,7 +431,14 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
         },
       },
     ],
-    [runStates, handleRun, openEdit, handleDeleteTest, handleRemoveCollection],
+    [
+      effectiveRunStates,
+      handleRun,
+      openEdit,
+      handleDeleteTest,
+      handleRemoveCollection,
+      handleUpdateExpected,
+    ],
   );
 
   const table = useTable({
@@ -415,9 +453,7 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
     state: { isLoading },
     muiTableBodyRowProps: ({ row }) => ({
       sx:
-        row.original.kind === "test"
-          ? { backgroundColor: "action.hover" }
-          : {},
+        row.original.kind === "test" ? { backgroundColor: "action.hover" } : {},
     }),
   });
 
