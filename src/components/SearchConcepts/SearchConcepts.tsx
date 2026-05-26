@@ -9,6 +9,7 @@ import {
   useCallback,
   useRef,
   useMemo,
+  useLayoutEffect,
 } from "react";
 import {
   Checkbox,
@@ -59,6 +60,8 @@ const SearchConcepts = ({
   > | null>(null);
 
   const lastQueryRef = useRef<string>("");
+  const resultsEndRef = useRef<HTMLDivElement | null>(null);
+  const shouldScrollToResultsEndRef = useRef(false);
   const initialSelectedRef = useRef<Record<number, boolean>>({
     ...(selected ?? {}),
   });
@@ -180,12 +183,23 @@ const SearchConcepts = ({
     />
   );
 
-  const handleShowMore = useCallback(() => {
+  const handleShowMore = useCallback(async () => {
     const nextPerPage =
       (activeResult?.per_page ?? perPage) + DEFAULT_CODES_PER_PAGE;
+    shouldScrollToResultsEndRef.current = true;
     setPerPage(nextPerPage);
-    onSearch(lastQueryRef.current, true, nextPerPage);
+    await onSearch(lastQueryRef.current, true, nextPerPage);
   }, [activeResult, perPage, onSearch]);
+
+  useLayoutEffect(() => {
+    if (!shouldScrollToResultsEndRef.current) return;
+
+    shouldScrollToResultsEndRef.current = false;
+    resultsEndRef.current?.scrollIntoView({
+      block: "end",
+      behavior: "smooth",
+    });
+  }, [activeResult?.per_page, visibleOptions.length]);
 
   return (
     <Box>
@@ -238,6 +252,7 @@ const SearchConcepts = ({
             {syntheticOptions.map(renderConceptItem)}
           </>
         )}
+        <Box ref={resultsEndRef} aria-hidden />
       </FormGroup>
       {activeResult && activeResult.per_page < activeResult.total && (
         <Box sx={{ mt: 1 }}>
