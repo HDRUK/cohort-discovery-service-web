@@ -8,9 +8,9 @@ import {
   TextField,
 } from "@mui/material";
 import { ReactNode, useMemo, useState } from "react";
-import { isAgeFilter, isRuleLeaf, updateById } from "@/utils/rules";
+import { isDemographicFilter, isRuleLeaf, updateById } from "@/utils/rules";
 import {
-  AgeFilterType,
+  DemographicFilterType,
   RuleLeafType,
   SingleSidedOperator,
 } from "@/types/rules";
@@ -28,7 +28,7 @@ import HoverableDiv from "@/components/HoverableDiv";
 
 export interface RuleAgeSelectorProps {
   children?: ReactNode;
-  rule: RuleLeafType | AgeFilterType;
+  rule: RuleLeafType | DemographicFilterType;
   title?: string;
   readOnly?: boolean;
   overrideConstrainForBunny?: boolean;
@@ -125,7 +125,7 @@ const RuleAgeSelector = ({
             ],
           };
         }
-        if (isAgeFilter(node)) {
+        if (isDemographicFilter(node)) {
           return {
             ...node,
             value: [
@@ -230,7 +230,7 @@ const RuleAgeSelector = ({
                   };
                 }
 
-                if (isAgeFilter(node)) {
+                if (isDemographicFilter(node)) {
                   if (left != null) return { ...node, value: [left, maxAge] };
                   if (right != null) return { ...node, value: [minAge, right] };
                   return { ...node, value: [minAge, maxAge] };

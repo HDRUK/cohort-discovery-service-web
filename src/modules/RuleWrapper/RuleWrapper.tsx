@@ -43,7 +43,7 @@ import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
 import { mergeSx } from "@/utils/helpers";
 import RuleAgeSelector from "@/components/RuleAgeSelector";
 import {
-  isAgeFilter,
+  isDemographicFilter,
   isEmptyRule,
   isRuleLeaf,
   removeById,
@@ -98,7 +98,7 @@ const RuleWrapper = ({
   const { id, valid = true, invalidReason } = node;
 
   let exclude;
-  if (!isAgeFilter(node)) {
+  if (!isDemographicFilter(node)) {
     exclude = !!node.exclude;
   }
 
@@ -187,7 +187,7 @@ const RuleWrapper = ({
   const nodeName = useMemo(() => getNodeName(node), [node, getNodeName]);
 
   const showFooter =
-    (type === "Rule" && isSelected && !isAgeFilter(node)) ||
+    (type === "Rule" && isSelected && !isDemographicFilter(node)) ||
     (!valid && (invalidReason ?? []).length > 0);
 
   useLogDependencyChanges("wrapper " + node.id, {
@@ -362,7 +362,7 @@ const RuleWrapper = ({
                 {showFooter && <Divider variant="fullWidth" />}
                 <Box
                   minHeight={
-                    type === "Rule" && isSelected && !isAgeFilter(node) ? 40 : 0
+                    type === "Rule" && isSelected && !isDemographicFilter(node) ? 40 : 0
                   }
                 >
                   {!valid && (

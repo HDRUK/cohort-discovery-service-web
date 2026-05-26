@@ -4,7 +4,7 @@ import { Fragment, useRef } from "react";
 
 import Rule from "@/modules/Rule";
 import {
-  isAgeFilter,
+  isDemographicFilter,
   isOperator,
   isRuleGroup,
   isRuleLeaf,
@@ -20,7 +20,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import useHasMounted from "@/hooks/useHasMounted";
-import RuleAgeFilter from "../RuleAgeFilter";
+import RuleDemographicFilter from "../RuleDemographicFilter";
 import SkeletonFull from "@/components/SkeletonFull";
 import useStateManagement from "@/hooks/useStateManagement";
 import useScrollToNode from "@/hooks/useScrollToNode";
@@ -37,8 +37,8 @@ function renderRule(item: RuleNodeType, ruleGroupId: string) {
     return <RuleGroup key={item.id} group={item} parentGroupId={ruleGroupId} />;
   } else if (isOperator(item)) {
     return <RuleOperator key={item.id} operator={item} groupId={ruleGroupId} />;
-  } else if (isAgeFilter(item)) {
-    return <RuleAgeFilter key={item.id} rule={item} groupId={ruleGroupId} />;
+  } else if (isDemographicFilter(item)) {
+    return <RuleDemographicFilter key={item.id} rule={item} groupId={ruleGroupId} />;
   }
 }
 

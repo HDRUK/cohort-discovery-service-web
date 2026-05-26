@@ -65,6 +65,7 @@ const MetadataPanel = ({ metadata }: MetadataPanelProps) => {
           label="BC Link Version"
           value={<Chip label={metadata.bclink} size="small" />}
         />
+        <MetadataItem label="Death Table" value={metadata.death_filter} />
       </Grid>
     </ActionMenuSection>
   );

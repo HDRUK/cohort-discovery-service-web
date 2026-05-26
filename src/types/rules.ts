@@ -43,18 +43,19 @@ export interface RuleLeafType extends Node {
   rule: ConceptOperator;
 }
 
-export interface AgeFilterType extends Omit<
+export interface DemographicFilterType extends Omit<
   Node,
   "exclude" | "timeConstraint" | "ageConstraint"
 > {
   value: [number, number];
+  deceased?: boolean;
 }
 
 export type RuleNodeType =
   | RuleGroupType
   | RuleLeafType
   | OperatorType
-  | AgeFilterType;
+  | DemographicFilterType;
 
 export interface BoardIndex {
   containers: string[];

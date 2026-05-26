@@ -1,6 +1,6 @@
 import { ConceptOperator, RuleGroupType, RuleNodeType } from "@/types/rules";
 import {
-  isAgeFilter,
+  isDemographicFilter,
   isMultipleConcept,
   isOperator,
   isRuleGroup,
@@ -189,7 +189,7 @@ const queryToText = (
       return [{ text }];
     }
 
-    if (isAgeFilter(n)) {
+    if (isDemographicFilter(n)) {
       const [minAge, maxAge] = n.value;
 
       if (

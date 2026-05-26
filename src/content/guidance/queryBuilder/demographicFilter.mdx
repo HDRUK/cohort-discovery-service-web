@@ -1,0 +1,16 @@
+<CollapsibleGuidance keyPrefix="RuleAgeSelector" title="Current Patient Age">
+  <RuleAgeSelector />
+  <Box sx={{ pb: 1 }}>
+    Define the patient age range by adjusting the slider value.
+  </Box>
+  <Box sx={{ color: "error.main" }}>
+    Age may be rounded ±1 year in some datasets, to either protect patient data or as the specific day or month was not recorded.
+  </Box>
+</CollapsibleGuidance>
+
+<CollapsibleGuidance keyPrefix="DeceasedSelector" title="Deceased Status">
+  <DeceasedSelector />
+  <Box sx={{ pb: 1 }}>
+    Filter by whether the patient is recorded as deceased. Set to **Any** to include all patients regardless of vital status.
+  </Box>
+</CollapsibleGuidance>

@@ -14,7 +14,7 @@ import {
   findById,
   findByIdWithNeighbors,
   getSelectedOrdered,
-  createAgeFilter,
+  createDemographicFilter,
 } from "@/utils/rules";
 import { useCallback, useMemo } from "react";
 import { useCohortBuilderContext } from "@/providers/CohortBuilderProvider";
@@ -177,11 +177,11 @@ const useNodeActions = (
     });
   }, [createAndScroll, id, groupRules, queryBuilderJson, setQueryBuilderJson]);
 
-  const handleCreateNewAgeFilter = useCallback(() => {
+  const handleCreateNewDemographicFilter = useCallback(() => {
     if (!groupRules) return;
     createAndScroll(() => {
-      const newAgeFilter = createAgeFilter();
-      const newRules = [newAgeFilter, createOperator(), ...groupRules];
+      const newDemographicFilter = createDemographicFilter();
+      const newRules = [newDemographicFilter, createOperator(), ...groupRules];
 
       setQueryBuilderJson(
         updateById(queryBuilderJson, id, (node) => ({
@@ -190,7 +190,7 @@ const useNodeActions = (
         })),
       );
 
-      return newAgeFilter;
+      return newDemographicFilter;
     });
   }, [createAndScroll, id, groupRules, queryBuilderJson, setQueryBuilderJson]);
 
@@ -224,7 +224,7 @@ const useNodeActions = (
       ? [
           { action: handleCreateNewRule, label: "Add Rule" },
           { action: handleCreateNewOperator, label: "Add And/Or" },
-          { action: handleCreateNewAgeFilter, label: "Add Age Rule" },
+          { action: handleCreateNewDemographicFilter, label: "Add Demographic" },
           { action: handleCollapseGroup, label: "Ungroup" },
         ]
       : []),
