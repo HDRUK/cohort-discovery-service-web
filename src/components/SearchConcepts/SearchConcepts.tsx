@@ -66,6 +66,7 @@ const SearchConcepts = ({
     ...(selected ?? {}),
   });
 
+  const [isShowingMore, setIsShowingMore] = useState(false);
   const [nonSyntheticOptions, setNonSyntheticOptions] = useState<Concept[]>([]);
   const [syntheticOptions, setSyntheticOptions] = useState<Concept[]>([]);
   const [noOptionsFound, setNoOptionsFound] = useState(false);
@@ -184,12 +185,22 @@ const SearchConcepts = ({
   );
 
   const handleShowMore = useCallback(async () => {
+    if (isLoading || isShowingMore) return;
+
     const nextPerPage =
       (activeResult?.per_page ?? perPage) + DEFAULT_CODES_PER_PAGE;
     shouldScrollToResultsEndRef.current = true;
+    setIsShowingMore(true);
     setPerPage(nextPerPage);
-    await onSearch(lastQueryRef.current, true, nextPerPage);
-  }, [activeResult, perPage, onSearch]);
+
+    try {
+      await onSearch(lastQueryRef.current, true, nextPerPage);
+    } catch (error) {
+      shouldScrollToResultsEndRef.current = false;
+      setIsShowingMore(false);
+      throw error;
+    }
+  }, [activeResult, perPage, onSearch, isLoading, isShowingMore]);
 
   useLayoutEffect(() => {
     if (!shouldScrollToResultsEndRef.current) return;
@@ -199,6 +210,7 @@ const SearchConcepts = ({
       block: "end",
       behavior: "smooth",
     });
+    requestAnimationFrame(() => setIsShowingMore(false));
   }, [activeResult?.per_page, visibleOptions.length]);
 
   return (
@@ -258,6 +270,7 @@ const SearchConcepts = ({
         <Box sx={{ mt: 1 }}>
           <Button
             variant="text"
+            disabled={isLoading || isShowingMore}
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
