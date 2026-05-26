@@ -61,18 +61,19 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
 
   const tests = useMemo(() => data?.data ?? [], [data]);
 
-  const apiInProgressStates = useMemo((): RunStates => {
-    const result: RunStates = {};
-    for (const test of tests) {
-      for (const col of test.collections) {
-        const task = col.tasks[0];
-        if (task && !task.completed_at && !task.failed_at) {
-          result[`${test.pid}::${col.pid}`] = new Set([task.pid]);
-        }
-      }
-    }
-    return result;
-  }, [tests]);
+  const apiInProgressStates = useMemo(
+    (): RunStates =>
+      Object.fromEntries(
+        tests.flatMap((test) =>
+          test.collections.flatMap((col) => {
+            const task = col.tasks[0];
+            if (!task || task.completed_at || task.failed_at) return [];
+            return [[`${test.pid}::${col.pid}`, new Set([task.pid])]];
+          }),
+        ),
+      ),
+    [tests],
+  );
 
   const rows = useMemo(
     (): TableRow[] =>
@@ -124,14 +125,10 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
     [queryClient],
   );
 
-  // Merge local (user-initiated) run states with API-derived in-progress states
-  const effectiveRunStates = useMemo((): RunStates => {
-    const merged: RunStates = { ...apiInProgressStates };
-    for (const [key, pids] of Object.entries(runStates)) {
-      merged[key] = pids;
-    }
-    return merged;
-  }, [runStates, apiInProgressStates]);
+  const effectiveRunStates = useMemo(
+    (): RunStates => ({ ...apiInProgressStates, ...runStates }),
+    [runStates, apiInProgressStates],
+  );
 
   const handleRunAll = () => {
     tests.forEach((t) => {
@@ -347,7 +344,9 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
             const { test } = row.original;
             const anyRunning =
               !!effectiveRunStates[test.pid] ||
-              test.collections.some((c) => !!effectiveRunStates[`${test.pid}::${c.pid}`]);
+              test.collections.some(
+                (c) => !!effectiveRunStates[`${test.pid}::${c.pid}`],
+              );
             return anyRunning ? <CircularProgress size={16} /> : null;
           }
           const { test, col } = row.original;
