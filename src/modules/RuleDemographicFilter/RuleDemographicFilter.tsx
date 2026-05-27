@@ -37,6 +37,11 @@ const RuleDemographicFilter = ({ rule, groupId, ...rest }: RuleDemographicFilter
           <Paper sx={{ border: 1, p: 1 }}>
             Deceased: {deceasedLabel(rule.deceased)}
           </Paper>
+          {!!rule.location?.length && (
+            <Paper sx={{ border: 1, p: 1 }}>
+              Location: {rule.location.join(", ")}
+            </Paper>
+          )}
         </Box>
       )}
       actions={actions}

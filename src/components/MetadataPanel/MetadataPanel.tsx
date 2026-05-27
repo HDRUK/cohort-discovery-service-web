@@ -1,17 +1,7 @@
 import { Typography, Grid, Chip, Box } from "@mui/material";
 import ActionMenuSection from "../ActionMenuSection";
 import { ReactNode } from "react";
-
-export interface CollectionMetadata {
-  created_at: string;
-  os: string | null;
-  bclink: string;
-  biobank: string;
-  datamodel: string;
-  protocol: string;
-  rounding: string;
-  threshold: string;
-}
+import { CollectionMetadata } from "@/types/api";
 
 type MetadataPanelProps = {
   metadata?: CollectionMetadata | null;

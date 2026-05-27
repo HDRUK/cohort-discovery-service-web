@@ -56,6 +56,7 @@ import AddAgeButton from "@/components/AddAgeButton";
 import RuleAgeSelector from "@/components/RuleAgeSelector";
 import DeleteAgeButton from "@/components/DeleteAgeButton";
 import DeceasedSelector from "@/components/DeceasedSelector";
+import LocationSelector from "@/components/LocationSelector";
 import useFeatures from "@/hooks/useFeatures";
 import CollapsibleGuidance from "@/components/CollapsibleGuidance";
 
@@ -296,6 +297,7 @@ const Guidance = () => {
       />
     ),
     DeceasedSelector: () => <DeceasedSelector rule={node} />,
+    LocationSelector: () => <LocationSelector rule={node} />,
   });
 
   const makeMultipleItemComponents = () => ({

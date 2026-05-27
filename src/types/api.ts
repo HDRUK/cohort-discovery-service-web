@@ -143,6 +143,7 @@ export interface CollectionMetadata {
   protocol: string;
   rounding: string;
   threshold: string;
+  death_filter: boolean | null;
 }
 
 export interface Activity extends WithTimestamps {

@@ -124,7 +124,7 @@ describe("SelectDatasets", () => {
       </MockCohortDiscoveryServiceStore>,
     );
 
-    const toggle = screen.getByTestId("toggle-action-on");
+    const toggle = screen.getAllByTestId("toggle-action-on")[0];
     await user.click(toggle);
 
     expect(setSelectedDatasets).toHaveBeenCalledWith(
@@ -167,7 +167,7 @@ describe("SelectDatasets", () => {
     expect(screen.getByText("Including")).toBeInTheDocument();
     expect(screen.getByText("Synthetic Data Collections")).toBeInTheDocument();
 
-    const toggle = screen.getByTestId("toggle-action-on");
+    const toggle = screen.getAllByTestId("toggle-action-on")[0];
     await user.click(toggle);
 
     expect(setSelectedDatasets).toHaveBeenCalledWith([]);

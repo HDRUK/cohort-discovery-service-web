@@ -49,6 +49,7 @@ export interface DemographicFilterType extends Omit<
 > {
   value: [number, number];
   deceased?: boolean;
+  location?: string[];
 }
 
 export type RuleNodeType =

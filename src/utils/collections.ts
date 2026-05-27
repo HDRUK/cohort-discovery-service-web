@@ -1,5 +1,8 @@
 import { Collection } from "@/types/api";
 
+export const hasDeathFilter = (collection: Collection): boolean =>
+  collection.latest_metadata?.death_filter === true;
+
 const getAllowedCollections = (
   collections: Collection[],
   includeSynthetic = false,
