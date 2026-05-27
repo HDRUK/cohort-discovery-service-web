@@ -13,7 +13,7 @@ import {
 } from "@/utils/rules";
 import { Box, BoxProps } from "@mui/material";
 import { RuleGroupType, RuleNodeType } from "@/types/rules";
-import { RuleGroupSlim } from "@/modules/RuleGroup";
+import RuleGroup from "@/modules/RuleGroup";
 import RuleMultiConcept from "@/modules/RuleMultiConcept";
 import RuleOperator from "@/modules/RuleOperator";
 import { useDroppable } from "@dnd-kit/core";
@@ -40,10 +40,7 @@ function renderRule(item: RuleNodeType, ruleGroupId: string) {
     }
     return <Rule key={item.id} rule={item} groupId={ruleGroupId} />;
   } else if (isRuleGroup(item)) {
-    return (
-      <RuleGroupSlim key={item.id} group={item} parentGroupId={ruleGroupId} />
-    );
-    //return <RuleGroup key={item.id} group={item} parentGroupId={ruleGroupId} />;
+    return <RuleGroup key={item.id} group={item} parentGroupId={ruleGroupId} />;
   } else if (isOperator(item)) {
     return <RuleOperator key={item.id} operator={item} groupId={ruleGroupId} />;
   } else if (isAgeFilter(item)) {
