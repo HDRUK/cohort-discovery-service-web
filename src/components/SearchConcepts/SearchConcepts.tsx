@@ -40,6 +40,17 @@ interface SearchConceptsProps {
 
 const SEARCH_RESULTS_MAX_HEIGHT = 420;
 
+const searchResultsSx = {
+  alignItems: "stretch",
+  flexDirection: "column",
+  flexWrap: "nowrap",
+  maxHeight: SEARCH_RESULTS_MAX_HEIGHT,
+  mt: 2,
+  overflowX: "hidden",
+  overflowY: "auto",
+  pr: 1,
+} as const;
+
 const SearchConcepts = ({
   domain,
   selected,
@@ -230,16 +241,7 @@ const SearchConcepts = ({
       />
       <FormGroup
         data-testid="search-concepts-results"
-        sx={{
-          alignItems: "stretch",
-          flexDirection: "column",
-          flexWrap: "nowrap",
-          maxHeight: SEARCH_RESULTS_MAX_HEIGHT,
-          mt: 2,
-          overflowX: "hidden",
-          overflowY: "auto",
-          pr: 1,
-        }}
+        sx={searchResultsSx}
       >
         {multiple && visibleOptions.length > 0 && (
           <>
