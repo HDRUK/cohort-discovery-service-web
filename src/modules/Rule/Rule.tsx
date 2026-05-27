@@ -19,6 +19,7 @@ import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import useNodeActions from "@/hooks/useNodeActions";
 import InvalidRule from "@/components/InvalidRule";
 import { getDomain } from "@/utils/omop";
+import { SelectMultipleConcepts } from "@/components/SelectMultipleConcepts/SelectMultipleConcepts";
 
 export interface RuleProps extends Omit<
   RuleWrapperProps,
@@ -170,42 +171,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
                 </>
               )}
               {isMultipleConcept(concept) && (
-                <>
-                  <ConceptChip
-                    indicateIfParent={showDescendants}
-                    concept={concept}
-                    onDelete={() => {
-                      clearConcept();
-                    }}
-                    onClick={(e: React.MouseEvent) => {
-                      e.stopPropagation();
-                      setConcept({ ...concept, alternatives: [] });
-                      setSelected(id, true, true);
-                    }}
-                  />
-
-                  {concept?.alternatives &&
-                    concept?.alternatives?.map((childConcept) => (
-                      <ConceptChip
-                        chipSx={{
-                          borderColor: "error.main",
-                        }}
-                        draggable={false}
-                        key={childConcept.concept_id}
-                        concept={childConcept}
-                        onClick={() => setConcept(childConcept)}
-                        onDelete={(e) => {
-                          e.stopPropagation();
-                          e.preventDefault();
-                          setConcept(removeAlternative(concept, childConcept));
-                          setSelected(id, true, true);
-                        }}
-                      >
-                        {" "}
-                        <InvalidRule reasons={[]} />
-                      </ConceptChip>
-                    ))}
-                </>
+                <SelectMultipleConcepts id={id} concept={concept} />
               )}
             </>
           )}
