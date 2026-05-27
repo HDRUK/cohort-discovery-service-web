@@ -22,7 +22,10 @@ import {
 import { ConceptItem, ConceptItemProps } from "./ConceptItem";
 import useUserStore from "@/hooks/useUserStore";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import { DEFAULT_CODES_PER_PAGE } from "@/config/defaults";
+import {
+  DEFAULT_CODES_PER_PAGE,
+  DEFAULT_SEARCH_RESULTS_MAX_HEIGHT,
+} from "@/config/defaults";
 import useFeatures from "@/hooks/useFeatures";
 
 interface SlotProps {
@@ -38,13 +41,11 @@ interface SearchConceptsProps {
   slotProps?: SlotProps;
 }
 
-const SEARCH_RESULTS_MAX_HEIGHT = 420;
-
 const searchResultsSx = {
   alignItems: "stretch",
   flexDirection: "column",
   flexWrap: "nowrap",
-  maxHeight: SEARCH_RESULTS_MAX_HEIGHT,
+  maxHeight: DEFAULT_SEARCH_RESULTS_MAX_HEIGHT,
   mt: 2,
   overflowX: "hidden",
   overflowY: "auto",
