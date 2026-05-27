@@ -342,7 +342,7 @@ const Guidance = () => {
       }
 
       const concept = selectedNode?.rule?.concept;
-      const category = concept?.category || "";
+      const category = (Array.isArray(concept) ? concept[0]?.category : concept?.category) || "";
       const { verb } = getDomainPhrase(category);
       const past = getDomainPastPhrase(category);
       const domain = getDomain(concept);
@@ -358,7 +358,9 @@ const Guidance = () => {
             components={makeRuleComponents(selectedNode)}
             showSelectors={
               !["Gender", "Race"].includes(
-                selectedNode.rule.concept?.category || "",
+                (Array.isArray(selectedNode.rule.concept)
+                  ? selectedNode.rule.concept[0]?.category
+                  : selectedNode.rule.concept?.category) || "",
               )
             }
           />

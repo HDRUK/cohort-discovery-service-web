@@ -79,7 +79,10 @@ const RuleTimeframeSelector = ({
     disableOpenPicker: readOnly ? true : false,
   };
 
-  const { verbPast } = getDomainPhrase(rule.rule.concept?.category);
+  const conceptCategory = Array.isArray(rule.rule.concept)
+    ? rule.rule.concept[0]?.category
+    : rule.rule.concept?.category;
+  const { verbPast } = getDomainPhrase(conceptCategory);
 
   const parseIsoToDayjs = useCallback(
     (iso: string | null) => (iso ? dayjs(iso) : null),

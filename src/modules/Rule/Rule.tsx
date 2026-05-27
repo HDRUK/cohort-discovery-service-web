@@ -1,9 +1,9 @@
 import { Chip, Box } from "@mui/material";
-import SearchConcepts from "@/components/SearchConcepts";
 import { Concept } from "@/types/api";
 import { useCallback } from "react";
 import ConceptChip from "@/components/ConceptChip";
 import { RuleLeafType, SingleSidedOperator } from "@/types/rules";
+import RuleSearch from "./RuleSearch";
 
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import {
@@ -11,15 +11,12 @@ import {
   updateById,
   isSingleConcept,
   isRuleLeaf,
-  isMultipleConcept,
 } from "@/utils/rules";
 
 import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import useNodeActions from "@/hooks/useNodeActions";
-import InvalidRule from "@/components/InvalidRule";
 import { getDomain } from "@/utils/omop";
-import { SelectMultipleConcepts } from "@/components/SelectMultipleConcepts/SelectMultipleConcepts";
 
 export interface RuleProps extends Omit<
   RuleWrapperProps,
@@ -40,13 +37,11 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     setQueryBuilderJson,
     showDescendants,
     setShowDescendants,
-    setSelected,
   } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
     showDescendants: qb.showDescendants[id],
     setShowDescendants: qb.setShowDescendants,
-    setSelected: qb.setSelected,
   }));
 
   const toggleShowDescendants = useCallback(
@@ -55,7 +50,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
   );
 
   const setConcept = useCallback(
-    (c: Concept) => {
+    (c: Concept | Concept[]) => {
       setQueryBuilderJson(
         updateById(queryBuilderJson, id, (node) => {
           if (isRuleLeaf(node)) {
@@ -89,13 +84,6 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     );
   }, [id, queryBuilderJson, setQueryBuilderJson]);
 
-  const onClick = useCallback(
-    (c: Concept) => {
-      setConcept(c);
-    },
-    [setConcept],
-  );
-
   const removeChild = useCallback((parent: Concept, child: Concept) => {
     const children = parent.children?.filter(
       (c) => c.concept_id !== child.concept_id,
@@ -103,17 +91,6 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     const newConcept = {
       ...parent,
       children,
-    };
-    return newConcept;
-  }, []);
-
-  const removeAlternative = useCallback((parent: Concept, child: Concept) => {
-    const alternatives = parent.alternatives?.filter(
-      (c) => c.concept_id !== child.concept_id,
-    );
-    const newConcept = {
-      ...parent,
-      alternatives,
     };
     return newConcept;
   }, []);
@@ -134,7 +111,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       render={() => (
         <Box py={1}>
           {isEmptyRule(rule) ? (
-            <SearchConcepts onClick={onClick} />
+            <RuleSearch onConfirm={setConcept} />
           ) : (
             <>
               {isSingleConcept(concept) && (
@@ -169,9 +146,6 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
                       />
                     ))}
                 </>
-              )}
-              {isMultipleConcept(concept) && (
-                <SelectMultipleConcepts id={id} concept={concept} />
               )}
             </>
           )}

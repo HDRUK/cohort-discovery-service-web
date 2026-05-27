@@ -78,6 +78,7 @@ export interface RuleWrapperProps extends BoxProps {
   actions?: Action[];
   forceShowHandle?: boolean;
   useLeftDragPlaceHolder?: boolean;
+  renderFooter?: ReactNode;
 }
 
 const RuleWrapper = ({
@@ -94,6 +95,7 @@ const RuleWrapper = ({
   actions,
   forceShowHandle = false,
   useLeftDragPlaceHolder = false,
+  renderFooter,
 }: RuleWrapperProps) => {
   const { id, valid = true, invalidReason } = node;
 
@@ -310,7 +312,7 @@ const RuleWrapper = ({
             {isRuleLeaf(node) &&
               type === "Rule" &&
               !isEmptyRule(node) &&
-              !["Gender", "Race"].includes(node.rule.concept?.category || "") &&
+              !["Gender", "Race"].includes((Array.isArray(node.rule.concept) ? node.rule.concept[0]?.category : node.rule.concept?.category) || "") &&
               (node.timeConstraint || node.ageConstraint || isSelected) && (
                 <CardActions sx={cardActionsSx}>
                   {node.timeConstraint ? (
@@ -365,12 +367,12 @@ const RuleWrapper = ({
                     type === "Rule" && isSelected && !isAgeFilter(node) ? 40 : 0
                   }
                 >
-                  {!valid && (
+                  {renderFooter ?? (!valid && (
                     <InvalidRule
                       reasons={invalidReason ?? []}
                       stackProps={{ sx: { pt: 1, pb: 1 } }}
                     />
-                  )}
+                  ))}
                 </Box>
               </>
             )}

@@ -43,6 +43,7 @@ export const ConceptChip = ({
   onDelete,
   chipSx,
   children,
+  categoryLabel,
 }: {
   draggable?: boolean;
   indicateIfParent?: boolean;
@@ -51,6 +52,7 @@ export const ConceptChip = ({
   onDelete: (e: React.MouseEvent) => void;
   chipSx?: ChipProps["sx"];
   children?: React.ReactNode;
+  categoryLabel?: string;
 }) => {
   const isParent = (concept?.children?.length ?? 0) > 0;
   const clickable = Boolean(onClick);
@@ -95,6 +97,12 @@ export const ConceptChip = ({
           onClick={onClick && onClick}
           label={
             <Typography>
+              {categoryLabel && (
+                <Box component="span" sx={{ color: "grey.500" }}>
+                  {categoryLabel}
+                  {" | "}
+                </Box>
+              )}
               {concept?.name} (
               <Box component="span" sx={{ color: "grey.500" }}>
                 OMOP

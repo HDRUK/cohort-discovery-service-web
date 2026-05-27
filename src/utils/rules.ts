@@ -144,28 +144,35 @@ export function groupToRules(
   return (normaliseExclude ? normaliseGroupExclude(group) : group).rules;
 }
 
-export const isUnknownRule = (rule: RuleLeafType): boolean =>
-  !!rule.rule.concept?.name && rule.rule.concept?.concept_id === null;
+export const isUnknownRule = (rule: RuleLeafType): boolean => {
+  const concept = rule.rule.concept;
+  if (Array.isArray(concept) || concept == null) return false;
+  return !!concept.name && concept.concept_id === null;
+};
 
-export const isEmptyRule = (
-  rule: RuleLeafType,
-): rule is RuleLeafType & {
-  rule: RuleLeafType["rule"] & {
-    concept: null | { concept_id: null };
-  };
-} => rule.rule.concept === null || rule.rule.concept?.concept_id === null;
+export const isEmptyRule = (rule: RuleLeafType): boolean => {
+  const concept = rule.rule.concept;
+  if (Array.isArray(concept)) return false;
+  return concept === null || concept?.concept_id === null;
+};
 
 export const isSingleConcept = (
-  concept: Concept | null,
-): concept is Concept & { alternatives: undefined } =>
-  concept != null && !isMultipleConcept(concept);
+  concept: Concept | Concept[] | null,
+): concept is Concept =>
+  concept != null && !Array.isArray(concept) && !concept.alternatives?.length;
 
-export const isMultipleConcept = (
-  concept: Concept | null,
+export const hasAlternatives = (
+  concept: Concept | Concept[] | null,
 ): concept is Concept & { alternatives: Concept[] } =>
   concept != null &&
-  Array.isArray(concept?.alternatives) &&
-  concept!.alternatives.length > 0;
+  !Array.isArray(concept) &&
+  Array.isArray(concept.alternatives) &&
+  concept.alternatives.length > 0;
+
+export const isMultipleConcept = (
+  concept: Concept | Concept[] | null,
+): concept is Concept[] =>
+  Array.isArray(concept) && concept.length > 0;
 
 export const isRuleGroup = (n: RuleNodeType): n is RuleGroupType =>
   "rules" in n;
@@ -509,15 +516,14 @@ export function validateRuleTree(
 
     let node = validateNode(leaf);
     if (isUnknownRule(leaf)) {
-      node = invalidateNode(
-        node,
-        `${RuleErrors.UNKNOWN_RULE} ${leaf.rule.concept?.name}`,
-      );
+      const c = leaf.rule.concept;
+      const name = !Array.isArray(c) ? c?.name : "";
+      node = invalidateNode(node, `${RuleErrors.UNKNOWN_RULE} ${name}`);
     } else if (isEmptyRule(leaf)) {
       node = invalidateNode(node, RuleErrors.EMPTY_RULE);
     }
 
-    if (isMultipleConcept(leaf.rule.concept)) {
+    if (hasAlternatives(leaf.rule.concept)) {
       node = invalidateNode(node, RuleErrors.HAS_ALTERNATIVES);
     }
     node = validateConstraints(node as RuleLeafType);

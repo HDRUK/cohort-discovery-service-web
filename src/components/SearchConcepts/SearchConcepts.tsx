@@ -33,7 +33,10 @@ interface SearchConceptsProps {
   selected?: Record<number, boolean>;
   setSelected?: Dispatch<SetStateAction<Record<number, boolean>>>;
   multiple?: boolean;
+  hideSelectAll?: boolean;
   onClick?: (concept: Concept) => void;
+  onToggle?: (concept: Concept, isSelected: boolean) => void;
+  onHasOptions?: (hasOptions: boolean) => void;
   slotProps?: SlotProps;
 }
 
@@ -42,8 +45,11 @@ const SearchConcepts = ({
   selected,
   setSelected,
   onClick,
+  onToggle,
+  onHasOptions,
   slotProps,
   multiple = false,
+  hideSelectAll = false,
 }: SearchConceptsProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const searchForConcepts = useUserStore((s) => s.searchForConcepts);
@@ -80,10 +86,11 @@ const SearchConcepts = ({
       const next = { ...prev };
       visibleOptions.forEach((o) => {
         next[o.concept_id] = !allSelected;
+        onToggle?.(o, !allSelected);
       });
       return next;
     });
-  }, [visibleOptions, allSelected, setSelected]);
+  }, [visibleOptions, allSelected, setSelected, onToggle]);
 
   const onSearch = useCallback(
     async (value: string, force = false, customPerPage?: number) => {
@@ -100,6 +107,7 @@ const SearchConcepts = ({
         setNonSyntheticOptions([]);
         setSyntheticOptions([]);
         setNoOptionsFound(false);
+        onHasOptions?.(false);
         return;
       }
 
@@ -144,8 +152,9 @@ const SearchConcepts = ({
       setNoOptionsFound(!hasVisibleOptions);
       setActiveResult(hasVisibleOptions ? res : null);
       setIsLoading(false);
+      onHasOptions?.(hasVisibleOptions);
     },
-    [domain, searchForConcepts, setSelected, includeSynthetic, perPage],
+    [domain, searchForConcepts, setSelected, includeSynthetic, perPage, onHasOptions],
   );
 
   const handleToggle = useCallback(
@@ -170,6 +179,7 @@ const SearchConcepts = ({
       handleClick={(id, e) => {
         onClick?.(c);
         handleToggle(id);
+        onToggle?.(c, !selected?.[c.concept_id]);
         e.stopPropagation();
         e.preventDefault();
       }}
@@ -201,7 +211,7 @@ const SearchConcepts = ({
         debounceMs={400}
       />
       <FormGroup sx={{ mt: 2 }}>
-        {multiple && visibleOptions.length > 0 && (
+        {multiple && !hideSelectAll && visibleOptions.length > 0 && (
           <>
             <FormControlLabel
               control={

@@ -97,10 +97,6 @@ export const EXAMPLE_1: RuleGroupType = {
       ],
     },
   ],
-  constraints: {
-    ageConstraint: [null, null],
-    timeConstraint: [null, null],
-  },
   warnings: [],
   valid: false,
   invalidReason: [
