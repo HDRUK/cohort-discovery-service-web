@@ -159,11 +159,12 @@ const MockCohortDiscoveryServiceStore = ({
       ) => RESOLVE<Query>(getMockQuery()),
       createConceptSet: (_payload: CreateConceptSetPost) =>
         RESOLVE<void>(undefined),
-      searchForConcepts: async ({ searchTerm, perPage, domain }) => {
+      searchForConcepts: async ({ searchTerm, perPage, page = 1, domain }) => {
         const { data } = await searchConcepts({
           concept_name: [searchTerm],
           concept_id: [searchTerm],
           per_page: perPage,
+          page,
           domain,
         });
 

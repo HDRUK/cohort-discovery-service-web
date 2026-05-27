@@ -54,7 +54,6 @@ const SearchConcepts = ({
     (qb) => qb.hasSelectedSyntheticDatasets,
   );
 
-  const [perPage, setPerPage] = useState(DEFAULT_CODES_PER_PAGE);
   const [activeResult, setActiveResult] = useState<Paginated<
     Partial<Concept>
   > | null>(null);
@@ -92,7 +91,7 @@ const SearchConcepts = ({
   }, [visibleOptions, allSelected, setSelected]);
 
   const onSearch = useCallback(
-    async (value: string, force = false, customPerPage?: number) => {
+    async (value: string, force = false, page = 1, append = false) => {
       const trimmedValue = value.trim().length < 3 ? "" : value.trim();
       const isNewSearch = trimmedValue !== lastQueryRef.current;
 
@@ -109,49 +108,43 @@ const SearchConcepts = ({
         return;
       }
 
-      let effectivePerPage = perPage;
-
       if (isNewSearch) {
-        effectivePerPage = DEFAULT_CODES_PER_PAGE;
-        setPerPage(DEFAULT_CODES_PER_PAGE);
         setSelected?.({ ...initialSelectedRef.current });
-      }
-
-      if (customPerPage) {
-        effectivePerPage = customPerPage;
       }
 
       setIsLoading(true);
 
-      const res = await searchForConcepts({
-        searchTerm: trimmedValue,
-        perPage: effectivePerPage,
-        domain,
-      });
+      try {
+        const res = await searchForConcepts({
+          searchTerm: trimmedValue,
+          perPage: DEFAULT_CODES_PER_PAGE,
+          page,
+          domain,
+        });
 
-      const results = (res.data as Concept[]) ?? [];
+        const results = (res.data as Concept[]) ?? [];
+        const nonSynthetic = results.filter((o) => o.all_synthetic !== 1);
+        const synthetic = includeSynthetic
+          ? results.filter((o) => o.all_synthetic === 1)
+          : [];
+        const hasVisibleOptions = nonSynthetic.length + synthetic.length > 0;
 
-      const nonSynthetic: Concept[] = [];
-      const synthetic: Concept[] = [];
-
-      results.forEach((o) => {
-        const allSynthetic = o.all_synthetic ?? 0;
-        if (allSynthetic === 1) {
-          if (includeSynthetic) synthetic.push(o);
+        if (append) {
+          setNonSyntheticOptions((prev) => [...prev, ...nonSynthetic]);
+          setSyntheticOptions((prev) => [...prev, ...synthetic]);
+          setNoOptionsFound(false);
         } else {
-          nonSynthetic.push(o);
+          setNonSyntheticOptions(nonSynthetic);
+          setSyntheticOptions(synthetic);
+          setNoOptionsFound(!hasVisibleOptions);
         }
-      });
 
-      const hasVisibleOptions = nonSynthetic.length + synthetic.length > 0;
-
-      setNonSyntheticOptions(nonSynthetic);
-      setSyntheticOptions(synthetic);
-      setNoOptionsFound(!hasVisibleOptions);
-      setActiveResult(hasVisibleOptions ? res : null);
-      setIsLoading(false);
+        setActiveResult(append || hasVisibleOptions ? res : null);
+      } finally {
+        setIsLoading(false);
+      }
     },
-    [domain, searchForConcepts, setSelected, includeSynthetic, perPage],
+    [domain, searchForConcepts, setSelected, includeSynthetic],
   );
 
   const handleToggle = useCallback(
@@ -185,33 +178,38 @@ const SearchConcepts = ({
   );
 
   const handleShowMore = useCallback(async () => {
-    if (isLoading || isShowingMore) return;
+    if (isLoading || isShowingMore || !activeResult) return;
 
-    const nextPerPage =
-      (activeResult?.per_page ?? perPage) + DEFAULT_CODES_PER_PAGE;
+    const nextPage = activeResult.current_page + 1;
     shouldScrollToResultsEndRef.current = true;
     setIsShowingMore(true);
-    setPerPage(nextPerPage);
 
     try {
-      await onSearch(lastQueryRef.current, true, nextPerPage);
+      await onSearch(lastQueryRef.current, true, nextPage, true);
     } catch (error) {
       shouldScrollToResultsEndRef.current = false;
       setIsShowingMore(false);
       throw error;
     }
-  }, [activeResult, perPage, onSearch, isLoading, isShowingMore]);
+  }, [activeResult, onSearch, isLoading, isShowingMore]);
 
+  // Scroll to the end of the results when new results are loaded via "Show more"
   useLayoutEffect(() => {
     if (!shouldScrollToResultsEndRef.current) return;
 
     shouldScrollToResultsEndRef.current = false;
-    resultsEndRef.current?.scrollIntoView({
+    resultsEndRef.current?.scrollIntoView?.({
       block: "end",
       behavior: "smooth",
     });
     requestAnimationFrame(() => setIsShowingMore(false));
-  }, [activeResult?.per_page, visibleOptions.length]);
+  }, [activeResult?.current_page, visibleOptions.length]);
+
+  const loadedCount = activeResult?.to ?? visibleOptions.length;
+  const hasMoreResults =
+    activeResult &&
+    activeResult.current_page < activeResult.last_page &&
+    loadedCount < activeResult.total;
 
   return (
     <Box>
@@ -266,7 +264,7 @@ const SearchConcepts = ({
         )}
         <Box ref={resultsEndRef} aria-hidden />
       </FormGroup>
-      {activeResult && activeResult.per_page < activeResult.total && (
+      {hasMoreResults && (
         <Box sx={{ mt: 1 }}>
           <Button
             variant="text"
@@ -277,7 +275,7 @@ const SearchConcepts = ({
               handleShowMore();
             }}
           >
-            Show more ({activeResult.per_page} / {activeResult.total})
+            Show more ({loadedCount} / {activeResult.total})
           </Button>
         </Box>
       )}
