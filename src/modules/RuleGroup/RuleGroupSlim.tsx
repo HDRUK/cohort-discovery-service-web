@@ -5,7 +5,7 @@ import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import useNodeActions from "@/hooks/useNodeActions";
 import { Chip, Stack } from "@mui/material";
 import ConceptChip from "@/components/ConceptChip";
-import { isEmptyRule, isOperator, isRuleLeaf, removeById } from "@/utils/rules";
+import { getPrimaryConcept, isEmptyRule, isOperator, isRuleLeaf, removeById } from "@/utils/rules";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 
 export interface RuleGroupProps extends Omit<
@@ -44,8 +44,7 @@ const RuleGroupSlim = ({ group, parentGroupId, ...rest }: RuleGroupProps) => {
           {" "}
           {group.rules.map((r) => {
             if (isRuleLeaf(r) && !isEmptyRule(r)) {
-              const c = r.rule.concept;
-              const singleConcept = Array.isArray(c) ? c[0] : c;
+              const singleConcept = getPrimaryConcept(r.rule.concept);
               if (!singleConcept) return null;
               return (
                 <ConceptChip

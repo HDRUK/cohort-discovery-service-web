@@ -43,6 +43,7 @@ import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
 import { mergeSx } from "@/utils/helpers";
 import RuleAgeSelector from "@/components/RuleAgeSelector";
 import {
+  getPrimaryConcept,
   isAgeFilter,
   isEmptyRule,
   isRuleLeaf,
@@ -312,7 +313,7 @@ const RuleWrapper = ({
             {isRuleLeaf(node) &&
               type === "Rule" &&
               !isEmptyRule(node) &&
-              !["Gender", "Race"].includes((Array.isArray(node.rule.concept) ? node.rule.concept[0]?.category : node.rule.concept?.category) || "") &&
+              !["Gender", "Race"].includes(getPrimaryConcept(node.rule.concept)?.category || "") &&
               (node.timeConstraint || node.ageConstraint || isSelected) && (
                 <CardActions sx={cardActionsSx}>
                   {node.timeConstraint ? (

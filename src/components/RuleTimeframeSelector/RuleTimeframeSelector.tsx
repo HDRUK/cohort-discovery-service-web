@@ -2,7 +2,7 @@
 
 import { ReactNode, useCallback } from "react";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import { updateById } from "@/utils/rules";
+import { getPrimaryConcept, updateById } from "@/utils/rules";
 import { RuleLeafType, SingleSidedOperator } from "@/types/rules";
 import dayjs, { Dayjs } from "dayjs";
 import {
@@ -79,9 +79,7 @@ const RuleTimeframeSelector = ({
     disableOpenPicker: readOnly ? true : false,
   };
 
-  const conceptCategory = Array.isArray(rule.rule.concept)
-    ? rule.rule.concept[0]?.category
-    : rule.rule.concept?.category;
+  const conceptCategory = getPrimaryConcept(rule.rule.concept)?.category;
   const { verbPast } = getDomainPhrase(conceptCategory);
 
   const parseIsoToDayjs = useCallback(

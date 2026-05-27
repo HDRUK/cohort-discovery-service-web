@@ -19,6 +19,7 @@ import {
   createRule,
   findById,
   isAgeFilter,
+  getPrimaryConcept,
   isEmptyRule,
   isInGroup,
   isOperator,
@@ -342,7 +343,7 @@ const Guidance = () => {
       }
 
       const concept = selectedNode?.rule?.concept;
-      const category = (Array.isArray(concept) ? concept[0]?.category : concept?.category) || "";
+      const category = getPrimaryConcept(concept)?.category || "";
       const { verb } = getDomainPhrase(category);
       const past = getDomainPastPhrase(category);
       const domain = getDomain(concept);
@@ -358,9 +359,7 @@ const Guidance = () => {
             components={makeRuleComponents(selectedNode)}
             showSelectors={
               !["Gender", "Race"].includes(
-                (Array.isArray(selectedNode.rule.concept)
-                  ? selectedNode.rule.concept[0]?.category
-                  : selectedNode.rule.concept?.category) || "",
+                getPrimaryConcept(selectedNode.rule.concept)?.category || "",
               )
             }
           />

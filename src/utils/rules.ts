@@ -174,6 +174,13 @@ export const isMultipleConcept = (
 ): concept is Concept[] =>
   Array.isArray(concept) && concept.length > 0;
 
+export const getPrimaryConcept = (
+  concept: Concept | Concept[] | null,
+): Concept | null => {
+  if (concept == null) return null;
+  return Array.isArray(concept) ? (concept[0] ?? null) : concept;
+};
+
 export const isRuleGroup = (n: RuleNodeType): n is RuleGroupType =>
   "rules" in n;
 export const isRuleLeaf = (n: RuleNodeType): n is RuleLeafType => "rule" in n;
