@@ -19,7 +19,6 @@ import { findRulesWithAlternatives, hasAlternatives, isRuleLeaf, updateById } fr
 import { useCohortBuilderContext } from "@/providers/CohortBuilderProvider";
 import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
-import { getDomain } from "@/utils/omop";
 
 interface RuleAlternativesProps
   extends Omit<RuleWrapperProps, "node" | "type" | "render"> {
@@ -60,11 +59,6 @@ const RuleAlternatives = ({
   const [selectedConceptIds, setSelectedConceptIds] = useState<number[]>(() =>
     conceptOptions.length > 0 ? [conceptOptions[0].concept_id] : [],
   );
-
-  const headerLabel = useMemo(() => {
-    const unique = new Set(conceptOptions.map((c) => getDomain(c)).filter(Boolean));
-    return unique.size === 1 ? [...unique][0] : "Mixed";
-  }, [conceptOptions]);
 
   const setConcept = useCallback(
     (c: Concept | Concept[]) => {
@@ -195,7 +189,7 @@ const RuleAlternatives = ({
       type="Rule"
       groupId={groupId}
       sortable={true}
-      headerExtra={<DomainChip label={headerLabel} />}
+      headerExtra={<DomainChip concept={concept} />}
       renderFooter={footer}
       render={() => (
         <Stack component="form" spacing={1} py={1}>

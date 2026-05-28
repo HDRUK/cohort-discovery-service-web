@@ -11,7 +11,6 @@ import useNodeActions from "@/hooks/useNodeActions";
 import { isMultipleConcept, isRuleLeaf, updateById } from "@/utils/rules";
 import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
-import { getDomain } from "@/utils/omop";
 
 interface RuleMultiConceptProps
   extends Omit<RuleWrapperProps, "node" | "type" | "render"> {
@@ -42,11 +41,6 @@ const RuleMultiConcept = ({
     () => (isMultipleConcept(concept) ? concept : []),
     [concept],
   );
-
-  const headerLabel = useMemo(() => {
-    const unique = new Set(concepts.map((c) => getDomain(c)).filter(Boolean));
-    return unique.size === 1 ? [...unique][0] : "Mixed";
-  }, [concepts]);
 
   const setConcept = useCallback(
     (c: Concept | Concept[]) => {
@@ -85,7 +79,7 @@ const RuleMultiConcept = ({
       type="Rule"
       groupId={groupId}
       sortable={true}
-      headerExtra={<DomainChip label={headerLabel} />}
+      headerExtra={<DomainChip concept={concept} />}
       render={() => (
         <Stack spacing={1} py={1}>
           {concepts.map((c) => (

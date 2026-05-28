@@ -17,7 +17,6 @@ import {
 import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import useNodeActions from "@/hooks/useNodeActions";
-import { getDomain } from "@/utils/omop";
 
 export interface RuleProps extends Omit<
   RuleWrapperProps,
@@ -110,7 +109,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       sortable={true}
       headerExtra={
         !isEmptyRule(rule) ? (
-          <DomainChip label={getDomain(concept)} />
+          <DomainChip concept={concept} />
         ) : null
       }
       render={() => (
