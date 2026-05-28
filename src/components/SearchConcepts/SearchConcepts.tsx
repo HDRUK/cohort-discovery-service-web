@@ -205,7 +205,7 @@ const SearchConcepts = ({
   useEffect(() => {
     const current = activeResult?.per_page ?? 0;
     if (current > prevPerPageRef.current && prevPerPageRef.current > 0) {
-      resultsContainerRef.current?.scrollTo({
+      resultsContainerRef.current?.scrollTo?.({
         top: resultsContainerRef.current.scrollHeight,
         behavior: "smooth",
       });
