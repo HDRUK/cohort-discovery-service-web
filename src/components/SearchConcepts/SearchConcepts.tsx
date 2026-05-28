@@ -196,12 +196,11 @@ const SearchConcepts = ({
   );
 
   const handleShowMore = useCallback(() => {
-    if (isLoading) return;
     const nextPerPage =
       (activeResult?.per_page ?? perPage) + DEFAULT_CODES_PER_PAGE;
     setPerPage(nextPerPage);
     onSearch(lastQueryRef.current, true, nextPerPage);
-  }, [activeResult, perPage, onSearch, isLoading]);
+  }, [activeResult, perPage, onSearch]);
 
   useEffect(() => {
     const current = activeResult?.per_page ?? 0;
