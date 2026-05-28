@@ -314,7 +314,9 @@ const RuleWrapper = ({
               type === "Rule" &&
               !isEmptyRule(node) &&
               !renderFooter &&
-              !["Gender", "Race"].includes(getPrimaryConcept(node.rule.concept)?.category || "") &&
+              !["Gender", "Race"].includes(
+                getPrimaryConcept(node.rule.concept)?.category || "",
+              ) &&
               (node.timeConstraint || node.ageConstraint || isSelected) && (
                 <CardActions sx={cardActionsSx}>
                   {node.timeConstraint ? (
@@ -369,12 +371,13 @@ const RuleWrapper = ({
                     type === "Rule" && isSelected && !isAgeFilter(node) ? 40 : 0
                   }
                 >
-                  {(isSelected && renderFooter) || (!valid && (
-                    <InvalidRule
-                      reasons={invalidReason ?? []}
-                      stackProps={{ sx: { pt: 1, pb: 1 } }}
-                    />
-                  ))}
+                  {(isSelected && renderFooter) ||
+                    (!valid && (
+                      <InvalidRule
+                        reasons={invalidReason ?? []}
+                        stackProps={{ sx: { pt: 1, pb: 1 } }}
+                      />
+                    ))}
                 </Box>
               </>
             )}

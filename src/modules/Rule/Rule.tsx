@@ -109,17 +109,21 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       sortable={true}
       headerExtra={
         !isEmptyRule(rule) ? (
-          <Chip variant="outlined" label={getDomain(concept)} />
+          <Chip
+            variant="outlined"
+            sx={{ bgcolor: "white" }}
+            label={getDomain(concept)}
+          />
         ) : null
       }
       render={() => (
         <Box py={1}>
           {isEmptyRule(rule) ? (
             <RuleSearch
-                onConfirm={setConcept}
-                isSelected={isSelected}
-                onSelect={() => select(id)}
-              />
+              onConfirm={setConcept}
+              isSelected={isSelected}
+              onSelect={() => select(id)}
+            />
           ) : (
             <>
               {isSingleConcept(concept) && (

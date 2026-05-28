@@ -147,7 +147,7 @@ const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
   ) : null;
 
   return (
-    <Box onClick={(e) => { e.stopPropagation(); onSelect?.(); }}>
+    <Box data-testid="rule-search-container" onClick={(e) => { e.stopPropagation(); onSelect?.(); }}>
       <SearchConcepts
         multiple={isMultiSelect}
         hideSelectAll
