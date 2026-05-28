@@ -34,10 +34,167 @@ export const NO_QUERY: RuleGroupType = {
 };
 
 export const EXAMPLE_1: RuleGroupType = {
-  id: "84205427-c40f-41bf-a977-46639652de12",
+  id: uuidv4(),
   rules: [
     {
-      id: "4ecaf150-4139-4713-9006-35523b8e33bd",
+      id: uuidv4(),
+      exclude: false,
+      rules: [
+        {
+          id: uuidv4(),
+          exclude: false,
+          rule: {
+            concept: {
+              concept_id: 3955320,
+              name: "Moderna - SARS-CoV-2 (COVID-19) vaccine",
+              category: "Drug",
+              children: [],
+            },
+          },
+          timeConstraint: ["2020-11-10T00:00:00.000Z", null],
+        },
+        {
+          id: uuidv4(),
+          combinator: CombinatorType.OR,
+          exclude: false,
+        },
+        {
+          id: uuidv4(),
+          exclude: false,
+          rule: {
+            concept: {
+              concept_id: 3955321,
+              name: "Pfizer - SARS-CoV-2 (COVID-19) vaccine",
+              category: "Drug",
+              children: [],
+            },
+          },
+          ageConstraint: [null, 55],
+        },
+      ],
+    },
+    {
+      id: uuidv4(),
+      combinator: CombinatorType.AND,
+      exclude: false,
+    },
+    {
+      id: uuidv4(),
+      exclude: true,
+      rule: {
+        concept: {
+          concept_id: 3955322,
+          name: "Oxford, AstraZeneca - SARS-CoV-2 (COVID-19) vaccine AZD1222",
+          category: "Drug",
+          children: [],
+        },
+      },
+      timeConstraint: [null, "2024-11-10T00:00:00.000Z"],
+      ageConstraint: [60, null],
+    },
+    {
+      id: uuidv4(),
+      combinator: CombinatorType.AND,
+    },
+    {
+      id: uuidv4(),
+      rule: {
+        concept: {
+          concept_id: 3959231,
+          name: "Close contact with confirmed COVID-19 case person/patient",
+          category: "Observation",
+          children: [],
+        },
+      },
+      timeConstraint: [null, null],
+      ageConstraint: [null, null],
+    },
+    {
+      id: uuidv4(),
+      combinator: CombinatorType.AND,
+    },
+    {
+      id: uuidv4(),
+      exclude: false,
+      rule: {
+        concept: {
+          concept_id: 3955313,
+          name: "SARS-CoV-2 antibody to nucleocapsid (N) protein present",
+          category: "Measurement",
+          children: [],
+        },
+      },
+    },
+    {
+      id: uuidv4(),
+      combinator: CombinatorType.AND,
+    },
+    {
+      id: uuidv4(),
+      exclude: false,
+      rule: {
+        concept: {
+          concept_id: 443597,
+          name: "Chronic kidney disease stage 3",
+          category: "Condition",
+          children: [
+            {
+              concept_id: 601163,
+              name: "Chronic kidney disease stage 3 due to drug induced diabetes mellitus",
+              category: "Condition",
+            },
+            {
+              concept_id: 37019193,
+              name: "Anemia co-occurrent and due to chronic kidney disease stage 3",
+              category: "Condition",
+            },
+            {
+              concept_id: 43531653,
+              name: "Chronic kidney disease stage 3 due to type 2 diabetes mellitus",
+              category: "Condition",
+            },
+            {
+              concept_id: 44782691,
+              name: "Chronic kidney disease stage 3 due to hypertension",
+              category: "Condition",
+            },
+            {
+              concept_id: 44792230,
+              name: "Chronic kidney disease stage 3 with proteinuria",
+              category: "Condition",
+            },
+            {
+              concept_id: 44792231,
+              name: "Chronic kidney disease stage 3 without proteinuria",
+              category: "Condition",
+            },
+            {
+              concept_id: 45763854,
+              name: "Chronic kidney disease stage 3A",
+              category: "Condition",
+            },
+            {
+              concept_id: 45763855,
+              name: "Chronic kidney disease stage 3B",
+              category: "Condition",
+            },
+            {
+              concept_id: 45771075,
+              name: "Chronic kidney disease stage 3 due to type 1 diabetes mellitus",
+              category: "Condition",
+            },
+          ],
+        },
+      },
+    },
+  ],
+};
+
+export const EXAMPLE_WITH_ALTERNATIVES: RuleGroupType = {
+  id: uuidv4(),
+  rules: [
+    {
+      id: uuidv4(),
       exclude: false,
       rule: {
         concept: {
@@ -48,9 +205,6 @@ export const EXAMPLE_1: RuleGroupType = {
           children: [],
           ncollections: 2,
           all_synthetic: 0,
-          match_score: 100.73972077083992,
-          tokens: ["19", "covid"],
-          phrase_tokens: ["covid 19"],
           alternatives: [
             {
               concept_id: 605554,
@@ -70,24 +224,6 @@ export const EXAMPLE_1: RuleGroupType = {
               ncollections: 2,
               all_synthetic: 0,
             },
-            {
-              concept_id: 608511,
-              name: "QCovid risk calculator",
-              description: "QCovid risk calculator",
-              category: "Measurement",
-              children: [],
-              ncollections: 2,
-              all_synthetic: 0,
-            },
-            {
-              concept_id: 703443,
-              name: "COVID-19 severity scale",
-              description: "COVID-19 severity scale",
-              category: "Measurement",
-              children: [],
-              ncollections: 2,
-              all_synthetic: 0,
-            },
           ],
         },
       },
@@ -96,11 +232,6 @@ export const EXAMPLE_1: RuleGroupType = {
         "The term has alternatives, please select the intended concept in the rule block(s) below.",
       ],
     },
-  ],
-  warnings: [],
-  valid: false,
-  invalidReason: [
-    "The term has alternatives, please select the intended concept in the rule block(s) below.",
   ],
 };
 

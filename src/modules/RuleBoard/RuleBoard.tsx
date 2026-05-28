@@ -3,6 +3,8 @@
 import { Fragment, useRef } from "react";
 
 import Rule from "@/modules/Rule";
+import RuleAlternatives from "@/modules/RuleAlternatives";
+import RuleMultiConcept from "@/modules/RuleMultiConcept";
 import {
   hasAlternatives,
   isAgeFilter,
@@ -14,7 +16,6 @@ import {
 import { Box, BoxProps } from "@mui/material";
 import { RuleGroupType, RuleNodeType } from "@/types/rules";
 import RuleGroup from "@/modules/RuleGroup";
-import RuleMultiConcept from "@/modules/RuleMultiConcept";
 import RuleOperator from "@/modules/RuleOperator";
 import { useDroppable } from "@dnd-kit/core";
 import DropSpacer from "@/components/DropSpacer";
@@ -35,7 +36,10 @@ interface RuleBoardProps extends BoxProps {
 
 function renderRule(item: RuleNodeType, ruleGroupId: string) {
   if (isRuleLeaf(item)) {
-    if (isMultipleConcept(item.rule.concept) || hasAlternatives(item.rule.concept)) {
+    if (hasAlternatives(item.rule.concept)) {
+      return <RuleAlternatives key={item.id} rule={item} groupId={ruleGroupId} />;
+    }
+    if (isMultipleConcept(item.rule.concept)) {
       return <RuleMultiConcept key={item.id} rule={item} groupId={ruleGroupId} />;
     }
     return <Rule key={item.id} rule={item} groupId={ruleGroupId} />;
