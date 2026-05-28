@@ -1,7 +1,7 @@
 "use client";
 
 import { Concept } from "@/types/api";
-import { Box, Button, Divider, Stack } from "@mui/material";
+import { Box, Button, Divider, Stack, Typography } from "@mui/material";
 import { useCallback, useMemo, useState } from "react";
 import SearchConcepts from "@/components/SearchConcepts";
 import SelectedConceptsPanel from "@/components/SelectedConceptsPanel";
@@ -11,6 +11,7 @@ interface RuleSearchProps {
 }
 
 const RuleSearch = ({ onConfirm }: RuleSearchProps) => {
+  const [isMultiSelect, setIsMultiSelect] = useState(false);
   const [hasOptions, setHasOptions] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Record<number, boolean>>({});
   const [selectedConceptsMap, setSelectedConceptsMap] = useState<
@@ -22,17 +23,20 @@ const RuleSearch = ({ onConfirm }: RuleSearchProps) => {
     [selectedConceptsMap],
   );
 
-  const handleOnToggle = useCallback((concept: Concept, isSelected: boolean) => {
-    setSelectedConceptsMap((prev) => {
-      const next = { ...prev };
-      if (isSelected) {
-        next[concept.concept_id] = concept;
-      } else {
-        delete next[concept.concept_id];
-      }
-      return next;
-    });
-  }, []);
+  const handleOnToggle = useCallback(
+    (concept: Concept, isSelected: boolean) => {
+      setSelectedConceptsMap((prev) => {
+        const next = { ...prev };
+        if (isSelected) {
+          next[concept.concept_id] = concept;
+        } else {
+          delete next[concept.concept_id];
+        }
+        return next;
+      });
+    },
+    [],
+  );
 
   const clearAll = useCallback(() => {
     setSelectedIds({});
@@ -63,17 +67,58 @@ const RuleSearch = ({ onConfirm }: RuleSearchProps) => {
     }
   }, [selectedConcepts, onConfirm]);
 
+  const handleSingleSelect = useCallback(
+    (concept: Concept) => {
+      const { alternatives: _omit, ...clean } = concept as Concept & {
+        alternatives?: Concept[];
+      };
+      onConfirm(clean as Concept);
+    },
+    [onConfirm],
+  );
+
+  const switchToMulti = useCallback(() => setIsMultiSelect(true), []);
+  const switchToSingle = useCallback(() => {
+    setIsMultiSelect(false);
+    clearAll();
+  }, [clearAll]);
+
+  const toggleRow = hasOptions ? (
+    <Stack
+      direction="row"
+      justifyContent="space-between"
+      alignItems="center"
+      py={0.75}
+    >
+      <Typography variant="body2" color="text.secondary">
+        {isMultiSelect
+          ? "Want to select only one at a time?"
+          : "Want to select more at once?"}
+      </Typography>
+      <Button
+        variant="text"
+        size="small"
+        color="secondary"
+        onClick={isMultiSelect ? switchToSingle : switchToMulti}
+      >
+        {isMultiSelect ? "Enable Single-select" : "Enable Multi-select"}
+      </Button>
+    </Stack>
+  ) : null;
+
   return (
     <Box onClick={(e) => e.stopPropagation()}>
       <SearchConcepts
-        multiple
+        multiple={isMultiSelect}
         hideSelectAll
-        selected={selectedIds}
-        setSelected={setSelectedIds}
-        onToggle={handleOnToggle}
+        selected={isMultiSelect ? selectedIds : undefined}
+        setSelected={isMultiSelect ? setSelectedIds : undefined}
+        onToggle={isMultiSelect ? handleOnToggle : undefined}
+        onClick={!isMultiSelect ? handleSingleSelect : undefined}
         onHasOptions={setHasOptions}
+        headerSlot={toggleRow}
       />
-      {hasOptions && (
+      {isMultiSelect && hasOptions && (
         <>
           <SelectedConceptsPanel
             concepts={selectedConcepts}

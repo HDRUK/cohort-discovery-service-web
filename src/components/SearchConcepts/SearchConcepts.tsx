@@ -37,6 +37,7 @@ interface SearchConceptsProps {
   onClick?: (concept: Concept) => void;
   onToggle?: (concept: Concept, isSelected: boolean) => void;
   onHasOptions?: (hasOptions: boolean) => void;
+  headerSlot?: React.ReactNode;
   slotProps?: SlotProps;
 }
 
@@ -47,6 +48,7 @@ const SearchConcepts = ({
   onClick,
   onToggle,
   onHasOptions,
+  headerSlot,
   slotProps,
   multiple = false,
   hideSelectAll = false,
@@ -210,7 +212,8 @@ const SearchConcepts = ({
         }
         debounceMs={400}
       />
-      <FormGroup sx={{ mt: 2 }}>
+      {headerSlot}
+      <FormGroup sx={{ mt: headerSlot ? 0 : 2 }}>
         {multiple && !hideSelectAll && visibleOptions.length > 0 && (
           <>
             <FormControlLabel

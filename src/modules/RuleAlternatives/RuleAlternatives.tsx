@@ -38,11 +38,12 @@ const RuleAlternatives = ({
 
   const { actions } = useNodeActions(rule);
 
-  const { queryBuilderJson, setQueryBuilderJson, showDescendants } =
+  const { queryBuilderJson, setQueryBuilderJson, showDescendants, isSelected } =
     useQueryBuilder((qb) => ({
       queryBuilderJson: qb.queryBuilderJson,
       setQueryBuilderJson: qb.setQueryBuilderJson,
       showDescendants: qb.showDescendants[id],
+      isSelected: !!qb.selected[id],
     }));
 
   const conceptOptions = useMemo(
@@ -52,7 +53,7 @@ const RuleAlternatives = ({
   );
 
   const [selectedConceptIds, setSelectedConceptIds] = useState<number[]>(() =>
-    conceptOptions.map((c) => c.concept_id),
+    conceptOptions.length > 0 ? [conceptOptions[0].concept_id] : [],
   );
 
   const allDomains = useMemo(
@@ -194,17 +195,20 @@ const RuleAlternatives = ({
               key={conceptOption.concept_id}
               spacing={1}
             >
-              <FormControlLabel
-                control={
-                  <SquareCheckbox
-                    checked={selectedConceptIds.includes(conceptOption.concept_id)}
-                    onChange={() => toggleConcept(conceptOption.concept_id)}
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                }
-                label=""
-                sx={{ m: 0 }}
-              />
+              {isSelected && (
+                <FormControlLabel
+                  control={
+                    <SquareCheckbox
+                      checked={selectedConceptIds.includes(conceptOption.concept_id)}
+                      onChange={() => toggleConcept(conceptOption.concept_id)}
+                      onClick={(e) => e.stopPropagation()}
+                      sx={{ p: 0 }}
+                    />
+                  }
+                  label=""
+                  sx={{ m: 0 }}
+                />
+              )}
               <ConceptChip
                 indicateIfParent={showDescendants}
                 concept={conceptOption}
