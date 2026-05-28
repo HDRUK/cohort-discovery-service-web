@@ -37,7 +37,7 @@
           <DeleteTimeFrameButton label="Remove timeframe from this rule" />
         </RuleTimeframeSelector>
         <Box>
-          Set the timeframe when the {props.category.toLowerCase()} event occurred.
+          Set the timeframe {props.category ? <>when the {props.category.toLowerCase()} event occurred</> : <>for this rule</>}.
         </Box>
       </CollapsibleGuidance>
 
@@ -46,7 +46,7 @@
           <DeleteAgeButton label="Remove age from this rule" />
         </RuleAgeSelector>
         <Box>
-          Define the patient's age when the {props.category.toLowerCase()} event occurred.
+          {props.category ? <>Define the patient's age when the {props.category.toLowerCase()} event occurred.</> : <>Define the patient age range.</>}
           <Box sx={{ color: "error.main" }}>
             Age may be rounded ±1 year in some datasets, to either protect patient data or as specific day or month was not recorded.
           </Box>

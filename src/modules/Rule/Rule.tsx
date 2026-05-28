@@ -1,4 +1,5 @@
-import { Chip, Box } from "@mui/material";
+import { Box } from "@mui/material";
+import DomainChip from "@/components/DomainChip/DomainChip";
 import { Concept } from "@/types/api";
 import { useCallback } from "react";
 import ConceptChip from "@/components/ConceptChip";
@@ -109,11 +110,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       sortable={true}
       headerExtra={
         !isEmptyRule(rule) ? (
-          <Chip
-            variant="outlined"
-            sx={{ bgcolor: "white" }}
-            label={getDomain(concept)}
-          />
+          <DomainChip label={getDomain(concept)} />
         ) : null
       }
       render={() => (

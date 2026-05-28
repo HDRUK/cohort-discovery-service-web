@@ -18,6 +18,7 @@ import {
   createOperator,
   createRule,
   findById,
+  hasAlternatives,
   isAgeFilter,
   getPrimaryConcept,
   isEmptyRule,
@@ -343,13 +344,22 @@ const Guidance = () => {
       }
 
       const concept = selectedNode?.rule?.concept;
-      const category = getPrimaryConcept(concept)?.category || "";
-      const { verb } = getDomainPhrase(category);
-      const past = getDomainPastPhrase(category);
-      const domain = getDomain(concept);
+
+      const allConcepts = Array.isArray(concept)
+        ? concept
+        : hasAlternatives(concept)
+          ? [concept, ...concept.alternatives]
+          : concept ? [concept] : [];
+      const uniqueDomains = new Set(allConcepts.map((c) => getDomain(c)).filter(Boolean));
+      const isMixed = allConcepts.length > 0 && uniqueDomains.size !== 1;
+
+      const domain = isMixed ? undefined : getDomain(concept);
+      const effectiveCategory = isMixed ? "" : (getPrimaryConcept(concept)?.category || "");
+      const { verb } = getDomainPhrase(effectiveCategory);
+      const past = getDomainPastPhrase(effectiveCategory);
 
       return (
-        <ActionMenuSection title={`${domain} Rule`} fixedExpanded>
+        <ActionMenuSection title={domain ? `${domain} Rule` : "Rule"} fixedExpanded>
           <RuleGuidance
             category={domain ?? ""}
             verb={verb}
@@ -358,9 +368,7 @@ const Guidance = () => {
             ageConstraint={selectedNode?.ageConstraint}
             components={makeRuleComponents(selectedNode)}
             showSelectors={
-              !["Gender", "Race"].includes(
-                getPrimaryConcept(selectedNode.rule.concept)?.category || "",
-              )
+              !["Gender", "Race"].includes(effectiveCategory)
             }
           />
         </ActionMenuSection>

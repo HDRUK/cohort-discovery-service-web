@@ -1,5 +1,5 @@
 import { RuleGroupType, RuleLeafType, RuleNodeType } from "@/types/rules";
-import { getAlternativeRuleIds } from "@/utils/rules";
+import { findRulesWithAlternatives } from "@/utils/rules";
 
 const makeLeaf = (id: string, hasAlts = false): RuleLeafType =>
   ({
@@ -18,15 +18,15 @@ const makeLeaf = (id: string, hasAlts = false): RuleLeafType =>
 const makeGroup = (id: string, rules: RuleNodeType[]): RuleGroupType =>
   ({ id, rules }) as RuleGroupType;
 
-describe("getAlternativeRuleIds", () => {
+describe("findRulesWithAlternatives", () => {
   it("returns empty array when no rules have alternatives", () => {
     const rules: RuleNodeType[] = [makeLeaf("a"), makeLeaf("b")];
-    expect(getAlternativeRuleIds(rules)).toEqual([]);
+    expect(findRulesWithAlternatives(rules)).toEqual([]);
   });
 
   it("returns the ID of a flat rule with alternatives", () => {
     const rules: RuleNodeType[] = [makeLeaf("a", true), makeLeaf("b")];
-    expect(getAlternativeRuleIds(rules)).toEqual(["a"]);
+    expect(findRulesWithAlternatives(rules)).toEqual(["a"]);
   });
 
   it("collects multiple alternative rule IDs from a flat list", () => {
@@ -35,18 +35,18 @@ describe("getAlternativeRuleIds", () => {
       makeLeaf("b"),
       makeLeaf("c", true),
     ];
-    expect(getAlternativeRuleIds(rules)).toEqual(["a", "c"]);
+    expect(findRulesWithAlternatives(rules)).toEqual(["a", "c"]);
   });
 
   it("recurses into nested groups to find alternative rules", () => {
     const inner = makeGroup("group-inner", [makeLeaf("nested", true)]);
     const rules: RuleNodeType[] = [makeLeaf("top"), inner];
-    expect(getAlternativeRuleIds(rules)).toEqual(["nested"]);
+    expect(findRulesWithAlternatives(rules)).toEqual(["nested"]);
   });
 
   it("collects from both top-level and nested locations", () => {
     const inner = makeGroup("group-inner", [makeLeaf("nested", true)]);
     const rules: RuleNodeType[] = [makeLeaf("top", true), inner];
-    expect(getAlternativeRuleIds(rules)).toEqual(["top", "nested"]);
+    expect(findRulesWithAlternatives(rules)).toEqual(["top", "nested"]);
   });
 });

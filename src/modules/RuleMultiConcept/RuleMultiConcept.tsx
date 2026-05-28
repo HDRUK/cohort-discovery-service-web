@@ -3,7 +3,8 @@
 import { Concept } from "@/types/api";
 import { RuleLeafType } from "@/types/rules";
 import ConceptChip from "@/components/ConceptChip";
-import { Chip, Stack } from "@mui/material";
+import { Stack } from "@mui/material";
+import DomainChip from "@/components/DomainChip/DomainChip";
 import { useCallback, useMemo } from "react";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import useNodeActions from "@/hooks/useNodeActions";
@@ -42,15 +43,10 @@ const RuleMultiConcept = ({
     [concept],
   );
 
-  const allDomains = useMemo(
-    () => concepts.map((c) => getDomain(c) ?? ""),
-    [concepts],
-  );
-
   const headerLabel = useMemo(() => {
-    const unique = new Set(allDomains.filter(Boolean));
+    const unique = new Set(concepts.map((c) => getDomain(c)).filter(Boolean));
     return unique.size === 1 ? [...unique][0] : "Mixed";
-  }, [allDomains]);
+  }, [concepts]);
 
   const setConcept = useCallback(
     (c: Concept | Concept[]) => {
@@ -89,15 +85,14 @@ const RuleMultiConcept = ({
       type="Rule"
       groupId={groupId}
       sortable={true}
-      headerExtra={<Chip variant="outlined" label={headerLabel} />}
+      headerExtra={<DomainChip label={headerLabel} />}
       render={() => (
         <Stack spacing={1} py={1}>
-          {concepts.map((c, i) => (
+          {concepts.map((c) => (
             <ConceptChip
               key={c.concept_id}
               indicateIfParent={showDescendants}
               concept={c}
-              categoryLabel={allDomains[i] || undefined}
               onDelete={(e) => {
                 e.stopPropagation();
                 handleDelete(c);

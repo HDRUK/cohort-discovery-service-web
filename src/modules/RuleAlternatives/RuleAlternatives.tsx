@@ -7,15 +7,15 @@ import SquareCheckbox from "@/components/SquareCheckbox";
 import ErrorIcon from "@/components/ErrorIcon";
 import {
   Button,
-  Chip,
   FormControlLabel,
   Stack,
   Typography,
 } from "@mui/material";
+import DomainChip from "@/components/DomainChip/DomainChip";
 import { useCallback, useMemo, useState } from "react";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import useNodeActions from "@/hooks/useNodeActions";
-import { getAlternativeRuleIds, hasAlternatives, isRuleLeaf, updateById } from "@/utils/rules";
+import { findRulesWithAlternatives, hasAlternatives, isRuleLeaf, updateById } from "@/utils/rules";
 import { useCohortBuilderContext } from "@/providers/CohortBuilderProvider";
 import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
@@ -61,15 +61,10 @@ const RuleAlternatives = ({
     conceptOptions.length > 0 ? [conceptOptions[0].concept_id] : [],
   );
 
-  const allDomains = useMemo(
-    () => conceptOptions.map((c) => getDomain(c) ?? ""),
-    [conceptOptions],
-  );
-
   const headerLabel = useMemo(() => {
-    const unique = new Set(allDomains.filter(Boolean));
+    const unique = new Set(conceptOptions.map((c) => getDomain(c)).filter(Boolean));
     return unique.size === 1 ? [...unique][0] : "Mixed";
-  }, [allDomains]);
+  }, [conceptOptions]);
 
   const setConcept = useCallback(
     (c: Concept | Concept[]) => {
@@ -96,7 +91,7 @@ const RuleAlternatives = ({
   const clearAll = () => setSelectedConceptIds([]);
 
   const handleConfirm = useCallback(() => {
-    const otherAlternativeIds = getAlternativeRuleIds(queryBuilderJson.rules).filter(
+    const otherAlternativeIds = findRulesWithAlternatives(queryBuilderJson.rules).filter(
       (rid) => rid !== id,
     );
 
@@ -200,11 +195,11 @@ const RuleAlternatives = ({
       type="Rule"
       groupId={groupId}
       sortable={true}
-      headerExtra={<Chip variant="outlined" label={headerLabel} />}
+      headerExtra={<DomainChip label={headerLabel} />}
       renderFooter={footer}
       render={() => (
         <Stack component="form" spacing={1} py={1}>
-          {conceptOptions.map((conceptOption, i) => (
+          {conceptOptions.map((conceptOption) => (
             <Stack
               direction="row"
               alignItems="center"
@@ -228,7 +223,6 @@ const RuleAlternatives = ({
               <ConceptChip
                 indicateIfParent={showDescendants}
                 concept={conceptOption}
-                categoryLabel={allDomains[i] || undefined}
                 onDelete={(e) => {
                   e.stopPropagation();
                   handleDelete(conceptOption);

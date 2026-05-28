@@ -1,7 +1,6 @@
 import { Concept } from "@/types/api";
 import { Box, Button, Stack, Typography } from "@mui/material";
 import ConceptChip from "@/components/ConceptChip";
-import { getDomain } from "@/utils/omop";
 
 interface SelectedConceptsPanelProps {
   concepts: Concept[];
@@ -40,7 +39,6 @@ const SelectedConceptsPanel = ({
         <ConceptChip
           key={c.concept_id}
           concept={c}
-          categoryLabel={getDomain(c) || undefined}
           onDelete={(e) => {
             e.stopPropagation();
             onRemove(c);

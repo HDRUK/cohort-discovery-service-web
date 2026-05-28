@@ -1,5 +1,6 @@
 import { Concept } from "@/types/api";
 import { Box, Chip, ChipProps, IconButton, Typography } from "@mui/material";
+import { getDomain } from "@/utils/omop";
 import { DragIndicator } from "@mui/icons-material";
 import CancelIcon from "@mui/icons-material/Cancel";
 import SyntheticChip from "../SyntheticChip";
@@ -43,7 +44,6 @@ export const ConceptChip = ({
   onDelete,
   chipSx,
   children,
-  categoryLabel,
 }: {
   draggable?: boolean;
   indicateIfParent?: boolean;
@@ -52,8 +52,8 @@ export const ConceptChip = ({
   onDelete: (e: React.MouseEvent) => void;
   chipSx?: ChipProps["sx"];
   children?: React.ReactNode;
-  categoryLabel?: string;
 }) => {
+  const categoryLabel = getDomain(concept);
   const isParent = (concept?.children?.length ?? 0) > 0;
   const clickable = Boolean(onClick);
 

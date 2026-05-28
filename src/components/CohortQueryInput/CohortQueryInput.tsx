@@ -11,7 +11,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import {
   createOperator,
   createRuleGroup,
-  getAlternativeRuleIds,
+  findRulesWithAlternatives,
   getFirstTopLevelCombinator,
   RuleErrors,
 } from "@/utils/rules";
@@ -226,7 +226,7 @@ const CohortQueryInput = ({
         appendError(RuleErrors.NO_QUERY_FOUND);
       }
 
-      const alternativeIds = getAlternativeRuleIds(queryJson.rules);
+      const alternativeIds = findRulesWithAlternatives(queryJson.rules, 1);
       if (alternativeIds.length > 0) {
         select(alternativeIds[0]);
       }
