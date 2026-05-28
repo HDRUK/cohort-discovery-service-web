@@ -37,11 +37,15 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     setQueryBuilderJson,
     showDescendants,
     setShowDescendants,
+    isSelected,
+    select,
   } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
     showDescendants: qb.showDescendants[id],
     setShowDescendants: qb.setShowDescendants,
+    isSelected: !!qb.selected[id],
+    select: qb.select,
   }));
 
   const toggleShowDescendants = useCallback(
@@ -111,7 +115,11 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       render={() => (
         <Box py={1}>
           {isEmptyRule(rule) ? (
-            <RuleSearch onConfirm={setConcept} />
+            <RuleSearch
+                onConfirm={setConcept}
+                isSelected={isSelected}
+                onSelect={() => select(id)}
+              />
           ) : (
             <>
               {isSingleConcept(concept) && (

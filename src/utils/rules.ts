@@ -185,6 +185,18 @@ export const isRuleGroup = (n: RuleNodeType): n is RuleGroupType =>
   "rules" in n;
 export const isRuleLeaf = (n: RuleNodeType): n is RuleLeafType => "rule" in n;
 
+export function getAlternativeRuleIds(rules: RuleNodeType[]): string[] {
+  const ids: string[] = [];
+  for (const rule of rules) {
+    if (isRuleLeaf(rule) && hasAlternatives(rule.rule.concept)) {
+      ids.push(rule.id as string);
+    } else if (isRuleGroup(rule)) {
+      ids.push(...getAlternativeRuleIds(rule.rules));
+    }
+  }
+  return ids;
+}
+
 export const isAgeFilter = (n: RuleNodeType): n is AgeFilterType =>
   "value" in n;
 

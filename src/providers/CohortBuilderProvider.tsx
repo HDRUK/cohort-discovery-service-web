@@ -60,6 +60,7 @@ type CohortBuilderContextValue = {
 
   pendingScrollToNodeId: string | null;
   clearPendingScrollToNodeId: () => void;
+  scrollToNode: (id: string) => void;
 };
 
 const CohortBuilderContext = createContext<CohortBuilderContextValue | null>(
@@ -319,6 +320,7 @@ export const CohortBuilderProvider = ({
       createAndScroll,
       pendingScrollToNodeId,
       clearPendingScrollToNodeId: () => setPendingScrollToNodeId(null),
+      scrollToNode: (id) => setPendingScrollToNodeId(id),
     }),
     [
       active,

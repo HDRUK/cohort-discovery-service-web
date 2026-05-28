@@ -4,6 +4,7 @@ import Rule, { RuleProps } from "./Rule";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 import { RuleLeafType, RuleGroupType } from "@/types/rules";
 import userEvent from "@testing-library/user-event";
+import { CloseGuardProvider } from "@/providers/CloseGuardProvider";
 
 jest.mock("@/utils/rules", () => {
   const actual = jest.requireActual("@/utils/rules");
@@ -39,13 +40,15 @@ describe("Rule", () => {
     } as RuleGroupType;
 
     const rendered = render(
-      <MockCohortDiscoveryServiceStore
-        overrides={{
-          queryBuilder: { queryBuilderJson: query, setQueryBuilderJson },
-        }}
-      >
-        <Rule {...rest} rule={rule} groupId="group-1" />
-      </MockCohortDiscoveryServiceStore>,
+      <CloseGuardProvider>
+        <MockCohortDiscoveryServiceStore
+          overrides={{
+            queryBuilder: { queryBuilderJson: query, setQueryBuilderJson },
+          }}
+        >
+          <Rule {...rest} rule={rule} groupId="group-1" />
+        </MockCohortDiscoveryServiceStore>
+      </CloseGuardProvider>,
     );
     return {
       query,

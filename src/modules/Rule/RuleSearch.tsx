@@ -2,59 +2,71 @@
 
 import { Concept } from "@/types/api";
 import { Box, Button, Divider, Stack, Typography } from "@mui/material";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import SearchConcepts from "@/components/SearchConcepts";
 import SelectedConceptsPanel from "@/components/SelectedConceptsPanel";
+import { useSaveChanges } from "@/hooks/useSaveChanges";
+
+type FormValues = { concepts: Record<number, Concept> };
 
 interface RuleSearchProps {
   onConfirm: (concept: Concept | Concept[]) => void;
+  isSelected?: boolean;
+  onSelect?: () => void;
 }
 
-const RuleSearch = ({ onConfirm }: RuleSearchProps) => {
+const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
   const [isMultiSelect, setIsMultiSelect] = useState(false);
   const [hasOptions, setHasOptions] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Record<number, boolean>>({});
-  const [selectedConceptsMap, setSelectedConceptsMap] = useState<
-    Record<number, Concept>
-  >({});
 
-  const selectedConcepts = useMemo(
-    () => Object.values(selectedConceptsMap),
-    [selectedConceptsMap],
-  );
+  const { control, setValue, reset } = useForm<FormValues>({
+    defaultValues: { concepts: {} },
+  });
+
+  const conceptsMap = useWatch({ control, name: "concepts", defaultValue: {} });
+  const selectedConcepts = useMemo(() => Object.values(conceptsMap), [conceptsMap]);
 
   const handleOnToggle = useCallback(
-    (concept: Concept, isSelected: boolean) => {
-      setSelectedConceptsMap((prev) => {
-        const next = { ...prev };
-        if (isSelected) {
-          next[concept.concept_id] = concept;
-        } else {
-          delete next[concept.concept_id];
-        }
-        return next;
-      });
+    (concept: Concept, toggled: boolean) => {
+      const next = { ...conceptsMap };
+      if (toggled) {
+        next[concept.concept_id] = concept;
+      } else {
+        delete next[concept.concept_id];
+      }
+      if (Object.keys(next).length === 0) {
+        reset({ concepts: {} });
+      } else {
+        setValue("concepts", next, { shouldDirty: true });
+      }
     },
-    [],
+    [conceptsMap, setValue, reset],
   );
 
   const clearAll = useCallback(() => {
     setSelectedIds({});
-    setSelectedConceptsMap({});
-  }, []);
+    reset({ concepts: {} });
+  }, [reset]);
 
-  const handleRemove = useCallback((concept: Concept) => {
-    setSelectedIds((prev) => {
-      const next = { ...prev };
+  const handleRemove = useCallback(
+    (concept: Concept) => {
+      setSelectedIds((prev) => {
+        const next = { ...prev };
+        delete next[concept.concept_id];
+        return next;
+      });
+      const next = { ...conceptsMap };
       delete next[concept.concept_id];
-      return next;
-    });
-    setSelectedConceptsMap((prev) => {
-      const next = { ...prev };
-      delete next[concept.concept_id];
-      return next;
-    });
-  }, []);
+      if (Object.keys(next).length === 0) {
+        reset({ concepts: {} });
+      } else {
+        setValue("concepts", next, { shouldDirty: true });
+      }
+    },
+    [conceptsMap, setValue, reset],
+  );
 
   const handleConfirm = useCallback(() => {
     const clean = selectedConcepts.map(
@@ -65,7 +77,9 @@ const RuleSearch = ({ onConfirm }: RuleSearchProps) => {
     } else if (clean.length > 1) {
       onConfirm(clean);
     }
-  }, [selectedConcepts, onConfirm]);
+    reset({ concepts: {} });
+    setSelectedIds({});
+  }, [selectedConcepts, onConfirm, reset]);
 
   const handleSingleSelect = useCallback(
     (concept: Concept) => {
@@ -76,6 +90,32 @@ const RuleSearch = ({ onConfirm }: RuleSearchProps) => {
     },
     [onConfirm],
   );
+
+  useSaveChanges({
+    control,
+    entityName: "rule selection",
+    onSave: handleConfirm,
+    onDiscard: () => {
+      clearAll();
+      setIsMultiSelect(false);
+    },
+    saveText: "Confirm selection",
+    discardText: "Discard",
+    showChanges: false,
+  });
+
+  useEffect(() => {
+    if (!isSelected) {
+      /*
+       * Intentional exception to react-hooks/set-state-in-effect:
+       * isSelected is external prop state — when the rule card loses selection,
+       * pending multi-select choices and the search mode must reset silently.
+       */
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      clearAll();
+      setIsMultiSelect(false);
+    }
+  }, [isSelected, clearAll]);
 
   const switchToMulti = useCallback(() => setIsMultiSelect(true), []);
   const switchToSingle = useCallback(() => {
@@ -107,7 +147,7 @@ const RuleSearch = ({ onConfirm }: RuleSearchProps) => {
   ) : null;
 
   return (
-    <Box onClick={(e) => e.stopPropagation()}>
+    <Box onClick={(e) => { e.stopPropagation(); onSelect?.(); }}>
       <SearchConcepts
         multiple={isMultiSelect}
         hideSelectAll
@@ -120,6 +160,7 @@ const RuleSearch = ({ onConfirm }: RuleSearchProps) => {
       />
       {isMultiSelect && hasOptions && (
         <>
+          <Divider sx={{ mt: 1 }} />
           <SelectedConceptsPanel
             concepts={selectedConcepts}
             onRemove={handleRemove}

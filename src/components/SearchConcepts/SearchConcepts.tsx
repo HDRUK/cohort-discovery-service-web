@@ -9,20 +9,25 @@ import {
   useCallback,
   useRef,
   useMemo,
+  useEffect,
 } from "react";
 import {
-  Checkbox,
   FormControlLabel,
   FormGroup,
   Box,
   Divider,
   Button,
 } from "@mui/material";
+import SquareCheckbox from "@/components/SquareCheckbox";
 import { ConceptItem, ConceptItemProps } from "./ConceptItem";
 import useUserStore from "@/hooks/useUserStore";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import { DEFAULT_CODES_PER_PAGE } from "@/config/defaults";
+import {
+  DEFAULT_CODES_PER_PAGE,
+  DEFAULT_SEARCH_RESULTS_MAX_HEIGHT,
+} from "@/config/defaults";
 import useFeatures from "@/hooks/useFeatures";
+import { mergeSx } from "@/utils/helpers";
 
 interface SlotProps {
   conceptItem: ConceptItemProps;
@@ -40,6 +45,17 @@ interface SearchConceptsProps {
   headerSlot?: React.ReactNode;
   slotProps?: SlotProps;
 }
+
+const searchResultsSx = {
+  alignItems: "stretch",
+  flexDirection: "column",
+  flexWrap: "nowrap",
+  maxHeight: DEFAULT_SEARCH_RESULTS_MAX_HEIGHT,
+  mt: 2,
+  overflowX: "hidden",
+  overflowY: "auto",
+  pr: 1,
+};
 
 const SearchConcepts = ({
   domain,
@@ -65,6 +81,8 @@ const SearchConcepts = ({
   > | null>(null);
 
   const lastQueryRef = useRef<string>("");
+  const resultsContainerRef = useRef<HTMLDivElement | null>(null);
+  const prevPerPageRef = useRef(0);
   const initialSelectedRef = useRef<Record<number, boolean>>({
     ...(selected ?? {}),
   });
@@ -156,7 +174,14 @@ const SearchConcepts = ({
       setIsLoading(false);
       onHasOptions?.(hasVisibleOptions);
     },
-    [domain, searchForConcepts, setSelected, includeSynthetic, perPage, onHasOptions],
+    [
+      domain,
+      searchForConcepts,
+      setSelected,
+      includeSynthetic,
+      perPage,
+      onHasOptions,
+    ],
   );
 
   const handleToggle = useCallback(
@@ -197,6 +222,17 @@ const SearchConcepts = ({
     onSearch(lastQueryRef.current, true, nextPerPage);
   }, [activeResult, perPage, onSearch]);
 
+  useEffect(() => {
+    const current = activeResult?.per_page ?? 0;
+    if (current > prevPerPageRef.current && prevPerPageRef.current > 0) {
+      resultsContainerRef.current?.scrollTo?.({
+        top: resultsContainerRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+    prevPerPageRef.current = current;
+  }, [activeResult?.per_page]);
+
   return (
     <Box>
       <SearchBar
@@ -213,12 +249,16 @@ const SearchConcepts = ({
         debounceMs={400}
       />
       {headerSlot}
-      <FormGroup sx={{ mt: headerSlot ? 0 : 2 }}>
+      <FormGroup
+        ref={resultsContainerRef}
+        data-testid="search-concepts-results"
+        sx={mergeSx(searchResultsSx, { mt: headerSlot ? 0 : 2 })}
+      >
         {multiple && !hideSelectAll && visibleOptions.length > 0 && (
           <>
             <FormControlLabel
               control={
-                <Checkbox checked={allSelected} onChange={toggleSelectAll} />
+                <SquareCheckbox checked={allSelected} onChange={toggleSelectAll} />
               }
               label="Select All"
             />
@@ -237,21 +277,22 @@ const SearchConcepts = ({
             {syntheticOptions.map(renderConceptItem)}
           </>
         )}
-        {activeResult && activeResult.per_page < activeResult.total && (
-          <Box>
-            <Button
-              variant="text"
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                handleShowMore();
-              }}
-            >
-              Show more ({activeResult.per_page} / {activeResult.total})
-            </Button>
-          </Box>
-        )}
       </FormGroup>
+      {activeResult && activeResult.per_page < activeResult.total && (
+        <Box sx={{ mt: 1 }}>
+          <Button
+            variant="text"
+            disabled={isLoading}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              handleShowMore();
+            }}
+          >
+            Show more ({activeResult.per_page} / {activeResult.total})
+          </Button>
+        </Box>
+      )}
     </Box>
   );
 };

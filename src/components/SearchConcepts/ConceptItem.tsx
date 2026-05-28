@@ -139,6 +139,7 @@ export const ConceptItem = ({
             <SquareCheckbox
               checked={isSelected}
               onChange={(e) => handleClick(id, e)}
+              sx={{ p: 0 }}
             />
           }
           label={labelEl}

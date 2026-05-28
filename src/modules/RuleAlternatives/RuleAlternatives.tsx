@@ -15,7 +15,8 @@ import {
 import { useCallback, useMemo, useState } from "react";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import useNodeActions from "@/hooks/useNodeActions";
-import { hasAlternatives, isRuleLeaf, updateById } from "@/utils/rules";
+import { getAlternativeRuleIds, hasAlternatives, isRuleLeaf, updateById } from "@/utils/rules";
+import { useCohortBuilderContext } from "@/providers/CohortBuilderProvider";
 import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import { getDomain } from "@/utils/omop";
@@ -38,13 +39,17 @@ const RuleAlternatives = ({
 
   const { actions } = useNodeActions(rule);
 
-  const { queryBuilderJson, setQueryBuilderJson, showDescendants, isSelected } =
+  const { queryBuilderJson, setQueryBuilderJson, showDescendants, isSelected, select, deselect } =
     useQueryBuilder((qb) => ({
       queryBuilderJson: qb.queryBuilderJson,
       setQueryBuilderJson: qb.setQueryBuilderJson,
       showDescendants: qb.showDescendants[id],
       isSelected: !!qb.selected[id],
+      select: qb.select,
+      deselect: qb.deselect,
     }));
+
+  const { scrollToNode } = useCohortBuilderContext();
 
   const conceptOptions = useMemo(
     () =>
@@ -91,6 +96,10 @@ const RuleAlternatives = ({
   const clearAll = () => setSelectedConceptIds([]);
 
   const handleConfirm = useCallback(() => {
+    const otherAlternativeIds = getAlternativeRuleIds(queryBuilderJson.rules).filter(
+      (rid) => rid !== id,
+    );
+
     const selected = conceptOptions.filter((c) =>
       selectedConceptIds.includes(c.concept_id),
     );
@@ -104,7 +113,14 @@ const RuleAlternatives = ({
         selected.map(({ alternatives: _omit, ...c }) => c as Concept),
       );
     }
-  }, [conceptOptions, selectedConceptIds, setConcept]);
+
+    if (otherAlternativeIds.length > 0) {
+      const nextId = otherAlternativeIds[0];
+      deselect(id);
+      select(nextId);
+      scrollToNode(nextId);
+    }
+  }, [conceptOptions, selectedConceptIds, setConcept, queryBuilderJson, id, deselect, select, scrollToNode]);
 
   const handleDelete = useCallback(
     (toDelete: Concept) => {
