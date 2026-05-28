@@ -9,6 +9,7 @@ import {
   useCallback,
   useRef,
   useMemo,
+  useEffect,
 } from "react";
 import {
   Checkbox,
@@ -21,7 +22,10 @@ import {
 import { ConceptItem, ConceptItemProps } from "./ConceptItem";
 import useUserStore from "@/hooks/useUserStore";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import { DEFAULT_CODES_PER_PAGE } from "@/config/defaults";
+import {
+  DEFAULT_CODES_PER_PAGE,
+  DEFAULT_SEARCH_RESULTS_MAX_HEIGHT,
+} from "@/config/defaults";
 import useFeatures from "@/hooks/useFeatures";
 
 interface SlotProps {
@@ -36,6 +40,17 @@ interface SearchConceptsProps {
   onClick?: (concept: Concept) => void;
   slotProps?: SlotProps;
 }
+
+const searchResultsSx = {
+  alignItems: "stretch",
+  flexDirection: "column",
+  flexWrap: "nowrap",
+  maxHeight: DEFAULT_SEARCH_RESULTS_MAX_HEIGHT,
+  mt: 2,
+  overflowX: "hidden",
+  overflowY: "auto",
+  pr: 1,
+} as const;
 
 const SearchConcepts = ({
   domain,
@@ -57,6 +72,8 @@ const SearchConcepts = ({
   > | null>(null);
 
   const lastQueryRef = useRef<string>("");
+  const resultsContainerRef = useRef<HTMLDivElement | null>(null);
+  const prevPerPageRef = useRef(0);
   const initialSelectedRef = useRef<Record<number, boolean>>({
     ...(selected ?? {}),
   });
@@ -185,6 +202,17 @@ const SearchConcepts = ({
     onSearch(lastQueryRef.current, true, nextPerPage);
   }, [activeResult, perPage, onSearch]);
 
+  useEffect(() => {
+    const current = activeResult?.per_page ?? 0;
+    if (current > prevPerPageRef.current && prevPerPageRef.current > 0) {
+      resultsContainerRef.current?.scrollTo?.({
+        top: resultsContainerRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+    prevPerPageRef.current = current;
+  }, [activeResult?.per_page]);
+
   return (
     <Box>
       <SearchBar
@@ -200,7 +228,11 @@ const SearchConcepts = ({
         }
         debounceMs={400}
       />
-      <FormGroup sx={{ mt: 2 }}>
+      <FormGroup
+        ref={resultsContainerRef}
+        data-testid="search-concepts-results"
+        sx={searchResultsSx}
+      >
         {multiple && visibleOptions.length > 0 && (
           <>
             <FormControlLabel
@@ -224,21 +256,22 @@ const SearchConcepts = ({
             {syntheticOptions.map(renderConceptItem)}
           </>
         )}
-        {activeResult && activeResult.per_page < activeResult.total && (
-          <Box>
-            <Button
-              variant="text"
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                handleShowMore();
-              }}
-            >
-              Show more ({activeResult.per_page} / {activeResult.total})
-            </Button>
-          </Box>
-        )}
       </FormGroup>
+      {activeResult && activeResult.per_page < activeResult.total && (
+        <Box sx={{ mt: 1 }}>
+          <Button
+            variant="text"
+            disabled={isLoading}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              handleShowMore();
+            }}
+          >
+            Show more ({activeResult.per_page} / {activeResult.total})
+          </Button>
+        </Box>
+      )}
     </Box>
   );
 };
