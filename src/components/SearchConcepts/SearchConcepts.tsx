@@ -72,7 +72,7 @@ const SearchConcepts = ({
   > | null>(null);
 
   const lastQueryRef = useRef<string>("");
-  const resultsEndRef = useRef<HTMLDivElement | null>(null);
+  const resultsContainerRef = useRef<HTMLDivElement | null>(null);
   const prevPerPageRef = useRef(0);
   const initialSelectedRef = useRef<Record<number, boolean>>({
     ...(selected ?? {}),
@@ -204,17 +204,12 @@ const SearchConcepts = ({
   }, [activeResult, perPage, onSearch, isLoading]);
 
   useEffect(() => {
-    const current = activeResult?.per_page;
-    if (!current) {
-      prevPerPageRef.current = 0;
-      return;
-    }
+    const current = activeResult?.per_page ?? 0;
     if (current > prevPerPageRef.current && prevPerPageRef.current > 0) {
-      const id = requestAnimationFrame(() => {
-        resultsEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+      resultsContainerRef.current?.scrollTo({
+        top: resultsContainerRef.current.scrollHeight,
+        behavior: "smooth",
       });
-      prevPerPageRef.current = current;
-      return () => cancelAnimationFrame(id);
     }
     prevPerPageRef.current = current;
   }, [activeResult?.per_page]);
@@ -235,6 +230,7 @@ const SearchConcepts = ({
         debounceMs={400}
       />
       <FormGroup
+        ref={resultsContainerRef}
         data-testid="search-concepts-results"
         sx={searchResultsSx}
       >
@@ -261,7 +257,6 @@ const SearchConcepts = ({
             {syntheticOptions.map(renderConceptItem)}
           </>
         )}
-        <Box ref={resultsEndRef} aria-hidden />
       </FormGroup>
       {activeResult && activeResult.per_page < activeResult.total && (
         <Box sx={{ mt: 1 }}>
