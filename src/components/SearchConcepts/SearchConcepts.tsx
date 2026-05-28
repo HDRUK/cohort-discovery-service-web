@@ -9,7 +9,7 @@ import {
   useCallback,
   useRef,
   useMemo,
-  useLayoutEffect,
+  useEffect,
 } from "react";
 import {
   Checkbox,
@@ -72,13 +72,12 @@ const SearchConcepts = ({
   > | null>(null);
 
   const lastQueryRef = useRef<string>("");
-  const resultsEndRef = useRef<HTMLDivElement | null>(null);
-  const shouldScrollToResultsEndRef = useRef(false);
+  const resultsContainerRef = useRef<HTMLDivElement | null>(null);
+  const prevPerPageRef = useRef(0);
   const initialSelectedRef = useRef<Record<number, boolean>>({
     ...(selected ?? {}),
   });
 
-  const [isShowingMore, setIsShowingMore] = useState(false);
   const [nonSyntheticOptions, setNonSyntheticOptions] = useState<Concept[]>([]);
   const [syntheticOptions, setSyntheticOptions] = useState<Concept[]>([]);
   const [noOptionsFound, setNoOptionsFound] = useState(false);
@@ -196,34 +195,23 @@ const SearchConcepts = ({
     />
   );
 
-  const handleShowMore = useCallback(async () => {
-    if (isLoading || isShowingMore) return;
-
+  const handleShowMore = useCallback(() => {
     const nextPerPage =
       (activeResult?.per_page ?? perPage) + DEFAULT_CODES_PER_PAGE;
-    shouldScrollToResultsEndRef.current = true;
-    setIsShowingMore(true);
     setPerPage(nextPerPage);
+    onSearch(lastQueryRef.current, true, nextPerPage);
+  }, [activeResult, perPage, onSearch]);
 
-    try {
-      await onSearch(lastQueryRef.current, true, nextPerPage);
-    } catch (error) {
-      shouldScrollToResultsEndRef.current = false;
-      setIsShowingMore(false);
-      throw error;
+  useEffect(() => {
+    const current = activeResult?.per_page ?? 0;
+    if (current > prevPerPageRef.current && prevPerPageRef.current > 0) {
+      resultsContainerRef.current?.scrollTo({
+        top: resultsContainerRef.current.scrollHeight,
+        behavior: "smooth",
+      });
     }
-  }, [activeResult, perPage, onSearch, isLoading, isShowingMore]);
-
-  useLayoutEffect(() => {
-    if (!shouldScrollToResultsEndRef.current) return;
-
-    shouldScrollToResultsEndRef.current = false;
-    resultsEndRef.current?.scrollIntoView({
-      block: "end",
-      behavior: "smooth",
-    });
-    requestAnimationFrame(() => setIsShowingMore(false));
-  }, [activeResult?.per_page, visibleOptions.length]);
+    prevPerPageRef.current = current;
+  }, [activeResult?.per_page]);
 
   return (
     <Box>
@@ -241,6 +229,7 @@ const SearchConcepts = ({
         debounceMs={400}
       />
       <FormGroup
+        ref={resultsContainerRef}
         data-testid="search-concepts-results"
         sx={searchResultsSx}
       >
@@ -267,13 +256,12 @@ const SearchConcepts = ({
             {syntheticOptions.map(renderConceptItem)}
           </>
         )}
-        <Box ref={resultsEndRef} aria-hidden />
       </FormGroup>
       {activeResult && activeResult.per_page < activeResult.total && (
         <Box sx={{ mt: 1 }}>
           <Button
             variant="text"
-            disabled={isLoading || isShowingMore}
+            disabled={isLoading}
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
