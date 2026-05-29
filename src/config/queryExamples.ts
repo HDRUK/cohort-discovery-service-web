@@ -38,10 +38,6 @@ export const EXAMPLE_1: RuleGroupType = {
   rules: [
     {
       id: uuidv4(),
-      combinator: CombinatorType.AND,
-    },
-    {
-      id: uuidv4(),
       exclude: false,
       rules: [
         {
