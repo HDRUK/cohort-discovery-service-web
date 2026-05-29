@@ -185,18 +185,19 @@ export const isRuleGroup = (n: RuleNodeType): n is RuleGroupType =>
   "rules" in n;
 export const isRuleLeaf = (n: RuleNodeType): n is RuleLeafType => "rule" in n;
 
-export function findRulesWithAlternatives(rules: RuleNodeType[], limit = Infinity): string[] {
-  const ids: string[] = [];
-  for (const rule of rules) {
-    if (ids.length >= limit) break;
-    if (isRuleLeaf(rule) && hasAlternatives(rule.rule.concept)) {
-      ids.push(rule.id as string);
-    } else if (isRuleGroup(rule)) {
-      ids.push(...findRulesWithAlternatives(rule.rules, limit - ids.length));
-    }
-  }
-  return ids;
-}
+export const findRulesWithAlternatives = (
+  rules: RuleNodeType[],
+  limit = Infinity,
+): string[] =>
+  rules
+    .flatMap((rule) =>
+      isRuleLeaf(rule) && hasAlternatives(rule.rule.concept)
+        ? [rule.id as string]
+        : isRuleGroup(rule)
+          ? findRulesWithAlternatives(rule.rules)
+          : [],
+    )
+    .slice(0, limit);
 
 export const isAgeFilter = (n: RuleNodeType): n is AgeFilterType =>
   "value" in n;

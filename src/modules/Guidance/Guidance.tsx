@@ -18,7 +18,6 @@ import {
   createOperator,
   createRule,
   findById,
-  hasAlternatives,
   isAgeFilter,
   getPrimaryConcept,
   isEmptyRule,
@@ -46,7 +45,7 @@ import { AddChipProps } from "@/components/AddChip/AddChip";
 import AddTimeFrameButton from "@/components/AddTimeFrameButton";
 import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
 import { CustomH1, CustomH2 } from "@/components/GuidanceHeaders";
-import { getDomain, getDomainPastPhrase, getDomainPhrase } from "@/utils/omop";
+import { getDomain, getDomainPastPhrase, getDomainPhrase, getUniqueDomains } from "@/utils/omop";
 import DeleteTimeFrameButton from "@/components/DeleteTimeFrameButton";
 import DeleteMenuItem, {
   DeleteMenuItemProps,
@@ -345,13 +344,8 @@ const Guidance = () => {
 
       const concept = selectedNode?.rule?.concept;
 
-      const allConcepts = Array.isArray(concept)
-        ? concept
-        : hasAlternatives(concept)
-          ? [concept, ...concept.alternatives]
-          : concept ? [concept] : [];
-      const uniqueDomains = new Set(allConcepts.map((c) => getDomain(c)).filter(Boolean));
-      const isMixed = allConcepts.length > 0 && uniqueDomains.size !== 1;
+      const uniqueDomains = getUniqueDomains(concept);
+      const isMixed = uniqueDomains.size > 1;
 
       const domain = isMixed ? undefined : getDomain(concept);
       const effectiveCategory = isMixed ? "" : (getPrimaryConcept(concept)?.category || "");
