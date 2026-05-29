@@ -19,6 +19,7 @@ import { EXAMPLES } from "@/config/queryExamples";
 import { Query } from "@/types/api";
 import SearchOverlay from "./SearchOverlay";
 import { useDefaults } from "@/providers/DefaultProvider";
+import { useCohortBuilderContext } from "@/providers/CohortBuilderProvider";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import InlineChoiceButton from "./InlineChoiceButton";
 import { CombinatorType } from "@/types/rules";
@@ -62,6 +63,7 @@ const CohortQueryInput = ({
   );
   const appendError = useQueryBuilder((qb) => qb.appendError);
   const select = useQueryBuilder((qb) => qb.select);
+  const { scrollToNode } = useCohortBuilderContext();
   const errors = useQueryBuilder((qb) => qb.errors ?? []);
   const warnings = useQueryBuilder((qb) => qb.queryBuilderJson.warnings ?? []);
 
@@ -229,6 +231,7 @@ const CohortQueryInput = ({
       const alternativeIds = findRulesWithAlternatives(queryJson.rules, 1);
       if (alternativeIds.length > 0) {
         select(alternativeIds[0]);
+        scrollToNode(alternativeIds[0]);
       }
 
       if (resetOnSearch) {
@@ -252,6 +255,7 @@ const CohortQueryInput = ({
       queryMode,
       queryBuilderJson,
       select,
+      scrollToNode,
     ],
   );
 
