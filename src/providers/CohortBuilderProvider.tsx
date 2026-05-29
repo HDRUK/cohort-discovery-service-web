@@ -371,7 +371,6 @@ export const CohortBuilderProvider = ({
 
         const placeholderInTree = !!findById(queryBuilderJson, activeNode.id);
 
-        // Merge into an existing rule card when dropped directly onto it
         if (overData.type === DragType.Rule && over.id !== activeNode.id) {
           const targetRuleId = over.id as string;
           let updated = placeholderInTree
