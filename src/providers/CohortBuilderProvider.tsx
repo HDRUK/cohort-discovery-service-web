@@ -86,7 +86,6 @@ export const useCohortBuilderContext = () => {
   return ctx;
 };
 
-
 type CohortBuilderProviderProps = {
   children: React.ReactNode;
   errorOnDrag?: boolean;
@@ -123,7 +122,9 @@ export const CohortBuilderProvider = ({
 
   const [active, setActive] = useState<Active | null>(null);
   const [activeNode, setActiveNode] = useState<RuleNodeType | null>(null);
-  const lastPlaceholderPos = useRef<{ groupId: string; index: number } | null>(null);
+  const lastPlaceholderPos = useRef<{ groupId: string; index: number } | null>(
+    null,
+  );
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
 
   const [sortableNodes, setSortableNodes] = useState(
@@ -177,13 +178,22 @@ export const CohortBuilderProvider = ({
         const sourceRule = findById(queryBuilderJson, sourceRuleId);
         const base = createRule({ concept });
         if (sourceRule && isRuleLeaf(sourceRule)) {
-          const { timeConstraint, timeConstraintOperator, ageConstraint, ageConstraintOperator } = sourceRule;
+          const {
+            timeConstraint,
+            timeConstraintOperator,
+            ageConstraint,
+            ageConstraintOperator,
+          } = sourceRule;
           setActiveNode({
             ...base,
             ...(timeConstraint !== undefined && { timeConstraint }),
-            ...(timeConstraintOperator !== undefined && { timeConstraintOperator }),
+            ...(timeConstraintOperator !== undefined && {
+              timeConstraintOperator,
+            }),
             ...(ageConstraint !== undefined && { ageConstraint }),
-            ...(ageConstraintOperator !== undefined && { ageConstraintOperator }),
+            ...(ageConstraintOperator !== undefined && {
+              ageConstraintOperator,
+            }),
           });
         } else {
           setActiveNode(base);
@@ -240,7 +250,8 @@ export const CohortBuilderProvider = ({
           isInTree &&
           lastPlaceholderPos.current?.groupId === overGroupId &&
           lastPlaceholderPos.current?.index === targetIndex
-        ) return;
+        )
+          return;
 
         if (!isInTree) {
           const updated = insertIntoGroup(
@@ -261,7 +272,10 @@ export const CohortBuilderProvider = ({
             errorOnDrag,
           );
         }
-        lastPlaceholderPos.current = { groupId: overGroupId, index: targetIndex };
+        lastPlaceholderPos.current = {
+          groupId: overGroupId,
+          index: targetIndex,
+        };
         return;
       }
 
@@ -329,7 +343,6 @@ export const CohortBuilderProvider = ({
         const sourceRuleId = activeData.sourceRuleId as string;
         const overGroupId = overData?.groupId;
 
-        // Cancel: dropped on source card or no valid drop target
         if (!overGroupId || over.id === sourceRuleId) {
           cancelConceptDrag();
           return;
@@ -342,15 +355,16 @@ export const CohortBuilderProvider = ({
             (c) => c.concept_id !== concept.concept_id,
           );
           if (remaining.length === 1) {
-            const { alternatives: _omit, ...single } = remaining[0] as Concept & {
-              alternatives?: Concept[];
-            };
+            const { alternatives: _omit, ...single } =
+              remaining[0] as Concept & {
+                alternatives?: Concept[];
+              };
             return { ...node, rule: { ...node.rule, concept: single } };
           }
           return { ...node, rule: { ...node.rule, concept: remaining } };
         };
 
-        const normalizeOps = (group: RuleNodeType) =>
+        const normaliseOps = (group: RuleNodeType) =>
           isRuleGroup(group)
             ? { ...group, rules: insertMissingOperators(group.rules) }
             : group;
@@ -370,8 +384,8 @@ export const CohortBuilderProvider = ({
             const merged = Array.isArray(existing)
               ? [...existing, concept]
               : existing != null
-              ? [existing, concept]
-              : concept;
+                ? [existing, concept]
+                : concept;
             return { ...node, rule: { ...node.rule, concept: merged } };
           });
           setQueryBuilderJson(updated);
@@ -381,33 +395,34 @@ export const CohortBuilderProvider = ({
           return;
         }
 
-        // Standalone rule: resolve target index
         const groupItems = boardIndex.itemsByGroup[overGroupId] ?? [];
         let targetIndex = groupItems.indexOf(overData.id);
         targetIndex = targetIndex < 0 ? 0 : targetIndex;
         if (overData.type === DragType.Spacer) {
-          targetIndex =
-            overData.position === "top" ? 0 : groupItems.length;
+          targetIndex = overData.position === "top" ? 0 : groupItems.length;
         }
 
         if (placeholderInTree) {
-          // Placeholder already at the right position — just strip from source
           let updated = updateById(
             queryBuilderJson,
             sourceRuleId,
             removeConceptFromSource,
           );
-          updated = updateById(updated, overGroupId, normalizeOps);
+          updated = updateById(updated, overGroupId, normaliseOps);
           setQueryBuilderJson(updated);
         } else {
-          // No placeholder in tree (fast drop) — insert directly
           let updated = updateById(
             queryBuilderJson,
             sourceRuleId,
             removeConceptFromSource,
           );
-          updated = insertIntoGroup(updated, overGroupId, activeNode, targetIndex);
-          updated = updateById(updated, overGroupId, normalizeOps);
+          updated = insertIntoGroup(
+            updated,
+            overGroupId,
+            activeNode,
+            targetIndex,
+          );
+          updated = updateById(updated, overGroupId, normaliseOps);
           setQueryBuilderJson(updated);
         }
 
@@ -455,7 +470,14 @@ export const CohortBuilderProvider = ({
       setActiveNode(null);
       setActive(null);
     },
-    [active, activeNode, boardIndex, cancelConceptDrag, queryBuilderJson, setQueryBuilderJson],
+    [
+      active,
+      activeNode,
+      boardIndex,
+      cancelConceptDrag,
+      queryBuilderJson,
+      setQueryBuilderJson,
+    ],
   );
 
   const { handleContextMenu, ...rightClickMenuMethods } = useRightClickMenu();
