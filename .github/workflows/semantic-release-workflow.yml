@@ -11,3 +11,29 @@ jobs:
     with:
       chart_path: chart/cohort-web/Chart.yaml
     secrets: inherit
+
+  setup:
+    runs-on: ubuntu-latest
+    environment: prod
+    outputs:
+      docker_build_args: ${{ steps.args.outputs.docker_build_args }}
+    steps:
+      - id: args
+        run: |
+          ARGS=""
+          ARGS+="--build-arg API_BASE_URL=${{ vars.INT_API_BASE_URL }} "
+          ARGS+="--build-arg NEXT_PUBLIC_LOGIN_URL=${{ vars.INT_NEXT_PUBLIC_LOGIN_URL }} "
+          ARGS+="--build-arg NEXT_PUBLIC_USE_DEBUG_LOGS=${{ vars.INT_NEXT_PUBLIC_USE_DEBUG_LOGS }} "
+          ARGS+="--build-arg NEXT_PUBLIC_TASK_URL=${{ vars.INT_NEXT_PUBLIC_TASK_URL }} "
+          ARGS+="--build-arg NEXT_PUBLIC_USE_EXAMPLE_QUERY=${{ vars.INT_NEXT_PUBLIC_USE_EXAMPLE_QUERY }} "
+          ARGS+="--build-arg APPLICATION_MODE=${{ vars.INT_APPLICATION_MODE }} "
+          echo "docker_build_args=$ARGS" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: setup
+    uses: HDRUK/github-actions-templates/.github/workflows/docker-build.yaml@main
+    with:
+      chart_path: chart/cohort-web/Chart.yaml
+      environment: prod
+      docker_build_args: ${{ needs.setup.outputs.docker_build_args }}
+    secrets: inherit
