@@ -39,6 +39,30 @@ export const EXAMPLE_1: RuleGroupType = {
     {
       id: uuidv4(),
       exclude: false,
+      rule: {
+        concept: [
+          {
+            concept_id: 201826,
+            name: "Type 2 diabetes mellitus",
+            category: "Condition",
+            children: [],
+          },
+          {
+            concept_id: 320128,
+            name: "Essential hypertension",
+            category: "Condition",
+            children: [],
+          },
+        ],
+      },
+    },
+    /*{
+      id: uuidv4(),
+      combinator: CombinatorType.AND,
+    },
+    {
+      id: uuidv4(),
+      exclude: false,
       rules: [
         {
           id: uuidv4(),
@@ -186,7 +210,7 @@ export const EXAMPLE_1: RuleGroupType = {
           ],
         },
       },
-    },
+    },*/
   ],
 };
 

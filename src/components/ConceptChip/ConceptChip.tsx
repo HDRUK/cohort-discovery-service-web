@@ -4,6 +4,7 @@ import { getDomain } from "@/utils/omop";
 import { DragIndicator } from "@mui/icons-material";
 import CancelIcon from "@mui/icons-material/Cancel";
 import SyntheticChip from "../SyntheticChip";
+import type { DraggableAttributes, DraggableSyntheticListeners } from "@dnd-kit/core";
 
 const ParentWrapper = ({
   active,
@@ -44,6 +45,7 @@ export const ConceptChip = ({
   onDelete,
   chipSx,
   children,
+  dragProps,
 }: {
   draggable?: boolean;
   indicateIfParent?: boolean;
@@ -52,6 +54,11 @@ export const ConceptChip = ({
   onDelete: (e: React.MouseEvent) => void;
   chipSx?: ChipProps["sx"];
   children?: React.ReactNode;
+  dragProps?: {
+    nodeRef?: (node: HTMLElement | null) => void;
+    handleListeners?: DraggableSyntheticListeners;
+    handleAttributes?: DraggableAttributes;
+  };
 }) => {
   const categoryLabel = getDomain(concept);
   const isParent = (concept?.children?.length ?? 0) > 0;
@@ -59,6 +66,7 @@ export const ConceptChip = ({
 
   return (
     <Box
+      ref={dragProps?.nodeRef}
       role={clickable ? "button" : undefined}
       sx={{
         display: "flex",
@@ -66,7 +74,10 @@ export const ConceptChip = ({
       }}
     >
       {draggable && (
-        <IconButton>
+        <IconButton
+          {...dragProps?.handleListeners}
+          {...dragProps?.handleAttributes}
+        >
           <DragIndicator fontSize="small" sx={{ cursor: "grab", mt: 0.25 }} />
         </IconButton>
       )}

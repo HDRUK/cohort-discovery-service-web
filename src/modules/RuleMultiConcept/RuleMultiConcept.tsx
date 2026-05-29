@@ -2,7 +2,7 @@
 
 import { Concept } from "@/types/api";
 import { RuleLeafType } from "@/types/rules";
-import ConceptChip from "@/components/ConceptChip";
+import { ConceptChip } from "@/components/ConceptChip/ConceptChip";
 import { Stack } from "@mui/material";
 import DomainChip from "@/components/DomainChip/DomainChip";
 import { useCallback, useMemo } from "react";
@@ -11,6 +11,41 @@ import useNodeActions from "@/hooks/useNodeActions";
 import { isMultipleConcept, isRuleLeaf, updateById } from "@/utils/rules";
 import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
+import { useDraggable } from "@dnd-kit/core";
+
+const DraggableConceptChip = ({
+  concept,
+  sourceRuleId,
+  sourceGroupId,
+  onDelete,
+  indicateIfParent,
+}: {
+  concept: Concept;
+  sourceRuleId: string;
+  sourceGroupId: string | undefined;
+  onDelete: (e: React.MouseEvent) => void;
+  indicateIfParent?: boolean;
+}) => {
+  const { setNodeRef, listeners, attributes, isDragging } = useDraggable({
+    id: `concept-drag-${concept.concept_id}-${sourceRuleId}`,
+    data: { type: "Concept", concept, sourceRuleId, sourceGroupId },
+  });
+
+  return (
+    <ConceptChip
+      concept={concept}
+      onDelete={onDelete}
+      indicateIfParent={indicateIfParent}
+      draggable
+      chipSx={{ opacity: isDragging ? 0.4 : 1 }}
+      dragProps={{
+        nodeRef: setNodeRef,
+        handleListeners: listeners,
+        handleAttributes: attributes,
+      }}
+    />
+  );
+};
 
 interface RuleMultiConceptProps
   extends Omit<RuleWrapperProps, "node" | "type" | "render"> {
@@ -83,10 +118,12 @@ const RuleMultiConcept = ({
       render={() => (
         <Stack spacing={1} py={1}>
           {concepts.map((c) => (
-            <ConceptChip
+            <DraggableConceptChip
               key={c.concept_id}
-              indicateIfParent={showDescendants}
               concept={c}
+              sourceRuleId={id}
+              sourceGroupId={groupId}
+              indicateIfParent={showDescendants}
               onDelete={(e) => {
                 e.stopPropagation();
                 handleDelete(c);
