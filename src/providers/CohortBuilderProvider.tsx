@@ -123,7 +123,6 @@ export const CohortBuilderProvider = ({
 
   const [active, setActive] = useState<Active | null>(null);
   const [activeNode, setActiveNode] = useState<RuleNodeType | null>(null);
-  const placeholderInserted = useRef(false);
   const lastPlaceholderPos = useRef<{ groupId: string; index: number } | null>(null);
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
 
@@ -176,7 +175,6 @@ export const CohortBuilderProvider = ({
         const concept = e.active.data.current.concept as Concept;
         const sourceRuleId = e.active.data.current.sourceRuleId as string;
         const sourceRule = findById(queryBuilderJson, sourceRuleId);
-        placeholderInserted.current = false;
         const base = createRule({ concept });
         if (sourceRule && isRuleLeaf(sourceRule)) {
           const { timeConstraint, timeConstraintOperator, ageConstraint, ageConstraintOperator } = sourceRule;
@@ -228,22 +226,23 @@ export const CohortBuilderProvider = ({
 
       if (activeData?.type === DragType.Concept) {
         if (!activeNode) return;
+        const isInTree = !!findById(queryBuilderJson, activeNode.id);
+
         if (over.id === activeData.sourceRuleId) {
-          if (placeholderInserted.current && activeNode) {
+          if (isInTree) {
             setQueryBuilderJson(removeById(queryBuilderJson, activeNode.id));
-            placeholderInserted.current = false;
             lastPlaceholderPos.current = null;
           }
           return;
         }
 
         if (
-          placeholderInserted.current &&
+          isInTree &&
           lastPlaceholderPos.current?.groupId === overGroupId &&
           lastPlaceholderPos.current?.index === targetIndex
         ) return;
 
-        if (!placeholderInserted.current) {
+        if (!isInTree) {
           const updated = insertIntoGroup(
             queryBuilderJson,
             overGroupId,
@@ -251,7 +250,6 @@ export const CohortBuilderProvider = ({
             targetIndex,
           );
           setQueryBuilderJson(updated, errorOnDrag);
-          placeholderInserted.current = true;
         } else {
           setQueryBuilderJson(
             moveItemIntoGroup(
@@ -299,10 +297,9 @@ export const CohortBuilderProvider = ({
   );
 
   const cancelConceptDrag = useCallback(() => {
-    if (placeholderInserted.current && activeNode) {
+    if (activeNode && findById(queryBuilderJson, activeNode.id)) {
       setQueryBuilderJson(removeById(queryBuilderJson, activeNode.id));
     }
-    placeholderInserted.current = false;
     lastPlaceholderPos.current = null;
     setActiveNode(null);
     setActive(null);
@@ -358,10 +355,12 @@ export const CohortBuilderProvider = ({
             ? { ...group, rules: insertMissingOperators(group.rules) }
             : group;
 
+        const placeholderInTree = !!findById(queryBuilderJson, activeNode.id);
+
         // Merge into an existing rule card when dropped directly onto it
         if (overData.type === DragType.Rule && over.id !== activeNode.id) {
           const targetRuleId = over.id as string;
-          let updated = placeholderInserted.current
+          let updated = placeholderInTree
             ? removeById(queryBuilderJson, activeNode.id)
             : queryBuilderJson;
           updated = updateById(updated, sourceRuleId, removeConceptFromSource);
@@ -376,7 +375,6 @@ export const CohortBuilderProvider = ({
             return { ...node, rule: { ...node.rule, concept: merged } };
           });
           setQueryBuilderJson(updated);
-          placeholderInserted.current = false;
           lastPlaceholderPos.current = null;
           setActiveNode(null);
           setActive(null);
@@ -392,7 +390,7 @@ export const CohortBuilderProvider = ({
             overData.position === "top" ? 0 : groupItems.length;
         }
 
-        if (placeholderInserted.current) {
+        if (placeholderInTree) {
           // Placeholder already at the right position — just strip from source
           let updated = updateById(
             queryBuilderJson,
@@ -413,7 +411,6 @@ export const CohortBuilderProvider = ({
           setQueryBuilderJson(updated);
         }
 
-        placeholderInserted.current = false;
         lastPlaceholderPos.current = null;
         setActiveNode(null);
         setActive(null);
