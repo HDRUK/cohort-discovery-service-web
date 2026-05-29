@@ -74,7 +74,11 @@ export const ConceptChip = ({
     <Box
       ref={draggableConfig ? setNodeRef : undefined}
       role={clickable ? "button" : undefined}
-      sx={{ display: "flex", alignItems: "center", opacity: isDragging ? 0.4 : 1 }}
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        opacity: isDragging ? 0.4 : 1,
+      }}
     >
       {draggable && (
         <IconButton {...listeners} {...attributes}>
@@ -91,11 +95,16 @@ export const ConceptChip = ({
           sx={{
             bgcolor: indicateIfParent && isParent ? "secondary.main" : "white",
             color:
-              indicateIfParent && isParent ? "secondary.contrastText" : "inherit",
+              indicateIfParent && isParent
+                ? "secondary.contrastText"
+                : "inherit",
             p: 2,
             borderRadius: 10,
             ...(clickable && {
-              "&:hover": { boxShadow: 2, backgroundColor: "action.hover" },
+              "&:hover": {
+                boxShadow: 2,
+                backgroundColor: "action.hover",
+              },
             }),
             cursor: onClick ? "pointer" : "default",
             ...chipSx,
