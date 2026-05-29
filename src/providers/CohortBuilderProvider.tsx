@@ -174,10 +174,24 @@ export const CohortBuilderProvider = ({
     (e: DragStartEvent) => {
       setActive(e.active);
 
-      if (e.active.data.current?.type === "Concept") {
+      if (e.active.data.current?.type === DragType.Concept) {
         const concept = e.active.data.current.concept as Concept;
+        const sourceRuleId = e.active.data.current.sourceRuleId as string;
+        const sourceRule = findById(queryBuilderJson, sourceRuleId);
         placeholderInserted.current = false;
-        setActiveNode(createRule({ concept }));
+        const base = createRule({ concept });
+        if (sourceRule && isRuleLeaf(sourceRule)) {
+          const { timeConstraint, timeConstraintOperator, ageConstraint, ageConstraintOperator } = sourceRule;
+          setActiveNode({
+            ...base,
+            ...(timeConstraint !== undefined && { timeConstraint }),
+            ...(timeConstraintOperator !== undefined && { timeConstraintOperator }),
+            ...(ageConstraint !== undefined && { ageConstraint }),
+            ...(ageConstraintOperator !== undefined && { ageConstraintOperator }),
+          });
+        } else {
+          setActiveNode(base);
+        }
         return;
       }
 
@@ -391,13 +405,12 @@ export const CohortBuilderProvider = ({
           setQueryBuilderJson(updated);
         } else {
           // No placeholder in tree (fast drop) — insert directly
-          const newRule = createRule({ concept });
           let updated = updateById(
             queryBuilderJson,
             sourceRuleId,
             removeConceptFromSource,
           );
-          updated = insertIntoGroup(updated, overGroupId, newRule, targetIndex);
+          updated = insertIntoGroup(updated, overGroupId, activeNode, targetIndex);
           updated = updateById(updated, overGroupId, normalizeOps);
           setQueryBuilderJson(updated);
         }
