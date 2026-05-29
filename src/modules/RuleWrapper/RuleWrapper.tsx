@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import { ReactNode, RefObject, useCallback, useMemo, useState } from "react";
 import useSortable from "@/hooks/useSortable";
-import { useCohortBuilderContextOptional } from "@/providers/CohortBuilderProvider";
+import { useCohortBuilderContext } from "@/providers/CohortBuilderProvider";
 import { useIsInDragOverlay } from "@/components/DragOverlay/DragOverlay";
 import { DragType } from "@/types/dnd";
 import { DragIndicator } from "@mui/icons-material";
@@ -143,9 +143,9 @@ const RuleWrapper = ({
     },
   });
 
-  const cohortCtx = useCohortBuilderContextOptional();
+  const { activeNode } = useCohortBuilderContext();
   const isInDragOverlay = useIsInDragOverlay();
-  const isPlaceholder = !isInDragOverlay && cohortCtx?.activeNode?.id === id;
+  const isPlaceholder = !isInDragOverlay && activeNode?.id === id;
   const effectiveIsDragging = isDragging || isPlaceholder;
 
   const { setHoverRef, isHighlighted } = useHoverable<HTMLDivElement>(node.id);

@@ -86,8 +86,6 @@ export const useCohortBuilderContext = () => {
   return ctx;
 };
 
-export const useCohortBuilderContextOptional = () =>
-  useContext(CohortBuilderContext);
 
 type CohortBuilderProviderProps = {
   children: React.ReactNode;
