@@ -110,8 +110,7 @@ export const ConceptChip = ({
             <Typography>
               {categoryLabel && (
                 <Box component="span" sx={{ color: "grey.500" }}>
-                  {categoryLabel}
-                  {" | "}
+                  {`${categoryLabel} | `}
                 </Box>
               )}
               {concept?.name} (
