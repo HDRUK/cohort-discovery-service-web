@@ -320,7 +320,7 @@ export const CohortBuilderProvider = ({
       createAndScroll,
       pendingScrollToNodeId,
       clearPendingScrollToNodeId: () => setPendingScrollToNodeId(null),
-      scrollToNode: (id) => setPendingScrollToNodeId(id),
+      scrollToNode: (id: string) => setPendingScrollToNodeId(id),
     }),
     [
       active,
