@@ -1,5 +1,6 @@
 "use client";
 
+import { createContext, useContext } from "react";
 import { DragOverlay as DndDragOverlay } from "@dnd-kit/core";
 
 import {
@@ -16,8 +17,10 @@ import RuleOperator from "@/modules/RuleOperator";
 import RuleMultiConcept from "@/modules/RuleMultiConcept";
 import RuleAlternatives from "@/modules/RuleAlternatives";
 import { RuleNodeType } from "@/types/rules";
-import { Concept } from "@/types/api";
-import { ConceptChip } from "@/components/ConceptChip/ConceptChip";
+
+export const DragOverlayRenderContext = createContext(false);
+
+export const useIsInDragOverlay = () => useContext(DragOverlayRenderContext);
 
 function renderRule(item: RuleNodeType) {
   if (isRuleLeaf(item)) {
@@ -33,19 +36,13 @@ function renderRule(item: RuleNodeType) {
   }
 }
 
-const DragOverlay = ({
-  node,
-  concept,
-}: {
-  node: RuleNodeType | null;
-  concept?: Concept | null;
-}) => {
+const DragOverlay = ({ node }: { node: RuleNodeType | null }) => {
   return (
     <DndDragOverlay>
-      {concept ? (
-        <ConceptChip concept={concept} onDelete={() => {}} draggable />
-      ) : node ? (
-        renderRule(node)
+      {node ? (
+        <DragOverlayRenderContext.Provider value={true}>
+          {renderRule(node)}
+        </DragOverlayRenderContext.Provider>
       ) : null}
     </DndDragOverlay>
   );

@@ -5,6 +5,7 @@ import React, {
   useCallback,
   useContext,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import {
@@ -29,7 +30,8 @@ import DragOverlay from "@/components/DragOverlay";
 import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
 import useRightClickMenu from "@/hooks/useRightClickMenu";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import { RuleLeafType, RuleNodeType } from "@/types/rules";
+import { RuleNodeType } from "@/types/rules";
+import { DragType } from "@/types/dnd";
 
 import {
   createRule,
@@ -84,6 +86,9 @@ export const useCohortBuilderContext = () => {
   return ctx;
 };
 
+export const useCohortBuilderContextOptional = () =>
+  useContext(CohortBuilderContext);
+
 type CohortBuilderProviderProps = {
   children: React.ReactNode;
   errorOnDrag?: boolean;
@@ -120,12 +125,8 @@ export const CohortBuilderProvider = ({
 
   const [active, setActive] = useState<Active | null>(null);
   const [activeNode, setActiveNode] = useState<RuleNodeType | null>(null);
-  const [conceptDrag, setConceptDrag] = useState<{
-    concept: Concept;
-    placeholder: RuleLeafType;
-    sourceRuleId: string;
-    placeholderInserted: boolean;
-  } | null>(null);
+  const placeholderInserted = useRef(false);
+  const lastPlaceholderPos = useRef<{ groupId: string; index: number } | null>(null);
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
 
   const [sortableNodes, setSortableNodes] = useState(
@@ -175,13 +176,8 @@ export const CohortBuilderProvider = ({
 
       if (e.active.data.current?.type === "Concept") {
         const concept = e.active.data.current.concept as Concept;
-        const sourceRuleId = e.active.data.current.sourceRuleId as string;
-        setConceptDrag({
-          concept,
-          placeholder: createRule({ concept }),
-          sourceRuleId,
-          placeholderInserted: false,
-        });
+        placeholderInserted.current = false;
+        setActiveNode(createRule({ concept }));
         return;
       }
 
@@ -208,7 +204,7 @@ export const CohortBuilderProvider = ({
       let targetIndex = groupItems.indexOf(overData.id);
       targetIndex = targetIndex < 0 ? 0 : targetIndex;
 
-      if (overData.type === "Spacer") {
+      if (overData.type === DragType.Spacer) {
         if (overData.position === "top") {
           targetIndex = 0;
         } else if (overData.position === "bottom") {
@@ -218,35 +214,44 @@ export const CohortBuilderProvider = ({
         }
       }
 
-      if (activeData?.type === "Concept") {
-        if (!conceptDrag) return;
-        if (over.id === conceptDrag.sourceRuleId) return;
+      if (activeData?.type === DragType.Concept) {
+        if (!activeNode) return;
+        if (over.id === activeData.sourceRuleId) {
+          if (placeholderInserted.current && activeNode) {
+            setQueryBuilderJson(removeById(queryBuilderJson, activeNode.id));
+            placeholderInserted.current = false;
+            lastPlaceholderPos.current = null;
+          }
+          return;
+        }
 
-        if (!conceptDrag.placeholderInserted) {
-          let updated = insertIntoGroup(
+        if (
+          placeholderInserted.current &&
+          lastPlaceholderPos.current?.groupId === overGroupId &&
+          lastPlaceholderPos.current?.index === targetIndex
+        ) return;
+
+        if (!placeholderInserted.current) {
+          const updated = insertIntoGroup(
             queryBuilderJson,
             overGroupId,
-            conceptDrag.placeholder,
+            activeNode,
             targetIndex,
           );
-          updated = updateById(updated, overGroupId, (g) =>
-            isRuleGroup(g)
-              ? { ...g, rules: insertMissingOperators(g.rules) }
-              : g,
-          );
           setQueryBuilderJson(updated, errorOnDrag);
-          setConceptDrag((prev) => prev && { ...prev, placeholderInserted: true });
+          placeholderInserted.current = true;
         } else {
           setQueryBuilderJson(
             moveItemIntoGroup(
               queryBuilderJson,
-              conceptDrag.placeholder.id,
+              activeNode.id,
               overGroupId,
               targetIndex,
             ),
             errorOnDrag,
           );
         }
+        lastPlaceholderPos.current = { groupId: overGroupId, index: targetIndex };
         return;
       }
 
@@ -254,7 +259,7 @@ export const CohortBuilderProvider = ({
       if (!activeGroupId) return;
       if (
         !queryBuilderAllowNestedGroups &&
-        activeData.type === "Group" &&
+        activeData.type === DragType.Group &&
         overGroupId !== activeGroupId
       )
         return;
@@ -272,8 +277,8 @@ export const CohortBuilderProvider = ({
     },
     [
       active,
+      activeNode,
       boardIndex,
-      conceptDrag,
       errorOnDrag,
       queryBuilderJson,
       setQueryBuilderJson,
@@ -282,14 +287,14 @@ export const CohortBuilderProvider = ({
   );
 
   const cancelConceptDrag = useCallback(() => {
-    if (conceptDrag?.placeholderInserted) {
-      setQueryBuilderJson(
-        removeById(queryBuilderJson, conceptDrag.placeholder.id),
-      );
+    if (placeholderInserted.current && activeNode) {
+      setQueryBuilderJson(removeById(queryBuilderJson, activeNode.id));
     }
-    setConceptDrag(null);
+    placeholderInserted.current = false;
+    lastPlaceholderPos.current = null;
+    setActiveNode(null);
     setActive(null);
-  }, [conceptDrag, queryBuilderJson, setQueryBuilderJson]);
+  }, [activeNode, queryBuilderJson, setQueryBuilderJson]);
 
   const onDragEnd = useCallback(
     (e: DragEndEvent) => {
@@ -305,14 +310,14 @@ export const CohortBuilderProvider = ({
       const activeData = active.data.current;
       const overData = over.data.current;
 
-      if (activeData?.type === "Concept") {
-        if (!conceptDrag) {
+      if (activeData?.type === DragType.Concept) {
+        if (!activeNode) {
           setActive(null);
           return;
         }
 
-        const { concept, placeholder, sourceRuleId, placeholderInserted } =
-          conceptDrag;
+        const concept = activeData.concept as Concept;
+        const sourceRuleId = activeData.sourceRuleId as string;
         const overGroupId = overData?.groupId;
 
         // Cancel: dropped on source card or no valid drop target
@@ -342,10 +347,10 @@ export const CohortBuilderProvider = ({
             : group;
 
         // Merge into an existing rule card when dropped directly onto it
-        if (overData.type === "Rule") {
+        if (overData.type === DragType.Rule && over.id !== activeNode.id) {
           const targetRuleId = over.id as string;
-          let updated = placeholderInserted
-            ? removeById(queryBuilderJson, placeholder.id)
+          let updated = placeholderInserted.current
+            ? removeById(queryBuilderJson, activeNode.id)
             : queryBuilderJson;
           updated = updateById(updated, sourceRuleId, removeConceptFromSource);
           updated = updateById(updated, targetRuleId, (node) => {
@@ -359,7 +364,9 @@ export const CohortBuilderProvider = ({
             return { ...node, rule: { ...node.rule, concept: merged } };
           });
           setQueryBuilderJson(updated);
-          setConceptDrag(null);
+          placeholderInserted.current = false;
+          lastPlaceholderPos.current = null;
+          setActiveNode(null);
           setActive(null);
           return;
         }
@@ -368,12 +375,12 @@ export const CohortBuilderProvider = ({
         const groupItems = boardIndex.itemsByGroup[overGroupId] ?? [];
         let targetIndex = groupItems.indexOf(overData.id);
         targetIndex = targetIndex < 0 ? 0 : targetIndex;
-        if (overData.type === "Spacer") {
+        if (overData.type === DragType.Spacer) {
           targetIndex =
             overData.position === "top" ? 0 : groupItems.length;
         }
 
-        if (placeholderInserted) {
+        if (placeholderInserted.current) {
           // Placeholder already at the right position — just strip from source
           let updated = updateById(
             queryBuilderJson,
@@ -395,7 +402,9 @@ export const CohortBuilderProvider = ({
           setQueryBuilderJson(updated);
         }
 
-        setConceptDrag(null);
+        placeholderInserted.current = false;
+        lastPlaceholderPos.current = null;
+        setActiveNode(null);
         setActive(null);
         return;
       }
@@ -406,7 +415,7 @@ export const CohortBuilderProvider = ({
       if (
         !overGroupId ||
         !activeGroupId ||
-        (activeData.type === "Group" && overGroupId !== activeGroupId)
+        (activeData.type === DragType.Group && overGroupId !== activeGroupId)
       ) {
         setActiveNode(null);
         setActive(null);
@@ -418,7 +427,7 @@ export const CohortBuilderProvider = ({
 
       targetIndex = targetIndex < 0 ? 0 : targetIndex;
 
-      if (overData.type === "Spacer") {
+      if (overData.type === DragType.Spacer) {
         if (overData.position === "top") {
           targetIndex = 0;
         } else {
@@ -438,7 +447,7 @@ export const CohortBuilderProvider = ({
       setActiveNode(null);
       setActive(null);
     },
-    [active, boardIndex, cancelConceptDrag, conceptDrag, queryBuilderJson, setQueryBuilderJson],
+    [active, activeNode, boardIndex, cancelConceptDrag, queryBuilderJson, setQueryBuilderJson],
   );
 
   const { handleContextMenu, ...rightClickMenuMethods } = useRightClickMenu();
@@ -514,7 +523,7 @@ export const CohortBuilderProvider = ({
       >
         {children}
         <RightClickMenu {...rightClickMenuMethods} actions={actions} />
-        <DragOverlay node={activeNode} concept={conceptDrag?.concept ?? null} />
+        <DragOverlay node={activeNode} />
       </DndContext>
     </CohortBuilderContext.Provider>
   );

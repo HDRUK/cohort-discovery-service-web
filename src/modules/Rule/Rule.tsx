@@ -1,4 +1,5 @@
 import { Box } from "@mui/material";
+import { DragType } from "@/types/dnd";
 import DomainChip from "@/components/DomainChip/DomainChip";
 import { Concept } from "@/types/api";
 import { useCallback } from "react";
@@ -104,7 +105,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
   return (
     <RuleWrapper
       node={rule}
-      type="Rule"
+      type={DragType.Rule}
       groupId={groupId}
       sortable={true}
       headerExtra={

@@ -15,6 +15,9 @@ import {
 } from "@mui/material";
 import { ReactNode, RefObject, useCallback, useMemo, useState } from "react";
 import useSortable from "@/hooks/useSortable";
+import { useCohortBuilderContextOptional } from "@/providers/CohortBuilderProvider";
+import { useIsInDragOverlay } from "@/components/DragOverlay/DragOverlay";
+import { DragType } from "@/types/dnd";
 import { DragIndicator } from "@mui/icons-material";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 
@@ -64,7 +67,7 @@ interface Action {
 
 export interface RuleWrapperProps extends BoxProps {
   node: RuleNodeType;
-  type: "Rule" | "Group" | "Operator";
+  type: DragType.Rule | DragType.Group | DragType.Operator;
   headerExtra?: ReactNode;
   hideHeader?: boolean;
   renderInHeader?: boolean;
@@ -140,6 +143,11 @@ const RuleWrapper = ({
     },
   });
 
+  const cohortCtx = useCohortBuilderContextOptional();
+  const isInDragOverlay = useIsInDragOverlay();
+  const isPlaceholder = !isInDragOverlay && cohortCtx?.activeNode?.id === id;
+  const effectiveIsDragging = isDragging || isPlaceholder;
+
   const { setHoverRef, isHighlighted } = useHoverable<HTMLDivElement>(node.id);
 
   const setCardRef = useCallback(
@@ -174,11 +182,11 @@ const RuleWrapper = ({
   };
 
   const onMouseLeave = useCallback(() => {
-    if (showHandle && !isDragging) {
+    if (showHandle && !effectiveIsDragging) {
       setShowHandle(false);
       setShowDelete(false);
     }
-  }, [showHandle, isDragging, setShowHandle, setShowDelete]);
+  }, [showHandle, effectiveIsDragging, setShowHandle, setShowDelete]);
 
   const { handleContextMenu, ...rightClickMenuMethods } = useRightClickMenu();
 
@@ -190,7 +198,7 @@ const RuleWrapper = ({
   const nodeName = useMemo(() => getNodeName(node), [node, getNodeName]);
 
   const showFooter =
-    (type === "Rule" && isSelected && !isAgeFilter(node)) ||
+    (type === DragType.Rule && isSelected && !isAgeFilter(node)) ||
     (!valid && (invalidReason ?? []).length > 0);
 
   useLogDependencyChanges("wrapper " + node.id, {
@@ -226,17 +234,17 @@ const RuleWrapper = ({
       {...containerProps}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      sx={containerSx(isSelected && !isDragging, containerProps?.sx)}
+      sx={containerSx(isSelected && !effectiveIsDragging, containerProps?.sx)}
     >
       <Box sx={headerRowSx}>
         <Collapse
-          in={showHandle || forceShowHandle || isDragging}
+          in={showHandle || forceShowHandle || effectiveIsDragging}
           orientation="horizontal"
           collapsedSize={0}
           unmountOnExit
           sx={{ display: "flex", alignItems: "center" }}
         >
-          <Fade in={showHandle || forceShowHandle || isDragging}>
+          <Fade in={showHandle || forceShowHandle || effectiveIsDragging}>
             <IconButton
               aria-label="Drag"
               data-draggable="true"
@@ -245,11 +253,11 @@ const RuleWrapper = ({
               {...(sortable ? listeners : {})}
               sx={dragButtonSx}
             >
-              <DragIndicator fontSize="small" sx={dragIconSx(isDragging)} />
+              <DragIndicator fontSize="small" sx={dragIconSx(effectiveIsDragging)} />
             </IconButton>
           </Fade>
         </Collapse>
-        {isDragging ? (
+        {effectiveIsDragging ? (
           <Skeleton
             variant="rectangular"
             animation="wave"
@@ -311,7 +319,7 @@ const RuleWrapper = ({
             )}
 
             {isRuleLeaf(node) &&
-              type === "Rule" &&
+              type === DragType.Rule &&
               !isEmptyRule(node) &&
               !renderFooter &&
               !["Gender", "Race"].includes(
@@ -363,12 +371,12 @@ const RuleWrapper = ({
               )}
 
             <RightClickMenu {...rightClickMenuMethods} actions={actions} />
-            {(type === "Rule" || type === "Group") && (
+            {(type === DragType.Rule || type === DragType.Group) && (
               <>
                 {showFooter && <Divider variant="fullWidth" />}
                 <Box
                   minHeight={
-                    type === "Rule" && isSelected && !isAgeFilter(node) ? 40 : 0
+                    type === DragType.Rule && isSelected && !isAgeFilter(node) ? 40 : 0
                   }
                 >
                   {(isSelected && renderFooter) ||
@@ -386,14 +394,14 @@ const RuleWrapper = ({
 
         {useLeftDragPlaceHolder && (
           <Collapse
-            in={showHandle || forceShowHandle || isDragging}
+            in={showHandle || forceShowHandle || effectiveIsDragging}
             orientation="horizontal"
             collapsedSize={0}
             unmountOnExit
             sx={{ display: "flex", alignItems: "center" }}
           >
             <IconButton aria-label="Drag" size="small" sx={{ opacity: 0 }}>
-              <DragIndicator fontSize="small" sx={dragIconSx(isDragging)} />
+              <DragIndicator fontSize="small" sx={dragIconSx(effectiveIsDragging)} />
             </IconButton>
           </Collapse>
         )}
@@ -413,7 +421,7 @@ const RuleWrapper = ({
               sx={deleteButtonSx}
               onClick={handleDelete}
             >
-              <Close fontSize="medium" sx={deleteIconSx(isDragging)} />
+              <Close fontSize="medium" sx={deleteIconSx(effectiveIsDragging)} />
             </IconButton>
           </Fade>
         </Collapse>

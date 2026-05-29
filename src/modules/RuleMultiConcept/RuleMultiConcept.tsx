@@ -2,50 +2,16 @@
 
 import { Concept } from "@/types/api";
 import { RuleLeafType } from "@/types/rules";
-import { ConceptChip } from "@/components/ConceptChip/ConceptChip";
 import { Stack } from "@mui/material";
 import DomainChip from "@/components/DomainChip/DomainChip";
+import { ConceptChip } from "@/components/ConceptChip/ConceptChip";
+import { DragType } from "@/types/dnd";
 import { useCallback, useMemo } from "react";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import useNodeActions from "@/hooks/useNodeActions";
 import { isMultipleConcept, isRuleLeaf, updateById } from "@/utils/rules";
 import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
-import { useDraggable } from "@dnd-kit/core";
-
-const DraggableConceptChip = ({
-  concept,
-  sourceRuleId,
-  sourceGroupId,
-  onDelete,
-  indicateIfParent,
-}: {
-  concept: Concept;
-  sourceRuleId: string;
-  sourceGroupId: string | undefined;
-  onDelete: (e: React.MouseEvent) => void;
-  indicateIfParent?: boolean;
-}) => {
-  const { setNodeRef, listeners, attributes, isDragging } = useDraggable({
-    id: `concept-drag-${concept.concept_id}-${sourceRuleId}`,
-    data: { type: "Concept", concept, sourceRuleId, sourceGroupId },
-  });
-
-  return (
-    <ConceptChip
-      concept={concept}
-      onDelete={onDelete}
-      indicateIfParent={indicateIfParent}
-      draggable
-      chipSx={{ opacity: isDragging ? 0.4 : 1 }}
-      dragProps={{
-        nodeRef: setNodeRef,
-        handleListeners: listeners,
-        handleAttributes: attributes,
-      }}
-    />
-  );
-};
 
 interface RuleMultiConceptProps
   extends Omit<RuleWrapperProps, "node" | "type" | "render"> {
@@ -111,19 +77,26 @@ const RuleMultiConcept = ({
   return (
     <RuleWrapper
       node={rule}
-      type="Rule"
+      type={DragType.Rule}
       groupId={groupId}
       sortable={true}
       headerExtra={<DomainChip concept={concept} />}
       render={() => (
         <Stack spacing={1} py={1}>
           {concepts.map((c) => (
-            <DraggableConceptChip
+            <ConceptChip
               key={c.concept_id}
               concept={c}
-              sourceRuleId={id}
-              sourceGroupId={groupId}
               indicateIfParent={showDescendants}
+              draggable={{
+                id: `concept-drag-${c.concept_id}-${id}`,
+                data: {
+                  type: DragType.Concept,
+                  concept: c,
+                  sourceRuleId: id,
+                  sourceGroupId: groupId,
+                },
+              }}
               onDelete={(e) => {
                 e.stopPropagation();
                 handleDelete(c);
