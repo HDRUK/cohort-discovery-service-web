@@ -1,9 +1,10 @@
-import { Chip, Box } from "@mui/material";
-import SearchConcepts from "@/components/SearchConcepts";
+import { Box } from "@mui/material";
+import DomainChip from "@/components/DomainChip/DomainChip";
 import { Concept } from "@/types/api";
 import { useCallback } from "react";
 import ConceptChip from "@/components/ConceptChip";
 import { RuleLeafType, SingleSidedOperator } from "@/types/rules";
+import RuleSearch from "./RuleSearch";
 
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import {
@@ -11,14 +12,11 @@ import {
   updateById,
   isSingleConcept,
   isRuleLeaf,
-  isMultipleConcept,
 } from "@/utils/rules";
 
 import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import useNodeActions from "@/hooks/useNodeActions";
-import InvalidRule from "@/components/InvalidRule";
-import { getDomain } from "@/utils/omop";
 
 export interface RuleProps extends Omit<
   RuleWrapperProps,
@@ -39,13 +37,15 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     setQueryBuilderJson,
     showDescendants,
     setShowDescendants,
-    setSelected,
+    isSelected,
+    select,
   } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
     showDescendants: qb.showDescendants[id],
     setShowDescendants: qb.setShowDescendants,
-    setSelected: qb.setSelected,
+    isSelected: !!qb.selected[id],
+    select: qb.select,
   }));
 
   const toggleShowDescendants = useCallback(
@@ -54,7 +54,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
   );
 
   const setConcept = useCallback(
-    (c: Concept) => {
+    (c: Concept | Concept[]) => {
       setQueryBuilderJson(
         updateById(queryBuilderJson, id, (node) => {
           if (isRuleLeaf(node)) {
@@ -88,13 +88,6 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     );
   }, [id, queryBuilderJson, setQueryBuilderJson]);
 
-  const onClick = useCallback(
-    (c: Concept) => {
-      setConcept(c);
-    },
-    [setConcept],
-  );
-
   const removeChild = useCallback((parent: Concept, child: Concept) => {
     const children = parent.children?.filter(
       (c) => c.concept_id !== child.concept_id,
@@ -102,17 +95,6 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     const newConcept = {
       ...parent,
       children,
-    };
-    return newConcept;
-  }, []);
-
-  const removeAlternative = useCallback((parent: Concept, child: Concept) => {
-    const alternatives = parent.alternatives?.filter(
-      (c) => c.concept_id !== child.concept_id,
-    );
-    const newConcept = {
-      ...parent,
-      alternatives,
     };
     return newConcept;
   }, []);
@@ -127,13 +109,17 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       sortable={true}
       headerExtra={
         !isEmptyRule(rule) ? (
-          <Chip variant="outlined" label={getDomain(concept)} />
+          <DomainChip concept={concept} />
         ) : null
       }
       render={() => (
         <Box py={1}>
           {isEmptyRule(rule) ? (
-            <SearchConcepts onClick={onClick} />
+            <RuleSearch
+              onConfirm={setConcept}
+              isSelected={isSelected}
+              onSelect={() => select(id)}
+            />
           ) : (
             <>
               {isSingleConcept(concept) && (
@@ -166,44 +152,6 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
                           setConcept(removeChild(concept, childConcept));
                         }}
                       />
-                    ))}
-                </>
-              )}
-              {isMultipleConcept(concept) && (
-                <>
-                  <ConceptChip
-                    indicateIfParent={showDescendants}
-                    concept={concept}
-                    onDelete={() => {
-                      clearConcept();
-                    }}
-                    onClick={(e: React.MouseEvent) => {
-                      e.stopPropagation();
-                      setConcept({ ...concept, alternatives: [] });
-                      setSelected(id, true, true);
-                    }}
-                  />
-
-                  {concept?.alternatives &&
-                    concept?.alternatives?.map((childConcept) => (
-                      <ConceptChip
-                        chipSx={{
-                          borderColor: "error.main",
-                        }}
-                        draggable={false}
-                        key={childConcept.concept_id}
-                        concept={childConcept}
-                        onClick={() => setConcept(childConcept)}
-                        onDelete={(e) => {
-                          e.stopPropagation();
-                          e.preventDefault();
-                          setConcept(removeAlternative(concept, childConcept));
-                          setSelected(id, true, true);
-                        }}
-                      >
-                        {" "}
-                        <InvalidRule reasons={[]} />
-                      </ConceptChip>
                     ))}
                 </>
               )}

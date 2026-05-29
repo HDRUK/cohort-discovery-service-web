@@ -12,13 +12,13 @@ import {
   useEffect,
 } from "react";
 import {
-  Checkbox,
   FormControlLabel,
   FormGroup,
   Box,
   Divider,
   Button,
 } from "@mui/material";
+import SquareCheckbox from "@/components/SquareCheckbox";
 import { ConceptItem, ConceptItemProps } from "./ConceptItem";
 import useUserStore from "@/hooks/useUserStore";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
@@ -27,6 +27,7 @@ import {
   DEFAULT_SEARCH_RESULTS_MAX_HEIGHT,
 } from "@/config/defaults";
 import useFeatures from "@/hooks/useFeatures";
+import { mergeSx } from "@/utils/helpers";
 
 interface SlotProps {
   conceptItem: ConceptItemProps;
@@ -37,7 +38,11 @@ interface SearchConceptsProps {
   selected?: Record<number, boolean>;
   setSelected?: Dispatch<SetStateAction<Record<number, boolean>>>;
   multiple?: boolean;
+  hideSelectAll?: boolean;
   onClick?: (concept: Concept) => void;
+  onToggle?: (concept: Concept, isSelected: boolean) => void;
+  onHasOptions?: (hasOptions: boolean) => void;
+  headerSlot?: React.ReactNode;
   slotProps?: SlotProps;
 }
 
@@ -50,15 +55,19 @@ const searchResultsSx = {
   overflowX: "hidden",
   overflowY: "auto",
   pr: 1,
-} as const;
+};
 
 const SearchConcepts = ({
   domain,
   selected,
   setSelected,
   onClick,
+  onToggle,
+  onHasOptions,
+  headerSlot,
   slotProps,
   multiple = false,
+  hideSelectAll = false,
 }: SearchConceptsProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const searchForConcepts = useUserStore((s) => s.searchForConcepts);
@@ -97,10 +106,11 @@ const SearchConcepts = ({
       const next = { ...prev };
       visibleOptions.forEach((o) => {
         next[o.concept_id] = !allSelected;
+        onToggle?.(o, !allSelected);
       });
       return next;
     });
-  }, [visibleOptions, allSelected, setSelected]);
+  }, [visibleOptions, allSelected, setSelected, onToggle]);
 
   const onSearch = useCallback(
     async (value: string, force = false, customPerPage?: number) => {
@@ -117,6 +127,7 @@ const SearchConcepts = ({
         setNonSyntheticOptions([]);
         setSyntheticOptions([]);
         setNoOptionsFound(false);
+        onHasOptions?.(false);
         return;
       }
 
@@ -161,8 +172,16 @@ const SearchConcepts = ({
       setNoOptionsFound(!hasVisibleOptions);
       setActiveResult(hasVisibleOptions ? res : null);
       setIsLoading(false);
+      onHasOptions?.(hasVisibleOptions);
     },
-    [domain, searchForConcepts, setSelected, includeSynthetic, perPage],
+    [
+      domain,
+      searchForConcepts,
+      setSelected,
+      includeSynthetic,
+      perPage,
+      onHasOptions,
+    ],
   );
 
   const handleToggle = useCallback(
@@ -187,6 +206,7 @@ const SearchConcepts = ({
       handleClick={(id, e) => {
         onClick?.(c);
         handleToggle(id);
+        onToggle?.(c, !selected?.[c.concept_id]);
         e.stopPropagation();
         e.preventDefault();
       }}
@@ -228,16 +248,17 @@ const SearchConcepts = ({
         }
         debounceMs={400}
       />
+      {headerSlot}
       <FormGroup
         ref={resultsContainerRef}
         data-testid="search-concepts-results"
-        sx={searchResultsSx}
+        sx={mergeSx(searchResultsSx, { mt: headerSlot ? 0 : 2 })}
       >
-        {multiple && visibleOptions.length > 0 && (
+        {multiple && !hideSelectAll && visibleOptions.length > 0 && (
           <>
             <FormControlLabel
               control={
-                <Checkbox checked={allSelected} onChange={toggleSelectAll} />
+                <SquareCheckbox checked={allSelected} onChange={toggleSelectAll} />
               }
               label="Select All"
             />

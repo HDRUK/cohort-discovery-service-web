@@ -1,10 +1,11 @@
-import { Chip, Box } from "@mui/material";
+import { Box } from "@mui/material";
 import { AgeFilterType } from "@/types/rules";
 
 import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import useNodeActions from "@/hooks/useNodeActions";
 import RuleAgeSelector from "@/components/RuleAgeSelector";
+import DomainChip from "@/components/DomainChip/DomainChip";
 
 export interface RuleProps extends Omit<
   RuleWrapperProps,
@@ -23,7 +24,7 @@ const RuleAgeFilter = ({ rule, groupId, ...rest }: RuleProps) => {
       type="Rule"
       groupId={groupId}
       sortable={true}
-      headerExtra={<Chip variant="outlined" label={"Age"} />}
+      headerExtra={<DomainChip label="Age" />}
       render={() => (
         <Box sx={{ width: "fit-content" }}>
           <RuleAgeSelector rule={rule} readOnly overrideConstrainForBunny />
