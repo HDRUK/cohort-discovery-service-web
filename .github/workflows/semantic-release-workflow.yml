@@ -29,7 +29,7 @@ jobs:
           ARGS+="--build-arg APPLICATION_MODE=${{ vars.INT_APPLICATION_MODE }} "
           echo "docker_build_args=$ARGS" >> "$GITHUB_OUTPUT"
 
-  build:
+  build-preprod:
     needs: setup-preprod
     uses: HDRUK/github-actions-templates/.github/workflows/docker-build.yaml@main
     with:
