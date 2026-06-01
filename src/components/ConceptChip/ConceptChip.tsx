@@ -4,6 +4,12 @@ import { getDomain } from "@/utils/omop";
 import { DragIndicator } from "@mui/icons-material";
 import CancelIcon from "@mui/icons-material/Cancel";
 import SyntheticChip from "../SyntheticChip";
+import { useDraggable } from "@dnd-kit/core";
+
+export type DraggableConfig = {
+  id: string;
+  data: Record<string, unknown>;
+};
 
 const ParentWrapper = ({
   active,
@@ -45,7 +51,7 @@ export const ConceptChip = ({
   chipSx,
   children,
 }: {
-  draggable?: boolean;
+  draggable?: boolean | DraggableConfig;
   indicateIfParent?: boolean;
   concept: Concept;
   onClick?: (e: React.MouseEvent) => void;
@@ -53,20 +59,29 @@ export const ConceptChip = ({
   chipSx?: ChipProps["sx"];
   children?: React.ReactNode;
 }) => {
+  const draggableConfig = typeof draggable === "object" ? draggable : null;
+  const { setNodeRef, listeners, attributes, isDragging } = useDraggable({
+    id: draggableConfig?.id ?? `nondraggable-${concept.concept_id}`,
+    data: draggableConfig?.data ?? {},
+    disabled: !draggableConfig,
+  });
+
   const categoryLabel = getDomain(concept);
   const isParent = (concept?.children?.length ?? 0) > 0;
   const clickable = Boolean(onClick);
 
   return (
     <Box
+      ref={draggableConfig ? setNodeRef : undefined}
       role={clickable ? "button" : undefined}
       sx={{
         display: "flex",
         alignItems: "center",
+        opacity: isDragging ? 0.4 : 1,
       }}
     >
       {draggable && (
-        <IconButton>
+        <IconButton {...listeners} {...attributes}>
           <DragIndicator fontSize="small" sx={{ cursor: "grab", mt: 0.25 }} />
         </IconButton>
       )}

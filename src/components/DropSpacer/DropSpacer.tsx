@@ -2,6 +2,7 @@
 
 import { Box } from "@mui/material";
 import { useDroppable } from "@dnd-kit/core";
+import { DragType } from "@/types/dnd";
 
 const DropSpacer = ({
   id,
@@ -18,7 +19,7 @@ const DropSpacer = ({
     id,
     data: {
       id,
-      type: "Spacer",
+      type: DragType.Spacer,
       position,
       groupId,
     },

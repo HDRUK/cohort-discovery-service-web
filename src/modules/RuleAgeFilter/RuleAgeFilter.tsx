@@ -1,5 +1,6 @@
 import { Box } from "@mui/material";
 import { AgeFilterType } from "@/types/rules";
+import { DragType } from "@/types/dnd";
 
 import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
@@ -21,7 +22,7 @@ const RuleAgeFilter = ({ rule, groupId, ...rest }: RuleProps) => {
   return (
     <RuleWrapper
       node={rule}
-      type="Rule"
+      type={DragType.Rule}
       groupId={groupId}
       sortable={true}
       headerExtra={<DomainChip label="Age" />}
