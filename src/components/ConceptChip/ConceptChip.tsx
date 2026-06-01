@@ -1,5 +1,6 @@
 import { Concept } from "@/types/api";
 import { Box, Chip, ChipProps, IconButton, Typography } from "@mui/material";
+import { getDomain } from "@/utils/omop";
 import { DragIndicator } from "@mui/icons-material";
 import CancelIcon from "@mui/icons-material/Cancel";
 import SyntheticChip from "../SyntheticChip";
@@ -52,6 +53,7 @@ export const ConceptChip = ({
   chipSx?: ChipProps["sx"];
   children?: React.ReactNode;
 }) => {
+  const categoryLabel = getDomain(concept);
   const isParent = (concept?.children?.length ?? 0) > 0;
   const clickable = Boolean(onClick);
 
@@ -95,6 +97,11 @@ export const ConceptChip = ({
           onClick={onClick && onClick}
           label={
             <Typography>
+              {categoryLabel && (
+                <Box component="span" sx={{ color: "grey.500" }}>
+                  {`${categoryLabel} | `}
+                </Box>
+              )}
               {concept?.name} (
               <Box component="span" sx={{ color: "grey.500" }}>
                 OMOP

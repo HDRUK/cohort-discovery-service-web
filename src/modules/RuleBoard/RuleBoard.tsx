@@ -3,8 +3,12 @@
 import { Fragment, useRef } from "react";
 
 import Rule from "@/modules/Rule";
+import RuleAlternatives from "@/modules/RuleAlternatives";
+import RuleMultiConcept from "@/modules/RuleMultiConcept";
 import {
+  hasAlternatives,
   isAgeFilter,
+  isMultipleConcept,
   isOperator,
   isRuleGroup,
   isRuleLeaf,
@@ -32,6 +36,12 @@ interface RuleBoardProps extends BoxProps {
 
 function renderRule(item: RuleNodeType, ruleGroupId: string) {
   if (isRuleLeaf(item)) {
+    if (hasAlternatives(item.rule.concept)) {
+      return <RuleAlternatives key={item.id} rule={item} groupId={ruleGroupId} />;
+    }
+    if (isMultipleConcept(item.rule.concept)) {
+      return <RuleMultiConcept key={item.id} rule={item} groupId={ruleGroupId} />;
+    }
     return <Rule key={item.id} rule={item} groupId={ruleGroupId} />;
   } else if (isRuleGroup(item)) {
     return <RuleGroup key={item.id} group={item} parentGroupId={ruleGroupId} />;

@@ -43,6 +43,7 @@ import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
 import { mergeSx } from "@/utils/helpers";
 import RuleAgeSelector from "@/components/RuleAgeSelector";
 import {
+  getPrimaryConcept,
   isAgeFilter,
   isEmptyRule,
   isRuleLeaf,
@@ -78,6 +79,7 @@ export interface RuleWrapperProps extends BoxProps {
   actions?: Action[];
   forceShowHandle?: boolean;
   useLeftDragPlaceHolder?: boolean;
+  renderFooter?: ReactNode;
 }
 
 const RuleWrapper = ({
@@ -94,6 +96,7 @@ const RuleWrapper = ({
   actions,
   forceShowHandle = false,
   useLeftDragPlaceHolder = false,
+  renderFooter,
 }: RuleWrapperProps) => {
   const { id, valid = true, invalidReason } = node;
 
@@ -310,7 +313,10 @@ const RuleWrapper = ({
             {isRuleLeaf(node) &&
               type === "Rule" &&
               !isEmptyRule(node) &&
-              !["Gender", "Race"].includes(node.rule.concept?.category || "") &&
+              !renderFooter &&
+              !["Gender", "Race"].includes(
+                getPrimaryConcept(node.rule.concept)?.category || "",
+              ) &&
               (node.timeConstraint || node.ageConstraint || isSelected) && (
                 <CardActions sx={cardActionsSx}>
                   {node.timeConstraint ? (
@@ -365,12 +371,13 @@ const RuleWrapper = ({
                     type === "Rule" && isSelected && !isAgeFilter(node) ? 40 : 0
                   }
                 >
-                  {!valid && (
-                    <InvalidRule
-                      reasons={invalidReason ?? []}
-                      stackProps={{ sx: { pt: 1, pb: 1 } }}
-                    />
-                  )}
+                  {(isSelected && renderFooter) ||
+                    (!valid && (
+                      <InvalidRule
+                        reasons={invalidReason ?? []}
+                        stackProps={{ sx: { pt: 1, pb: 1 } }}
+                      />
+                    ))}
                 </Box>
               </>
             )}
