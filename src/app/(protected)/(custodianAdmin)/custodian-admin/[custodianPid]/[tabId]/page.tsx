@@ -31,7 +31,10 @@ const CustodianAdminPage = async ({
       href: routes.teamHosts(custodianPid),
       page: (
         <Suspense fallback={<CollectionHostsSkeleton />}>
-          <CollectionHostsTab custodianPid={custodianPid} />
+          <CollectionHostsTab
+            custodianPid={custodianPid}
+            searchParams={apiSearchParams}
+          />
         </Suspense>
       ),
     },

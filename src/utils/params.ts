@@ -1,4 +1,5 @@
 import {
+  ApiSearchParams,
   CollectionsSearchParams,
   ConceptSearchParams,
   QueryHistorySearchParams,
@@ -45,6 +46,12 @@ export const buildCollectionParams = (
   };
 
   return buildSearchParams(params);
+};
+
+export const buildCollectionHostParams = (searchParams: ApiSearchParams) => {
+  const { sort } = searchParams ?? {};
+
+  return buildSearchParams({ sort });
 };
 
 export const buildQueryHistoryParams = (
