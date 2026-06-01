@@ -4,6 +4,8 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import SearchConcepts from "./SearchConcepts";
 import ApplicationModeProvider from "@/providers/ApplicationModeProvider";
+import { useUserDataStore, UserDataStoreState } from "@/hooks/userDataStore";
+import { Concept, Paginated } from "@/types/api";
 jest.mock("@/actions/concept/searchConcepts");
 
 function Wrapper(props: React.ComponentProps<typeof SearchConcepts>) {
@@ -20,11 +22,50 @@ function Wrapper(props: React.ComponentProps<typeof SearchConcepts>) {
 }
 
 describe("SearchConcepts", () => {
+  const defaultSearchForConcepts =
+    useUserDataStore.getState().searchForConcepts;
+
+  afterEach(() => {
+    act(() => {
+      useUserDataStore.setState({
+        searchForConcepts: defaultSearchForConcepts,
+      });
+    });
+  });
+
   const renderComponent = (
     props?: React.ComponentProps<typeof SearchConcepts>,
+    searchForConcepts?: UserDataStoreState["searchForConcepts"],
   ) => {
+    if (searchForConcepts) {
+      useUserDataStore.setState({ searchForConcepts });
+    }
+
     render(<Wrapper {...props} />);
   };
+
+  const getPagedConceptSearch =
+    (total: number): UserDataStoreState["searchForConcepts"] =>
+    async ({ page = 1, perPage }) => {
+      const allConcepts = Array.from({ length: total }, (_, i) => ({
+        concept_id: i + 1,
+        name: `Paged concept ${i + 1}`,
+        category: "Condition",
+      })) as Concept[];
+
+      const start = (page - 1) * perPage;
+      const data = allConcepts.slice(start, start + perPage);
+
+      return {
+        data,
+        from: data.length ? start + 1 : 0,
+        to: start + data.length,
+        current_page: page,
+        per_page: perPage,
+        total,
+        last_page: Math.max(1, Math.ceil(total / perPage)),
+      } as Paginated<Partial<Concept>>;
+    };
 
   it("displays results upon search", async () => {
     renderComponent();
@@ -110,5 +151,29 @@ describe("SearchConcepts", () => {
       expect(screen.getAllByTestId("concept-item")).toHaveLength(22);
       expect(screen.queryByRole("button", { name: /show more/i })).toBeNull();
     });
+  });
+
+  it("keeps loading pages after 100 results and hides Show more on the final page", async () => {
+    renderComponent(undefined, getPagedConceptSearch(105));
+
+    const input = screen.getByRole("textbox");
+    await userEvent.type(input, "Paged{enter}");
+
+    expect(await screen.findAllByTestId("concept-item")).toHaveLength(20);
+
+    for (const loadedCount of [20, 40, 60, 80, 100]) {
+      const showMoreButton = await screen.findByRole("button", {
+        name: `Show more (${loadedCount} / 105)`,
+      });
+      await waitFor(() => expect(showMoreButton).toBeEnabled());
+      await userEvent.click(showMoreButton);
+    }
+
+    await waitFor(() => {
+      expect(screen.getAllByTestId("concept-item")).toHaveLength(105);
+    });
+    expect(
+      screen.queryByRole("button", { name: /show more/i }),
+    ).not.toBeInTheDocument();
   });
 });
