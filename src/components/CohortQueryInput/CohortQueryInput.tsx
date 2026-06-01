@@ -11,6 +11,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import {
   createOperator,
   createRuleGroup,
+  findRulesWithAlternatives,
   getFirstTopLevelCombinator,
   RuleErrors,
 } from "@/utils/rules";
@@ -26,6 +27,7 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 type FormValues = {
   cohortQueryInput: string;
 };
+
 
 enum QueryMode {
   FRESH = "fresh",
@@ -59,6 +61,7 @@ const CohortQueryInput = ({
     (qb) => qb.hasSelectedSyntheticDatasets,
   );
   const appendError = useQueryBuilder((qb) => qb.appendError);
+  const select = useQueryBuilder((qb) => qb.select);
   const errors = useQueryBuilder((qb) => qb.errors ?? []);
   const warnings = useQueryBuilder((qb) => qb.queryBuilderJson.warnings ?? []);
 
@@ -223,6 +226,11 @@ const CohortQueryInput = ({
         appendError(RuleErrors.NO_QUERY_FOUND);
       }
 
+      const alternativeIds = findRulesWithAlternatives(queryJson.rules, 1);
+      if (alternativeIds.length > 0) {
+        select(alternativeIds[0]);
+      }
+
       if (resetOnSearch) {
         resetField("cohortQueryInput", { defaultValue: "" });
       }
@@ -243,6 +251,7 @@ const CohortQueryInput = ({
       includeSynthetic,
       queryMode,
       queryBuilderJson,
+      select,
     ],
   );
 

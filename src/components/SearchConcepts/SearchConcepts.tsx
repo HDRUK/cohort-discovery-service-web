@@ -9,21 +9,25 @@ import {
   useCallback,
   useRef,
   useMemo,
-  useLayoutEffect,
+  useEffect,
 } from "react";
 import {
-  Checkbox,
   FormControlLabel,
   FormGroup,
   Box,
   Divider,
   Button,
 } from "@mui/material";
+import SquareCheckbox from "@/components/SquareCheckbox";
 import { ConceptItem, ConceptItemProps } from "./ConceptItem";
 import useUserStore from "@/hooks/useUserStore";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import { DEFAULT_CODES_PER_PAGE } from "@/config/defaults";
+import {
+  DEFAULT_CODES_PER_PAGE,
+  DEFAULT_SEARCH_RESULTS_MAX_HEIGHT,
+} from "@/config/defaults";
 import useFeatures from "@/hooks/useFeatures";
+import { mergeSx } from "@/utils/helpers";
 
 interface SlotProps {
   conceptItem: ConceptItemProps;
@@ -34,19 +38,36 @@ interface SearchConceptsProps {
   selected?: Record<number, boolean>;
   setSelected?: Dispatch<SetStateAction<Record<number, boolean>>>;
   multiple?: boolean;
+  hideSelectAll?: boolean;
   onClick?: (concept: Concept) => void;
+  onToggle?: (concept: Concept, isSelected: boolean) => void;
+  onHasOptions?: (hasOptions: boolean) => void;
+  headerSlot?: React.ReactNode;
   slotProps?: SlotProps;
 }
 
-const SEARCH_RESULTS_MAX_HEIGHT = 420;
+const searchResultsSx = {
+  alignItems: "stretch",
+  flexDirection: "column",
+  flexWrap: "nowrap",
+  maxHeight: DEFAULT_SEARCH_RESULTS_MAX_HEIGHT,
+  mt: 2,
+  overflowX: "hidden",
+  overflowY: "auto",
+  pr: 1,
+};
 
 const SearchConcepts = ({
   domain,
   selected,
   setSelected,
   onClick,
+  onToggle,
+  onHasOptions,
+  headerSlot,
   slotProps,
   multiple = false,
+  hideSelectAll = false,
 }: SearchConceptsProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const searchForConcepts = useUserStore((s) => s.searchForConcepts);
@@ -59,7 +80,7 @@ const SearchConcepts = ({
   > | null>(null);
 
   const lastQueryRef = useRef<string>("");
-  const resultsEndRef = useRef<HTMLDivElement | null>(null);
+  const resultsContainerRef = useRef<HTMLDivElement | null>(null);
   const shouldScrollToResultsEndRef = useRef(false);
   const initialSelectedRef = useRef<Record<number, boolean>>({
     ...(selected ?? {}),
@@ -85,10 +106,11 @@ const SearchConcepts = ({
       const next = { ...prev };
       visibleOptions.forEach((o) => {
         next[o.concept_id] = !allSelected;
+        onToggle?.(o, !allSelected);
       });
       return next;
     });
-  }, [visibleOptions, allSelected, setSelected]);
+  }, [visibleOptions, allSelected, setSelected, onToggle]);
 
   const onSearch = useCallback(
     async (value: string, force = false, page = 1, append = false) => {
@@ -105,6 +127,7 @@ const SearchConcepts = ({
         setNonSyntheticOptions([]);
         setSyntheticOptions([]);
         setNoOptionsFound(false);
+        onHasOptions?.(false);
         return;
       }
 
@@ -140,11 +163,12 @@ const SearchConcepts = ({
         }
 
         setActiveResult(append || hasVisibleOptions ? res : null);
+        onHasOptions?.(append || hasVisibleOptions);
       } finally {
         setIsLoading(false);
       }
     },
-    [domain, searchForConcepts, setSelected, includeSynthetic],
+    [domain, searchForConcepts, setSelected, includeSynthetic, onHasOptions],
   );
 
   const handleToggle = useCallback(
@@ -169,6 +193,7 @@ const SearchConcepts = ({
       handleClick={(id, e) => {
         onClick?.(c);
         handleToggle(id);
+        onToggle?.(c, !selected?.[c.concept_id]);
         e.stopPropagation();
         e.preventDefault();
       }}
@@ -194,12 +219,12 @@ const SearchConcepts = ({
   }, [activeResult, onSearch, isLoading, isShowingMore]);
 
   // Scroll to the end of the results when new results are loaded via "Show more"
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!shouldScrollToResultsEndRef.current) return;
 
     shouldScrollToResultsEndRef.current = false;
-    resultsEndRef.current?.scrollIntoView?.({
-      block: "end",
+    resultsContainerRef.current?.scrollTo?.({
+      top: resultsContainerRef.current.scrollHeight,
       behavior: "smooth",
     });
     requestAnimationFrame(() => setIsShowingMore(false));
@@ -226,24 +251,20 @@ const SearchConcepts = ({
         }
         debounceMs={400}
       />
+      {headerSlot}
       <FormGroup
+        ref={resultsContainerRef}
         data-testid="search-concepts-results"
-        sx={{
-          alignItems: "stretch",
-          flexDirection: "column",
-          flexWrap: "nowrap",
-          maxHeight: SEARCH_RESULTS_MAX_HEIGHT,
-          mt: 2,
-          overflowX: "hidden",
-          overflowY: "auto",
-          pr: 1,
-        }}
+        sx={mergeSx(searchResultsSx, { mt: headerSlot ? 0 : 2 })}
       >
-        {multiple && visibleOptions.length > 0 && (
+        {multiple && !hideSelectAll && visibleOptions.length > 0 && (
           <>
             <FormControlLabel
               control={
-                <Checkbox checked={allSelected} onChange={toggleSelectAll} />
+                <SquareCheckbox
+                  checked={allSelected}
+                  onChange={toggleSelectAll}
+                />
               }
               label="Select All"
             />
@@ -262,7 +283,6 @@ const SearchConcepts = ({
             {syntheticOptions.map(renderConceptItem)}
           </>
         )}
-        <Box ref={resultsEndRef} aria-hidden />
       </FormGroup>
       {hasMoreResults && (
         <Box sx={{ mt: 1 }}>

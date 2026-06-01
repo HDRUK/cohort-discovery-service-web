@@ -19,6 +19,7 @@ import {
   createRule,
   findById,
   isAgeFilter,
+  getPrimaryConcept,
   isEmptyRule,
   isInGroup,
   isOperator,
@@ -44,7 +45,7 @@ import { AddChipProps } from "@/components/AddChip/AddChip";
 import AddTimeFrameButton from "@/components/AddTimeFrameButton";
 import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
 import { CustomH1, CustomH2 } from "@/components/GuidanceHeaders";
-import { getDomain, getDomainPastPhrase, getDomainPhrase } from "@/utils/omop";
+import { getDomain, getDomainPastPhrase, getDomainPhrase, getUniqueDomains } from "@/utils/omop";
 import DeleteTimeFrameButton from "@/components/DeleteTimeFrameButton";
 import DeleteMenuItem, {
   DeleteMenuItemProps,
@@ -342,13 +343,17 @@ const Guidance = () => {
       }
 
       const concept = selectedNode?.rule?.concept;
-      const category = concept?.category || "";
-      const { verb } = getDomainPhrase(category);
-      const past = getDomainPastPhrase(category);
-      const domain = getDomain(concept);
+
+      const uniqueDomains = getUniqueDomains(concept);
+      const isMixed = uniqueDomains.size > 1;
+
+      const domain = isMixed ? undefined : getDomain(concept);
+      const effectiveCategory = isMixed ? "" : (getPrimaryConcept(concept)?.category || "");
+      const { verb } = getDomainPhrase(effectiveCategory);
+      const past = getDomainPastPhrase(effectiveCategory);
 
       return (
-        <ActionMenuSection title={`${domain} Rule`} fixedExpanded>
+        <ActionMenuSection title={domain ? `${domain} Rule` : "Rule"} fixedExpanded>
           <RuleGuidance
             category={domain ?? ""}
             verb={verb}
@@ -357,9 +362,7 @@ const Guidance = () => {
             ageConstraint={selectedNode?.ageConstraint}
             components={makeRuleComponents(selectedNode)}
             showSelectors={
-              !["Gender", "Race"].includes(
-                selectedNode.rule.concept?.category || "",
-              )
+              !["Gender", "Race"].includes(effectiveCategory)
             }
           />
         </ActionMenuSection>

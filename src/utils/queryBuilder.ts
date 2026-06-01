@@ -1,5 +1,6 @@
 import { ConceptOperator, RuleGroupType, RuleNodeType } from "@/types/rules";
 import {
+  hasAlternatives,
   isAgeFilter,
   isMultipleConcept,
   isOperator,
@@ -143,15 +144,21 @@ const queryToText = (
     if (isSingleConcept(c)) {
       const verb = getVerb(c.category, exclude);
       const desc = `${cleanDescription(c.name)}${
-        !rule.concept?.concept_id ? " [unknown]" : ""
+        !c.concept_id ? " [unknown]" : ""
       }`;
       return { verb, text: desc, category: c.category };
     }
 
-    if (isMultipleConcept(c)) {
+    if (hasAlternatives(c)) {
       const text = `${cleanDescription(c.name)} [alternatives found]`;
       const verb = getVerb(c.category, exclude);
       return { verb, text, category: c.category };
+    }
+
+    if (isMultipleConcept(c)) {
+      const names = c.map((concept) => cleanDescription(concept.name)).join(" or ");
+      const verb = getVerb(c[0].category, exclude);
+      return { verb, text: names, category: c[0].category };
     }
 
     return { verb: null, text: null, category: undefined };

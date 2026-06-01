@@ -2,7 +2,6 @@ import { Concept } from "@/types/api";
 import {
   Paper,
   FormControlLabel,
-  Checkbox,
   PaperProps,
   Box,
   Typography,
@@ -11,8 +10,8 @@ import {
   Tooltip,
 } from "@mui/material";
 import { ChangeEvent, MouseEvent } from "react";
-import Title from "../Title";
 import { getDomain } from "@/utils/omop";
+import SquareCheckbox from "@/components/SquareCheckbox";
 
 type ConceptSelectEvent =
   | ChangeEvent<HTMLInputElement>
@@ -71,49 +70,61 @@ export const ConceptItem = ({
   showCounts = false,
 }: ConceptItemProps) => {
   const id = concept.concept_id!;
-  const titleText = showCode ? (
+
+  const nameEl = (
     <Typography>
-      {concept.name} (
-      <Box component="span" sx={{ color: "grey.500" }}>
-        OMOP
-      </Box>{" "}
-      {id})
+      {concept.name}
+      {showCode && (
+        <>
+          {" "}(
+          <Box component="span" sx={{ color: "grey.500" }}>
+            OMOP
+          </Box>{" "}
+          {id})
+        </>
+      )}
     </Typography>
-  ) : (
-    concept.name
   );
 
-  const labelEl = (
-    <Title
-      size="small"
-      useSeparator={false}
-      title={titleText}
-      subTitle={showDomain ? getDomain(concept) : ""}
-      display={"flex"}
-      justifyContent={"space-between"}
-      alignItems={"center"}
-      width={"100%"}
-      wrapperSx={{
-        width: "100%",
-        overflow: "auto",
-        flexWrap: "wrap",
-      }}
-      titleOverflow={"wrap"}
+  const rightEl = (showDomain || showCounts) && (
+    <Stack
+      direction="row"
+      alignItems="center"
+      gap={1}
+      sx={{ ml: "auto", flexShrink: 0, pl: 1 }}
     >
+      {showDomain && (
+        <Typography variant="body2" color="text.secondary">
+          {getDomain(concept)}
+        </Typography>
+      )}
       {showCounts && (
-        <Stack sx={{ ml: "auto" }} gap={1} direction={"row"}>
+        <>
           <Tooltip title="Number of datasets present in">
-            <Chip color="success" label={concept.ncollections} />
+            <Chip color="success" size="small" label={concept.ncollections} />
           </Tooltip>
           <Tooltip title="Total number of counts for this concept">
             <Chip
               color="secondary"
+              size="small"
               label={Number(concept.count).toLocaleString()}
             />
           </Tooltip>
-        </Stack>
+        </>
       )}
-    </Title>
+    </Stack>
+  );
+
+  const labelEl = (
+    <Stack
+      direction="row"
+      alignItems="center"
+      justifyContent="space-between"
+      width="100%"
+    >
+      <Box sx={{ flex: 1, minWidth: 0 }}>{nameEl}</Box>
+      {rightEl}
+    </Stack>
   );
 
   return (
@@ -123,15 +134,12 @@ export const ConceptItem = ({
     >
       {multiple ? (
         <FormControlLabel
-          sx={{ p: 0, m: 0, width: "100%" }}
+          sx={{ p: 0, m: 0, width: "100%", "& .MuiFormControlLabel-label": { width: "100%" } }}
           control={
-            <Checkbox
+            <SquareCheckbox
               checked={isSelected}
               onChange={(e) => handleClick(id, e)}
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-              }}
+              sx={{ p: 0 }}
             />
           }
           label={labelEl}
