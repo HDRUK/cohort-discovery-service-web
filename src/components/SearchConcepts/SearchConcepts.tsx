@@ -81,12 +81,11 @@ const SearchConcepts = ({
 
   const lastQueryRef = useRef<string>("");
   const resultsContainerRef = useRef<HTMLDivElement | null>(null);
-  const shouldScrollToResultsEndRef = useRef(false);
+  const prevPageRef = useRef(0);
   const initialSelectedRef = useRef<Record<number, boolean>>({
     ...(selected ?? {}),
   });
 
-  const [isShowingMore, setIsShowingMore] = useState(false);
   const [nonSyntheticOptions, setNonSyntheticOptions] = useState<Concept[]>([]);
   const [syntheticOptions, setSyntheticOptions] = useState<Concept[]>([]);
   const [noOptionsFound, setNoOptionsFound] = useState(false);
@@ -212,32 +211,23 @@ const SearchConcepts = ({
   );
 
   const handleShowMore = useCallback(async () => {
-    if (isLoading || isShowingMore || !activeResult) return;
+    if (isLoading || !activeResult) return;
 
     const nextPage = activeResult.current_page + 1;
-    shouldScrollToResultsEndRef.current = true;
-    setIsShowingMore(true);
-
-    try {
-      await onSearch(lastQueryRef.current, true, nextPage, true);
-    } catch (error) {
-      shouldScrollToResultsEndRef.current = false;
-      setIsShowingMore(false);
-      throw error;
-    }
-  }, [activeResult, onSearch, isLoading, isShowingMore]);
+    await onSearch(lastQueryRef.current, true, nextPage, true);
+  }, [activeResult, onSearch, isLoading]);
 
   // Scroll to the end of the results when new results are loaded via "Show more"
   useEffect(() => {
-    if (!shouldScrollToResultsEndRef.current) return;
-
-    shouldScrollToResultsEndRef.current = false;
-    resultsContainerRef.current?.scrollTo?.({
-      top: resultsContainerRef.current.scrollHeight,
-      behavior: "smooth",
-    });
-    requestAnimationFrame(() => setIsShowingMore(false));
-  }, [activeResult?.current_page, visibleOptions.length]);
+    const current = activeResult?.current_page ?? 0;
+    if (current > prevPageRef.current && prevPageRef.current > 0) {
+      resultsContainerRef.current?.scrollTo?.({
+        top: resultsContainerRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+    prevPageRef.current = current;
+  }, [activeResult?.current_page]);
 
   const loadedCount = activeResult?.to ?? visibleOptions.length;
   const hasMoreResults =
@@ -297,7 +287,7 @@ const SearchConcepts = ({
         <Box sx={{ mt: 1 }}>
           <Button
             variant="text"
-            disabled={isLoading || isShowingMore}
+            disabled={isLoading}
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
