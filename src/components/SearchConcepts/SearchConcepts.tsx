@@ -146,10 +146,19 @@ const SearchConcepts = ({
         });
 
         const results = (res.data as Concept[]) ?? [];
-        const nonSynthetic = results.filter((o) => o.all_synthetic !== 1);
-        const synthetic = includeSynthetic
-          ? results.filter((o) => o.all_synthetic === 1)
-          : [];
+
+        const nonSynthetic: Concept[] = [];
+        const synthetic: Concept[] = [];
+
+        results.forEach((o) => {
+          const allSynthetic = o.all_synthetic ?? 0;
+          if (allSynthetic === 1) {
+            if (includeSynthetic) synthetic.push(o);
+          } else {
+            nonSynthetic.push(o);
+          }
+        });
+
         const hasVisibleOptions = nonSynthetic.length + synthetic.length > 0;
 
         if (append) {
