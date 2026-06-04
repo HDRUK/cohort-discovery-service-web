@@ -2,7 +2,7 @@
 
 import { Box } from "@mui/material";
 import { useDroppable } from "@dnd-kit/core";
-import { DragType } from "@/types/dnd";
+import { DragType, SpacerPosition } from "@/types/dnd";
 
 const DropSpacer = ({
   id,
@@ -12,7 +12,7 @@ const DropSpacer = ({
 }: {
   id: string;
   groupId: string;
-  position: "top" | "bottom" | number;
+  position: SpacerPosition | number;
   isVisible?: boolean;
 }) => {
   const { setNodeRef, isOver } = useDroppable({

@@ -5,3 +5,8 @@ export enum DragType {
   Spacer = "Spacer",
   Concept = "Concept",
 }
+
+export enum SpacerPosition {
+  Top = "top",
+  Bottom = "bottom",
+}

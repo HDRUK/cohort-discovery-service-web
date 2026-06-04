@@ -31,7 +31,7 @@ import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
 import useRightClickMenu from "@/hooks/useRightClickMenu";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { RuleNodeType } from "@/types/rules";
-import { DragType } from "@/types/dnd";
+import { DragType, SpacerPosition } from "@/types/dnd";
 
 import {
   createRule,
@@ -55,8 +55,8 @@ const resolveTargetIndex = (
   groupItems: string[],
 ): number => {
   if (overData.type === DragType.Spacer) {
-    if (overData.position === "top") return 0;
-    if (overData.position === "bottom") return groupItems.length;
+    if (overData.position === SpacerPosition.Top) return 0;
+    if (overData.position === SpacerPosition.Bottom) return groupItems.length;
     return overData.position as number;
   }
   const idx = groupItems.indexOf(overData.id as string);
