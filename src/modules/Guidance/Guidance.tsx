@@ -236,6 +236,7 @@ const Guidance = () => {
         rule={node}
         {...props}
         uniDirectional={constrainForBunnyV1}
+        preserveInputFocusOnCommit
       />
     ),
     DeleteAgeButton: (props: DeleteMenuItemProps) => (
