@@ -16,7 +16,7 @@ import {
 import { ReactNode, RefObject, useCallback, useMemo, useState } from "react";
 import useSortable from "@/hooks/useSortable";
 import { useCohortBuilderContext } from "@/providers/CohortBuilderProvider";
-import { useIsInDragOverlay } from "@/components/DragOverlay/DragOverlay";
+import useIsInDragOverlay from "@/hooks/useIsInDragOverlay";
 import { DragType } from "@/types/dnd";
 import { DragIndicator } from "@mui/icons-material";
 import useQueryBuilder from "@/hooks/useQueryBuilder";

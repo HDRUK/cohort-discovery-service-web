@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext } from "react";
+import { createContext } from "react";
 import { DragOverlay as DndDragOverlay } from "@dnd-kit/core";
 
 import {
@@ -19,8 +19,6 @@ import RuleAlternatives from "@/modules/RuleAlternatives";
 import { RuleNodeType } from "@/types/rules";
 
 export const DragOverlayRenderContext = createContext(false);
-
-export const useIsInDragOverlay = () => useContext(DragOverlayRenderContext);
 
 function renderRule(item: RuleNodeType) {
   if (isRuleLeaf(item)) {

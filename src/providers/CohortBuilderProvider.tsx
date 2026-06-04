@@ -37,19 +37,18 @@ import {
   createRule,
   findById,
   insertIntoGroup,
-  insertMissingOperators,
-  isMultipleConcept,
   isRuleGroup,
   isRuleLeaf,
+  mergeConceptIntoRule,
   moveItemIntoGroup,
+  normaliseOps,
   removeById,
+  removeConceptFromSource,
   updateById,
 } from "@/utils/rules";
 import { Concept } from "@/types/api";
 
 import useFeatures from "@/hooks/useFeatures";
-
-// ─── Pure helpers ────────────────────────────────────────────────────────────
 
 const resolveTargetIndex = (
   overData: Record<string, unknown>,
@@ -63,42 +62,6 @@ const resolveTargetIndex = (
   const idx = groupItems.indexOf(overData.id as string);
   return idx < 0 ? 0 : idx;
 };
-
-const removeConceptFromSource =
-  (concept: Concept) =>
-  (node: RuleNodeType): RuleNodeType => {
-    if (!isRuleLeaf(node) || !isMultipleConcept(node.rule.concept)) return node;
-    const remaining = (node.rule.concept as Concept[]).filter(
-      (c) => c.concept_id !== concept.concept_id,
-    );
-    if (remaining.length === 1) {
-      const { alternatives: _omit, ...single } = remaining[0] as Concept & {
-        alternatives?: Concept[];
-      };
-      return { ...node, rule: { ...node.rule, concept: single } };
-    }
-    return { ...node, rule: { ...node.rule, concept: remaining } };
-  };
-
-const normaliseOps = (group: RuleNodeType): RuleNodeType =>
-  isRuleGroup(group)
-    ? { ...group, rules: insertMissingOperators(group.rules) }
-    : group;
-
-const mergeConceptIntoRule =
-  (concept: Concept) =>
-  (node: RuleNodeType): RuleNodeType => {
-    if (!isRuleLeaf(node)) return node;
-    const existing = node.rule.concept;
-    const merged = Array.isArray(existing)
-      ? [...existing, concept]
-      : existing != null
-        ? [existing, concept]
-        : concept;
-    return { ...node, rule: { ...node.rule, concept: merged } };
-  };
-
-// ─── Context ─────────────────────────────────────────────────────────────────
 
 type Action = {
   action: () => void;
@@ -136,8 +99,6 @@ export const useCohortBuilderContext = () => {
   }
   return ctx;
 };
-
-// ─── Provider ────────────────────────────────────────────────────────────────
 
 type CohortBuilderProviderProps = {
   children: React.ReactNode;
@@ -339,7 +300,6 @@ export const CohortBuilderProvider = ({
 
         const placeholderInTree = !!findById(queryBuilderJson, activeNode.id);
 
-        // Merge into an existing rule card
         if (overData.type === DragType.Rule && over.id !== activeNode.id) {
           let updated = placeholderInTree
             ? removeById(queryBuilderJson, activeNode.id)
@@ -351,7 +311,6 @@ export const CohortBuilderProvider = ({
           return;
         }
 
-        // Standalone drop — use placeholder position if available, otherwise insert
         const groupItems = boardIndex.itemsByGroup[overGroupId] ?? [];
         const targetIndex = resolveTargetIndex(overData, groupItems);
         let updated = placeholderInTree
@@ -364,7 +323,6 @@ export const CohortBuilderProvider = ({
         return;
       }
 
-      // Rule / group drag
       const activeGroupId = activeData?.groupId;
       const overGroupId = overData?.groupId;
 
