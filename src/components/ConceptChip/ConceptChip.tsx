@@ -44,14 +44,14 @@ const ParentWrapper = ({
 
 export const ConceptChip = ({
   indicateIfParent = false,
-  draggable = false,
+  draggable,
   concept,
   onClick,
   onDelete,
   chipSx,
   children,
 }: {
-  draggable?: boolean | DraggableConfig;
+  draggable?: DraggableConfig;
   indicateIfParent?: boolean;
   concept: Concept;
   onClick?: (e: React.MouseEvent) => void;
@@ -59,11 +59,10 @@ export const ConceptChip = ({
   chipSx?: ChipProps["sx"];
   children?: React.ReactNode;
 }) => {
-  const draggableConfig = typeof draggable === "object" ? draggable : null;
   const { setNodeRef, listeners, attributes, isDragging } = useDraggable({
-    id: draggableConfig?.id ?? `nondraggable-${concept.concept_id}`,
-    data: draggableConfig?.data ?? {},
-    disabled: !draggableConfig,
+    id: draggable?.id ?? `nondraggable-${concept.concept_id}`,
+    data: draggable?.data ?? {},
+    disabled: !draggable,
   });
 
   const categoryLabel = getDomain(concept);
@@ -72,7 +71,7 @@ export const ConceptChip = ({
 
   return (
     <Box
-      ref={draggableConfig ? setNodeRef : undefined}
+      ref={draggable ? setNodeRef : undefined}
       role={clickable ? "button" : undefined}
       sx={{
         display: "flex",

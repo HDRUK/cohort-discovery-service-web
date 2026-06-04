@@ -146,7 +146,6 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
                   {showDescendants &&
                     concept?.children?.map((childConcept) => (
                       <ConceptChip
-                        draggable={false}
                         key={childConcept.concept_id}
                         concept={childConcept}
                         onDelete={() => {
