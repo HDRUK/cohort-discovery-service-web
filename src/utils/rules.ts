@@ -694,6 +694,40 @@ export function validateRuleTree(
   return validatedRoot;
 }
 
+export const removeConceptFromSource =
+  (concept: Concept) =>
+  (node: RuleNodeType): RuleNodeType => {
+    if (!isRuleLeaf(node) || !isMultipleConcept(node.rule.concept)) return node;
+    const remaining = (node.rule.concept as Concept[]).filter(
+      (c) => c.concept_id !== concept.concept_id,
+    );
+    if (remaining.length === 1) {
+      const { alternatives: _omit, ...single } = remaining[0] as Concept & {
+        alternatives?: Concept[];
+      };
+      return { ...node, rule: { ...node.rule, concept: single } };
+    }
+    return { ...node, rule: { ...node.rule, concept: remaining } };
+  };
+
+export const normaliseOps = (group: RuleNodeType): RuleNodeType =>
+  isRuleGroup(group)
+    ? { ...group, rules: insertMissingOperators(group.rules) }
+    : group;
+
+export const mergeConceptIntoRule =
+  (concept: Concept) =>
+  (node: RuleNodeType): RuleNodeType => {
+    if (!isRuleLeaf(node)) return node;
+    const existing = node.rule.concept;
+    const merged = Array.isArray(existing)
+      ? [...existing, concept]
+      : existing != null
+        ? [existing, concept]
+        : concept;
+    return { ...node, rule: { ...node.rule, concept: merged } };
+  };
+
 export function getSelectedOrdered(
   selected: Record<UniqueIdentifier, boolean>,
   root: RuleGroupType,

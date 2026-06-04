@@ -2,9 +2,10 @@
 
 import { Concept } from "@/types/api";
 import { RuleLeafType } from "@/types/rules";
-import ConceptChip from "@/components/ConceptChip";
 import { Stack } from "@mui/material";
 import DomainChip from "@/components/DomainChip/DomainChip";
+import { ConceptChip } from "@/components/ConceptChip/ConceptChip";
+import { DragType } from "@/types/dnd";
 import { useCallback, useMemo } from "react";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import useNodeActions from "@/hooks/useNodeActions";
@@ -76,7 +77,7 @@ const RuleMultiConcept = ({
   return (
     <RuleWrapper
       node={rule}
-      type="Rule"
+      type={DragType.Rule}
       groupId={groupId}
       sortable={true}
       headerExtra={<DomainChip concept={concept} />}
@@ -85,8 +86,17 @@ const RuleMultiConcept = ({
           {concepts.map((c) => (
             <ConceptChip
               key={c.concept_id}
-              indicateIfParent={showDescendants}
               concept={c}
+              indicateIfParent={showDescendants}
+              draggable={{
+                id: `concept-drag-${c.concept_id}-${id}`,
+                data: {
+                  type: DragType.Concept,
+                  concept: c,
+                  sourceRuleId: id,
+                  sourceGroupId: groupId,
+                },
+              }}
               onDelete={(e) => {
                 e.stopPropagation();
                 handleDelete(c);

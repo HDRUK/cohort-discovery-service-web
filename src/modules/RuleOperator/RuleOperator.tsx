@@ -2,6 +2,7 @@
 
 import { Box, Chip, Divider } from "@mui/material";
 import { OperatorType } from "@/types/rules";
+import { DragType } from "@/types/dnd";
 import RuleWrapper from "../RuleWrapper";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { cardSx, rootSx, dividerSx, chipSx } from "./RuleOperator.styles";
@@ -42,7 +43,7 @@ const RuleOperator = ({
         sx: cardSx(isSelected, isHighlighted),
       }}
       node={operator}
-      type={"Operator"}
+      type={DragType.Operator}
       groupId={groupId}
       sortable={true}
       render={() => (

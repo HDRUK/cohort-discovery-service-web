@@ -1,4 +1,5 @@
 import { RuleGroupType } from "@/types/rules";
+import { DragType } from "@/types/dnd";
 
 import RuleBoard from "../RuleBoard";
 import RuleWrapper from "../RuleWrapper";
@@ -20,7 +21,7 @@ const RuleGroup = ({ group, parentGroupId, ...rest }: RuleGroupProps) => {
   return (
     <RuleWrapper
       node={group}
-      type="Group"
+      type={DragType.Group}
       groupId={parentGroupId}
       sortable={true}
       render={() => <RuleBoard ruleGroup={group} />}

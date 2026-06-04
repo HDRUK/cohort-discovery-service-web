@@ -1,6 +1,7 @@
 "use client";
 
 import { Concept } from "@/types/api";
+import { DragType } from "@/types/dnd";
 import { RuleLeafType } from "@/types/rules";
 import ConceptChip from "@/components/ConceptChip";
 import SquareCheckbox from "@/components/SquareCheckbox";
@@ -186,7 +187,7 @@ const RuleAlternatives = ({
   return (
     <RuleWrapper
       node={rule}
-      type="Rule"
+      type={DragType.Rule}
       groupId={groupId}
       sortable={true}
       headerExtra={<DomainChip concept={concept} />}
