@@ -60,7 +60,7 @@ const SelectCustodianDatasets = ({
 
     return (
       <Typography component="span">
-        <SyntheticChip isSynthetic={c.is_synthetic ?? false} sx={{ mr: 1 }} />
+        <SyntheticChip isSynthetic={c.is_synthetic ?? false} sx={{ mx: 1 }} />
         <Typography component="span">{c.name}</Typography>
 
         {showState && (
@@ -94,10 +94,12 @@ const SelectCustodianDatasets = ({
               onChange={() => {
                 handleSelectAll();
               }}
+              sx={{ p: 0 }}
             />
           }
           title={custodianCollections.custodian.name}
           subTitle={`${nSelected}/${nTotal} Collections Selected`}
+          centerTitleContent
           useSeparator={false}
         />
       </AccordionSummary>
@@ -133,9 +135,11 @@ const SelectCustodianDatasets = ({
                       <SquareCheckbox
                         onChange={() => handleSelectDataset(c.pid)}
                         checked={selectedDatasets.includes(c.pid)}
+                        sx={{ p: 0 }}
                       />
                     }
                     label={<CollectionName c={c} />}
+                    sx={{ ml: 0, mr: 0.5 }}
                   />
                 }
               />
