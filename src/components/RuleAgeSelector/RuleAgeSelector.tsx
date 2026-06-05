@@ -26,8 +26,6 @@ import { clamp } from "@/utils/numbers";
 import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
 import HoverableDiv from "@/components/HoverableDiv";
 
-let focusedBunnyAgeInputRuleId: string | null = null;
-
 export interface RuleAgeSelectorProps {
   children?: ReactNode;
   rule: RuleLeafType | AgeFilterType;
@@ -36,7 +34,6 @@ export interface RuleAgeSelectorProps {
   overrideConstrainForBunny?: boolean;
   uniDirectional?: boolean;
   flex?: boolean;
-  preserveInputFocusOnCommit?: boolean;
 }
 
 export const RuleAgeSelectorReadOnly = ({
@@ -82,7 +79,6 @@ const RuleAgeSelector = ({
   uniDirectional = false,
   readOnly = false,
   flex = false,
-  preserveInputFocusOnCommit = false,
 }: RuleAgeSelectorProps) => {
   const minAge = MIN_AGE_FILTER;
   const maxAge = MAX_AGE_FILTER;
@@ -213,10 +209,9 @@ const RuleAgeSelector = ({
           }
           readOnly={readOnly}
           anyLabel="Any age"
-          onClick={() => {
-            setSelectedGuidance(key, true);
-          }}
           onConstraintChange={(next, nextOperator) => {
+            setSelectedGuidance(key, true);
+
             setQueryBuilderJson(
               updateById(queryBuilderJson, rule.id, (node) => {
                 const left =
@@ -250,47 +245,17 @@ const RuleAgeSelector = ({
               sx={{ m: 0 }}
               control={
                 <TextField
-                  inputRef={
-                    preserveInputFocusOnCommit
-                      ? (input) => {
-                          if (
-                            input &&
-                            focusedBunnyAgeInputRuleId === rule.id &&
-                            document.activeElement === document.body
-                          ) {
-                            input.focus();
-                            input.setSelectionRange(
-                              input.value.length,
-                              input.value.length,
-                            );
-                          }
-                        }
-                      : undefined
-                  }
                   size="small"
-                  type={preserveInputFocusOnCommit ? "text" : "number"}
+                  type="number"
                   value={value ?? ""}
                   slotProps={{
-                    htmlInput: preserveInputFocusOnCommit
-                      ? {
-                          inputMode: "numeric",
-                          pattern: "[0-9]*",
-                        }
-                      : { min: minAge, max: maxAge },
+                    htmlInput: { min: minAge, max: maxAge },
                   }}
                   onClick={(e) => {
-                    if (!preserveInputFocusOnCommit) e.preventDefault();
+                    e.preventDefault();
                     e.stopPropagation();
                   }}
-                  onFocus={() => {
-                    if (preserveInputFocusOnCommit) {
-                      focusedBunnyAgeInputRuleId = rule.id;
-                    }
-                  }}
                   onChange={(e) => {
-                    if (preserveInputFocusOnCommit) {
-                      focusedBunnyAgeInputRuleId = rule.id;
-                    }
                     const raw = e.target.value;
                     if (raw === "") return onChange(null);
 
@@ -298,11 +263,6 @@ const RuleAgeSelector = ({
                     if (Number.isNaN(n)) return;
 
                     onChange(clamp(n, minAge, maxAge));
-                  }}
-                  onBlur={() => {
-                    if (preserveInputFocusOnCommit) {
-                      focusedBunnyAgeInputRuleId = null;
-                    }
                   }}
                 />
               }
