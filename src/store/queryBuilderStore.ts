@@ -11,15 +11,15 @@ import {
 import {
   buildIndexFromModel,
   createOperator,
-  createAgeFilter,
+  createDemographicFilter,
   createRule,
   createRuleGroup,
+  isDemographicFilter,
   isOperator,
   isRuleGroup,
   isRuleLeaf,
   updateById,
   validateRuleTree,
-  isAgeFilter,
   groupToRules,
   findById,
 } from "@/utils/rules";
@@ -39,7 +39,7 @@ export enum NodeKind {
   RULE = "RULE",
   GROUP = "GROUP",
   OPERATOR = "OPERATOR",
-  AGE_FILTER = "AGE_FILTER",
+  DEMOGRAPHIC_FILTER = "DEMOGRAPHIC_FILTER",
 }
 
 type NodeFactory = () => RuleNodeType | RuleNodeType[];
@@ -53,7 +53,7 @@ export const Creators: Record<string, NodeFactory> = {
   [NodeKind.RULE]: createRule,
   [NodeKind.GROUP]: createRuleGroup,
   [NodeKind.OPERATOR]: createOperator,
-  [NodeKind.AGE_FILTER]: createAgeFilter,
+  [NodeKind.DEMOGRAPHIC_FILTER]: createDemographicFilter,
 };
 
 export const DEFAULT_QUERY: RuleGroupType =
@@ -110,7 +110,7 @@ export interface QueryBuilderStoreState {
   createNewRule: () => RuleNodeType;
   createNewGroup: () => RuleNodeType;
   createNewOperator: () => RuleNodeType;
-  createNewAgeFilter: () => RuleNodeType;
+  createNewDemographicFilter: () => RuleNodeType;
 
   queryAsText: string;
   getQueryFromText: (
@@ -352,7 +352,7 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
   createNewRule: () => get().createNewNode(NodeKind.RULE),
   createNewGroup: () => get().createNewNode(NodeKind.GROUP),
   createNewOperator: () => get().createNewNode(NodeKind.OPERATOR),
-  createNewAgeFilter: () => get().createNewNode(NodeKind.AGE_FILTER),
+  createNewDemographicFilter: () => get().createNewNode(NodeKind.DEMOGRAPHIC_FILTER),
 
   queryAsText: queryToText(DEFAULT_QUERY),
 
@@ -398,7 +398,7 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     if (node.name) return node.name;
     let name = "";
 
-    if (!isAgeFilter(node) && node.exclude) name = "Excluded ";
+    if (!isDemographicFilter(node) && node.exclude) name = "Excluded ";
 
     if (isRuleGroup(node)) name += "Group";
     else if (isRuleLeaf(node)) {
@@ -408,7 +408,7 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
       name += `${noun} rule`.trim();
     } else if (isOperator(node))
       name += `${node.combinator.toUpperCase()} operator`;
-    else if (isAgeFilter(node)) name += "Age Rule";
+    else if (isDemographicFilter(node)) name += "Demographic Rule";
     else name += "Unknown";
 
     return name;

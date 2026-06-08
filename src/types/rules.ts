@@ -41,18 +41,22 @@ export interface RuleLeafType extends Node {
   rule: ConceptOperator;
 }
 
-export interface AgeFilterType extends Omit<
+export type GeoRadiusLocation = { lat: number; lon: number; radius: number };
+
+export interface DemographicFilterType extends Omit<
   Node,
   "exclude" | "timeConstraint" | "ageConstraint"
 > {
   value: [number, number];
+  deceased?: boolean;
+  location?: string[] | GeoRadiusLocation;
 }
 
 export type RuleNodeType =
   | RuleGroupType
   | RuleLeafType
   | OperatorType
-  | AgeFilterType;
+  | DemographicFilterType;
 
 export interface BoardIndex {
   containers: string[];

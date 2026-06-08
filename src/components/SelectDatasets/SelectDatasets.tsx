@@ -24,7 +24,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import { useUserDataStore } from "@/hooks/userDataStore";
 import SquareCheckbox from "../SquareCheckbox";
-import { addPids, removePids } from "@/utils/collections";
+import { addPids, hasDeathFilter, removePids } from "@/utils/collections";
 import SearchBox from "../SearchBox";
 import { useDebounce } from "@/hooks/useDebounce";
 
@@ -50,18 +50,21 @@ const SelectDatasets = () => {
   // - we always want to be aware of all user accessible collections though
   //   that's why we can just filter these on the FE
   const [searchTerm, setSearchTerm] = useState<string>();
+  const [filterByDeath, setFilterByDeath] = useState(false);
 
   const { debounced: debouncedSearchTerm } = useDebounce(searchTerm, {});
 
   const filteredCollections = useMemo(() => {
-    const searchTerm = debouncedSearchTerm?.trim().toLowerCase();
-    if (searchTerm && searchTerm.length > 2) {
-      return collections.filter((c) =>
-        c.name.toLowerCase().includes(searchTerm),
-      );
+    let result = collections;
+    const term = debouncedSearchTerm?.trim().toLowerCase();
+    if (term && term.length > 2) {
+      result = result.filter((c) => c.name.toLowerCase().includes(term));
     }
-    return collections;
-  }, [collections, debouncedSearchTerm]);
+    if (filterByDeath) {
+      result = result.filter(hasDeathFilter);
+    }
+    return result;
+  }, [collections, debouncedSearchTerm, filterByDeath]);
 
   const custodianGroups = useMemo(() => {
     return Object.values(
@@ -184,6 +187,21 @@ const SelectDatasets = () => {
           <Title
             title={hasSelectedSyntheticDatasets ? "Including" : "Excluding"}
             subTitle={"Synthetic Data Collections"}
+            useSeparator={false}
+          />
+        </Stack>
+
+        <Stack direction="row" gap={1} padding={2} sx={{ pt: 0 }}>
+          <ToggleAction
+            size={25}
+            active={filterByDeath}
+            onToggle={() => setFilterByDeath((v) => !v)}
+            activeIcon={CheckIcon}
+            inactiveIcon={CloseIcon}
+          />
+          <Title
+            title={filterByDeath ? "Showing only" : "Showing all"}
+            subTitle={"Death Table Collections"}
             useSeparator={false}
           />
         </Stack>

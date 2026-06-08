@@ -8,9 +8,63 @@ import {
   TextField,
 } from "@mui/material";
 import { ReactNode, useMemo, useState } from "react";
-import { isAgeFilter, isRuleLeaf, updateById } from "@/utils/rules";
+
+function AgeInput({
+  value,
+  onChange,
+  minAge,
+  maxAge,
+}: {
+  value: number | null;
+  onChange: (v: number | null) => void;
+  minAge: number;
+  maxAge: number;
+}) {
+  const [draft, setDraft] = useState<string>(value != null ? String(value) : "");
+  const [lastValue, setLastValue] = useState<number | null>(value);
+
+  if (lastValue !== value) {
+    setLastValue(value);
+    setDraft(value != null ? String(value) : "");
+  }
+
+  const commit = () => {
+    if (draft === "") {
+      onChange(null);
+      return;
+    }
+    const n = Number(draft);
+    if (!Number.isNaN(n)) onChange(clamp(n, minAge, maxAge));
+  };
+
+  return (
+    <FormControlLabel
+      sx={{ m: 0 }}
+      control={
+        <TextField
+          size="small"
+          type="number"
+          value={draft}
+          slotProps={{ htmlInput: { min: minAge, max: maxAge } }}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          onChange={(e) => setDraft(e.target.value)}
+          onBlur={commit}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") commit();
+          }}
+        />
+      }
+      slotProps={{ typography: { sx: { mx: 1 } } }}
+      label="Years"
+    />
+  );
+}
+import { isDemographicFilter, isRuleLeaf, updateById } from "@/utils/rules";
 import {
-  AgeFilterType,
+  DemographicFilterType,
   RuleLeafType,
   SingleSidedOperator,
 } from "@/types/rules";
@@ -28,7 +82,7 @@ import HoverableDiv from "@/components/HoverableDiv";
 
 export interface RuleAgeSelectorProps {
   children?: ReactNode;
-  rule: RuleLeafType | AgeFilterType;
+  rule: RuleLeafType | DemographicFilterType;
   title?: string;
   readOnly?: boolean;
   overrideConstrainForBunny?: boolean;
@@ -125,7 +179,7 @@ const RuleAgeSelector = ({
             ],
           };
         }
-        if (isAgeFilter(node)) {
+        if (isDemographicFilter(node)) {
           return {
             ...node,
             value: [
@@ -230,7 +284,7 @@ const RuleAgeSelector = ({
                   };
                 }
 
-                if (isAgeFilter(node)) {
+                if (isDemographicFilter(node)) {
                   if (left != null) return { ...node, value: [left, maxAge] };
                   if (right != null) return { ...node, value: [minAge, right] };
                   return { ...node, value: [minAge, maxAge] };
@@ -241,33 +295,11 @@ const RuleAgeSelector = ({
             );
           }}
           renderPicker={({ value, onChange }) => (
-            <FormControlLabel
-              sx={{ m: 0 }}
-              control={
-                <TextField
-                  size="small"
-                  type="number"
-                  value={value ?? ""}
-                  slotProps={{
-                    htmlInput: { min: minAge, max: maxAge },
-                  }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  }}
-                  onChange={(e) => {
-                    const raw = e.target.value;
-                    if (raw === "") return onChange(null);
-
-                    const n = Number(raw);
-                    if (Number.isNaN(n)) return;
-
-                    onChange(clamp(n, minAge, maxAge));
-                  }}
-                />
-              }
-              slotProps={{ typography: { sx: { mx: 1 } } }}
-              label="Years"
+            <AgeInput
+              value={value}
+              onChange={onChange}
+              minAge={minAge}
+              maxAge={maxAge}
             />
           )}
           renderReadOnlyLabel={() => (

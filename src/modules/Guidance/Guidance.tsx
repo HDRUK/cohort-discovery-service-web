@@ -4,7 +4,7 @@ import ToolGuidance from "@/content/guidance/queryBuilder/tool.mdx";
 import RuleGuidance from "@/content/guidance/queryBuilder/rule.mdx";
 import OperatorGuidance from "@/content/guidance/queryBuilder/operator.mdx";
 import GroupGuidance from "@/content/guidance/queryBuilder/group.mdx";
-import AgeFilterGuidance from "@/content/guidance/queryBuilder/ageFilter.mdx";
+import DemographicFilterGuidance from "@/content/guidance/queryBuilder/demographicFilter.mdx";
 import EmptyRuleGuidance from "@/content/guidance/queryBuilder/emptyRule.mdx";
 import ExclusionGuidance from "@/content/guidance/queryBuilder/exclusionGuidance.mdx";
 import MultipleItemGuidance from "@/content/guidance/queryBuilder/multipleItem.mdx";
@@ -13,12 +13,12 @@ import { useCallback, useMemo } from "react";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import {
-  createAgeFilter,
+  createDemographicFilter,
   createRuleGroup,
   createOperator,
   createRule,
   findById,
-  isAgeFilter,
+  isDemographicFilter,
   getPrimaryConcept,
   isEmptyRule,
   isInGroup,
@@ -30,7 +30,7 @@ import {
 } from "@/utils/rules";
 import { trueKeys } from "@/utils/numbers";
 import {
-  AgeFilterType,
+  DemographicFilterType,
   OperatorType,
   RuleGroupType,
   RuleLeafType,
@@ -56,6 +56,8 @@ import ConvertToGroupMenuItem, {
 import AddAgeButton from "@/components/AddAgeButton";
 import RuleAgeSelector from "@/components/RuleAgeSelector";
 import DeleteAgeButton from "@/components/DeleteAgeButton";
+import DeceasedSelector from "@/components/DeceasedSelector";
+import LocationSelector from "@/components/LocationSelector";
 import useFeatures from "@/hooks/useFeatures";
 import CollapsibleGuidance from "@/components/CollapsibleGuidance";
 
@@ -113,9 +115,9 @@ const Guidance = () => {
     return node;
   }, [queryBuilderJson, selectedIds]);
 
-  const handleCreateNewAgeFilterInGroup = useCallback(
+  const handleCreateNewDemographicFilterInGroup = useCallback(
     (id: RuleGroupType["id"], rules: RuleGroupType["rules"]) => {
-      const newRules = [createAgeFilter(), createOperator(), ...rules];
+      const newRules = [createDemographicFilter(), createOperator(), ...rules];
 
       setQueryBuilderJson(
         updateById(queryBuilderJson, id, (node) => ({
@@ -255,10 +257,10 @@ const Guidance = () => {
     const { id, rules } = group;
     return {
       ...baseComponents,
-      AddNewAgeFilterButton: (props: AddButtonProps) => (
+      AddNewDemographicFilterButton: (props: AddButtonProps) => (
         <AddButton
           {...props}
-          onClick={() => handleCreateNewAgeFilterInGroup(id, rules)}
+          onClick={() => handleCreateNewDemographicFilterInGroup(id, rules)}
         />
       ),
       AddNewOperatorButton: (props: AddButtonProps) => (
@@ -282,7 +284,7 @@ const Guidance = () => {
     };
   };
 
-  const makeAgeFilterComponents = (node: AgeFilterType) => ({
+  const makeDemographicFilterComponents = (node: DemographicFilterType) => ({
     ...baseComponents,
     CollapsibleGuidance: (props: GuidanceProps) => (
       <CollapsibleGuidance {...props}></CollapsibleGuidance>
@@ -295,6 +297,8 @@ const Guidance = () => {
         overrideConstrainForBunny={true}
       />
     ),
+    DeceasedSelector: () => <DeceasedSelector rule={node} />,
+    LocationSelector: () => <LocationSelector rule={node} />,
   });
 
   const makeMultipleItemComponents = () => ({
@@ -382,11 +386,11 @@ const Guidance = () => {
           />
         </ActionMenuSection>
       );
-    } else if (isAgeFilter(selectedNode)) {
+    } else if (isDemographicFilter(selectedNode)) {
       return (
-        <ActionMenuSection title={"Age Rule"} fixedExpanded>
-          <AgeFilterGuidance
-            components={makeAgeFilterComponents(selectedNode)}
+        <ActionMenuSection title={"Demographic Rule"} fixedExpanded>
+          <DemographicFilterGuidance
+            components={makeDemographicFilterComponents(selectedNode)}
           />
         </ActionMenuSection>
       );

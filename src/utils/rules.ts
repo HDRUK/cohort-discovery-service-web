@@ -8,7 +8,8 @@ import {
   ConceptOperator,
   BoardIndex,
   OperatorType,
-  AgeFilterType,
+  DemographicFilterType,
+  GeoRadiusLocation,
 } from "@/types/rules";
 import { UniqueIdentifier } from "@dnd-kit/core";
 import { v4 as uuidv4 } from "uuid";
@@ -74,9 +75,10 @@ export const createOperator = (
   combinator,
 });
 
-export const createAgeFilter = (): AgeFilterType => ({
+export const createDemographicFilter = (): DemographicFilterType => ({
   id: uuidv4(),
   value: [MIN_AGE_FILTER, MAX_AGE_FILTER],
+  deceased: undefined,
 });
 
 export function ruleToGroup(
@@ -109,7 +111,7 @@ export function groupToRules(
   const normaliseExclude = opts?.normaliseExclude ?? true;
 
   const toggleExclude = (item: RuleNodeType) =>
-    isOperator(item) || isAgeFilter(item) || item.exclude === undefined
+    isOperator(item) || isDemographicFilter(item) || item.exclude === undefined
       ? item
       : { ...item, exclude: !item.exclude };
 
@@ -199,8 +201,12 @@ export const findRulesWithAlternatives = (
     )
     .slice(0, limit);
 
-export const isAgeFilter = (n: RuleNodeType): n is AgeFilterType =>
+export const isDemographicFilter = (n: RuleNodeType): n is DemographicFilterType =>
   "value" in n;
+
+export const isGeoRadiusLocation = (
+  loc: NonNullable<DemographicFilterType["location"]>,
+): loc is GeoRadiusLocation => !Array.isArray(loc) && "lat" in loc;
 
 export const isOperator = (n: RuleNodeType): n is OperatorType =>
   "combinator" in n;
@@ -454,7 +460,7 @@ export function validateRuleTree(
   const allowNestedGroups = options?.allowNestedGroups ?? false;
 
   const isContent = (n: RuleNodeType) =>
-    isRuleLeaf(n) || isRuleGroup(n) || isAgeFilter(n);
+    isRuleLeaf(n) || isRuleGroup(n) || isDemographicFilter(n);
 
   const setValid = <T extends RuleNodeType>(n: T, v: boolean): T => {
     if (isRuleGroup(n)) return { ...n, valid: v } as T;

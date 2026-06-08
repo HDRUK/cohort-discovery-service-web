@@ -47,7 +47,7 @@ import { mergeSx } from "@/utils/helpers";
 import RuleAgeSelector from "@/components/RuleAgeSelector";
 import {
   getPrimaryConcept,
-  isAgeFilter,
+  isDemographicFilter,
   isEmptyRule,
   isRuleLeaf,
   removeById,
@@ -104,7 +104,7 @@ const RuleWrapper = ({
   const { id, valid = true, invalidReason } = node;
 
   let exclude;
-  if (!isAgeFilter(node)) {
+  if (!isDemographicFilter(node)) {
     exclude = !!node.exclude;
   }
 
@@ -198,7 +198,7 @@ const RuleWrapper = ({
   const nodeName = useMemo(() => getNodeName(node), [node, getNodeName]);
 
   const showFooter =
-    (type === DragType.Rule && isSelected && !isAgeFilter(node)) ||
+    (type === DragType.Rule && isSelected && !isDemographicFilter(node)) ||
     (!valid && (invalidReason ?? []).length > 0);
 
   useLogDependencyChanges("wrapper " + node.id, {
@@ -376,7 +376,7 @@ const RuleWrapper = ({
                 {showFooter && <Divider variant="fullWidth" />}
                 <Box
                   minHeight={
-                    type === DragType.Rule && isSelected && !isAgeFilter(node) ? 40 : 0
+                    type === DragType.Rule && isSelected && !isDemographicFilter(node) ? 40 : 0
                   }
                 >
                   {(isSelected && renderFooter) ||
