@@ -83,7 +83,7 @@ const Title = ({
             minWidth: 0,
             ...overflowStyles,
             display: "flex",
-            alignItems: centerTitleContent ? "center" : undefined,
+            ...(centerTitleContent && { alignItems: "center" }),
             gap: 1,
           }}
         >
