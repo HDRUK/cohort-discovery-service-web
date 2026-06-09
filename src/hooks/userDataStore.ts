@@ -70,6 +70,7 @@ export interface UserDataStoreState {
     selectedDatasets?: string[];
     searchTerm: string;
     perPage: number;
+    page?: number;
     domain?: string;
   }) => Promise<Paginated<Partial<Concept>>>;
 
@@ -173,13 +174,14 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
     await createConceptSet(payload);
   },
 
-  searchForConcepts: async ({ searchTerm, perPage, domain }) => {
+  searchForConcepts: async ({ searchTerm, perPage, page = 1, domain }) => {
     const { selectedDatasets } = useQueryBuilderStore.getState();
 
     const { data } = await searchConcepts({
       concept_name: [searchTerm],
       concept_id: [searchTerm],
       per_page: perPage,
+      page,
       domain,
       collections: selectedDatasets,
     });
