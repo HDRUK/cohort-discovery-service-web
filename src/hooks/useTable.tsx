@@ -15,6 +15,7 @@ export const useTable = <TData extends MRT_RowData>({
   columns,
   data,
   enableRowSelection = true,
+  enableSorting = false,
   ...rest
 }: MRT_TableOptions<TData>) => {
   const hydratedColumns = useMemo<MRT_ColumnDef<TData>[]>(
@@ -24,6 +25,7 @@ export const useTable = <TData extends MRT_RowData>({
             {
               id: "custom-row-select",
               header: "select",
+              enableSorting: false,
               Header: ({ table }) => (
                 <Tooltip title="Select all">
                   <SquareCheckbox
@@ -58,7 +60,7 @@ export const useTable = <TData extends MRT_RowData>({
     columns: hydratedColumns,
     data,
     enablePagination: false,
-    enableSorting: false,
+    enableSorting,
     enableFilters: false,
     enableColumnActions: false,
     enableDensityToggle: false,
