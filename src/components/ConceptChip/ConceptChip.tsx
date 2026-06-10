@@ -32,6 +32,7 @@ const ParentWrapper = ({
         display: "flex",
         alignItems: "center",
         gap: 1,
+        minWidth: 0,
       }}
     >
       <Typography variant="body2" sx={{ fontWeight: 500 }}>
@@ -99,6 +100,7 @@ export const ConceptChip = ({
                 : "inherit",
             p: 2,
             borderRadius: 10,
+            minWidth: 0,
             ...(clickable && {
               "&:hover": {
                 boxShadow: 2,
@@ -110,7 +112,7 @@ export const ConceptChip = ({
           }}
           onClick={onClick && onClick}
           label={
-            <Typography>
+            <Typography noWrap title={concept.name}>
               {categoryLabel && (
                 <Box component="span" sx={{ color: "grey.500" }}>
                   {`${categoryLabel} | `}
