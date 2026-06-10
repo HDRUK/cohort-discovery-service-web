@@ -710,10 +710,12 @@ export const removeConceptFromSource =
     return { ...node, rule: { ...node.rule, concept: remaining } };
   };
 
-export const normaliseOps = (group: RuleNodeType): RuleNodeType =>
-  isRuleGroup(group)
-    ? { ...group, rules: insertMissingOperators(group.rules) }
-    : group;
+export const normaliseOps = (group: RuleNodeType): RuleNodeType => {
+  if (!isRuleGroup(group)) return group;
+  const existingOp = group.rules.find(isOperator);
+  const combinator = existingOp ? existingOp.combinator : CombinatorType.OR;
+  return { ...group, rules: insertMissingOperators(group.rules, combinator) };
+};
 
 export const mergeConceptIntoRule =
   (concept: Concept) =>
