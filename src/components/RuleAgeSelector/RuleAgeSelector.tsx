@@ -20,7 +20,9 @@ function AgeInput({
   minAge: number;
   maxAge: number;
 }) {
-  const [draft, setDraft] = useState<string>(value != null ? String(value) : "");
+  const [draft, setDraft] = useState<string>(
+    value != null ? String(value) : "",
+  );
   const [lastValue, setLastValue] = useState<number | null>(value);
 
   if (lastValue !== value) {
