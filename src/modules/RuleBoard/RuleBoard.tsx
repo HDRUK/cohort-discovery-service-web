@@ -3,8 +3,12 @@
 import { Fragment, useRef } from "react";
 
 import Rule from "@/modules/Rule";
+import RuleAlternatives from "@/modules/RuleAlternatives";
+import RuleMultiConcept from "@/modules/RuleMultiConcept";
 import {
+  hasAlternatives,
   isAgeFilter,
+  isMultipleConcept,
   isOperator,
   isRuleGroup,
   isRuleLeaf,
@@ -15,6 +19,7 @@ import RuleGroup from "@/modules/RuleGroup";
 import RuleOperator from "@/modules/RuleOperator";
 import { useDroppable } from "@dnd-kit/core";
 import DropSpacer from "@/components/DropSpacer";
+import { SpacerPosition } from "@/types/dnd";
 import {
   SortableContext,
   verticalListSortingStrategy,
@@ -32,6 +37,12 @@ interface RuleBoardProps extends BoxProps {
 
 function renderRule(item: RuleNodeType, ruleGroupId: string) {
   if (isRuleLeaf(item)) {
+    if (hasAlternatives(item.rule.concept)) {
+      return <RuleAlternatives key={item.id} rule={item} groupId={ruleGroupId} />;
+    }
+    if (isMultipleConcept(item.rule.concept)) {
+      return <RuleMultiConcept key={item.id} rule={item} groupId={ruleGroupId} />;
+    }
     return <Rule key={item.id} rule={item} groupId={ruleGroupId} />;
   } else if (isRuleGroup(item)) {
     return <RuleGroup key={item.id} group={item} parentGroupId={ruleGroupId} />;
@@ -80,7 +91,7 @@ const RuleBoard = ({
       gap={0}
       {...rest}
     >
-      <DropSpacer id={`${id}::top`} position="top" groupId={id} />
+      <DropSpacer id={`${id}::top`} position={SpacerPosition.Top} groupId={id} />
       <SortableContext
         items={rules.map((r) => r.id)}
         strategy={verticalListSortingStrategy}
@@ -89,7 +100,7 @@ const RuleBoard = ({
           return <Fragment key={rule.id}>{renderRule(rule, id)}</Fragment>;
         })}
       </SortableContext>
-      <DropSpacer id={`${id}::bottom`} position="bottom" groupId={id} />
+      <DropSpacer id={`${id}::bottom`} position={SpacerPosition.Bottom} groupId={id} />
       {children}
     </Box>
   );

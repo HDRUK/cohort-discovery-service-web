@@ -12,6 +12,7 @@ export const DEFAULT_MAX_INVALID_REASONS = 4;
 export const DEFAULT_SEARCH_PREFETCH = 500;
 export const DEFAULT_SEARCH_WAIT_TIME = 400;
 export const DEFAULT_SEARCH_SUGGESTION_ROTATION = 2000;
+export const DEFAULT_SEARCH_RESULTS_MAX_HEIGHT = 420;
 
 export const DEFAULT_STATUS_LABELS: Record<string, string> = {
   ok: "Successful",

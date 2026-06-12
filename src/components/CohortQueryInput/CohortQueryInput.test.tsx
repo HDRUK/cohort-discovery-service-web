@@ -57,7 +57,7 @@ const covidAndCancerQuery = createRuleGroup([covidRule, andRule, cancerRule]);
 
 const covidOrCancerQuery = createRuleGroup([covidRule, orRule, cancerRule]);
 
-const renderComponent = ({ queryBuilderJson = createRuleGroup([]) } = {}) => {
+const renderComponent = ({ queryBuilderJson = createRuleGroup([]) } = {}, extraOverrides: Record<string, unknown> = {}) => {
   return render(
     <MockCohortDiscoveryServiceStore
       overrides={{
@@ -69,6 +69,7 @@ const renderComponent = ({ queryBuilderJson = createRuleGroup([]) } = {}) => {
           appendError,
           errors: [],
           hasSelectedSyntheticDatasets: false,
+          ...extraOverrides,
         },
       }}
     >
@@ -363,6 +364,33 @@ describe("CohortQueryInput", () => {
       orRule,
       cancerRule,
     ]);
+  });
+
+  it("selects the first alternative rule after search returns a query with alternatives", async () => {
+    const mockSelect = jest.fn();
+    const ruleWithAlts = {
+      id: "covid-alt-rule",
+      valid: false,
+      invalidReason: ["alternatives"],
+      rule: {
+        concept: {
+          concept_id: 100,
+          name: "COVID-19",
+          category: "Condition",
+          alternatives: [{ concept_id: 200, name: "Acute COVID-19", category: "Condition" }],
+        },
+      },
+    } as unknown as RuleLeafType;
+
+    getQueryFromText.mockResolvedValueOnce(createRuleGroup([ruleWithAlts]));
+
+    renderComponent({}, { select: mockSelect });
+
+    await submitWithEnter("covid-alternatives");
+
+    await waitFor(() => {
+      expect(mockSelect).toHaveBeenCalledWith("covid-alt-rule");
+    });
   });
 
   it("groups existing covid OR cancer when adding explicit AND diabetes", async () => {

@@ -518,13 +518,16 @@ export interface RemoveCustodiansFromNetworkPost {
 export interface Concept {
   concept_id: number;
   name: string;
-  // description: string; - comment out for now, may use it again
+  description?: string;
   category: string;
   children?: Concept[];
   alternatives?: Concept[];
   ncollections?: number;
   count?: number;
   all_synthetic?: number;
+  match_score?: number;
+  tokens?: string[];
+  phrase_tokens?: string[];
 }
 
 export interface ConceptSet extends WithTimestamps {

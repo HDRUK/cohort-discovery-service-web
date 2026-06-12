@@ -51,4 +51,15 @@ const getDomain = (
   return capitaliseFirstLetter(mapped);
 };
 
-export { codesToOption, getDomainPhrase, getDomainPastPhrase, getDomain };
+const getUniqueDomains = (concept: Concept | Concept[] | null): Set<string> => {
+  const all: Concept[] = Array.isArray(concept)
+    ? concept
+    : concept != null
+    ? [concept, ...(concept.alternatives ?? [])]
+    : [];
+  return new Set(
+    all.map((c) => getDomain(c, { useDefault: false })).filter(Boolean) as string[],
+  );
+};
+
+export { codesToOption, getDomainPhrase, getDomainPastPhrase, getDomain, getUniqueDomains };

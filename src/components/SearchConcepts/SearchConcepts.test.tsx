@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom";
 import { useState } from "react";
-import { render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import SearchConcepts from "./SearchConcepts";
 import ApplicationModeProvider from "@/providers/ApplicationModeProvider";
@@ -87,5 +87,28 @@ describe("SearchConcepts", () => {
     const calledWith = onClick.mock.calls[0][0];
     expect(calledWith).toHaveProperty("concept_id");
     expect(calledWith).toHaveProperty("name");
+  });
+
+  it("loads more results after clicking Show more", async () => {
+    renderComponent();
+
+    const input = screen.getByRole("textbox");
+    await userEvent.type(input, "Chronic{enter}");
+
+    const initialItems = await screen.findAllByTestId("concept-item");
+    expect(initialItems).toHaveLength(20);
+    expect(screen.getByRole("button", { name: /show more/i })).toHaveTextContent(
+      "Show more (20 / 22)",
+    );
+
+    const showMore = await screen.findByRole("button", { name: /show more/i });
+    await act(async () => {
+      showMore.click();
+    });
+
+    await waitFor(() => {
+      expect(screen.getAllByTestId("concept-item")).toHaveLength(22);
+      expect(screen.queryByRole("button", { name: /show more/i })).toBeNull();
+    });
   });
 });

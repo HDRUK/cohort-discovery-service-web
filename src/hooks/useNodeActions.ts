@@ -17,6 +17,7 @@ import {
   createAgeFilter,
 } from "@/utils/rules";
 import { useCallback, useMemo } from "react";
+import { useCohortBuilderContext } from "@/providers/CohortBuilderProvider";
 
 export interface RightClickAction {
   action: () => void;
@@ -42,6 +43,9 @@ const useNodeActions = (
       selected: qb.selected,
     }),
   );
+
+  const { createAndScroll } = useCohortBuilderContext();
+
   const selectedNodeIds = useMemo(
     () => getSelectedOrdered(selected, queryBuilderJson),
     [selected, queryBuilderJson],
@@ -154,41 +158,58 @@ const useNodeActions = (
   }, [id, queryBuilderJson, setQueryBuilderJson]);
 
   const groupRules = node && isRuleGroup(node) ? node.rules : undefined;
+
+  // Right-click group action that adds a new rule at the top of a group.
   const handleCreateNewRule = useCallback(() => {
     if (!groupRules) return;
-    const newRules = [createRule(), createOperator(), ...groupRules];
+    createAndScroll(() => {
+      const newRule = createRule();
+      const newRules = [newRule, createOperator(), ...groupRules];
 
-    setQueryBuilderJson(
-      updateById(queryBuilderJson, id, (node) => ({
-        ...node,
-        rules: newRules,
-      })),
-    );
-  }, [id, groupRules, queryBuilderJson, setQueryBuilderJson]);
+      setQueryBuilderJson(
+        updateById(queryBuilderJson, id, (node) => ({
+          ...node,
+          rules: newRules,
+        })),
+      );
+
+      return newRule;
+    });
+  }, [createAndScroll, id, groupRules, queryBuilderJson, setQueryBuilderJson]);
 
   const handleCreateNewAgeFilter = useCallback(() => {
     if (!groupRules) return;
-    const newRules = [createAgeFilter(), createOperator(), ...groupRules];
+    createAndScroll(() => {
+      const newAgeFilter = createAgeFilter();
+      const newRules = [newAgeFilter, createOperator(), ...groupRules];
 
-    setQueryBuilderJson(
-      updateById(queryBuilderJson, id, (node) => ({
-        ...node,
-        rules: newRules,
-      })),
-    );
-  }, [id, groupRules, queryBuilderJson, setQueryBuilderJson]);
+      setQueryBuilderJson(
+        updateById(queryBuilderJson, id, (node) => ({
+          ...node,
+          rules: newRules,
+        })),
+      );
+
+      return newAgeFilter;
+    });
+  }, [createAndScroll, id, groupRules, queryBuilderJson, setQueryBuilderJson]);
 
   const handleCreateNewOperator = useCallback(() => {
     if (!groupRules) return;
-    const newRules = [createOperator(), ...groupRules];
+    createAndScroll(() => {
+      const newOperator = createOperator();
+      const newRules = [newOperator, ...groupRules];
 
-    setQueryBuilderJson(
-      updateById(queryBuilderJson, id, (node) => ({
-        ...node,
-        rules: newRules,
-      })),
-    );
-  }, [id, groupRules, queryBuilderJson, setQueryBuilderJson]);
+      setQueryBuilderJson(
+        updateById(queryBuilderJson, id, (node) => ({
+          ...node,
+          rules: newRules,
+        })),
+      );
+
+      return newOperator;
+    });
+  }, [createAndScroll, id, groupRules, queryBuilderJson, setQueryBuilderJson]);
 
   const actions = [
     { action: handleDeleteRule, label: "Delete" },

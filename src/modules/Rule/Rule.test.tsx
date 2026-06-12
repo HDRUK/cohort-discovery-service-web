@@ -4,6 +4,7 @@ import Rule, { RuleProps } from "./Rule";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 import { RuleLeafType, RuleGroupType } from "@/types/rules";
 import userEvent from "@testing-library/user-event";
+import { CloseGuardProvider } from "@/providers/CloseGuardProvider";
 
 jest.mock("@/utils/rules", () => {
   const actual = jest.requireActual("@/utils/rules");
@@ -21,6 +22,7 @@ describe("Rule", () => {
   const renderComponent = (
     opArgs: Partial<RuleLeafType> = {},
     rest?: Partial<RuleProps>,
+    storeOverrides: Record<string, unknown> = {},
   ) => {
     const rule = {
       id: "rule-1",
@@ -39,13 +41,15 @@ describe("Rule", () => {
     } as RuleGroupType;
 
     const rendered = render(
-      <MockCohortDiscoveryServiceStore
-        overrides={{
-          queryBuilder: { queryBuilderJson: query, setQueryBuilderJson },
-        }}
-      >
-        <Rule {...rest} rule={rule} groupId="group-1" />
-      </MockCohortDiscoveryServiceStore>,
+      <CloseGuardProvider>
+        <MockCohortDiscoveryServiceStore
+          overrides={{
+            queryBuilder: { queryBuilderJson: query, setQueryBuilderJson, ...storeOverrides },
+          }}
+        >
+          <Rule {...rest} rule={rule} groupId="group-1" />
+        </MockCohortDiscoveryServiceStore>
+      </CloseGuardProvider>,
     );
     return {
       query,
@@ -100,6 +104,15 @@ describe("Rule", () => {
 
     await userEvent.type(searchInput, "diabetes");
     expect(searchInput).toHaveValue("diabetes");
+  });
+
+  it("calls select with the rule id when a blank rule card is clicked", async () => {
+    const mockSelect = jest.fn();
+    renderComponent({ rule: { concept: null } }, undefined, { select: mockSelect });
+
+    await userEvent.click(screen.getByTestId("rule-search-container"));
+
+    expect(mockSelect).toHaveBeenCalledWith("rule-1");
   });
 
   it("calls setQueryBuilderJson with updated state when Delete action is triggered", async () => {

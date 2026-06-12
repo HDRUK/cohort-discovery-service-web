@@ -21,6 +21,7 @@ import {
   validateRuleTree,
   isAgeFilter,
   groupToRules,
+  findById,
 } from "@/utils/rules";
 import { UniqueIdentifier } from "@dnd-kit/core";
 import { removeFalseKeys } from "@/utils/numbers";
@@ -374,11 +375,18 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
       text = defaultInvalidText;
     }
 
+    const currentSelected = get().selected;
+    const prunedSelected = Object.fromEntries(
+      Object.entries(currentSelected).filter(
+        ([id, isSelected]) => isSelected && !!findById(updatedQuery, id),
+      ),
+    );
+
     set((state) => ({
       ...state,
-
       queryBuilderJson: updatedQuery,
       boardIndex: buildIndexFromModel(updatedQuery),
+      selected: prunedSelected,
       ...(validate ? { queryAsText: text } : {}),
     }));
 

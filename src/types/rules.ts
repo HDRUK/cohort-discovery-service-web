@@ -13,9 +13,7 @@ export enum SingleSidedOperator {
 }
 
 export type ConceptOperator = {
-  //ageConstraint: string;
-  //valueConstraint: string;
-  concept: Concept | null;
+  concept: Concept | Concept[] | null;
 };
 
 type Node = {

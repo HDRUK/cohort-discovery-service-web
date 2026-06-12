@@ -190,6 +190,51 @@ export const EXAMPLE_1: RuleGroupType = {
   ],
 };
 
+export const EXAMPLE_WITH_ALTERNATIVES: RuleGroupType = {
+  id: uuidv4(),
+  rules: [
+    {
+      id: uuidv4(),
+      exclude: false,
+      rule: {
+        concept: {
+          concept_id: 37311061,
+          name: "COVID-19",
+          description: "COVID-19",
+          category: "Condition",
+          children: [],
+          ncollections: 2,
+          all_synthetic: 0,
+          alternatives: [
+            {
+              concept_id: 605554,
+              name: "Acute COVID-19",
+              description: "Acute COVID-19",
+              category: "Condition",
+              children: [],
+              ncollections: 2,
+              all_synthetic: 0,
+            },
+            {
+              concept_id: 37311060,
+              name: "Suspected COVID-19",
+              description: "Suspected COVID-19",
+              category: "Observation",
+              children: [],
+              ncollections: 2,
+              all_synthetic: 0,
+            },
+          ],
+        },
+      },
+      valid: false,
+      invalidReason: [
+        "The term has alternatives, please select the intended concept in the rule block(s) below.",
+      ],
+    },
+  ],
+};
+
 export const EXAMPLE_2 = {
   id: "board",
   rules: [

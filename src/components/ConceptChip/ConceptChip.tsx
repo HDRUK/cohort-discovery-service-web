@@ -1,8 +1,15 @@
 import { Concept } from "@/types/api";
 import { Box, Chip, ChipProps, IconButton, Typography } from "@mui/material";
+import { getDomain } from "@/utils/omop";
 import { DragIndicator } from "@mui/icons-material";
 import CancelIcon from "@mui/icons-material/Cancel";
 import SyntheticChip from "../SyntheticChip";
+import { useDraggable } from "@dnd-kit/core";
+
+export type DraggableConfig = {
+  id: string;
+  data: Record<string, unknown>;
+};
 
 const ParentWrapper = ({
   active,
@@ -37,14 +44,14 @@ const ParentWrapper = ({
 
 export const ConceptChip = ({
   indicateIfParent = false,
-  draggable = false,
+  draggable,
   concept,
   onClick,
   onDelete,
   chipSx,
   children,
 }: {
-  draggable?: boolean;
+  draggable?: DraggableConfig;
   indicateIfParent?: boolean;
   concept: Concept;
   onClick?: (e: React.MouseEvent) => void;
@@ -52,19 +59,28 @@ export const ConceptChip = ({
   chipSx?: ChipProps["sx"];
   children?: React.ReactNode;
 }) => {
+  const { setNodeRef, listeners, attributes, isDragging } = useDraggable({
+    id: draggable?.id ?? `nondraggable-${concept.concept_id}`,
+    data: draggable?.data ?? {},
+    disabled: !draggable,
+  });
+
+  const categoryLabel = getDomain(concept);
   const isParent = (concept?.children?.length ?? 0) > 0;
   const clickable = Boolean(onClick);
 
   return (
     <Box
+      ref={draggable ? setNodeRef : undefined}
       role={clickable ? "button" : undefined}
       sx={{
         display: "flex",
         alignItems: "center",
+        opacity: isDragging ? 0.4 : 1,
       }}
     >
       {draggable && (
-        <IconButton>
+        <IconButton {...listeners} {...attributes}>
           <DragIndicator fontSize="small" sx={{ cursor: "grab", mt: 0.25 }} />
         </IconButton>
       )}
@@ -95,6 +111,11 @@ export const ConceptChip = ({
           onClick={onClick && onClick}
           label={
             <Typography>
+              {categoryLabel && (
+                <Box component="span" sx={{ color: "grey.500" }}>
+                  {`${categoryLabel} | `}
+                </Box>
+              )}
               {concept?.name} (
               <Box component="span" sx={{ color: "grey.500" }}>
                 OMOP

@@ -14,7 +14,8 @@ import AddIcon from "@mui/icons-material/Add";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+import { useCallback, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { RuleGroupType } from "@/types/rules";
 import { MRT_ColumnDef } from "material-react-table";
@@ -33,14 +34,16 @@ import updateRegressionTest from "@/actions/regressionTest/updateRegressionTest"
 import deleteRegressionTest from "@/actions/regressionTest/deleteRegressionTest";
 import runRegressionTest from "@/actions/regressionTest/runRegressionTest";
 import PassFailChip from "./PassFailChip";
+import EditableExpected from "./EditableExpected";
 import AddRegressionTestDialog from "./AddRegressionTestDialog";
-import CollectionTaskHistory from "./CollectionTaskHistory";
 import useTaskPolling from "@/hooks/useTaskPolling";
+import { useConfirmBool } from "@/hooks/useConfirm";
 
-// testPid → set of still-pending taskPids
 type RunStates = Record<string, Set<string>>;
 
-type FlatRow = { test: RegressionTest; col: RegressionTestCollection | null };
+type TableRow =
+  | { kind: "test"; test: RegressionTest }
+  | { kind: "collection"; test: RegressionTest; col: RegressionTestCollection };
 
 interface RegressionTestsProps {
   collections: CollectionWithHosts[];
@@ -48,6 +51,7 @@ interface RegressionTestsProps {
 
 const RegressionTests = ({ collections }: RegressionTestsProps) => {
   const queryClient = useQueryClient();
+  const confirmBool = useConfirmBool();
 
   const { data, isLoading } = useQuery({
     queryKey: ["regression-tests"],
@@ -57,13 +61,28 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
 
   const tests = useMemo(() => data?.data ?? [], [data]);
 
-  const rows = useMemo(
-    (): FlatRow[] =>
-      tests.flatMap((test): FlatRow[] =>
-        test.collections.length > 0
-          ? test.collections.map((col) => ({ test, col }))
-          : [{ test, col: null }],
+  const apiInProgressStates = useMemo(
+    (): RunStates =>
+      Object.fromEntries(
+        tests.flatMap((test) =>
+          test.collections.flatMap((col) => {
+            const task = col.tasks[0];
+            if (!task || task.completed_at || task.failed_at) return [];
+            return [[`${test.pid}::${col.pid}`, new Set([task.pid])]];
+          }),
+        ),
       ),
+    [tests],
+  );
+
+  const rows = useMemo(
+    (): TableRow[] =>
+      tests.flatMap((test): TableRow[] => [
+        { kind: "test", test },
+        ...test.collections.map(
+          (col): TableRow => ({ kind: "collection", test, col }),
+        ),
+      ]),
     [tests],
   );
 
@@ -79,48 +98,44 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
     [editing],
   );
 
-  const handleRun = useCallback(async (testPid: string) => {
-    try {
-      const res = await runRegressionTest(testPid);
-      if (res.error || !res.data?.task_pids?.length) return;
-      setRunStates((prev) => ({
-        ...prev,
-        [testPid]: new Set(res.data.task_pids),
-      }));
-    } catch {
-      // silently fail
-    }
+  const handleRun = useCallback(async (testPid: string, colPid?: string) => {
+    const key = colPid ? `${testPid}::${colPid}` : testPid;
+    const res = await runRegressionTest(testPid, colPid);
+    if (res.error || !res.data?.task_pids?.length) return;
+    setRunStates((prev) => ({
+      ...prev,
+      [key]: new Set(res.data.task_pids),
+    }));
   }, []);
 
-  const handleTaskComplete = useCallback((testPid: string, taskPid: string) => {
-    setRunStates((prev) => {
-      const pending = new Set(prev[testPid]);
-      pending.delete(taskPid);
-      if (pending.size === 0) {
-        const next = { ...prev };
-        delete next[testPid];
-        return next;
-      }
-      return { ...prev, [testPid]: pending };
-    });
-  }, []);
-
-  // Invalidate when a test's tasks all complete (its key disappears from runStates)
-  const runStateKeysRef = useRef<string[]>([]);
-  useEffect(() => {
-    const currentKeys = Object.keys(runStates);
-    const justCompleted = runStateKeysRef.current.filter(
-      (k) => !currentKeys.includes(k),
-    );
-    runStateKeysRef.current = currentKeys;
-    if (justCompleted.length > 0) {
+  const handleTaskComplete = useCallback(
+    (key: string, taskPid: string) => {
+      setRunStates((prev) => {
+        const pending = new Set(prev[key]);
+        pending.delete(taskPid);
+        if (pending.size === 0) {
+          const next = { ...prev };
+          delete next[key];
+          return next;
+        }
+        return { ...prev, [key]: pending };
+      });
       queryClient.invalidateQueries({ queryKey: ["regression-tests"] });
-    }
-  }, [runStates, queryClient]);
+    },
+    [queryClient],
+  );
+
+  const effectiveRunStates = useMemo(
+    (): RunStates => ({ ...apiInProgressStates, ...runStates }),
+    [runStates, apiInProgressStates],
+  );
 
   const handleRunAll = () => {
     tests.forEach((t) => {
-      if (!runStates[t.pid]) handleRun(t.pid);
+      const anyRunning =
+        !!effectiveRunStates[t.pid] ||
+        t.collections.some((c) => !!effectiveRunStates[`${t.pid}::${c.pid}`]);
+      if (!anyRunning) handleRun(t.pid);
     });
   };
 
@@ -151,46 +166,86 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
     queryClient.invalidateQueries({ queryKey: ["regression-tests"] });
   };
 
-  const handleDelete = useCallback(
-    async (pid: string) => {
-      await deleteRegressionTest(pid);
+  const handleDeleteTest = useCallback(
+    async (test: RegressionTest) => {
+      const ok = await confirmBool({
+        title: "Delete test",
+        description: `Delete "${test.name}" and all its history?`,
+        confirmText: "Delete",
+        confirmColor: "error",
+        confirmVariant: "contained",
+        cancelText: "Cancel",
+      });
+      if (!ok) return;
+      await deleteRegressionTest(test.pid);
+      queryClient.invalidateQueries({ queryKey: ["regression-tests"] });
+    },
+    [confirmBool, queryClient],
+  );
+
+  const handleRemoveCollection = useCallback(
+    async (test: RegressionTest, colPid: string) => {
+      await updateRegressionTest(test.pid, {
+        collections: test.collections
+          .filter((c) => c.pid !== colPid)
+          .map((c) => ({ pid: c.pid, expected_result: c.expected_result })),
+      });
       queryClient.invalidateQueries({ queryKey: ["regression-tests"] });
     },
     [queryClient],
   );
 
-  useTaskPolling(runStates, handleTaskComplete);
+  const handleUpdateExpected = useCallback(
+    async (test: RegressionTest, colPid: string, expected: number | null) => {
+      await updateRegressionTest(test.pid, {
+        collections: test.collections.map((c) =>
+          c.pid === colPid
+            ? { pid: c.pid, expected_result: expected }
+            : { pid: c.pid, expected_result: c.expected_result },
+        ),
+      });
+      queryClient.invalidateQueries({ queryKey: ["regression-tests"] });
+    },
+    [queryClient],
+  );
+
+  useTaskPolling(effectiveRunStates, handleTaskComplete);
 
   const columns = useMemo(
-    (): MRT_ColumnDef<FlatRow>[] => [
+    (): MRT_ColumnDef<TableRow>[] => [
       {
         id: "test",
         header: "Test",
-        Cell: ({ row }) => (
-          <Typography variant="body2">{row.original.test.name}</Typography>
-        ),
+        Cell: ({ row }) => {
+          if (row.original.kind !== "test") return null;
+          return (
+            <Typography variant="body2" fontWeight="bold">
+              {row.original.test.name}
+            </Typography>
+          );
+        },
       },
       {
         id: "collection",
         header: "Collection",
-        accessorFn: (row) => row.col?.name ?? "—",
-        Cell: ({ cell }) => (
-          <Typography variant="body2">{cell.getValue<string>()}</Typography>
-        ),
+        Cell: ({ row }) => {
+          if (row.original.kind !== "collection") return null;
+          return (
+            <Typography variant="body2">{row.original.col.name}</Typography>
+          );
+        },
       },
       {
         id: "expected",
         header: "Expected",
         size: 100,
-        accessorFn: (row) => row.col?.expected_result,
-        Cell: ({ cell }) => {
-          const expected = cell.getValue<number | null | undefined>();
-          if (expected === null || expected === undefined) return "—";
+        Cell: ({ row }) => {
+          if (row.original.kind !== "collection") return null;
+          const { test, col } = row.original;
           return (
-            <Chip
-              label={expected.toLocaleString()}
-              size="small"
-              variant="outlined"
+            <EditableExpected
+              col={col}
+              onSave={(val) => handleUpdateExpected(test, col.pid, val)}
             />
           );
         },
@@ -199,16 +254,12 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
         id: "actual",
         header: "Actual",
         size: 100,
-        accessorFn: (row) => ({
-          actual: row.col?.tasks[0]?.result?.count,
-          expected: row.col?.expected_result,
-        }),
-        Cell: ({ cell }) => {
-          const { actual, expected } = cell.getValue<{
-            actual: number | null | undefined;
-            expected: number | null | undefined;
-          }>();
-          if (actual === null || actual === undefined) return "—";
+        Cell: ({ row }) => {
+          if (row.original.kind !== "collection") return null;
+          const { col } = row.original;
+          const actual = col.tasks[0]?.result?.count;
+          const expected = col.expected_result;
+          if (actual === null || actual === undefined) return <>—</>;
           const matched = expected != null ? actual === expected : null;
           return (
             <Chip
@@ -230,19 +281,17 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
         id: "time",
         header: "Time",
         size: 80,
-        accessorFn: (row) => {
-          const task = row.col?.tasks[0];
-          return getDurationSeconds(
+        Cell: ({ row }) => {
+          if (row.original.kind !== "collection") return null;
+          const task = row.original.col.tasks[0];
+          const duration = getDurationSeconds(
             task?.created_at,
             task?.completed_at ?? task?.failed_at,
           );
-        },
-        Cell: ({ cell }) => {
-          const duration = cell.getValue<string | null>();
           return duration ? (
             <Typography variant="body2">{duration}</Typography>
           ) : (
-            "—"
+            <>—</>
           );
         },
       },
@@ -250,27 +299,23 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
         id: "runs",
         header: "Runs",
         size: 70,
-        accessorFn: (row) => row.col?.run_count,
-        Cell: ({ cell }) => {
-          const n = cell.getValue<number | undefined>();
-          return n != null && n > 0 ? (
-            <Typography variant="body2">{n}</Typography>
-          ) : (
-            "—"
-          );
+        Cell: ({ row }) => {
+          if (row.original.kind !== "collection") return null;
+          const n = row.original.col.run_count;
+          return n > 0 ? <Typography variant="body2">{n}</Typography> : <>—</>;
         },
       },
       {
         id: "passRate",
         header: "Pass Rate",
         size: 90,
-        accessorFn: (row) => row.col?.pass_rate,
-        Cell: ({ cell }) => {
-          const rate = cell.getValue<number | null | undefined>();
+        Cell: ({ row }) => {
+          if (row.original.kind !== "collection") return null;
+          const rate = row.original.col.pass_rate;
           return rate != null ? (
             <Typography variant="body2">{rate}%</Typography>
           ) : (
-            "—"
+            <>—</>
           );
         },
       },
@@ -278,15 +323,15 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
         id: "lastRun",
         header: "Last Run",
         size: 155,
-        accessorFn: (row) => row.col?.last_run_at,
-        Cell: ({ cell }) => {
-          const ts = cell.getValue<string | null | undefined>();
+        Cell: ({ row }) => {
+          if (row.original.kind !== "collection") return null;
+          const ts = row.original.col.last_run_at;
           return ts ? (
             <Typography variant="caption" color="text.secondary">
               {getDatetime(ts)}
             </Typography>
           ) : (
-            "—"
+            <>—</>
           );
         },
       },
@@ -295,45 +340,89 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
         header: "Status",
         size: 100,
         Cell: ({ row }) => {
-          const isRunning = !!runStates[row.original.test.pid];
-          if (isRunning) return <CircularProgress size={16} />;
-          return <PassFailChip value={row.original.col?.last_passed} />;
+          if (row.original.kind === "test") {
+            const { test } = row.original;
+            const anyRunning =
+              !!effectiveRunStates[test.pid] ||
+              test.collections.some(
+                (c) => !!effectiveRunStates[`${test.pid}::${c.pid}`],
+              );
+            return anyRunning ? <CircularProgress size={16} /> : null;
+          }
+          const { test, col } = row.original;
+          if (!!effectiveRunStates[`${test.pid}::${col.pid}`])
+            return <CircularProgress size={16} />;
+          const latestTask = col.tasks[0];
+          const passValue = latestTask?.failed_at ? false : col.last_passed;
+          return <PassFailChip value={passValue} />;
         },
       },
       {
         id: "controls",
         header: "",
-        size: 120,
+        size: 140,
         muiTableBodyCellProps: { sx: { whiteSpace: "nowrap" } },
         Cell: ({ row }) => {
-          const isRunning = !!runStates[row.original.test.pid];
+          if (row.original.kind === "test") {
+            const { test } = row.original;
+            const anyRunning =
+              !!effectiveRunStates[test.pid] ||
+              test.collections.some(
+                (c) => !!effectiveRunStates[`${test.pid}::${c.pid}`],
+              );
+            return (
+              <Stack direction="row" alignItems="center" spacing={0.5}>
+                <Tooltip title="Run all collections">
+                  <span>
+                    <IconButton
+                      size="small"
+                      onClick={() => handleRun(test.pid)}
+                      disabled={anyRunning}
+                    >
+                      <PlayArrowIcon fontSize="small" />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+                <Tooltip title="Edit">
+                  <IconButton size="small" onClick={() => openEdit(test)}>
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Delete test">
+                  <IconButton
+                    size="small"
+                    onClick={() => handleDeleteTest(test)}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </Stack>
+            );
+          }
+
+          const { test, col } = row.original;
+          const isRunning =
+            !!effectiveRunStates[`${test.pid}::${col.pid}`] ||
+            !!effectiveRunStates[test.pid];
           return (
             <Stack direction="row" alignItems="center" spacing={0.5}>
-              <Tooltip title="Run">
+              <Tooltip title="Run this collection">
                 <span>
                   <IconButton
                     size="small"
-                    onClick={() => handleRun(row.original.test.pid)}
+                    onClick={() => handleRun(test.pid, col.pid)}
                     disabled={isRunning}
                   >
                     <PlayArrowIcon fontSize="small" />
                   </IconButton>
                 </span>
               </Tooltip>
-              <Tooltip title="Edit">
+              <Tooltip title="Remove from test">
                 <IconButton
                   size="small"
-                  onClick={() => openEdit(row.original.test)}
+                  onClick={() => handleRemoveCollection(test, col.pid)}
                 >
-                  <EditIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Delete">
-                <IconButton
-                  size="small"
-                  onClick={() => handleDelete(row.original.test.pid)}
-                >
-                  <DeleteIcon fontSize="small" />
+                  <RemoveCircleOutlineIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
             </Stack>
@@ -341,22 +430,30 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
         },
       },
     ],
-    [runStates, handleRun, openEdit, handleDelete],
+    [
+      effectiveRunStates,
+      handleRun,
+      openEdit,
+      handleDeleteTest,
+      handleRemoveCollection,
+      handleUpdateExpected,
+    ],
   );
 
   const table = useTable({
     data: rows,
     columns,
-    getRowId: (row) => `${row?.test?.pid ?? ""}-${row.col?.pid ?? "empty"}`,
+    getRowId: (row) =>
+      row?.kind === "test"
+        ? `test-${row.test.pid}`
+        : `col-${row?.col?.pid ?? ""}`,
     enableRowSelection: false,
     enableSorting: false,
     state: { isLoading },
-    enableExpanding: true,
-    renderDetailPanel: ({ row }) => {
-      const col = row.original.col;
-      if (!col) return null;
-      return <CollectionTaskHistory col={col} />;
-    },
+    muiTableBodyRowProps: ({ row }) => ({
+      sx:
+        row.original.kind === "test" ? { backgroundColor: "action.hover" } : {},
+    }),
   });
 
   return (

@@ -62,10 +62,12 @@ const SelectNetworkDatasets = ({
               onChange={() => {
                 handleSelectNetwork();
               }}
+              sx={{ p: 0 }}
             />
           }
           title={networkCollections.network?.name ?? "No network"}
           subTitle={`${nSelected}/${nTotal} Collections Selected`}
+          centerTitleContent
           useSeparator={false}
         />
       </AccordionSummary>

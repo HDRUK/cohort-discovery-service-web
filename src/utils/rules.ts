@@ -32,6 +32,22 @@ export enum RuleErrors {
   NO_QUERY_FOUND = "No valid query could be found for your search term.",
 }
 
+export const insertMissingOperators = (
+  rules: Array<RuleNodeType>,
+  combinator: CombinatorType = CombinatorType.OR,
+): Array<RuleNodeType> =>
+  rules.reduce<Array<RuleNodeType>>((acc, rule) => {
+    const previous = acc.at(-1);
+
+    if (previous && !isOperator(previous) && !isOperator(rule)) {
+      acc.push(createOperator(combinator));
+    }
+
+    acc.push(rule);
+
+    return acc;
+  }, []);
+
 export const createRule = (
   rule: ConceptOperator = { concept: null },
   exclude = false,
@@ -44,10 +60,11 @@ export const createRule = (
 export const createRuleGroup = (
   rules: Array<RuleNodeType> = [createRule(), createOperator(), createRule()],
   exclude = false,
+  combinator: CombinatorType = CombinatorType.OR,
 ): RuleGroupType => ({
   id: uuidv4(),
   exclude,
-  rules,
+  rules: insertMissingOperators(rules, combinator),
 });
 
 export const createOperator = (
@@ -127,27 +144,60 @@ export function groupToRules(
   return (normaliseExclude ? normaliseGroupExclude(group) : group).rules;
 }
 
-export const isUnknownRule = (rule: RuleLeafType): boolean =>
-  !!rule.rule.concept?.name && rule.rule.concept?.concept_id === null;
+export const isUnknownRule = (rule: RuleLeafType): boolean => {
+  const concept = rule.rule.concept;
+  if (Array.isArray(concept) || concept == null) return false;
+  return !!concept.name && concept.concept_id === null;
+};
 
-export const isEmptyRule = (rule: RuleLeafType): boolean =>
-  rule.rule.concept === null || rule.rule.concept?.concept_id === null;
+export const isEmptyRule = (rule: RuleLeafType): boolean => {
+  const concept = rule.rule.concept;
+  if (Array.isArray(concept)) return false;
+  return concept === null || concept?.concept_id === null;
+};
 
 export const isSingleConcept = (
-  concept: Concept | null,
-): concept is Concept & { alternatives: undefined } =>
-  concept != null && !isMultipleConcept(concept);
+  concept: Concept | Concept[] | null,
+): concept is Concept =>
+  concept != null && !Array.isArray(concept) && !concept.alternatives?.length;
 
-export const isMultipleConcept = (
-  concept: Concept | null,
+export const hasAlternatives = (
+  concept: Concept | Concept[] | null,
 ): concept is Concept & { alternatives: Concept[] } =>
   concept != null &&
-  Array.isArray(concept?.alternatives) &&
-  concept!.alternatives.length > 0;
+  !Array.isArray(concept) &&
+  Array.isArray(concept.alternatives) &&
+  concept.alternatives.length > 0;
+
+export const isMultipleConcept = (
+  concept: Concept | Concept[] | null,
+): concept is Concept[] =>
+  Array.isArray(concept) && concept.length > 0;
+
+export const getPrimaryConcept = (
+  concept: Concept | Concept[] | null,
+): Concept | null => {
+  if (concept == null) return null;
+  return Array.isArray(concept) ? (concept[0] ?? null) : concept;
+};
 
 export const isRuleGroup = (n: RuleNodeType): n is RuleGroupType =>
   "rules" in n;
 export const isRuleLeaf = (n: RuleNodeType): n is RuleLeafType => "rule" in n;
+
+export const findRulesWithAlternatives = (
+  rules: RuleNodeType[],
+  limit = Infinity,
+): string[] =>
+  rules
+    .flatMap((rule) =>
+      isRuleLeaf(rule) && hasAlternatives(rule.rule.concept)
+        ? [rule.id as string]
+        : isRuleGroup(rule)
+          ? findRulesWithAlternatives(rule.rules)
+          : [],
+    )
+    .slice(0, limit);
 
 export const isAgeFilter = (n: RuleNodeType): n is AgeFilterType =>
   "value" in n;
@@ -487,15 +537,14 @@ export function validateRuleTree(
 
     let node = validateNode(leaf);
     if (isUnknownRule(leaf)) {
-      node = invalidateNode(
-        node,
-        `${RuleErrors.UNKNOWN_RULE} ${leaf.rule.concept?.name}`,
-      );
+      const c = leaf.rule.concept;
+      const name = !Array.isArray(c) ? c?.name : "";
+      node = invalidateNode(node, `${RuleErrors.UNKNOWN_RULE} ${name}`);
     } else if (isEmptyRule(leaf)) {
       node = invalidateNode(node, RuleErrors.EMPTY_RULE);
     }
 
-    if (isMultipleConcept(leaf.rule.concept)) {
+    if (hasAlternatives(leaf.rule.concept)) {
       node = invalidateNode(node, RuleErrors.HAS_ALTERNATIVES);
     }
     node = validateConstraints(node as RuleLeafType);
@@ -644,6 +693,42 @@ export function validateRuleTree(
 
   return validatedRoot;
 }
+
+export const removeConceptFromSource =
+  (concept: Concept) =>
+  (node: RuleNodeType): RuleNodeType => {
+    if (!isRuleLeaf(node) || !isMultipleConcept(node.rule.concept)) return node;
+    const remaining = (node.rule.concept as Concept[]).filter(
+      (c) => c.concept_id !== concept.concept_id,
+    );
+    if (remaining.length === 1) {
+      const { alternatives: _omit, ...single } = remaining[0] as Concept & {
+        alternatives?: Concept[];
+      };
+      return { ...node, rule: { ...node.rule, concept: single } };
+    }
+    return { ...node, rule: { ...node.rule, concept: remaining } };
+  };
+
+export const normaliseOps = (group: RuleNodeType): RuleNodeType => {
+  if (!isRuleGroup(group)) return group;
+  const existingOp = group.rules.find(isOperator);
+  const combinator = existingOp ? existingOp.combinator : CombinatorType.OR;
+  return { ...group, rules: insertMissingOperators(group.rules, combinator) };
+};
+
+export const mergeConceptIntoRule =
+  (concept: Concept) =>
+  (node: RuleNodeType): RuleNodeType => {
+    if (!isRuleLeaf(node)) return node;
+    const existing = node.rule.concept;
+    const merged = Array.isArray(existing)
+      ? [...existing, concept]
+      : existing != null
+        ? [existing, concept]
+        : concept;
+    return { ...node, rule: { ...node.rule, concept: merged } };
+  };
 
 export function getSelectedOrdered(
   selected: Record<UniqueIdentifier, boolean>,

@@ -9,20 +9,25 @@ import {
   useCallback,
   useRef,
   useMemo,
+  useEffect,
 } from "react";
 import {
-  Checkbox,
   FormControlLabel,
   FormGroup,
   Box,
   Divider,
   Button,
 } from "@mui/material";
+import SquareCheckbox from "@/components/SquareCheckbox";
 import { ConceptItem, ConceptItemProps } from "./ConceptItem";
 import useUserStore from "@/hooks/useUserStore";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import { DEFAULT_CODES_PER_PAGE } from "@/config/defaults";
+import {
+  DEFAULT_CODES_PER_PAGE,
+  DEFAULT_SEARCH_RESULTS_MAX_HEIGHT,
+} from "@/config/defaults";
 import useFeatures from "@/hooks/useFeatures";
+import { mergeSx } from "@/utils/helpers";
 
 interface SlotProps {
   conceptItem: ConceptItemProps;
@@ -33,17 +38,36 @@ interface SearchConceptsProps {
   selected?: Record<number, boolean>;
   setSelected?: Dispatch<SetStateAction<Record<number, boolean>>>;
   multiple?: boolean;
+  hideSelectAll?: boolean;
   onClick?: (concept: Concept) => void;
+  onToggle?: (concept: Concept, isSelected: boolean) => void;
+  onHasOptions?: (hasOptions: boolean) => void;
+  headerSlot?: React.ReactNode;
   slotProps?: SlotProps;
 }
+
+const searchResultsSx = {
+  alignItems: "stretch",
+  flexDirection: "column",
+  flexWrap: "nowrap",
+  maxHeight: DEFAULT_SEARCH_RESULTS_MAX_HEIGHT,
+  mt: 2,
+  overflowX: "hidden",
+  overflowY: "auto",
+  pr: 1,
+};
 
 const SearchConcepts = ({
   domain,
   selected,
   setSelected,
   onClick,
+  onToggle,
+  onHasOptions,
+  headerSlot,
   slotProps,
   multiple = false,
+  hideSelectAll = false,
 }: SearchConceptsProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const searchForConcepts = useUserStore((s) => s.searchForConcepts);
@@ -51,12 +75,13 @@ const SearchConcepts = ({
     (qb) => qb.hasSelectedSyntheticDatasets,
   );
 
-  const [perPage, setPerPage] = useState(DEFAULT_CODES_PER_PAGE);
   const [activeResult, setActiveResult] = useState<Paginated<
     Partial<Concept>
   > | null>(null);
 
   const lastQueryRef = useRef<string>("");
+  const resultsContainerRef = useRef<HTMLDivElement | null>(null);
+  const prevPageRef = useRef(0);
   const initialSelectedRef = useRef<Record<number, boolean>>({
     ...(selected ?? {}),
   });
@@ -80,13 +105,14 @@ const SearchConcepts = ({
       const next = { ...prev };
       visibleOptions.forEach((o) => {
         next[o.concept_id] = !allSelected;
+        onToggle?.(o, !allSelected);
       });
       return next;
     });
-  }, [visibleOptions, allSelected, setSelected]);
+  }, [visibleOptions, allSelected, setSelected, onToggle]);
 
   const onSearch = useCallback(
-    async (value: string, force = false, customPerPage?: number) => {
+    async (value: string, force = false, page = 1, append = false) => {
       const trimmedValue = value.trim().length < 3 ? "" : value.trim();
       const isNewSearch = trimmedValue !== lastQueryRef.current;
 
@@ -100,52 +126,57 @@ const SearchConcepts = ({
         setNonSyntheticOptions([]);
         setSyntheticOptions([]);
         setNoOptionsFound(false);
+        onHasOptions?.(false);
         return;
       }
 
-      let effectivePerPage = perPage;
-
       if (isNewSearch) {
-        effectivePerPage = DEFAULT_CODES_PER_PAGE;
-        setPerPage(DEFAULT_CODES_PER_PAGE);
         setSelected?.({ ...initialSelectedRef.current });
-      }
-
-      if (customPerPage) {
-        effectivePerPage = customPerPage;
       }
 
       setIsLoading(true);
 
-      const res = await searchForConcepts({
-        searchTerm: trimmedValue,
-        perPage: effectivePerPage,
-        domain,
-      });
+      try {
+        const res = await searchForConcepts({
+          searchTerm: trimmedValue,
+          perPage: DEFAULT_CODES_PER_PAGE,
+          page,
+          domain,
+        });
 
-      const results = (res.data as Concept[]) ?? [];
+        const results = (res.data as Concept[]) ?? [];
 
-      const nonSynthetic: Concept[] = [];
-      const synthetic: Concept[] = [];
+        const nonSynthetic: Concept[] = [];
+        const synthetic: Concept[] = [];
 
-      results.forEach((o) => {
-        const allSynthetic = o.all_synthetic ?? 0;
-        if (allSynthetic === 1) {
-          if (includeSynthetic) synthetic.push(o);
+        results.forEach((o) => {
+          const allSynthetic = o.all_synthetic ?? 0;
+          if (allSynthetic === 1) {
+            if (includeSynthetic) synthetic.push(o);
+          } else {
+            nonSynthetic.push(o);
+          }
+        });
+
+        const hasVisibleOptions = nonSynthetic.length + synthetic.length > 0;
+
+        if (append) {
+          setNonSyntheticOptions((prev) => [...prev, ...nonSynthetic]);
+          setSyntheticOptions((prev) => [...prev, ...synthetic]);
+          setNoOptionsFound(false);
         } else {
-          nonSynthetic.push(o);
+          setNonSyntheticOptions(nonSynthetic);
+          setSyntheticOptions(synthetic);
+          setNoOptionsFound(!hasVisibleOptions);
         }
-      });
 
-      const hasVisibleOptions = nonSynthetic.length + synthetic.length > 0;
-
-      setNonSyntheticOptions(nonSynthetic);
-      setSyntheticOptions(synthetic);
-      setNoOptionsFound(!hasVisibleOptions);
-      setActiveResult(hasVisibleOptions ? res : null);
-      setIsLoading(false);
+        setActiveResult(append || hasVisibleOptions ? res : null);
+        onHasOptions?.(append || hasVisibleOptions);
+      } finally {
+        setIsLoading(false);
+      }
     },
-    [domain, searchForConcepts, setSelected, includeSynthetic, perPage],
+    [domain, searchForConcepts, setSelected, includeSynthetic, onHasOptions],
   );
 
   const handleToggle = useCallback(
@@ -170,6 +201,7 @@ const SearchConcepts = ({
       handleClick={(id, e) => {
         onClick?.(c);
         handleToggle(id);
+        onToggle?.(c, !selected?.[c.concept_id]);
         e.stopPropagation();
         e.preventDefault();
       }}
@@ -178,12 +210,30 @@ const SearchConcepts = ({
     />
   );
 
-  const handleShowMore = useCallback(() => {
-    const nextPerPage =
-      (activeResult?.per_page ?? perPage) + DEFAULT_CODES_PER_PAGE;
-    setPerPage(nextPerPage);
-    onSearch(lastQueryRef.current, true, nextPerPage);
-  }, [activeResult, perPage, onSearch]);
+  const handleShowMore = useCallback(async () => {
+    if (isLoading || !activeResult) return;
+
+    const nextPage = activeResult.current_page + 1;
+    await onSearch(lastQueryRef.current, true, nextPage, true);
+  }, [activeResult, onSearch, isLoading]);
+
+  // Scroll to the end of the results when new results are loaded via "Show more"
+  useEffect(() => {
+    const current = activeResult?.current_page ?? 0;
+    if (current > prevPageRef.current && prevPageRef.current > 0) {
+      resultsContainerRef.current?.scrollTo?.({
+        top: resultsContainerRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+    prevPageRef.current = current;
+  }, [activeResult?.current_page]);
+
+  const loadedCount = activeResult?.to ?? visibleOptions.length;
+  const hasMoreResults =
+    activeResult &&
+    activeResult.current_page < activeResult.last_page &&
+    loadedCount < activeResult.total;
 
   return (
     <Box>
@@ -200,12 +250,20 @@ const SearchConcepts = ({
         }
         debounceMs={400}
       />
-      <FormGroup sx={{ mt: 2 }}>
-        {multiple && visibleOptions.length > 0 && (
+      {headerSlot}
+      <FormGroup
+        ref={resultsContainerRef}
+        data-testid="search-concepts-results"
+        sx={mergeSx(searchResultsSx, { mt: headerSlot ? 0 : 2 })}
+      >
+        {multiple && !hideSelectAll && visibleOptions.length > 0 && (
           <>
             <FormControlLabel
               control={
-                <Checkbox checked={allSelected} onChange={toggleSelectAll} />
+                <SquareCheckbox
+                  checked={allSelected}
+                  onChange={toggleSelectAll}
+                />
               }
               label="Select All"
             />
@@ -224,21 +282,22 @@ const SearchConcepts = ({
             {syntheticOptions.map(renderConceptItem)}
           </>
         )}
-        {activeResult && activeResult.per_page < activeResult.total && (
-          <Box>
-            <Button
-              variant="text"
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                handleShowMore();
-              }}
-            >
-              Show more ({activeResult.per_page} / {activeResult.total})
-            </Button>
-          </Box>
-        )}
       </FormGroup>
+      {hasMoreResults && (
+        <Box sx={{ mt: 1 }}>
+          <Button
+            variant="text"
+            disabled={isLoading}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              handleShowMore();
+            }}
+          >
+            Show more ({loadedCount} / {activeResult.total})
+          </Button>
+        </Box>
+      )}
     </Box>
   );
 };

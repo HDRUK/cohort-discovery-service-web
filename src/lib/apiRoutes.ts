@@ -48,6 +48,8 @@ export const API_ROUTES = {
   regressionTestsAdmin: `${API_URL}/admin/regression-tests`,
   regressionTest: (pid: string) => `${API_URL}/regression-tests/${pid}`,
   runRegressionTest: (pid: string) => `${API_URL}/regression-tests/${pid}/run`,
+  runRegressionTestSingle: (pid: string, collectionPid: string) =>
+    `${API_URL}/regression-tests/${pid}/run/${collectionPid}`,
   workgroups: `${API_URL}/workgroups`,
   authCallback: "http://localhost:8100/auth/callback",
   users: `${API_URL}/users`,
