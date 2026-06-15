@@ -72,11 +72,12 @@ export const ConceptItem = ({
   const id = concept.concept_id!;
 
   const nameEl = (
-    <Typography>
+    <Typography noWrap title={concept.name}>
       {concept.name}
       {showCode && (
         <>
-          {" "}(
+          {" "}
+          (
           <Box component="span" sx={{ color: "grey.500" }}>
             OMOP
           </Box>{" "}
@@ -134,7 +135,12 @@ export const ConceptItem = ({
     >
       {multiple ? (
         <FormControlLabel
-          sx={{ p: 0, m: 0, width: "100%", "& .MuiFormControlLabel-label": { width: "100%" } }}
+          sx={{
+            p: 0,
+            m: 0,
+            width: "100%",
+            "& .MuiFormControlLabel-label": { width: "100%" },
+          }}
           control={
             <SquareCheckbox
               checked={isSelected}
