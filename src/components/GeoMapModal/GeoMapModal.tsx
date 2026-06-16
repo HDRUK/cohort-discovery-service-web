@@ -11,9 +11,26 @@ import {
   useMapEvents,
 } from "react-leaflet";
 import { useEffect, useState } from "react";
-import { Box, Button, Slider, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormControlLabel,
+  Slider,
+  Stack,
+  Switch,
+  Typography,
+} from "@mui/material";
 import Modal from "@/components/Modal";
 import { GeoRadiusLocation } from "@/types/rules";
+import { formatRadius } from "./formatRadius";
+import LSOABoundaries from "./LSOABoundaries";
+
+const MIN_RADIUS = 10_000;
+const MAX_RADIUS = 1_000_000;
+const sliderToMeters = (v: number) =>
+  Math.round(MIN_RADIUS * Math.pow(MAX_RADIUS / MIN_RADIUS, v / 100));
+const metersToSlider = (m: number) =>
+  (Math.log(m / MIN_RADIUS) / Math.log(MAX_RADIUS / MIN_RADIUS)) * 100;
 
 const pinIcon = new L.DivIcon({
   className: "",
@@ -21,8 +38,6 @@ const pinIcon = new L.DivIcon({
   iconSize: [16, 16],
   iconAnchor: [8, 8],
 });
-
-export const formatRadius = (m: number) => `${(m / 1000).toFixed(1)} km`;
 
 function InvalidateOnMount() {
   const map = useMap();
@@ -68,12 +83,15 @@ export default function GeoMapModal({
     initialLocation ? [initialLocation.lat, initialLocation.lon] : null,
   );
   const [radius, setRadius] = useState(initialLocation?.radius ?? 50000);
+  const [showBoundaries, setShowBoundaries] = useState(true);
 
   // Reset draft state each time the modal opens
   const [lastOpen, setLastOpen] = useState(false);
   if (!lastOpen && open) {
     setLastOpen(true);
-    setPosition(initialLocation ? [initialLocation.lat, initialLocation.lon] : null);
+    setPosition(
+      initialLocation ? [initialLocation.lat, initialLocation.lon] : null,
+    );
     setRadius(initialLocation?.radius ?? 50000);
   } else if (lastOpen && !open) {
     setLastOpen(false);
@@ -90,7 +108,7 @@ export default function GeoMapModal({
       open={open}
       onClose={onClose}
       title="Pick location"
-      maxWidth="md"
+      maxWidth="lg"
       actionLabel="Cancel"
       additionalActions={
         <Button
@@ -103,9 +121,23 @@ export default function GeoMapModal({
       }
     >
       <Stack spacing={2}>
+        <Stack direction="row" justifyContent="flex-end" alignItems="center">
+          <FormControlLabel
+            control={
+              <Switch
+                size="small"
+                checked={showBoundaries}
+                onChange={(_, checked) => setShowBoundaries(checked)}
+              />
+            }
+            label={
+              <Typography variant="body2">Show LSOA boundaries</Typography>
+            }
+          />
+        </Stack>
         <Box
           sx={{
-            height: 400,
+            height: 600,
             width: "100%",
             "& .leaflet-container": { borderRadius: 1 },
           }}
@@ -113,6 +145,7 @@ export default function GeoMapModal({
           <MapContainer
             center={position ?? defaultCenter}
             zoom={position ? 10 : 6}
+            maxZoom={13}
             style={{ height: "100%", width: "100%" }}
           >
             <TileLayer
@@ -120,6 +153,11 @@ export default function GeoMapModal({
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             <InvalidateOnMount />
+            <LSOABoundaries
+              pinPosition={position}
+              radius={radius}
+              enabled={showBoundaries}
+            />
             <LocationMarker
               position={position}
               onPositionChange={setPosition}
@@ -143,11 +181,11 @@ export default function GeoMapModal({
             Radius: {formatRadius(radius)}
           </Typography>
           <Slider
-            value={radius}
-            onChange={(_, v) => setRadius(v as number)}
-            min={10000}
-            max={1000000}
-            step={1000}
+            value={metersToSlider(radius)}
+            onChange={(_, v) => setRadius(sliderToMeters(v as number))}
+            min={0}
+            max={100}
+            step={0.5}
           />
           <Stack direction="row" justifyContent="space-between">
             <Typography variant="caption" color="text.secondary">

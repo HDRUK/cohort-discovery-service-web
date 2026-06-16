@@ -2,6 +2,7 @@ import { ConceptOperator, RuleGroupType, RuleNodeType } from "@/types/rules";
 import {
   hasAlternatives,
   isDemographicFilter,
+  isGeoRadiusLocation,
   isMultipleConcept,
   isOperator,
   isRuleGroup,
@@ -11,6 +12,7 @@ import {
 import { MAX_AGE_FILTER, MIN_AGE_FILTER } from "@/config/rules";
 import { UniqueIdentifier } from "@dnd-kit/core";
 import { getDomainPhrase } from "./omop";
+import { formatRadius } from "@/components/GeoMapModal/formatRadius";
 
 type Piece = { verb?: string | null; text: string };
 
@@ -199,34 +201,31 @@ const queryToText = (
     if (isDemographicFilter(n)) {
       const [minAge, maxAge] = n.value;
 
-      if (
-        [MIN_AGE_FILTER, null].includes(minAge) &&
-        [MAX_AGE_FILTER, null].includes(maxAge)
-      ) {
-        return [{ text: "are of any age" }];
+      const hasMinAge = minAge != null && minAge > MIN_AGE_FILTER;
+      const hasMaxAge = maxAge != null && maxAge < MAX_AGE_FILTER;
+
+      let ageText = "";
+      if (hasMinAge && hasMaxAge) {
+        ageText = `are between ${minAge} and ${maxAge} years old`;
+      } else if (hasMinAge) {
+        ageText = `are older than ${minAge} years`;
+      } else if (hasMaxAge) {
+        ageText = `are younger than ${maxAge} years`;
       }
 
-      if (
-        minAge != null &&
-        minAge > MIN_AGE_FILTER &&
-        [MAX_AGE_FILTER, null].includes(maxAge)
-      ) {
-        return [{ text: `are older than ${minAge} years` }];
+      let locationText = "";
+      if (n.location && isGeoRadiusLocation(n.location)) {
+        const { lat, lon, radius } = n.location;
+        locationText = `live within ${formatRadius(radius)} of (${lat.toFixed(3)}, ${lon.toFixed(3)})`;
       }
 
-      if (
-        [MIN_AGE_FILTER, null].includes(minAge) &&
-        maxAge != null &&
-        maxAge < MAX_AGE_FILTER
-      ) {
-        return [{ text: `are younger than ${maxAge} years` }];
+      if (ageText && locationText) {
+        return [{ text: `${ageText} and ${locationText}` }];
       }
+      if (ageText) return [{ text: ageText }];
+      if (locationText) return [{ text: locationText }];
 
-      if (minAge != null && maxAge != null) {
-        return [{ text: `are between ${minAge} and ${maxAge} years old` }];
-      }
-
-      return [];
+      return [{ text: "are of any age" }];
     }
 
     if (isRuleLeaf(n)) {

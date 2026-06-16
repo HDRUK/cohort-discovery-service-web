@@ -1,2 +1,1 @@
-export { default } from "./GeoMapModal";
-export { formatRadius } from "./GeoMapModal";
+export { formatRadius } from "./formatRadius";

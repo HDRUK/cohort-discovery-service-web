@@ -2,7 +2,7 @@
 
 import { Query, Task, Result } from "../../types/api";
 import { MRT_TableOptions, type MRT_ColumnDef } from "material-react-table";
-import { CircularProgress, Link } from "@mui/material";
+import { CircularProgress, Link, Stack } from "@mui/material";
 import ErrorIcon from "@/components/ErrorIcon";
 import LaunchIcon from "@mui/icons-material/Launch";
 import { useEffect, useMemo } from "react";
@@ -17,6 +17,13 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import QueryHistoryGuidance from "../QueryHistory";
 import { useDefaults } from "@/providers/DefaultProvider";
 import TwoPaneSwimLaneLayout from "@/modules/TwoPaneSwimLaneLayout";
+import dynamic from "next/dynamic";
+import { isDemographicFilter, isGeoRadiusLocation } from "@/utils/rules";
+
+const GeoMapReadOnly = dynamic(
+  () => import("@/components/GeoMapModal/GeoMapReadOnly"),
+  { ssr: false },
+);
 
 interface QueryResultsTableProps {
   initialData: Query;
@@ -179,6 +186,15 @@ const QueryResultsTable = ({
     return tasks;
   }, [tasks, currentSortDirection]);
 
+  const geoLocation = useMemo(() => {
+    for (const rule of initialData.definition.rules) {
+      if (isDemographicFilter(rule) && rule.location && isGeoRadiusLocation(rule.location)) {
+        return rule.location;
+      }
+    }
+    return null;
+  }, [initialData.definition.rules]);
+
   const table = useTable<Task>({
     columns,
     data: sortedTasks,
@@ -187,17 +203,24 @@ const QueryResultsTable = ({
 
   const tableContent = <Table table={table} {...tableProps} />;
 
+  const leftContent = (
+    <Stack spacing={2}>
+      {tableContent}
+      {geoLocation && <GeoMapReadOnly location={geoLocation} />}
+    </Stack>
+  );
+
   return (
     <>
       {showGuidance ? (
         <TwoPaneSwimLaneLayout
-          left={tableContent}
+          left={leftContent}
           right={
             <QueryHistoryGuidance resultsView currentResult={initialData.pid} />
           }
         />
       ) : (
-        tableContent
+        leftContent
       )}
     </>
   );
