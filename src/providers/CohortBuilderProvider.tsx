@@ -115,7 +115,7 @@ export const CohortBuilderProvider = ({
     boardIndex,
     createNewGroup,
     createNewRule,
-    createNewAgeFilter,
+    createNewDemographicFilter,
     createNewOperator,
   } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
@@ -123,7 +123,7 @@ export const CohortBuilderProvider = ({
     boardIndex: qb.boardIndex,
     createNewGroup: qb.createNewGroup,
     createNewRule: qb.createNewRule,
-    createNewAgeFilter: qb.createNewAgeFilter,
+    createNewDemographicFilter: qb.createNewDemographicFilter,
     createNewOperator: qb.createNewOperator,
   }));
 
@@ -348,10 +348,10 @@ export const CohortBuilderProvider = ({
     () => [
       { action: () => createAndScroll(createNewRule), label: "Add rule" },
       { action: () => createAndScroll(createNewOperator), label: "Add and/or" },
-      { action: () => createAndScroll(createNewAgeFilter), label: "Add age rule" },
+      { action: () => createAndScroll(createNewDemographicFilter), label: "Add demographic" },
       { action: () => createAndScroll(createNewGroup), label: "Add group" },
     ],
-    [createAndScroll, createNewAgeFilter, createNewRule, createNewGroup, createNewOperator],
+    [createAndScroll, createNewDemographicFilter, createNewRule, createNewGroup, createNewOperator],
   );
 
   const value = useMemo(

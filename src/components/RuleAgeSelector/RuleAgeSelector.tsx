@@ -29,7 +29,7 @@ const RuleAgeSelector = ({
 }: RuleAgeSelectorProps) => {
   const { constrainForBunnyV1 } = useFeatures();
 
-  const values = isRuleLeaf(rule) ? rule.ageConstraint : rule.value;
+  const values = isRuleLeaf(rule) ? rule.ageConstraint : rule.age;
   if (!values) return null;
 
   const from = values[0] ?? MIN_AGE_FILTER;

@@ -1,6 +1,7 @@
 import { create, StateCreator } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import parseQuery from "@/actions/query/parseQuery";
+import getDistributionConcepts from "@/actions/concept/getDistributionConcepts";
 import { queryToText } from "@/utils/queryBuilder";
 import {
   SizeCache,
@@ -12,6 +13,7 @@ import {
   buildIndexFromModel,
   createOperator,
   createAgeFilter,
+  createDemographicFilter,
   createRule,
   createRuleGroup,
   isOperator,
@@ -27,7 +29,7 @@ import { UniqueIdentifier } from "@dnd-kit/core";
 import { removeFalseKeys } from "@/utils/numbers";
 import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
 import { DatasetErrors } from "@/utils/datasets";
-import { Collection } from "@/types/api";
+import { Collection, Concept } from "@/types/api";
 import { FeatureName } from "@/types/features";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import { intersection } from "lodash";
@@ -40,6 +42,7 @@ export enum NodeKind {
   GROUP = "GROUP",
   OPERATOR = "OPERATOR",
   AGE_FILTER = "AGE_FILTER",
+  DEMOGRAPHIC_FILTER = "DEMOGRAPHIC_FILTER",
 }
 
 type NodeFactory = () => RuleNodeType | RuleNodeType[];
@@ -54,6 +57,7 @@ export const Creators: Record<string, NodeFactory> = {
   [NodeKind.GROUP]: createRuleGroup,
   [NodeKind.OPERATOR]: createOperator,
   [NodeKind.AGE_FILTER]: createAgeFilter,
+  [NodeKind.DEMOGRAPHIC_FILTER]: createDemographicFilter,
 };
 
 export const DEFAULT_QUERY: RuleGroupType =
@@ -111,6 +115,7 @@ export interface QueryBuilderStoreState {
   createNewGroup: () => RuleNodeType;
   createNewOperator: () => RuleNodeType;
   createNewAgeFilter: () => RuleNodeType;
+  createNewDemographicFilter: () => RuleNodeType;
 
   queryAsText: string;
   getQueryFromText: (
@@ -146,6 +151,10 @@ export interface QueryBuilderStoreState {
 
   selectedGuidance: Record<string, boolean>;
   setSelectedGuidance: (id: string, value: boolean) => void;
+
+  genderConcepts: Concept[];
+  raceConcepts: Concept[];
+  loadDemographicConcepts: () => Promise<void>;
 }
 
 const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
@@ -353,6 +362,8 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
   createNewGroup: () => get().createNewNode(NodeKind.GROUP),
   createNewOperator: () => get().createNewNode(NodeKind.OPERATOR),
   createNewAgeFilter: () => get().createNewNode(NodeKind.AGE_FILTER),
+  createNewDemographicFilter: () =>
+    get().createNewNode(NodeKind.DEMOGRAPHIC_FILTER),
 
   queryAsText: queryToText(DEFAULT_QUERY),
 
@@ -408,7 +419,7 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
       name += `${noun} rule`.trim();
     } else if (isOperator(node))
       name += `${node.combinator.toUpperCase()} operator`;
-    else if (isAgeFilter(node)) name += "Age Rule";
+    else if (isAgeFilter(node)) name += "Demographic Rule";
     else name += "Unknown";
 
     return name;
@@ -553,6 +564,32 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
       ...state,
       selectedGuidance: { [id]: value },
     })),
+
+  genderConcepts: [],
+  raceConcepts: [],
+  loadDemographicConcepts: async () => {
+    const { genderConcepts, raceConcepts } = get();
+    if (genderConcepts.length > 0 && raceConcepts.length > 0) return;
+    const [genderRes, raceRes] = await Promise.all([
+      getDistributionConcepts("Gender"),
+      getDistributionConcepts("Race"),
+    ]);
+
+    console.log({ race: raceRes.data.data });
+
+    const mapConcept = (
+      c: Concept & { concept_name?: string; domain_id?: string },
+    ): Concept => ({
+      ...c,
+      name: c.concept_name ?? c.name,
+      category: c.domain_id ?? c.category,
+    });
+    set((state) => ({
+      ...state,
+      genderConcepts: (genderRes.data?.data ?? []).map(mapConcept),
+      raceConcepts: (raceRes.data?.data ?? []).map(mapConcept),
+    }));
+  },
 });
 
 export const useQueryBuilderStore = create<QueryBuilderStoreState>()(

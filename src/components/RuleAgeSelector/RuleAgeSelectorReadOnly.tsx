@@ -20,7 +20,7 @@ const RuleAgeSelectorReadOnly = ({
   } else if (to === maxAge) {
     label = `Age ≥ ${from}`;
   } else {
-    label = `Age ${from} - ${to}`;
+    label = `Age ${from} – ${to}`;
   }
 
   return (

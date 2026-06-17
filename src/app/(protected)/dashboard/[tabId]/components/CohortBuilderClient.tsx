@@ -10,7 +10,7 @@ import FilterDatasets from "@/components/FilterDatasets";
 import SelectDatasets from "@/components/SelectDatasets";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { Query } from "@/types/api";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { QUERY_BUILDER_GUIDANCE_COOKIE } from "@/config/internals";
 import GuidanceModal from "@/components/GuidanceModal";
@@ -27,7 +27,14 @@ const CohortBuilderClient = ({
   query,
 }: CohortBuilderClientProps) => {
   const open = useQueryBuilder((qb) => qb.openSelectDatasetsPanel);
+  const loadDemographicConcepts = useQueryBuilder(
+    (qb) => qb.loadDemographicConcepts,
+  );
   const [showGuidance, setShowGuidance] = useState(initialShowGuidance);
+
+  useEffect(() => {
+    loadDemographicConcepts();
+  }, [loadDemographicConcepts]);
   const router = useRouter();
 
   const { setHelpTooltipOpen } = useQueryBuilder((qb) => ({

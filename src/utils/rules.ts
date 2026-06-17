@@ -9,6 +9,7 @@ import {
   BoardIndex,
   OperatorType,
   AgeFilterType,
+  DemographicFilterType,
 } from "@/types/rules";
 import { UniqueIdentifier } from "@dnd-kit/core";
 import { v4 as uuidv4 } from "uuid";
@@ -76,7 +77,12 @@ export const createOperator = (
 
 export const createAgeFilter = (): AgeFilterType => ({
   id: uuidv4(),
-  value: [MIN_AGE_FILTER, MAX_AGE_FILTER],
+  age: [MIN_AGE_FILTER, MAX_AGE_FILTER],
+});
+
+export const createDemographicFilter = (): DemographicFilterType => ({
+  id: uuidv4(),
+  age: [MIN_AGE_FILTER, MAX_AGE_FILTER],
 });
 
 export function ruleToGroup(
@@ -200,7 +206,11 @@ export const findRulesWithAlternatives = (
     .slice(0, limit);
 
 export const isAgeFilter = (n: RuleNodeType): n is AgeFilterType =>
-  "value" in n;
+  "age" in n;
+
+export const isDemographicFilter = (
+  n: RuleNodeType,
+): n is DemographicFilterType => "age" in n;
 
 export const isOperator = (n: RuleNodeType): n is OperatorType =>
   "combinator" in n;

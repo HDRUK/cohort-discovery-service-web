@@ -58,8 +58,8 @@ const RuleAgeSelectorSingleBound = ({
       return rule.ageConstraint ?? [null, null];
     }
 
-    const l = rule.value?.[0] ?? minAge;
-    const r = rule.value?.[1] ?? maxAge;
+    const l = rule.age?.[0] ?? minAge;
+    const r = rule.age?.[1] ?? maxAge;
 
     return [l === minAge ? null : l, r === maxAge ? null : r];
   }, [rule, minAge, maxAge]);
@@ -91,9 +91,9 @@ const RuleAgeSelectorSingleBound = ({
         }
 
         if (isAgeFilter(node)) {
-          if (left != null) return { ...node, value: [left, maxAge] };
-          if (right != null) return { ...node, value: [minAge, right] };
-          return { ...node, value: [minAge, maxAge] };
+          if (left != null) return { ...node, age: [left, maxAge] };
+          if (right != null) return { ...node, age: [minAge, right] };
+          return { ...node, age: [minAge, maxAge] };
         }
 
         return node;

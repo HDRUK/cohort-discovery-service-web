@@ -45,6 +45,7 @@ const ParentWrapper = ({
 
 export const ConceptChip = ({
   indicateIfParent = false,
+  showCategory = true,
   draggable,
   concept,
   onClick,
@@ -54,6 +55,7 @@ export const ConceptChip = ({
 }: {
   draggable?: DraggableConfig;
   indicateIfParent?: boolean;
+  showCategory?: boolean;
   concept: Concept;
   onClick?: (e: React.MouseEvent) => void;
   onDelete: (e: React.MouseEvent) => void;
@@ -113,7 +115,7 @@ export const ConceptChip = ({
           onClick={onClick && onClick}
           label={
             <Typography noWrap title={concept.name}>
-              {categoryLabel && (
+              {showCategory && categoryLabel && (
                 <Box component="span" sx={{ color: "grey.500" }}>
                   {`${categoryLabel} | `}
                 </Box>

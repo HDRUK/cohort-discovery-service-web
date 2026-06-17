@@ -64,7 +64,7 @@ const RuleAgeSelectorSlider = ({
         if (isAgeFilter(node)) {
           return {
             ...node,
-            value: [
+            age: [
               Math.max(minAge, Math.min(l, r)),
               Math.min(maxAge, Math.max(l, r)),
             ],

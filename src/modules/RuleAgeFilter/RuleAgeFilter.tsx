@@ -20,8 +20,8 @@ export interface RuleProps extends Omit<
 const RuleAgeFilter = ({ rule, groupId, ...rest }: RuleProps) => {
   const { actions } = useNodeActions(rule);
 
-  const from = rule.value?.[0] ?? MIN_AGE_FILTER;
-  const to = rule.value?.[1] ?? MAX_AGE_FILTER;
+  const from = rule.age?.[0] ?? MIN_AGE_FILTER;
+  const to = rule.age?.[1] ?? MAX_AGE_FILTER;
 
   return (
     <RuleWrapper

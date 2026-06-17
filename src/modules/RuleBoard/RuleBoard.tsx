@@ -7,7 +7,7 @@ import RuleAlternatives from "@/modules/RuleAlternatives";
 import RuleMultiConcept from "@/modules/RuleMultiConcept";
 import {
   hasAlternatives,
-  isAgeFilter,
+  isDemographicFilter,
   isMultipleConcept,
   isOperator,
   isRuleGroup,
@@ -25,7 +25,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import useHasMounted from "@/hooks/useHasMounted";
-import RuleAgeFilter from "../RuleAgeFilter";
+import RuleDemographicFilter from "../RuleDemographicFilter";
 import SkeletonFull from "@/components/SkeletonFull";
 import useStateManagement from "@/hooks/useStateManagement";
 import useScrollToNode from "@/hooks/useScrollToNode";
@@ -38,18 +38,24 @@ interface RuleBoardProps extends BoxProps {
 function renderRule(item: RuleNodeType, ruleGroupId: string) {
   if (isRuleLeaf(item)) {
     if (hasAlternatives(item.rule.concept)) {
-      return <RuleAlternatives key={item.id} rule={item} groupId={ruleGroupId} />;
+      return (
+        <RuleAlternatives key={item.id} rule={item} groupId={ruleGroupId} />
+      );
     }
     if (isMultipleConcept(item.rule.concept)) {
-      return <RuleMultiConcept key={item.id} rule={item} groupId={ruleGroupId} />;
+      return (
+        <RuleMultiConcept key={item.id} rule={item} groupId={ruleGroupId} />
+      );
     }
     return <Rule key={item.id} rule={item} groupId={ruleGroupId} />;
   } else if (isRuleGroup(item)) {
     return <RuleGroup key={item.id} group={item} parentGroupId={ruleGroupId} />;
   } else if (isOperator(item)) {
     return <RuleOperator key={item.id} operator={item} groupId={ruleGroupId} />;
-  } else if (isAgeFilter(item)) {
-    return <RuleAgeFilter key={item.id} rule={item} groupId={ruleGroupId} />;
+  } else if (isDemographicFilter(item)) {
+    return (
+      <RuleDemographicFilter key={item.id} rule={item} groupId={ruleGroupId} />
+    );
   }
 }
 
@@ -91,7 +97,11 @@ const RuleBoard = ({
       gap={0}
       {...rest}
     >
-      <DropSpacer id={`${id}::top`} position={SpacerPosition.Top} groupId={id} />
+      <DropSpacer
+        id={`${id}::top`}
+        position={SpacerPosition.Top}
+        groupId={id}
+      />
       <SortableContext
         items={rules.map((r) => r.id)}
         strategy={verticalListSortingStrategy}
@@ -100,7 +110,11 @@ const RuleBoard = ({
           return <Fragment key={rule.id}>{renderRule(rule, id)}</Fragment>;
         })}
       </SortableContext>
-      <DropSpacer id={`${id}::bottom`} position={SpacerPosition.Bottom} groupId={id} />
+      <DropSpacer
+        id={`${id}::bottom`}
+        position={SpacerPosition.Bottom}
+        groupId={id}
+      />
       {children}
     </Box>
   );

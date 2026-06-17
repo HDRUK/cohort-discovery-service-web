@@ -4,7 +4,7 @@ import ToolGuidance from "@/content/guidance/queryBuilder/tool.mdx";
 import RuleGuidance from "@/content/guidance/queryBuilder/rule.mdx";
 import OperatorGuidance from "@/content/guidance/queryBuilder/operator.mdx";
 import GroupGuidance from "@/content/guidance/queryBuilder/group.mdx";
-import AgeFilterGuidance from "@/content/guidance/queryBuilder/ageFilter.mdx";
+import DemographicsGuidance from "@/content/guidance/queryBuilder/demographicsGuidance.mdx";
 import EmptyRuleGuidance from "@/content/guidance/queryBuilder/emptyRule.mdx";
 import ExclusionGuidance from "@/content/guidance/queryBuilder/exclusionGuidance.mdx";
 import MultipleItemGuidance from "@/content/guidance/queryBuilder/multipleItem.mdx";
@@ -45,7 +45,12 @@ import { AddChipProps } from "@/components/AddChip/AddChip";
 import AddTimeFrameButton from "@/components/AddTimeFrameButton";
 import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
 import { CustomH1, CustomH2 } from "@/components/GuidanceHeaders";
-import { getDomain, getDomainPastPhrase, getDomainPhrase, getUniqueDomains } from "@/utils/omop";
+import {
+  getDomain,
+  getDomainPastPhrase,
+  getDomainPhrase,
+  getUniqueDomains,
+} from "@/utils/omop";
 import DeleteTimeFrameButton from "@/components/DeleteTimeFrameButton";
 import DeleteMenuItem, {
   DeleteMenuItemProps,
@@ -55,6 +60,8 @@ import ConvertToGroupMenuItem, {
 } from "@/components/ConvertToGroupMenuItem/ConvertToGroupMenuItem";
 import AddAgeButton from "@/components/AddAgeButton";
 import RuleAgeSelector from "@/components/RuleAgeSelector";
+import RuleGenderSelector from "@/components/RuleGenderSelector";
+import RuleRaceSelector from "@/components/RuleRaceSelector";
 import DeleteAgeButton from "@/components/DeleteAgeButton";
 import useFeatures from "@/hooks/useFeatures";
 import CollapsibleGuidance from "@/components/CollapsibleGuidance";
@@ -282,7 +289,7 @@ const Guidance = () => {
     };
   };
 
-  const makeAgeFilterComponents = (node: AgeFilterType) => ({
+  const makeDemographicsComponents = (node: AgeFilterType) => ({
     ...baseComponents,
     CollapsibleGuidance: (props: GuidanceProps) => (
       <CollapsibleGuidance {...props}></CollapsibleGuidance>
@@ -295,6 +302,8 @@ const Guidance = () => {
         overrideConstrainForBunny={true}
       />
     ),
+    RuleGenderSelector: () => <RuleGenderSelector rule={node} />,
+    RuleRaceSelector: () => <RuleRaceSelector rule={node} />,
   });
 
   const makeMultipleItemComponents = () => ({
@@ -348,12 +357,17 @@ const Guidance = () => {
       const isMixed = uniqueDomains.size > 1;
 
       const domain = isMixed ? undefined : getDomain(concept);
-      const effectiveCategory = isMixed ? "" : (getPrimaryConcept(concept)?.category || "");
+      const effectiveCategory = isMixed
+        ? ""
+        : getPrimaryConcept(concept)?.category || "";
       const { verb } = getDomainPhrase(effectiveCategory);
       const past = getDomainPastPhrase(effectiveCategory);
 
       return (
-        <ActionMenuSection title={domain ? `${domain} Rule` : "Rule"} fixedExpanded>
+        <ActionMenuSection
+          title={domain ? `${domain} Rule` : "Rule"}
+          fixedExpanded
+        >
           <RuleGuidance
             category={domain ?? ""}
             verb={verb}
@@ -361,9 +375,7 @@ const Guidance = () => {
             timeConstraint={selectedNode?.timeConstraint}
             ageConstraint={selectedNode?.ageConstraint}
             components={makeRuleComponents(selectedNode)}
-            showSelectors={
-              !["Gender", "Race"].includes(effectiveCategory)
-            }
+            showSelectors={!["Gender", "Race"].includes(effectiveCategory)}
           />
         </ActionMenuSection>
       );
@@ -384,9 +396,9 @@ const Guidance = () => {
       );
     } else if (isAgeFilter(selectedNode)) {
       return (
-        <ActionMenuSection title={"Age Rule"} fixedExpanded>
-          <AgeFilterGuidance
-            components={makeAgeFilterComponents(selectedNode)}
+        <ActionMenuSection title={"Demographics Rule"} fixedExpanded>
+          <DemographicsGuidance
+            components={makeDemographicsComponents(selectedNode)}
           />
         </ActionMenuSection>
       );

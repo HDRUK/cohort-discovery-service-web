@@ -49,7 +49,7 @@ describe("RuleAgeSelector", () => {
     it("renders the SingleBound path in edit mode", () => {
       // Pass a rule with a non-default lower bound so SingleBoundSelector
       // renders the constraint input rather than staying in "Any age" mode.
-      const ruleWithConstraint = { ...createAgeFilter(), value: [18, MAX_AGE_FILTER] as [number, number] };
+      const ruleWithConstraint = { ...createAgeFilter(), age: [18, MAX_AGE_FILTER] as [number, number] };
       renderComponent({ readOnly: false, rule: ruleWithConstraint }, true);
       expect(screen.getByText("Years")).toBeInTheDocument();
       expect(screen.queryAllByRole("slider")).toHaveLength(0);

@@ -56,6 +56,8 @@ export const API_ROUTES = {
   user: (id: number) => `${API_URL}/users/${id}`,
   featureFlags: `${API_URL}/features`,
   feature: (name: string) => `${API_URL}/features/${name}`,
+  distributionConcepts: (domain: string) =>
+    `${API_URL}/distribution_concepts?domain=${encodeURIComponent(domain)}&per_page=1000`,
 };
 
 export const GATEWAY_ROUTES = {

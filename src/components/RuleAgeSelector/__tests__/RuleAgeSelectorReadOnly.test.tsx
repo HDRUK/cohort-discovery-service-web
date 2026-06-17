@@ -48,6 +48,6 @@ describe("RuleAgeSelectorReadOnly", () => {
         maxAge={MAX_AGE_FILTER}
       />,
     );
-    expect(screen.getByText("Age 18 - 65")).toBeInTheDocument();
+    expect(screen.getByText("Age 18 – 65")).toBeInTheDocument();
   });
 });

@@ -1,7 +1,7 @@
 import { ConceptOperator, RuleGroupType, RuleNodeType } from "@/types/rules";
 import {
   hasAlternatives,
-  isAgeFilter,
+  isDemographicFilter,
   isMultipleConcept,
   isOperator,
   isRuleGroup,
@@ -196,37 +196,31 @@ const queryToText = (
       return [{ text }];
     }
 
-    if (isAgeFilter(n)) {
-      const [minAge, maxAge] = n.value;
+    if (isDemographicFilter(n)) {
+      const [minAge, maxAge] = n.age;
+      const parts: string[] = [];
 
-      if (
-        [MIN_AGE_FILTER, null].includes(minAge) &&
-        [MAX_AGE_FILTER, null].includes(maxAge)
-      ) {
-        return [{ text: "are of any age" }];
+      const isMinDefault = minAge == null || minAge <= MIN_AGE_FILTER;
+      const isMaxDefault = maxAge == null || maxAge >= MAX_AGE_FILTER;
+
+      if (!isMinDefault && !isMaxDefault) {
+        parts.push(`are between ${minAge} and ${maxAge} years old`);
+      } else if (!isMinDefault) {
+        parts.push(`are older than ${minAge} years`);
+      } else if (!isMaxDefault) {
+        parts.push(`are younger than ${maxAge} years`);
+      } else {
+        parts.push("are of any age");
       }
 
-      if (
-        minAge != null &&
-        minAge > MIN_AGE_FILTER &&
-        [MAX_AGE_FILTER, null].includes(maxAge)
-      ) {
-        return [{ text: `are older than ${minAge} years` }];
+      if (n.sex?.length) {
+        parts.push(`with sex ${n.sex.map((c) => c.name).join(" or ")}`);
+      }
+      if (n.race?.length) {
+        parts.push(`with race ${n.race.map((c) => c.name).join(" or ")}`);
       }
 
-      if (
-        [MIN_AGE_FILTER, null].includes(minAge) &&
-        maxAge != null &&
-        maxAge < MAX_AGE_FILTER
-      ) {
-        return [{ text: `are younger than ${maxAge} years` }];
-      }
-
-      if (minAge != null && maxAge != null) {
-        return [{ text: `are between ${minAge} and ${maxAge} years old` }];
-      }
-
-      return [];
+      return [{ text: parts.join(" and ") }];
     }
 
     if (isRuleLeaf(n)) {
