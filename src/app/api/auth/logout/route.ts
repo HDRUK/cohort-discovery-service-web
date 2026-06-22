@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
+import { isOidcEnabled } from "@/lib/oidc";
 
 const REDIRECT_URL = process?.env?.NEXT_PUBLIC_LOGIN_URL;
 
@@ -9,8 +10,6 @@ export async function GET(req: NextRequest) {
   signOutUrl.searchParams.set("callbackUrl", `${origin}/login`);
 
   const base = REDIRECT_URL ?? req.url;
-  const url = new URL("/login", base);
-  const response = NextResponse.redirect(url);
   const loginUrl = new URL("/login", base);
 
   const response = NextResponse.redirect(
