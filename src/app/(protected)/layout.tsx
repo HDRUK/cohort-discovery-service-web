@@ -8,6 +8,7 @@ import getMe from "@/actions/getMe";
 import getCustodians from "@/actions/custodian/getCustodians";
 import getFeatureFlags from "@/actions/getFeatureFlags";
 import { isStandalone } from "@/utils/modes";
+import { isOidcEnabled } from "@/lib/oidc";
 import { ErrorMode } from "@/lib/apiClient";
 import getWorkgroups from "@/actions/workgroup/getWorkgroups";
 import getUserCollections from "@/actions/collection/getUserCollections";
@@ -23,11 +24,13 @@ export default async function ProtectedLayout({
   const token = await getAccessToken();
   const decoded = token ? (jwt.decode(token) as JwtPayload) : undefined;
   if (!token) {
+    if (isOidcEnabled()) {
+      redirect("/auth/signin/oidc?callbackUrl=%2F");
+    }
     if (isStandalone(applicationMode)) {
       redirect("/login");
-    } else {
-      redirect("/403?reason=no-token");
     }
+    redirect("/403?reason=no-token");
   }
 
   const h = await headers();
