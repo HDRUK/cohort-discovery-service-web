@@ -9,6 +9,14 @@ const useFeatures = () => {
     useShallow((st) => {
       const flags = { ...DEFAULT_FLAGS, ...(st.flags ?? {}) };
 
+      const envHdrukTheme = process.env.NEXT_PUBLIC_HDRUK_THEME_ENABLED;
+      const hdrukTheme =
+        envHdrukTheme === "true"
+          ? true
+          : envHdrukTheme === "false"
+            ? false
+            : flags[FeatureName.HdrukTheme];
+
       return {
         queryBuilder: flags[FeatureName.QueryBuilder],
         queryBuilderLeaveConfirm: flags[FeatureName.QueryBuilderLeaveConfirm],
@@ -41,7 +49,7 @@ const useFeatures = () => {
         syncCustodiansEveryRequest:
           flags[FeatureName.IntegratedSyncCustodiansEveryRequest],
 
-        hdrukTheme: flags[FeatureName.HdrukTheme],
+        hdrukTheme,
         manageWorkgroupsInternal:
           isStandalone || flags[FeatureName.ManageWorkgroupsInternally],
 

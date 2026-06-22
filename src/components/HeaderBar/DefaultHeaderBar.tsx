@@ -10,6 +10,7 @@ import { useApplicationMode } from "@/providers/ApplicationModeProvider";
 
 const NEXT_PUBLIC_LOGIN_URL =
   process.env.NEXT_PUBLIC_LOGIN_URL ?? "https://healthdatagateway.org";
+const NEXT_PUBLIC_HEADER_LOGO_URL = process.env.NEXT_PUBLIC_HEADER_LOGO_URL;
 
 const DefaultHeaderBar = () => {
   const router = useRouter();
@@ -52,7 +53,18 @@ const DefaultHeaderBar = () => {
       <Toolbar sx={{ justifyContent: "space-between" }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Box sx={{ py: 0.5 }}>
-            <b> image</b>
+            {NEXT_PUBLIC_HEADER_LOGO_URL ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={NEXT_PUBLIC_HEADER_LOGO_URL}
+                alt="Cohort Discovery logo"
+                style={{ height: 30, display: "block" }}
+              />
+            ) : (
+              <Typography component="span" fontWeight="bold">
+                Cohort Discovery
+              </Typography>
+            )}
           </Box>
         </Box>
 
