@@ -7,18 +7,16 @@ export enum CombinatorType {
   FOLLOWED_BY = "followed_by",
 }
 
+export enum SingleSidedOperator {
+  GREATER_THAN = "gt",
+  LESS_THAN = "lt",
+}
+
 export enum ValueAsNumberOperator {
   GREATER_THAN = "gt",
   LESS_THAN = "lt",
   BETWEEN = "between",
 }
-
-export const SingleSidedOperator = {
-  GREATER_THAN: ValueAsNumberOperator.GREATER_THAN,
-  LESS_THAN: ValueAsNumberOperator.LESS_THAN,
-} as const;
-export type SingleSidedOperator =
-  (typeof SingleSidedOperator)[keyof typeof SingleSidedOperator];
 
 export type ConceptOperator = {
   concept: Concept | Concept[] | null;

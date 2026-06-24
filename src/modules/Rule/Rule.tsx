@@ -4,7 +4,7 @@ import DomainChip from "@/components/DomainChip/DomainChip";
 import { Concept } from "@/types/api";
 import { useCallback } from "react";
 import ConceptChip from "@/components/ConceptChip";
-import { RuleLeafType, ValueAsNumberOperator } from "@/types/rules";
+import { RuleLeafType, SingleSidedOperator } from "@/types/rules";
 import RuleSearch from "./RuleSearch";
 
 import useQueryBuilder from "@/hooks/useQueryBuilder";
@@ -79,9 +79,9 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
             ...node,
             rule: { ...node.rule, concept: null },
             ageConstraint: undefined,
-            ageConstraintOperator: ValueAsNumberOperator.GREATER_THAN,
+            ageConstraintOperator: SingleSidedOperator.GREATER_THAN,
             timeConstraint: undefined,
-            timeConstraintOperator: ValueAsNumberOperator.GREATER_THAN,
+            timeConstraintOperator: SingleSidedOperator.GREATER_THAN,
             valueAsNumber: undefined,
             valueAsNumberOperator: undefined,
           };
@@ -110,11 +110,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       type={DragType.Rule}
       groupId={groupId}
       sortable={true}
-      headerExtra={
-        !isEmptyRule(rule) ? (
-          <DomainChip concept={concept} />
-        ) : null
-      }
+      headerExtra={!isEmptyRule(rule) ? <DomainChip concept={concept} /> : null}
       render={() => (
         <Box py={1}>
           {isEmptyRule(rule) ? (

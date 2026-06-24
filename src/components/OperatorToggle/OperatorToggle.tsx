@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { ClickAwayListener, Collapse, Stack, Tooltip } from "@mui/material";
-import CircularIconButton from "../CircularIconButton";
+import CircularIconButton from "@/components/CircularIconButton";
 
 interface OperatorToggleProps<T extends string> {
   operator: T;

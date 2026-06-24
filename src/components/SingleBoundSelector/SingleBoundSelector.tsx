@@ -4,7 +4,7 @@ import { Paper, Stack } from "@mui/material";
 import { ReactNode, useMemo } from "react";
 import { SingleSidedOperator } from "@/types/rules";
 
-import OperatorToggle from "./OperatorToggle";
+import OperatorToggle from "@/components/OperatorToggle";
 
 export type NullablePair<T> = [T | null, T | null];
 

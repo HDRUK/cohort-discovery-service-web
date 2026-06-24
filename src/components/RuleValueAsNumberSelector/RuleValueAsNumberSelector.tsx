@@ -7,7 +7,7 @@ import { RuleLeafType, ValueAsNumberOperator } from "@/types/rules";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
 import HoverableDiv from "@/components/HoverableDiv";
-import OperatorToggle from "@/components/SingleBoundSelector/OperatorToggle";
+import OperatorToggle from "@/components/OperatorToggle";
 import NumericValueInput from "./NumericValueInput";
 
 export interface RuleValueAsNumberSelectorProps {

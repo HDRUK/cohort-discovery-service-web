@@ -383,8 +383,7 @@ const Guidance = () => {
             timeConstraint={selectedNode?.timeConstraint}
             ageConstraint={selectedNode?.ageConstraint}
             valueAsNumber={selectedNode?.valueAsNumber}
-            isMeasurement={!isMixed && effectiveCategory === "Measurement"}
-            components={makeRuleComponents(selectedNode)}
+components={makeRuleComponents(selectedNode)}
             showSelectors={
               !["Gender", "Race"].includes(effectiveCategory)
             }

@@ -6,7 +6,6 @@
   * @property {[number | null, number | null] | undefined} ageConstraint
   * @property {[number | null, number | null] | undefined} valueAsNumber
   * @property {boolean} showSelectors
-  * @property {boolean} isMeasurement
   */}
 
 
@@ -27,7 +26,6 @@
     <>
       <AddTimeFrameButton label="Add timeframe" />
       <AddAgeButton label="Add age" />
-      {props.isMeasurement && <AddValueAsNumberButton label="Add value" />}
     </>
   }
 </Box>
@@ -56,7 +54,7 @@
         </Box>
       </CollapsibleGuidance>
 
-      {props.isMeasurement && props.valueAsNumber && (
+      {props.valueAsNumber && (
         <CollapsibleGuidance keyPrefix="RuleValueAsNumberSelector" title="Set Value">
           <RuleValueAsNumberSelector>
             <DeleteValueAsNumberButton label="Remove value from this rule" />
