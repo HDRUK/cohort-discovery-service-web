@@ -125,7 +125,7 @@ const RuleWrapper = ({
     setQueryBuilderJson: qb.setQueryBuilderJson,
   }));
 
-  const { constrainForBunnyV1 } = useFeatures();
+  const { constrainForBunnyV1, queryBuilderUseValueAsNumber } = useFeatures();
 
   const {
     setNodeRef,
@@ -328,7 +328,7 @@ const RuleWrapper = ({
               ) &&
               (node.timeConstraint ||
                 node.ageConstraint ||
-                node.valueAsNumber ||
+                (queryBuilderUseValueAsNumber && node.valueAsNumber) ||
                 isSelected) && (
                 <CardActions sx={cardActionsSx}>
                   {node.timeConstraint ? (
@@ -361,7 +361,8 @@ const RuleWrapper = ({
                       hoverKey={`rule-age-${node.id}`}
                     />
                   ) : null}
-                  {isValueAsNumberDomain(node.rule.concept) &&
+                  {queryBuilderUseValueAsNumber &&
+                    isValueAsNumberDomain(node.rule.concept) &&
                     (node.valueAsNumber ? (
                       <RuleValueAsNumberSelector
                         rule={node}
