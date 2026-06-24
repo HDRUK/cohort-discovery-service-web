@@ -55,6 +55,10 @@ export const authOptions: AuthOptions = {
         token.accessToken = account.access_token;
       }
 
+      if (account?.id_token) {
+        token.idToken = account.id_token;
+      }
+
       if (account?.expires_at) {
         setTokenLifetime(token, Math.floor(account.expires_at));
       }
