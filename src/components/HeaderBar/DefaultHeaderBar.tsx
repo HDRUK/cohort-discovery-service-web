@@ -7,6 +7,7 @@ import PositionedMenu, { PositionedMenuItem } from "../PositionedMenu";
 import { useRouter } from "next/navigation";
 import useUserStore from "@/hooks/useUserStore";
 import { useApplicationMode } from "@/providers/ApplicationModeProvider";
+import useFeatures from "@/hooks/useFeatures";
 
 const NEXT_PUBLIC_LOGIN_URL =
   process.env.NEXT_PUBLIC_LOGIN_URL ?? "https://healthdatagateway.org";
@@ -17,9 +18,10 @@ const DefaultHeaderBar = () => {
   const user = useUserStore((s) => s.user);
   const setUser = useUserStore((s) => s.setUser);
   const { isStandalone } = useApplicationMode();
+  const { hdrukTheme: hdrukThemeEnabled } = useFeatures();
 
   const links: PositionedMenuItem[] = [
-    ...(isStandalone
+    ...(isStandalone || !hdrukThemeEnabled
       ? [
           {
             id: "logout",
