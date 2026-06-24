@@ -54,11 +54,13 @@ const DefaultHeaderBar = () => {
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Box sx={{ py: 0.5 }}>
             {NEXT_PUBLIC_HEADER_LOGO_URL ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 src={NEXT_PUBLIC_HEADER_LOGO_URL}
                 alt="Cohort Discovery logo"
-                style={{ height: 30, display: "block" }}
+                width={120}
+                height={30}
+                unoptimized
+                style={{ height: 30, width: "auto", display: "block" }}
               />
             ) : (
               <Typography component="span" fontWeight="bold">
