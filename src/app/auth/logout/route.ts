@@ -15,8 +15,6 @@ export async function GET(req: NextRequest) {
   const response = NextResponse.redirect(
     isOidcEnabled() ? signOutUrl : loginUrl,
   );
-  // Delete via multiple strategies to handle domain-scoped cookies set by
-  // different origins (e.g., Cypress test runner sets domain: "localhost").
   response.cookies.delete(ACCESS_TOKEN_NAME);
   response.cookies.set(ACCESS_TOKEN_NAME, "", {
     expires: new Date(0),

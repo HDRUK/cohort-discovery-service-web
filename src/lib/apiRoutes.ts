@@ -1,5 +1,5 @@
 const API_URL = "/api/v1";
-const API_AUTH_URL = "/api/auth";
+const API_AUTH_URL = "/auth";
 
 export const API_ROUTES = {
   task: `${API_URL}/task`,

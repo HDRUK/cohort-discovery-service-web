@@ -136,7 +136,7 @@ async function handle(req, res) {
   // -------------------------------------------------------------------------
   // Auth
   // -------------------------------------------------------------------------
-  if (method === "POST" && pathname === "/api/auth/login") {
+  if (method === "POST" && pathname === "/auth/login") {
     const body = await readBody(req);
     // Only the configured test email is accepted; everything else is rejected.
     const VALID_EMAIL = "test@example.com";

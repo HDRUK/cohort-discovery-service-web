@@ -26,7 +26,7 @@ const DefaultHeaderBar = () => {
             label: "Logout",
             onClick: () => {
               setUser(null);
-              router.push("/api/auth/logout");
+              router.push("/auth/logout");
             },
           },
         ]
