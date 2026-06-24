@@ -36,20 +36,21 @@ npm run dev
 
 Use `.env.example` as the base:
 
-| Variable | Required | Description                                                                                                                 |
-| --- | --- |-----------------------------------------------------------------------------------------------------------------------------|
-| `API_BASE_URL` | Yes | Backend API base URL used by server actions.                                                                                |
-| `NEXT_PUBLIC_LOGIN_URL` | Yes | Login URL used by the app when unauthenticated.                                                                             |
-| `APPLICATION_MODE` | Yes | `integrated` or `standalone`. Controls auth/access behavior.                                                                |
-| `OIDC_ENABLED` | No | Enables OIDC auth-code flow when `true` and required OIDC vars are set.                                                     |
-| `OIDC_ISSUER_URL` | If `OIDC_ENABLED=true` | OIDC authority issuer URL (used for discovery).                                                                             |
-| `OIDC_CLIENT_ID` | If `OIDC_ENABLED=true` | OIDC public client ID.                                                                                                      |
-| `OIDC_SCOPES` | No | OIDC scopes, defaults to `openid profile email`.                                                                            |
-| `NEXTAUTH_SECRET` | If `OIDC_ENABLED=true` | Secret used by next-auth to sign/encrypt session JWT.                                                                       |
-| `NEXT_PUBLIC_USE_EXAMPLE_QUERY` | No | Enables example query UX/debug helpers when `true`.                                                                         |
-| `NEXT_PUBLIC_USE_DEBUG_LOGS` | No | Enables extra client-side debug logging when `true`.                                                                        |
-| `NEXT_PUBLIC_HDRUK_THEME_ENABLED` | No | Disables the HDR UK themed header when `true`; disables it when `false`. Falls back to the backend feature flag when unset. |
-| `NEXT_PUBLIC_HEADER_LOGO_URL` | No | URL for the logo image shown in the default header. When unset, a text fallback is shown.                                   |
+| Variable                          | Required               | Description                                                                                                                 |
+|-----------------------------------|------------------------|-----------------------------------------------------------------------------------------------------------------------------|
+| `API_BASE_URL`                    | Yes                    | Backend API base URL used by server actions.                                                                                |
+| `NEXT_PUBLIC_LOGIN_URL`           | Yes                    | Login URL used by the app when unauthenticated.                                                                             |
+| `APPLICATION_MODE`                | Yes                    | `integrated` or `standalone`. Controls auth/access behavior.                                                                |
+| `OIDC_ENABLED`                    | No                     | Enables OIDC auth-code flow when `true` and required OIDC vars are set.                                                     |
+| `OIDC_ISSUER_URL`                 | If `OIDC_ENABLED=true` | OIDC authority issuer URL (used for discovery).                                                                             |
+| `OIDC_CLIENT_ID`                  | If `OIDC_ENABLED=true` | OIDC public client ID.                                                                                                      |
+| `OIDC_SCOPES`                     | No                     | OIDC scopes, defaults to `openid profile email`.                                                                            |
+| `NEXTAUTH_SECRET`                 | If `OIDC_ENABLED=true` | Secret used by next-auth to sign/encrypt session JWT.                                                                       |
+| `NEXTAUTH_URL`                    | If `OIDC_ENABLED=true` | URL used by next auth for login/logout                                                                                      |
+| `NEXT_PUBLIC_USE_EXAMPLE_QUERY`   | No                     | Enables example query UX/debug helpers when `true`.                                                                         |
+| `NEXT_PUBLIC_USE_DEBUG_LOGS`      | No                     | Enables extra client-side debug logging when `true`.                                                                        |
+| `NEXT_PUBLIC_HDRUK_THEME_ENABLED` | No                     | Disables the HDR UK themed header when `true`; disables it when `false`. Falls back to the backend feature flag when unset. |
+| `NEXT_PUBLIC_HEADER_LOGO_URL`     | No                     | URL for the logo image shown in the default header. When unset, a text fallback is shown.                                   |
 
 ## Available Scripts
 
