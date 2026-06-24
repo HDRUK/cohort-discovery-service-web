@@ -1,48 +1,42 @@
+"use client";
+
 import * as React from "react";
 import { ClickAwayListener, Collapse, Stack, Tooltip } from "@mui/material";
-import { SingleSidedOperator } from "@/types/rules";
 import CircularIconButton from "../CircularIconButton";
 
-interface OperatorToggleProps {
-  operator: SingleSidedOperator;
+interface OperatorToggleProps<T extends string> {
+  operator: T;
+  operators: T[];
+  operatorLabels: Record<T, React.ReactNode>;
   handleOperatorChange: (
     event: React.MouseEvent<HTMLElement>,
-    newOperator: SingleSidedOperator,
+    newOperator: T,
   ) => void;
   readOnly?: boolean;
-  greaterThanLabel: React.ReactNode;
-  lessThanLabel: React.ReactNode;
   onClick?: () => void;
 }
 
-const OperatorToggle = ({
+function OperatorToggle<T extends string>({
   operator,
+  operators,
+  operatorLabels,
   handleOperatorChange,
   readOnly,
-  greaterThanLabel,
-  lessThanLabel,
   onClick,
-}: OperatorToggleProps) => {
+}: OperatorToggleProps<T>) {
   const [open, setOpen] = React.useState(false);
 
-  const [currentLabel, alternativeLabel] =
-    operator === SingleSidedOperator.GREATER_THAN
-      ? [greaterThanLabel, lessThanLabel]
-      : [lessThanLabel, greaterThanLabel];
+  const alternatives = operators.filter((op) => op !== operator);
 
-  const onSelect = (event: React.MouseEvent<HTMLElement>) => {
-    handleOperatorChange(
-      event,
-      operator === SingleSidedOperator.GREATER_THAN
-        ? SingleSidedOperator.LESS_THAN
-        : SingleSidedOperator.GREATER_THAN,
-    );
+  const handleSelect = (event: React.MouseEvent<HTMLElement>, next: T) => {
+    event.stopPropagation();
+    handleOperatorChange(event, next);
     setOpen(false);
   };
 
   return (
     <ClickAwayListener onClickAway={() => setOpen(false)}>
-      <Stack direction={"row"} gap={1} onClick={onClick}>
+      <Stack direction="row" gap={1} onClick={onClick}>
         <Tooltip title="Change operator" disableInteractive>
           <CircularIconButton
             disabled={!!readOnly}
@@ -51,17 +45,24 @@ const OperatorToggle = ({
             aria-haspopup="true"
             aria-expanded={open ? "true" : undefined}
           >
-            {currentLabel}
+            {operatorLabels[operator]}
           </CircularIconButton>
         </Tooltip>
         <Collapse in={open} orientation="horizontal">
-          <CircularIconButton onClick={onSelect}>
-            {alternativeLabel}
-          </CircularIconButton>
+          <Stack direction="row" gap={1}>
+            {alternatives.map((alt) => (
+              <CircularIconButton
+                key={alt}
+                onClick={(e) => handleSelect(e, alt)}
+              >
+                {operatorLabels[alt]}
+              </CircularIconButton>
+            ))}
+          </Stack>
         </Collapse>
       </Stack>
     </ClickAwayListener>
   );
-};
+}
 
 export default OperatorToggle;

@@ -1,19 +1,14 @@
 "use client";
 
-import { ReactNode } from "react";
+import { MouseEvent, ReactNode } from "react";
 import { Paper, Stack, Typography } from "@mui/material";
 import { isRuleLeaf, updateById } from "@/utils/rules";
-import {
-  RuleLeafType,
-  SingleSidedOperator,
-  BETWEEN_OPERATOR,
-  ValueAsNumberOperator,
-} from "@/types/rules";
+import { RuleLeafType, ValueAsNumberOperator } from "@/types/rules";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
 import HoverableDiv from "@/components/HoverableDiv";
+import OperatorToggle from "@/components/SingleBoundSelector/OperatorToggle";
 import NumericValueInput from "./NumericValueInput";
-import ValueOperatorToggle from "./ValueOperatorToggle";
 
 export interface RuleValueAsNumberSelectorProps {
   rule: RuleLeafType;
@@ -27,10 +22,10 @@ function deriveCurrentValue(
   operator: ValueAsNumberOperator,
 ): { lower: number | null; upper: number | null } {
   const [l, r] = valueAsNumber ?? [null, null];
-  if (operator === BETWEEN_OPERATOR) {
+  if (operator === ValueAsNumberOperator.BETWEEN) {
     return { lower: l, upper: r };
   }
-  if (operator === SingleSidedOperator.GREATER_THAN) {
+  if (operator === ValueAsNumberOperator.GREATER_THAN) {
     return { lower: l ?? r, upper: null };
   }
   return { lower: null, upper: r ?? l };
@@ -41,8 +36,8 @@ function buildConstraint(
   lower: number | null,
   upper: number | null,
 ): [number | null, number | null] {
-  if (operator === BETWEEN_OPERATOR) return [lower, upper];
-  if (operator === SingleSidedOperator.GREATER_THAN) return [lower, null];
+  if (operator === ValueAsNumberOperator.BETWEEN) return [lower, upper];
+  if (operator === ValueAsNumberOperator.GREATER_THAN) return [lower, null];
   return [null, upper];
 }
 
@@ -53,18 +48,18 @@ function operatorSwitchConstraint(
 ): [number | null, number | null] {
   const [l, r] = prev ?? [null, null];
   const singleValue =
-    prevOperator === SingleSidedOperator.GREATER_THAN ? l : r;
+    prevOperator === ValueAsNumberOperator.GREATER_THAN ? l : r;
 
-  if (nextOperator === BETWEEN_OPERATOR) {
+  if (nextOperator === ValueAsNumberOperator.BETWEEN) {
     return [singleValue, null];
   }
-  if (prevOperator === BETWEEN_OPERATOR) {
-    return nextOperator === SingleSidedOperator.GREATER_THAN
+  if (prevOperator === ValueAsNumberOperator.BETWEEN) {
+    return nextOperator === ValueAsNumberOperator.GREATER_THAN
       ? [l, null]
       : [null, r];
   }
   // toggling between ≥ and <
-  return nextOperator === SingleSidedOperator.GREATER_THAN
+  return nextOperator === ValueAsNumberOperator.GREATER_THAN
     ? [singleValue, null]
     : [null, singleValue];
 }
@@ -74,15 +69,15 @@ function readOnlyLabel(
   lower: number | null,
   upper: number | null,
 ): string {
-  if (operator === BETWEEN_OPERATOR) {
+  if (operator === ValueAsNumberOperator.BETWEEN) {
     if (lower == null && upper == null) return "Any value";
     if (lower == null) return `Value < ${upper}`;
     if (upper == null) return `Value ≥ ${lower}`;
     return `${lower} ≤ Value < ${upper}`;
   }
-  const value = operator === SingleSidedOperator.GREATER_THAN ? lower : upper;
+  const value = operator === ValueAsNumberOperator.GREATER_THAN ? lower : upper;
   if (value == null) return "Any value";
-  return operator === SingleSidedOperator.GREATER_THAN
+  return operator === ValueAsNumberOperator.GREATER_THAN
     ? `Value ≥ ${value}`
     : `Value < ${value}`;
 }
@@ -106,7 +101,7 @@ const RuleValueAsNumberSelector = ({
   }));
 
   const operator: ValueAsNumberOperator =
-    rule.valueAsNumberOperator ?? SingleSidedOperator.GREATER_THAN;
+    rule.valueAsNumberOperator ?? ValueAsNumberOperator.GREATER_THAN;
 
   const { lower, upper } = deriveCurrentValue(rule.valueAsNumber, operator);
 
@@ -171,13 +166,23 @@ const RuleValueAsNumberSelector = ({
         </Paper>
       ) : (
         <Stack direction="row" gap={1} alignItems="center">
-          <ValueOperatorToggle
+          <OperatorToggle
             operator={operator}
-            onChange={handleOperatorChange}
+            operators={[
+              ValueAsNumberOperator.GREATER_THAN,
+              ValueAsNumberOperator.LESS_THAN,
+              ValueAsNumberOperator.BETWEEN,
+            ]}
+            operatorLabels={{
+              [ValueAsNumberOperator.GREATER_THAN]: "≥",
+              [ValueAsNumberOperator.LESS_THAN]: "<",
+              [ValueAsNumberOperator.BETWEEN]: "↔",
+            }}
+            handleOperatorChange={(_e: MouseEvent<HTMLElement>, op: ValueAsNumberOperator) => handleOperatorChange(op)}
             readOnly={readOnly}
           />
           <NumericValueInput value={lower} onChange={handleLowerChange} />
-          {operator === BETWEEN_OPERATOR && (
+          {operator === ValueAsNumberOperator.BETWEEN && (
             <>
               <Typography variant="body2" sx={{ flexShrink: 0 }}>
                 –

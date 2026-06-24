@@ -156,10 +156,16 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
           <Stack direction={"row"} gap={1} alignItems={"center"}>
             <OperatorToggle
               operator={operator}
+              operators={[
+                SingleSidedOperator.GREATER_THAN,
+                SingleSidedOperator.LESS_THAN,
+              ]}
+              operatorLabels={{
+                [SingleSidedOperator.GREATER_THAN]: greaterThanLabel,
+                [SingleSidedOperator.LESS_THAN]: lessThanLabel,
+              }}
               handleOperatorChange={handleOperatorChange}
               readOnly={readOnly}
-              greaterThanLabel={greaterThanLabel}
-              lessThanLabel={lessThanLabel}
               onClick={onClick}
             />
 
