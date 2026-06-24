@@ -22,7 +22,6 @@ export default async function ProtectedLayout({
   children: React.ReactNode;
 }) {
   const token = await getAccessToken();
-  const decoded = token ? (jwt.decode(token) as JwtPayload) : undefined;
   if (!token) {
     if (isOidcEnabled()) {
       redirect("/auth/signin/oidc?callbackUrl=%2F");
@@ -33,11 +32,14 @@ export default async function ProtectedLayout({
     redirect("/403?reason=no-token");
   }
 
-  const h = await headers();
-  const requestNow = h?.get("x-request-now");
-  const now = requestNow !== null ? Math.floor(Number(requestNow)) : 0;
-  if (decoded?.exp && now >= Math.floor(decoded.exp)) {
-    redirect("/auth/logout");
+  if (!isOidcEnabled()) {
+    const decoded = jwt.decode(token) as JwtPayload;
+    const h = await headers();
+    const requestNow = h?.get("x-request-now");
+    const now = requestNow !== null ? Math.floor(Number(requestNow)) : 0;
+    if (decoded.exp && now >= Math.floor(decoded.exp)) {
+      redirect("/api/auth/logout");
+    }
   }
 
   const { user } = await getTokenUser();
