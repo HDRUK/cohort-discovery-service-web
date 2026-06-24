@@ -1,6 +1,6 @@
 "use client";
 
-import { MouseEvent, ReactNode } from "react";
+import { ReactNode } from "react";
 import { Paper, Stack, Typography } from "@mui/material";
 import { isRuleLeaf, updateById } from "@/utils/rules";
 import { RuleLeafType, ValueAsNumberOperator } from "@/types/rules";
@@ -167,18 +167,9 @@ const RuleValueAsNumberSelector = ({
       ) : (
         <Stack direction="row" gap={1} alignItems="center">
           <OperatorToggle
+            operators={[ValueAsNumberOperator.GREATER_THAN, ValueAsNumberOperator.LESS_THAN, ValueAsNumberOperator.BETWEEN]}
             operator={operator}
-            operators={[
-              ValueAsNumberOperator.GREATER_THAN,
-              ValueAsNumberOperator.LESS_THAN,
-              ValueAsNumberOperator.BETWEEN,
-            ]}
-            operatorLabels={{
-              [ValueAsNumberOperator.GREATER_THAN]: "≥",
-              [ValueAsNumberOperator.LESS_THAN]: "<",
-              [ValueAsNumberOperator.BETWEEN]: "↔",
-            }}
-            handleOperatorChange={(_e: MouseEvent<HTMLElement>, op: ValueAsNumberOperator) => handleOperatorChange(op)}
+            onChange={handleOperatorChange}
             readOnly={readOnly}
           />
           <NumericValueInput value={lower} onChange={handleLowerChange} />

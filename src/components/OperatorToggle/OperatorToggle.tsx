@@ -2,25 +2,23 @@
 
 import * as React from "react";
 import { ClickAwayListener, Collapse, Stack, Tooltip } from "@mui/material";
+import { SingleSidedOperator, ValueAsNumberOperator } from "@/types/rules";
 import CircularIconButton from "@/components/CircularIconButton";
 
-interface OperatorToggleProps<T extends string> {
+type KnownOperator = SingleSidedOperator | ValueAsNumberOperator;
+
+interface OperatorToggleProps<T extends KnownOperator> {
+  operators: readonly T[];
   operator: T;
-  operators: T[];
-  operatorLabels: Record<T, React.ReactNode>;
-  handleOperatorChange: (
-    event: React.MouseEvent<HTMLElement>,
-    newOperator: T,
-  ) => void;
+  onChange: (newOperator: T) => void;
   readOnly?: boolean;
   onClick?: () => void;
 }
 
-function OperatorToggle<T extends string>({
-  operator,
+function OperatorToggle<T extends KnownOperator>({
   operators,
-  operatorLabels,
-  handleOperatorChange,
+  operator,
+  onChange,
   readOnly,
   onClick,
 }: OperatorToggleProps<T>) {
@@ -28,9 +26,8 @@ function OperatorToggle<T extends string>({
 
   const alternatives = operators.filter((op) => op !== operator);
 
-  const handleSelect = (event: React.MouseEvent<HTMLElement>, next: T) => {
-    event.stopPropagation();
-    handleOperatorChange(event, next);
+  const handleSelect = (next: T) => {
+    onChange(next);
     setOpen(false);
   };
 
@@ -45,17 +42,14 @@ function OperatorToggle<T extends string>({
             aria-haspopup="true"
             aria-expanded={open ? "true" : undefined}
           >
-            {operatorLabels[operator]}
+            {operator}
           </CircularIconButton>
         </Tooltip>
         <Collapse in={open} orientation="horizontal">
           <Stack direction="row" gap={1}>
             {alternatives.map((alt) => (
-              <CircularIconButton
-                key={alt}
-                onClick={(e) => handleSelect(e, alt)}
-              >
-                {operatorLabels[alt]}
+              <CircularIconButton key={alt} onClick={() => handleSelect(alt)}>
+                {alt}
               </CircularIconButton>
             ))}
           </Stack>

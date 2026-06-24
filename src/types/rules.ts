@@ -8,14 +8,14 @@ export enum CombinatorType {
 }
 
 export enum SingleSidedOperator {
-  GREATER_THAN = "gt",
-  LESS_THAN = "lt",
+  GREATER_THAN = "≥",
+  LESS_THAN = "<",
 }
 
 export enum ValueAsNumberOperator {
-  GREATER_THAN = "gt",
-  LESS_THAN = "lt",
-  BETWEEN = "between",
+  GREATER_THAN = "≥",
+  LESS_THAN = "<",
+  BETWEEN = "↔",
 }
 
 export type ConceptOperator = {

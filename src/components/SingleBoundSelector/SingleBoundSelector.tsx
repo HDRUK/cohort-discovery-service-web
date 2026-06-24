@@ -32,8 +32,6 @@ export type SingleBoundSelectorProps<TStored, TUi = TStored> = {
 
   readOnly?: boolean;
 
-  operatorLabelOverrides?: Map<SingleSidedOperator, ReactNode | string>;
-
   renderPicker: (args: {
     value: TUi | null;
     onChange: (value: TUi | null) => void;
@@ -77,7 +75,6 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
   serialise,
   readOnly,
   anyLabel = "Any time",
-  operatorLabelOverrides,
   renderPicker,
   renderReadOnlyLabel,
   onClick,
@@ -97,12 +94,7 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
     [parseFn, constraint, constraintOperator],
   );
 
-  const handleOperatorChange = (
-    _e: React.MouseEvent<HTMLElement>,
-    nextOperator: SingleSidedOperator | null,
-  ) => {
-    if (!nextOperator) return;
-
+  const handleOperatorChange = (nextOperator: SingleSidedOperator) => {
     const stored = serialiseFn(value);
     onConstraintChange(
       nextOperator === SingleSidedOperator.GREATER_THAN
@@ -121,11 +113,6 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
       operator,
     );
   };
-
-  const greaterThanLabel =
-    operatorLabelOverrides?.get(SingleSidedOperator.GREATER_THAN) ?? "≥";
-  const lessThanLabel =
-    operatorLabelOverrides?.get(SingleSidedOperator.LESS_THAN) ?? "<";
 
   return (
     <>
@@ -146,25 +133,16 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
             const defaultText =
               value == null
                 ? anyLabel
-                : operator === SingleSidedOperator.GREATER_THAN
-                  ? `${greaterThanLabel} ${String(value)}`
-                  : `${lessThanLabel} ${String(value)}`;
+                : `${operator} ${String(value)}`;
 
             return <Paper sx={{ border: 1, p: 1 }}>{defaultText}</Paper>;
           })()
         ) : (
           <Stack direction={"row"} gap={1} alignItems={"center"}>
             <OperatorToggle
+              operators={[SingleSidedOperator.GREATER_THAN, SingleSidedOperator.LESS_THAN]}
               operator={operator}
-              operators={[
-                SingleSidedOperator.GREATER_THAN,
-                SingleSidedOperator.LESS_THAN,
-              ]}
-              operatorLabels={{
-                [SingleSidedOperator.GREATER_THAN]: greaterThanLabel,
-                [SingleSidedOperator.LESS_THAN]: lessThanLabel,
-              }}
-              handleOperatorChange={handleOperatorChange}
+              onChange={handleOperatorChange}
               readOnly={readOnly}
               onClick={onClick}
             />
