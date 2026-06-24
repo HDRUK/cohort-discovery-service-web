@@ -2,14 +2,14 @@
 
 import { Paper, Stack } from "@mui/material";
 import { ReactNode, useMemo } from "react";
-import { SingleSidedOperator } from "@/types/rules";
+import { ValueAsNumberOperator } from "@/types/rules";
 
 import OperatorToggle from "@/components/OperatorToggle";
 
 export type NullablePair<T> = [T | null, T | null];
 
 type ReadOnlyLabelArgs<TUi> = {
-  operator: SingleSidedOperator;
+  operator: ValueAsNumberOperator;
   value: TUi | null;
 };
 
@@ -19,11 +19,11 @@ export type SingleBoundSelectorProps<TStored, TUi = TStored> = {
 
   constraint: NullablePair<TStored>;
 
-  constraintOperator: SingleSidedOperator;
+  constraintOperator: ValueAsNumberOperator;
 
   onConstraintChange: (
     next: NullablePair<TStored>,
-    nextOperator: SingleSidedOperator,
+    nextOperator: ValueAsNumberOperator,
   ) => void;
 
   parse?: (stored: TStored | null) => TUi | null;
@@ -48,19 +48,19 @@ export type SingleBoundSelectorProps<TStored, TUi = TStored> = {
 function deriveOperatorAndValue<TStored, TUi>(
   constraint: NullablePair<TStored>,
   parse: (stored: TStored | null) => TUi | null,
-  constraintOperator: SingleSidedOperator,
-): { operator: SingleSidedOperator; value: TUi | null } {
+  constraintOperator: ValueAsNumberOperator,
+): { operator: ValueAsNumberOperator; value: TUi | null } {
   const [left, right] = constraint;
 
   if (left != null && right == null)
-    return { operator: SingleSidedOperator.GREATER_THAN, value: parse(left) };
+    return { operator: ValueAsNumberOperator.GREATER_THAN, value: parse(left) };
   if (left == null && right != null)
-    return { operator: SingleSidedOperator.LESS_THAN, value: parse(right) };
+    return { operator: ValueAsNumberOperator.LESS_THAN, value: parse(right) };
 
   if (left != null)
-    return { operator: SingleSidedOperator.GREATER_THAN, value: parse(left) };
+    return { operator: ValueAsNumberOperator.GREATER_THAN, value: parse(left) };
   if (right != null)
-    return { operator: SingleSidedOperator.LESS_THAN, value: parse(right) };
+    return { operator: ValueAsNumberOperator.LESS_THAN, value: parse(right) };
 
   return { operator: constraintOperator, value: null };
 }
@@ -94,10 +94,10 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
     [parseFn, constraint, constraintOperator],
   );
 
-  const handleOperatorChange = (nextOperator: SingleSidedOperator) => {
+  const handleOperatorChange = (nextOperator: ValueAsNumberOperator) => {
     const stored = serialiseFn(value);
     onConstraintChange(
-      nextOperator === SingleSidedOperator.GREATER_THAN
+      nextOperator === ValueAsNumberOperator.GREATER_THAN
         ? [stored, null]
         : [null, stored],
       nextOperator,
@@ -107,7 +107,7 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
   const handleValueChange = (nextValue: TUi | null) => {
     const stored = serialiseFn(nextValue);
     onConstraintChange(
-      operator === SingleSidedOperator.GREATER_THAN
+      operator === ValueAsNumberOperator.GREATER_THAN
         ? [stored, null]
         : [null, stored],
       operator,
@@ -140,7 +140,7 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
         ) : (
           <Stack direction={"row"} gap={1} alignItems={"center"}>
             <OperatorToggle
-              operators={[SingleSidedOperator.GREATER_THAN, SingleSidedOperator.LESS_THAN]}
+              operators={[ValueAsNumberOperator.GREATER_THAN, ValueAsNumberOperator.LESS_THAN]}
               operator={operator}
               onChange={handleOperatorChange}
               readOnly={readOnly}

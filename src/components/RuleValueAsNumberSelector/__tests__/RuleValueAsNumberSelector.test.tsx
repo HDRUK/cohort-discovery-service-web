@@ -106,7 +106,7 @@ describe("RuleValueAsNumberSelector — edit mode", () => {
     expect(screen.queryByText("–")).not.toBeInTheDocument();
   });
 
-  it("renders a single input for the < operator", () => {
+  it("renders a single input for the < operator showing the upper bound value", () => {
     const rule = {
       ...createRule(),
       valueAsNumber: [null, 10] as [number | null, number | null],
@@ -115,6 +115,7 @@ describe("RuleValueAsNumberSelector — edit mode", () => {
     renderComponent(rule, false);
     expect(screen.getAllByRole("spinbutton")).toHaveLength(1);
     expect(screen.queryByText("–")).not.toBeInTheDocument();
+    expect(screen.getByRole("spinbutton")).toHaveValue(10);
   });
 
   it("renders two inputs and a dash separator for the ↔ operator", () => {

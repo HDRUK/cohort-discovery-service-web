@@ -4,7 +4,7 @@ import DomainChip from "@/components/DomainChip/DomainChip";
 import { Concept } from "@/types/api";
 import { useCallback } from "react";
 import ConceptChip from "@/components/ConceptChip";
-import { RuleLeafType, SingleSidedOperator } from "@/types/rules";
+import { RuleLeafType, ValueAsNumberOperator } from "@/types/rules";
 import RuleSearch from "./RuleSearch";
 
 import useQueryBuilder from "@/hooks/useQueryBuilder";
@@ -79,9 +79,9 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
             ...node,
             rule: { ...node.rule, concept: null },
             ageConstraint: undefined,
-            ageConstraintOperator: SingleSidedOperator.GREATER_THAN,
+            ageConstraintOperator: ValueAsNumberOperator.GREATER_THAN,
             timeConstraint: undefined,
-            timeConstraintOperator: SingleSidedOperator.GREATER_THAN,
+            timeConstraintOperator: ValueAsNumberOperator.GREATER_THAN,
             valueAsNumber: undefined,
             valueAsNumberOperator: undefined,
           };

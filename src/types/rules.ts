@@ -7,16 +7,13 @@ export enum CombinatorType {
   FOLLOWED_BY = "followed_by",
 }
 
-export enum SingleSidedOperator {
-  GREATER_THAN = "≥",
-  LESS_THAN = "<",
-}
-
 export enum ValueAsNumberOperator {
   GREATER_THAN = "≥",
   LESS_THAN = "<",
   BETWEEN = "↔",
 }
+
+export type SingleSidedOperator = Exclude<ValueAsNumberOperator, ValueAsNumberOperator.BETWEEN>;
 
 export type ConceptOperator = {
   concept: Concept | Concept[] | null;

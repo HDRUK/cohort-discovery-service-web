@@ -45,7 +45,12 @@ import { AddChipProps } from "@/components/AddChip/AddChip";
 import AddTimeFrameButton from "@/components/AddTimeFrameButton";
 import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
 import { CustomH1, CustomH2 } from "@/components/GuidanceHeaders";
-import { getDomain, getDomainPastPhrase, getDomainPhrase, getUniqueDomains } from "@/utils/omop";
+import {
+  getDomain,
+  getDomainPastPhrase,
+  getDomainPhrase,
+  getUniqueDomains,
+} from "@/utils/omop";
 import DeleteTimeFrameButton from "@/components/DeleteTimeFrameButton";
 import DeleteMenuItem, {
   DeleteMenuItemProps,
@@ -255,7 +260,11 @@ const Guidance = () => {
         )
       );
     },
-    RuleValueAsNumberSelector: ({ children }: { children?: React.ReactNode }) => (
+    RuleValueAsNumberSelector: ({
+      children,
+    }: {
+      children?: React.ReactNode;
+    }) => (
       <RuleValueAsNumberSelector rule={node} readOnly={false} flex={false}>
         {children}
       </RuleValueAsNumberSelector>
@@ -370,12 +379,17 @@ const Guidance = () => {
       const isMixed = uniqueDomains.size > 1;
 
       const domain = isMixed ? undefined : getDomain(concept);
-      const effectiveCategory = isMixed ? "" : (getPrimaryConcept(concept)?.category || "");
+      const effectiveCategory = isMixed
+        ? ""
+        : getPrimaryConcept(concept)?.category || "";
       const { verb } = getDomainPhrase(effectiveCategory);
       const past = getDomainPastPhrase(effectiveCategory);
 
       return (
-        <ActionMenuSection title={domain ? `${domain} Rule` : "Rule"} fixedExpanded>
+        <ActionMenuSection
+          title={domain ? `${domain} Rule` : "Rule"}
+          fixedExpanded
+        >
           <RuleGuidance
             category={domain ?? ""}
             verb={verb}
@@ -383,10 +397,8 @@ const Guidance = () => {
             timeConstraint={selectedNode?.timeConstraint}
             ageConstraint={selectedNode?.ageConstraint}
             valueAsNumber={selectedNode?.valueAsNumber}
-components={makeRuleComponents(selectedNode)}
-            showSelectors={
-              !["Gender", "Race"].includes(effectiveCategory)
-            }
+            components={makeRuleComponents(selectedNode)}
+            showSelectors={!["Gender", "Race"].includes(effectiveCategory)}
           />
         </ActionMenuSection>
       );

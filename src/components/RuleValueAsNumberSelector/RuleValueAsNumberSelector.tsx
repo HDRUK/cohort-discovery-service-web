@@ -51,7 +51,9 @@ function operatorSwitchConstraint(
     prevOperator === ValueAsNumberOperator.GREATER_THAN ? l : r;
 
   if (nextOperator === ValueAsNumberOperator.BETWEEN) {
-    return [singleValue, null];
+    return prevOperator === ValueAsNumberOperator.GREATER_THAN
+      ? [singleValue, null]
+      : [null, singleValue];
   }
   if (prevOperator === ValueAsNumberOperator.BETWEEN) {
     return nextOperator === ValueAsNumberOperator.GREATER_THAN
@@ -172,7 +174,10 @@ const RuleValueAsNumberSelector = ({
             onChange={handleOperatorChange}
             readOnly={readOnly}
           />
-          <NumericValueInput value={lower} onChange={handleLowerChange} />
+          <NumericValueInput
+              value={operator === ValueAsNumberOperator.LESS_THAN ? upper : lower}
+              onChange={operator === ValueAsNumberOperator.LESS_THAN ? handleUpperChange : handleLowerChange}
+            />
           {operator === ValueAsNumberOperator.BETWEEN && (
             <>
               <Typography variant="body2" sx={{ flexShrink: 0 }}>

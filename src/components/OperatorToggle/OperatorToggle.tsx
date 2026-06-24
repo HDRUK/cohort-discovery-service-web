@@ -2,10 +2,10 @@
 
 import * as React from "react";
 import { ClickAwayListener, Collapse, Stack, Tooltip } from "@mui/material";
-import { SingleSidedOperator, ValueAsNumberOperator } from "@/types/rules";
+import { ValueAsNumberOperator } from "@/types/rules";
 import CircularIconButton from "@/components/CircularIconButton";
 
-type KnownOperator = SingleSidedOperator | ValueAsNumberOperator;
+type KnownOperator = ValueAsNumberOperator;
 
 interface OperatorToggleProps<T extends KnownOperator> {
   operators: readonly T[];
