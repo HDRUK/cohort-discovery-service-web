@@ -52,13 +52,14 @@ import {
   isRuleLeaf,
   removeById,
 } from "@/utils/rules";
+import { isValueAsNumberDomain } from "@/utils/omop";
 import useFeatures from "@/hooks/useFeatures";
 import Close from "@mui/icons-material/Close";
 import useHoverable from "@/hooks/useHoverable";
 import AddTimeframeButton from "@/components/AddTimeFrameButton";
 import AddAgeButton from "@/components/AddAgeButton";
-import DeleteAgeButton from "@/components/DeleteAgeButton";
-import DeleteTimeFrameButton from "@/components/DeleteTimeFrameButton";
+import RuleValueAsNumberSelector from "@/components/RuleValueAsNumberSelector";
+import AddValueAsNumberButton from "@/components/AddValueAsNumberButton";
 
 interface Action {
   action: () => void;
@@ -325,48 +326,56 @@ const RuleWrapper = ({
               !["Gender", "Race"].includes(
                 getPrimaryConcept(node.rule.concept)?.category || "",
               ) &&
-              (node.timeConstraint || node.ageConstraint || isSelected) && (
+              (node.timeConstraint ||
+                node.ageConstraint ||
+                node.valueAsNumber ||
+                isSelected) && (
                 <CardActions sx={cardActionsSx}>
                   {node.timeConstraint ? (
                     <RuleTimeframeSelector
                       data-testid="rule-timeframe-selector"
                       rule={node}
-                      readOnly={!isSelected}
+                      readOnly={true}
                       flex
-                    >
-                      {isSelected && (
-                        <Box sx={{ ml: 1 }}>
-                          <DeleteTimeFrameButton rule={node} />
-                        </Box>
-                      )}
-                    </RuleTimeframeSelector>
+                    />
                   ) : isSelected ? (
                     <AddTimeframeButton
                       label="Add timeframe"
                       rule={node}
                       key="RuleTimeframeSelector"
                       hoverKey={`rule-timeframe-${node.id}`}
-                      disabled={!!node.ageConstraint}
                     />
                   ) : null}
                   {node.ageConstraint ? (
                     <RuleAgeSelector
                       rule={node}
-                      readOnly={!isSelected}
+                      readOnly={true}
                       uniDirectional={constrainForBunnyV1}
                       flex
-                    >
-                      {isSelected && <DeleteAgeButton rule={node} />}
-                    </RuleAgeSelector>
+                    />
                   ) : isSelected ? (
                     <AddAgeButton
                       label="Add age"
                       rule={node}
                       key="RuleAgeSelector"
                       hoverKey={`rule-age-${node.id}`}
-                      disabled={!!node.timeConstraint}
                     />
                   ) : null}
+                  {isValueAsNumberDomain(node.rule.concept) &&
+                    (node.valueAsNumber ? (
+                      <RuleValueAsNumberSelector
+                        rule={node}
+                        readOnly={true}
+                        flex
+                      />
+                    ) : isSelected ? (
+                      <AddValueAsNumberButton
+                        label="Add value"
+                        rule={node}
+                        key="RuleValueAsNumberSelector"
+                        hoverKey={`rule-value-as-number-${node.id}`}
+                      />
+                    ) : null)}
                 </CardActions>
               )}
 

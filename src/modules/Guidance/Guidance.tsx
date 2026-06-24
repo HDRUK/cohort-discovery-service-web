@@ -9,7 +9,7 @@ import EmptyRuleGuidance from "@/content/guidance/queryBuilder/emptyRule.mdx";
 import ExclusionGuidance from "@/content/guidance/queryBuilder/exclusionGuidance.mdx";
 import MultipleItemGuidance from "@/content/guidance/queryBuilder/multipleItem.mdx";
 import { Box, BoxProps, Link, LinkProps, TypographyProps } from "@mui/material";
-import { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import {
@@ -56,6 +56,9 @@ import ConvertToGroupMenuItem, {
 import AddAgeButton from "@/components/AddAgeButton";
 import RuleAgeSelector from "@/components/RuleAgeSelector";
 import DeleteAgeButton from "@/components/DeleteAgeButton";
+import RuleValueAsNumberSelector from "@/components/RuleValueAsNumberSelector";
+import AddValueAsNumberButton from "@/components/AddValueAsNumberButton";
+import DeleteValueAsNumberButton from "@/components/DeleteValueAsNumberButton";
 import useFeatures from "@/hooks/useFeatures";
 import CollapsibleGuidance from "@/components/CollapsibleGuidance";
 
@@ -241,6 +244,25 @@ const Guidance = () => {
     DeleteAgeButton: (props: DeleteMenuItemProps) => (
       <DeleteAgeButton rule={node} {...props} />
     ),
+    AddValueAsNumberButton: (props: AddChipProps) => {
+      return (
+        !node.valueAsNumber && (
+          <AddValueAsNumberButton
+            rule={node}
+            hoverKey={`rule-value-as-number-${node.id}`}
+            {...props}
+          />
+        )
+      );
+    },
+    RuleValueAsNumberSelector: ({ children }: { children?: React.ReactNode }) => (
+      <RuleValueAsNumberSelector rule={node} readOnly={false} flex={false}>
+        {children}
+      </RuleValueAsNumberSelector>
+    ),
+    DeleteValueAsNumberButton: (props: DeleteMenuItemProps) => (
+      <DeleteValueAsNumberButton rule={node} {...props} />
+    ),
   });
 
   const makeOperatorComponents = (node: OperatorType) => ({
@@ -360,6 +382,8 @@ const Guidance = () => {
             verbPastTense={past}
             timeConstraint={selectedNode?.timeConstraint}
             ageConstraint={selectedNode?.ageConstraint}
+            valueAsNumber={selectedNode?.valueAsNumber}
+            isMeasurement={!isMixed && effectiveCategory === "Measurement"}
             components={makeRuleComponents(selectedNode)}
             showSelectors={
               !["Gender", "Race"].includes(effectiveCategory)

@@ -12,6 +12,9 @@ export enum SingleSidedOperator {
   LESS_THAN = "lt",
 }
 
+export const BETWEEN_OPERATOR = "between" as const;
+export type ValueAsNumberOperator = SingleSidedOperator | typeof BETWEEN_OPERATOR;
+
 export type ConceptOperator = {
   concept: Concept | Concept[] | null;
 };
@@ -27,6 +30,8 @@ type Node = {
   timeConstraintOperator?: SingleSidedOperator;
   ageConstraint?: [number | null, number | null];
   ageConstraintOperator?: SingleSidedOperator;
+  valueAsNumber?: [number | null, number | null];
+  valueAsNumberOperator?: ValueAsNumberOperator;
 };
 
 export interface OperatorType extends Node {
