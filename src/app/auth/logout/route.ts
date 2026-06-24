@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import { isOidcEnabled, getOidcEndSessionEndpoint } from "@/lib/oidc";
 
@@ -8,21 +7,9 @@ export async function GET(req: NextRequest) {
 
   const endSessionEndpoint = isOidcEnabled() ? await getOidcEndSessionEndpoint() : null;
 
-  let token = null;
-  if (endSessionEndpoint) {
-    try {
-      token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-    } catch {
-      token = null;
-    }
-  }
-
   const endSessionUrl = new URL(endSessionEndpoint ?? loginUrl);
   if (endSessionEndpoint) {
     endSessionUrl.searchParams.set("post_logout_redirect_uri", loginUrl);
-    if (token?.idToken) {
-      endSessionUrl.searchParams.set("id_token_hint", token.idToken);
-    }
   }
 
   const response = NextResponse.redirect(endSessionUrl.toString());
