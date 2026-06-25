@@ -71,4 +71,12 @@ const isValueAsNumberDomain = (concept: Concept | Concept[] | null): boolean => 
   return matches(concept);
 };
 
-export { codesToOption, getDomainPhrase, getDomainPastPhrase, getDomain, getUniqueDomains, isValueAsNumberDomain };
+const NO_SELECTOR_DOMAINS = new Set<OmopTableName>([
+  OmopTableName.Gender,
+  OmopTableName.Race,
+]);
+
+const categoryHasSelectors = (category: string): boolean =>
+  !NO_SELECTOR_DOMAINS.has(category.toLowerCase() as OmopTableName);
+
+export { codesToOption, getDomainPhrase, getDomainPastPhrase, getDomain, getUniqueDomains, isValueAsNumberDomain, categoryHasSelectors };

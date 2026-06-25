@@ -128,28 +128,18 @@ const RuleValueAsNumberSelector = ({
     );
   };
 
-  const handleLowerChange = (value: number | null) => {
+  const handleChange = (slot: "lower" | "upper") => (value: number | null) => {
     setSelectedGuidance(key, true);
     setQueryBuilderJson(
       updateById(queryBuilderJson, rule.id, (node) => {
         if (!isRuleLeaf(node)) return node;
         return {
           ...node,
-          valueAsNumber: buildConstraint(operator, value, upper),
-          valueAsNumberOperator: operator,
-        };
-      }),
-    );
-  };
-
-  const handleUpperChange = (value: number | null) => {
-    setSelectedGuidance(key, true);
-    setQueryBuilderJson(
-      updateById(queryBuilderJson, rule.id, (node) => {
-        if (!isRuleLeaf(node)) return node;
-        return {
-          ...node,
-          valueAsNumber: buildConstraint(operator, lower, value),
+          valueAsNumber: buildConstraint(
+            operator,
+            slot === "lower" ? value : lower,
+            slot === "upper" ? value : upper,
+          ),
           valueAsNumberOperator: operator,
         };
       }),
@@ -176,14 +166,14 @@ const RuleValueAsNumberSelector = ({
           />
           <NumericValueInput
               value={operator === ValueAsNumberOperator.LESS_THAN ? upper : lower}
-              onChange={operator === ValueAsNumberOperator.LESS_THAN ? handleUpperChange : handleLowerChange}
+              onChange={operator === ValueAsNumberOperator.LESS_THAN ? handleChange("upper") : handleChange("lower")}
             />
           {operator === ValueAsNumberOperator.BETWEEN && (
             <>
               <Typography variant="body2" sx={{ flexShrink: 0 }}>
                 –
               </Typography>
-              <NumericValueInput value={upper} onChange={handleUpperChange} />
+              <NumericValueInput value={upper} onChange={handleChange("upper")} />
             </>
           )}
         </Stack>

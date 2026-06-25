@@ -46,6 +46,7 @@ import AddTimeFrameButton from "@/components/AddTimeFrameButton";
 import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
 import { CustomH1, CustomH2 } from "@/components/GuidanceHeaders";
 import {
+  categoryHasSelectors,
   getDomain,
   getDomainPastPhrase,
   getDomainPhrase,
@@ -401,7 +402,7 @@ const Guidance = () => {
             ageConstraint={selectedNode?.ageConstraint}
             valueAsNumber={selectedNode?.valueAsNumber}
             components={makeRuleComponents(selectedNode)}
-            showSelectors={!["Gender", "Race"].includes(effectiveCategory)}
+            showSelectors={categoryHasSelectors(effectiveCategory)}
           />
         </ActionMenuSection>
       );
