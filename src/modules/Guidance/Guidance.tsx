@@ -50,6 +50,7 @@ import {
   getDomainPastPhrase,
   getDomainPhrase,
   getUniqueDomains,
+  isValueAsNumberDomain,
 } from "@/utils/omop";
 import DeleteTimeFrameButton from "@/components/DeleteTimeFrameButton";
 import DeleteMenuItem, {
@@ -177,7 +178,7 @@ const Guidance = () => {
     [queryBuilderJson, setQueryBuilderJson],
   );
 
-  const { constrainForBunnyV1, queryBuilderAllowNestedGroups } = useFeatures();
+  const { constrainForBunnyV1, queryBuilderAllowNestedGroups, queryBuilderUseValueAsNumber } = useFeatures();
 
   const handleDelete = useCallback(() => {
     const newQuery = selectedIds.reduce(
@@ -251,6 +252,8 @@ const Guidance = () => {
     ),
     AddValueAsNumberButton: (props: AddChipProps) => {
       return (
+        queryBuilderUseValueAsNumber &&
+        isValueAsNumberDomain(node.rule.concept) &&
         !node.valueAsNumber && (
           <AddValueAsNumberButton
             rule={node}

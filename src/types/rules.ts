@@ -13,7 +13,10 @@ export enum ValueAsNumberOperator {
   BETWEEN = "↔",
 }
 
-export type SingleSidedOperator = Exclude<ValueAsNumberOperator, ValueAsNumberOperator.BETWEEN>;
+export enum SingleSidedOperator {
+  GREATER_THAN = "≥",
+  LESS_THAN = "<",
+}
 
 export type ConceptOperator = {
   concept: Concept | Concept[] | null;

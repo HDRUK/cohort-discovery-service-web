@@ -3,7 +3,7 @@
 import { ReactNode, useCallback } from "react";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { getPrimaryConcept, updateById } from "@/utils/rules";
-import { RuleLeafType, ValueAsNumberOperator } from "@/types/rules";
+import { RuleLeafType, SingleSidedOperator } from "@/types/rules";
 import dayjs, { Dayjs } from "dayjs";
 import {
   DatePicker,
@@ -105,7 +105,7 @@ const RuleTimeframeSelector = ({
         <SingleBoundSelector<string, Dayjs>
           constraint={rule.timeConstraint ?? []}
           constraintOperator={
-            rule.timeConstraintOperator ?? ValueAsNumberOperator.GREATER_THAN
+            rule.timeConstraintOperator ?? SingleSidedOperator.GREATER_THAN
           }
           onConstraintChange={(next, nextOperator) => {
             setSelectedGuidance(key, true);
@@ -131,7 +131,7 @@ const RuleTimeframeSelector = ({
           renderReadOnlyLabel={({ operator, value }) =>
             value
               ? `${capitaliseFirstLetter(verbPast)} ${
-                  operator === ValueAsNumberOperator.GREATER_THAN
+                  operator === SingleSidedOperator.GREATER_THAN
                     ? "after"
                     : "before"
                 } ${value.format("MM-YYYY")}`

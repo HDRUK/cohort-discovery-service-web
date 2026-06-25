@@ -5,7 +5,7 @@ import { isAgeFilter, isRuleLeaf, updateById } from "@/utils/rules";
 import {
   AgeFilterType,
   RuleLeafType,
-  ValueAsNumberOperator,
+  SingleSidedOperator,
 } from "@/types/rules";
 import { CustomH1 } from "@/components/GuidanceHeaders";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
@@ -68,16 +68,14 @@ const RuleAgeSelectorSingleBound = ({
 
   const handleConstraintChange = (
     next: NullablePair<number>,
-    nextOperator: ValueAsNumberOperator,
+    nextOperator: SingleSidedOperator,
   ) => {
     setSelectedGuidance(key, true);
 
     setQueryBuilderJson(
       updateById(queryBuilderJson, rule.id, (node) => {
-        const left =
-          next[0] == null ? null : clamp(next[0], minAge, maxAge);
-        const right =
-          next[1] == null ? null : clamp(next[1], minAge, maxAge);
+        const left = next[0] == null ? null : clamp(next[0], minAge, maxAge);
+        const right = next[1] == null ? null : clamp(next[1], minAge, maxAge);
 
         if (isRuleLeaf(node)) {
           return {
@@ -111,7 +109,7 @@ const RuleAgeSelectorSingleBound = ({
       <SingleBoundSelector<number>
         constraint={ageConstraint}
         constraintOperator={
-          rule.ageConstraintOperator ?? ValueAsNumberOperator.GREATER_THAN
+          rule.ageConstraintOperator ?? SingleSidedOperator.GREATER_THAN
         }
         readOnly={readOnly}
         anyLabel="Any age"
