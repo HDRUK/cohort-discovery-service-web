@@ -40,6 +40,27 @@ export async function getAccessToken(): Promise<string | undefined> {
   return cookieStore.get(ACCESS_TOKEN_NAME)?.value;
 }
 
+type StringOrNamed = string | { name: string };
+
+const normaliseTokenUser = (
+  raw: Omit<TokenUser, "workgroups" | "cohort_discovery_roles"> & {
+    workgroups?: StringOrNamed[];
+    cohort_discovery_roles?: StringOrNamed[];
+  },
+): TokenUser => ({
+  ...raw,
+  workgroups:
+    raw.workgroups?.map((item) =>
+      typeof item === "string" ? item : item.name,
+    ) ?? [],
+  cohort_discovery_roles:
+    raw.cohort_discovery_roles
+      ?.map((item) => (typeof item === "string" ? item : item.name))
+      .filter((name): name is RoleName =>
+        Object.values(RoleName).includes(name as RoleName),
+      ) ?? [],
+});
+
 const mapUserToTokenUser = (user: User): TokenUser => {
   const fullName = (user.name ?? "").trim();
   const [firstname = "", lastname = ""] = fullName.split(/\s+/, 2);
@@ -118,7 +139,15 @@ export async function getTokenUser(): Promise<{
 
   const decoded = token ? (jwt.decode(token) as JwtPayload) : undefined;
 
-  const user = decoded?.user as TokenUser;
+  const user = decoded?.user
+    ? normaliseTokenUser(
+        decoded.user as Omit<TokenUser, "workgroups" | "cohort_discovery_roles"> & {
+          workgroups?: StringOrNamed[];
+          cohort_discovery_roles?: StringOrNamed[];
+        },
+      )
+    : undefined;
+
   if (!user) {
     if (isStandalone(applicationMode)) {
       redirect("/login");
