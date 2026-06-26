@@ -1,0 +1,48 @@
+name: Build Args
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      mode:
+        required: true
+        type: string
+
+    outputs:
+      docker_build_args:
+        value: ${{ jobs.generate.outputs.docker_build_args }}
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    outputs:
+      docker_build_args: ${{ steps.args.outputs.docker_build_args }}
+
+    steps:
+      - id: args
+        run: |
+          ARGS=""
+
+          if [ "${{ inputs.mode }}" = "standalone" ]; then
+            ARGS+="--build-arg API_BASE_URL=${{ vars.API_BASE_URL }} "
+            ARGS+="--build-arg NEXT_PUBLIC_LOGIN_URL=${{ vars.NEXT_PUBLIC_LOGIN_URL }} "
+            ARGS+="--build-arg NEXT_PUBLIC_USE_DEBUG_LOGS=${{ vars.NEXT_PUBLIC_USE_DEBUG_LOGS }} "
+            ARGS+="--build-arg NEXT_PUBLIC_TASK_URL=${{ vars.NEXT_PUBLIC_TASK_URL }} "
+            ARGS+="--build-arg NEXT_PUBLIC_USE_EXAMPLE_QUERY=${{ vars.NEXT_PUBLIC_USE_EXAMPLE_QUERY }} "
+            ARGS+="--build-arg APPLICATION_MODE=${{ vars.APPLICATION_MODE }} "
+          else
+            ARGS+="--build-arg API_BASE_URL=${{ vars.INT_API_BASE_URL }} "
+            ARGS+="--build-arg NEXT_PUBLIC_LOGIN_URL=${{ vars.INT_NEXT_PUBLIC_LOGIN_URL }} "
+            ARGS+="--build-arg NEXT_PUBLIC_USE_DEBUG_LOGS=${{ vars.INT_NEXT_PUBLIC_USE_DEBUG_LOGS }} "
+            ARGS+="--build-arg NEXT_PUBLIC_TASK_URL=${{ vars.INT_NEXT_PUBLIC_TASK_URL }} "
+            ARGS+="--build-arg NEXT_PUBLIC_USE_EXAMPLE_QUERY=${{ vars.INT_NEXT_PUBLIC_USE_EXAMPLE_QUERY }} "
+            ARGS+="--build-arg APPLICATION_MODE=${{ vars.INT_APPLICATION_MODE }} "
+          fi
+
+          ARGS="${ARGS% }"
+
+          echo "docker_build_args=${ARGS}" >> "$GITHUB_OUTPUT"
