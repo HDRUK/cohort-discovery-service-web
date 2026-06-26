@@ -74,10 +74,8 @@ const RuleAgeSelectorSingleBound = ({
 
     setQueryBuilderJson(
       updateById(queryBuilderJson, rule.id, (node) => {
-        const left =
-          next[0] == null ? null : clamp(next[0], minAge, maxAge);
-        const right =
-          next[1] == null ? null : clamp(next[1], minAge, maxAge);
+        const left = next[0] == null ? null : clamp(next[0], minAge, maxAge);
+        const right = next[1] == null ? null : clamp(next[1], minAge, maxAge);
 
         if (isRuleLeaf(node)) {
           return {

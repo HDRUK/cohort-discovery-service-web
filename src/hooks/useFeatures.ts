@@ -47,6 +47,9 @@ const useFeatures = () => {
 
         adminMoreCollectionDetails:
           flags[FeatureName.AdminMoreCollectionDetails],
+
+        queryBuilderUseValueAsNumber:
+          flags[FeatureName.QueryBuilderUseValueAsNumber],
       };
     }),
   );

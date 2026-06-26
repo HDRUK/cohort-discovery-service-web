@@ -58,8 +58,8 @@
             }
           },
           "exclude": false,
-          "ageConstraintOperator": "gt",
-          "timeConstraintOperator": "gt"
+          "ageConstraintOperator": "≥",
+          "timeConstraintOperator": "≥"
         }
       ]
     }

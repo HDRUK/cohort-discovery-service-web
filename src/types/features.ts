@@ -21,6 +21,8 @@ export enum FeatureName {
   HdrukTheme = "hdruk-uk-theme",
 
   AdminMoreCollectionDetails = "admin-more-collection-details",
+
+  QueryBuilderUseValueAsNumber = "query-builder-use-value-as-number",
 }
 
 export type FeatureFlag = Record<FeatureName, boolean>;
@@ -50,4 +52,6 @@ export const DEFAULT_FLAGS: FeatureFlag = {
   [FeatureName.ManageWorkgroupsInternally]: true,
 
   [FeatureName.AdminMoreCollectionDetails]: false,
+
+  [FeatureName.QueryBuilderUseValueAsNumber]: false,
 };
