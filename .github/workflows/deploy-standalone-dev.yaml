@@ -1,0 +1,41 @@
+name: Deploy branch to standalone DEV
+run-name: ${{ github.actor }} deploying ${{ github.ref_name }} to standalone DEV
+
+on:
+  workflow_dispatch:
+
+jobs:
+  setup-standalone:
+    runs-on: ubuntu-latest
+    environment: dev-standalone
+    outputs:
+      docker_build_args: ${{ steps.args.outputs.docker_build_args }}
+    steps:
+      - id: args
+        run: |
+          ARGS=""
+          ARGS+="--build-arg API_BASE_URL=${{ vars.API_BASE_URL }} "
+          ARGS+="--build-arg NEXT_PUBLIC_LOGIN_URL=${{ vars.NEXT_PUBLIC_LOGIN_URL }} "
+          ARGS+="--build-arg NEXT_PUBLIC_USE_DEBUG_LOGS=${{ vars.NEXT_PUBLIC_USE_DEBUG_LOGS }} "
+          ARGS+="--build-arg NEXT_PUBLIC_TASK_URL=${{ vars.NEXT_PUBLIC_TASK_URL }} "
+          ARGS+="--build-arg NEXT_PUBLIC_USE_EXAMPLE_QUERY=${{ vars.NEXT_PUBLIC_USE_EXAMPLE_QUERY }} "
+          ARGS+="--build-arg APPLICATION_MODE=${{ vars.APPLICATION_MODE }} "
+          echo "docker_build_args=$ARGS" >> "$GITHUB_OUTPUT"
+
+  build-standalone:
+    needs: setup-standalone
+    uses: HDRUK/github-actions-templates/.github/workflows/docker-build.yaml@main
+    with:
+      chart_path: chart/cohort-web/Chart.yaml
+      environment: dev-standalone
+      docker_build_args: ${{ needs.setup-standalone.outputs.docker_build_args }}
+    secrets: inherit
+
+  deploy-standalone:
+    needs: build-standalone
+    uses: HDRUK/github-actions-templates/.github/workflows/deploy-release.yml@main
+    with:
+      env: dev-standalone
+      chart_path: chart/cohort-web/Chart.yaml
+      git_ref: ${{ github.ref_name }}
+    secrets: inherit
