@@ -26,7 +26,7 @@ jobs:
     needs: build-standalone
     uses: HDRUK/github-actions-templates/.github/workflows/deploy-release.yml@main
     with:
-      env: dev-integrated
+      env: dev-standalone
       chart_path: chart/cohort-web/Chart.yaml
       git_ref: dev
     secrets: inherit
