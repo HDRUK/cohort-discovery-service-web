@@ -42,7 +42,7 @@ const RuleDemographicFilter = ({ rule, groupId, ...rest }: RuleDemographicFilter
           {!!rule.location && (
             <Paper sx={{ border: 1, p: 1 }}>
               {isGeoRadiusLocation(rule.location)
-                ? `Within ${formatRadius(rule.location.radius)} of (${rule.location.lat.toFixed(4)}, ${rule.location.lon.toFixed(4)})`
+                ? `Within ${formatRadius(rule.location.radius)} of ${rule.location.address ?? `(${rule.location.lat.toFixed(4)}, ${rule.location.lon.toFixed(4)})`}`
                 : `Location: ${rule.location.join(", ")}`}
             </Paper>
           )}

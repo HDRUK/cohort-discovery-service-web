@@ -215,8 +215,8 @@ const queryToText = (
 
       let locationText = "";
       if (n.location && isGeoRadiusLocation(n.location)) {
-        const { lat, lon, radius } = n.location;
-        locationText = `live within ${formatRadius(radius)} of (${lat.toFixed(3)}, ${lon.toFixed(3)})`;
+        const { lat, lon, radius, address } = n.location;
+        locationText = `live within ${formatRadius(radius)} of ${address ?? `(${lat.toFixed(3)}, ${lon.toFixed(3)})`}`;
       }
 
       if (ageText && locationText) {

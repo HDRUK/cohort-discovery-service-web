@@ -53,8 +53,8 @@ const LocationSelector = ({ rule }: LocationSelectorProps) => {
       {geoLocation ? (
         <Stack spacing={0.5}>
           <Typography variant="body2">
-            Within {formatRadius(geoLocation.radius)} of (
-            {geoLocation.lat.toFixed(4)}, {geoLocation.lon.toFixed(4)})
+            Within {formatRadius(geoLocation.radius)} of{" "}
+            {geoLocation.address ?? `(${geoLocation.lat.toFixed(4)}, ${geoLocation.lon.toFixed(4)})`}
           </Typography>
           <Stack direction="row" spacing={1}>
             <Button size="small" variant="outlined" onClick={() => setModalOpen(true)}>

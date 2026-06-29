@@ -10,6 +10,7 @@ import {
   useMap,
   useMapEvents,
 } from "react-leaflet";
+import AddressSearch from "./AddressSearch";
 import { useEffect, useState } from "react";
 import {
   Box,
@@ -25,7 +26,7 @@ import { GeoRadiusLocation } from "@/types/rules";
 import { formatRadius } from "./formatRadius";
 import LSOABoundaries from "./LSOABoundaries";
 
-const MIN_RADIUS = 10_000;
+const MIN_RADIUS = 5_000;
 const MAX_RADIUS = 1_000_000;
 const sliderToMeters = (v: number) =>
   Math.round(MIN_RADIUS * Math.pow(MAX_RADIUS / MIN_RADIUS, v / 100));
@@ -38,6 +39,14 @@ const pinIcon = new L.DivIcon({
   iconSize: [16, 16],
   iconAnchor: [8, 8],
 });
+
+function FlyTo({ target }: { target: L.LatLngTuple | null }) {
+  const map = useMap();
+  useEffect(() => {
+    if (target) map.flyTo(target, 12);
+  }, [target, map]);
+  return null;
+}
 
 function InvalidateOnMount() {
   const map = useMap();
@@ -82,6 +91,8 @@ export default function GeoMapModal({
   const [position, setPosition] = useState<L.LatLngTuple | null>(
     initialLocation ? [initialLocation.lat, initialLocation.lon] : null,
   );
+  const [flyTarget, setFlyTarget] = useState<L.LatLngTuple | null>(null);
+  const [address, setAddress] = useState<string | undefined>(initialLocation?.address);
   const [radius, setRadius] = useState(initialLocation?.radius ?? 50000);
   const [showBoundaries, setShowBoundaries] = useState(true);
 
@@ -92,6 +103,8 @@ export default function GeoMapModal({
     setPosition(
       initialLocation ? [initialLocation.lat, initialLocation.lon] : null,
     );
+    setFlyTarget(null);
+    setAddress(initialLocation?.address);
     setRadius(initialLocation?.radius ?? 50000);
   } else if (lastOpen && !open) {
     setLastOpen(false);
@@ -99,7 +112,7 @@ export default function GeoMapModal({
 
   const handleConfirm = () => {
     if (!position) return;
-    onConfirm({ lat: position[0], lon: position[1], radius });
+    onConfirm({ lat: position[0], lon: position[1], radius, address });
     onClose();
   };
 
@@ -121,6 +134,14 @@ export default function GeoMapModal({
       }
     >
       <Stack spacing={2}>
+        <AddressSearch
+          onSelect={(pos, addr) => {
+            setPosition(pos);
+            setFlyTarget(pos);
+            setAddress(addr);
+            setRadius(MIN_RADIUS);
+          }}
+        />
         <Stack direction="row" justifyContent="flex-end" alignItems="center">
           <FormControlLabel
             control={
@@ -153,6 +174,7 @@ export default function GeoMapModal({
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             <InvalidateOnMount />
+            <FlyTo target={flyTarget} />
             <LSOABoundaries
               pinPosition={position}
               radius={radius}
@@ -160,7 +182,10 @@ export default function GeoMapModal({
             />
             <LocationMarker
               position={position}
-              onPositionChange={setPosition}
+              onPositionChange={(pos) => {
+                setPosition(pos);
+                setAddress(undefined);
+              }}
             />
             {position && (
               <Circle
@@ -189,7 +214,7 @@ export default function GeoMapModal({
           />
           <Stack direction="row" justifyContent="space-between">
             <Typography variant="caption" color="text.secondary">
-              10 km
+              5 km
             </Typography>
             <Typography variant="caption" color="text.secondary">
               1000 km

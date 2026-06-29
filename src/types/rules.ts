@@ -41,7 +41,7 @@ export interface RuleLeafType extends Node {
   rule: ConceptOperator;
 }
 
-export type GeoRadiusLocation = { lat: number; lon: number; radius: number };
+export type GeoRadiusLocation = { lat: number; lon: number; radius: number; address?: string };
 
 export interface DemographicFilterType extends Omit<
   Node,
