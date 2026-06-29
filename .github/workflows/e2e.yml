@@ -180,6 +180,7 @@ jobs:
       OIDC_ISSUER_URL: http://localhost:4011
       OIDC_CLIENT_ID: auth-code-client
       OIDC_SCOPES: openid profile email
+      OIDC_PROVIDER_NAME: Lifescience Login
       NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET || 'cypress-nextauth-secret' }}
       NEXTAUTH_URL: http://localhost:3000/auth
 
@@ -220,6 +221,7 @@ jobs:
           OIDC_ISSUER_URL: http://localhost:4011
           OIDC_CLIENT_ID: auth-code-client
           OIDC_SCOPES: openid profile email
+          OIDC_PROVIDER_NAME: Lifescience Login
           NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET || 'cypress-nextauth-secret' }}
           NEXTAUTH_URL: http://localhost:3000/auth
         run: npm run build
@@ -258,6 +260,7 @@ jobs:
           OIDC_ISSUER_URL: http://localhost:4011
           OIDC_CLIENT_ID: auth-code-client
           OIDC_SCOPES: openid profile email
+          OIDC_PROVIDER_NAME: Lifescience Login
           NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET || 'cypress-nextauth-secret' }}
           NEXTAUTH_URL: http://localhost:3000/auth
         run: |
