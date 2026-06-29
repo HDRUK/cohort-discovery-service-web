@@ -35,6 +35,9 @@ export const authOptions: AuthOptions = {
             authorization: {
               params: {
                 scope: OIDC_CONFIG.scopes,
+                ...(OIDC_CONFIG.audience && {
+                  resource: OIDC_CONFIG.audience,
+                }),
               },
             },
             idToken: true,
@@ -53,6 +56,9 @@ export const authOptions: AuthOptions = {
     async jwt({ token, account, user }) {
       if (account?.access_token) {
         token.accessToken = account.access_token;
+        if (process.env.NEXT_PUBLIC_USE_DEBUG_LOGS === "true") {
+          console.log("[OIDC] access token:", account.access_token);
+        }
       }
 
       if (account?.expires_at) {

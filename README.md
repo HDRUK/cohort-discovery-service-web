@@ -45,6 +45,7 @@ Use `.env.example` as the base:
 | `OIDC_ISSUER_URL`                 | If `OIDC_ENABLED=true` | OIDC authority issuer URL (used for discovery).                                                                             |
 | `OIDC_CLIENT_ID`                  | If `OIDC_ENABLED=true` | OIDC public client ID.                                                                                                      |
 | `OIDC_SCOPES`                     | No                     | OIDC scopes, defaults to `openid profile email`.                                                                            |
+| `OIDC_AUDIENCE`                   | No                     | Optional OIDC audience sent to the authorization endpoint.                                                                  |
 | `NEXTAUTH_SECRET`                 | If `OIDC_ENABLED=true` | Secret used by next-auth to sign/encrypt session JWT.                                                                       |
 | `NEXTAUTH_URL`                    | If `OIDC_ENABLED=true` | URL used by next auth for login/logout                                                                                      |
 | `NEXT_PUBLIC_USE_EXAMPLE_QUERY`   | No                     | Enables example query UX/debug helpers when `true`.                                                                         |
