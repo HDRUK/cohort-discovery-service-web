@@ -1,3 +1,9 @@
+## [1.7.1](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.7.0...v1.7.1) (2026-06-29)
+
+### 🐛 Bug Fixes
+
+* **DP-861:** Truncate long concept names with "..." (#417) ([a64f25d](https://github.com/HDRUK/cohort-discovery-service-web/commit/a64f25d8aae0d3e3c481a14fb71c3e8d0ad99b79)), closes [DP-861](undefinedDP-861)
+
 ## [1.7.0](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.6.0...v1.7.0) (2026-06-12)
 
 ### ✨ Features
