@@ -31,9 +31,7 @@ const getActiveOidcSession = async () => {
 export async function getAccessToken(): Promise<string | undefined> {
   if (isOidcEnabled()) {
     const session = await getActiveOidcSession();
-    if (session?.accessToken) {
-      return session.accessToken;
-    }
+    return session?.accessToken;
   }
 
   const cookieStore = await cookies();
