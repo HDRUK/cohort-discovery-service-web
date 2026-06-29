@@ -64,7 +64,7 @@
     "react-hook-form": "^7.62.0",
     "react-syntax-highlighter": "16.1.0",
     "semantic-release": "^24.2.1",
-    "uuid": "^13.0.0",
+    "uuid": "^14.0.0",
     "yup": "^1.7.0",
     "zustand": "^5.0.6"
   },
