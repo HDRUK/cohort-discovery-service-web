@@ -65,7 +65,7 @@ const LoginClient = ({ oidcEnabled }: LoginClientProps) => {
           minWidth: 150,
         }}
       >
-        {oidcEnabled ? "Sign in with Lifescience Login" : "Sign in"}
+        Sign in
       </Button>
     </Circles>
   );

@@ -6,6 +6,7 @@ export const OIDC_CONFIG = {
   clientId: process.env.OIDC_CLIENT_ID,
   scopes: process.env.OIDC_SCOPES ?? "openid profile email",
   audience: process.env.OIDC_AUDIENCE,
+  name: process.env.OIDC_PROVIDER_NAME ?? "OIDC",
 };
 
 export const isOidcEnabled = () =>

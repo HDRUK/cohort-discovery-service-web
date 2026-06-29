@@ -27,7 +27,7 @@ export const authOptions: AuthOptions = {
       ? [
           {
             id: "oidc",
-            name: "Lifescience Login",
+            name: OIDC_CONFIG.name,
             type: "oauth",
             wellKnown: `${issuer}/.well-known/openid-configuration`,
             clientId: OIDC_CONFIG.clientId,
