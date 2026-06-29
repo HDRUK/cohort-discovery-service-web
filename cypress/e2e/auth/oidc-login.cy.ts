@@ -16,7 +16,7 @@ const oidcEnabled =
 
   it("renders the OIDC sign-in button on the login page", () => {
     cy.visit("/login");
-    cy.contains("button", "Sign in with Lifescience Login").should("be.visible");
+    cy.contains("button", "Sign in").should("be.visible");
   });
 
   it("redirects unauthenticated users to the OIDC sign-in endpoint from protected pages", () => {
@@ -26,7 +26,7 @@ const oidcEnabled =
 
   it("completes OIDC login and lands on the dashboard", () => {
     cy.visit("/login");
-    cy.contains("button", "Sign in with Lifescience Login").should("be.visible").click();
+    cy.contains("button", "Sign in").should("be.visible").click();
     // next-auth renders an intermediary sign-in page; submit it to start the
     // OAuth redirect to the mock OIDC server on localhost:4011.
     cy.url({ timeout: 10000 }).should("include", "/auth/signin/oidc");
