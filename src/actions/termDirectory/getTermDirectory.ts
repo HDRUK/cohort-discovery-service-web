@@ -26,18 +26,7 @@ const getTermDirectory = async (
     tags: [getTagTermDirectory(userId)],
   });
 
-  const rows = result.data.data.map((entry) => ({
-    ...entry,
-    id: entry.concept_id,
-  }));
-
-  return {
-    ...result,
-    data: {
-      ...result.data,
-      data: rows,
-    },
-  };
+  return result;
 };
 
 export default getTermDirectory;

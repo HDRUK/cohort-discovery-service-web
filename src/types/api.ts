@@ -234,7 +234,6 @@ export interface TermDirectoryEntry {
   domain_id: string;
   count: number;
   ncollections: number;
-  id: number; // alias of concept_id, required by usePaginatedTable
 }
 
 export interface TaskRun {
