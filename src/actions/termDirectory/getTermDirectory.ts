@@ -1,5 +1,6 @@
 "use server";
 
+import { getTokenUser } from "@/lib/auth";
 import { apiGet } from "@/lib/apiClient";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { TermDirectoryEntry, ApiResponse, Paginated } from "@/types/api";
@@ -10,6 +11,10 @@ const getTermDirectory = async (
   page = 1,
   per_page = DEFAULT_PER_PAGE,
 ): Promise<ApiResponse<Paginated<TermDirectoryEntry>>> => {
+  const {
+    user: { id: userId },
+  } = await getTokenUser();
+
   const params = new URLSearchParams({
     page: String(page),
     per_page: String(per_page),
@@ -18,7 +23,7 @@ const getTermDirectory = async (
   const result = await apiGet<ApiResponse<Paginated<TermDirectoryEntry>>>({
     url: API_ROUTES.termDirectory,
     params,
-    tags: getTagTermDirectory(),
+    tags: [getTagTermDirectory(userId)],
   });
 
   const rows = result.data.data.map((entry) => ({
