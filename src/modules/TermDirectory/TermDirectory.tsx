@@ -51,7 +51,6 @@ const TermDirectory = ({
     perPageDefault: DEFAULT_PER_PAGE,
     getRowId: (row) => String(row.concept_id),
     enableStickyHeader: true,
-    muiTableContainerProps: { sx: { maxHeight: "calc(100vh - 300px)" } },
   });
 
   return <Table table={table} emptyMessage="No terms found." />;
