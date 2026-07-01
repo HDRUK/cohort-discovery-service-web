@@ -47,10 +47,7 @@ export default async function RootLayout({
                   sx={{
                     display: "flex",
                     flexDirection: "column",
-                    // Double check this looks good on all pages when changed from 120vh to 100vh
-                    // Original was "120vh" to account for the footer
-                    // but this was causing a scroll bar to appear on some pages
-                    height: "100vh",
+                    height: "120vh",
                   }}
                 >
                   {!standalone && <SupportPopOut />}
