@@ -228,6 +228,15 @@ export interface CodeStat extends Code {
   collections_pct: number;
 }
 
+export interface TermDirectoryEntry {
+  concept_id: number;
+  concept_name: string;
+  domain_id: string;
+  count: number;
+  ncollections: number;
+  id: number; // alias of concept_id, required by usePaginatedTable
+}
+
 export interface TaskRun {
   duration_ms: number;
   error_class: string;
