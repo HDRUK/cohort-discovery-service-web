@@ -94,7 +94,7 @@ export function usePaginatedTable<TData extends MRT_RowData>({
     perPageParam,
   ]);
 
-  const firstRowId = data?.length ? getRowId(data?.[0]) : undefined;
+  const firstRowId = getRowId(data?.[0]);
   const expanded = useMemo(() => {
     return firstRowId && expandFirstRow ? { [firstRowId]: true } : {};
   }, [firstRowId, expandFirstRow]);
