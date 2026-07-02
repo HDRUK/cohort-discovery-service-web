@@ -356,12 +356,7 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
   createNewRule: () => get().createNewNode(NodeKind.RULE),
   createNewGroup: () => get().createNewNode(NodeKind.GROUP),
   createNewOperator: () => get().createNewNode(NodeKind.OPERATOR),
-<<<<<<< Updated upstream
   createNewAgeFilter: () => get().createNewNode(NodeKind.AGE_FILTER),
-=======
-  createNewDemographicFilter: () =>
-    get().createNewNode(NodeKind.DEMOGRAPHIC_FILTER),
->>>>>>> Stashed changes
 
   queryAsText: queryToText(DEFAULT_QUERY),
 
