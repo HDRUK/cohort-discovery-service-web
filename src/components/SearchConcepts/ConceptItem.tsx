@@ -101,6 +101,8 @@ export const ConceptItem = ({
       )}
       {showCounts && (
         <>
+          <Chip color="success" size="small" label={concept.collection_score} />
+          <Chip color="success" size="small" label={concept.match_score} />
           <Tooltip title="Number of datasets present in">
             <Chip color="success" size="small" label={concept.ncollections} />
           </Tooltip>
