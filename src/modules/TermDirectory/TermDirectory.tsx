@@ -49,7 +49,7 @@ const TermDirectory = ({
     data: entries.data,
     rowCount: entries.total,
     perPageDefault: DEFAULT_PER_PAGE,
-    getRowId: (row) => String(row.concept_id),
+    getRowId: (row) => String(row?.concept_id),
     enableStickyHeader: true,
   });
 
