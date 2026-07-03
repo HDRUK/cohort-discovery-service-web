@@ -42,12 +42,14 @@ describe("TermDirectory", () => {
     expect(within(firstRow).getByText("201826")).toBeInTheDocument();
     expect(within(firstRow).getByText("2")).toBeInTheDocument();
 
-    expect(
-      screen.getByRole("row", { name: /Myocardial infarction/i }),
-    ).toBeInTheDocument();
+    const secondRow = screen.getByRole("row", {
+      name: /Myocardial infarction/i,
+    });
+    expect(within(secondRow).getByText("4329847")).toBeInTheDocument();
+    expect(within(secondRow).getByText("1")).toBeInTheDocument();
   });
 
-  it("formats the count with thousands separators for readability", () => {
+  it("renders the count, formatted with thousands separators for readability", () => {
     render(<TermDirectory entries={paginateData({ data: mockEntries })} />);
 
     expect(screen.getByText("1,234")).toBeInTheDocument();
