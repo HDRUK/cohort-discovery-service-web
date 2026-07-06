@@ -53,7 +53,17 @@ const TermDirectory = ({
     enableStickyHeader: true,
   });
 
-  return <Table table={table} emptyMessage="No terms found." />;
+  return (
+    <Table
+      table={table}
+      emptyMessage="No terms found."
+      leftAction={{
+        searchProps: {
+          placeholder: "Search by term name or OMOP ID...",
+        },
+      }}
+    />
+  );
 };
 
 export default TermDirectory;
