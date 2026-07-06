@@ -38,7 +38,7 @@ jobs:
     with:
       env: dev-standalone
       chart_path: chart/cohort-web/Chart.yaml
-      git_ref: dev
+      git_ref: ${{ github.ref_name }}
     secrets: inherit
 
   setup-integrated:
@@ -65,5 +65,5 @@ jobs:
     with:
       env: dev-integrated
       chart_path: chart/cohort-web/Chart.yaml
-      git_ref: ${{ github.ref_name }}
+      git_ref: dev
     secrets: inherit
