@@ -26,7 +26,7 @@ interface UsePaginatedTableOptions<TData extends MRT_RowData> extends Partial<
   perPageParam?: string;
 }
 
-export function usePaginatedTable<TData extends { id: number; pid?: string }>({
+export function usePaginatedTable<TData extends MRT_RowData>({
   columns,
   data,
   rowCount,
