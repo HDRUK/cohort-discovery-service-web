@@ -1,10 +1,20 @@
 name: Build and deploy to DEV
-run-name:  ${{ github.actor }} triggered deploy to DEV pipeline
+run-name: ${{ github.actor }} triggered deploy to DEV pipeline
 
 on:
   push:
     branches:
       - dev
+
+  workflow_dispatch:
+    inputs:
+      env:
+        description: Environment
+        required: true
+        default: dev-standalone
+        type: choice
+        options:
+          - dev-standalone
 
 jobs:
   setup-standalone:
@@ -32,12 +42,14 @@ jobs:
     secrets: inherit
 
   setup-integrated:
+    if: github.event_name == 'push'
     uses: ./.github/workflows/build-args.yaml
     with:
       environment: dev-integrated
       mode: integrated
 
   build-integrated:
+    if: github.event_name == 'push'
     needs: setup-integrated
     uses: HDRUK/github-actions-templates/.github/workflows/docker-build.yaml@main
     with:
@@ -47,10 +59,11 @@ jobs:
     secrets: inherit
 
   deploy-integrated:
+    if: github.event_name == 'push'
     needs: build-integrated
     uses: HDRUK/github-actions-templates/.github/workflows/deploy-release.yml@main
     with:
       env: dev-integrated
       chart_path: chart/cohort-web/Chart.yaml
-      git_ref: dev
+      git_ref: ${{ github.ref_name }}
     secrets: inherit
