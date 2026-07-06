@@ -10,6 +10,7 @@ import { getTagTermDirectory } from "@/config/tags";
 const getTermDirectory = async (
   page = 1,
   per_page = DEFAULT_PER_PAGE,
+  search?: string,
 ): Promise<ApiResponse<Paginated<TermDirectoryEntry>>> => {
   const {
     user: { id: userId },
@@ -19,6 +20,10 @@ const getTermDirectory = async (
     page: String(page),
     per_page: String(per_page),
   });
+
+  if (search) {
+    params.set("concept_name", search);
+  }
 
   const result = await apiGet<ApiResponse<Paginated<TermDirectoryEntry>>>({
     url: API_ROUTES.termDirectory,
