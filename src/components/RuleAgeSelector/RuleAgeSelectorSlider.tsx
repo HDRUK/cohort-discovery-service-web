@@ -2,15 +2,15 @@
 
 import { ReactNode, useMemo, useState } from "react";
 import { Slider, Stack, TextField } from "@mui/material";
-import { isAgeFilter, isRuleLeaf, updateById } from "@/utils/rules";
-import { AgeFilterType, RuleLeafType } from "@/types/rules";
+import { isDemographicFilter, isRuleLeaf, updateById } from "@/utils/rules";
+import { DemographicFilterType, RuleLeafType } from "@/types/rules";
 import { CustomH1 } from "@/components/GuidanceHeaders";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import HoverableDiv from "@/components/HoverableDiv";
 import RuleAgeSelectorReadOnly from "./RuleAgeSelectorReadOnly";
 
 export interface RuleAgeSelectorSliderProps {
-  rule: RuleLeafType | AgeFilterType;
+  rule: RuleLeafType | DemographicFilterType;
   from: number;
   to: number;
   minAge: number;
@@ -61,7 +61,7 @@ const RuleAgeSelectorSlider = ({
             ],
           };
         }
-        if (isAgeFilter(node)) {
+        if (isDemographicFilter(node)) {
           return {
             ...node,
             value: [

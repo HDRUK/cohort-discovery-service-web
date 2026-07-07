@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import RuleAgeSelector, { RuleAgeSelectorProps } from "../RuleAgeSelector";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
-import { createAgeFilter, createRuleGroup } from "@/utils/rules";
+import { createDemographicFilter, createRuleGroup } from "@/utils/rules";
 import { MAX_AGE_FILTER } from "@/config/rules";
 
 beforeEach(() => {
@@ -26,7 +26,7 @@ const renderComponent = (
         },
       }}
     >
-      <RuleAgeSelector rule={createAgeFilter()} {...props} />
+      <RuleAgeSelector rule={createDemographicFilter()} {...props} />
     </MockCohortDiscoveryServiceStore>,
   );
 
@@ -49,7 +49,10 @@ describe("RuleAgeSelector", () => {
     it("renders the SingleBound path in edit mode", () => {
       // Pass a rule with a non-default lower bound so SingleBoundSelector
       // renders the constraint input rather than staying in "Any age" mode.
-      const ruleWithConstraint = { ...createAgeFilter(), value: [18, MAX_AGE_FILTER] as [number, number] };
+      const ruleWithConstraint = {
+        ...createDemographicFilter(),
+        value: [18, MAX_AGE_FILTER] as [number, number],
+      };
       renderComponent({ readOnly: false, rule: ruleWithConstraint }, true);
       expect(screen.getByText("Years")).toBeInTheDocument();
       expect(screen.queryAllByRole("slider")).toHaveLength(0);
@@ -63,7 +66,10 @@ describe("RuleAgeSelector", () => {
     });
 
     it("falls back to the slider when overrideConstrainForBunny is true", () => {
-      renderComponent({ readOnly: false, overrideConstrainForBunny: true }, true);
+      renderComponent(
+        { readOnly: false, overrideConstrainForBunny: true },
+        true,
+      );
       expect(screen.getAllByRole("slider")).toHaveLength(2);
       expect(screen.queryByText("Years")).not.toBeInTheDocument();
     });

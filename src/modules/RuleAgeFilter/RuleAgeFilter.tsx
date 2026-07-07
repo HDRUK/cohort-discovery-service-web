@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import { AgeFilterType } from "@/types/rules";
+import { DemographicFilterType } from "@/types/rules";
 import { DragType } from "@/types/dnd";
 import { MAX_AGE_FILTER, MIN_AGE_FILTER } from "@/config/rules";
 
@@ -13,7 +13,7 @@ export interface RuleProps extends Omit<
   RuleWrapperProps,
   "node" | "type" | "render"
 > {
-  rule: AgeFilterType;
+  rule: DemographicFilterType;
   groupId?: string;
 }
 

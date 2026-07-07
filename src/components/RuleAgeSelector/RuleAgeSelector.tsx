@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import { AgeFilterType, RuleLeafType } from "@/types/rules";
+import { DemographicFilterType, RuleLeafType } from "@/types/rules";
 import { MAX_AGE_FILTER, MIN_AGE_FILTER } from "@/config/rules";
 import useFeatures from "@/hooks/useFeatures";
 import { isRuleLeaf } from "@/utils/rules";
@@ -10,7 +10,7 @@ import RuleAgeSelectorSlider from "./RuleAgeSelectorSlider";
 
 export interface RuleAgeSelectorProps {
   children?: ReactNode;
-  rule: RuleLeafType | AgeFilterType;
+  rule: RuleLeafType | DemographicFilterType;
   title?: string;
   readOnly?: boolean;
   overrideConstrainForBunny?: boolean;

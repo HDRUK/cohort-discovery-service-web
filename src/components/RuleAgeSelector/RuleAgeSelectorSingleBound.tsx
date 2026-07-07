@@ -1,9 +1,9 @@
 "use client";
 
 import { ReactNode, useMemo } from "react";
-import { isAgeFilter, isRuleLeaf, updateById } from "@/utils/rules";
+import { isDemographicFilter, isRuleLeaf, updateById } from "@/utils/rules";
 import {
-  AgeFilterType,
+  DemographicFilterType,
   RuleLeafType,
   SingleSidedOperator,
 } from "@/types/rules";
@@ -19,7 +19,7 @@ import RuleAgeSelectorReadOnly from "./RuleAgeSelectorReadOnly";
 import AgeInput from "./AgeInput";
 
 export interface RuleAgeSelectorSingleBoundProps {
-  rule: RuleLeafType | AgeFilterType;
+  rule: RuleLeafType | DemographicFilterType;
   from: number;
   to: number;
   minAge: number;
@@ -88,7 +88,7 @@ const RuleAgeSelectorSingleBound = ({
           };
         }
 
-        if (isAgeFilter(node)) {
+        if (isDemographicFilter(node)) {
           if (left != null) return { ...node, value: [left, maxAge] };
           if (right != null) return { ...node, value: [minAge, right] };
           return { ...node, value: [minAge, maxAge] };

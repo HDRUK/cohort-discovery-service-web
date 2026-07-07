@@ -8,6 +8,7 @@ import useNodeActions from "@/hooks/useNodeActions";
 import RuleAgeSelector from "@/components/RuleAgeSelector";
 import { isGeoRadiusLocation } from "@/utils/rules";
 import { formatRadius } from "@/components/GeoMapModal";
+import { DragType } from "@/types/dnd";
 
 export interface RuleDemographicFilterProps extends Omit<
   RuleWrapperProps,
@@ -23,18 +24,29 @@ const deceasedLabel = (deceased: boolean | undefined) => {
   return "Any";
 };
 
-const RuleDemographicFilter = ({ rule, groupId, ...rest }: RuleDemographicFilterProps) => {
+const RuleDemographicFilter = ({
+  rule,
+  groupId,
+  ...rest
+}: RuleDemographicFilterProps) => {
   const { actions } = useNodeActions(rule);
 
   return (
     <RuleWrapper
       node={rule}
-      type="Rule"
+      type={DragType.Rule}
       groupId={groupId}
       sortable={true}
       headerExtra={<Chip variant="outlined" label="Demographic" />}
       render={() => (
-        <Box sx={{ display: "flex", gap: 1, alignItems: "center", width: "fit-content" }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1,
+            alignItems: "center",
+            width: "fit-content",
+          }}
+        >
           <RuleAgeSelector rule={rule} readOnly overrideConstrainForBunny />
           <Paper sx={{ border: 1, p: 1 }}>
             Deceased: {deceasedLabel(rule.deceased)}
