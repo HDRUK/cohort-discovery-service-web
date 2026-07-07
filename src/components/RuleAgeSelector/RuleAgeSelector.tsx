@@ -10,7 +10,7 @@ import RuleAgeSelectorSlider from "./RuleAgeSelectorSlider";
 
 export interface RuleAgeSelectorProps {
   children?: ReactNode;
-  rule: RuleLeafType | DemographicFilterType;
+  rule: RuleLeafType | AgeFilterType;
   title?: string;
   readOnly?: boolean;
   overrideConstrainForBunny?: boolean;
