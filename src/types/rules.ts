@@ -7,9 +7,15 @@ export enum CombinatorType {
   FOLLOWED_BY = "followed_by",
 }
 
+export enum ValueAsNumberOperator {
+  GREATER_THAN = "≥",
+  LESS_THAN = "<",
+  BETWEEN = "↔",
+}
+
 export enum SingleSidedOperator {
-  GREATER_THAN = "gt",
-  LESS_THAN = "lt",
+  GREATER_THAN = "≥",
+  LESS_THAN = "<",
 }
 
 export type ConceptOperator = {
@@ -27,6 +33,8 @@ type Node = {
   timeConstraintOperator?: SingleSidedOperator;
   ageConstraint?: [number | null, number | null];
   ageConstraintOperator?: SingleSidedOperator;
+  valueAsNumber?: [number | null, number | null];
+  valueAsNumberOperator?: ValueAsNumberOperator;
 };
 
 export interface OperatorType extends Node {

@@ -75,14 +75,13 @@ const SearchConcepts = ({
     (qb) => qb.hasSelectedSyntheticDatasets,
   );
 
-  const [perPage, setPerPage] = useState(DEFAULT_CODES_PER_PAGE);
   const [activeResult, setActiveResult] = useState<Paginated<
     Partial<Concept>
   > | null>(null);
 
   const lastQueryRef = useRef<string>("");
   const resultsContainerRef = useRef<HTMLDivElement | null>(null);
-  const prevPerPageRef = useRef(0);
+  const prevPageRef = useRef(0);
   const initialSelectedRef = useRef<Record<number, boolean>>({
     ...(selected ?? {}),
   });
@@ -113,7 +112,7 @@ const SearchConcepts = ({
   }, [visibleOptions, allSelected, setSelected, onToggle]);
 
   const onSearch = useCallback(
-    async (value: string, force = false, customPerPage?: number) => {
+    async (value: string, force = false, page = 1, append = false) => {
       const trimmedValue = value.trim().length < 3 ? "" : value.trim();
       const isNewSearch = trimmedValue !== lastQueryRef.current;
 
@@ -131,57 +130,53 @@ const SearchConcepts = ({
         return;
       }
 
-      let effectivePerPage = perPage;
-
       if (isNewSearch) {
-        effectivePerPage = DEFAULT_CODES_PER_PAGE;
-        setPerPage(DEFAULT_CODES_PER_PAGE);
         setSelected?.({ ...initialSelectedRef.current });
-      }
-
-      if (customPerPage) {
-        effectivePerPage = customPerPage;
       }
 
       setIsLoading(true);
 
-      const res = await searchForConcepts({
-        searchTerm: trimmedValue,
-        perPage: effectivePerPage,
-        domain,
-      });
+      try {
+        const res = await searchForConcepts({
+          searchTerm: trimmedValue,
+          perPage: DEFAULT_CODES_PER_PAGE,
+          page,
+          domain,
+        });
 
-      const results = (res.data as Concept[]) ?? [];
+        const results = (res.data as Concept[]) ?? [];
 
-      const nonSynthetic: Concept[] = [];
-      const synthetic: Concept[] = [];
+        const nonSynthetic: Concept[] = [];
+        const synthetic: Concept[] = [];
 
-      results.forEach((o) => {
-        const allSynthetic = o.all_synthetic ?? 0;
-        if (allSynthetic === 1) {
-          if (includeSynthetic) synthetic.push(o);
+        results.forEach((o) => {
+          const allSynthetic = o.all_synthetic ?? 0;
+          if (allSynthetic === 1) {
+            if (includeSynthetic) synthetic.push(o);
+          } else {
+            nonSynthetic.push(o);
+          }
+        });
+
+        const hasVisibleOptions = nonSynthetic.length + synthetic.length > 0;
+
+        if (append) {
+          setNonSyntheticOptions((prev) => [...prev, ...nonSynthetic]);
+          setSyntheticOptions((prev) => [...prev, ...synthetic]);
+          setNoOptionsFound(false);
         } else {
-          nonSynthetic.push(o);
+          setNonSyntheticOptions(nonSynthetic);
+          setSyntheticOptions(synthetic);
+          setNoOptionsFound(!hasVisibleOptions);
         }
-      });
 
-      const hasVisibleOptions = nonSynthetic.length + synthetic.length > 0;
-
-      setNonSyntheticOptions(nonSynthetic);
-      setSyntheticOptions(synthetic);
-      setNoOptionsFound(!hasVisibleOptions);
-      setActiveResult(hasVisibleOptions ? res : null);
-      setIsLoading(false);
-      onHasOptions?.(hasVisibleOptions);
+        setActiveResult(append || hasVisibleOptions ? res : null);
+        onHasOptions?.(append || hasVisibleOptions);
+      } finally {
+        setIsLoading(false);
+      }
     },
-    [
-      domain,
-      searchForConcepts,
-      setSelected,
-      includeSynthetic,
-      perPage,
-      onHasOptions,
-    ],
+    [domain, searchForConcepts, setSelected, includeSynthetic, onHasOptions],
   );
 
   const handleToggle = useCallback(
@@ -215,23 +210,30 @@ const SearchConcepts = ({
     />
   );
 
-  const handleShowMore = useCallback(() => {
-    const nextPerPage =
-      (activeResult?.per_page ?? perPage) + DEFAULT_CODES_PER_PAGE;
-    setPerPage(nextPerPage);
-    onSearch(lastQueryRef.current, true, nextPerPage);
-  }, [activeResult, perPage, onSearch]);
+  const handleShowMore = useCallback(async () => {
+    if (isLoading || !activeResult) return;
 
+    const nextPage = activeResult.current_page + 1;
+    await onSearch(lastQueryRef.current, true, nextPage, true);
+  }, [activeResult, onSearch, isLoading]);
+
+  // Scroll to the end of the results when new results are loaded via "Show more"
   useEffect(() => {
-    const current = activeResult?.per_page ?? 0;
-    if (current > prevPerPageRef.current && prevPerPageRef.current > 0) {
+    const current = activeResult?.current_page ?? 0;
+    if (current > prevPageRef.current && prevPageRef.current > 0) {
       resultsContainerRef.current?.scrollTo?.({
         top: resultsContainerRef.current.scrollHeight,
         behavior: "smooth",
       });
     }
-    prevPerPageRef.current = current;
-  }, [activeResult?.per_page]);
+    prevPageRef.current = current;
+  }, [activeResult?.current_page]);
+
+  const loadedCount = activeResult?.to ?? visibleOptions.length;
+  const hasMoreResults =
+    activeResult &&
+    activeResult.current_page < activeResult.last_page &&
+    loadedCount < activeResult.total;
 
   return (
     <Box>
@@ -258,7 +260,10 @@ const SearchConcepts = ({
           <>
             <FormControlLabel
               control={
-                <SquareCheckbox checked={allSelected} onChange={toggleSelectAll} />
+                <SquareCheckbox
+                  checked={allSelected}
+                  onChange={toggleSelectAll}
+                />
               }
               label="Select All"
             />
@@ -278,7 +283,7 @@ const SearchConcepts = ({
           </>
         )}
       </FormGroup>
-      {activeResult && activeResult.per_page < activeResult.total && (
+      {hasMoreResults && (
         <Box sx={{ mt: 1 }}>
           <Button
             variant="text"
@@ -289,7 +294,7 @@ const SearchConcepts = ({
               handleShowMore();
             }}
           >
-            Show more ({activeResult.per_page} / {activeResult.total})
+            Show more ({loadedCount} / {activeResult.total})
           </Button>
         </Box>
       )}

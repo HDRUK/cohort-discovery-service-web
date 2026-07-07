@@ -1,3 +1,28 @@
+## [1.7.1](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.7.0...v1.7.1) (2026-06-29)
+
+### 🐛 Bug Fixes
+
+* **DP-861:** Truncate long concept names with "..." (#417) ([a64f25d](https://github.com/HDRUK/cohort-discovery-service-web/commit/a64f25d8aae0d3e3c481a14fb71c3e8d0ad99b79)), closes [DP-861](undefinedDP-861)
+
+## [1.7.0](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.6.0...v1.7.0) (2026-06-12)
+
+### ✨ Features
+
+* **DP-833:** Update for regression testing  (#400) ([b730679](https://github.com/HDRUK/cohort-discovery-service-web/commit/b730679d3ed837ff275cb689f38332db7d82ea35)), closes [DP-833](undefinedDP-833)
+* **DP-848:** Super Rule (#402) ([d57ade6](https://github.com/HDRUK/cohort-discovery-service-web/commit/d57ade64d5a0372d78967c7ce0d9993afbbc64ed)), closes [DP-848](undefinedDP-848)
+
+### 🐛 Bug Fixes
+
+* **DP-722:** auto-focus search input for newly added rule blocks (#392) ([1f5e7fb](https://github.com/HDRUK/cohort-discovery-service-web/commit/1f5e7fbca1059781d6e3f454027d29c8f8419a71)), closes [DP-722](undefinedDP-722)
+* **DP-858:** keep rule search results fixed height with vertical scroll (subtask of DP-721) (#401) ([75b9839](https://github.com/HDRUK/cohort-discovery-service-web/commit/75b9839ec48ee39ff3ffc368d9f4a9cbff0bfa3e)), closes [DP-721](undefinedDP-721)
+* **DP-863:** fix pagination for concept search "Show more" results (#403) ([b75fb46](https://github.com/HDRUK/cohort-discovery-service-web/commit/b75fb460dfcad61f3422608b7e0497cddee3a7cc)), closes [DP-863](undefinedDP-863) [DP-858](undefinedDP-858)
+* **DP-867:** Dragging concepts (#406) ([c204b7d](https://github.com/HDRUK/cohort-discovery-service-web/commit/c204b7d6b8803df84051f174ed2f6a4e8d651032)), closes [DP-867](undefinedDP-867)
+* **DP-876:** fix UI misalignment in collection selection screen (#412) ([f326f80](https://github.com/HDRUK/cohort-discovery-service-web/commit/f326f8064a0fbaee5ff8dec5755eabb9c4c92a20))
+* **GAT-8811:** added docker build in semantic release (#407) ([d867f03](https://github.com/HDRUK/cohort-discovery-service-web/commit/d867f03ff5270e479290ad8938ad619e37e9b085)), closes [GAT-8811](undefinedGAT-8811)
+* **GAT-8811:** fixed the arguments in the pipelines (#397) ([a6291f5](https://github.com/HDRUK/cohort-discovery-service-web/commit/a6291f5c0908adac9b54f5e39f69cc5690c6872c))
+* **GAT-8811:** updated pipeline to use two separate environments for dev (#398) ([beca5de](https://github.com/HDRUK/cohort-discovery-service-web/commit/beca5de46a16aef7b47b532d3de19349abe33643)), closes [GAT-8811](undefinedGAT-8811)
+* **GAT-8811:** updated workflows to use reusable pipelines (#396) ([4ba9317](https://github.com/HDRUK/cohort-discovery-service-web/commit/4ba93179266b9aad39b16b87fd98ef7a564c51bc)), closes [GAT-8811](undefinedGAT-8811)
+
 ## [1.6.0](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.5.0...v1.6.0) (2026-05-21)
 
 ### ✨ Features

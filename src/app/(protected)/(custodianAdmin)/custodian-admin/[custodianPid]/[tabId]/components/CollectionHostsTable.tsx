@@ -6,6 +6,7 @@ import { Box, Chip } from "@mui/material";
 import { Dispatch, SetStateAction, useMemo } from "react";
 import Table from "@/components/Table";
 import { routes } from "@/config/routes";
+import SortButton from "@/components/SortButton";
 
 interface CollectionHostsTableProps {
   collectionHosts: CollectionHost[];
@@ -72,9 +73,19 @@ const CollectionHostsTable = ({
           titleProps: {
             title: "Collection Hosts",
             subTitle: "All",
+            children: <SortButton field="name" />,
+            wrapperSx: {
+              sx: {
+                display: "flex",
+                alignItems: "center",
+                flexWrap: "nowrap",
+              },
+            },
           },
         }}
-        rightAction={{ deleteProps: { onClick: onDelete } }}
+        rightAction={{
+          deleteProps: { onClick: onDelete },
+        }}
       />
     </Box>
   );

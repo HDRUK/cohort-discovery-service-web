@@ -223,6 +223,7 @@ const SelectDatasets = () => {
             <Title
               title="All Collections"
               subTitle={`${nSelected}/${nTotal} Collections Selected`}
+              centerTitleContent
               startIcon={
                 <SquareCheckbox
                   checked={nSelected > 0}
@@ -230,6 +231,7 @@ const SelectDatasets = () => {
                   onChange={() => {
                     handleToggleAll();
                   }}
+                  sx={{ p: 0 }}
                 />
               }
               useSeparator={false}

@@ -26,7 +26,10 @@ const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
   });
 
   const conceptsMap = useWatch({ control, name: "concepts", defaultValue: {} });
-  const selectedConcepts = useMemo(() => Object.values(conceptsMap), [conceptsMap]);
+  const selectedConcepts = useMemo(
+    () => Object.values(conceptsMap),
+    [conceptsMap],
+  );
 
   const handleOnToggle = useCallback(
     (concept: Concept, toggled: boolean) => {
@@ -126,7 +129,7 @@ const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
   const toggleRow = hasOptions ? (
     <Stack
       direction="row"
-      justifyContent="space-between"
+      justifyContent="flex-start"
       alignItems="center"
       py={0.75}
     >
@@ -147,7 +150,13 @@ const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
   ) : null;
 
   return (
-    <Box data-testid="rule-search-container" onClick={(e) => { e.stopPropagation(); onSelect?.(); }}>
+    <Box
+      data-testid="rule-search-container"
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect?.();
+      }}
+    >
       <SearchConcepts
         multiple={isMultiSelect}
         hideSelectAll

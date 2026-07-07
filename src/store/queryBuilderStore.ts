@@ -115,7 +115,11 @@ export interface QueryBuilderStoreState {
   queryAsText: string;
   getQueryFromText: (
     input: string,
-    options?: { commit?: boolean; ignoreSynthetic?: boolean },
+    options?: {
+      commit?: boolean;
+      ignoreSynthetic?: boolean;
+      collections?: string[];
+    },
   ) => Promise<RuleGroupType>;
 
   previouslySelectedDatasets: string[];
@@ -520,7 +524,12 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     {
       commit = false,
       ignoreSynthetic = false,
-    }: { commit?: boolean; ignoreSynthetic?: boolean } = {},
+      collections,
+    }: {
+      commit?: boolean;
+      ignoreSynthetic?: boolean;
+      collections?: string[];
+    } = {},
   ) => {
     const cleanQuery = (queryString: string) => {
       const query = JSON.parse(queryString) as RuleGroupType;
@@ -531,7 +540,9 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     };
     const { data: newQueryString } = await parseQuery(input, {
       ignoreSynthetic,
+      collections,
     });
+
     const newQuery = cleanQuery(newQueryString);
     return commit ? get().setQueryBuilderJson(newQuery) : newQuery;
   },

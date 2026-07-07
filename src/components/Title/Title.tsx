@@ -10,6 +10,7 @@ export interface TitleProps extends Omit<BoxProps, "title"> {
   size?: "small" | "medium" | "large";
   wrapperSx?: BoxProps;
   titleOverflow?: "ellipsis" | "scroll" | "wrap" | "visible";
+  centerTitleContent?: boolean;
 }
 
 const Title = ({
@@ -21,6 +22,7 @@ const Title = ({
   size = "medium",
   wrapperSx,
   titleOverflow = "ellipsis",
+  centerTitleContent = false,
   ...rest
 }: TitleProps) => {
   const titleVariant =
@@ -69,7 +71,11 @@ const Title = ({
       }}
       {...wrapperSx}
     >
-      <Box display="flex" alignItems="baseline" {...rest}>
+      <Box
+        display="flex"
+        alignItems={centerTitleContent ? "center" : "baseline"}
+        {...rest}
+      >
         <Typography
           variant={titleVariant}
           component="span"
@@ -77,6 +83,7 @@ const Title = ({
             minWidth: 0,
             ...overflowStyles,
             display: "flex",
+            ...(centerTitleContent && { alignItems: "center" }),
             gap: 1,
           }}
         >
