@@ -11,6 +11,7 @@ const getTermDirectory = async (
   page = 1,
   per_page = DEFAULT_PER_PAGE,
   search?: string,
+  domain?: string,
 ): Promise<ApiResponse<Paginated<TermDirectoryEntry>>> => {
   const {
     user: { id: userId },
@@ -24,6 +25,14 @@ const getTermDirectory = async (
   if (search) {
     params.set("concept_name", search);
     params.set("concept_id", search);
+  }
+
+  if (domain === "Person") {
+    params.set("domain_id__in", "Gender,Race,Ethnicity");
+  } else if (domain === "Medication") {
+    params.set("domain_id", "Drug");
+  } else if (domain) {
+    params.set("domain_id", domain);
   }
 
   const result = await apiGet<ApiResponse<Paginated<TermDirectoryEntry>>>({
