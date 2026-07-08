@@ -18,12 +18,20 @@ on:
 
 jobs:
   setup-standalone:
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' &&
+      contains(github.event.head_commit.message, '[deploy-standalone]'))
     uses: ./.github/workflows/build-args.yaml
     with:
       environment: dev-standalone
       mode: standalone
 
   build-standalone:
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' &&
+      contains(github.event.head_commit.message, '[deploy-standalone]'))
     needs: setup-standalone
     uses: HDRUK/github-actions-templates/.github/workflows/docker-build.yaml@main
     with:
@@ -33,6 +41,10 @@ jobs:
     secrets: inherit
 
   deploy-standalone:
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' &&
+      contains(github.event.head_commit.message, '[deploy-standalone]'))
     needs: build-standalone
     uses: HDRUK/github-actions-templates/.github/workflows/deploy-release.yml@main
     with:
