@@ -3,20 +3,19 @@ import { Suspense } from "react";
 import Title from "@/components/Title";
 import TermDirectory from "@/modules/TermDirectory";
 import getTermDirectory from "@/actions/termDirectory/getTermDirectory";
+import { ApiSearchParams } from "@/types/api";
 
 interface PageProps {
-  searchParams: Promise<{
-    page?: string;
-    per_page?: string;
-    search_term?: string;
-  }>;
+  searchParams: Promise<ApiSearchParams>;
 }
 
 const TermDirectoryPageContent = async ({ searchParams }: PageProps) => {
   const params = await searchParams;
-  const page = params?.page ? parseInt(params.page) : undefined;
-  const perPage = params?.per_page ? parseInt(params.per_page) : undefined;
-  const result = await getTermDirectory(page, perPage, params?.search_term);
+  const result = await getTermDirectory(
+    params?.page,
+    params?.per_page,
+    params?.search_term,
+  );
 
   return (
     <Paper sx={{ p: 2, gap: 2, display: "flex", flexDirection: "column" }}>
