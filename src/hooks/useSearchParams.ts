@@ -34,11 +34,37 @@ const useSearchParams = (paramName: string = "searchTerm") => {
     [paramName, searchParams],
   );
 
+  const setSearchParams = useCallback(
+    (updates: Record<string, string | null>) => {
+      const params = new URLSearchParams(searchParams.toString());
+
+      Object.entries(updates).forEach(([name, update]) => {
+        const value = update?.trim();
+
+        if (value) {
+          params.set(name, value);
+        } else {
+          params.delete(name);
+        }
+      });
+
+      const queryString = params.toString();
+      router.replace(queryString ? `?${queryString}` : ".");
+    },
+    [router, searchParams],
+  );
+
   const clearSearchParams = useCallback(() => {
     router.replace(pathname);
   }, [router, pathname]);
 
-  return { searchParams, getSearchParam, setSearchParam, clearSearchParams };
+  return {
+    searchParams,
+    getSearchParam,
+    setSearchParam,
+    setSearchParams,
+    clearSearchParams,
+  };
 };
 
 export default useSearchParams;

@@ -1,35 +1,16 @@
 "use client";
 
 import { Tab, Tabs } from "@mui/material";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback } from "react";
 import { DOMAIN_TABS } from "@/config/domainFilters";
-
-const DOMAIN_PARAM = "domain";
-const PAGE_PARAM = "page";
+import useSearchParams from "@/hooks/useSearchParams";
 
 const DomainFilterTabs = () => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const { getSearchParam, setSearchParams } = useSearchParams("domain");
 
-  const selected = searchParams.get(DOMAIN_PARAM) ?? false;
+  const selected = getSearchParam() ?? false;
 
-  const setDomain = useCallback(
-    (value: string | null) => {
-      const params = new URLSearchParams(searchParams.toString());
-
-      if (value) {
-        params.set(DOMAIN_PARAM, value);
-      } else {
-        params.delete(DOMAIN_PARAM);
-      }
-
-      params.set(PAGE_PARAM, "1");
-
-      router.replace(`?${params.toString()}`);
-    },
-    [router, searchParams],
-  );
+  const setDomain = (value: string | null) =>
+    setSearchParams({ domain: value, page: "1" });
 
   return (
     <Tabs
