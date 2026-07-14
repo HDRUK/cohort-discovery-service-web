@@ -19,22 +19,12 @@ const DomainFilterTabs = () => {
       variant="scrollable"
       scrollButtons="auto"
       aria-label="Filter terms by domain"
-      sx={{
-        "& .MuiTabs-indicator": {
-          bgcolor: "#475DA7",
-        },
-      }}
     >
       {DOMAIN_TABS.map((domain) => (
         <Tab
           key={domain}
           label={domain}
           value={domain}
-          sx={{
-            "&.Mui-selected": {
-              backgroundColor: "transparent",
-            },
-          }}
           onClick={() => {
             if (domain === selected) setDomain(null);
           }}
