@@ -5,6 +5,7 @@ import { apiGet } from "@/lib/apiClient";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { TermDirectoryEntry, ApiResponse, Paginated } from "@/types/api";
 import { DEFAULT_PER_PAGE } from "@/config/defaults";
+import { DOMAIN_TAB_FILTERS } from "@/config/domainFilters";
 import { getTagTermDirectory } from "@/config/tags";
 
 const getTermDirectory = async (
@@ -27,12 +28,14 @@ const getTermDirectory = async (
     params.set("concept_id", search);
   }
 
-  if (domain === "Person") {
-    params.set("domain_id__in", "Gender,Race,Ethnicity");
-  } else if (domain === "Medication") {
-    params.set("domain_id", "Drug");
-  } else if (domain) {
-    params.set("domain_id", domain);
+  if (domain) {
+    const domainIds = DOMAIN_TAB_FILTERS[domain] ?? [domain];
+
+    if (domainIds.length > 1) {
+      params.set("domain_id__in", domainIds.join(","));
+    } else {
+      params.set("domain_id", domainIds[0]);
+    }
   }
 
   const result = await apiGet<ApiResponse<Paginated<TermDirectoryEntry>>>({
