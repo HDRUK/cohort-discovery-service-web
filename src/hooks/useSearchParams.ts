@@ -12,28 +12,6 @@ const useSearchParams = (paramName: string = "searchTerm") => {
   const searchParams = useNextSearchParams();
   const pathname = usePathname();
 
-  const setSearchParam = useCallback(
-    (userSearchInput: string | null) => {
-      const params = new URLSearchParams(searchParams.toString());
-      const value = userSearchInput?.trim();
-
-      if (value) {
-        params.set(paramName, value);
-      } else {
-        params.delete(paramName);
-      }
-
-      const queryString = params.toString();
-      router.replace(queryString ? `?${queryString}` : ".");
-    },
-    [router, searchParams, paramName],
-  );
-
-  const getSearchParam = useCallback(
-    () => searchParams?.get(paramName),
-    [paramName, searchParams],
-  );
-
   const setSearchParams = useCallback(
     (updates: Record<string, string | null>) => {
       const params = new URLSearchParams(searchParams.toString());
@@ -52,6 +30,17 @@ const useSearchParams = (paramName: string = "searchTerm") => {
       router.replace(queryString ? `?${queryString}` : ".");
     },
     [router, searchParams],
+  );
+
+  const setSearchParam = useCallback(
+    (userSearchInput: string | null) =>
+      setSearchParams({ [paramName]: userSearchInput }),
+    [setSearchParams, paramName],
+  );
+
+  const getSearchParam = useCallback(
+    () => searchParams?.get(paramName),
+    [paramName, searchParams],
   );
 
   const clearSearchParams = useCallback(() => {
