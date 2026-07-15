@@ -21,7 +21,15 @@ const TermDirectoryPageContent = async ({ searchParams }: PageProps) => {
   );
 
   return (
-    <Paper sx={{ p: 2, gap: 2, display: "flex", flexDirection: "column" }}>
+    <Paper
+      sx={{
+        p: 2,
+        gap: 2,
+        display: "flex",
+        flexDirection: "column",
+        bgcolor: "background.default",
+      }}
+    >
       <Title
         title="Term Directory"
         subTitle={
