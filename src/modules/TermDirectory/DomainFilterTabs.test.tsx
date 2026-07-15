@@ -3,6 +3,8 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import DomainFilterTabs from "./DomainFilterTabs";
 import { DOMAIN_TABS } from "@/config/domainFilters";
+import { getDomainPhrase } from "@/utils/omop";
+import { capitaliseFirstLetter } from "@/utils/string";
 
 const mockReplace = jest.fn();
 let mockSearchParams = new URLSearchParams();
@@ -25,7 +27,8 @@ describe("DomainFilterTabs", () => {
   it("renders a tab for every domain filter", () => {
     render(<DomainFilterTabs />);
 
-    for (const label of DOMAIN_TABS) {
+    for (const domain of DOMAIN_TABS) {
+      const label = capitaliseFirstLetter(getDomainPhrase(domain).noun);
       expect(screen.getByRole("tab", { name: label })).toBeInTheDocument();
     }
   });
@@ -35,11 +38,11 @@ describe("DomainFilterTabs", () => {
 
     await userEvent.click(screen.getByRole("tab", { name: "Observation" }));
 
-    expect(mockReplace).toHaveBeenCalledWith("?domain=Observation&page=1");
+    expect(mockReplace).toHaveBeenCalledWith("?domain=observation&page=1");
   });
 
   it("marks the tab from the URL as selected", () => {
-    mockSearchParams = new URLSearchParams("domain=Measurement");
+    mockSearchParams = new URLSearchParams("domain=measurement");
     render(<DomainFilterTabs />);
 
     expect(screen.getByRole("tab", { name: "Measurement" })).toHaveAttribute(

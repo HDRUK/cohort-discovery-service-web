@@ -1,10 +1,14 @@
-export const DOMAIN_TAB_FILTERS: Record<string, string[]> = {
-  Condition: ["Condition"],
-  Observation: ["Observation"],
-  Measurement: ["Measurement"],
-  Medication: ["Drug"],
-  Procedure: ["Procedure"],
-  Person: ["Gender", "Race", "Ethnicity"],
+import { OmopTableName } from "@/types/omop";
+
+export const DOMAIN_TAB_FILTERS = {
+  [OmopTableName.Condition]: ["Condition"],
+  [OmopTableName.Observation]: ["Observation"],
+  [OmopTableName.Measurement]: ["Measurement"],
+  [OmopTableName.Drug]: ["Drug"],
+  [OmopTableName.Procedure]: ["Procedure"],
+  [OmopTableName.Person]: ["Gender", "Race", "Ethnicity"],
 };
 
-export const DOMAIN_TABS = Object.keys(DOMAIN_TAB_FILTERS);
+export type DomainTab = keyof typeof DOMAIN_TAB_FILTERS;
+
+export const DOMAIN_TABS = Object.keys(DOMAIN_TAB_FILTERS) as DomainTab[];

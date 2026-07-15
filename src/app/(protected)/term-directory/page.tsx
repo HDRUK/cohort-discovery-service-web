@@ -4,6 +4,8 @@ import Title from "@/components/Title";
 import TermDirectory from "@/modules/TermDirectory";
 import getTermDirectory from "@/actions/termDirectory/getTermDirectory";
 import { TermDirectorySearchParams } from "@/types/api";
+import { getDomainPhrase } from "@/utils/omop";
+import { capitaliseFirstLetter } from "@/utils/string";
 
 interface PageProps {
   searchParams: Promise<TermDirectorySearchParams>;
@@ -20,7 +22,13 @@ const TermDirectoryPageContent = async ({ searchParams }: PageProps) => {
 
   return (
     <Paper sx={{ p: 2, gap: 2, display: "flex", flexDirection: "column" }}>
-      <Title title="Term Directory" subTitle={params?.domain} />
+      <Title
+        title="Term Directory"
+        subTitle={
+          params?.domain &&
+          capitaliseFirstLetter(getDomainPhrase(params.domain).noun)
+        }
+      />
       <TermDirectory entries={result.data} />
     </Paper>
   );

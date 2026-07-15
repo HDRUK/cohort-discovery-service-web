@@ -1,3 +1,4 @@
+import { DomainTab } from "@/config/domainFilters";
 import { QueryContext } from "./context";
 import { Role, RoleName } from "./roles";
 import { RuleGroupType } from "./rules";
@@ -35,7 +36,7 @@ export interface ConceptSearchParams extends ApiSearchParams {
 }
 
 export interface TermDirectorySearchParams extends ApiSearchParams {
-  domain?: string;
+  domain?: DomainTab;
 }
 
 export interface CacheOptions {
