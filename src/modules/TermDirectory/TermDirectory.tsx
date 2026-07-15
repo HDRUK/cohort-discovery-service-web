@@ -7,6 +7,7 @@ import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import Table from "@/components/Table";
 import { formatNumber } from "@/utils/numbers";
 import { DEFAULT_PER_PAGE } from "@/config/defaults";
+import DomainFilterTabs from "./DomainFilterTabs";
 
 const TermDirectory = ({
   entries,
@@ -62,6 +63,7 @@ const TermDirectory = ({
           placeholder: "Search by term name or OMOP ID...",
         },
       }}
+      details={<DomainFilterTabs />}
     />
   );
 };

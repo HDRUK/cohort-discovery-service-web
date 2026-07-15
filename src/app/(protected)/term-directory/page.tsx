@@ -3,10 +3,12 @@ import { Suspense } from "react";
 import Title from "@/components/Title";
 import TermDirectory from "@/modules/TermDirectory";
 import getTermDirectory from "@/actions/termDirectory/getTermDirectory";
-import { ApiSearchParams } from "@/types/api";
+import { TermDirectorySearchParams } from "@/types/api";
+import { getDomainPhrase } from "@/utils/omop";
+import { capitaliseFirstLetter } from "@/utils/string";
 
 interface PageProps {
-  searchParams: Promise<ApiSearchParams>;
+  searchParams: Promise<TermDirectorySearchParams>;
 }
 
 const TermDirectoryPageContent = async ({ searchParams }: PageProps) => {
@@ -15,11 +17,26 @@ const TermDirectoryPageContent = async ({ searchParams }: PageProps) => {
     params?.page,
     params?.per_page,
     params?.search_term,
+    params?.domain,
   );
 
   return (
-    <Paper sx={{ p: 2, gap: 2, display: "flex", flexDirection: "column" }}>
-      <Title title="Term Directory" subTitle={result.data.total} />
+    <Paper
+      sx={{
+        p: 2,
+        gap: 2,
+        display: "flex",
+        flexDirection: "column",
+        bgcolor: "background.default",
+      }}
+    >
+      <Title
+        title="Term Directory"
+        subTitle={
+          params?.domain &&
+          capitaliseFirstLetter(getDomainPhrase(params.domain).noun)
+        }
+      />
       <TermDirectory entries={result.data} />
     </Paper>
   );
