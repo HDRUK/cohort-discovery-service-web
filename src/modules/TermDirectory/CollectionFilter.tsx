@@ -34,16 +34,16 @@ const CollectionFilter = () => {
   );
 
   const filteredCollections = useMemo(() => {
-    const term = debouncedSearchTerm?.trim().toLowerCase();
-    if (term && term.length > 2) {
+    const searchTerm = debouncedSearchTerm?.trim().toLowerCase();
+    if (searchTerm && searchTerm.length > 2) {
       return userCollections.filter((collection) =>
-        collection.name.toLowerCase().includes(term),
+        collection.name.toLowerCase().includes(searchTerm),
       );
     }
     return userCollections;
   }, [userCollections, debouncedSearchTerm]);
 
-  const groupedCollections = useMemo(
+  const custodianGroups = useMemo(
     () =>
       Object.values(
         filteredCollections.reduce<Record<number, GroupedCollection>>(
@@ -128,7 +128,7 @@ const CollectionFilter = () => {
             inputBgColor="background.default"
             onChange={(event) => setSearchTerm(event.target.value)}
           />
-          {groupedCollections.map(({ custodian, items }) => (
+          {custodianGroups.map(({ custodian, items }) => (
             <Stack key={custodian.id} sx={{ gap: 0.5, mt: 1 }}>
               <Typography variant="subtitle2" color="text.secondary">
                 {custodian.name}
