@@ -1,7 +1,8 @@
-import { Paper, Skeleton } from "@mui/material";
+import { Paper, Skeleton, Stack } from "@mui/material";
 import { Suspense } from "react";
 import Title from "@/components/Title";
 import TermDirectory from "@/modules/TermDirectory";
+import CollectionFilter from "@/modules/TermDirectory/CollectionFilter";
 import getTermDirectory from "@/actions/termDirectory/getTermDirectory";
 import { TermDirectorySearchParams } from "@/types/api";
 import { getDomainPhrase } from "@/utils/omop";
@@ -18,6 +19,7 @@ const TermDirectoryPageContent = async ({ searchParams }: PageProps) => {
     params?.per_page,
     params?.search_term,
     params?.domain,
+    params?.collections?.split(","),
   );
 
   return (
@@ -30,13 +32,21 @@ const TermDirectoryPageContent = async ({ searchParams }: PageProps) => {
         bgcolor: "background.default",
       }}
     >
-      <Title
-        title="Term Directory"
-        subTitle={
-          params?.domain &&
-          capitaliseFirstLetter(getDomainPhrase(params.domain).noun)
-        }
-      />
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        gap={2}
+      >
+        <Title
+          title="Term Directory"
+          subTitle={
+            params?.domain &&
+            capitaliseFirstLetter(getDomainPhrase(params.domain).noun)
+          }
+        />
+        <CollectionFilter />
+      </Stack>
       <TermDirectory entries={result.data} />
     </Paper>
   );
