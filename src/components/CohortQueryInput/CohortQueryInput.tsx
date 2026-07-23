@@ -28,7 +28,6 @@ type FormValues = {
   cohortQueryInput: string;
 };
 
-
 enum QueryMode {
   FRESH = "fresh",
   APPEND = "append",
@@ -72,6 +71,15 @@ const CohortQueryInput = ({
 
   const [queryMode, setQueryMode] = useState<QueryMode | null>(null);
   const [openSearchOverlap, setOpenSearchOverlap] = useState(false);
+
+  /*
+   * On the initial auto-focus we want the box focused but the examples overlay
+   * hidden until the user starts typing. Any later focus (or interaction)
+   * should pop the examples open as normal, so this only guards that first
+   * pristine focus and is cleared as soon as the user types or blurs.
+   */
+  const [suppressInitialExamples, setSuppressInitialExamples] =
+    useState(autoFocus);
 
   const programmaticValueRef = useRef<string | null>(null);
   const lastSyncedQueryAsText = useRef<string | null>(null);
@@ -144,7 +152,10 @@ const CohortQueryInput = ({
       queryClient.prefetchQuery({
         queryKey: ["cohortRules", v, includeSynthetic, selectedDatasets],
         queryFn: () =>
-          getQueryFromText(v, { ignoreSynthetic: !includeSynthetic, collections: selectedDatasets }),
+          getQueryFromText(v, {
+            ignoreSynthetic: !includeSynthetic,
+            collections: selectedDatasets,
+          }),
         staleTime: STALE_TIME,
       });
     },
@@ -198,7 +209,10 @@ const CohortQueryInput = ({
       const queryJson = await queryClient.fetchQuery({
         queryKey: ["cohortRules", q, includeSynthetic, selectedDatasets],
         queryFn: () =>
-          getQueryFromText(q, { ignoreSynthetic: !includeSynthetic, collections: selectedDatasets }),
+          getQueryFromText(q, {
+            ignoreSynthetic: !includeSynthetic,
+            collections: selectedDatasets,
+          }),
         staleTime: STALE_TIME,
       });
 
@@ -360,7 +374,10 @@ const CohortQueryInput = ({
           },
         }}
         render={({ field, fieldState: { error, isDirty } }) => {
-          const hasInput = String(field.value ?? "").trim().length > 0;
+          const trimmedInputLength = String(field.value ?? "").trim().length;
+          const hasInput = trimmedInputLength > 0;
+          const inputTooShort = trimmedInputLength < MIN_SEARCH_LENGTH;
+
           const showChoicePrompt = requiresQueryModeChoice && !hasInput;
 
           const searchDisabled = showChoicePrompt || !!error || !hasInput;
@@ -371,14 +388,12 @@ const CohortQueryInput = ({
             color: isAppendMode ? "success.main" : "inherit",
           };
 
-          const inputTooShort =
-            String(field.value ?? "").trim().length < MIN_SEARCH_LENGTH;
-
           const showSearchOverlay =
             !showChoicePrompt &&
             !isAppendMode &&
             openSearchOverlap &&
-            inputTooShort;
+            inputTooShort &&
+            (hasInput || !suppressInitialExamples);
 
           return (
             <Box display="flex" flexDirection="row" sx={{ gap: 1 }}>
@@ -435,12 +450,16 @@ const CohortQueryInput = ({
                   }}
                   onBlur={() => {
                     field.onBlur();
+                    setSuppressInitialExamples(false);
                     setTimeout(() => setOpenSearchOverlap(false), 150);
                   }}
                   onChange={(e) => {
                     programmaticValueRef.current = null;
 
                     field.onChange(e);
+
+                    setSuppressInitialExamples(false);
+                    setOpenSearchOverlap(true);
                   }}
                 />
 
