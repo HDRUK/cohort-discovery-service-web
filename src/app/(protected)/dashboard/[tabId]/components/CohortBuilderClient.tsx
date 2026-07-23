@@ -80,7 +80,7 @@ const CohortBuilderClient = ({
             display="flex"
           >
             <Stack direction="column" spacing={1} sx={{ flex: 1, minWidth: 0 }}>
-              <CohortQueryInput queries={userQueries} />
+              <CohortQueryInput queries={userQueries} autoFocus />
               <Divider />
             </Stack>
           </Stack>
