@@ -161,6 +161,28 @@ describe("CohortQueryInput", () => {
     expect(await screen.findByText("Query Examples")).toBeInTheDocument();
   });
 
+  it("hides the examples once 3+ characters are typed and shows them again below 3", async () => {
+    const user = userEvent.setup();
+
+    renderComponent();
+
+    const input = getSearchInput();
+
+    await user.click(input);
+
+    expect(await screen.findByText("Query Examples")).toBeInTheDocument();
+
+    await user.type(input, "zzz");
+
+    await waitFor(() =>
+      expect(screen.queryByText("Query Examples")).not.toBeInTheDocument(),
+    );
+
+    await user.keyboard("{Backspace}");
+
+    expect(await screen.findByText("Query Examples")).toBeInTheDocument();
+  });
+
   it("does not update queryBuilderJson while typing, then updates when Enter is pressed", async () => {
     const user = userEvent.setup();
 
