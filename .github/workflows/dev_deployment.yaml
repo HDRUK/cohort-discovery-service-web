@@ -1,30 +1,37 @@
 name: Build and deploy to DEV
-run-name:  ${{ github.actor }} triggered deploy to DEV pipeline
+run-name: ${{ github.actor }} triggered deploy to DEV pipeline
 
 on:
   push:
     branches:
       - dev
 
+  workflow_dispatch:
+    inputs:
+      env:
+        description: Environment
+        required: true
+        default: dev-standalone
+        type: choice
+        options:
+          - dev-standalone
+
 jobs:
   setup-standalone:
-    runs-on: ubuntu-latest
-    environment: dev-standalone
-    outputs:
-      docker_build_args: ${{ steps.args.outputs.docker_build_args }}
-    steps:
-      - id: args
-        run: |
-          ARGS=""
-          ARGS+="--build-arg API_BASE_URL=${{ vars.API_BASE_URL }} "
-          ARGS+="--build-arg NEXT_PUBLIC_LOGIN_URL=${{ vars.NEXT_PUBLIC_LOGIN_URL }} "
-          ARGS+="--build-arg NEXT_PUBLIC_USE_DEBUG_LOGS=${{ vars.NEXT_PUBLIC_USE_DEBUG_LOGS }} "
-          ARGS+="--build-arg NEXT_PUBLIC_TASK_URL=${{ vars.NEXT_PUBLIC_TASK_URL }} "
-          ARGS+="--build-arg NEXT_PUBLIC_USE_EXAMPLE_QUERY=${{ vars.NEXT_PUBLIC_USE_EXAMPLE_QUERY }} "
-          ARGS+="--build-arg APPLICATION_MODE=${{ vars.APPLICATION_MODE }} "
-          echo "docker_build_args=$ARGS" >> "$GITHUB_OUTPUT"
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' &&
+      contains(github.event.head_commit.message, '[deploy-standalone]'))
+    uses: ./.github/workflows/build-args.yaml
+    with:
+      environment: dev-standalone
+      mode: standalone
 
   build-standalone:
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' &&
+      contains(github.event.head_commit.message, '[deploy-standalone]'))
     needs: setup-standalone
     uses: HDRUK/github-actions-templates/.github/workflows/docker-build.yaml@main
     with:
@@ -34,32 +41,27 @@ jobs:
     secrets: inherit
 
   deploy-standalone:
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' &&
+      contains(github.event.head_commit.message, '[deploy-standalone]'))
     needs: build-standalone
     uses: HDRUK/github-actions-templates/.github/workflows/deploy-release.yml@main
     with:
-      env: dev-integrated
+      env: dev-standalone
       chart_path: chart/cohort-web/Chart.yaml
-      git_ref: dev
+      git_ref: ${{ github.ref_name }}
     secrets: inherit
 
   setup-integrated:
-    runs-on: ubuntu-latest
-    environment: dev-integrated
-    outputs:
-      docker_build_args: ${{ steps.args.outputs.docker_build_args }}
-    steps:
-      - id: args
-        run: |
-          ARGS=""
-          ARGS+="--build-arg API_BASE_URL=${{ vars.INT_API_BASE_URL }} "
-          ARGS+="--build-arg NEXT_PUBLIC_LOGIN_URL=${{ vars.INT_NEXT_PUBLIC_LOGIN_URL }} "
-          ARGS+="--build-arg NEXT_PUBLIC_USE_DEBUG_LOGS=${{ vars.INT_NEXT_PUBLIC_USE_DEBUG_LOGS }} "
-          ARGS+="--build-arg NEXT_PUBLIC_TASK_URL=${{ vars.INT_NEXT_PUBLIC_TASK_URL }} "
-          ARGS+="--build-arg NEXT_PUBLIC_USE_EXAMPLE_QUERY=${{ vars.INT_NEXT_PUBLIC_USE_EXAMPLE_QUERY }} "
-          ARGS+="--build-arg APPLICATION_MODE=${{ vars.INT_APPLICATION_MODE }} "
-          echo "docker_build_args=$ARGS" >> "$GITHUB_OUTPUT"
+    if: github.event_name == 'push'
+    uses: ./.github/workflows/build-args.yaml
+    with:
+      environment: dev-integrated
+      mode: integrated
 
   build-integrated:
+    if: github.event_name == 'push'
     needs: setup-integrated
     uses: HDRUK/github-actions-templates/.github/workflows/docker-build.yaml@main
     with:
@@ -69,6 +71,7 @@ jobs:
     secrets: inherit
 
   deploy-integrated:
+    if: github.event_name == 'push'
     needs: build-integrated
     uses: HDRUK/github-actions-templates/.github/workflows/deploy-release.yml@main
     with:

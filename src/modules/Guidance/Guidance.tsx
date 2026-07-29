@@ -9,7 +9,7 @@ import EmptyRuleGuidance from "@/content/guidance/queryBuilder/emptyRule.mdx";
 import ExclusionGuidance from "@/content/guidance/queryBuilder/exclusionGuidance.mdx";
 import MultipleItemGuidance from "@/content/guidance/queryBuilder/multipleItem.mdx";
 import { Box, BoxProps, Link, LinkProps, TypographyProps } from "@mui/material";
-import { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import {
@@ -45,7 +45,14 @@ import { AddChipProps } from "@/components/AddChip/AddChip";
 import AddTimeFrameButton from "@/components/AddTimeFrameButton";
 import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
 import { CustomH1, CustomH2 } from "@/components/GuidanceHeaders";
-import { getDomain, getDomainPastPhrase, getDomainPhrase, getUniqueDomains } from "@/utils/omop";
+import {
+  categoryHasSelectors,
+  getDomain,
+  getDomainPastPhrase,
+  getDomainPhrase,
+  getUniqueDomains,
+  isValueAsNumberDomain,
+} from "@/utils/omop";
 import DeleteTimeFrameButton from "@/components/DeleteTimeFrameButton";
 import DeleteMenuItem, {
   DeleteMenuItemProps,
@@ -56,6 +63,9 @@ import ConvertToGroupMenuItem, {
 import AddAgeButton from "@/components/AddAgeButton";
 import RuleAgeSelector from "@/components/RuleAgeSelector";
 import DeleteAgeButton from "@/components/DeleteAgeButton";
+import RuleValueAsNumberSelector from "@/components/RuleValueAsNumberSelector";
+import AddValueAsNumberButton from "@/components/AddValueAsNumberButton";
+import DeleteValueAsNumberButton from "@/components/DeleteValueAsNumberButton";
 import useFeatures from "@/hooks/useFeatures";
 import CollapsibleGuidance from "@/components/CollapsibleGuidance";
 
@@ -169,7 +179,7 @@ const Guidance = () => {
     [queryBuilderJson, setQueryBuilderJson],
   );
 
-  const { constrainForBunnyV1, queryBuilderAllowNestedGroups } = useFeatures();
+  const { constrainForBunnyV1, queryBuilderAllowNestedGroups, queryBuilderUseValueAsNumber } = useFeatures();
 
   const handleDelete = useCallback(() => {
     const newQuery = selectedIds.reduce(
@@ -240,6 +250,31 @@ const Guidance = () => {
     ),
     DeleteAgeButton: (props: DeleteMenuItemProps) => (
       <DeleteAgeButton rule={node} {...props} />
+    ),
+    AddValueAsNumberButton: (props: AddChipProps) => {
+      return (
+        queryBuilderUseValueAsNumber &&
+        isValueAsNumberDomain(node.rule.concept) &&
+        !node.valueAsNumber && (
+          <AddValueAsNumberButton
+            rule={node}
+            hoverKey={`rule-value-as-number-${node.id}`}
+            {...props}
+          />
+        )
+      );
+    },
+    RuleValueAsNumberSelector: ({
+      children,
+    }: {
+      children?: React.ReactNode;
+    }) => (
+      <RuleValueAsNumberSelector rule={node} readOnly={false} flex={false}>
+        {children}
+      </RuleValueAsNumberSelector>
+    ),
+    DeleteValueAsNumberButton: (props: DeleteMenuItemProps) => (
+      <DeleteValueAsNumberButton rule={node} {...props} />
     ),
   });
 
@@ -348,22 +383,26 @@ const Guidance = () => {
       const isMixed = uniqueDomains.size > 1;
 
       const domain = isMixed ? undefined : getDomain(concept);
-      const effectiveCategory = isMixed ? "" : (getPrimaryConcept(concept)?.category || "");
+      const effectiveCategory = isMixed
+        ? ""
+        : getPrimaryConcept(concept)?.category || "";
       const { verb } = getDomainPhrase(effectiveCategory);
       const past = getDomainPastPhrase(effectiveCategory);
 
       return (
-        <ActionMenuSection title={domain ? `${domain} Rule` : "Rule"} fixedExpanded>
+        <ActionMenuSection
+          title={domain ? `${domain} Rule` : "Rule"}
+          fixedExpanded
+        >
           <RuleGuidance
             category={domain ?? ""}
             verb={verb}
             verbPastTense={past}
             timeConstraint={selectedNode?.timeConstraint}
             ageConstraint={selectedNode?.ageConstraint}
+            valueAsNumber={selectedNode?.valueAsNumber}
             components={makeRuleComponents(selectedNode)}
-            showSelectors={
-              !["Gender", "Race"].includes(effectiveCategory)
-            }
+            showSelectors={categoryHasSelectors(effectiveCategory)}
           />
         </ActionMenuSection>
       );

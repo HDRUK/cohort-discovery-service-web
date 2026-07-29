@@ -12,21 +12,30 @@ const useSearchParams = (paramName: string = "searchTerm") => {
   const searchParams = useNextSearchParams();
   const pathname = usePathname();
 
-  const setSearchParam = useCallback(
-    (userSearchInput: string | null) => {
+  const setSearchParams = useCallback(
+    (updates: Record<string, string | null>) => {
       const params = new URLSearchParams(searchParams.toString());
-      const value = userSearchInput?.trim();
 
-      if (value) {
-        params.set(paramName, value);
-      } else {
-        params.delete(paramName);
-      }
+      Object.entries(updates).forEach(([name, update]) => {
+        const value = update?.trim();
+
+        if (value) {
+          params.set(name, value);
+        } else {
+          params.delete(name);
+        }
+      });
 
       const queryString = params.toString();
       router.replace(queryString ? `?${queryString}` : ".");
     },
-    [router, searchParams, paramName],
+    [router, searchParams],
+  );
+
+  const setSearchParam = useCallback(
+    (userSearchInput: string | null) =>
+      setSearchParams({ [paramName]: userSearchInput }),
+    [setSearchParams, paramName],
   );
 
   const getSearchParam = useCallback(
@@ -38,7 +47,13 @@ const useSearchParams = (paramName: string = "searchTerm") => {
     router.replace(pathname);
   }, [router, pathname]);
 
-  return { searchParams, getSearchParam, setSearchParam, clearSearchParams };
+  return {
+    searchParams,
+    getSearchParam,
+    setSearchParam,
+    setSearchParams,
+    clearSearchParams,
+  };
 };
 
 export default useSearchParams;

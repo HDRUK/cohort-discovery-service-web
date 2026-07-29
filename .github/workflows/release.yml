@@ -8,38 +8,16 @@ on:
 
 jobs:
   setup-preprod:
-    runs-on: ubuntu-latest
-    environment: preprod
-    outputs:
-      docker_build_args: ${{ steps.args.outputs.docker_build_args }}
-    steps:
-      - id: args
-        run: |
-          ARGS=""
-          ARGS+="--build-arg API_BASE_URL=${{ vars.API_BASE_URL }} "
-          ARGS+="--build-arg NEXT_PUBLIC_LOGIN_URL=${{ vars.NEXT_PUBLIC_LOGIN_URL }} "
-          ARGS+="--build-arg NEXT_PUBLIC_USE_DEBUG_LOGS=${{ vars.NEXT_PUBLIC_USE_DEBUG_LOGS }} "
-          ARGS+="--build-arg NEXT_PUBLIC_TASK_URL=${{ vars.NEXT_PUBLIC_TASK_URL }} "
-          ARGS+="--build-arg NEXT_PUBLIC_USE_EXAMPLE_QUERY=${{ vars.NEXT_PUBLIC_USE_EXAMPLE_QUERY }} "
-          ARGS+="--build-arg APPLICATION_MODE=${{ vars.APPLICATION_MODE }} "
-          echo "docker_build_args=$ARGS" >> "$GITHUB_OUTPUT"
+    uses: ./.github/workflows/build-args.yaml
+    with:
+      environment: preprod
+      mode: standalone
 
   setup-prod:
-    runs-on: ubuntu-latest
-    environment: prod
-    outputs:
-      docker_build_args: ${{ steps.args.outputs.docker_build_args }}
-    steps:
-      - id: args
-        run: |
-          ARGS=""
-          ARGS+="--build-arg API_BASE_URL=${{ vars.API_BASE_URL }} "
-          ARGS+="--build-arg NEXT_PUBLIC_LOGIN_URL=${{ vars.NEXT_PUBLIC_LOGIN_URL }} "
-          ARGS+="--build-arg NEXT_PUBLIC_USE_DEBUG_LOGS=${{ vars.NEXT_PUBLIC_USE_DEBUG_LOGS }} "
-          ARGS+="--build-arg NEXT_PUBLIC_TASK_URL=${{ vars.NEXT_PUBLIC_TASK_URL }} "
-          ARGS+="--build-arg NEXT_PUBLIC_USE_EXAMPLE_QUERY=${{ vars.NEXT_PUBLIC_USE_EXAMPLE_QUERY }} "
-          ARGS+="--build-arg APPLICATION_MODE=${{ vars.APPLICATION_MODE }} "
-          echo "docker_build_args=$ARGS" >> "$GITHUB_OUTPUT"
+    uses: ./.github/workflows/build-args.yaml
+    with:
+      environment: prod
+      mode: standalone
 
   build-preprod:
     needs: setup-preprod

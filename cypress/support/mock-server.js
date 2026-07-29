@@ -474,6 +474,13 @@ async function handle(req, res) {
   }
 
   // -------------------------------------------------------------------------
+  // Term Directory
+  // -------------------------------------------------------------------------
+  if (method === "GET" && pathname === "/api/v1/term-directory") {
+    return json(res, 200, fixture("term-directory"));
+  }
+
+  // -------------------------------------------------------------------------
   // Fallthrough – return 404 so tests fail loudly on missing routes
   // -------------------------------------------------------------------------
   console.warn(`[mock-server] Unhandled ${method} ${pathname}`);

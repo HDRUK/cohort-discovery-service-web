@@ -82,6 +82,8 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
             ageConstraintOperator: SingleSidedOperator.GREATER_THAN,
             timeConstraint: undefined,
             timeConstraintOperator: SingleSidedOperator.GREATER_THAN,
+            valueAsNumber: undefined,
+            valueAsNumberOperator: undefined,
           };
         }
         return node;
@@ -108,11 +110,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       type={DragType.Rule}
       groupId={groupId}
       sortable={true}
-      headerExtra={
-        !isEmptyRule(rule) ? (
-          <DomainChip concept={concept} />
-        ) : null
-      }
+      headerExtra={!isEmptyRule(rule) ? <DomainChip concept={concept} /> : null}
       render={() => (
         <Box py={1}>
           {isEmptyRule(rule) ? (

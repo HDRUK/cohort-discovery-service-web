@@ -4,7 +4,7 @@ import { Paper, Stack } from "@mui/material";
 import { ReactNode, useMemo } from "react";
 import { SingleSidedOperator } from "@/types/rules";
 
-import OperatorToggle from "./OperatorToggle";
+import OperatorToggle from "@/components/OperatorToggle";
 
 export type NullablePair<T> = [T | null, T | null];
 
@@ -31,8 +31,6 @@ export type SingleBoundSelectorProps<TStored, TUi = TStored> = {
   serialise?: (ui: TUi | null) => TStored | null;
 
   readOnly?: boolean;
-
-  operatorLabelOverrides?: Map<SingleSidedOperator, ReactNode | string>;
 
   renderPicker: (args: {
     value: TUi | null;
@@ -77,7 +75,6 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
   serialise,
   readOnly,
   anyLabel = "Any time",
-  operatorLabelOverrides,
   renderPicker,
   renderReadOnlyLabel,
   onClick,
@@ -97,12 +94,7 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
     [parseFn, constraint, constraintOperator],
   );
 
-  const handleOperatorChange = (
-    _e: React.MouseEvent<HTMLElement>,
-    nextOperator: SingleSidedOperator | null,
-  ) => {
-    if (!nextOperator) return;
-
+  const handleOperatorChange = (nextOperator: SingleSidedOperator) => {
     const stored = serialiseFn(value);
     onConstraintChange(
       nextOperator === SingleSidedOperator.GREATER_THAN
@@ -121,11 +113,6 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
       operator,
     );
   };
-
-  const greaterThanLabel =
-    operatorLabelOverrides?.get(SingleSidedOperator.GREATER_THAN) ?? "≥";
-  const lessThanLabel =
-    operatorLabelOverrides?.get(SingleSidedOperator.LESS_THAN) ?? "<";
 
   return (
     <>
@@ -146,20 +133,17 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
             const defaultText =
               value == null
                 ? anyLabel
-                : operator === SingleSidedOperator.GREATER_THAN
-                  ? `${greaterThanLabel} ${String(value)}`
-                  : `${lessThanLabel} ${String(value)}`;
+                : `${operator} ${String(value)}`;
 
             return <Paper sx={{ border: 1, p: 1 }}>{defaultText}</Paper>;
           })()
         ) : (
           <Stack direction={"row"} gap={1} alignItems={"center"}>
             <OperatorToggle
+              operators={[SingleSidedOperator.GREATER_THAN, SingleSidedOperator.LESS_THAN]}
               operator={operator}
-              handleOperatorChange={handleOperatorChange}
+              onChange={handleOperatorChange}
               readOnly={readOnly}
-              greaterThanLabel={greaterThanLabel}
-              lessThanLabel={lessThanLabel}
               onClick={onClick}
             />
 

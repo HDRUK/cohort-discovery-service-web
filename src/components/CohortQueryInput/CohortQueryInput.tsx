@@ -60,6 +60,7 @@ const CohortQueryInput = ({
   const includeSynthetic = useQueryBuilder(
     (qb) => qb.hasSelectedSyntheticDatasets,
   );
+  const selectedDatasets = useQueryBuilder((qb) => qb.selectedDatasets);
   const appendError = useQueryBuilder((qb) => qb.appendError);
   const select = useQueryBuilder((qb) => qb.select);
   const errors = useQueryBuilder((qb) => qb.errors ?? []);
@@ -141,13 +142,13 @@ const CohortQueryInput = ({
       if (v === programmaticValueRef.current) return;
 
       queryClient.prefetchQuery({
-        queryKey: ["cohortRules", v, includeSynthetic],
+        queryKey: ["cohortRules", v, includeSynthetic, selectedDatasets],
         queryFn: () =>
-          getQueryFromText(v, { ignoreSynthetic: !includeSynthetic }),
+          getQueryFromText(v, { ignoreSynthetic: !includeSynthetic, collections: selectedDatasets }),
         staleTime: STALE_TIME,
       });
     },
-    [getQueryFromText, queryClient, includeSynthetic],
+    [getQueryFromText, queryClient, includeSynthetic, selectedDatasets],
   );
 
   const handleSearch = useCallback(
@@ -195,9 +196,9 @@ const CohortQueryInput = ({
       }
 
       const queryJson = await queryClient.fetchQuery({
-        queryKey: ["cohortRules", q, includeSynthetic],
+        queryKey: ["cohortRules", q, includeSynthetic, selectedDatasets],
         queryFn: () =>
-          getQueryFromText(q, { ignoreSynthetic: !includeSynthetic }),
+          getQueryFromText(q, { ignoreSynthetic: !includeSynthetic, collections: selectedDatasets }),
         staleTime: STALE_TIME,
       });
 
@@ -249,6 +250,7 @@ const CohortQueryInput = ({
       resetQuery,
       setQueryBuilderJson,
       includeSynthetic,
+      selectedDatasets,
       queryMode,
       queryBuilderJson,
       select,
