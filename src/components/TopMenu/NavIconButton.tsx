@@ -1,13 +1,11 @@
 "use client";
 
-import { ElementType } from "react";
 import { IconButton, IconButtonProps } from "@mui/material";
 
 import { mergeSx } from "@/utils/helpers";
 
 type Props = IconButtonProps & {
   selected: boolean;
-  component?: ElementType;
   href?: string;
 };
 
