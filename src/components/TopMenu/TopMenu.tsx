@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Stack, Tooltip } from "@mui/material";
+import { Stack } from "@mui/material";
 
 import TabsShell from "@/components/TabsShell";
 import { routes } from "../../config/routes";
