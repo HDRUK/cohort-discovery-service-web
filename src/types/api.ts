@@ -37,6 +37,7 @@ export interface ConceptSearchParams extends ApiSearchParams {
 
 export interface TermDirectorySearchParams extends ApiSearchParams {
   domain?: DomainTab;
+  collections?: string;
 }
 
 export interface CacheOptions {

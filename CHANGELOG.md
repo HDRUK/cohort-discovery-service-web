@@ -1,3 +1,21 @@
+## [1.8.0](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.7.1...v1.8.0) (2026-07-29)
+
+### ✨ Features
+
+* **DP-903:** term directory page foundation & browse (#433) ([d734e91](https://github.com/HDRUK/cohort-discovery-service-web/commit/d734e91db67a7bbd2920527a70603d790bc5992a)), closes [DP-903](undefinedDP-903)
+* **DP-904:** add term directory search (#438) ([96d57bc](https://github.com/HDRUK/cohort-discovery-service-web/commit/96d57bc463e9107783dd1759ac02d7a00efdbec8)), closes [DP-904](undefinedDP-904)
+* **DP-906:** add Term Directory "copy OMOP ID" button (#442) ([543e250](https://github.com/HDRUK/cohort-discovery-service-web/commit/543e250dbe3764865f93b63b6cdc4d717313d7a8)), closes [DP-906](undefinedDP-906)
+* **DP-913:** Adding Rule for value as number selector (#427) ([fbd2d8d](https://github.com/HDRUK/cohort-discovery-service-web/commit/fbd2d8dcf62969aeaad60aa4a5d911c6e1095efd)), closes [DP-913](undefinedDP-913)
+* **DP-929:** Update for query parser to send collections (#434) ([4997adf](https://github.com/HDRUK/cohort-discovery-service-web/commit/4997adfc1481206574440538e0235abd6ae8600a)), closes [DP-929](undefinedDP-929)
+* **DP-932:** New workflow for deploying to dev standalone (#430) ([077b724](https://github.com/HDRUK/cohort-discovery-service-web/commit/077b724a92ff32767d6c4302dc63e556bdf471cb)), closes [DP-932](undefinedDP-932)
+* **DP-941:** add term directory domain filters (#440) ([46600d7](https://github.com/HDRUK/cohort-discovery-service-web/commit/46600d7abc68f3e5c2f4d8d673da1d79d309b9ee)), closes [DP-941](undefinedDP-941)
+
+### 🐛 Bug Fixes
+
+* **DP-932:** updated dev deployment pipeline for standalone so it can run on manual… (#436) ([8442ca0](https://github.com/HDRUK/cohort-discovery-service-web/commit/8442ca0f4471b1ec3deffacb235dbc35229ba639)), closes [DP-932](undefinedDP-932)
+* **DP-932:** updated dev pipeline to run standalone when tag has been added (#439) ([95d9d3b](https://github.com/HDRUK/cohort-discovery-service-web/commit/95d9d3b5b8ea78cdfa6e58d7456edd84f6d7521a)), closes [DP-932](undefinedDP-932)
+* **GAT-8999:** removed args duplicates from the pipelines (#428) ([f304441](https://github.com/HDRUK/cohort-discovery-service-web/commit/f304441d62eca89f22636e55724cbea89bb80fca)), closes [GAT-8999](undefinedGAT-8999)
+
 ## [1.7.1](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.7.0...v1.7.1) (2026-06-29)
 
 ### 🐛 Bug Fixes

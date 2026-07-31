@@ -13,6 +13,7 @@ jobs:
     secrets: inherit
 
   setup-preprod:
+    needs: semantic
     uses: ./.github/workflows/build-args.yaml
     with:
       environment: preprod
@@ -28,6 +29,7 @@ jobs:
     secrets: inherit
 
   setup-prod:
+    needs: semantic
     uses: ./.github/workflows/build-args.yaml
     with:
       environment: prod

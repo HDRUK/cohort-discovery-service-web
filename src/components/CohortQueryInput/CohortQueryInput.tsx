@@ -28,7 +28,6 @@ type FormValues = {
   cohortQueryInput: string;
 };
 
-
 enum QueryMode {
   FRESH = "fresh",
   APPEND = "append",
@@ -41,12 +40,14 @@ type CohortQueryInputProps = {
   queries: Query[];
   syncFromQueryAsText?: boolean;
   resetOnSearch?: boolean;
+  autoFocus?: boolean;
 };
 
 const CohortQueryInput = ({
   queries,
   syncFromQueryAsText = false,
   resetOnSearch = true,
+  autoFocus = false,
 }: CohortQueryInputProps) => {
   const defaults = useDefaults();
 
@@ -70,6 +71,15 @@ const CohortQueryInput = ({
 
   const [queryMode, setQueryMode] = useState<QueryMode | null>(null);
   const [openSearchOverlap, setOpenSearchOverlap] = useState(false);
+
+  /*
+   * On the initial auto-focus we want the box focused but the examples overlay
+   * hidden until the user starts typing. Any later focus (or interaction)
+   * should pop the examples open as normal, so this only guards that first
+   * pristine focus and is cleared as soon as the user types or blurs.
+   */
+  const [suppressInitialExamples, setSuppressInitialExamples] =
+    useState(autoFocus);
 
   const programmaticValueRef = useRef<string | null>(null);
   const lastSyncedQueryAsText = useRef<string | null>(null);
@@ -100,20 +110,18 @@ const CohortQueryInput = ({
   useEffect(() => {
     /*
      * Intentional exception to react-hooks/set-state-in-effect:
-     * queryMode/openSearchOverlap are transient local UI states tied to the
-     * current query builder contents.
+     * queryMode is a transient local UI state tied to the current query
+     * builder contents.
      *
      * If the rules change outside this component (which they can do),
      * the previous mode may no longer be valid.
      * Resetting it forces the user back through the mode choice when
      * requiresQueryModeChoice becomes true.
      *
-     * Functional setters prevent redundant updates if already reset.
+     * Functional setter prevents redundant updates if already reset.
      */
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setQueryMode((current) => (current === null ? current : null));
-
-    setOpenSearchOverlap((current) => (current ? false : current));
   }, [rulesKey]);
 
   const resetQuery = useCallback(() => {
@@ -144,7 +152,10 @@ const CohortQueryInput = ({
       queryClient.prefetchQuery({
         queryKey: ["cohortRules", v, includeSynthetic, selectedDatasets],
         queryFn: () =>
-          getQueryFromText(v, { ignoreSynthetic: !includeSynthetic, collections: selectedDatasets }),
+          getQueryFromText(v, {
+            ignoreSynthetic: !includeSynthetic,
+            collections: selectedDatasets,
+          }),
         staleTime: STALE_TIME,
       });
     },
@@ -198,7 +209,10 @@ const CohortQueryInput = ({
       const queryJson = await queryClient.fetchQuery({
         queryKey: ["cohortRules", q, includeSynthetic, selectedDatasets],
         queryFn: () =>
-          getQueryFromText(q, { ignoreSynthetic: !includeSynthetic, collections: selectedDatasets }),
+          getQueryFromText(q, {
+            ignoreSynthetic: !includeSynthetic,
+            collections: selectedDatasets,
+          }),
         staleTime: STALE_TIME,
       });
 
@@ -360,7 +374,10 @@ const CohortQueryInput = ({
           },
         }}
         render={({ field, fieldState: { error, isDirty } }) => {
-          const hasInput = String(field.value ?? "").trim().length > 0;
+          const trimmedInputLength = String(field.value ?? "").trim().length;
+          const hasInput = trimmedInputLength > 0;
+          const inputTooShort = trimmedInputLength < MIN_SEARCH_LENGTH;
+
           const showChoicePrompt = requiresQueryModeChoice && !hasInput;
 
           const searchDisabled = showChoicePrompt || !!error || !hasInput;
@@ -372,13 +389,18 @@ const CohortQueryInput = ({
           };
 
           const showSearchOverlay =
-            !showChoicePrompt && !isAppendMode && openSearchOverlap;
+            !showChoicePrompt &&
+            !isAppendMode &&
+            openSearchOverlap &&
+            inputTooShort &&
+            (hasInput || !suppressInitialExamples);
 
           return (
             <Box display="flex" flexDirection="row" sx={{ gap: 1 }}>
               <Box ref={anchorRef} sx={{ flex: 1 }}>
                 <SearchBox
                   {...field}
+                  autoFocus={autoFocus}
                   startIcon={<SearchIcon fontSize="medium" sx={{ ml: 2 }} />}
                   collapsible={false}
                   error={isDirty && !!error}
@@ -428,6 +450,7 @@ const CohortQueryInput = ({
                   }}
                   onBlur={() => {
                     field.onBlur();
+                    setSuppressInitialExamples(false);
                     setTimeout(() => setOpenSearchOverlap(false), 150);
                   }}
                   onChange={(e) => {
@@ -435,9 +458,8 @@ const CohortQueryInput = ({
 
                     field.onChange(e);
 
-                    if (e.target.value || isAppendMode) {
-                      setOpenSearchOverlap(false);
-                    }
+                    setSuppressInitialExamples(false);
+                    setOpenSearchOverlap(true);
                   }}
                 />
 
