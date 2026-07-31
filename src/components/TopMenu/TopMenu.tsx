@@ -139,7 +139,7 @@ export default function TopMenu() {
                 aria-label="Help"
                 selected={isRouteActive(routes.help())}
               >
-                <HelpIcon sx={{ maxHeight: 20, maxWidth: 20 }} />
+                <HelpIcon sx={{ maxHeight: 25, maxWidth: 25 }} />
               </NavIconButton>
             </HelpTooltip>
             <HelpTooltip title="Term Directory">
@@ -150,7 +150,7 @@ export default function TopMenu() {
                 selected={isRouteActive(routes.termDirectory)}
                 sx={{ mr: 2 }}
               >
-                <TermDirectoryIcon sx={{ maxHeight: 20, maxWidth: 20 }} />
+                <TermDirectoryIcon sx={{ maxHeight: 25, maxWidth: 25 }} />
               </NavIconButton>
             </HelpTooltip>
           </Stack>

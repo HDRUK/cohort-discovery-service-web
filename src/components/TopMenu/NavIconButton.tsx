@@ -16,6 +16,7 @@ const NavIconButton = ({ selected, sx, ...props }: Props) => (
     {...props}
     sx={mergeSx(
       (theme) => ({
+        width: 50,
         height: "100%",
         borderRadius: 0,
         color: theme.palette.tooltip?.main,
