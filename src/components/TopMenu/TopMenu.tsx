@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
-import { redirect, usePathname } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { Stack, Tooltip } from "@mui/material";
 
 import TabsShell from "@/components/TabsShell";
 import { routes } from "../../config/routes";
@@ -11,8 +13,9 @@ import useUserStore from "@/hooks/useUserStore";
 import { HelpIcon } from "@/icons/HelpIcon";
 import HelpTooltip from "../HelpTooltip";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import theme from "@/config/theme";
 import { useApplicationMode } from "@/providers/ApplicationModeProvider";
+import { TermDirectoryIcon } from "@/icons/TermDirectoryIcon";
+import NavIconButton from "./NavIconButton";
 
 export default function TopMenu() {
   const pathname = usePathname();
@@ -23,6 +26,8 @@ export default function TopMenu() {
     helpTooltipOpen: qb.helpTooltipOpen,
     setHelpTooltipOpen: qb.setHelpTooltipOpen,
   }));
+
+  const [helpHoverOpen, setHelpHoverOpen] = useState(false);
 
   useEffect(() => {
     if (!helpTooltipOpen || !user) return;
@@ -84,17 +89,21 @@ export default function TopMenu() {
     return baseTabs;
   }, [isStandalone, user, userCustodians]);
 
+  const isRouteActive = (route: string) =>
+    pathname === route || pathname.startsWith(route + "/");
+
   const currentTabValue =
     tabs.find((tab) => {
       const matchPath = tab?.route ?? tab.href;
       if (!matchPath) return false;
 
-      return pathname === matchPath || pathname.startsWith(matchPath + "/");
+      return isRouteActive(matchPath);
     })?.id ??
     tabs[0]?.id ??
     0;
 
   const handleTooltipClose = () => {
+    setHelpHoverOpen(false);
     setHelpTooltipOpen(false);
   };
 
@@ -115,23 +124,36 @@ export default function TopMenu() {
           backgroundColor: theme.palette.background.paper,
         })}
         endIcon={
-          <HelpTooltip
-            title="Tool guidance can be found here"
-            placement="left"
-            open={helpTooltipOpen && !!user}
-            onClose={handleTooltipClose}
-            sx={{ zIndex: 1250 }}
-          >
-            <HelpIcon
-              sx={{
-                maxHeight: 20,
-                maxWidth: 20,
-                color: theme.palette.tooltip?.main,
-                mr: 2,
-              }}
-              onClick={() => redirect(routes.help())}
-            />
-          </HelpTooltip>
+          <Stack direction="row" sx={{ height: "100%" }}>
+            <HelpTooltip
+              title="Tool guidance can be found here"
+              placement="left"
+              open={(helpTooltipOpen && !!user) || helpHoverOpen}
+              onOpen={() => setHelpHoverOpen(true)}
+              onClose={handleTooltipClose}
+              sx={{ zIndex: 1250 }}
+            >
+              <NavIconButton
+                component={Link}
+                href={routes.help()}
+                aria-label="Help"
+                selected={isRouteActive(routes.help())}
+              >
+                <HelpIcon sx={{ maxHeight: 20, maxWidth: 20 }} />
+              </NavIconButton>
+            </HelpTooltip>
+            <HelpTooltip title="Term Directory">
+              <NavIconButton
+                component={Link}
+                href={routes.termDirectory}
+                aria-label="Term Directory"
+                selected={isRouteActive(routes.termDirectory)}
+                sx={{ mr: 2 }}
+              >
+                <TermDirectoryIcon sx={{ maxHeight: 20, maxWidth: 20 }} />
+              </NavIconButton>
+            </HelpTooltip>
+          </Stack>
         }
       />
     </>
