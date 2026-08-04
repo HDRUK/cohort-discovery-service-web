@@ -41,6 +41,12 @@ const TermDirectory = ({
         size: 400,
       },
       {
+        id: "domain_id",
+        header: "Domain",
+        accessorFn: (row) => row.domain_id,
+        size: 140,
+      },
+      {
         id: "count",
         header: "Count",
         accessorFn: (row) => row.count,
