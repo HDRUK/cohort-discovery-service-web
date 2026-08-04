@@ -1,4 +1,4 @@
-import { Box, BoxProps, Divider, Grid, Typography } from "@mui/material";
+import { Box, BoxProps, Grid, Typography } from "@mui/material";
 import {
   MaterialReactTable,
   MaterialReactTableProps,
