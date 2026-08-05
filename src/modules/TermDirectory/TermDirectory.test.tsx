@@ -36,13 +36,13 @@ describe("TermDirectory", () => {
       name: /Type 2 diabetes mellitus/i,
     });
     expect(within(firstRow).getByText("201826")).toBeInTheDocument();
-    expect(within(firstRow).getByText("2")).toBeInTheDocument();
+    expect(within(firstRow).getByText("2 Collections")).toBeInTheDocument();
 
     const secondRow = screen.getByRole("row", {
       name: /Myocardial infarction/i,
     });
     expect(within(secondRow).getByText("4329847")).toBeInTheDocument();
-    expect(within(secondRow).getByText("1")).toBeInTheDocument();
+    expect(within(secondRow).getByText("1 Collection")).toBeInTheDocument();
   });
 
   it("renders the count, formatted with thousands separators for readability", () => {
