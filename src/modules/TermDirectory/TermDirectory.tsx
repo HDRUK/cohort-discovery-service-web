@@ -55,6 +55,12 @@ const TermDirectory = ({
         Cell: ({ cell }) => (
           <AssociatedCollectionsChip count={cell.getValue<number>()} />
         ),
+        muiTableBodyCellProps: {
+          align: "center",
+        },
+        muiTableHeadCellProps: {
+          align: "center",
+        },
         size: 160,
       },
     ],
