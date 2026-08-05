@@ -10,6 +10,7 @@ import Table from "@/components/Table";
 import { formatNumber } from "@/utils/numbers";
 import { DEFAULT_PER_PAGE } from "@/config/defaults";
 import DomainFilterTabs from "./DomainFilterTabs";
+import AssociatedCollectionsChip from "./AssociatedCollectionsChip";
 
 const TermDirectory = ({
   entries,
@@ -51,6 +52,9 @@ const TermDirectory = ({
         id: "ncollections",
         header: "Associated Collections",
         accessorFn: (row) => row.ncollections,
+        Cell: ({ cell }) => (
+          <AssociatedCollectionsChip count={cell.getValue<number>()} />
+        ),
         size: 160,
       },
     ],
