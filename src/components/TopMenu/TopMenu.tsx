@@ -80,7 +80,6 @@ export default function TopMenu() {
         href: routes.help(),
         route: routes.help(),
         page: null,
-        alignRight: true,
         icon: (
           <HelpTooltip
             title="Tool guidance can be found here"
