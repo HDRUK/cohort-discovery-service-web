@@ -2,8 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
-import Link from "next/link";
-import { Stack } from "@mui/material";
 
 import TabsShell from "@/components/TabsShell";
 import { routes } from "../../config/routes";
@@ -15,7 +13,6 @@ import HelpTooltip from "../HelpTooltip";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { useApplicationMode } from "@/providers/ApplicationModeProvider";
 import { TermDirectoryIcon } from "@/icons/TermDirectoryIcon";
-import NavIconButton from "./NavIconButton";
 
 export default function TopMenu() {
   const pathname = usePathname();
@@ -77,10 +74,52 @@ export default function TopMenu() {
             },
           ]
         : []),
+      {
+        id: routes.help(),
+        label: "Help",
+        href: routes.help(),
+        route: routes.help(),
+        page: null,
+        alignRight: true,
+        icon: (
+          <HelpTooltip
+            title="Tool guidance can be found here"
+            placement="left"
+            open={(helpTooltipOpen && !!user) || helpHoverOpen}
+            onOpen={() => setHelpHoverOpen(true)}
+            onClose={() => {
+              setHelpHoverOpen(false);
+              setHelpTooltipOpen(false);
+            }}
+            sx={{ zIndex: 1250 }}
+          >
+            <HelpIcon />
+          </HelpTooltip>
+        ),
+      },
+      {
+        id: routes.termDirectory,
+        label: "Term Directory",
+        href: routes.termDirectory,
+        route: routes.termDirectory,
+        page: null,
+        icon: (
+          <HelpTooltip title="Term Directory">
+            <TermDirectoryIcon />
+          </HelpTooltip>
+        ),
+      },
     ];
 
     return baseTabs;
-  }, [isStandalone, user, userCustodians]);
+  }, [
+    isStandalone,
+    user,
+    userCustodians,
+    helpTooltipOpen,
+    helpHoverOpen,
+    setHelpTooltipOpen,
+  ]);
 
   const isRouteActive = (route: string) =>
     pathname === route || pathname.startsWith(route + "/");
@@ -94,11 +133,6 @@ export default function TopMenu() {
     })?.id ??
     tabs[0]?.id ??
     0;
-
-  const handleTooltipClose = () => {
-    setHelpHoverOpen(false);
-    setHelpTooltipOpen(false);
-  };
 
   return (
     <>
@@ -115,39 +149,8 @@ export default function TopMenu() {
         })}
         tabHeaderSx={(theme) => ({
           backgroundColor: theme.palette.background.paper,
+          pr: 2,
         })}
-        endIcon={
-          <Stack direction="row" sx={{ height: "100%" }}>
-            <HelpTooltip
-              title="Tool guidance can be found here"
-              placement="left"
-              open={(helpTooltipOpen && !!user) || helpHoverOpen}
-              onOpen={() => setHelpHoverOpen(true)}
-              onClose={handleTooltipClose}
-              sx={{ zIndex: 1250 }}
-            >
-              <NavIconButton
-                component={Link}
-                href={routes.help()}
-                aria-label="Help"
-                selected={isRouteActive(routes.help())}
-              >
-                <HelpIcon />
-              </NavIconButton>
-            </HelpTooltip>
-            <HelpTooltip title="Term Directory">
-              <NavIconButton
-                component={Link}
-                href={routes.termDirectory}
-                aria-label="Term Directory"
-                selected={isRouteActive(routes.termDirectory)}
-                sx={{ mr: 2 }}
-              >
-                <TermDirectoryIcon />
-              </NavIconButton>
-            </HelpTooltip>
-          </Stack>
-        }
       />
     </>
   );
