@@ -120,15 +120,12 @@ export default function TopMenu() {
     setHelpTooltipOpen,
   ]);
 
-  const isRouteActive = (route: string) =>
-    pathname === route || pathname.startsWith(route + "/");
-
   const currentTabValue =
     tabs.find((tab) => {
       const matchPath = tab?.route ?? tab.href;
       if (!matchPath) return false;
 
-      return isRouteActive(matchPath);
+      return pathname === matchPath || pathname.startsWith(matchPath + "/");
     })?.id ??
     tabs[0]?.id ??
     0;
