@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { usePathname } from "next/navigation";
 
 import TabsShell from "@/components/TabsShell";
@@ -10,7 +10,6 @@ import { checkIsAdmin } from "@/utils/user";
 import useUserStore from "@/hooks/useUserStore";
 import { HelpIcon } from "@/icons/HelpIcon";
 import HelpTooltip from "../HelpTooltip";
-import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { useApplicationMode } from "@/providers/ApplicationModeProvider";
 import { TermDirectoryIcon } from "@/icons/TermDirectoryIcon";
 
@@ -18,19 +17,6 @@ export default function TopMenu() {
   const pathname = usePathname();
   const user = useUserStore((s) => s.user);
   const { isStandalone } = useApplicationMode();
-
-  const { helpTooltipOpen, setHelpTooltipOpen } = useQueryBuilder((qb) => ({
-    helpTooltipOpen: qb.helpTooltipOpen,
-    setHelpTooltipOpen: qb.setHelpTooltipOpen,
-  }));
-
-  const [helpHoverOpen, setHelpHoverOpen] = useState(false);
-
-  useEffect(() => {
-    if (!helpTooltipOpen || !user) return;
-    const id = setTimeout(() => setHelpTooltipOpen(false), 10000);
-    return () => clearTimeout(id);
-  }, [helpTooltipOpen, setHelpTooltipOpen, user]);
 
   const userCustodians = useMemo(
     () => user?.custodians ?? [],
@@ -80,21 +66,20 @@ export default function TopMenu() {
         href: routes.help(),
         route: routes.help(),
         page: null,
-        icon: (
-          <HelpTooltip
-            title="Tool guidance can be found here"
-            placement="left"
-            open={(helpTooltipOpen && !!user) || helpHoverOpen}
-            onOpen={() => setHelpHoverOpen(true)}
-            onClose={() => {
-              setHelpHoverOpen(false);
-              setHelpTooltipOpen(false);
-            }}
-            sx={{ zIndex: 1250 }}
-          >
-            <HelpIcon />
-          </HelpTooltip>
-        ),
+        // Tooltip turned off for now, to be reimplemented with the component library
+        // The icon used to be wrapped in:
+        // <HelpTooltip
+        //   title="Tool guidance can be found here"
+        //   placement="left"
+        //   open={(helpTooltipOpen && !!user) || helpHoverOpen}
+        //   onOpen={() => setHelpHoverOpen(true)}
+        //   onClose={() => {
+        //     setHelpHoverOpen(false);
+        //     setHelpTooltipOpen(false);
+        //   }}
+        //   sx={{ zIndex: 1250 }}
+        // >
+        icon: <HelpIcon />,
         iconOnly: true,
         alignRight: true,
       },
@@ -115,14 +100,7 @@ export default function TopMenu() {
     ];
 
     return baseTabs;
-  }, [
-    isStandalone,
-    user,
-    userCustodians,
-    helpTooltipOpen,
-    helpHoverOpen,
-    setHelpTooltipOpen,
-  ]);
+  }, [isStandalone, user, userCustodians]);
 
   const currentTabValue =
     tabs.find((tab) => {
