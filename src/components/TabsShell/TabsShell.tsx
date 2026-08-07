@@ -23,7 +23,9 @@ export type TabType = {
   page: React.ReactNode;
   id?: string;
   label: string;
-  icon?: React.ReactNode;
+  icon?: React.ReactElement | string;
+  iconOnly?: boolean;
+  alignRight?: boolean;
   href?: string;
   route?: string;
   onCloseHref?: string;
@@ -82,15 +84,28 @@ export default function TabsShell({
             scrollButtons="auto"
           >
             {tabs.map(
-              ({ id, label, icon, href, onCloseHref, disabled = false }, i) => {
+              (
+                {
+                  id,
+                  label,
+                  icon,
+                  iconOnly,
+                  href,
+                  onCloseHref,
+                  disabled = false,
+                },
+                i,
+              ) => {
                 return (
                   <Tab
                     disabled={disabled}
                     value={id || i}
                     key={id || label}
-                    aria-label={icon ? label : undefined}
+                    aria-label={iconOnly ? label : undefined}
+                    icon={icon}
+                    iconPosition="start"
                     label={
-                      icon ?? (
+                      iconOnly && !onCloseHref ? undefined : (
                         <Typography
                           variant="body1"
                           component="span"
@@ -102,7 +117,7 @@ export default function TabsShell({
                             disabled ? { display: "none" } : {},
                           )}
                         >
-                          {label}
+                          {!iconOnly && label}
                           {onCloseHref && (
                             <IconButton
                               size="small"
@@ -122,8 +137,8 @@ export default function TabsShell({
                     href={href ?? undefined}
                     sx={mergeSx(
                       defaultTabSx,
-                      icon ? { minWidth: 50 } : {},
-                      i === tabs.findIndex((tab) => tab.icon)
+                      iconOnly ? { minWidth: 50 } : {},
+                      i === tabs.findIndex((tab) => tab.alignRight)
                         ? { ml: "auto" }
                         : {},
                       tabSx,

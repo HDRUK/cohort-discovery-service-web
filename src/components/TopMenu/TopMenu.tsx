@@ -95,6 +95,8 @@ export default function TopMenu() {
             <HelpIcon />
           </HelpTooltip>
         ),
+        iconOnly: true,
+        alignRight: true,
       },
       {
         id: routes.termDirectory,
@@ -107,6 +109,8 @@ export default function TopMenu() {
             <TermDirectoryIcon />
           </HelpTooltip>
         ),
+        iconOnly: true,
+        alignRight: true,
       },
     ];
 
