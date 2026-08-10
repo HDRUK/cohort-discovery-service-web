@@ -76,6 +76,13 @@ const TermDirectory = ({
         },
       }}
       details={<DomainFilterTabs />}
+      boxSxProps={{
+        "& > .MuiGrid-container": {
+          bgcolor: "table.main",
+          p: 1,
+          borderRadius: 1,
+        },
+      }}
     />
   );
 };
