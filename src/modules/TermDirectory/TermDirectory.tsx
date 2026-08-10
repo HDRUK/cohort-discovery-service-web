@@ -1,10 +1,15 @@
 "use client";
 
 import { Stack } from "@mui/material";
-import { type MRT_ColumnDef } from "material-react-table";
+import {
+  type MRT_ColumnDef,
+  type MRT_SortingState,
+} from "material-react-table";
 import { useMemo } from "react";
 import { TermDirectoryEntry, Paginated } from "@/types/api";
+import { SortDirection } from "@/types/common";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
+import useSearchParams from "@/hooks/useSearchParams";
 import CopyableTextButton from "@/components/CopyableTextButton";
 import Table from "@/components/Table";
 import { formatNumber } from "@/utils/numbers";
@@ -57,6 +62,14 @@ const TermDirectory = ({
     [],
   );
 
+  const { getSearchParam, setSearchParams } = useSearchParams("sort");
+
+  const [sortField, sortDirection] = (getSearchParam() ?? "").split(":");
+
+  const sorting: MRT_SortingState = sortField
+    ? [{ id: sortField, desc: sortDirection === SortDirection.DESCENDING }]
+    : [];
+
   const table = usePaginatedTable<TermDirectoryEntry>({
     columns,
     data: entries.data,
@@ -64,6 +77,25 @@ const TermDirectory = ({
     perPageDefault: DEFAULT_PER_PAGE,
     getRowId: (row) => String(row?.concept_id),
     enableStickyHeader: true,
+    manualSorting: true,
+    state: { sorting },
+    onSortingChange: (updaterOrValue) => {
+      const nextSorting =
+        typeof updaterOrValue === "function"
+          ? updaterOrValue(sorting)
+          : updaterOrValue;
+
+      const [column] = nextSorting;
+
+      const direction = column?.desc
+        ? SortDirection.DESCENDING
+        : SortDirection.ASCENDING;
+
+      setSearchParams({
+        sort: column ? `${column.id}:${direction}` : null,
+        page: "1",
+      });
+    },
   });
 
   return (
