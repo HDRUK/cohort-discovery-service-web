@@ -26,6 +26,7 @@ const TermDirectory = ({
       {
         id: "concept_id",
         header: "OMOP ID",
+        enableSorting: false,
         accessorFn: (row) => row.concept_id,
         Cell: ({ cell }) => (
           <Stack direction="row" alignItems="center">
