@@ -39,7 +39,6 @@ const DragOverlay = ({ node }: { node: RuleNodeType | null }) => {
   return (
     <DndDragOverlay>
       {node ? (
-        // Overlay is portaled outside SwimLane's CloseGuardProvider, so give clones their own.
         <CloseGuardProvider>
           <DragOverlayRenderContext.Provider value={true}>
             {renderRule(node)}
