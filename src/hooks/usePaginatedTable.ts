@@ -7,10 +7,12 @@ import {
   MRT_RowData,
   MRT_TableOptions,
   MRT_SortingState,
+  MRT_Updater,
 } from "material-react-table";
 import { useTable } from "./useTable";
 import { buildRowsPerPageOptions } from "@/utils/pagination";
 import { DEFAULT_PER_PAGE } from "@/config/defaults";
+import { SortDirection } from "@/types/common";
 
 interface UsePaginatedTableOptions<TData extends MRT_RowData> extends Partial<
   MRT_TableOptions<TData>
@@ -24,6 +26,9 @@ interface UsePaginatedTableOptions<TData extends MRT_RowData> extends Partial<
 
   pageParam?: string;
   perPageParam?: string;
+
+  sortParam?: string;
+  serverSorting?: boolean;
 }
 
 export function usePaginatedTable<TData extends MRT_RowData>({
@@ -35,6 +40,8 @@ export function usePaginatedTable<TData extends MRT_RowData>({
   getRowId = (row) => row?.pid ?? String(row?.id || ""),
   pageParam = "page",
   perPageParam = "per_page",
+  sortParam = "sort",
+  serverSorting = false,
   state,
   initialState,
   ...rest
@@ -57,6 +64,40 @@ export function usePaginatedTable<TData extends MRT_RowData>({
   });
 
   const [sorting, setSorting] = useState<MRT_SortingState>([]);
+
+  const [sortField, sortDirection] = (searchParams.get(sortParam) ?? "").split(
+    ":",
+  );
+
+  const urlSorting: MRT_SortingState = sortField
+    ? [{ id: sortField, desc: sortDirection === SortDirection.DESCENDING }]
+    : [];
+
+  const handleSortingChange = (
+    updaterOrValue: MRT_Updater<MRT_SortingState>,
+  ) => {
+    const nextSorting =
+      typeof updaterOrValue === "function"
+        ? updaterOrValue(urlSorting)
+        : updaterOrValue;
+
+    const [column] = nextSorting;
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (column) {
+      const direction = column.desc
+        ? SortDirection.DESCENDING
+        : SortDirection.ASCENDING;
+
+      params.set(sortParam, `${column.id}:${direction}`);
+    } else {
+      params.delete(sortParam);
+    }
+
+    params.set(pageParam, "1");
+
+    router.replace(`?${params.toString()}`);
+  };
 
   /*useEffect(() => {
     const collapsed = sorting
@@ -107,15 +148,16 @@ export function usePaginatedTable<TData extends MRT_RowData>({
     enablePagination: true,
     manualPagination: true,
     enableSorting: true,
+    manualSorting: serverSorting,
     onPaginationChange: setPagination,
-    onSortingChange: setSorting,
+    onSortingChange: serverSorting ? handleSortingChange : setSorting,
     initialState: {
       ...initialState,
       expanded,
     },
     state: {
       pagination,
-      sorting,
+      sorting: serverSorting ? urlSorting : sorting,
       ...state,
     },
     muiPaginationProps: {
