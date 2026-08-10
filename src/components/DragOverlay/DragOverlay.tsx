@@ -2,6 +2,7 @@
 
 import { createContext } from "react";
 import { DragOverlay as DndDragOverlay } from "@dnd-kit/core";
+import { CloseGuardProvider } from "@/providers/CloseGuardProvider";
 
 import {
   hasAlternatives,
@@ -38,9 +39,12 @@ const DragOverlay = ({ node }: { node: RuleNodeType | null }) => {
   return (
     <DndDragOverlay>
       {node ? (
-        <DragOverlayRenderContext.Provider value={true}>
-          {renderRule(node)}
-        </DragOverlayRenderContext.Provider>
+        // Overlay is portaled outside SwimLane's CloseGuardProvider, so give clones their own.
+        <CloseGuardProvider>
+          <DragOverlayRenderContext.Provider value={true}>
+            {renderRule(node)}
+          </DragOverlayRenderContext.Provider>
+        </CloseGuardProvider>
       ) : null}
     </DndDragOverlay>
   );
