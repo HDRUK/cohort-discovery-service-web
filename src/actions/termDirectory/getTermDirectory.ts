@@ -7,6 +7,10 @@ import { TermDirectoryEntry, ApiResponse, Paginated } from "@/types/api";
 import { DEFAULT_PER_PAGE } from "@/config/defaults";
 import { DOMAIN_TAB_FILTERS, DomainTab } from "@/config/domainFilters";
 import { getTagTermDirectory } from "@/config/tags";
+import { SortDirection } from "@/types/common";
+
+const SORTABLE_FIELDS = ["concept_name", "count", "ncollections"];
+const SORT_DIRECTIONS: string[] = Object.values(SortDirection);
 
 const getTermDirectory = async (
   page = 1,
@@ -43,7 +47,14 @@ const getTermDirectory = async (
   collections?.forEach((pid) => params.append("collection_pid[]", pid));
 
   if (sort) {
-    params.set("sort", sort);
+    const [field, direction] = sort.split(":");
+
+    if (
+      SORTABLE_FIELDS.includes(field) &&
+      SORT_DIRECTIONS.includes(direction)
+    ) {
+      params.set("sort", sort);
+    }
   }
 
   const result = await apiGet<ApiResponse<Paginated<TermDirectoryEntry>>>({
