@@ -27,6 +27,7 @@ const TermDirectoryPageContent = async ({ searchParams }: PageProps) => {
       sx={{
         p: 2,
         gap: 2,
+        height: "100%",
         display: "flex",
         flexDirection: "column",
         bgcolor: "background.default",

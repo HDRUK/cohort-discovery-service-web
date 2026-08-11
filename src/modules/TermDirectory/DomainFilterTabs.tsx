@@ -24,6 +24,7 @@ const DomainFilterTabs = () => {
       variant="scrollable"
       scrollButtons="auto"
       aria-label="Filter terms by domain"
+      sx={{ pt: 1 }}
     >
       <Tab label="All" value="all" />
       {DOMAIN_TABS.map((domain) => (
