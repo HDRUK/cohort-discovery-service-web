@@ -74,6 +74,7 @@ const TermDirectory = ({
     perPageDefault: DEFAULT_PER_PAGE,
     getRowId: (row) => String(row?.concept_id),
     enableStickyHeader: true,
+    enableSorting: false,
   });
 
   return (
