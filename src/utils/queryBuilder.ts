@@ -14,12 +14,14 @@ import { getDomainPhrase } from "./omop";
 
 type Piece = { verb?: string | null; text: string };
 
+export const PREVIEW_SUBJECT_NOUN = "People";
+
 const queryToText = (
   node: RuleGroupType,
   options?: { includeBrackets?: boolean },
 ) => {
   const includeBrackets = options?.includeBrackets ?? false;
-  const subject = "People who";
+  const subject = `${PREVIEW_SUBJECT_NOUN} who`;
 
   const getVerb = (category: string, exclude = false): string => {
     const domain = getDomainPhrase(category);
