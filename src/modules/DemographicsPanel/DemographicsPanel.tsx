@@ -13,8 +13,10 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import AccordionExpandIcon from "@/components/AccordionExpandIcon";
 import { OmopTableName } from "@/types/omop";
+import { SEX_CONCEPTS, SEX_GUIDANCE } from "@/config/demographics";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import DemographicAgeSection from "./DemographicAgeSection";
+import DemographicCheckboxSection from "./DemographicCheckboxSection";
 import DemographicConceptSection from "./DemographicConceptSection";
 import { formatAgeSummary, formatConceptCountSummary } from "./summary";
 
@@ -99,12 +101,13 @@ const DemographicsPanel = () => {
 
         <DemographicAgeSection />
 
-        <DemographicConceptSection
+        <DemographicCheckboxSection
           label="Sex"
-          domain={OmopTableName.Gender}
-          concepts={sex}
+          options={SEX_CONCEPTS}
+          selected={sex}
           onToggle={toggleSex}
           onClear={clearSex}
+          note={SEX_GUIDANCE}
         />
 
         {SHOW_RACE && (
