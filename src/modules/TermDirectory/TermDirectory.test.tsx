@@ -21,7 +21,13 @@ describe("TermDirectory", () => {
   it("renders the correct column headers", () => {
     renderComponent(paginateData({ data: mockTermDirectoryEntries }));
 
-    const columns = ["OMOP ID", "Term Name", "Count", "Associated Collections"];
+    const columns = [
+      "OMOP ID",
+      "Term Name",
+      "Domain",
+      "Count",
+      "Associated Collections",
+    ];
     for (const column of columns) {
       expect(
         screen.getByRole("columnheader", { name: new RegExp(column) }),
@@ -87,5 +93,19 @@ describe("TermDirectory", () => {
 
     expect(writeText).toHaveBeenCalledWith("201826");
     expect(await screen.findByText("Copied to clipboard")).toBeInTheDocument();
+  });
+
+  it("renders each term's domain", () => {
+    renderComponent(paginateData({ data: mockTermDirectoryEntries }));
+
+    const firstRow = screen.getByRole("row", {
+      name: /Type 2 diabetes mellitus/i,
+    });
+    expect(within(firstRow).getByText("Condition")).toBeInTheDocument();
+
+    const secondRow = screen.getByRole("row", {
+      name: /Myocardial infarction/i,
+    });
+    expect(within(secondRow).getByText("Observation")).toBeInTheDocument();
   });
 });
