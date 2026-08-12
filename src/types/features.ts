@@ -23,6 +23,7 @@ export enum FeatureName {
   AdminMoreCollectionDetails = "admin-more-collection-details",
 
   QueryBuilderUseValueAsNumber = "query-builder-use-value-as-number",
+  QueryBuilderUseDemographicRule = "query-builder-use-demographic-rule",
 }
 
 export type FeatureFlag = Record<FeatureName, boolean>;
@@ -54,4 +55,6 @@ export const DEFAULT_FLAGS: FeatureFlag = {
   [FeatureName.AdminMoreCollectionDetails]: false,
 
   [FeatureName.QueryBuilderUseValueAsNumber]: false,
+
+  [FeatureName.QueryBuilderUseDemographicRule]: false,
 };
