@@ -7,6 +7,7 @@ import {
   BoardIndex,
   RuleGroupType,
   RuleNodeType,
+  Demographics,
 } from "@/types/rules";
 import {
   buildIndexFromModel,
@@ -27,7 +28,7 @@ import { UniqueIdentifier } from "@dnd-kit/core";
 import { removeFalseKeys } from "@/utils/numbers";
 import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
 import { DatasetErrors } from "@/utils/datasets";
-import { Collection } from "@/types/api";
+import { Collection, Concept } from "@/types/api";
 import { FeatureName } from "@/types/features";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import { intersection } from "lodash";
@@ -58,6 +59,19 @@ export const Creators: Record<string, NodeFactory> = {
 
 export const DEFAULT_QUERY: RuleGroupType =
   process.env.NEXT_PUBLIC_USE_EXAMPLE_QUERY === "true" ? EXAMPLE_1 : NO_QUERY;
+
+const EMPTY_DEMOGRAPHICS: Demographics = { age: null, sex: [], race: [] };
+
+const withDemographics = (
+  qb: RuleGroupType,
+  updater: (d: Demographics) => Demographics,
+): RuleGroupType => ({
+  ...qb,
+  demographics: updater(qb.demographics ?? EMPTY_DEMOGRAPHICS),
+});
+
+const withoutConcept = (concepts: Concept[], concept: Concept): Concept[] =>
+  concepts.filter((c) => c.concept_id !== concept.concept_id);
 
 export interface QueryBuilderStoreState {
   queryName: string;
@@ -111,6 +125,14 @@ export interface QueryBuilderStoreState {
   createNewGroup: () => RuleNodeType;
   createNewOperator: () => RuleNodeType;
   createNewAgeFilter: () => RuleNodeType;
+
+  addDemographics: () => void;
+  removeDemographics: () => void;
+  setDemographicsAge: (age: [number, number] | null) => void;
+  toggleDemographicsSex: (concept: Concept, selected: boolean) => void;
+  clearDemographicsSex: () => void;
+  toggleDemographicsRace: (concept: Concept, selected: boolean) => void;
+  clearDemographicsRace: () => void;
 
   queryAsText: string;
   getQueryFromText: (
@@ -357,6 +379,64 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
   createNewGroup: () => get().createNewNode(NodeKind.GROUP),
   createNewOperator: () => get().createNewNode(NodeKind.OPERATOR),
   createNewAgeFilter: () => get().createNewNode(NodeKind.AGE_FILTER),
+
+  addDemographics: () => {
+    const { queryBuilderJson, setQueryBuilderJson } = get();
+    if (queryBuilderJson.demographics) return;
+    setQueryBuilderJson(
+      { ...queryBuilderJson, demographics: { ...EMPTY_DEMOGRAPHICS } },
+      false,
+    );
+  },
+  removeDemographics: () => {
+    const { queryBuilderJson, setQueryBuilderJson } = get();
+    setQueryBuilderJson({ ...queryBuilderJson, demographics: undefined }, false);
+  },
+  setDemographicsAge: (age) => {
+    const { queryBuilderJson, setQueryBuilderJson } = get();
+    setQueryBuilderJson(
+      withDemographics(queryBuilderJson, (d) => ({ ...d, age })),
+      false,
+    );
+  },
+  toggleDemographicsSex: (concept, selected) => {
+    const { queryBuilderJson, setQueryBuilderJson } = get();
+    setQueryBuilderJson(
+      withDemographics(queryBuilderJson, (d) => ({
+        ...d,
+        sex: selected
+          ? [...withoutConcept(d.sex, concept), concept]
+          : withoutConcept(d.sex, concept),
+      })),
+      false,
+    );
+  },
+  clearDemographicsSex: () => {
+    const { queryBuilderJson, setQueryBuilderJson } = get();
+    setQueryBuilderJson(
+      withDemographics(queryBuilderJson, (d) => ({ ...d, sex: [] })),
+      false,
+    );
+  },
+  toggleDemographicsRace: (concept, selected) => {
+    const { queryBuilderJson, setQueryBuilderJson } = get();
+    setQueryBuilderJson(
+      withDemographics(queryBuilderJson, (d) => ({
+        ...d,
+        race: selected
+          ? [...withoutConcept(d.race, concept), concept]
+          : withoutConcept(d.race, concept),
+      })),
+      false,
+    );
+  },
+  clearDemographicsRace: () => {
+    const { queryBuilderJson, setQueryBuilderJson } = get();
+    setQueryBuilderJson(
+      withDemographics(queryBuilderJson, (d) => ({ ...d, race: [] })),
+      false,
+    );
+  },
 
   queryAsText: queryToText(DEFAULT_QUERY),
 

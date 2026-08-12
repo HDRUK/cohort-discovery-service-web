@@ -31,7 +31,6 @@ const QueryBuilder = ({
       deselect: qb.deselect,
       selectedGuidance: qb.selectedGuidance,
     }));
-
   useEffect(() => {
     if (query?.definition) {
       setQueryBuilderJson(query.definition);
