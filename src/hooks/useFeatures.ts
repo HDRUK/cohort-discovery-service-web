@@ -50,6 +50,9 @@ const useFeatures = () => {
 
         queryBuilderUseValueAsNumber:
           flags[FeatureName.QueryBuilderUseValueAsNumber],
+
+        queryBuilderUseDemographicRule:
+          flags[FeatureName.QueryBuilderUseDemographicRule],
       };
     }),
   );
