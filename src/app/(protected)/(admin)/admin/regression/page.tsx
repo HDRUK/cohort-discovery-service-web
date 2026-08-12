@@ -1,14 +1,20 @@
+import { Suspense } from "react";
 import { Box, Divider } from "@mui/material";
 import Title from "@/components/Title";
+import TableSkeleton from "@/components/TableSkeleton";
 import getAdminCollections from "@/actions/collection/getAdminCollections";
 import RegressionTests from "@/modules/RegressionTests/RegressionTests";
 
-const AdminRegressionPage = async () => {
+const RegressionContent = async () => {
   const result = await getAdminCollections({
     params: new URLSearchParams({ per_page: "500" }),
   });
   const collections = result.data?.data ?? [];
 
+  return <RegressionTests collections={collections} />;
+};
+
+const AdminRegressionPage = () => {
   return (
     <Box
       sx={{
@@ -22,7 +28,9 @@ const AdminRegressionPage = async () => {
     >
       <Title title="Admin" subTitle="Regression Tests" />
       <Divider sx={{ mb: 2 }} />
-      <RegressionTests collections={collections} />
+      <Suspense fallback={<TableSkeleton />}>
+        <RegressionContent />
+      </Suspense>
     </Box>
   );
 };
