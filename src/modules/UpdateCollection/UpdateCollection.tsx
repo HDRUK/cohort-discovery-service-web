@@ -323,7 +323,7 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
       <FormProvider {...formMethods}>
         <FormLabel underlined>Collection Type</FormLabel>
 
-        <Stack direction={"row"} spacing={2} justifyContent={"space-between"}>
+        <Stack direction={"row"} spacing={2} justifyContent={"flex-start"}>
           <ToggleSynthetic disabled={!expandedRight} />
           <ToggleLocation disabled={!expandedRight} />
           <ToggleDeath disabled={!expandedRight} />
