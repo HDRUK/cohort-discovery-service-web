@@ -6,6 +6,7 @@ import useFeatures from "@/hooks/useFeatures";
 import useUserStore from "@/hooks/useUserStore";
 import { useUiPreferences } from "@/store/uiPreferencesStore";
 import { DEFAULT_ACCESS_BANNER_AUTO_HIDE } from "@/config/defaults";
+import { checkHasNhsSdeAccess } from "@/utils/user";
 
 const BANNER_LABEL = "New!";
 const BANNER_HEADING = "Optional NHS Research SDE Cohort";
@@ -23,7 +24,7 @@ const AccessBanner = () => {
   const dismiss = useUiPreferences((s) => s.dismiss);
   const dismissBanner = () => dismiss("accessBanner");
 
-  if (!accessBannerEnabled || !user) return null;
+  if (!accessBannerEnabled || !user || checkHasNhsSdeAccess(user)) return null;
 
   return (
     <InfoBanner
