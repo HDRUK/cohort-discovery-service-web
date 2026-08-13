@@ -1,7 +1,7 @@
 import { UpdateCollectionFormValues } from "@/types/forms";
 import ToggleVertical from "../ToggleVertical";
 
-const ToggleSynthetic = ({
+const ToggleLocation = ({
   label,
   disabled = false,
 }: {
@@ -12,11 +12,11 @@ const ToggleSynthetic = ({
     <ToggleVertical<UpdateCollectionFormValues>
       label={label}
       disabled={disabled}
-      name="collection.is_synthetic"
-      labelTrue="Synthetic"
-      labelFalse="Non-synthetic"
+      name="collection.location_enabled"
+      labelTrue="Location Enabled"
+      labelFalse="Location Disabled"
     />
   );
 };
 
-export default ToggleSynthetic;
+export default ToggleLocation;

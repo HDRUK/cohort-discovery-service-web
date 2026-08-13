@@ -43,6 +43,8 @@ import { useUserDataStore } from "@/hooks/userDataStore";
 import { useIsAdminSection } from "@/contexts/AdminSectionContext";
 import ToggleSynthetic from "@/components/ToggleSynthetic";
 import { getFrequencyModeKey } from "@/utils/frequency";
+import ToggleLocation from "@/components/ToggleLocation";
+import ToggleDeath from "@/components/ToggleDeath";
 
 export type UpdateCollectionProps = {
   collection: CollectionWithHosts;
@@ -320,7 +322,12 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
     >
       <FormProvider {...formMethods}>
         <FormLabel underlined>Collection Type</FormLabel>
-        <ToggleSynthetic disabled={!expandedRight} />
+
+        <Stack direction={"row"} spacing={2} justifyContent={"space-between"}>
+          <ToggleSynthetic disabled={!expandedRight} />
+          <ToggleLocation disabled={!expandedRight} />
+          <ToggleDeath disabled={!expandedRight} />
+        </Stack>
 
         <FormLabel underlined>Collection Status</FormLabel>
         <ManageCollectionStatus

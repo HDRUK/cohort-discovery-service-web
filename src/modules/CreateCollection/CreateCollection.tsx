@@ -224,10 +224,16 @@ const CreateCollection = ({ onCancel }: CreateCollectionProps) => {
               )}
             />
 
-            <ToggleSynthetic
-              label={"Collection type"}
-              disabled={!selectedHostId}
-            />
+            <Stack direction={"row"}>
+              <ToggleSynthetic
+                label={"Collection type"}
+                disabled={!selectedHostId}
+              />
+              <ToggleSynthetic
+                label={"Collection type"}
+                disabled={!selectedHostId}
+              />
+            </Stack>
 
             {/* // component disabled anyway, it should not be shown
             <Controller
