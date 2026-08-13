@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Box, Button, Chip, Stack } from "@mui/material";
+import { Box, Chip, Stack } from "@mui/material";
 import { Concept } from "@/types/api";
 import SearchConcepts from "@/components/SearchConcepts";
 import ConceptChip from "@/components/ConceptChip";
@@ -25,26 +25,15 @@ const DemographicConceptSection = ({
   onToggle,
   onClear,
 }: DemographicConceptSectionProps) => {
-  const [editing, setEditing] = useState(false);
   const [selected, setSelected] = useState<Record<number, boolean>>({});
-
-  const startEditing = () => {
-    setSelected(toSelectedMap(concepts));
-    setEditing(true);
-  };
 
   const handleRemove = (concept: Concept) => {
     setSelected((prev) => ({ ...prev, [concept.concept_id]: false }));
     onToggle(concept, false);
   };
 
-  const handleClear = () => {
-    onClear();
-    setEditing(false);
-  };
-
   const selectedChips = concepts.length > 0 && (
-    <Stack direction="row" flexWrap="wrap" gap={0.5} sx={{ mt: editing ? 1 : 0 }}>
+    <Stack direction="row" flexWrap="wrap" gap={0.5}>
       {concepts.map((c) => (
         <ConceptChip
           key={c.concept_id}
@@ -61,11 +50,10 @@ const DemographicConceptSection = ({
   return (
     <DemographicRow
       label={label}
-      onEdit={editing ? undefined : startEditing}
-      onClear={handleClear}
+      onEdit={() => setSelected(toSelectedMap(concepts))}
+      onClear={onClear}
       showClear={concepts.length > 0}
-    >
-      {editing ? (
+      renderEditing={
         <Box>
           <SearchConcepts
             domain={domain}
@@ -75,19 +63,11 @@ const DemographicConceptSection = ({
             onToggle={onToggle}
           />
           {selectedChips}
-          <Button
-            variant="text"
-            size="small"
-            sx={{ mt: 1 }}
-            onClick={() => setEditing(false)}
-          >
-            Done
-          </Button>
         </Box>
-      ) : (
-        selectedChips || (
-          <Chip variant="outlined" sx={{ bgcolor: "white" }} label="Any" />
-        )
+      }
+    >
+      {selectedChips || (
+        <Chip variant="outlined" sx={{ bgcolor: "white" }} label="Any" />
       )}
     </DemographicRow>
   );

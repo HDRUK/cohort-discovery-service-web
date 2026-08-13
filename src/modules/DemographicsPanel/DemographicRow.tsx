@@ -1,64 +1,109 @@
 "use client";
 
-import { ReactNode } from "react";
-import { Box, Button, IconButton, Stack, Typography } from "@mui/material";
+import { ReactNode, useState } from "react";
+import { Button, Divider, IconButton, Stack } from "@mui/material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import Title from "@/components/Title";
 
 interface DemographicRowProps {
   label: string;
   onEdit?: () => void;
+  onSave?: () => void;
   onClear?: () => void;
   showClear?: boolean;
   children: ReactNode;
+  renderEditing: ReactNode;
 }
 
 const DemographicRow = ({
   label,
   onEdit,
+  onSave,
   onClear,
   showClear = false,
   children,
-}: DemographicRowProps) => (
-  <Stack
-    direction="row"
-    alignItems="flex-start"
-    spacing={1}
-    sx={{ py: 1, width: "100%" }}
-  >
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      sx={{
-        minWidth: 44,
-        minHeight: 32,
-        display: "flex",
-        alignItems: "center",
-        flexShrink: 0,
-      }}
-    >
-      {label} /
-    </Typography>
+  renderEditing,
+}: DemographicRowProps) => {
+  const [editing, setEditing] = useState(false);
 
-    <Box sx={{ flex: 1, minWidth: 0 }}>{children}</Box>
+  const handleEdit = () => {
+    setEditing(true);
+    onEdit?.();
+  };
 
-    <Stack
-      direction="row"
-      alignItems="center"
-      spacing={0.5}
-      sx={{ minHeight: 32, flexShrink: 0 }}
-    >
-      {onEdit && (
-        <IconButton size="small" aria-label={`Edit ${label}`} onClick={onEdit}>
-          <EditOutlinedIcon fontSize="small" />
-        </IconButton>
+  const handleClear = () => {
+    setEditing(false);
+    onClear?.();
+  };
+  const handleSave = () => {
+    setEditing(false);
+    onSave?.();
+  };
+
+  return (
+    <>
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="space-between"
+        spacing={1}
+        sx={{ py: 1, width: "100%" }}
+      >
+        <Title
+          title={label}
+          size={"small"}
+          subTitle={editing ? renderEditing : children}
+          wrapperSx={{ width: "100%" }}
+        />
+
+        <Stack
+          direction="row"
+          alignItems="center"
+          spacing={0.5}
+          sx={{ minHeight: 32, flexShrink: 0 }}
+        >
+          {!editing && (
+            <IconButton
+              size="small"
+              aria-label={`Edit ${label}`}
+              onClick={handleEdit}
+            >
+              <EditOutlinedIcon fontSize="small" />
+            </IconButton>
+          )}
+          {showClear && !editing && (
+            <Button
+              variant="text"
+              size="small"
+              color="secondary"
+              onClick={handleClear}
+            >
+              Clear all
+            </Button>
+          )}
+        </Stack>
+      </Stack>
+      <Divider />
+      {editing && (
+        <>
+          <Stack
+            direction={"row"}
+            spacing={1}
+            justifyContent={"flex-end"}
+            my={1}
+          >
+            <Button variant="outlined" color="secondary" onClick={handleClear}>
+              Reset Selection{" "}
+            </Button>
+            <Button color="secondary" onClick={handleSave}>
+              Save Selection and Collapse
+            </Button>
+          </Stack>
+          <Divider />
+        </>
       )}
-      {showClear && onClear && (
-        <Button variant="text" size="small" color="secondary" onClick={onClear}>
-          Clear all
-        </Button>
-      )}
-    </Stack>
-  </Stack>
-);
+    </>
+  );
+};
 
 export default DemographicRow;

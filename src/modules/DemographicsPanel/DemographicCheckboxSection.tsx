@@ -1,8 +1,6 @@
 "use client";
 
-import { useState } from "react";
 import {
-  Button,
   Chip,
   FormControlLabel,
   FormGroup,
@@ -34,24 +32,15 @@ const DemographicCheckboxSection = ({
   onClear,
   note,
 }: DemographicCheckboxSectionProps) => {
-  const [editing, setEditing] = useState(false);
-
   const isChecked = (conceptId: number) =>
     selected.some((c) => c.concept_id === conceptId);
-
-  const handleClear = () => {
-    onClear();
-    setEditing(false);
-  };
 
   return (
     <DemographicRow
       label={label}
-      onEdit={editing ? undefined : () => setEditing(true)}
-      onClear={handleClear}
+      onClear={onClear}
       showClear={selected.length > 0}
-    >
-      {editing ? (
+      renderEditing={
         <>
           <FormGroup>
             {options.map((option) => (
@@ -74,16 +63,10 @@ const DemographicCheckboxSection = ({
               {note}
             </Typography>
           )}
-          <Button
-            variant="text"
-            size="small"
-            sx={{ mt: 1 }}
-            onClick={() => setEditing(false)}
-          >
-            Done
-          </Button>
         </>
-      ) : selected.length > 0 ? (
+      }
+    >
+      {selected.length > 0 ? (
         <Stack direction="row" flexWrap="wrap" gap={0.5}>
           {selected.map((c) => (
             <Chip
