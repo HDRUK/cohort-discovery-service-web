@@ -45,6 +45,7 @@ import ToggleSynthetic from "@/components/ToggleSynthetic";
 import { getFrequencyModeKey } from "@/utils/frequency";
 import ToggleLocation from "@/components/ToggleLocation";
 import ToggleDeath from "@/components/ToggleDeath";
+import useFeatures from "@/hooks/useFeatures";
 
 export type UpdateCollectionProps = {
   collection: CollectionWithHosts;
@@ -312,6 +313,8 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
     fieldConfig,
   });
 
+  const features = useFeatures();
+
   return (
     <UpdatePanel
       label="Collection"
@@ -325,8 +328,12 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
 
         <Stack direction={"row"} spacing={2} justifyContent={"flex-start"}>
           <ToggleSynthetic disabled={!expandedRight} />
-          <ToggleLocation disabled={!expandedRight} />
-          <ToggleDeath disabled={!expandedRight} />
+          {features.queryBuilderUseLocation && (
+            <ToggleLocation disabled={!expandedRight} />
+          )}
+          {features.queryBuilderUseDeath && (
+            <ToggleDeath disabled={!expandedRight} />
+          )}
         </Stack>
 
         <FormLabel underlined>Collection Status</FormLabel>
