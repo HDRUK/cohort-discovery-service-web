@@ -5,8 +5,8 @@ const checkIsAdmin = (user?: CombinedUser | null) =>
   !!user?.roles.find((r) => r.name === RoleName.ADMIN);
 
 const checkHasNhsSdeAccess = (user?: CombinedUser | null) =>
-  user?.workgroups?.some((workgroup) =>
-    ["NHS SDE", "NHS-SDE"].includes(workgroup.name.trim().toUpperCase()),
+  user?.workgroups?.some(
+    (workgroup) => workgroup.name.trim().toUpperCase() === "NHS-SDE",
   ) ?? false;
 
 const getLastName = (name?: string) => {

@@ -45,7 +45,6 @@ const InfoBanner = ({
     anchorOrigin={anchorOrigin}
     sx={{
       position: "static",
-      transform: "none",
       zIndex: "auto",
       "> div": {
         borderRadius: 0,
