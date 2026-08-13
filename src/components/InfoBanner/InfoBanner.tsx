@@ -3,7 +3,7 @@
 import { Close } from "@mui/icons-material";
 import { IconButton, Snackbar, SnackbarProps } from "@mui/material";
 
-export interface InfoBannerProps extends Omit<SnackbarProps, "color"> {
+export interface InfoBannerProps extends SnackbarProps {
   backgroundColor?: string;
   textColor?: string;
   ariaCloseButtonLabel: string;
