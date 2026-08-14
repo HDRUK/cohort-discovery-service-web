@@ -21,7 +21,7 @@ const TermDirectory = ({
     () => [
       {
         id: "concept_id",
-        header: "OMOP ID",
+        header: "OMOP Concept ID",
         accessorFn: (row) => row.concept_id,
         Cell: ({ cell }) => (
           <Stack direction="row" alignItems="center">
@@ -29,7 +29,7 @@ const TermDirectory = ({
             <CopyableTextButton
               text={String(cell.getValue<number>())}
               size="small"
-              ariaLabel={`Copy OMOP ID ${cell.getValue<number>()}`}
+              ariaLabel={`Copy OMOP Concept ID ${cell.getValue<number>()}`}
             />
           </Stack>
         ),
@@ -81,6 +81,7 @@ const TermDirectory = ({
     getRowId: (row) => String(row?.concept_id),
     enableStickyHeader: true,
     enableSorting: false,
+    enableRowSelection: false,
   });
 
   return (
@@ -97,7 +98,9 @@ const TermDirectory = ({
         "& > .MuiGrid-container": {
           bgcolor: "table.main",
           p: 1,
-          borderRadius: 1,
+        },
+        "& .MuiPaper-root": {
+          borderRadius: 0,
         },
       }}
     />
