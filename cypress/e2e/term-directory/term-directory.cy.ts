@@ -9,7 +9,7 @@ describe("Term Directory", () => {
   });
 
   it("shows the correct table columns", () => {
-    cy.contains("OMOP ID").should("be.visible");
+    cy.contains("OMOP Concept ID").should("be.visible");
     cy.contains("Term Name").should("be.visible");
     cy.contains("Count").should("be.visible");
     cy.contains("Associated Collections").should("be.visible");

@@ -22,7 +22,7 @@ describe("TermDirectory", () => {
     renderComponent(paginateData({ data: mockTermDirectoryEntries }));
 
     const columns = [
-      "OMOP ID",
+      "OMOP Concept ID",
       "Term Name",
       "Domain",
       "Count",
