@@ -21,7 +21,7 @@ import { formatAgeSummary, formatConceptCountSummary } from "./summary";
 const DemographicsPanel = ({
   initialExpand = true,
 }: {
-  initialExpand: boolean;
+  initialExpand?: boolean;
 }) => {
   const { demographics, remove, toggleSex, clearSex } = useQueryBuilder(
     (qb) => ({
