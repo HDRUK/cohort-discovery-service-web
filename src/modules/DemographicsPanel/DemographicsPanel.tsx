@@ -31,7 +31,7 @@ const DemographicsPanel = () => {
   const age = demographics?.age ?? null;
   const sex = demographics?.sex ?? [];
 
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
 
   const summary = [
     formatAgeSummary(age),

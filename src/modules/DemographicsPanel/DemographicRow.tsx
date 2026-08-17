@@ -68,7 +68,7 @@ const DemographicRow = ({
               aria-label={`Edit ${label}`}
               onClick={handleEdit}
             >
-              <EditOutlinedIcon fontSize="small" />
+              <EditOutlinedIcon fontSize="small" color="secondary" />
             </IconButton>
           )}
           {showClear && !editing && (
