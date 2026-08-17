@@ -23,6 +23,8 @@ export enum FeatureName {
   AdminMoreCollectionDetails = "admin-more-collection-details",
 
   QueryBuilderUseValueAsNumber = "query-builder-use-value-as-number",
+
+  AccessBanner = "access-banner",
 }
 
 export type FeatureFlag = Record<FeatureName, boolean>;
@@ -54,4 +56,6 @@ export const DEFAULT_FLAGS: FeatureFlag = {
   [FeatureName.AdminMoreCollectionDetails]: false,
 
   [FeatureName.QueryBuilderUseValueAsNumber]: false,
+
+  [FeatureName.AccessBanner]: false,
 };

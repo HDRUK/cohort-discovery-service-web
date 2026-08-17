@@ -50,6 +50,8 @@ const useFeatures = () => {
 
         queryBuilderUseValueAsNumber:
           flags[FeatureName.QueryBuilderUseValueAsNumber],
+
+        accessBanner: flags[FeatureName.AccessBanner],
       };
     }),
   );
