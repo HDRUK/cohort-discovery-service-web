@@ -16,7 +16,6 @@
     "integrated-sync-sde-wgs-from-claim": true,
     "integrated-sync-roles-every-request": true,
     "integrated-sync-custodians-every-request": true,
-    "hdruk-uk-theme": true,
-    "access-banner": true
+    "hdruk-uk-theme": true
   }
 }
