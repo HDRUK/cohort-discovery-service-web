@@ -3,8 +3,8 @@
 import { Box, Chip } from "@mui/material";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { MAX_AGE_FILTER, MIN_AGE_FILTER } from "@/config/rules";
+import AgeRangeInput from "@/components/RuleAgeSelector/AgeRangeInput";
 import DemographicRow from "./DemographicRow";
-import DemographicAgeSelector from "./DemographicAgeSelector";
 import { formatAgeSummary } from "./summary";
 
 const DEFAULT_AGE_RANGE: [number, number] = [MIN_AGE_FILTER, MAX_AGE_FILTER];
@@ -31,7 +31,15 @@ const DemographicAgeSection = () => {
       showClear={age !== null}
       renderEditing={
         <Box minWidth={350} maxWidth={400}>
-          {age && <DemographicAgeSelector value={age} onChange={setAge} />}
+          {age && (
+            <AgeRangeInput
+              value={age}
+              minAge={MIN_AGE_FILTER}
+              maxAge={MAX_AGE_FILTER}
+              onChange={setAge}
+              sx={{ flex: 1, py: 1 }}
+            />
+          )}
         </Box>
       }
     >
