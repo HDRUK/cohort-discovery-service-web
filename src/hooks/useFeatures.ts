@@ -53,6 +53,8 @@ const useFeatures = () => {
 
         queryBuilderUseDemographicRule:
           flags[FeatureName.QueryBuilderUseDemographicRule],
+
+        accessBanner: flags[FeatureName.AccessBanner],
       };
     }),
   );

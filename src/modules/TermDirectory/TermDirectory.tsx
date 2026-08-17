@@ -10,6 +10,7 @@ import Table from "@/components/Table";
 import { formatNumber } from "@/utils/numbers";
 import { DEFAULT_PER_PAGE } from "@/config/defaults";
 import DomainFilterTabs from "./DomainFilterTabs";
+import AssociatedCollectionsChip from "./AssociatedCollectionsChip";
 
 const TermDirectory = ({
   entries,
@@ -20,7 +21,7 @@ const TermDirectory = ({
     () => [
       {
         id: "concept_id",
-        header: "OMOP ID",
+        header: "OMOP Concept ID",
         accessorFn: (row) => row.concept_id,
         Cell: ({ cell }) => (
           <Stack direction="row" alignItems="center">
@@ -28,7 +29,7 @@ const TermDirectory = ({
             <CopyableTextButton
               text={String(cell.getValue<number>())}
               size="small"
-              ariaLabel={`Copy OMOP ID ${cell.getValue<number>()}`}
+              ariaLabel={`Copy OMOP Concept ID ${cell.getValue<number>()}`}
             />
           </Stack>
         ),
@@ -41,6 +42,12 @@ const TermDirectory = ({
         size: 400,
       },
       {
+        id: "domain_id",
+        header: "Domain",
+        accessorFn: (row) => row.domain_id,
+        size: 140,
+      },
+      {
         id: "count",
         header: "Count",
         accessorFn: (row) => row.count,
@@ -51,6 +58,15 @@ const TermDirectory = ({
         id: "ncollections",
         header: "Associated Collections",
         accessorFn: (row) => row.ncollections,
+        Cell: ({ cell }) => (
+          <AssociatedCollectionsChip count={cell.getValue<number>()} />
+        ),
+        muiTableBodyCellProps: {
+          align: "center",
+        },
+        muiTableHeadCellProps: {
+          align: "center",
+        },
         size: 160,
       },
     ],
@@ -64,6 +80,8 @@ const TermDirectory = ({
     perPageDefault: DEFAULT_PER_PAGE,
     getRowId: (row) => String(row?.concept_id),
     enableStickyHeader: true,
+    enableSorting: false,
+    enableRowSelection: false,
   });
 
   return (
@@ -76,6 +94,15 @@ const TermDirectory = ({
         },
       }}
       details={<DomainFilterTabs />}
+      boxSxProps={{
+        "& > .MuiGrid-container": {
+          bgcolor: "table.main",
+          p: 1,
+        },
+        "& .MuiPaper-root": {
+          borderRadius: 0,
+        },
+      }}
     />
   );
 };
