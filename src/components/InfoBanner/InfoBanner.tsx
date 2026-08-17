@@ -3,6 +3,12 @@
 import { Close } from "@mui/icons-material";
 import { IconButton, Snackbar, SnackbarProps } from "@mui/material";
 
+// This component was ported from Gateway, and is a candidate for the shared
+// component library once that exists.
+// There's a caveat here as `open` is controlled by the parent (AccessBanner),
+// not interanlly like Gateway's version, since we need to persist the dismissal
+// state in the store.
+
 export interface InfoBannerProps extends SnackbarProps {
   backgroundColor?: string;
   textColor?: string;
