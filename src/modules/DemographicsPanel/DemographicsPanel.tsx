@@ -18,7 +18,11 @@ import DemographicAgeSection from "./DemographicAgeSection";
 import DemographicCheckboxSection from "./DemographicCheckboxSection";
 import { formatAgeSummary, formatConceptCountSummary } from "./summary";
 
-const DemographicsPanel = () => {
+const DemographicsPanel = ({
+  initialExpand = true,
+}: {
+  initialExpand: boolean;
+}) => {
   const { demographics, remove, toggleSex, clearSex } = useQueryBuilder(
     (qb) => ({
       demographics: qb.queryBuilderJson.demographics,
@@ -31,7 +35,7 @@ const DemographicsPanel = () => {
   const age = demographics?.age ?? null;
   const sex = demographics?.sex ?? [];
 
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(initialExpand);
 
   const summary = [
     formatAgeSummary(age),
