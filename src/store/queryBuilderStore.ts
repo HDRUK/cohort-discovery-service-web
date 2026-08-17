@@ -385,18 +385,18 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     if (queryBuilderJson.demographics) return;
     setQueryBuilderJson(
       { ...queryBuilderJson, demographics: { ...EMPTY_DEMOGRAPHICS } },
-      false,
+      true,
     );
   },
   removeDemographics: () => {
     const { queryBuilderJson, setQueryBuilderJson } = get();
-    setQueryBuilderJson({ ...queryBuilderJson, demographics: undefined }, false);
+    setQueryBuilderJson({ ...queryBuilderJson, demographics: undefined }, true);
   },
   setDemographicsAge: (age) => {
     const { queryBuilderJson, setQueryBuilderJson } = get();
     setQueryBuilderJson(
       withDemographics(queryBuilderJson, (d) => ({ ...d, age })),
-      false,
+      true,
     );
   },
   toggleDemographicsSex: (concept, selected) => {
@@ -408,14 +408,14 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
           ? [...withoutConcept(d.sex, concept), concept]
           : withoutConcept(d.sex, concept),
       })),
-      false,
+      true,
     );
   },
   clearDemographicsSex: () => {
     const { queryBuilderJson, setQueryBuilderJson } = get();
     setQueryBuilderJson(
       withDemographics(queryBuilderJson, (d) => ({ ...d, sex: [] })),
-      false,
+      true,
     );
   },
   toggleDemographicsRace: (concept, selected) => {
@@ -427,14 +427,14 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
           ? [...withoutConcept(d.race, concept), concept]
           : withoutConcept(d.race, concept),
       })),
-      false,
+      true,
     );
   },
   clearDemographicsRace: () => {
     const { queryBuilderJson, setQueryBuilderJson } = get();
     setQueryBuilderJson(
       withDemographics(queryBuilderJson, (d) => ({ ...d, race: [] })),
-      false,
+      true,
     );
   },
 
@@ -635,6 +635,8 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
         featureFlags?.[FeatureName.ConstrainForBunnyV1] || false,
       allowNestedGroups:
         featureFlags?.[FeatureName.QueryBuilderAllowNestedGroups] || false,
+      allowDemographicsOnly:
+        featureFlags?.[FeatureName.QueryBuilderUseDemographicRule] || false,
     });
   },
 

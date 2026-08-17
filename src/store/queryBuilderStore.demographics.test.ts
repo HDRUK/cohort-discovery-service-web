@@ -3,6 +3,8 @@ import {
   DEFAULT_QUERY,
   useQueryBuilderStore,
 } from "@/store/queryBuilderStore";
+import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
+import { FeatureFlag, FeatureName } from "@/types/features";
 
 const concept = (concept_id: number, name: string): Concept =>
   ({ concept_id, name, category: "Gender" }) as Concept;
@@ -12,8 +14,17 @@ const male = concept(8507, "Male");
 
 const store = () => useQueryBuilderStore.getState();
 const demographics = () => store().queryBuilderJson.demographics;
+const isValid = () => store().queryBuilderJson.valid;
+
+const setDemographicRuleFlag = (enabled: boolean) =>
+  useFeatureFlagsStore.setState({
+    flags: {
+      [FeatureName.QueryBuilderUseDemographicRule]: enabled,
+    } as FeatureFlag,
+  });
 
 beforeEach(() => {
+  setDemographicRuleFlag(false);
   store().setQueryBuilderJson(DEFAULT_QUERY);
 });
 
@@ -59,5 +70,50 @@ describe("queryBuilderStore demographics", () => {
   it("keeps demographics inside queryBuilderJson (single source of truth)", () => {
     store().toggleDemographicsSex(male, true);
     expect(store().queryBuilderJson.demographics?.sex).toEqual([male]);
+  });
+
+  describe("run-query validity (demographic-rule flag on)", () => {
+    beforeEach(() => {
+      setDemographicRuleFlag(true);
+      store().setQueryBuilderJson(DEFAULT_QUERY);
+    });
+
+    it("is valid with a demographic age set and no rules", () => {
+      store().setDemographicsAge([50, 80]);
+      expect(isValid()).toBe(true);
+    });
+
+    it("is valid with a demographic sex set and no rules", () => {
+      store().toggleDemographicsSex(female, true);
+      expect(isValid()).toBe(true);
+    });
+
+    it("stays invalid when the demographics block is empty", () => {
+      store().addDemographics();
+      expect(isValid()).toBe(false);
+    });
+
+    it("becomes invalid again once demographics are cleared", () => {
+      store().setDemographicsAge([50, 80]);
+      expect(isValid()).toBe(true);
+
+      store().setDemographicsAge(null);
+      expect(isValid()).toBe(false);
+    });
+
+    it("becomes invalid when the whole block is removed", () => {
+      store().toggleDemographicsSex(female, true);
+      expect(isValid()).toBe(true);
+
+      store().removeDemographics();
+      expect(isValid()).toBe(false);
+    });
+  });
+
+  it("stays invalid with demographics set when the flag is off", () => {
+    setDemographicRuleFlag(false);
+    store().setQueryBuilderJson(DEFAULT_QUERY);
+    store().setDemographicsAge([50, 80]);
+    expect(isValid()).toBe(false);
   });
 });
