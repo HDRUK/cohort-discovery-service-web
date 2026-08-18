@@ -15,7 +15,8 @@ import {
   getFirstTopLevelCombinator,
   RuleErrors,
 } from "@/utils/rules";
-import { EXAMPLES } from "@/config/queryExamples";
+import { getExamples } from "@/config/queryExamples";
+import useFeatures from "@/hooks/useFeatures";
 import { Query } from "@/types/api";
 import SearchOverlay from "./SearchOverlay";
 import { useDefaults } from "@/providers/DefaultProvider";
@@ -333,7 +334,14 @@ const CohortQueryInput = ({
     clearFormErrors,
   ]);
 
-  const placeholders = Object.keys(EXAMPLES);
+  const { queryBuilderUseDemographicRule } = useFeatures();
+
+  const examples = useMemo(
+    () => getExamples(queryBuilderUseDemographicRule),
+    [queryBuilderUseDemographicRule],
+  );
+
+  const placeholders = Object.keys(examples);
 
   const onSubmit = useCallback(
     (e?: React.BaseSyntheticEvent) => {
@@ -469,8 +477,8 @@ const CohortQueryInput = ({
                   anchorEl={anchorRef.current}
                   options={placeholders.map((label) => ({
                     label,
-                    value: EXAMPLES[label].id,
-                    rules: EXAMPLES[label],
+                    value: examples[label].id,
+                    rules: examples[label],
                   }))}
                 />
               </Box>
