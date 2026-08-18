@@ -51,6 +51,9 @@ const useFeatures = () => {
         queryBuilderUseValueAsNumber:
           flags[FeatureName.QueryBuilderUseValueAsNumber],
 
+        queryBuilderUseDemographicRule:
+          flags[FeatureName.QueryBuilderUseDemographicRule],
+
         accessBanner: flags[FeatureName.AccessBanner],
       };
     }),
