@@ -6,9 +6,71 @@ import QueryBuilder from "./QueryBuilder";
 import { getQueryJson } from "./__mocks__/getQueryJson";
 
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
+import { Query } from "@/types/api";
+
+let mockUrlQueryPid: string | null = null;
+jest.mock("@/hooks/useSearchParams", () => ({
+  __esModule: true,
+  default: () => ({
+    searchParams: {
+      get: (name: string) => (name === "query" ? mockUrlQueryPid : null),
+    },
+    getSearchParam: jest.fn(),
+    setSearchParam: jest.fn(),
+    setSearchParams: jest.fn(),
+    clearSearchParams: jest.fn(),
+  }),
+}));
+
 const setQueryBuilderJson = jest.fn();
 
 describe("QueryBuilder", () => {
+  describe("hydration from the server query prop (DP-1057)", () => {
+    const editedQuery: Query = {
+      id: 1,
+      pid: "query-b",
+      name: "Query B",
+      definition: getQueryJson({ demographics: { age: null, sex: [], race: [] } }),
+      created_at: "2024-01-01T00:00:00Z",
+      tasks: [],
+    };
+
+    const renderWithQuery = () =>
+      render(
+        <MockCohortDiscoveryServiceStore
+          overrides={{
+            queryBuilder: {
+              queryBuilderJson: getQueryJson(),
+              setQueryBuilderJson,
+            },
+          }}
+        >
+          <QueryBuilder query={editedQuery} />
+        </MockCohortDiscoveryServiceStore>,
+      );
+
+    beforeEach(() => {
+      setQueryBuilderJson.mockClear();
+      mockUrlQueryPid = null;
+    });
+
+    it("does not hydrate when the prop pid does not match the URL query pid", () => {
+      mockUrlQueryPid = "some-other-query";
+      renderWithQuery();
+
+      expect(setQueryBuilderJson).not.toHaveBeenCalledWith(
+        editedQuery.definition,
+      );
+    });
+
+    it("hydrates when the prop pid matches the URL query pid", () => {
+      mockUrlQueryPid = "query-b";
+      renderWithQuery();
+
+      expect(setQueryBuilderJson).toHaveBeenCalledWith(editedQuery.definition);
+    });
+  });
+
   const renderComponent = () => {
     const query = getQueryJson();
     const rendered = render(
