@@ -20,6 +20,7 @@ const numberFieldSx = {
   "& .MuiOutlinedInput-root": { borderRadius: 1 },
 };
 
+// Emits an ordered, clamped [low, high] pair — consumers rely on l <= r.
 const normalise = (
   [l, r]: [number, number],
   minAge: number,

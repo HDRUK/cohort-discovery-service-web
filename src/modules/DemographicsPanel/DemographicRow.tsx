@@ -93,7 +93,7 @@ const DemographicRow = ({
             my={1}
           >
             <Button variant="outlined" color="secondary" onClick={handleClear}>
-              Reset Selection{" "}
+              Reset Selection
             </Button>
             <Button color="secondary" onClick={handleSave}>
               Save Selection and Collapse
