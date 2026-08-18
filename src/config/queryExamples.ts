@@ -22,8 +22,6 @@ export const EXAMPLES: Record<string, RuleGroupType> = {
 // and sex live in a `demographics` block instead of standalone age-filter /
 // Gender-concept rule nodes. query_3 has no age/sex, so it is shared as-is.
 export const DEMOGRAPHIC_EXAMPLES: Record<string, RuleGroupType> = {
-  // Cast via unknown: JSON infers `demographics.age` as number[] rather than
-  // the [number, number] tuple RuleGroupType expects.
   [WOMEN_OVER_18]: query1WithDemo as unknown as RuleGroupType,
   [ADULTS_DIABETES]: query2WithDemo as unknown as RuleGroupType,
   [COVID_VACCINES]: query3 as RuleGroupType,
