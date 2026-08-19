@@ -85,6 +85,7 @@ const CohortQueryInput = ({
   const programmaticValueRef = useRef<string | null>(null);
   const lastSyncedQueryAsText = useRef<string | null>(null);
   const anchorRef = useRef<HTMLDivElement | null>(null);
+  const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const {
     handleSubmit: handleSubmitSearch,
@@ -124,6 +125,15 @@ const CohortQueryInput = ({
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setQueryMode((current) => (current === null ? current : null));
   }, [rulesKey]);
+
+  useEffect(
+    () => () => {
+      if (blurTimeoutRef.current) {
+        clearTimeout(blurTimeoutRef.current);
+      }
+    },
+    [],
+  );
 
   const resetQuery = useCallback(() => {
     clearFormErrors();
@@ -452,14 +462,25 @@ const CohortQueryInput = ({
                   endIcon={<EndIcon sx={endIconSx} />}
                   onClickEndAdornment={onSubmit}
                   onFocus={() => {
-                    if (!showChoicePrompt && !isAppendMode) {
+                    if (blurTimeoutRef.current) {
+                      clearTimeout(blurTimeoutRef.current);
+                      blurTimeoutRef.current = null;
+                    }
+                    if (
+                      !showChoicePrompt &&
+                      !isAppendMode &&
+                      !suppressInitialExamples
+                    ) {
                       setOpenSearchOverlap(true);
                     }
                   }}
                   onBlur={() => {
                     field.onBlur();
                     setSuppressInitialExamples(false);
-                    setTimeout(() => setOpenSearchOverlap(false), 150);
+                    blurTimeoutRef.current = setTimeout(() => {
+                      setOpenSearchOverlap(false);
+                      blurTimeoutRef.current = null;
+                    }, 150);
                   }}
                   onChange={(e) => {
                     programmaticValueRef.current = null;
