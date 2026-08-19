@@ -5,12 +5,21 @@ import {
 } from "@/store/queryBuilderStore";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import { FeatureFlag, FeatureName } from "@/types/features";
+import {
+  DemographicConceptField,
+  DemographicDomain,
+} from "@/config/demographics";
 
-const concept = (concept_id: number, name: string): Concept =>
-  ({ concept_id, name, category: "Gender" }) as Concept;
+const concept = (
+  concept_id: number,
+  name: string,
+  category: string = DemographicDomain.Gender,
+): Concept => ({ concept_id, name, category }) as Concept;
 
 const female = concept(8532, "Female");
 const male = concept(8507, "Male");
+const white = concept(8527, "White", DemographicDomain.Race);
+const black = concept(8516, "Black", DemographicDomain.Race);
 
 const store = () => useQueryBuilderStore.getState();
 const demographics = () => store().queryBuilderJson.demographics;
@@ -47,28 +56,48 @@ describe("queryBuilderStore demographics", () => {
     expect(demographics()?.age).toEqual([18, 65]);
   });
 
-  it("toggleDemographicsSex adds and removes without duplicating", () => {
-    store().toggleDemographicsSex(female, true);
-    store().toggleDemographicsSex(female, true);
+  it("toggleDemographicsConcept adds and removes sex without duplicating", () => {
+    store().toggleDemographicsConcept(DemographicConceptField.Sex, female, true);
+    store().toggleDemographicsConcept(DemographicConceptField.Sex, female, true);
     expect(demographics()?.sex).toEqual([female]);
 
-    store().toggleDemographicsSex(male, true);
+    store().toggleDemographicsConcept(DemographicConceptField.Sex, male, true);
     expect(demographics()?.sex).toHaveLength(2);
 
-    store().toggleDemographicsSex(female, false);
+    store().toggleDemographicsConcept(DemographicConceptField.Sex, female, false);
     expect(demographics()?.sex).toEqual([male]);
   });
 
-  it("clearDemographicsSex empties sex without touching age", () => {
+  it("toggleDemographicsConcept adds and removes race without duplicating", () => {
+    store().toggleDemographicsConcept(DemographicConceptField.Race, white, true);
+    store().toggleDemographicsConcept(DemographicConceptField.Race, white, true);
+    expect(demographics()?.race).toEqual([white]);
+
+    store().toggleDemographicsConcept(DemographicConceptField.Race, black, true);
+    expect(demographics()?.race).toHaveLength(2);
+
+    store().toggleDemographicsConcept(DemographicConceptField.Race, white, false);
+    expect(demographics()?.race).toEqual([black]);
+  });
+
+  it("clearDemographicsConcept empties sex without touching age", () => {
     store().setDemographicsAge([0, 30]);
-    store().toggleDemographicsSex(female, true);
-    store().clearDemographicsSex();
+    store().toggleDemographicsConcept(DemographicConceptField.Sex, female, true);
+    store().clearDemographicsConcept(DemographicConceptField.Sex);
     expect(demographics()?.sex).toEqual([]);
     expect(demographics()?.age).toEqual([0, 30]);
   });
 
+  it("clearDemographicsConcept empties race without touching sex", () => {
+    store().toggleDemographicsConcept(DemographicConceptField.Sex, female, true);
+    store().toggleDemographicsConcept(DemographicConceptField.Race, white, true);
+    store().clearDemographicsConcept(DemographicConceptField.Race);
+    expect(demographics()?.race).toEqual([]);
+    expect(demographics()?.sex).toEqual([female]);
+  });
+
   it("keeps demographics inside queryBuilderJson (single source of truth)", () => {
-    store().toggleDemographicsSex(male, true);
+    store().toggleDemographicsConcept(DemographicConceptField.Sex, male, true);
     expect(store().queryBuilderJson.demographics?.sex).toEqual([male]);
   });
 
@@ -84,7 +113,7 @@ describe("queryBuilderStore demographics", () => {
     });
 
     it("is valid with a demographic sex set and no rules", () => {
-      store().toggleDemographicsSex(female, true);
+      store().toggleDemographicsConcept(DemographicConceptField.Sex, female, true);
       expect(isValid()).toBe(true);
     });
 
@@ -102,7 +131,7 @@ describe("queryBuilderStore demographics", () => {
     });
 
     it("becomes invalid when the whole block is removed", () => {
-      store().toggleDemographicsSex(female, true);
+      store().toggleDemographicsConcept(DemographicConceptField.Sex, female, true);
       expect(isValid()).toBe(true);
 
       store().removeDemographics();

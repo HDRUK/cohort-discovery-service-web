@@ -1,31 +1,27 @@
-import { Concept } from "@/types/api";
+import { Concept, TermDirectoryEntry } from "@/types/api";
 
-/**
- * Fixed demographic concept options rendered as checkboxes in the Demographics
- * panel. Curated by hand here so the shown values can be decided without a
- * round-trip to the API. This could be sourced from an endpoint in the future.
- *
- * concept_id values should be confirmed against the OMOP vocabulary in use.
- */
-export interface DemographicOption {
-  concept_id: number;
-  name: string;
+/** Concept-array fields on the demographics block (keys of `Demographics`). */
+export enum DemographicConceptField {
+  Sex = "sex",
+  Race = "race",
 }
 
-export const SEX_CONCEPTS: DemographicOption[] = [
-  { concept_id: 8532, name: "Female" },
-  { concept_id: 8507, name: "Male" },
-  { concept_id: 0, name: "No matching concept" },
-  { concept_id: 8551, name: "Unknown" },
-];
+/** OMOP `domain_id` values used to bucket person-level concepts. */
+export enum DemographicDomain {
+  Gender = "Gender",
+  Race = "Race",
+}
 
 export const SEX_GUIDANCE =
   "Define the patient sex criteria that should apply. Patient sex information may be unavailable or incomplete in some records.";
 
+export const RACE_GUIDANCE =
+  "Define the patient race criteria that should apply. Patient race information may be unavailable or incomplete in some records.";
+
 export const demographicOptionToConcept = (
-  option: DemographicOption,
+  option: TermDirectoryEntry,
 ): Concept => ({
   concept_id: option.concept_id,
-  name: option.name,
-  category: "Gender",
+  name: option.concept_name,
+  category: option.domain_id,
 });

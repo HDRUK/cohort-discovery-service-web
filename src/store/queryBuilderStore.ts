@@ -29,6 +29,7 @@ import { removeFalseKeys } from "@/utils/numbers";
 import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
 import { DatasetErrors } from "@/utils/datasets";
 import { Collection, Concept } from "@/types/api";
+import { DemographicConceptField } from "@/config/demographics";
 import { FeatureName } from "@/types/features";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import { intersection } from "lodash";
@@ -129,10 +130,12 @@ export interface QueryBuilderStoreState {
   addDemographics: () => void;
   removeDemographics: () => void;
   setDemographicsAge: (age: [number, number] | null) => void;
-  toggleDemographicsSex: (concept: Concept, selected: boolean) => void;
-  clearDemographicsSex: () => void;
-  toggleDemographicsRace: (concept: Concept, selected: boolean) => void;
-  clearDemographicsRace: () => void;
+  toggleDemographicsConcept: (
+    field: DemographicConceptField,
+    concept: Concept,
+    selected: boolean,
+  ) => void;
+  clearDemographicsConcept: (field: DemographicConceptField) => void;
 
   queryAsText: string;
   getQueryFromText: (
@@ -399,41 +402,22 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
       true,
     );
   },
-  toggleDemographicsSex: (concept, selected) => {
+  toggleDemographicsConcept: (field, concept, selected) => {
     const { queryBuilderJson, setQueryBuilderJson } = get();
     setQueryBuilderJson(
       withDemographics(queryBuilderJson, (d) => ({
         ...d,
-        sex: selected
-          ? [...withoutConcept(d.sex, concept), concept]
-          : withoutConcept(d.sex, concept),
+        [field]: selected
+          ? [...withoutConcept(d[field], concept), concept]
+          : withoutConcept(d[field], concept),
       })),
       true,
     );
   },
-  clearDemographicsSex: () => {
+  clearDemographicsConcept: (field) => {
     const { queryBuilderJson, setQueryBuilderJson } = get();
     setQueryBuilderJson(
-      withDemographics(queryBuilderJson, (d) => ({ ...d, sex: [] })),
-      true,
-    );
-  },
-  toggleDemographicsRace: (concept, selected) => {
-    const { queryBuilderJson, setQueryBuilderJson } = get();
-    setQueryBuilderJson(
-      withDemographics(queryBuilderJson, (d) => ({
-        ...d,
-        race: selected
-          ? [...withoutConcept(d.race, concept), concept]
-          : withoutConcept(d.race, concept),
-      })),
-      true,
-    );
-  },
-  clearDemographicsRace: () => {
-    const { queryBuilderJson, setQueryBuilderJson } = get();
-    setQueryBuilderJson(
-      withDemographics(queryBuilderJson, (d) => ({ ...d, race: [] })),
+      withDemographics(queryBuilderJson, (d) => ({ ...d, [field]: [] })),
       true,
     );
   },
