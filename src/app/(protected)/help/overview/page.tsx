@@ -2,9 +2,9 @@
 
 import { Box } from "@mui/material";
 import QueryBuilderGuidance from "@/app/(protected)/dashboard/[tabId]/components/QueryBuilderGuidance";
-import OverviewMdx from "@/content/help/overview.mdx";
 import { baseComponents } from "@/modules/Guidance/Guidance";
-import Video from "./Video";
+import Video from "../components/Video";
+import OverviewMdx from "./overview.mdx";
 
 const components = {
   ...baseComponents,
@@ -12,7 +12,7 @@ const components = {
   QueryBuilderGuidance,
 };
 
-const OverviewTab = () => {
+const OverviewPage = () => {
   return (
     <Box sx={{ overflowY: "scroll", height: "auto" }}>
       <OverviewMdx components={components} />
@@ -20,4 +20,4 @@ const OverviewTab = () => {
   );
 };
 
-export default OverviewTab;
+export default OverviewPage;
