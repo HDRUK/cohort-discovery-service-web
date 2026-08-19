@@ -1,8 +1,6 @@
 import type { StorybookConfig } from "@storybook/nextjs";
 
 const config: StorybookConfig = {
-  // Only pick up real Storybook stories. The .mdx files under src/ are app
-  // content (help tutorials + query-builder guidance), not Storybook docs.
   stories: ["../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
   addons: [
     "@chromatic-com/storybook",
