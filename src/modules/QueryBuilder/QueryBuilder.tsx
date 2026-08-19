@@ -15,6 +15,7 @@ import RuleBoard from "../RuleBoard";
 import DemographicsPanel from "../DemographicsPanel";
 import { CohortBuilderProvider } from "@/providers/CohortBuilderProvider";
 import useFeatures from "@/hooks/useFeatures";
+import useSearchParams from "@/hooks/useSearchParams";
 
 const QueryBuilder = ({
   query,
@@ -37,11 +38,14 @@ const QueryBuilder = ({
   const showDemographics =
     queryBuilderUseDemographicRule && !!queryBuilderJson.demographics;
 
+  const { searchParams } = useSearchParams();
+  const urlQueryPid = searchParams.get("query");
+
   useEffect(() => {
-    if (query?.definition) {
+    if (query?.definition && query.pid === urlQueryPid) {
       setQueryBuilderJson(query.definition);
     }
-  }, [query, setQueryBuilderJson]);
+  }, [query, urlQueryPid, setQueryBuilderJson]);
 
   useLeaveConfirmation(
     queryBuilderLeaveConfirm && queryBuilderJson.rules.length > 0,
