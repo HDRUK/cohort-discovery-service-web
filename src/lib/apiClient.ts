@@ -7,10 +7,15 @@ import { notFound, redirect } from "next/navigation";
 import { DEFAULT_REVALIDATE } from "@/config/defaults";
 import { getTokenUser } from "./auth";
 import { CacheOptions } from "@/types/api";
-import { paramsToString } from "@/utils/string";
+import { hashString, paramsToString } from "@/utils/string";
 
 const baseURL = process.env.API_BASE_URL ?? "http://localhost:8100";
 const isCypress = process.env.CYPRESS === "true";
+
+// Next.js rejects cache tags longer than 256 characters. Query strings with
+// many params (e.g. lots of collection_pid[]) can blow past this, so fall back
+// to a hash of the query string once the tag would exceed the limit.
+const MAX_CACHE_TAG_LENGTH = 256;
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 
@@ -55,7 +60,14 @@ const buildCachedRequest = async ({
   } = await getTokenUser();
 
   const queryTags =
-    queryString && tags ? tags.map((t) => `${t}-${queryString}`) : [];
+    queryString && tags
+      ? tags.map((t) => {
+          const tag = `${t}-${queryString}`;
+          return tag.length <= MAX_CACHE_TAG_LENGTH
+            ? tag
+            : `${t}-${hashString(queryString)}`;
+        })
+      : [];
 
   const allTags = [
     "admin",
