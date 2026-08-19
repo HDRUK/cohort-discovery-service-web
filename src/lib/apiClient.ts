@@ -7,7 +7,7 @@ import { notFound, redirect } from "next/navigation";
 import { DEFAULT_REVALIDATE } from "@/config/defaults";
 import { getTokenUser } from "./auth";
 import { CacheOptions } from "@/types/api";
-import { hashString, paramsToString } from "@/utils/string";
+import { hashString, canonicaliseQueryString } from "@/utils/string";
 
 const baseURL = process.env.API_BASE_URL ?? "http://localhost:8100";
 const isCypress = process.env.CYPRESS === "true";
@@ -52,7 +52,9 @@ const buildCachedRequest = async ({
 }: CachedGetArgs) => {
   const { useCache = true } = cacheOptions ?? {};
 
-  const queryString = paramsToString(params);
+  // Canonicalise so param ordering doesn't fragment the cache (same request,
+  // different order → same URL and tag).
+  const queryString = canonicaliseQueryString(params);
   const finalUrl = queryString ? `${url}?${queryString}` : url;
 
   const {
