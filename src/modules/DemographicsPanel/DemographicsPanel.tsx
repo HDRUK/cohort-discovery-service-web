@@ -67,7 +67,7 @@ const DemographicsPanel = ({
     queryFn: async () =>
       await getTermDirectory(1, 100, "", OmopTableName.Person, collectionPids),
     enabled: !!user?.id,
-    staleTime: 60_000,
+    staleTime: 10 * 60_000,
   });
 
   const sexConcepts = useMemo(
