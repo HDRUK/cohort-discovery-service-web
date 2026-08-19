@@ -12,11 +12,8 @@ export enum DemographicDomain {
   Race = "Race",
 }
 
-export const SEX_GUIDANCE =
-  "Define the patient sex criteria that should apply. Patient sex information may be unavailable or incomplete in some records.";
-
-export const RACE_GUIDANCE =
-  "Define the patient race criteria that should apply. Patient race information may be unavailable or incomplete in some records.";
+export const demographicGuidance = (demographic: string): string =>
+  `Define the patient ${demographic} criteria that should apply. Patient ${demographic} information may be unavailable or incomplete in some records.`;
 
 export const demographicOptionToConcept = (
   option: TermDirectoryEntry,

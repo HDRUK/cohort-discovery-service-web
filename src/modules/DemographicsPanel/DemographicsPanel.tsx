@@ -14,8 +14,7 @@ import AccordionExpandIcon from "@/components/AccordionExpandIcon";
 import {
   DemographicConceptField,
   DemographicDomain,
-  RACE_GUIDANCE,
-  SEX_GUIDANCE,
+  demographicGuidance,
 } from "@/config/demographics";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import Title from "@/components/Title";
@@ -143,7 +142,7 @@ const DemographicsPanel = ({
             toggleConcept(DemographicConceptField.Sex, concept, selected)
           }
           onClear={() => clearConcept(DemographicConceptField.Sex)}
-          note={SEX_GUIDANCE}
+          note={demographicGuidance(DemographicConceptField.Sex)}
         />
 
         <DemographicCheckboxSection
@@ -154,7 +153,7 @@ const DemographicsPanel = ({
             toggleConcept(DemographicConceptField.Race, concept, selected)
           }
           onClear={() => clearConcept(DemographicConceptField.Race)}
-          note={RACE_GUIDANCE}
+          note={demographicGuidance(DemographicConceptField.Race)}
         />
       </Collapse>
     </Box>
