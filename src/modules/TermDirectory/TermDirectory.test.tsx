@@ -8,6 +8,14 @@ import { mockTermDirectoryEntries } from "@/actions/termDirectory/__mocks__/getT
 import { paginateData } from "@/utils/mock";
 import { TermDirectoryEntry, Paginated } from "@/types/api";
 
+let mockSearchParams = new URLSearchParams("page=1&per_page=5");
+
+jest.mock("next/navigation", () => ({
+  useSearchParams: () => mockSearchParams,
+  usePathname: () => "/term-directory",
+  useRouter: () => ({ push: jest.fn(), replace: jest.fn() }),
+}));
+
 const renderComponent = (entries: Paginated<TermDirectoryEntry>) =>
   render(
     <DefaultProvider>
@@ -107,5 +115,29 @@ describe("TermDirectory", () => {
       name: /Myocardial infarction/i,
     });
     expect(within(secondRow).getByText("Observation")).toBeInTheDocument();
+  });
+
+  it("takes the current page from the URL, so a filter resetting to page 1 is not overridden by the table", () => {
+    const entries = {
+      ...paginateData({ data: mockTermDirectoryEntries, perPage: 5 }),
+      total: 100,
+    };
+
+    mockSearchParams = new URLSearchParams("page=3&per_page=5");
+    const { rerender } = renderComponent(entries);
+
+    expect(screen.getByText("11-15 of 100")).toBeInTheDocument();
+
+    // a filter (eg the domain tabs) puts the user back on page 1
+    mockSearchParams = new URLSearchParams("page=1&per_page=5");
+    rerender(
+      <DefaultProvider>
+        <NotifyProvider>
+          <TermDirectory entries={entries} />
+        </NotifyProvider>
+      </DefaultProvider>,
+    );
+
+    expect(screen.getByText("1-5 of 100")).toBeInTheDocument();
   });
 });
