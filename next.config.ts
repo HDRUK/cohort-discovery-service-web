@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
   },
   transpilePackages: ["@faker-js/faker"],
   outputFileTracingRoot: path.join(__dirname, "../"),
+  // Boundary GeoJSON lives outside `public/`; ensure it ships with the
+  // standalone build so the route handler can stream it at runtime.
+  outputFileTracingIncludes: {
+    "/api/location/boundaries/[region]": ["./boundaries/**"],
+  },
   async headers() {
     if (process.env.NODE_ENV === "production") {
       return [

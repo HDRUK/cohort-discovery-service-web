@@ -13,10 +13,6 @@ interface DemographicRowProps {
   showClear?: boolean;
   children: ReactNode;
   renderEditing: ReactNode;
-  // Render the editing content as a full-width block below the label row
-  // instead of inline beside it — needed when the editor is wide (e.g. a
-  // multi-column checkbox grid).
-  fullWidthEditing?: boolean;
 }
 
 const DemographicRow = ({
@@ -27,7 +23,6 @@ const DemographicRow = ({
   showClear = false,
   children,
   renderEditing,
-  fullWidthEditing = false,
 }: DemographicRowProps) => {
   const [editing, setEditing] = useState(false);
 
@@ -57,11 +52,34 @@ const DemographicRow = ({
         <Title
           title={label}
           size={"small"}
-          subTitle={
-            editing ? (fullWidthEditing ? undefined : renderEditing) : children
-          }
+          subTitle={editing ? " " : children}
           wrapperSx={{ width: "100%" }}
-        />
+        >
+          {editing && (
+            <Stack sx={{ width: "100%" }}>
+              <Box sx={{ width: "100%", py: 1 }}>{renderEditing}</Box>
+
+              <Stack
+                direction={"row"}
+                spacing={1}
+                justifyContent={"flex-end"}
+                my={1}
+              >
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={handleClear}
+                >
+                  Reset Selection
+                </Button>
+                <Button color="secondary" onClick={handleSave}>
+                  Save Selection and Collapse
+                </Button>
+              </Stack>
+              <Divider />
+            </Stack>
+          )}
+        </Title>
 
         <Stack
           direction="row"
@@ -91,27 +109,6 @@ const DemographicRow = ({
         </Stack>
       </Stack>
       <Divider />
-      {editing && (
-        <>
-          {fullWidthEditing && (
-            <Box sx={{ width: "100%", py: 1 }}>{renderEditing}</Box>
-          )}
-          <Stack
-            direction={"row"}
-            spacing={1}
-            justifyContent={"flex-end"}
-            my={1}
-          >
-            <Button variant="outlined" color="secondary" onClick={handleClear}>
-              Reset Selection
-            </Button>
-            <Button color="secondary" onClick={handleSave}>
-              Save Selection and Collapse
-            </Button>
-          </Stack>
-          <Divider />
-        </>
-      )}
     </>
   );
 };

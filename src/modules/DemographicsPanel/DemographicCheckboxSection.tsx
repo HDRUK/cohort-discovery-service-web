@@ -58,14 +58,15 @@ const DemographicCheckboxSection = ({
     options.length > 0 && options.every((o) => isChecked(o.concept_id));
 
   const handleToggleAll = () =>
-    allSelected ? onClear() : onSetAll(sortedOptions.map(demographicOptionToConcept));
+    allSelected
+      ? onClear()
+      : onSetAll(sortedOptions.map(demographicOptionToConcept));
 
   return (
     <DemographicRow
       label={label}
       onClear={onClear}
       showClear={selected.length > 0}
-      fullWidthEditing
       renderEditing={
         options.length === 0 ? (
           <Typography variant="body2" color="text.secondary">

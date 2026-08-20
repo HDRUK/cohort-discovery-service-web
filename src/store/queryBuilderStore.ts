@@ -8,6 +8,7 @@ import {
   RuleGroupType,
   RuleNodeType,
   Demographics,
+  GeoRadiusLocation,
 } from "@/types/rules";
 import {
   buildIndexFromModel,
@@ -61,7 +62,12 @@ export const Creators: Record<string, NodeFactory> = {
 export const DEFAULT_QUERY: RuleGroupType =
   process.env.NEXT_PUBLIC_USE_EXAMPLE_QUERY === "true" ? EXAMPLE_1 : NO_QUERY;
 
-const EMPTY_DEMOGRAPHICS: Demographics = { age: null, sex: [], race: [] };
+const EMPTY_DEMOGRAPHICS: Demographics = {
+  age: null,
+  sex: [],
+  race: [],
+  location: null,
+};
 
 const withDemographics = (
   qb: RuleGroupType,
@@ -130,6 +136,7 @@ export interface QueryBuilderStoreState {
   addDemographics: () => void;
   removeDemographics: () => void;
   setDemographicsAge: (age: [number, number] | null) => void;
+  setDemographicsLocation: (location: GeoRadiusLocation | null) => void;
   toggleDemographicsConcept: (
     field: DemographicConceptField,
     concept: Concept,
@@ -403,6 +410,13 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     const { queryBuilderJson, setQueryBuilderJson } = get();
     setQueryBuilderJson(
       withDemographics(queryBuilderJson, (d) => ({ ...d, age })),
+      true,
+    );
+  },
+  setDemographicsLocation: (location) => {
+    const { queryBuilderJson, setQueryBuilderJson } = get();
+    setQueryBuilderJson(
+      withDemographics(queryBuilderJson, (d) => ({ ...d, location })),
       true,
     );
   },

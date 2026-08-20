@@ -19,11 +19,17 @@ import useQueryBuilder from "@/hooks/useQueryBuilder";
 import Title from "@/components/Title";
 import DemographicAgeSection from "./DemographicAgeSection";
 import DemographicCheckboxSection from "./DemographicCheckboxSection";
-import { formatAgeSummary, formatConceptCountSummary } from "./summary";
+import DemographicLocationSection from "./DemographicLocationSection";
+import {
+  formatAgeSummary,
+  formatConceptCountSummary,
+  formatLocationSummary,
+} from "./summary";
 import { useQuery } from "@tanstack/react-query";
 import getTermDirectory from "@/actions/termDirectory/getTermDirectory";
 import { OmopTableName } from "@/types/omop";
 import { useUserDataStore } from "@/hooks/userDataStore";
+import useFeatures from "@/hooks/useFeatures";
 
 const DemographicsPanel = ({
   initialExpand = true,
@@ -46,10 +52,12 @@ const DemographicsPanel = ({
     selectedDatasets: qb.selectedDatasets,
   }));
   const user = useUserDataStore((s) => s.user);
+  const { queryBuilderUseLocation } = useFeatures();
 
   const age = demographics?.age ?? null;
   const sex = demographics?.sex ?? [];
   const race = demographics?.race ?? [];
+  const location = demographics?.location ?? null;
 
   const [expanded, setExpanded] = useState(initialExpand);
 
@@ -57,6 +65,7 @@ const DemographicsPanel = ({
     formatAgeSummary(age),
     formatConceptCountSummary("Sex", sex),
     formatConceptCountSummary("Race", race),
+    ...(queryBuilderUseLocation ? [formatLocationSummary(location)] : []),
   ].join(" · ");
 
   const collectionPids = [...selectedDatasets].sort();
@@ -160,6 +169,8 @@ const DemographicsPanel = ({
           }
           onClear={() => clearConcept(DemographicConceptField.Race)}
         />
+
+        {queryBuilderUseLocation && <DemographicLocationSection />}
       </Collapse>
     </Box>
   );
