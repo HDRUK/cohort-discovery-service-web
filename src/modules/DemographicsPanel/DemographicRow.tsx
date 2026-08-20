@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode, useState } from "react";
-import { Button, Divider, IconButton, Stack } from "@mui/material";
+import { Box, Button, Divider, IconButton, Stack } from "@mui/material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import Title from "@/components/Title";
 
@@ -13,6 +13,10 @@ interface DemographicRowProps {
   showClear?: boolean;
   children: ReactNode;
   renderEditing: ReactNode;
+  // Render the editing content as a full-width block below the label row
+  // instead of inline beside it — needed when the editor is wide (e.g. a
+  // multi-column checkbox grid).
+  fullWidthEditing?: boolean;
 }
 
 const DemographicRow = ({
@@ -23,6 +27,7 @@ const DemographicRow = ({
   showClear = false,
   children,
   renderEditing,
+  fullWidthEditing = false,
 }: DemographicRowProps) => {
   const [editing, setEditing] = useState(false);
 
@@ -52,7 +57,9 @@ const DemographicRow = ({
         <Title
           title={label}
           size={"small"}
-          subTitle={editing ? renderEditing : children}
+          subTitle={
+            editing ? (fullWidthEditing ? undefined : renderEditing) : children
+          }
           wrapperSx={{ width: "100%" }}
         />
 
@@ -86,6 +93,9 @@ const DemographicRow = ({
       <Divider />
       {editing && (
         <>
+          {fullWidthEditing && (
+            <Box sx={{ width: "100%", py: 1 }}>{renderEditing}</Box>
+          )}
           <Stack
             direction={"row"}
             spacing={1}

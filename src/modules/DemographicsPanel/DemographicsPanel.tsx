@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Box,
   Collapse,
@@ -11,36 +11,80 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import AccordionExpandIcon from "@/components/AccordionExpandIcon";
-import { SEX_CONCEPTS, SEX_GUIDANCE } from "@/config/demographics";
+import {
+  DemographicConceptField,
+  DemographicDomain,
+} from "@/config/demographics";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import Title from "@/components/Title";
 import DemographicAgeSection from "./DemographicAgeSection";
 import DemographicCheckboxSection from "./DemographicCheckboxSection";
 import { formatAgeSummary, formatConceptCountSummary } from "./summary";
+import { useQuery } from "@tanstack/react-query";
+import getTermDirectory from "@/actions/termDirectory/getTermDirectory";
+import { OmopTableName } from "@/types/omop";
+import { useUserDataStore } from "@/hooks/userDataStore";
 
 const DemographicsPanel = ({
   initialExpand = true,
 }: {
   initialExpand?: boolean;
 }) => {
-  const { demographics, remove, toggleSex, clearSex } = useQueryBuilder(
-    (qb) => ({
-      demographics: qb.queryBuilderJson.demographics,
-      remove: qb.removeDemographics,
-      toggleSex: qb.toggleDemographicsSex,
-      clearSex: qb.clearDemographicsSex,
-    }),
-  );
+  const {
+    demographics,
+    remove,
+    toggleConcept,
+    setConcept,
+    clearConcept,
+    selectedDatasets,
+  } = useQueryBuilder((qb) => ({
+    demographics: qb.queryBuilderJson.demographics,
+    remove: qb.removeDemographics,
+    toggleConcept: qb.toggleDemographicsConcept,
+    setConcept: qb.setDemographicsConcept,
+    clearConcept: qb.clearDemographicsConcept,
+    selectedDatasets: qb.selectedDatasets,
+  }));
+  const user = useUserDataStore((s) => s.user);
 
   const age = demographics?.age ?? null;
   const sex = demographics?.sex ?? [];
+  const race = demographics?.race ?? [];
 
   const [expanded, setExpanded] = useState(initialExpand);
 
   const summary = [
     formatAgeSummary(age),
     formatConceptCountSummary("Sex", sex),
+    formatConceptCountSummary("Race", race),
   ].join(" · ");
+
+  const collectionPids = [...selectedDatasets].sort();
+
+  //this will be different for different users and what collectionPids are selected
+  const { data: personConcepts } = useQuery({
+    queryKey: [`demographics-${user?.id}`, collectionPids],
+    queryFn: async () =>
+      await getTermDirectory(1, 100, "", OmopTableName.Person, collectionPids),
+    enabled: !!user?.id,
+    staleTime: 10 * 60_000,
+  });
+
+  const sexConcepts = useMemo(
+    () =>
+      personConcepts?.data.data.filter(
+        (c) => c.domain_id === DemographicDomain.Gender,
+      ),
+    [personConcepts],
+  );
+
+  const raceConcepts = useMemo(
+    () =>
+      personConcepts?.data.data.filter(
+        (c) => c.domain_id === DemographicDomain.Race,
+      ),
+    [personConcepts],
+  );
 
   return (
     <Box data-marquee-ignore="true">
@@ -93,11 +137,28 @@ const DemographicsPanel = ({
 
         <DemographicCheckboxSection
           label="Sex"
-          options={SEX_CONCEPTS}
+          options={sexConcepts ?? []}
           selected={sex}
-          onToggle={toggleSex}
-          onClear={clearSex}
-          note={SEX_GUIDANCE}
+          onToggle={(concept, selected) =>
+            toggleConcept(DemographicConceptField.Sex, concept, selected)
+          }
+          onSetAll={(concepts) =>
+            setConcept(DemographicConceptField.Sex, concepts)
+          }
+          onClear={() => clearConcept(DemographicConceptField.Sex)}
+        />
+
+        <DemographicCheckboxSection
+          label="Race"
+          options={raceConcepts ?? []}
+          selected={race}
+          onToggle={(concept, selected) =>
+            toggleConcept(DemographicConceptField.Race, concept, selected)
+          }
+          onSetAll={(concepts) =>
+            setConcept(DemographicConceptField.Race, concepts)
+          }
+          onClear={() => clearConcept(DemographicConceptField.Race)}
         />
       </Collapse>
     </Box>
