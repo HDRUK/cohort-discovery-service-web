@@ -7,6 +7,7 @@ import {
   BoardIndex,
   RuleGroupType,
   RuleNodeType,
+  Demographics,
 } from "@/types/rules";
 import {
   buildIndexFromModel,
@@ -27,7 +28,8 @@ import { UniqueIdentifier } from "@dnd-kit/core";
 import { removeFalseKeys } from "@/utils/numbers";
 import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
 import { DatasetErrors } from "@/utils/datasets";
-import { Collection } from "@/types/api";
+import { Collection, Concept } from "@/types/api";
+import { DemographicConceptField } from "@/config/demographics";
 import { FeatureName } from "@/types/features";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import { intersection } from "lodash";
@@ -58,6 +60,19 @@ export const Creators: Record<string, NodeFactory> = {
 
 export const DEFAULT_QUERY: RuleGroupType =
   process.env.NEXT_PUBLIC_USE_EXAMPLE_QUERY === "true" ? EXAMPLE_1 : NO_QUERY;
+
+const EMPTY_DEMOGRAPHICS: Demographics = { age: null, sex: [], race: [] };
+
+const withDemographics = (
+  qb: RuleGroupType,
+  updater: (d: Demographics) => Demographics,
+): RuleGroupType => ({
+  ...qb,
+  demographics: updater(qb.demographics ?? EMPTY_DEMOGRAPHICS),
+});
+
+const withoutConcept = (concepts: Concept[], concept: Concept): Concept[] =>
+  concepts.filter((c) => c.concept_id !== concept.concept_id);
 
 export interface QueryBuilderStoreState {
   queryName: string;
@@ -111,6 +126,20 @@ export interface QueryBuilderStoreState {
   createNewGroup: () => RuleNodeType;
   createNewOperator: () => RuleNodeType;
   createNewAgeFilter: () => RuleNodeType;
+
+  addDemographics: () => void;
+  removeDemographics: () => void;
+  setDemographicsAge: (age: [number, number] | null) => void;
+  toggleDemographicsConcept: (
+    field: DemographicConceptField,
+    concept: Concept,
+    selected: boolean,
+  ) => void;
+  setDemographicsConcept: (
+    field: DemographicConceptField,
+    concepts: Concept[],
+  ) => void;
+  clearDemographicsConcept: (field: DemographicConceptField) => void;
 
   queryAsText: string;
   getQueryFromText: (
@@ -358,6 +387,52 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
   createNewOperator: () => get().createNewNode(NodeKind.OPERATOR),
   createNewAgeFilter: () => get().createNewNode(NodeKind.AGE_FILTER),
 
+  addDemographics: () => {
+    const { queryBuilderJson, setQueryBuilderJson } = get();
+    if (queryBuilderJson.demographics) return;
+    setQueryBuilderJson(
+      { ...queryBuilderJson, demographics: { ...EMPTY_DEMOGRAPHICS } },
+      true,
+    );
+  },
+  removeDemographics: () => {
+    const { queryBuilderJson, setQueryBuilderJson } = get();
+    setQueryBuilderJson({ ...queryBuilderJson, demographics: undefined }, true);
+  },
+  setDemographicsAge: (age) => {
+    const { queryBuilderJson, setQueryBuilderJson } = get();
+    setQueryBuilderJson(
+      withDemographics(queryBuilderJson, (d) => ({ ...d, age })),
+      true,
+    );
+  },
+  toggleDemographicsConcept: (field, concept, selected) => {
+    const { queryBuilderJson, setQueryBuilderJson } = get();
+    setQueryBuilderJson(
+      withDemographics(queryBuilderJson, (d) => ({
+        ...d,
+        [field]: selected
+          ? [...withoutConcept(d[field], concept), concept]
+          : withoutConcept(d[field], concept),
+      })),
+      true,
+    );
+  },
+  setDemographicsConcept: (field, concepts) => {
+    const { queryBuilderJson, setQueryBuilderJson } = get();
+    setQueryBuilderJson(
+      withDemographics(queryBuilderJson, (d) => ({ ...d, [field]: concepts })),
+      true,
+    );
+  },
+  clearDemographicsConcept: (field) => {
+    const { queryBuilderJson, setQueryBuilderJson } = get();
+    setQueryBuilderJson(
+      withDemographics(queryBuilderJson, (d) => ({ ...d, [field]: [] })),
+      true,
+    );
+  },
+
   queryAsText: queryToText(DEFAULT_QUERY),
 
   setQueryBuilderJson: (
@@ -555,6 +630,8 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
         featureFlags?.[FeatureName.ConstrainForBunnyV1] || false,
       allowNestedGroups:
         featureFlags?.[FeatureName.QueryBuilderAllowNestedGroups] || false,
+      allowDemographicsOnly:
+        featureFlags?.[FeatureName.QueryBuilderUseDemographicRule] || false,
     });
   },
 

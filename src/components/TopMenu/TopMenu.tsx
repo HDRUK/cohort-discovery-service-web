@@ -120,9 +120,15 @@ export default function TopMenu() {
         value={currentTabValue}
         sx={{ height: "auto" }}
         tabSx={(theme) => ({
+          "& .MuiSvgIcon-root": {
+            color: theme.palette.tooltip?.main,
+          },
           "&.Mui-selected": {
             bgcolor: theme.palette.secondary.main,
             color: theme.palette.secondary.contrastText,
+            "& .MuiSvgIcon-root": {
+              color: "inherit",
+            },
           },
         })}
         tabHeaderSx={(theme) => ({

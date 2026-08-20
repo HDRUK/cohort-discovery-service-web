@@ -12,8 +12,10 @@ import ThreePaneSwimLaneLayout from "../ThreePaneSwimLaneLayout";
 import { ThreePaneProvider } from "@/providers/ThreePaneProvider";
 import { useLeaveConfirmation } from "@/hooks/useLeaveConfirmation";
 import RuleBoard from "../RuleBoard";
+import DemographicsPanel from "../DemographicsPanel";
 import { CohortBuilderProvider } from "@/providers/CohortBuilderProvider";
 import useFeatures from "@/hooks/useFeatures";
+import useSearchParams from "@/hooks/useSearchParams";
 
 const QueryBuilder = ({
   query,
@@ -22,7 +24,8 @@ const QueryBuilder = ({
   query?: Query;
   errorOnDrag?: boolean;
 }) => {
-  const { queryBuilderLeaveConfirm } = useFeatures();
+  const { queryBuilderLeaveConfirm, queryBuilderUseDemographicRule } =
+    useFeatures();
   const { queryBuilderJson, setQueryBuilderJson, select, deselect } =
     useQueryBuilder((qb) => ({
       queryBuilderJson: qb.queryBuilderJson,
@@ -32,11 +35,17 @@ const QueryBuilder = ({
       selectedGuidance: qb.selectedGuidance,
     }));
 
+  const showDemographics =
+    queryBuilderUseDemographicRule && !!queryBuilderJson.demographics;
+
+  const { searchParams } = useSearchParams();
+  const urlQueryPid = searchParams.get("query");
+
   useEffect(() => {
-    if (query?.definition) {
+    if (query?.definition && query.pid === urlQueryPid) {
       setQueryBuilderJson(query.definition);
     }
-  }, [query, setQueryBuilderJson]);
+  }, [query, urlQueryPid, setQueryBuilderJson]);
 
   useLeaveConfirmation(
     queryBuilderLeaveConfirm && queryBuilderJson.rules.length > 0,
@@ -64,18 +73,21 @@ const QueryBuilder = ({
               <QueryBuilderSkeleton />
             )
           }
-          middleProps={{ ref: boardRef }}
+          middleProps={{
+            ref: boardRef,
+            topSlot: showDemographics ? <DemographicsPanel /> : undefined,
+          }}
           right={<RuleMenu />}
           rightDisabled={
             !queryBuilderJson ||
-            (queryBuilderJson?.rules && queryBuilderJson.rules.length === 0)
+            (queryBuilderJson.rules.length === 0 && !showDemographics)
           }
         />
         <MarqueeSelection
           containerRef={boardRef}
           selectable='[data-selectable="true"]'
           idAttr="data-id"
-          ignoreWhenInside='[data-draggable="true"]'
+          ignoreWhenInside='[data-draggable="true"], [data-marquee-ignore="true"]'
           onChange={onChangeSelection}
         />
       </ThreePaneProvider>

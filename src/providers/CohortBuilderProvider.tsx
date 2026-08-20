@@ -66,6 +66,7 @@ const resolveTargetIndex = (
 type Action = {
   action: () => void;
   label: string;
+  disabled?: boolean;
 };
 
 type CohortBuilderContextValue = {
@@ -127,7 +128,13 @@ export const CohortBuilderProvider = ({
     createNewOperator: qb.createNewOperator,
   }));
 
-  const { queryBuilderAllowNestedGroups } = useFeatures();
+  const { showDemographics, demographicsVisible } = useQueryBuilder((qb) => ({
+    showDemographics: qb.addDemographics,
+    demographicsVisible: !!qb.queryBuilderJson.demographics,
+  }));
+
+  const { queryBuilderAllowNestedGroups, queryBuilderUseDemographicRule } =
+    useFeatures();
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -346,12 +353,30 @@ export const CohortBuilderProvider = ({
 
   const actions = useMemo<Action[]>(
     () => [
+      queryBuilderUseDemographicRule
+        ? {
+            action: showDemographics,
+            label: "Add demographic rule",
+            disabled: demographicsVisible,
+          }
+        : {
+            action: () => createAndScroll(createNewAgeFilter),
+            label: "Add age rule",
+          },
       { action: () => createAndScroll(createNewRule), label: "Add rule" },
       { action: () => createAndScroll(createNewOperator), label: "Add and/or" },
-      { action: () => createAndScroll(createNewAgeFilter), label: "Add age rule" },
       { action: () => createAndScroll(createNewGroup), label: "Add group" },
     ],
-    [createAndScroll, createNewAgeFilter, createNewRule, createNewGroup, createNewOperator],
+    [
+      createAndScroll,
+      createNewRule,
+      createNewGroup,
+      createNewOperator,
+      createNewAgeFilter,
+      showDemographics,
+      demographicsVisible,
+      queryBuilderUseDemographicRule,
+    ],
   );
 
   const value = useMemo(

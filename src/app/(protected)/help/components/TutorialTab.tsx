@@ -1,3 +1,4 @@
+import { SyntheticEvent } from "react";
 import {
   Box,
   Card,
@@ -10,13 +11,13 @@ import {
   Typography,
 } from "@mui/material";
 import { notFound, usePathname } from "next/navigation";
-import { IFrameWrapper } from "./IFrameWrapper";
+import Video from "./Video";
 import { PlayCircle, West } from "@mui/icons-material";
+import { baseComponents } from "@/modules/Guidance/Guidance";
 import useSearchParams from "@/hooks/useSearchParams";
+import { HelpVideo } from "@/types/help";
 
-import { Video } from "../[sectionId]/page";
-
-const TutorialTab = ({ videos }: { videos: Video[] }) => {
+const TutorialTab = ({ videos }: { videos: HelpVideo[] }) => {
   const pathname = usePathname();
   const { getSearchParam, setSearchParam } = useSearchParams("tutorial-id");
   const tutorialId = getSearchParam();
@@ -46,23 +47,10 @@ const TutorialTab = ({ videos }: { videos: Video[] }) => {
         <Typography variant="h4" sx={{ px: 1, pb: 1 }}>
           {video.title}
         </Typography>
-        <Typography sx={{ px: 1, pb: 2, maxWidth: "700px" }}>
-          {video.text}
-        </Typography>
-        <IFrameWrapper maxWidth="1280px">
-          <iframe
-            loading="lazy"
-            title={video.title}
-            src={video.url}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-            style={{
-              border: "0",
-              borderTopLeftRadius: 20,
-              borderTopRightRadius: 20,
-            }}
-          ></iframe>
-        </IFrameWrapper>
+        <Box sx={{ px: 1, pb: 2, maxWidth: "700px" }}>
+          <video.Body components={baseComponents} />
+        </Box>
+        <Video url={video.youtube} title={video.title} maxWidth="1280px" />
       </Paper>
     );
   }
@@ -86,6 +74,12 @@ const TutorialTab = ({ videos }: { videos: Video[] }) => {
                 component="img"
                 alt={v.title}
                 image={v.thumbnail}
+                onError={(e: SyntheticEvent<HTMLImageElement>) => {
+                  const img = e.currentTarget;
+                  if (img.src !== v.thumbnailFallback) {
+                    img.src = v.thumbnailFallback;
+                  }
+                }}
                 sx={{
                   borderTopLeftRadius: "10px",
                   borderTopRightRadius: "10px",

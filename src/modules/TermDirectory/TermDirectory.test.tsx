@@ -22,7 +22,7 @@ describe("TermDirectory", () => {
     renderComponent(paginateData({ data: mockTermDirectoryEntries }));
 
     const columns = [
-      "OMOP ID",
+      "OMOP Concept ID",
       "Term Name",
       "Domain",
       "Count",
@@ -75,10 +75,10 @@ describe("TermDirectory", () => {
     renderComponent(paginateData({ data: mockTermDirectoryEntries }));
 
     expect(
-      screen.getByRole("button", { name: "Copy OMOP ID 201826" }),
+      screen.getByRole("button", { name: "Copy OMOP Concept ID 201826" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Copy OMOP ID 4329847" }),
+      screen.getByRole("button", { name: "Copy OMOP Concept ID 4329847" }),
     ).toBeInTheDocument();
   });
 
@@ -88,7 +88,7 @@ describe("TermDirectory", () => {
     const writeText = jest.spyOn(navigator.clipboard, "writeText");
 
     await user.click(
-      screen.getByRole("button", { name: "Copy OMOP ID 201826" }),
+      screen.getByRole("button", { name: "Copy OMOP Concept ID 201826" }),
     );
 
     expect(writeText).toHaveBeenCalledWith("201826");

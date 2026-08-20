@@ -15,7 +15,8 @@ import {
   getFirstTopLevelCombinator,
   RuleErrors,
 } from "@/utils/rules";
-import { EXAMPLES } from "@/config/queryExamples";
+import { getExamples } from "@/config/queryExamples";
+import useFeatures from "@/hooks/useFeatures";
 import { Query } from "@/types/api";
 import SearchOverlay from "./SearchOverlay";
 import { useDefaults } from "@/providers/DefaultProvider";
@@ -84,6 +85,7 @@ const CohortQueryInput = ({
   const programmaticValueRef = useRef<string | null>(null);
   const lastSyncedQueryAsText = useRef<string | null>(null);
   const anchorRef = useRef<HTMLDivElement | null>(null);
+  const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const {
     handleSubmit: handleSubmitSearch,
@@ -123,6 +125,15 @@ const CohortQueryInput = ({
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setQueryMode((current) => (current === null ? current : null));
   }, [rulesKey]);
+
+  useEffect(
+    () => () => {
+      if (blurTimeoutRef.current) {
+        clearTimeout(blurTimeoutRef.current);
+      }
+    },
+    [],
+  );
 
   const resetQuery = useCallback(() => {
     clearFormErrors();
@@ -333,7 +344,14 @@ const CohortQueryInput = ({
     clearFormErrors,
   ]);
 
-  const placeholders = Object.keys(EXAMPLES);
+  const { queryBuilderUseDemographicRule } = useFeatures();
+
+  const examples = useMemo(
+    () => getExamples(queryBuilderUseDemographicRule),
+    [queryBuilderUseDemographicRule],
+  );
+
+  const placeholders = Object.keys(examples);
 
   const onSubmit = useCallback(
     (e?: React.BaseSyntheticEvent) => {
@@ -444,14 +462,25 @@ const CohortQueryInput = ({
                   endIcon={<EndIcon sx={endIconSx} />}
                   onClickEndAdornment={onSubmit}
                   onFocus={() => {
-                    if (!showChoicePrompt && !isAppendMode) {
+                    if (blurTimeoutRef.current) {
+                      clearTimeout(blurTimeoutRef.current);
+                      blurTimeoutRef.current = null;
+                    }
+                    if (
+                      !showChoicePrompt &&
+                      !isAppendMode &&
+                      !suppressInitialExamples
+                    ) {
                       setOpenSearchOverlap(true);
                     }
                   }}
                   onBlur={() => {
                     field.onBlur();
                     setSuppressInitialExamples(false);
-                    setTimeout(() => setOpenSearchOverlap(false), 150);
+                    blurTimeoutRef.current = setTimeout(() => {
+                      setOpenSearchOverlap(false);
+                      blurTimeoutRef.current = null;
+                    }, 150);
                   }}
                   onChange={(e) => {
                     programmaticValueRef.current = null;
@@ -469,8 +498,8 @@ const CohortQueryInput = ({
                   anchorEl={anchorRef.current}
                   options={placeholders.map((label) => ({
                     label,
-                    value: EXAMPLES[label].id,
-                    rules: EXAMPLES[label],
+                    value: examples[label].id,
+                    rules: examples[label],
                   }))}
                 />
               </Box>

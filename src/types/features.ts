@@ -25,6 +25,10 @@ export enum FeatureName {
   QueryBuilderUseValueAsNumber = "query-builder-use-value-as-number",
   QueryBuilderUseLocation = "query-builder-use-location",
   QueryBuilderUseDeath = "query-builder-use-death",
+
+  QueryBuilderUseDemographicRule = "query-builder-use-demographic-rule",
+
+  AccessBanner = "access-banner",
 }
 
 export type FeatureFlag = Record<FeatureName, boolean>;
@@ -58,4 +62,8 @@ export const DEFAULT_FLAGS: FeatureFlag = {
   [FeatureName.QueryBuilderUseValueAsNumber]: false,
   [FeatureName.QueryBuilderUseLocation]: false,
   [FeatureName.QueryBuilderUseDeath]: false,
+
+  [FeatureName.QueryBuilderUseDemographicRule]: false,
+
+  [FeatureName.AccessBanner]: false,
 };

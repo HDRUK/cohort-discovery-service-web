@@ -22,6 +22,12 @@ export type ConceptOperator = {
   concept: Concept | Concept[] | null;
 };
 
+export interface Demographics {
+  age: [number, number] | null;
+  sex: Concept[];
+  race: Concept[];
+}
+
 type Node = {
   id: string;
   exclude?: boolean;
@@ -43,6 +49,7 @@ export interface OperatorType extends Node {
 
 export interface RuleGroupType extends Node {
   rules: Array<RuleNodeType>;
+  demographics?: Demographics;
 }
 
 export interface RuleLeafType extends Node {
