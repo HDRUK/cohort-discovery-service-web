@@ -34,7 +34,7 @@ const CreateCollection = ({ onCancel }: CreateCollectionProps) => {
 
   const isAdmin = !currentCustodian;
 
-  const features = useFeatures();
+  const { queryBuilderUseLocation, queryBuilderUseDeath } = useFeatures();
 
   const notify = useNotify();
 
@@ -234,10 +234,10 @@ const CreateCollection = ({ onCancel }: CreateCollectionProps) => {
                 label={"Collection type"}
                 disabled={!selectedHostId}
               />
-              {features.queryBuilderUseLocation && (
+              {queryBuilderUseLocation && (
                 <ToggleLocation disabled={!selectedHostId} />
               )}
-              {features.queryBuilderUseDeath && (
+              {queryBuilderUseDeath && (
                 <ToggleDeath disabled={!selectedHostId} />
               )}
             </Stack>

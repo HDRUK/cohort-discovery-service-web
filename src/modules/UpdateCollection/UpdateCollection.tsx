@@ -313,7 +313,7 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
     fieldConfig,
   });
 
-  const features = useFeatures();
+  const { queryBuilderUseLocation, queryBuilderUseDeath } = useFeatures();
 
   return (
     <UpdatePanel
@@ -328,12 +328,10 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
 
         <Stack direction={"row"} spacing={2} justifyContent={"flex-start"}>
           <ToggleSynthetic disabled={!expandedRight} />
-          {features.queryBuilderUseLocation && (
+          {queryBuilderUseLocation && (
             <ToggleLocation disabled={!expandedRight} />
           )}
-          {features.queryBuilderUseDeath && (
-            <ToggleDeath disabled={!expandedRight} />
-          )}
+          {queryBuilderUseDeath && <ToggleDeath disabled={!expandedRight} />}
         </Stack>
 
         <FormLabel underlined>Collection Status</FormLabel>
