@@ -80,6 +80,12 @@ describe("queryBuilderStore demographics", () => {
     expect(demographics()?.race).toEqual([black]);
   });
 
+  it("setDemographicsConcept replaces the whole list (select all)", () => {
+    store().toggleDemographicsConcept(DemographicConceptField.Race, white, true);
+    store().setDemographicsConcept(DemographicConceptField.Race, [white, black]);
+    expect(demographics()?.race).toEqual([white, black]);
+  });
+
   it("clearDemographicsConcept empties sex without touching age", () => {
     store().setDemographicsAge([0, 30]);
     store().toggleDemographicsConcept(DemographicConceptField.Sex, female, true);

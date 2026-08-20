@@ -135,6 +135,10 @@ export interface QueryBuilderStoreState {
     concept: Concept,
     selected: boolean,
   ) => void;
+  setDemographicsConcept: (
+    field: DemographicConceptField,
+    concepts: Concept[],
+  ) => void;
   clearDemographicsConcept: (field: DemographicConceptField) => void;
 
   queryAsText: string;
@@ -411,6 +415,13 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
           ? [...withoutConcept(d[field], concept), concept]
           : withoutConcept(d[field], concept),
       })),
+      true,
+    );
+  },
+  setDemographicsConcept: (field, concepts) => {
+    const { queryBuilderJson, setQueryBuilderJson } = get();
+    setQueryBuilderJson(
+      withDemographics(queryBuilderJson, (d) => ({ ...d, [field]: concepts })),
       true,
     );
   },

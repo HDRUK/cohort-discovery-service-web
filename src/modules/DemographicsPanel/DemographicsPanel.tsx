@@ -14,7 +14,6 @@ import AccordionExpandIcon from "@/components/AccordionExpandIcon";
 import {
   DemographicConceptField,
   DemographicDomain,
-  demographicGuidance,
 } from "@/config/demographics";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import Title from "@/components/Title";
@@ -35,12 +34,14 @@ const DemographicsPanel = ({
     demographics,
     remove,
     toggleConcept,
+    setConcept,
     clearConcept,
     selectedDatasets,
   } = useQueryBuilder((qb) => ({
     demographics: qb.queryBuilderJson.demographics,
     remove: qb.removeDemographics,
     toggleConcept: qb.toggleDemographicsConcept,
+    setConcept: qb.setDemographicsConcept,
     clearConcept: qb.clearDemographicsConcept,
     selectedDatasets: qb.selectedDatasets,
   }));
@@ -141,8 +142,10 @@ const DemographicsPanel = ({
           onToggle={(concept, selected) =>
             toggleConcept(DemographicConceptField.Sex, concept, selected)
           }
+          onSetAll={(concepts) =>
+            setConcept(DemographicConceptField.Sex, concepts)
+          }
           onClear={() => clearConcept(DemographicConceptField.Sex)}
-          note={demographicGuidance(DemographicConceptField.Sex)}
         />
 
         <DemographicCheckboxSection
@@ -152,8 +155,10 @@ const DemographicsPanel = ({
           onToggle={(concept, selected) =>
             toggleConcept(DemographicConceptField.Race, concept, selected)
           }
+          onSetAll={(concepts) =>
+            setConcept(DemographicConceptField.Race, concepts)
+          }
           onClear={() => clearConcept(DemographicConceptField.Race)}
-          note={demographicGuidance(DemographicConceptField.Race)}
         />
       </Collapse>
     </Box>
