@@ -12,8 +12,6 @@ import WorkgroupsTab, { WorkgroupsSkeleton } from "./components/WorkgroupsTab";
 import { SearchParams } from "@/types/api";
 import { isStandalone } from "@/utils/modes";
 import NetworksTab from "./components/NetworksTab";
-import getAdminCollections from "@/actions/collection/getAdminCollections";
-import { buildCollectionParams } from "@/utils/params";
 
 type Params = Promise<{ tabId: string }>;
 
@@ -28,10 +26,6 @@ const CustodianAdminPage = async ({
 }) => {
   const { tabId } = await params;
   const apiSearchParams = await searchParams;
-
-  const adminCollectionsPromise = getAdminCollections({
-    params: buildCollectionParams(apiSearchParams),
-  });
 
   const TABS = [
     ...(isStandalone(applicationMode)
@@ -54,10 +48,7 @@ const CustodianAdminPage = async ({
       href: routes.adminWorkgroups,
       page: (
         <Suspense fallback={<WorkgroupsSkeleton />}>
-          <WorkgroupsTab
-            searchParams={apiSearchParams}
-            collectionsPromise={adminCollectionsPromise}
-          />
+          <WorkgroupsTab searchParams={apiSearchParams} />
         </Suspense>
       ),
     },
@@ -67,10 +58,7 @@ const CustodianAdminPage = async ({
       href: routes.adminCollections,
       page: (
         <Suspense fallback={<CollectionsSkeleton />}>
-          <CollectionsTab
-            searchParams={apiSearchParams}
-            collectionsPromise={adminCollectionsPromise}
-          />
+          <CollectionsTab searchParams={apiSearchParams} />
         </Suspense>
       ),
     },
