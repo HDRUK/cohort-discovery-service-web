@@ -12,11 +12,6 @@ import { hashString, canonicaliseQueryString } from "@/utils/string";
 const baseURL = process.env.API_BASE_URL ?? "http://localhost:8100";
 const isCypress = process.env.CYPRESS === "true";
 
-// Next.js rejects cache tags longer than 256 characters. Query strings with
-// many params (e.g. lots of collection_pid[]) can blow past this, so fall back
-// to a hash of the query string once the tag would exceed the limit.
-const MAX_CACHE_TAG_LENGTH = 256;
-
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 
 export enum ErrorMode {
@@ -61,15 +56,12 @@ const buildCachedRequest = async ({
     user: { id: userId },
   } = await getTokenUser();
 
+  // Hash the (canonicalised) query string so the per-query tag is always a
+  // stable, bounded length — Next.js rejects cache tags over 256 characters,
+  // which a raw query string with many params can easily exceed.
+  const queryHash = queryString ? hashString(queryString) : "";
   const queryTags =
-    queryString && tags
-      ? tags.map((t) => {
-          const tag = `${t}-${queryString}`;
-          return tag.length <= MAX_CACHE_TAG_LENGTH
-            ? tag
-            : `${t}-${hashString(queryString)}`;
-        })
-      : [];
+    queryString && tags ? tags.map((t) => `${t}-${queryHash}`) : [];
 
   const allTags = [
     "admin",
