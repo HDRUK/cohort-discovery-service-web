@@ -22,10 +22,18 @@ export type ConceptOperator = {
   concept: Concept | Concept[] | null;
 };
 
+export type GeoRadiusLocation = {
+  lat: number;
+  lon: number;
+  radius: number;
+  address?: string;
+};
+
 export interface Demographics {
   age: [number, number] | null;
   sex: Concept[];
   race: Concept[];
+  location: GeoRadiusLocation | null;
 }
 
 type Node = {

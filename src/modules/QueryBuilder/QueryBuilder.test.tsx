@@ -30,7 +30,9 @@ describe("QueryBuilder", () => {
       id: 1,
       pid: "query-b",
       name: "Query B",
-      definition: getQueryJson({ demographics: { age: null, sex: [], race: [] } }),
+      definition: getQueryJson({
+        demographics: { age: null, sex: [], race: [], location: null },
+      }),
       created_at: "2024-01-01T00:00:00Z",
       tasks: [],
     };

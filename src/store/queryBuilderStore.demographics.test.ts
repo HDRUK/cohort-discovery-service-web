@@ -44,7 +44,12 @@ describe("queryBuilderStore demographics", () => {
 
   it("addDemographics creates an empty block; removeDemographics drops it", () => {
     store().addDemographics();
-    expect(demographics()).toEqual({ age: null, sex: [], race: [] });
+    expect(demographics()).toEqual({
+      age: null,
+      sex: [],
+      race: [],
+      location: null,
+    });
 
     store().removeDemographics();
     expect(demographics()).toBeUndefined();
@@ -53,6 +58,20 @@ describe("queryBuilderStore demographics", () => {
   it("setDemographicsAge writes the age range into the block", () => {
     store().addDemographics();
     store().setDemographicsAge([18, 65]);
+    expect(demographics()?.age).toEqual([18, 65]);
+  });
+
+  it("setDemographicsLocation writes and clears the location without touching age", () => {
+    store().addDemographics();
+    store().setDemographicsAge([18, 65]);
+
+    const location = { lat: 51.5, lon: -0.1, radius: 50000, address: "London" };
+    store().setDemographicsLocation(location);
+    expect(demographics()?.location).toEqual(location);
+    expect(demographics()?.age).toEqual([18, 65]);
+
+    store().setDemographicsLocation(null);
+    expect(demographics()?.location).toBeNull();
     expect(demographics()?.age).toEqual([18, 65]);
   });
 
