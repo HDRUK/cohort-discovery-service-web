@@ -43,6 +43,9 @@ import { useUserDataStore } from "@/hooks/userDataStore";
 import { useIsAdminSection } from "@/contexts/AdminSectionContext";
 import ToggleSynthetic from "@/components/ToggleSynthetic";
 import { getFrequencyModeKey } from "@/utils/frequency";
+import ToggleLocation from "@/components/ToggleLocation";
+import ToggleDeath from "@/components/ToggleDeath";
+import useFeatures from "@/hooks/useFeatures";
 
 export type UpdateCollectionProps = {
   collection: CollectionWithHosts;
@@ -310,6 +313,8 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
     fieldConfig,
   });
 
+  const { queryBuilderUseLocation, queryBuilderUseDeath } = useFeatures();
+
   return (
     <UpdatePanel
       label="Collection"
@@ -320,7 +325,14 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
     >
       <FormProvider {...formMethods}>
         <FormLabel underlined>Collection Type</FormLabel>
-        <ToggleSynthetic disabled={!expandedRight} />
+
+        <Stack direction={"row"} spacing={2} justifyContent={"flex-start"}>
+          <ToggleSynthetic disabled={!expandedRight} />
+          {queryBuilderUseLocation && (
+            <ToggleLocation disabled={!expandedRight} />
+          )}
+          {queryBuilderUseDeath && <ToggleDeath disabled={!expandedRight} />}
+        </Stack>
 
         <FormLabel underlined>Collection Status</FormLabel>
         <ManageCollectionStatus
