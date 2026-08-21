@@ -4,11 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import { GeoJSON, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import type { Feature, FeatureCollection, Polygon, MultiPolygon } from "geojson";
+import { useTheme } from "@mui/material";
 import { pointInPolygon } from "./pointInPolygon";
 import { haversineMetres } from "./haversine";
-
-const MIN_ZOOM_FOR_BOUNDARIES = 8;
-const MAX_RENDERED_FEATURES = 1500;
+import { MAX_RENDERED_FEATURES, MIN_ZOOM_FOR_BOUNDARIES } from "@/config/map";
 
 type EnrichedProps = {
   __id: string;
@@ -101,6 +100,8 @@ interface Props {
 }
 
 const LSOABoundaries = ({ pinPosition, radius, enabled }: Props) => {
+  const theme = useTheme();
+  const accentColor = theme.palette.link.main;
   const map = useMap();
   const [zoom, setZoom] = useState(map.getZoom());
   const [bounds, setBounds] = useState<L.LatLngBounds>(map.getBounds());
@@ -203,10 +204,10 @@ const LSOABoundaries = ({ pinPosition, radius, enabled }: Props) => {
           } as FeatureCollection<Polygon | MultiPolygon>
         }
         style={{
-          color: "#1976d2",
+          color: accentColor,
           weight: 1,
           opacity: 0.7,
-          fillColor: "#1976d2",
+          fillColor: accentColor,
           fillOpacity: 0.12,
         }}
         interactive={false}
@@ -216,10 +217,10 @@ const LSOABoundaries = ({ pinPosition, radius, enabled }: Props) => {
           key={`pin-${pinContainsId ?? "x"}`}
           data={pinContains}
           style={{
-            color: "#1976d2",
+            color: accentColor,
             weight: 2.5,
             opacity: 1,
-            fillColor: "#1976d2",
+            fillColor: accentColor,
             fillOpacity: 0.25,
           }}
           interactive={false}

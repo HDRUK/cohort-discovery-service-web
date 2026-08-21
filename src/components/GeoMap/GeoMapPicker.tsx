@@ -11,7 +11,7 @@ import {
   useMapEvents,
 } from "react-leaflet";
 import AddressSearch from "./AddressSearch";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Box,
   FormControlLabel,
@@ -19,30 +19,43 @@ import {
   Stack,
   Switch,
   Typography,
+  useTheme,
 } from "@mui/material";
 import { GeoRadiusLocation } from "@/types/rules";
 import { formatRadius } from "./formatRadius";
 import LSOABoundaries from "./LSOABoundaries";
+import {
+  DEFAULT_MAP_CENTER,
+  DEFAULT_MAP_ZOOM,
+  DEFAULT_RADIUS,
+  FLY_TO_ZOOM,
+  MAX_MAP_ZOOM,
+  MAX_RADIUS,
+  MIN_RADIUS,
+  PINNED_MAP_ZOOM,
+  TILE_ATTRIBUTION,
+  TILE_URL,
+} from "@/config/map";
 
-const MIN_RADIUS = 5_000;
-const MAX_RADIUS = 1_000_000;
-const DEFAULT_RADIUS = 50_000;
 const sliderToMeters = (v: number) =>
   Math.round(MIN_RADIUS * Math.pow(MAX_RADIUS / MIN_RADIUS, v / 100));
 const metersToSlider = (m: number) =>
   (Math.log(m / MIN_RADIUS) / Math.log(MAX_RADIUS / MIN_RADIUS)) * 100;
 
-const pinIcon = new L.DivIcon({
-  className: "",
-  html: '<div style="width:16px;height:16px;background:#1976d2;border-radius:50%;border:3px solid white;box-shadow:0 2px 4px rgba(0,0,0,0.4)"></div>',
-  iconSize: [16, 16],
-  iconAnchor: [8, 8],
-});
+const PIN_SIZE = 16;
+
+const makePinIcon = (color: string) =>
+  new L.DivIcon({
+    className: "",
+    html: `<div class="geomap-pin" style="--pin-color:${color}"></div>`,
+    iconSize: [PIN_SIZE, PIN_SIZE],
+    iconAnchor: [PIN_SIZE / 2, PIN_SIZE / 2],
+  });
 
 function FlyTo({ target }: { target: L.LatLngTuple | null }) {
   const map = useMap();
   useEffect(() => {
-    if (target) map.flyTo(target, 12);
+    if (target) map.flyTo(target, FLY_TO_ZOOM);
   }, [target, map]);
   return null;
 }
@@ -59,9 +72,11 @@ function InvalidateOnMount() {
 function LocationMarker({
   position,
   onPositionChange,
+  icon,
 }: {
   position: L.LatLngTuple | null;
   onPositionChange: (pos: L.LatLngTuple) => void;
+  icon: L.DivIcon;
 }) {
   useMapEvents({
     click(e) {
@@ -69,7 +84,7 @@ function LocationMarker({
     },
   });
   if (!position) return null;
-  return <Marker position={position} icon={pinIcon} />;
+  return <Marker position={position} icon={icon} />;
 }
 
 interface GeoMapPickerProps {
@@ -83,7 +98,9 @@ export default function GeoMapPicker({
   onChange,
   mapHeight = 500,
 }: GeoMapPickerProps) {
-  const defaultCenter: L.LatLngTuple = [54.0, -2.0];
+  const theme = useTheme();
+  const accentColor = theme.palette.link.main;
+  const pinIcon = useMemo(() => makePinIcon(accentColor), [accentColor]);
 
   const [position, setPosition] = useState<L.LatLngTuple | null>(
     value ? [value.lat, value.lon] : null,
@@ -144,15 +161,12 @@ export default function GeoMapPicker({
         }}
       >
         <MapContainer
-          center={position ?? defaultCenter}
-          zoom={position ? 10 : 6}
-          maxZoom={13}
+          center={position ?? DEFAULT_MAP_CENTER}
+          zoom={position ? PINNED_MAP_ZOOM : DEFAULT_MAP_ZOOM}
+          maxZoom={MAX_MAP_ZOOM}
           style={{ height: "100%", width: "100%" }}
         >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
+          <TileLayer attribution={TILE_ATTRIBUTION} url={TILE_URL} />
           <InvalidateOnMount />
           <FlyTo target={flyTarget} />
           <LSOABoundaries
@@ -160,14 +174,18 @@ export default function GeoMapPicker({
             radius={radius}
             enabled={showBoundaries}
           />
-          <LocationMarker position={position} onPositionChange={handlePinDrop} />
+          <LocationMarker
+            position={position}
+            onPositionChange={handlePinDrop}
+            icon={pinIcon}
+          />
           {position && (
             <Circle
               center={position}
               radius={radius}
               pathOptions={{
-                color: "#1976d2",
-                fillColor: "#1976d2",
+                color: accentColor,
+                fillColor: accentColor,
                 fillOpacity: 0.15,
               }}
             />

@@ -40,3 +40,12 @@ a {
     color-scheme: dark;
   }
 }
+
+.geomap-pin {
+  width: 16px;
+  height: 16px;
+  background: var(--pin-color);
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
