@@ -62,6 +62,8 @@ const getDefaultValues = (collection: CollectionWithHosts | null) => {
         model_state: undefined,
         workgroups: [],
         is_synthetic: false,
+        location_enabled: false,
+        death_enabled: false,
       },
       config: {
         frequency_mode: Number(FrequencyMode.WEEKLY),
@@ -81,6 +83,8 @@ const getDefaultValues = (collection: CollectionWithHosts | null) => {
     model_state,
     workgroups,
     is_synthetic,
+    location_enabled,
+    death_enabled,
   } = collection;
   const [host] = hosts;
   return {
@@ -92,6 +96,8 @@ const getDefaultValues = (collection: CollectionWithHosts | null) => {
       model_state: model_state,
       workgroups: workgroups,
       is_synthetic: is_synthetic,
+      location_enabled: location_enabled ?? false,
+      death_enabled: death_enabled ?? false,
     },
     config: {
       frequency_mode: config.frequency_mode,
