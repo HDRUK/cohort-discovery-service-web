@@ -50,4 +50,22 @@ describe("DomainFilterTabs", () => {
       "true",
     );
   });
+
+  it("does nothing when clicking the already-selected domain tab", async () => {
+    mockSearchParams = new URLSearchParams("domain=observation");
+    render(<DomainFilterTabs />);
+
+    await userEvent.click(screen.getByRole("tab", { name: "Observation" }));
+
+    expect(mockReplace).not.toHaveBeenCalled();
+  });
+
+  it("clears the domain filter when clicking All while a domain is selected", async () => {
+    mockSearchParams = new URLSearchParams("domain=observation");
+    render(<DomainFilterTabs />);
+
+    await userEvent.click(screen.getByRole("tab", { name: "All" }));
+
+    expect(mockReplace).toHaveBeenCalledWith("?page=1");
+  });
 });

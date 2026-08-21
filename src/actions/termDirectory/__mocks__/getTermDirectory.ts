@@ -17,6 +17,7 @@ export const mockTermDirectoryEntries: TermDirectoryEntry[] = [
   getMockTermDirectoryEntry({
     concept_id: 4329847,
     concept_name: "Myocardial infarction",
+    domain_id: "Observation",
     count: 50,
     ncollections: 1,
   }),

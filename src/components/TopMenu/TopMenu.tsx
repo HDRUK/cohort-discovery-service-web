@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
-import { redirect, usePathname } from "next/navigation";
+import { useMemo } from "react";
+import { usePathname } from "next/navigation";
 
 import TabsShell from "@/components/TabsShell";
 import { routes } from "../../config/routes";
@@ -10,25 +10,13 @@ import { checkIsAdmin } from "@/utils/user";
 import useUserStore from "@/hooks/useUserStore";
 import { HelpIcon } from "@/icons/HelpIcon";
 import HelpTooltip from "../HelpTooltip";
-import useQueryBuilder from "@/hooks/useQueryBuilder";
-import theme from "@/config/theme";
 import { useApplicationMode } from "@/providers/ApplicationModeProvider";
+import { TermDirectoryIcon } from "@/icons/TermDirectoryIcon";
 
 export default function TopMenu() {
   const pathname = usePathname();
   const user = useUserStore((s) => s.user);
   const { isStandalone } = useApplicationMode();
-
-  const { helpTooltipOpen, setHelpTooltipOpen } = useQueryBuilder((qb) => ({
-    helpTooltipOpen: qb.helpTooltipOpen,
-    setHelpTooltipOpen: qb.setHelpTooltipOpen,
-  }));
-
-  useEffect(() => {
-    if (!helpTooltipOpen || !user) return;
-    const id = setTimeout(() => setHelpTooltipOpen(false), 10000);
-    return () => clearTimeout(id);
-  }, [helpTooltipOpen, setHelpTooltipOpen, user]);
 
   const userCustodians = useMemo(
     () => user?.custodians ?? [],
@@ -78,6 +66,36 @@ export default function TopMenu() {
         href: routes.help(),
         route: routes.help(),
         page: null,
+        // Tooltip turned off for now, to be reimplemented with the component library
+        // The icon used to be wrapped in:
+        // <HelpTooltip
+        //   title="Tool guidance can be found here"
+        //   placement="left"
+        //   open={(helpTooltipOpen && !!user) || helpHoverOpen}
+        //   onOpen={() => setHelpHoverOpen(true)}
+        //   onClose={() => {
+        //     setHelpHoverOpen(false);
+        //     setHelpTooltipOpen(false);
+        //   }}
+        //   sx={{ zIndex: 1250 }}
+        // >
+        icon: <HelpIcon />,
+        iconOnly: true,
+        alignRight: true,
+      },
+      {
+        id: routes.termDirectory,
+        label: "Term Directory",
+        href: routes.termDirectory,
+        route: routes.termDirectory,
+        page: null,
+        icon: (
+          <HelpTooltip title="Term Directory">
+            <TermDirectoryIcon />
+          </HelpTooltip>
+        ),
+        iconOnly: true,
+        alignRight: true,
       },
     ];
 
@@ -94,10 +112,6 @@ export default function TopMenu() {
     tabs[0]?.id ??
     0;
 
-  const handleTooltipClose = () => {
-    setHelpTooltipOpen(false);
-  };
-
   return (
     <>
       <TabsShell
@@ -106,33 +120,21 @@ export default function TopMenu() {
         value={currentTabValue}
         sx={{ height: "auto" }}
         tabSx={(theme) => ({
+          "& .MuiSvgIcon-root": {
+            color: theme.palette.tooltip?.main,
+          },
           "&.Mui-selected": {
             bgcolor: theme.palette.secondary.main,
             color: theme.palette.secondary.contrastText,
+            "& .MuiSvgIcon-root": {
+              color: "inherit",
+            },
           },
         })}
         tabHeaderSx={(theme) => ({
           backgroundColor: theme.palette.background.paper,
+          pr: 2,
         })}
-        endIcon={
-          <HelpTooltip
-            title="Tool guidance can be found here"
-            placement="left"
-            open={helpTooltipOpen && !!user}
-            onClose={handleTooltipClose}
-            sx={{ zIndex: 1250 }}
-          >
-            <HelpIcon
-              sx={{
-                maxHeight: 20,
-                maxWidth: 20,
-                color: theme.palette.tooltip?.main,
-                mr: 2,
-              }}
-              onClick={() => redirect(routes.help())}
-            />
-          </HelpTooltip>
-        }
       />
     </>
   );

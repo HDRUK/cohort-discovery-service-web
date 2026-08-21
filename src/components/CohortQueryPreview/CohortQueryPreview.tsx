@@ -6,12 +6,30 @@ import CohortErrors from "@/modules/CohortErrors";
 import SubmitQueryButton from "@/components/SubmitQueryButton";
 
 import useQueryBuilder from "@/hooks/useQueryBuilder";
+import useFeatures from "@/hooks/useFeatures";
+import {
+  applyDemographicSubject,
+  formatDemographicSubject,
+} from "@/utils/demographicsText";
 import ClearQueryButton from "@/components/ClearQueryButton";
 import ShowJsonButton from "@/components/ShowJsonButton";
 
 const CohortQueryPreview = () => {
   const warnings = useQueryBuilder((qb) => qb.queryBuilderJson.warnings ?? []);
   const queryAsText = useQueryBuilder((qb) => qb.queryAsText);
+  const demographics = useQueryBuilder(
+    (qb) => qb.queryBuilderJson.demographics,
+  );
+
+  const { queryBuilderUseDemographicRule } = useFeatures();
+
+  const subject =
+    queryBuilderUseDemographicRule && demographics
+      ? formatDemographicSubject(demographics.age, demographics.sex)
+      : null;
+  const previewText = subject
+    ? applyDemographicSubject(queryAsText, subject)
+    : queryAsText;
 
   return (
     <Stack
@@ -23,7 +41,7 @@ const CohortQueryPreview = () => {
       width="100%"
     >
       <Stack>
-        <Typography>{queryAsText}</Typography>
+        <Typography>{previewText}</Typography>
         <CohortErrors />
       </Stack>
       <Stack gap={1} direction={"row"}>

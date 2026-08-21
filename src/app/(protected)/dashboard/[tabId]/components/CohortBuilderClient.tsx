@@ -9,6 +9,7 @@ import CohortQueryTitle from "@/components/CohortQueryTitle";
 import FilterDatasets from "@/components/FilterDatasets";
 import SelectDatasets from "@/components/SelectDatasets";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
+import useSearchParams from "@/hooks/useSearchParams";
 import { Query } from "@/types/api";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -29,6 +30,8 @@ const CohortBuilderClient = ({
   const open = useQueryBuilder((qb) => qb.openSelectDatasetsPanel);
   const [showGuidance, setShowGuidance] = useState(initialShowGuidance);
   const router = useRouter();
+  const { searchParams } = useSearchParams();
+  const urlQueryPid = searchParams.get("query");
 
   const { setHelpTooltipOpen } = useQueryBuilder((qb) => ({
     setHelpTooltipOpen: qb.setHelpTooltipOpen,
@@ -80,7 +83,7 @@ const CohortBuilderClient = ({
             display="flex"
           >
             <Stack direction="column" spacing={1} sx={{ flex: 1, minWidth: 0 }}>
-              <CohortQueryInput queries={userQueries} />
+              <CohortQueryInput queries={userQueries} autoFocus />
               <Divider />
             </Stack>
           </Stack>
@@ -89,7 +92,7 @@ const CohortBuilderClient = ({
             <CohortQueryPreview />
           </Title>
 
-          <QueryBuilder query={query} />
+          <QueryBuilder key={urlQueryPid ?? "new"} query={query} />
         </>
       )}
     </Box>

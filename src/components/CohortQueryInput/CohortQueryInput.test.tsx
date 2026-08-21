@@ -57,7 +57,10 @@ const covidAndCancerQuery = createRuleGroup([covidRule, andRule, cancerRule]);
 
 const covidOrCancerQuery = createRuleGroup([covidRule, orRule, cancerRule]);
 
-const renderComponent = ({ queryBuilderJson = createRuleGroup([]) } = {}, extraOverrides: Record<string, unknown> = {}) => {
+const renderComponent = (
+  { queryBuilderJson = createRuleGroup([]), autoFocus = false } = {},
+  extraOverrides: Record<string, unknown> = {},
+) => {
   return render(
     <MockCohortDiscoveryServiceStore
       overrides={{
@@ -73,7 +76,7 @@ const renderComponent = ({ queryBuilderJson = createRuleGroup([]) } = {}, extraO
         },
       }}
     >
-      <CohortQueryInput queries={[]} />
+      <CohortQueryInput queries={[]} autoFocus={autoFocus} />
     </MockCohortDiscoveryServiceStore>,
   );
 };
@@ -157,6 +160,54 @@ describe("CohortQueryInput", () => {
     expect(
       await screen.findByTestId("search-overlay-paper"),
     ).toBeInTheDocument();
+
+    expect(await screen.findByText("Query Examples")).toBeInTheDocument();
+  });
+
+  it("does not open the search overlay when a pristine autofocused input is blurred", async () => {
+    const user = userEvent.setup();
+
+    renderComponent({ autoFocus: true });
+
+    const input = getSearchInput();
+
+    // autoFocus should acquire focus, but the overlay must stay hidden
+    await waitFor(() => expect(input).toHaveFocus());
+
+    expect(
+      screen.queryByTestId("search-overlay-paper"),
+    ).not.toBeInTheDocument();
+
+    // clicking anywhere off the input blurs it. The old bug cleared
+    // suppressInitialExamples synchronously while deferring the openSearchOverlap
+    // reset by 150ms, leaving a window where the overlay flashed open. Assert
+    // immediately after the blur (inside that window) that it never appears.
+    await user.click(document.body);
+
+    expect(
+      screen.queryByTestId("search-overlay-paper"),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Query Examples")).not.toBeInTheDocument();
+  });
+
+  it("hides the examples once 3+ characters are typed and shows them again below 3", async () => {
+    const user = userEvent.setup();
+
+    renderComponent();
+
+    const input = getSearchInput();
+
+    await user.click(input);
+
+    expect(await screen.findByText("Query Examples")).toBeInTheDocument();
+
+    await user.type(input, "zzz");
+
+    await waitFor(() =>
+      expect(screen.queryByText("Query Examples")).not.toBeInTheDocument(),
+    );
+
+    await user.keyboard("{Backspace}");
 
     expect(await screen.findByText("Query Examples")).toBeInTheDocument();
   });

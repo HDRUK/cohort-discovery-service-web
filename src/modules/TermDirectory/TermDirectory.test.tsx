@@ -21,7 +21,13 @@ describe("TermDirectory", () => {
   it("renders the correct column headers", () => {
     renderComponent(paginateData({ data: mockTermDirectoryEntries }));
 
-    const columns = ["OMOP ID", "Term Name", "Count", "Associated Collections"];
+    const columns = [
+      "OMOP Concept ID",
+      "Term Name",
+      "Domain",
+      "Count",
+      "Associated Collections",
+    ];
     for (const column of columns) {
       expect(
         screen.getByRole("columnheader", { name: new RegExp(column) }),
@@ -36,13 +42,13 @@ describe("TermDirectory", () => {
       name: /Type 2 diabetes mellitus/i,
     });
     expect(within(firstRow).getByText("201826")).toBeInTheDocument();
-    expect(within(firstRow).getByText("2")).toBeInTheDocument();
+    expect(within(firstRow).getByText("2 Collections")).toBeInTheDocument();
 
     const secondRow = screen.getByRole("row", {
       name: /Myocardial infarction/i,
     });
     expect(within(secondRow).getByText("4329847")).toBeInTheDocument();
-    expect(within(secondRow).getByText("1")).toBeInTheDocument();
+    expect(within(secondRow).getByText("1 Collection")).toBeInTheDocument();
   });
 
   it("renders the count, formatted with thousands separators for readability", () => {
@@ -69,10 +75,10 @@ describe("TermDirectory", () => {
     renderComponent(paginateData({ data: mockTermDirectoryEntries }));
 
     expect(
-      screen.getByRole("button", { name: "Copy OMOP ID 201826" }),
+      screen.getByRole("button", { name: "Copy OMOP Concept ID 201826" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Copy OMOP ID 4329847" }),
+      screen.getByRole("button", { name: "Copy OMOP Concept ID 4329847" }),
     ).toBeInTheDocument();
   });
 
@@ -82,10 +88,24 @@ describe("TermDirectory", () => {
     const writeText = jest.spyOn(navigator.clipboard, "writeText");
 
     await user.click(
-      screen.getByRole("button", { name: "Copy OMOP ID 201826" }),
+      screen.getByRole("button", { name: "Copy OMOP Concept ID 201826" }),
     );
 
     expect(writeText).toHaveBeenCalledWith("201826");
     expect(await screen.findByText("Copied to clipboard")).toBeInTheDocument();
+  });
+
+  it("renders each term's domain", () => {
+    renderComponent(paginateData({ data: mockTermDirectoryEntries }));
+
+    const firstRow = screen.getByRole("row", {
+      name: /Type 2 diabetes mellitus/i,
+    });
+    expect(within(firstRow).getByText("Condition")).toBeInTheDocument();
+
+    const secondRow = screen.getByRole("row", {
+      name: /Myocardial infarction/i,
+    });
+    expect(within(secondRow).getByText("Observation")).toBeInTheDocument();
   });
 });

@@ -9,10 +9,13 @@ import { capitaliseFirstLetter } from "@/utils/string";
 const DomainFilterTabs = () => {
   const { getSearchParam, setSearchParams } = useSearchParams("domain");
 
-  const selected = getSearchParam() ?? false;
+  const selected = getSearchParam() ?? "all";
 
   const setDomain = (value: string | null) =>
-    setSearchParams({ domain: value, page: "1" });
+    setSearchParams({
+      domain: value === "all" ? null : value,
+      page: "1",
+    });
 
   return (
     <Tabs
@@ -21,15 +24,14 @@ const DomainFilterTabs = () => {
       variant="scrollable"
       scrollButtons="auto"
       aria-label="Filter terms by domain"
+      sx={{ pt: 1 }}
     >
+      <Tab label="All" value="all" />
       {DOMAIN_TABS.map((domain) => (
         <Tab
           key={domain}
           label={capitaliseFirstLetter(getDomainPhrase(domain).noun)}
           value={domain}
-          onClick={() => {
-            if (domain === selected) setDomain(null);
-          }}
         />
       ))}
     </Tabs>
