@@ -172,8 +172,7 @@ export const hasAlternatives = (
 
 export const isMultipleConcept = (
   concept: Concept | Concept[] | null,
-): concept is Concept[] =>
-  Array.isArray(concept) && concept.length > 0;
+): concept is Concept[] => Array.isArray(concept) && concept.length > 0;
 
 export const getPrimaryConcept = (
   concept: Concept | Concept[] | null,
@@ -444,13 +443,12 @@ export const buildIndexFromModel = (root: RuleGroupType): BoardIndex => {
   return { containers, itemsByGroup };
 };
 
-export const hasDemographicsContent = (
-  demographics?: Demographics,
-): boolean =>
+export const hasDemographicsContent = (demographics?: Demographics): boolean =>
   !!demographics &&
   (demographics.age !== null ||
     demographics.sex.length > 0 ||
-    demographics.race.length > 0);
+    demographics.race.length > 0 ||
+    demographics.location !== null);
 
 export function validateRuleTree(
   root: RuleGroupType,
