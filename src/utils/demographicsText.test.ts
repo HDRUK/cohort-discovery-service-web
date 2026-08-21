@@ -46,6 +46,38 @@ describe("formatDemographicSubject", () => {
       "Males over 85",
     );
   });
+
+  it("phrases location only against 'People'", () => {
+    expect(
+      formatDemographicSubject(null, [], {
+        lat: 51.5,
+        lon: -0.1,
+        radius: 50000,
+        address: "London",
+      }),
+    ).toBe("People living within 50.0 km of London");
+  });
+
+  it("falls back to coordinates when the location has no address", () => {
+    expect(
+      formatDemographicSubject(null, [], {
+        lat: 51.5,
+        lon: -0.1,
+        radius: 5000,
+      }),
+    ).toBe("People living within 5.0 km of (51.5000, -0.1000)");
+  });
+
+  it("combines sex, age and location", () => {
+    expect(
+      formatDemographicSubject([85, MAX_AGE_FILTER], [male], {
+        lat: 51.5,
+        lon: -0.1,
+        radius: 50000,
+        address: "London",
+      }),
+    ).toBe("Males over 85 living within 50.0 km of London");
+  });
 });
 
 describe("applyDemographicSubject", () => {

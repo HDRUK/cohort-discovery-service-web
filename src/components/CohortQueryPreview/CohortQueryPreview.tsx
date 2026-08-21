@@ -21,11 +21,15 @@ const CohortQueryPreview = () => {
     (qb) => qb.queryBuilderJson.demographics,
   );
 
-  const { queryBuilderUseDemographicRule } = useFeatures();
+  const { queryBuilderUseDemographicRule, queryBuilderUseLocation } =
+    useFeatures();
 
+  const location = queryBuilderUseLocation
+    ? (demographics?.location ?? null)
+    : null;
   const subject =
     queryBuilderUseDemographicRule && demographics
-      ? formatDemographicSubject(demographics.age, demographics.sex)
+      ? formatDemographicSubject(demographics.age, demographics.sex, location)
       : null;
   const previewText = subject
     ? applyDemographicSubject(queryAsText, subject)
