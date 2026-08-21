@@ -447,7 +447,7 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     );
   },
 
-  queryAsText: queryToText(DEFAULT_QUERY),
+  queryAsText: queryToText(DEFAULT_QUERY, { includeDemographics: false }),
 
   setQueryBuilderJson: (
     query,
@@ -459,7 +459,11 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     let text = "";
 
     try {
-      const nextText = queryToText(updatedQuery);
+      // queryAsText feeds the editable search input, whose text is round-tripped
+      // back to concept matching — it must stay concept-only (no demographics).
+      const nextText = queryToText(updatedQuery, {
+        includeDemographics: false,
+      });
 
       if (typeof nextText === "string" && nextText.trim()) {
         text = nextText;

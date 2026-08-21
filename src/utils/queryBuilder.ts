@@ -1,4 +1,10 @@
-import { ConceptOperator, RuleGroupType, RuleNodeType } from "@/types/rules";
+import { Concept } from "@/types/api";
+import {
+  ConceptOperator,
+  GeoRadiusLocation,
+  RuleGroupType,
+  RuleNodeType,
+} from "@/types/rules";
 import {
   hasAlternatives,
   isAgeFilter,
@@ -10,13 +16,14 @@ import {
 } from "@/utils/rules";
 import { MAX_AGE_FILTER, MIN_AGE_FILTER } from "@/config/rules";
 import { UniqueIdentifier } from "@dnd-kit/core";
+import { formatRadius } from "@/components/GeoMap";
 import { getDomainPhrase } from "./omop";
 
 type Piece = { verb?: string | null; text: string };
 
 export const PREVIEW_SUBJECT_NOUN = "People";
 
-const queryToText = (
+const queryRulesToText = (
   node: RuleGroupType,
   options?: { includeBrackets?: boolean },
 ) => {
@@ -397,4 +404,107 @@ const collapsibleGuidanceKey = (
   return `${componentName}-${keySuffix}`;
 };
 
-export { queryToText, collapsibleGuidanceKey };
+const pluralizeSex = (name: string): string =>
+  name.endsWith("s") ? name : `${name}s`;
+
+const formatSexNoun = (sex: Concept[]): string | null => {
+  if (!sex?.length) return null;
+  return sex.map((c) => pluralizeSex(c.name)).join(" or ");
+};
+
+const formatAgePhrase = (age: [number, number] | null): string | null => {
+  if (!age) return null;
+  const [min, max] = age;
+  const noLower = min <= MIN_AGE_FILTER;
+  const noUpper = max >= MAX_AGE_FILTER;
+
+  if (noLower && noUpper) return null;
+  if (!noLower && noUpper) return `over ${min}`;
+  if (noLower && !noUpper) return `under ${max}`;
+  return `between ${min} and ${max}`;
+};
+
+const formatLocationPhrase = (
+  location: GeoRadiusLocation | null,
+): string | null => {
+  if (!location) return null;
+  const { lat, lon, radius, address } = location;
+  const place = address ?? `(${lat.toFixed(4)}, ${lon.toFixed(4)})`;
+  return `living within ${formatRadius(radius)} of ${place}`;
+};
+
+/**
+ * Builds a demographic subject noun-phrase for the query preview, e.g.
+ * "Males over 85 living within 5.0 km of London". Returns null when none of
+ * sex, a bounded age, or a location is set.
+ */
+const formatDemographicSubject = (
+  age: [number, number] | null,
+  sex: Concept[],
+  location: GeoRadiusLocation | null = null,
+): string | null => {
+  const noun = formatSexNoun(sex);
+  const agePhrase = formatAgePhrase(age);
+  const locationPhrase = formatLocationPhrase(location);
+
+  if (!noun && !agePhrase && !locationPhrase) return null;
+
+  const parts = [noun ?? PREVIEW_SUBJECT_NOUN];
+  if (agePhrase) parts.push(agePhrase);
+  if (locationPhrase) parts.push(locationPhrase);
+  return parts.join(" ");
+};
+
+/**
+ * Splices a demographic subject into a preview sentence by replacing the
+ * leading "People" noun (e.g. "People who ..." -> "Males over 85 who ...").
+ */
+const applyDemographicSubject = (queryText: string, subject: string): string => {
+  if (queryText.length === 0) return subject;
+  if (queryText.startsWith(`${PREVIEW_SUBJECT_NOUN} `)) {
+    return `${subject}${queryText.slice(PREVIEW_SUBJECT_NOUN.length)}`;
+  }
+  return queryText;
+};
+
+/**
+ * Renders a query definition as its full preview sentence, folding the
+ * demographics block (age, sex, location) into the concept-rule text. This is
+ * the single entry point for turning a definition into text everywhere a query
+ * is displayed (query builder preview, recent searches, history, results).
+ *
+ * The demographic subject replaces the leading "People" noun, so it always
+ * scopes the entire "who ..." clause regardless of whether the rules are
+ * combined with OR, AND, or a mix — matching the AND intersection of the
+ * demographics filter with the rule tree.
+ *
+ * Pass `includeDemographics: false` for the concept-only rendering used by the
+ * editable search input, whose text is round-tripped back to concept matching
+ * and must not contain the demographic subject.
+ */
+const queryToText = (
+  definition: RuleGroupType,
+  options?: { includeBrackets?: boolean; includeDemographics?: boolean },
+): string => {
+  const queryText = queryRulesToText(definition, options);
+
+  if (options?.includeDemographics === false) return queryText;
+
+  const demographics = definition.demographics;
+  const subject = demographics
+    ? formatDemographicSubject(
+        demographics.age,
+        demographics.sex,
+        demographics.location,
+      )
+    : null;
+  return subject ? applyDemographicSubject(queryText, subject) : queryText;
+};
+
+export {
+  queryRulesToText,
+  queryToText,
+  formatDemographicSubject,
+  applyDemographicSubject,
+  collapsibleGuidanceKey,
+};
