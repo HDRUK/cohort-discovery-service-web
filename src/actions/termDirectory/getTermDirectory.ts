@@ -14,6 +14,7 @@ const getTermDirectory = async (
   search?: string,
   domain?: DomainTab,
   collections?: string[],
+  sort?: string,
 ): Promise<ApiResponse<Paginated<TermDirectoryEntry>>> => {
   const {
     user: { id: userId },
@@ -40,6 +41,12 @@ const getTermDirectory = async (
   }
 
   collections?.forEach((pid) => params.append("collection_pid[]", pid));
+
+  if (sort) {
+    params.set("sort", sort);
+  }
+
+  console.log("getTermDirectory params:", params.toString());
 
   const result = await apiGet<ApiResponse<Paginated<TermDirectoryEntry>>>({
     url: API_ROUTES.termDirectory,

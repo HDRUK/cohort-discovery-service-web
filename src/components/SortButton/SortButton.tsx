@@ -12,58 +12,127 @@ import { SortDescendingIcon } from "@/icons/SortDescendingIcon";
 import { useCallback } from "react";
 
 export interface SortButtonProps {
-  field: string;
+  fields: { field: string; displayName: string; numeric: boolean }[];
   searchParamName?: string;
 }
 
-const SortButton = ({ field, searchParamName = "sort" }: SortButtonProps) => {
-  const { getSearchParam, setSearchParam } = useSearchParams(searchParamName);
+const SortButton = ({ fields, searchParamName = "sort" }: SortButtonProps) => {
+  const { getSearchParam, setSearchParam, clearSearchParams } =
+    useSearchParams(searchParamName);
+  const currentField = getSearchParam()?.split(":")[0];
   const currentSortDirection = getSearchParam()?.split(":")[1];
 
   const handleSort = useCallback(
-    (direction: SortDirection) => {
-      setSearchParam(
-        direction !== currentSortDirection ? `${field}:${direction}` : null,
-      );
+    (field: string, direction: SortDirection) => {
+      if (field !== currentField || direction !== currentSortDirection) {
+        setSearchParam(`${field}:${direction}`);
+      }
     },
-    [field, currentSortDirection, setSearchParam],
+    [currentSortDirection, currentField, setSearchParam],
   );
 
-  const items: PositionedMenuItem[] = [
+  const itemsArr: PositionedMenuItem[] = [
     {
-      id: SortDirection.ASCENDING,
+      id: "none",
       label: (
         <Typography
           component="span"
           sx={{ display: "flex", alignItems: "center" }}
-          fontWeight={
-            currentSortDirection == SortDirection.ASCENDING ? "bold" : "normal"
-          }
+          fontWeight={!currentField ? "bold" : "normal"}
         >
-          <SortAscendingIcon sx={{ mr: 1 }} /> Sort alphabetically (A-Z)
+          <SortAscendingIcon sx={{ mr: 1 }} /> Clear sorting
         </Typography>
       ),
-      onClick: () => handleSort(SortDirection.ASCENDING),
-    },
-    {
-      id: SortDirection.DESCENDING,
-      label: (
-        <Typography
-          component="span"
-          sx={{ display: "flex", alignItems: "center" }}
-          fontWeight={
-            currentSortDirection == SortDirection.DESCENDING ? "bold" : "normal"
-          }
-        >
-          <SortDescendingIcon sx={{ mr: 1 }} /> Sort alphabetically (Z-A)
-        </Typography>
-      ),
-      onClick: () => handleSort(SortDirection.DESCENDING),
+      onClick: () => clearSearchParams(),
     },
   ];
 
+  for (const fieldObj of fields) {
+    const field = fieldObj.field;
+    const displayName = fieldObj.displayName;
+    const numeric = fieldObj.numeric;
+
+    console.log("field:", field, "displayName:", displayName);
+
+    itemsArr.push(
+      {
+        id: `${field}:${SortDirection.ASCENDING}`,
+        label: (
+          <Typography
+            component="span"
+            sx={{ display: "flex", alignItems: "center" }}
+            fontWeight={
+              currentField === field &&
+              currentSortDirection === SortDirection.ASCENDING
+                ? "bold"
+                : "normal"
+            }
+          >
+            <SortAscendingIcon sx={{ mr: 1 }} /> Sort by {displayName}{" "}
+            {numeric ? "(Low-High)" : "(A-Z)"}
+          </Typography>
+        ),
+        onClick: () => handleSort(field, SortDirection.ASCENDING),
+      },
+      {
+        id: `${field}:${SortDirection.DESCENDING}`,
+        label: (
+          <Typography
+            component="span"
+            sx={{ display: "flex", alignItems: "center" }}
+            fontWeight={
+              currentField === field &&
+              currentSortDirection === SortDirection.DESCENDING
+                ? "bold"
+                : "normal"
+            }
+          >
+            <SortDescendingIcon sx={{ mr: 1 }} /> Sort by {displayName}{" "}
+            {numeric ? "(High-Low)" : "(Z-A)"}
+          </Typography>
+        ),
+        onClick: () => handleSort(field, SortDirection.DESCENDING),
+      },
+    );
+  }
+
+  console.log("itemsArr:", itemsArr);
+
+  // const items: PositionedMenuItem[] = [
+  //   {
+  //     id: SortDirection.ASCENDING,
+  //     label: (
+  //       <Typography
+  //         component="span"
+  //         sx={{ display: "flex", alignItems: "center" }}
+  //         fontWeight={
+  //           currentSortDirection == SortDirection.ASCENDING ? "bold" : "normal"
+  //         }
+  //       >
+  //         <SortAscendingIcon sx={{ mr: 1 }} /> Sort alphabetically (A-Z)
+  //       </Typography>
+  //     ),
+  //     onClick: () => handleSort(SortDirection.ASCENDING),
+  //   },
+  //   {
+  //     id: SortDirection.DESCENDING,
+  //     label: (
+  //       <Typography
+  //         component="span"
+  //         sx={{ display: "flex", alignItems: "center" }}
+  //         fontWeight={
+  //           currentSortDirection == SortDirection.DESCENDING ? "bold" : "normal"
+  //         }
+  //       >
+  //         <SortDescendingIcon sx={{ mr: 1 }} /> Sort alphabetically (Z-A)
+  //       </Typography>
+  //     ),
+  //     onClick: () => handleSort(SortDirection.DESCENDING),
+  //   },
+  // ];
+
   return (
-    <PositionedMenu isIcon items={items} active={!!currentSortDirection}>
+    <PositionedMenu isIcon items={itemsArr} active={!!currentField}>
       <SortIcon sx={{ width: 20, height: 20 }} />
     </PositionedMenu>
   );
