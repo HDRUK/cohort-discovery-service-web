@@ -9,7 +9,7 @@ import { useEffect, useMemo } from "react";
 import { useTable } from "../../hooks/useTable";
 import { formatNumber } from "@/utils/numbers";
 import { addQueryParam } from "@/utils/string";
-import logClickThrough from "@/actions/query/logClickThrough";
+import useTrackClick from "@/hooks/useTrackClick";
 import useSearchParams from "@/hooks/useSearchParams";
 import { DEFAULT_STATUS_LABELS } from "@/config/defaults";
 import Table from "../../components/Table";
@@ -36,6 +36,7 @@ const QueryResultsTable = ({
   showGuidance = false,
 }: QueryResultsTableProps) => {
   const defaults = useDefaults();
+  const track = useTrackClick();
 
   const queryKey = useMemo(
     () => [
@@ -78,13 +79,13 @@ const QueryResultsTable = ({
       accessorFn: (row) => ({
         name: row.collection.name,
         url: row.collection.url,
-        collectionPid: row.collection.pid,
+        taskPid: row.pid,
       }),
       Cell: ({ cell }) => {
-        const { name, url, collectionPid } = cell.getValue<{
+        const { name, url, taskPid } = cell.getValue<{
           name: string;
           url: string;
-          collectionPid: string;
+          taskPid: string;
         }>();
         if (!url) {
           return <span> {name} </span>;
@@ -96,8 +97,13 @@ const QueryResultsTable = ({
             target="_blank"
             href={addQueryParam(url, "ref", query.pid)}
             onClick={() => {
-              // Fire and forget: tracking must never hold up the navigation.
-              logClickThrough(query.pid, collectionPid).catch(() => {});
+              track({
+                subjectType: "task",
+                subjectId: taskPid,
+                action: "clicked_collection_link",
+                description:
+                  "User followed the collection link on the results page",
+              });
             }}
             sx={{
               display: "inline-flex",
