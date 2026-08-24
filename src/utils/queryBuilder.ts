@@ -404,12 +404,12 @@ const collapsibleGuidanceKey = (
   return `${componentName}-${keySuffix}`;
 };
 
-const pluralizeSex = (name: string): string =>
+const pluralise = (name: string): string =>
   name.endsWith("s") ? name : `${name}s`;
 
 const formatSexNoun = (sex: Concept[]): string | null => {
   if (!sex?.length) return null;
-  return sex.map((c) => pluralizeSex(c.name)).join(" or ");
+  return sex.map((c) => pluralise(c.name)).join(" or ");
 };
 
 const formatAgePhrase = (age: [number, number] | null): string | null => {
@@ -501,10 +501,4 @@ const queryToText = (
   return subject ? applyDemographicSubject(queryText, subject) : queryText;
 };
 
-export {
-  queryRulesToText,
-  queryToText,
-  formatDemographicSubject,
-  applyDemographicSubject,
-  collapsibleGuidanceKey,
-};
+export { queryToText, collapsibleGuidanceKey };

@@ -1,15 +1,10 @@
 import { CombinatorType, RuleGroupType } from "@/types/rules";
-import {
-  queryRulesToText,
-  queryToText,
-  formatDemographicSubject,
-  applyDemographicSubject,
-} from "@/utils/queryBuilder";
+import { queryToText } from "@/utils/queryBuilder";
 import { Concept } from "@/types/api";
 import { MAX_AGE_FILTER, MIN_AGE_FILTER } from "@/config/rules";
 import { v4 as uuidv4 } from "uuid";
 
-describe("queryRulesToText", () => {
+describe("queryToText", () => {
   it("collapses repeated verbs into comma list", async () => {
     const query: RuleGroupType = {
       id: uuidv4(),
@@ -49,7 +44,7 @@ describe("queryRulesToText", () => {
       ],
     };
 
-    expect(queryRulesToText(query)).toBe(
+    expect(queryToText(query)).toBe(
       "People who were diagnosed with Chronic laryngitis, Chronic kidney disease, and Sickle cell-hemoglobin C disease",
     );
   });
@@ -72,7 +67,7 @@ describe("queryRulesToText", () => {
       ],
     };
 
-    expect(queryRulesToText(query)).toBe(
+    expect(queryToText(query)).toBe(
       "People who were diagnosed with Chronic laryngitis when they were aged over 4 years",
     );
   });
@@ -95,7 +90,7 @@ describe("queryRulesToText", () => {
       ],
     };
 
-    expect(queryRulesToText(query)).toBe(
+    expect(queryToText(query)).toBe(
       "People who were diagnosed with Type 2 diabetes mellitus which occurred after 2026-08-11",
     );
   });
@@ -141,7 +136,7 @@ describe("queryRulesToText", () => {
       ],
     };
 
-    expect(queryRulesToText(query)).toBe(
+    expect(queryToText(query)).toBe(
       "People who were diagnosed with Chronic laryngitis when they were aged over 3 years, and Sickle cell-hemoglobin C disease which occurred after 2026-08-11, and were observed with Long Covid-19",
     );
   });
@@ -179,7 +174,7 @@ describe("queryRulesToText", () => {
       ],
     };
 
-    expect(queryRulesToText(query)).toBe(
+    expect(queryToText(query)).toBe(
       "People who were measured with Rubella IgG level or Anti GA1 antibody level",
     );
   });
@@ -231,7 +226,7 @@ describe("queryRulesToText", () => {
       ],
     };
 
-    expect(queryRulesToText(query, { includeBrackets: true })).toBe(
+    expect(queryToText(query, { includeBrackets: true })).toBe(
       "People who received COVID-19 vaccine, and (were measured with Rubella IgG level or Anti GA1 antibody level)",
     );
   });
@@ -243,103 +238,7 @@ const concept = (concept_id: number, name: string): Concept =>
 const male = concept(8507, "Male");
 const female = concept(8532, "Female");
 
-describe("formatDemographicSubject", () => {
-  it("returns null when nothing is set", () => {
-    expect(formatDemographicSubject(null, [])).toBeNull();
-    expect(
-      formatDemographicSubject([MIN_AGE_FILTER, MAX_AGE_FILTER], []),
-    ).toBeNull();
-  });
-
-  it("pluralises a single sex", () => {
-    expect(formatDemographicSubject(null, [male])).toBe("Males");
-  });
-
-  it("does not throw when sex is missing (legacy definitions)", () => {
-    expect(
-      formatDemographicSubject([85, MAX_AGE_FILTER], undefined as never),
-    ).toBe("People over 85");
-  });
-
-  it("joins multiple sexes with 'or'", () => {
-    expect(formatDemographicSubject(null, [female, male])).toBe(
-      "Females or Males",
-    );
-  });
-
-  it("phrases age only against 'People'", () => {
-    expect(formatDemographicSubject([85, MAX_AGE_FILTER], [])).toBe(
-      "People over 85",
-    );
-    expect(formatDemographicSubject([MIN_AGE_FILTER, 40], [])).toBe(
-      "People under 40",
-    );
-    expect(formatDemographicSubject([18, 65], [])).toBe(
-      "People between 18 and 65",
-    );
-  });
-
-  it("combines sex and age", () => {
-    expect(formatDemographicSubject([85, MAX_AGE_FILTER], [male])).toBe(
-      "Males over 85",
-    );
-  });
-
-  it("phrases location only against 'People'", () => {
-    expect(
-      formatDemographicSubject(null, [], {
-        lat: 51.5,
-        lon: -0.1,
-        radius: 50000,
-        address: "London",
-      }),
-    ).toBe("People living within 50.0 km of London");
-  });
-
-  it("falls back to coordinates when the location has no address", () => {
-    expect(
-      formatDemographicSubject(null, [], {
-        lat: 51.5,
-        lon: -0.1,
-        radius: 5000,
-      }),
-    ).toBe("People living within 5.0 km of (51.5000, -0.1000)");
-  });
-
-  it("combines sex, age and location", () => {
-    expect(
-      formatDemographicSubject([85, MAX_AGE_FILTER], [male], {
-        lat: 51.5,
-        lon: -0.1,
-        radius: 50000,
-        address: "London",
-      }),
-    ).toBe("Males over 85 living within 50.0 km of London");
-  });
-});
-
-describe("applyDemographicSubject", () => {
-  it("replaces the leading People noun", () => {
-    expect(
-      applyDemographicSubject(
-        "People who were diagnosed with X",
-        "Males over 85",
-      ),
-    ).toBe("Males over 85 who were diagnosed with X");
-  });
-
-  it("returns the subject alone for empty query text", () => {
-    expect(applyDemographicSubject("", "Males over 85")).toBe("Males over 85");
-  });
-
-  it("leaves text unchanged when it does not start with People", () => {
-    expect(applyDemographicSubject("Something else", "Males")).toBe(
-      "Something else",
-    );
-  });
-});
-
-describe("queryToText", () => {
+describe("queryToText — demographics", () => {
   const condition = (name: string): Concept =>
     ({ concept_id: 1, name, category: "Condition" }) as Concept;
   const covid = condition("Covid");
@@ -357,19 +256,134 @@ describe("queryToText", () => {
     },
   };
 
-  it("renders a demographics-only query using the subject alone", () => {
-    const definition: RuleGroupType = {
-      id: "group-1",
-      rules: [],
-      demographics: {
-        age: [85, MAX_AGE_FILTER],
-        sex: [male],
-        race: [],
-        location: null,
-      },
-    };
+  // A demographics-only query (no rules) renders the demographic subject alone,
+  // so these assert the subject built from age/sex/location.
+  const demographicsOnly = (
+    demographics: RuleGroupType["demographics"],
+  ): RuleGroupType => ({ id: "group-1", rules: [], demographics });
 
-    expect(queryToText(definition)).toBe("Males over 85");
+  it("renders nothing when no demographics or rules are set", () => {
+    expect(
+      queryToText(
+        demographicsOnly({
+          age: [MIN_AGE_FILTER, MAX_AGE_FILTER],
+          sex: [],
+          race: [],
+          location: null,
+        }),
+      ),
+    ).toBe("");
+  });
+
+  it("pluralises a single sex", () => {
+    expect(
+      queryToText(
+        demographicsOnly({ age: null, sex: [male], race: [], location: null }),
+      ),
+    ).toBe("Males");
+  });
+
+  it("joins multiple sexes with 'or'", () => {
+    expect(
+      queryToText(
+        demographicsOnly({
+          age: null,
+          sex: [female, male],
+          race: [],
+          location: null,
+        }),
+      ),
+    ).toBe("Females or Males");
+  });
+
+  it("does not throw when sex is missing (legacy definitions)", () => {
+    expect(
+      queryToText(
+        demographicsOnly({
+          age: [85, MAX_AGE_FILTER],
+          sex: undefined as never,
+          race: [],
+          location: null,
+        }),
+      ),
+    ).toBe("People over 85");
+  });
+
+  it("phrases age bounds against 'People'", () => {
+    expect(
+      queryToText(
+        demographicsOnly({
+          age: [85, MAX_AGE_FILTER],
+          sex: [],
+          race: [],
+          location: null,
+        }),
+      ),
+    ).toBe("People over 85");
+    expect(
+      queryToText(
+        demographicsOnly({
+          age: [MIN_AGE_FILTER, 40],
+          sex: [],
+          race: [],
+          location: null,
+        }),
+      ),
+    ).toBe("People under 40");
+    expect(
+      queryToText(
+        demographicsOnly({ age: [18, 65], sex: [], race: [], location: null }),
+      ),
+    ).toBe("People between 18 and 65");
+  });
+
+  it("phrases a location with an address", () => {
+    expect(
+      queryToText(
+        demographicsOnly({
+          age: null,
+          sex: [],
+          race: [],
+          location: {
+            lat: 51.5,
+            lon: -0.1,
+            radius: 50000,
+            address: "London",
+          },
+        }),
+      ),
+    ).toBe("People living within 50.0 km of London");
+  });
+
+  it("falls back to coordinates when the location has no address", () => {
+    expect(
+      queryToText(
+        demographicsOnly({
+          age: null,
+          sex: [],
+          race: [],
+          location: { lat: 51.5, lon: -0.1, radius: 5000 },
+        }),
+      ),
+    ).toBe("People living within 5.0 km of (51.5000, -0.1000)");
+  });
+
+  it("combines sex, age and location", () => {
+    expect(
+      queryToText(
+        demographicsOnly({
+          age: [85, MAX_AGE_FILTER],
+          sex: [male],
+          race: [],
+          location: {
+            lat: 51.5,
+            lon: -0.1,
+            radius: 50000,
+            address: "London",
+          },
+        }),
+      ),
+    ).toBe("Males over 85 living within 50.0 km of London");
   });
 
   it("folds demographics into the concept-rule text", () => {
