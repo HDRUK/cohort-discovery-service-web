@@ -414,23 +414,6 @@ describe("queryToText — demographics", () => {
     );
   });
 
-  it("omits demographics when includeDemographics is false", () => {
-    const definition: RuleGroupType = {
-      id: "group-1",
-      rules: [conditionRule],
-      demographics: {
-        age: [85, MAX_AGE_FILTER],
-        sex: [male],
-        race: [],
-        location: null,
-      },
-    };
-
-    expect(queryToText(definition, { includeDemographics: false })).toBe(
-      "People who were diagnosed with Chronic laryngitis",
-    );
-  });
-
   it("scopes the demographic subject over an OR rule group", () => {
     const definition: RuleGroupType = {
       id: "group-1",

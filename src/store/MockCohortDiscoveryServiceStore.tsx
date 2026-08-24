@@ -100,7 +100,7 @@ const MockCohortDiscoveryServiceStore = ({
   useQueryBuilderStore.setState(
     {
       queryBuilderJson: validateRuleTree(DEFAULT_QUERY),
-      queryAsText: queryToText(DEFAULT_QUERY, { includeDemographics: false }),
+      queryAsText: queryToText(DEFAULT_QUERY),
       getNodeName: (node: RuleNodeType) => node?.name ?? node.id,
       setNodeName: (_node: RuleNodeType, _name: string) => {},
       boardIndex: {} as BoardIndex,

@@ -471,24 +471,19 @@ const applyDemographicSubject = (queryText: string, subject: string): string => 
  * Renders a query definition as its full preview sentence, folding the
  * demographics block (age, sex, location) into the concept-rule text. This is
  * the single entry point for turning a definition into text everywhere a query
- * is displayed (query builder preview, recent searches, history, results).
+ * is displayed. The full definition — rules and demographics — is the text, so
+ * the demographics block is always included when present.
  *
  * The demographic subject replaces the leading "People" noun, so it always
  * scopes the entire "who ..." clause regardless of whether the rules are
  * combined with OR, AND, or a mix — matching the AND intersection of the
  * demographics filter with the rule tree.
- *
- * Pass `includeDemographics: false` for the concept-only rendering used by the
- * editable search input, whose text is round-tripped back to concept matching
- * and must not contain the demographic subject.
  */
 const queryToText = (
   definition: RuleGroupType,
-  options?: { includeBrackets?: boolean; includeDemographics?: boolean },
+  options?: { includeBrackets?: boolean },
 ): string => {
   const queryText = queryRulesToText(definition, options);
-
-  if (options?.includeDemographics === false) return queryText;
 
   const demographics = definition.demographics;
   const subject = demographics
