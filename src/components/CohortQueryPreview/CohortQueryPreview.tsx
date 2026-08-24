@@ -6,34 +6,12 @@ import CohortErrors from "@/modules/CohortErrors";
 import SubmitQueryButton from "@/components/SubmitQueryButton";
 
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import useFeatures from "@/hooks/useFeatures";
-import {
-  applyDemographicSubject,
-  formatDemographicSubject,
-} from "@/utils/demographicsText";
 import ClearQueryButton from "@/components/ClearQueryButton";
 import ShowJsonButton from "@/components/ShowJsonButton";
 
 const CohortQueryPreview = () => {
+  const previewText = useQueryBuilder((qb) => qb.queryAsText);
   const warnings = useQueryBuilder((qb) => qb.queryBuilderJson.warnings ?? []);
-  const queryAsText = useQueryBuilder((qb) => qb.queryAsText);
-  const demographics = useQueryBuilder(
-    (qb) => qb.queryBuilderJson.demographics,
-  );
-
-  const { queryBuilderUseDemographicRule, queryBuilderUseLocation } =
-    useFeatures();
-
-  const location = queryBuilderUseLocation
-    ? (demographics?.location ?? null)
-    : null;
-  const subject =
-    queryBuilderUseDemographicRule && demographics
-      ? formatDemographicSubject(demographics.age, demographics.sex, location)
-      : null;
-  const previewText = subject
-    ? applyDemographicSubject(queryAsText, subject)
-    : queryAsText;
 
   return (
     <Stack
