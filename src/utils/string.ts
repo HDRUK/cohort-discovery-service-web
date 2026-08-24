@@ -63,6 +63,16 @@ const canonicaliseQueryString = (params?: URLSearchParams | string) => {
   return sorted.toString();
 };
 
+const addQueryParam = (url: string, key: string, value: string) => {
+  try {
+    const parsed = new URL(url);
+    parsed.searchParams.set(key, value);
+    return parsed.toString();
+  } catch {
+    return url;
+  }
+};
+
 export {
   capitaliseFirstLetter,
   getTokenKey,
@@ -71,4 +81,5 @@ export {
   getEnumLabel,
   paramsToString,
   canonicaliseQueryString,
+  addQueryParam,
 };

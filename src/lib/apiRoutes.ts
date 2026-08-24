@@ -57,6 +57,7 @@ export const API_ROUTES = {
   featureFlags: `${API_URL}/features`,
   feature: (name: string) => `${API_URL}/features/${name}`,
   termDirectory: `${API_URL}/term-directory`,
+  queryClickThrough: (pid: string) => `${API_URL}/queries/${pid}/click-through`,
 };
 
 export const GATEWAY_ROUTES = {

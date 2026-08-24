@@ -8,6 +8,8 @@ import LaunchIcon from "@mui/icons-material/Launch";
 import { useEffect, useMemo } from "react";
 import { useTable } from "../../hooks/useTable";
 import { formatNumber } from "@/utils/numbers";
+import { addQueryParam } from "@/utils/string";
+import logClickThrough from "@/actions/query/logClickThrough";
 import useSearchParams from "@/hooks/useSearchParams";
 import { DEFAULT_STATUS_LABELS } from "@/config/defaults";
 import Table from "../../components/Table";
@@ -76,9 +78,14 @@ const QueryResultsTable = ({
       accessorFn: (row) => ({
         name: row.collection.name,
         url: row.collection.url,
+        collectionPid: row.collection.pid,
       }),
       Cell: ({ cell }) => {
-        const { name, url } = cell.getValue<{ name: string; url: string }>();
+        const { name, url, collectionPid } = cell.getValue<{
+          name: string;
+          url: string;
+          collectionPid: string;
+        }>();
         if (!url) {
           return <span> {name} </span>;
         }
@@ -87,7 +94,11 @@ const QueryResultsTable = ({
             component="a"
             rel="noopener noreferrer"
             target="_blank"
-            href={url}
+            href={addQueryParam(url, "ref", query.pid)}
+            onClick={() => {
+              // Fire and forget: tracking must never hold up the navigation.
+              logClickThrough(query.pid, collectionPid).catch(() => {});
+            }}
             sx={{
               display: "inline-flex",
               textDecoration: "none",
