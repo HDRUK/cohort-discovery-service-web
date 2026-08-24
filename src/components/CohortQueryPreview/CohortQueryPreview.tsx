@@ -6,15 +6,12 @@ import CohortErrors from "@/modules/CohortErrors";
 import SubmitQueryButton from "@/components/SubmitQueryButton";
 
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import { queryToText } from "@/utils/queryBuilder";
 import ClearQueryButton from "@/components/ClearQueryButton";
 import ShowJsonButton from "@/components/ShowJsonButton";
 
 const CohortQueryPreview = () => {
-  const queryBuilderJson = useQueryBuilder((qb) => qb.queryBuilderJson);
-
-  const warnings = queryBuilderJson.warnings ?? [];
-  const previewText = queryToText(queryBuilderJson);
+  const previewText = useQueryBuilder((qb) => qb.queryAsText);
+  const warnings = useQueryBuilder((qb) => qb.queryBuilderJson.warnings ?? []);
 
   return (
     <Stack
