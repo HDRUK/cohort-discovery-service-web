@@ -9,6 +9,7 @@ export interface TrackClickInput {
   subjectId: string | number;
   action: string;
   description?: string;
+  properties?: Record<string, unknown>;
 }
 
 interface TrackClickBody {
@@ -16,6 +17,7 @@ interface TrackClickBody {
   subject_id: string | number;
   action: string;
   description?: string;
+  properties?: Record<string, unknown>;
 }
 
 const trackClick = async ({
@@ -23,12 +25,14 @@ const trackClick = async ({
   subjectId,
   action,
   description,
+  properties,
 }: TrackClickInput): Promise<ApiResponse<null>> =>
   await apiPost<ApiResponse<null>, TrackClickBody>(API_ROUTES.clicks, {
     subject_type: subjectType,
     subject_id: subjectId,
     action,
     description,
+    properties,
   });
 
 export default trackClick;

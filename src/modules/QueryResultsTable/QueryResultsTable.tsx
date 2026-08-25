@@ -103,6 +103,10 @@ const QueryResultsTable = ({
                 action: "clicked_collection_link",
                 description:
                   "User followed the collection link on the results page",
+                properties: {
+                  collection_url: url,
+                  query_pid: query.pid,
+                },
               });
             }}
             sx={{
