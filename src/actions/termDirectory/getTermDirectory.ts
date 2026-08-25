@@ -46,8 +46,6 @@ const getTermDirectory = async (
     params.set("sort", sort);
   }
 
-  console.log("getTermDirectory params:", params.toString());
-
   const result = await apiGet<ApiResponse<Paginated<TermDirectoryEntry>>>({
     url: API_ROUTES.termDirectory,
     params,
