@@ -2,7 +2,7 @@
 
 import { Query, Task, Result } from "../../types/api";
 import { MRT_TableOptions, type MRT_ColumnDef } from "material-react-table";
-import { CircularProgress, Link } from "@mui/material";
+import { CircularProgress, Link, Stack } from "@mui/material";
 import LaunchIcon from "@mui/icons-material/Launch";
 import { useEffect, useMemo } from "react";
 import { useTable } from "../../hooks/useTable";
@@ -18,6 +18,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import QueryHistoryGuidance from "../QueryHistory";
 import { useDefaults } from "@/providers/DefaultProvider";
 import TwoPaneSwimLaneLayout from "@/modules/TwoPaneSwimLaneLayout";
+import QueryResultsLocation from "./QueryResultsLocation";
 
 interface QueryResultsTableProps {
   initialData: Query;
@@ -70,7 +71,8 @@ const QueryResultsTable = ({
     qc.setQueryData(queryKey, initialData);
   }, [qc, queryKey, initialData]);
 
-  const { tasks } = query;
+  const { tasks, definition } = query;
+  const location = definition.demographics?.location ?? null;
 
   const columns: MRT_ColumnDef<Task>[] = [
     {
@@ -219,17 +221,26 @@ const QueryResultsTable = ({
 
   const tableContent = <Table table={table} {...tableProps} />;
 
+  const content = location ? (
+    <Stack spacing={2}>
+      {tableContent}
+      <QueryResultsLocation location={location} />
+    </Stack>
+  ) : (
+    tableContent
+  );
+
   return (
     <>
       {showGuidance ? (
         <TwoPaneSwimLaneLayout
-          left={tableContent}
+          left={content}
           right={
             <QueryHistoryGuidance resultsView currentResult={initialData.pid} />
           }
         />
       ) : (
-        tableContent
+        content
       )}
     </>
   );

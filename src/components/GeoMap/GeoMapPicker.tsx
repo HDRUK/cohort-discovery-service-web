@@ -1,17 +1,9 @@
 "use client";
 
-import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import {
-  Circle,
-  MapContainer,
-  Marker,
-  TileLayer,
-  useMap,
-  useMapEvents,
-} from "react-leaflet";
+import { Marker, useMap, useMapEvents } from "react-leaflet";
 import AddressSearch from "./AddressSearch";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   FormControlLabel,
@@ -19,22 +11,21 @@ import {
   Stack,
   Switch,
   Typography,
-  useTheme,
 } from "@mui/material";
 import { GeoRadiusLocation } from "@/types/rules";
 import { formatRadius } from "./formatRadius";
+import GeoMapFrame from "./GeoMapFrame";
 import LSOABoundaries from "./LSOABoundaries";
+import RadiusCircle from "./RadiusCircle";
+import usePinIcon from "./usePinIcon";
 import {
   DEFAULT_MAP_CENTER,
   DEFAULT_MAP_ZOOM,
   DEFAULT_RADIUS,
   FLY_TO_ZOOM,
-  MAX_MAP_ZOOM,
   MAX_RADIUS,
   MIN_RADIUS,
   PINNED_MAP_ZOOM,
-  TILE_ATTRIBUTION,
-  TILE_URL,
 } from "@/config/map";
 
 const sliderToMeters = (v: number) =>
@@ -42,30 +33,11 @@ const sliderToMeters = (v: number) =>
 const metersToSlider = (m: number) =>
   (Math.log(m / MIN_RADIUS) / Math.log(MAX_RADIUS / MIN_RADIUS)) * 100;
 
-const PIN_SIZE = 16;
-
-const makePinIcon = (color: string) =>
-  new L.DivIcon({
-    className: "",
-    html: `<div class="geomap-pin" style="--pin-color:${color}"></div>`,
-    iconSize: [PIN_SIZE, PIN_SIZE],
-    iconAnchor: [PIN_SIZE / 2, PIN_SIZE / 2],
-  });
-
 function FlyTo({ target }: { target: L.LatLngTuple | null }) {
   const map = useMap();
   useEffect(() => {
     if (target) map.flyTo(target, FLY_TO_ZOOM);
   }, [target, map]);
-  return null;
-}
-
-function InvalidateOnMount() {
-  const map = useMap();
-  useEffect(() => {
-    const t = setTimeout(() => map.invalidateSize(), 150);
-    return () => clearTimeout(t);
-  }, [map]);
   return null;
 }
 
@@ -98,9 +70,7 @@ export default function GeoMapPicker({
   onChange,
   mapHeight = 500,
 }: GeoMapPickerProps) {
-  const theme = useTheme();
-  const accentColor = theme.palette.link.main;
-  const pinIcon = useMemo(() => makePinIcon(accentColor), [accentColor]);
+  const pinIcon = usePinIcon();
 
   const [position, setPosition] = useState<L.LatLngTuple | null>(
     value ? [value.lat, value.lon] : null,
@@ -153,45 +123,24 @@ export default function GeoMapPicker({
         />
       </Stack>
 
-      <Box
-        sx={{
-          height: mapHeight,
-          width: "100%",
-          "& .leaflet-container": { borderRadius: 1 },
-        }}
+      <GeoMapFrame
+        height={mapHeight}
+        center={position ?? DEFAULT_MAP_CENTER}
+        zoom={position ? PINNED_MAP_ZOOM : DEFAULT_MAP_ZOOM}
       >
-        <MapContainer
-          center={position ?? DEFAULT_MAP_CENTER}
-          zoom={position ? PINNED_MAP_ZOOM : DEFAULT_MAP_ZOOM}
-          maxZoom={MAX_MAP_ZOOM}
-          style={{ height: "100%", width: "100%" }}
-        >
-          <TileLayer attribution={TILE_ATTRIBUTION} url={TILE_URL} />
-          <InvalidateOnMount />
-          <FlyTo target={flyTarget} />
-          <LSOABoundaries
-            pinPosition={position}
-            radius={radius}
-            enabled={showBoundaries}
-          />
-          <LocationMarker
-            position={position}
-            onPositionChange={handlePinDrop}
-            icon={pinIcon}
-          />
-          {position && (
-            <Circle
-              center={position}
-              radius={radius}
-              pathOptions={{
-                color: accentColor,
-                fillColor: accentColor,
-                fillOpacity: 0.15,
-              }}
-            />
-          )}
-        </MapContainer>
-      </Box>
+        <FlyTo target={flyTarget} />
+        <LSOABoundaries
+          pinPosition={position}
+          radius={radius}
+          enabled={showBoundaries}
+        />
+        <LocationMarker
+          position={position}
+          onPositionChange={handlePinDrop}
+          icon={pinIcon}
+        />
+        {position && <RadiusCircle center={position} radius={radius} />}
+      </GeoMapFrame>
 
       <Stack spacing={0.5} px={1}>
         <Typography variant="body2" fontWeight={500}>

@@ -16,5 +16,10 @@ export const TILE_URL = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
 export const TILE_ATTRIBUTION =
   '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
+// Leaflet's default prefix embeds a flag SVG alongside the credit; keep the
+// credit, drop the flag.
+export const LEAFLET_ATTRIBUTION_PREFIX =
+  '<a href="https://leafletjs.com/">Leaflet</a>';
+
 export const MIN_ZOOM_FOR_BOUNDARIES = 8;
 export const MAX_RENDERED_FEATURES = 1500;
