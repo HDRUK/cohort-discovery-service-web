@@ -23,13 +23,12 @@ const trackClick = async ({
   subjectId,
   action,
   description,
-}: TrackClickInput): Promise<ApiResponse<null>> => {
-  return await apiPost<ApiResponse<null>, TrackClickBody>(API_ROUTES.clicks, {
+}: TrackClickInput): Promise<ApiResponse<null>> =>
+  await apiPost<ApiResponse<null>, TrackClickBody>(API_ROUTES.clicks, {
     subject_type: subjectType,
     subject_id: subjectId,
     action,
     description,
   });
-};
 
 export default trackClick;
