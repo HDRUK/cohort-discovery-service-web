@@ -10,6 +10,7 @@ import { Typography } from "@mui/material";
 import { SortAscendingIcon } from "@/icons/SortAscendingIcon";
 import { SortDescendingIcon } from "@/icons/SortDescendingIcon";
 import { useCallback, useMemo } from "react";
+import { useLogDependencyChanges } from "@/utils/deps";
 
 export interface SortButtonProps {
   fields: { field: string; displayName: string; numeric: boolean }[];
@@ -46,14 +47,7 @@ const SortButton = ({ fields, searchParamName = "sort" }: SortButtonProps) => {
         ),
         onClick: () => clearSearchParams(),
       },
-    ];
-
-    for (const fieldObj of fields) {
-      const field = fieldObj.field;
-      const displayName = fieldObj.displayName;
-      const numeric = fieldObj.numeric;
-
-      itemsArr.push(
+      ...fields.flatMap(({ field, displayName, numeric }) => [
         {
           id: `${field}:${SortDirection.ASCENDING}`,
           label: (
@@ -92,8 +86,8 @@ const SortButton = ({ fields, searchParamName = "sort" }: SortButtonProps) => {
           ),
           onClick: () => handleSort(field, SortDirection.DESCENDING),
         },
-      );
-    }
+      ]),
+    ];
 
     return itemsArr;
   }, [
