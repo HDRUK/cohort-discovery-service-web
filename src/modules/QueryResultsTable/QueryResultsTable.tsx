@@ -8,6 +8,8 @@ import LaunchIcon from "@mui/icons-material/Launch";
 import { useEffect, useMemo } from "react";
 import { useTable } from "../../hooks/useTable";
 import { formatNumber } from "@/utils/numbers";
+import { addQueryParam } from "@/utils/string";
+import useTrackClick from "@/hooks/useTrackClick";
 import useSearchParams from "@/hooks/useSearchParams";
 import { DEFAULT_STATUS_LABELS } from "@/config/defaults";
 import Table from "../../components/Table";
@@ -34,6 +36,7 @@ const QueryResultsTable = ({
   showGuidance = false,
 }: QueryResultsTableProps) => {
   const defaults = useDefaults();
+  const track = useTrackClick();
 
   const queryKey = useMemo(
     () => [
@@ -76,9 +79,14 @@ const QueryResultsTable = ({
       accessorFn: (row) => ({
         name: row.collection.name,
         url: row.collection.url,
+        taskPid: row.pid,
       }),
       Cell: ({ cell }) => {
-        const { name, url } = cell.getValue<{ name: string; url: string }>();
+        const { name, url, taskPid } = cell.getValue<{
+          name: string;
+          url: string;
+          taskPid: string;
+        }>();
         if (!url) {
           return <span> {name} </span>;
         }
@@ -87,7 +95,20 @@ const QueryResultsTable = ({
             component="a"
             rel="noopener noreferrer"
             target="_blank"
-            href={url}
+            href={addQueryParam(url, "ref", query.pid)}
+            onClick={() => {
+              track({
+                subjectType: "task",
+                subjectId: taskPid,
+                action: "clicked_collection_link",
+                description:
+                  "User followed the collection link on the results page",
+                properties: {
+                  collection_url: url,
+                  query_pid: query.pid,
+                },
+              });
+            }}
             sx={{
               display: "inline-flex",
               textDecoration: "none",
