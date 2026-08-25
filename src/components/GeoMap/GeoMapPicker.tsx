@@ -24,6 +24,7 @@ import {
 import { GeoRadiusLocation } from "@/types/rules";
 import { formatRadius } from "./formatRadius";
 import LSOABoundaries from "./LSOABoundaries";
+import { makePinIcon } from "./pinIcon";
 import {
   DEFAULT_MAP_CENTER,
   DEFAULT_MAP_ZOOM,
@@ -41,16 +42,6 @@ const sliderToMeters = (v: number) =>
   Math.round(MIN_RADIUS * Math.pow(MAX_RADIUS / MIN_RADIUS, v / 100));
 const metersToSlider = (m: number) =>
   (Math.log(m / MIN_RADIUS) / Math.log(MAX_RADIUS / MIN_RADIUS)) * 100;
-
-const PIN_SIZE = 16;
-
-const makePinIcon = (color: string) =>
-  new L.DivIcon({
-    className: "",
-    html: `<div class="geomap-pin" style="--pin-color:${color}"></div>`,
-    iconSize: [PIN_SIZE, PIN_SIZE],
-    iconAnchor: [PIN_SIZE / 2, PIN_SIZE / 2],
-  });
 
 function FlyTo({ target }: { target: L.LatLngTuple | null }) {
   const map = useMap();
