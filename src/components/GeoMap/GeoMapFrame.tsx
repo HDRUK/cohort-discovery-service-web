@@ -4,13 +4,19 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { ReactNode, useEffect } from "react";
 import {
+  AttributionControl,
   MapContainer,
   MapContainerProps,
   TileLayer,
   useMap,
 } from "react-leaflet";
 import { Box } from "@mui/material";
-import { MAX_MAP_ZOOM, TILE_ATTRIBUTION, TILE_URL } from "@/config/map";
+import {
+  LEAFLET_ATTRIBUTION_PREFIX,
+  MAX_MAP_ZOOM,
+  TILE_ATTRIBUTION,
+  TILE_URL,
+} from "@/config/map";
 
 const BOUNDS_PADDING: L.PointTuple = [16, 16];
 
@@ -53,8 +59,10 @@ const GeoMapFrame = ({
       boundsOptions={{ padding: BOUNDS_PADDING }}
       maxZoom={MAX_MAP_ZOOM}
       style={{ height: "100%", width: "100%" }}
+      attributionControl={false}
       {...mapProps}
     >
+      <AttributionControl prefix={LEAFLET_ATTRIBUTION_PREFIX} />
       <TileLayer attribution={TILE_ATTRIBUTION} url={TILE_URL} />
       <SettleOnMount fitBounds={fitBounds} />
       {children}
