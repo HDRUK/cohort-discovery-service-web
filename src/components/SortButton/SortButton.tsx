@@ -98,18 +98,6 @@ const SortButton = ({ fields, searchParamName = "sort" }: SortButtonProps) => {
     handleSort,
   ]);
 
-  useLogDependencyChanges(
-    "SortButton",
-    {
-      fields,
-      currentField,
-      currentSortDirection,
-      handleSort,
-      clearSearchParams,
-    },
-    { enabled: true },
-  );
-
   return (
     <PositionedMenu isIcon items={items} active={!!currentField}>
       <SortIcon sx={{ width: 20, height: 20 }} />
