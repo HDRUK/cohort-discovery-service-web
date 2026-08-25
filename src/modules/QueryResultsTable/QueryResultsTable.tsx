@@ -115,7 +115,7 @@ const QueryResultsTable = ({
         const result = cell.getValue<Result>();
         const { count, status } = result || {};
         if (status === "error" || original.failed_at) {
-          return <ErrorIcon message={original.latest_run?.error_message} />;
+          return 0;
         }
 
         return count === undefined || count === null ? (
@@ -156,6 +156,18 @@ const QueryResultsTable = ({
         const rawStatus = result?.status ?? "pending";
         const displayStatus = DEFAULT_STATUS_LABELS[rawStatus] ?? rawStatus;
         return displayStatus;
+      },
+      size: 100,
+      minSize: 100,
+      maxSize: 100,
+    },
+    {
+      accessorKey: "reason",
+      accessorFn: (row) => row.latest_run?.error_message,
+      header: "Reason",
+      Cell: ({ cell }) => {
+        const value = cell.getValue<string | null>();
+        return value ?? "N/A";
       },
       size: 100,
       minSize: 100,
