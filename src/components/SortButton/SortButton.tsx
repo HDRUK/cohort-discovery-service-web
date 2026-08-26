@@ -99,7 +99,12 @@ const SortButton = ({ fields, searchParamName = "sort" }: SortButtonProps) => {
   ]);
 
   return (
-    <PositionedMenu isIcon items={items} active={!!currentField}>
+    <PositionedMenu
+      isIcon
+      items={items}
+      active={!!currentField}
+      aria-label="Sort"
+    >
       <SortIcon sx={{ width: 20, height: 20 }} />
     </PositionedMenu>
   );
