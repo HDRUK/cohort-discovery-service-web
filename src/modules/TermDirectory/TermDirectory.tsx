@@ -93,6 +93,14 @@ const TermDirectory = ({
           placeholder: "Search by term name or OMOP ID...",
         },
       }}
+      rightAction={{
+        sortProps: {
+          fields: [
+            { field: "concept_name", displayName: "Term Name", numeric: false },
+            { field: "count", displayName: "Count", numeric: true },
+          ],
+        },
+      }}
       details={<DomainFilterTabs />}
       boxSxProps={{
         "& > .MuiGrid-container": {
@@ -101,6 +109,9 @@ const TermDirectory = ({
         },
         "& .MuiPaper-root": {
           borderRadius: 0,
+        },
+        "& .MuiGrid-root": {
+          alignItems: "center",
         },
       }}
     />

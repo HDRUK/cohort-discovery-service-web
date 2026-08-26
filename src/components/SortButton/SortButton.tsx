@@ -9,61 +9,101 @@ import { SortDirection } from "@/types/common";
 import { Typography } from "@mui/material";
 import { SortAscendingIcon } from "@/icons/SortAscendingIcon";
 import { SortDescendingIcon } from "@/icons/SortDescendingIcon";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 export interface SortButtonProps {
-  field: string;
+  fields: { field: string; displayName: string; numeric: boolean }[];
   searchParamName?: string;
 }
 
-const SortButton = ({ field, searchParamName = "sort" }: SortButtonProps) => {
-  const { getSearchParam, setSearchParam } = useSearchParams(searchParamName);
+const SortButton = ({ fields, searchParamName = "sort" }: SortButtonProps) => {
+  const { getSearchParam, setSearchParam, clearSearchParams } =
+    useSearchParams(searchParamName);
+  const currentField = getSearchParam()?.split(":")[0];
   const currentSortDirection = getSearchParam()?.split(":")[1];
 
   const handleSort = useCallback(
-    (direction: SortDirection) => {
-      setSearchParam(
-        direction !== currentSortDirection ? `${field}:${direction}` : null,
-      );
+    (field: string, direction: SortDirection) => {
+      if (field !== currentField || direction !== currentSortDirection) {
+        setSearchParam(`${field}:${direction}`);
+      }
     },
-    [field, currentSortDirection, setSearchParam],
+    [currentSortDirection, currentField, setSearchParam],
   );
 
-  const items: PositionedMenuItem[] = [
-    {
-      id: SortDirection.ASCENDING,
-      label: (
-        <Typography
-          component="span"
-          sx={{ display: "flex", alignItems: "center" }}
-          fontWeight={
-            currentSortDirection == SortDirection.ASCENDING ? "bold" : "normal"
-          }
-        >
-          <SortAscendingIcon sx={{ mr: 1 }} /> Sort alphabetically (A-Z)
-        </Typography>
-      ),
-      onClick: () => handleSort(SortDirection.ASCENDING),
-    },
-    {
-      id: SortDirection.DESCENDING,
-      label: (
-        <Typography
-          component="span"
-          sx={{ display: "flex", alignItems: "center" }}
-          fontWeight={
-            currentSortDirection == SortDirection.DESCENDING ? "bold" : "normal"
-          }
-        >
-          <SortDescendingIcon sx={{ mr: 1 }} /> Sort alphabetically (Z-A)
-        </Typography>
-      ),
-      onClick: () => handleSort(SortDirection.DESCENDING),
-    },
-  ];
+  const items = useMemo(() => {
+    const itemsArr: PositionedMenuItem[] = [
+      {
+        id: "none",
+        label: (
+          <Typography
+            component="span"
+            sx={{ display: "flex", alignItems: "center" }}
+            fontWeight={!currentField ? "bold" : "normal"}
+          >
+            <SortAscendingIcon sx={{ mr: 1 }} /> Clear sorting
+          </Typography>
+        ),
+        onClick: () => clearSearchParams(),
+      },
+      ...fields.flatMap(({ field, displayName, numeric }) => [
+        {
+          id: `${field}:${SortDirection.ASCENDING}`,
+          label: (
+            <Typography
+              component="span"
+              sx={{ display: "flex", alignItems: "center" }}
+              fontWeight={
+                currentField === field &&
+                currentSortDirection === SortDirection.ASCENDING
+                  ? "bold"
+                  : "normal"
+              }
+            >
+              <SortAscendingIcon sx={{ mr: 1 }} /> Sort by {displayName}{" "}
+              {numeric ? "(Low-High)" : "(A-Z)"}
+            </Typography>
+          ),
+          onClick: () => handleSort(field, SortDirection.ASCENDING),
+        },
+        {
+          id: `${field}:${SortDirection.DESCENDING}`,
+          label: (
+            <Typography
+              component="span"
+              sx={{ display: "flex", alignItems: "center" }}
+              fontWeight={
+                currentField === field &&
+                currentSortDirection === SortDirection.DESCENDING
+                  ? "bold"
+                  : "normal"
+              }
+            >
+              <SortDescendingIcon sx={{ mr: 1 }} /> Sort by {displayName}{" "}
+              {numeric ? "(High-Low)" : "(Z-A)"}
+            </Typography>
+          ),
+          onClick: () => handleSort(field, SortDirection.DESCENDING),
+        },
+      ]),
+    ];
+
+    return itemsArr;
+  }, [
+    currentField,
+    clearSearchParams,
+    fields,
+    currentSortDirection,
+    handleSort,
+  ]);
 
   return (
-    <PositionedMenu isIcon items={items} active={!!currentSortDirection}>
+    <PositionedMenu
+      isIcon
+      items={items}
+      active={!!currentField}
+      aria-label="Sort"
+    >
       <SortIcon sx={{ width: 20, height: 20 }} />
     </PositionedMenu>
   );
