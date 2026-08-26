@@ -10,7 +10,6 @@ import { Typography } from "@mui/material";
 import { SortAscendingIcon } from "@/icons/SortAscendingIcon";
 import { SortDescendingIcon } from "@/icons/SortDescendingIcon";
 import { useCallback, useMemo } from "react";
-import { useLogDependencyChanges } from "@/utils/deps";
 
 export interface SortButtonProps {
   fields: { field: string; displayName: string; numeric: boolean }[];
