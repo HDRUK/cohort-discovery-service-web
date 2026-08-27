@@ -143,7 +143,15 @@ export default function GeoMapPicker({
         }}
       >
         <Box sx={{ flex: 1, minWidth: 0 }}>
-          <AddressSearch onSelect={handleSearchSelect} />
+          <AddressSearch
+            onSelect={handleSearchSelect}
+            value={
+              address ??
+              (position
+                ? `${position[0].toFixed(4)}, ${position[1].toFixed(4)}`
+                : "")
+            }
+          />
         </Box>
         <ToggleAction
           size={25}

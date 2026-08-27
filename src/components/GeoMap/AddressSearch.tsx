@@ -17,15 +17,33 @@ interface NominatimResult {
 
 interface AddressSearchProps {
   onSelect: (position: LatLngTuple, address: string) => void;
+  /** Displayed in the input, e.g. an address or "lat, lon" after a pin drop. */
+  value?: string;
 }
 
-export default function AddressSearch({ onSelect }: AddressSearchProps) {
-  const [inputValue, setInputValue] = useState("");
+export default function AddressSearch({
+  onSelect,
+  value = "",
+}: AddressSearchProps) {
+  const [inputValue, setInputValue] = useState(value);
   const [options, setOptions] = useState<NominatimResult[]>([]);
   const [loading, setLoading] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // A pin drop or saved value syncs the input without it being a search
+  // query — skip the next fetch so we don't hit Nominatim with "51.5, -0.1".
+  const skipNextFetch = useRef(false);
 
   useEffect(() => {
+    skipNextFetch.current = true;
+    setInputValue(value);
+  }, [value]);
+
+  useEffect(() => {
+    if (skipNextFetch.current) {
+      skipNextFetch.current = false;
+      return;
+    }
+
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
     const query = inputValue.trim();
@@ -62,16 +80,17 @@ export default function AddressSearch({ onSelect }: AddressSearchProps) {
   }, [inputValue]);
 
   return (
-    <Autocomplete<NominatimResult>
+    <Autocomplete<NominatimResult, false, false, true>
       options={options}
-      getOptionLabel={(o) => o.display_name}
+      getOptionLabel={(o) => (typeof o === "string" ? o : o.display_name)}
       isOptionEqualToValue={(a, b) => a.place_id === b.place_id}
       filterOptions={(x) => x}
       loading={loading}
+      freeSolo
       inputValue={inputValue}
       onInputChange={(_, v) => setInputValue(v)}
       onChange={(_, result) => {
-        if (!result) return;
+        if (!result || typeof result === "string") return;
         onSelect(
           [parseFloat(result.lat), parseFloat(result.lon)],
           result.display_name,
