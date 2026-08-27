@@ -172,7 +172,7 @@ const DemographicCheckboxSection = ({
               key={c.concept_id}
               variant="outlined"
               sx={{ bgcolor: "white" }}
-              label={c.name}
+              label={capitaliseFirstLetter(c.name.toLocaleLowerCase())}
             />
           ))}
           {selected.length > MAX_VISIBLE_CHIPS && (
