@@ -1,9 +1,12 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { FormProvider, useForm } from "react-hook-form";
 import {
   DEFAULT_QUERY,
+  EMPTY_DEMOGRAPHICS,
   useQueryBuilderStore,
 } from "@/store/queryBuilderStore";
+import { Demographics } from "@/types/rules";
 import DemographicLocationSection from "./DemographicLocationSection";
 
 // The real picker pulls in leaflet (touches `window` at import) — replace it
@@ -21,15 +24,42 @@ jest.mock("next/dynamic", () => ({
 }));
 
 const store = () => useQueryBuilderStore.getState();
-const location = () => store().queryBuilderJson.demographics?.location;
 
 const setLondon = () =>
-  store().setDemographicsLocation({
-    lat: 51.5,
-    lon: -0.1,
-    radius: 50000,
-    address: "London",
+  store().setDemographics({
+    ...(store().queryBuilderJson.demographics ?? EMPTY_DEMOGRAPHICS),
+    location: { lat: 51.5, lon: -0.1, radius: 50000, address: "London" },
   });
+
+const Harness = ({
+  editing = false,
+  onSave = jest.fn(),
+  onReset = jest.fn(),
+  onClear = jest.fn(),
+}: {
+  editing?: boolean;
+  onSave?: () => void;
+  onReset?: () => void;
+  onClear?: () => void;
+}) => {
+  const form = useForm<Demographics>({
+    defaultValues: store().queryBuilderJson.demographics ?? EMPTY_DEMOGRAPHICS,
+  });
+
+  return (
+    <FormProvider {...form}>
+      <DemographicLocationSection
+        editing={editing}
+        disabled={false}
+        hideActions={false}
+        onEditStart={() => {}}
+        onSave={onSave}
+        onReset={onReset}
+        onClear={onClear}
+      />
+    </FormProvider>
+  );
+};
 
 beforeEach(() => {
   store().setQueryBuilderJson(DEFAULT_QUERY);
@@ -38,32 +68,30 @@ beforeEach(() => {
 
 describe("DemographicLocationSection", () => {
   it("renders the Location row with an Any chip by default", () => {
-    render(<DemographicLocationSection />);
+    render(<Harness />);
     expect(screen.getByText(/Location/)).toBeInTheDocument();
     expect(screen.getByText("Any")).toBeInTheDocument();
   });
 
   it("summarises a set location", () => {
     setLondon();
-    render(<DemographicLocationSection />);
+    render(<Harness />);
     expect(
       screen.getByText("Within 50.0 km of London"),
     ).toBeInTheDocument();
   });
 
   it("reveals the map picker and guidance when editing", async () => {
-    render(<DemographicLocationSection />);
-    await userEvent.click(
-      screen.getByRole("button", { name: /edit location/i }),
-    );
+    render(<Harness editing />);
     expect(screen.getByTestId("geo-map-picker")).toBeInTheDocument();
     expect(screen.getByText(/drop a pin/i)).toBeInTheDocument();
   });
 
   it("clears the location via Clear all", async () => {
     setLondon();
-    render(<DemographicLocationSection />);
+    const onClear = jest.fn();
+    render(<Harness onClear={onClear} />);
     await userEvent.click(screen.getByRole("button", { name: /clear all/i }));
-    expect(location()).toBeNull();
+    expect(onClear).toHaveBeenCalled();
   });
 });

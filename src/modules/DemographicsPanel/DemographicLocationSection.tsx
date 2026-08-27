@@ -1,11 +1,13 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { Controller, useFormContext } from "react-hook-form";
 import { Box, Chip, Skeleton, Stack, Typography } from "@mui/material";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { formatRadius } from "@/components/GeoMap";
 import { locationGuidance } from "@/config/demographics";
-import DemographicRow from "./DemographicRow";
+import { Demographics } from "@/types/rules";
+import DemographicRow, { DemographicRowActionProps } from "./DemographicRow";
 
 // Leaflet touches `window` at module load, so the map must never render on the
 // server — load it only in the browser once the row is being edited.
@@ -14,10 +16,10 @@ const GeoMapPicker = dynamic(() => import("@/components/GeoMap/GeoMapPicker"), {
   loading: () => <Skeleton variant="rectangular" height={500} />,
 });
 
-const DemographicLocationSection = () => {
-  const { location, setLocation } = useQueryBuilder((qb) => ({
+const DemographicLocationSection = (props: DemographicRowActionProps) => {
+  const { control } = useFormContext<Demographics>();
+  const { location } = useQueryBuilder((qb) => ({
     location: qb.queryBuilderJson.demographics?.location ?? null,
-    setLocation: qb.setDemographicsLocation,
   }));
 
   const summaryLabel = location
@@ -30,17 +32,23 @@ const DemographicLocationSection = () => {
   return (
     <DemographicRow
       label="Location"
-      onClear={() => setLocation(null)}
+      {...props}
       showClear={location !== null}
       renderEditing={
         <Box
           sx={{ maxHeight: 450, overflowY: "auto", overflowX: "hidden", pr: 1 }}
         >
           <Stack spacing={1} marginX={10}>
-            <GeoMapPicker
-              value={location}
-              onChange={setLocation}
-              mapHeight={400}
+            <Controller
+              name="location"
+              control={control}
+              render={({ field }) => (
+                <GeoMapPicker
+                  value={field.value}
+                  onChange={field.onChange}
+                  mapHeight={400}
+                />
+              )}
             />
             <Typography variant="body2" color="text.secondary">
               {locationGuidance}

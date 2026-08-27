@@ -1,5 +1,6 @@
 "use client";
 
+import { Controller, useFormContext } from "react-hook-form";
 import {
   Button,
   Chip,
@@ -10,11 +11,12 @@ import {
 } from "@mui/material";
 import SquareCheckbox from "@/components/SquareCheckbox";
 import { Concept, TermDirectoryEntry } from "@/types/api";
+import { Demographics } from "@/types/rules";
 import {
   demographicGuidance,
   demographicOptionToConcept,
 } from "@/config/demographics";
-import DemographicRow from "./DemographicRow";
+import DemographicRow, { DemographicRowActionProps } from "./DemographicRow";
 import { capitaliseFirstLetter } from "@/utils/string";
 
 // Above this many options the checkboxes flow into a scrollable multi-column
@@ -25,26 +27,21 @@ const MULTI_COLUMN_THRESHOLD = 10;
 // the rest into a "+N more" chip.
 const MAX_VISIBLE_CHIPS = 6;
 
-interface DemographicCheckboxSectionProps {
+interface DemographicCheckboxSectionProps extends DemographicRowActionProps {
   label: string;
+  field: "sex" | "race";
   options: TermDirectoryEntry[];
   selected: Concept[];
-  onToggle: (concept: Concept, selected: boolean) => void;
-  onSetAll: (concepts: Concept[]) => void;
-  onClear: () => void;
 }
 
 const DemographicCheckboxSection = ({
   label,
+  field,
   options,
   selected,
-  onToggle,
-  onSetAll,
-  onClear,
+  ...actionProps
 }: DemographicCheckboxSectionProps) => {
-  const isChecked = (conceptId: number) =>
-    selected.some((c) => c.concept_id === conceptId);
-
+  const { control } = useFormContext<Demographics>();
   const note = demographicGuidance(label.toLowerCase());
 
   const sortedOptions = [...options].sort((a, b) =>
@@ -54,18 +51,11 @@ const DemographicCheckboxSection = ({
   );
 
   const isMultiColumn = options.length > MULTI_COLUMN_THRESHOLD;
-  const allSelected =
-    options.length > 0 && options.every((o) => isChecked(o.concept_id));
-
-  const handleToggleAll = () =>
-    allSelected
-      ? onClear()
-      : onSetAll(sortedOptions.map(demographicOptionToConcept));
 
   return (
     <DemographicRow
       label={label}
-      onClear={onClear}
+      {...actionProps}
       showClear={selected.length > 0}
       renderEditing={
         options.length === 0 ? (
@@ -73,69 +63,105 @@ const DemographicCheckboxSection = ({
             {`No ${label.toLowerCase()} options are available — the collections you have selected do not contain this data.`}
           </Typography>
         ) : (
-          <>
-            {isMultiColumn && (
-              <Button
-                variant="text"
-                size="small"
-                color="secondary"
-                onClick={handleToggleAll}
-                sx={{ alignSelf: "flex-start", mb: 0.5 }}
-              >
-                {allSelected ? "Deselect all" : "Select all"}
-              </Button>
-            )}
-            <FormGroup
-              sx={
-                isMultiColumn
-                  ? {
-                      display: "grid",
-                      gridTemplateColumns:
-                        "repeat(auto-fill, minmax(220px, 1fr))",
-                      width: "100%",
-                      maxHeight: 400,
-                      overflowY: "auto",
-                      pr: 1,
-                    }
-                  : undefined
-              }
-            >
-              {sortedOptions.map((option) => (
-                <FormControlLabel
-                  key={option.concept_id}
-                  sx={{
-                    minWidth: 0,
-                    alignItems: "flex-start",
-                    "& .MuiFormControlLabel-label": {
-                      mt: "9px",
-                      whiteSpace: "normal",
-                      overflowWrap: "anywhere",
-                    },
-                  }}
-                  control={
-                    <SquareCheckbox
-                      checked={isChecked(option.concept_id)}
-                      onChange={(_e, checked) =>
-                        onToggle(demographicOptionToConcept(option), checked)
-                      }
-                    />
-                  }
-                  label={capitaliseFirstLetter(
-                    option.concept_name.toLocaleLowerCase(),
+          <Controller
+            name={field}
+            control={control}
+            render={({ field: draftField }) => {
+              const draft = draftField.value;
+              const isChecked = (conceptId: number) =>
+                draft.some((c) => c.concept_id === conceptId);
+              const allSelected =
+                options.length > 0 && options.every((o) => isChecked(o.concept_id));
+
+              const handleToggleAll = () =>
+                draftField.onChange(
+                  allSelected
+                    ? []
+                    : sortedOptions.map(demographicOptionToConcept),
+                );
+
+              const handleToggle = (concept: Concept, checked: boolean) =>
+                draftField.onChange(
+                  checked
+                    ? [
+                        ...draft.filter(
+                          (c) => c.concept_id !== concept.concept_id,
+                        ),
+                        concept,
+                      ]
+                    : draft.filter((c) => c.concept_id !== concept.concept_id),
+                );
+
+              return (
+                <>
+                  {isMultiColumn && (
+                    <Button
+                      variant="text"
+                      size="small"
+                      color="secondary"
+                      onClick={handleToggleAll}
+                      sx={{ alignSelf: "flex-start", mb: 0.5 }}
+                    >
+                      {allSelected ? "Deselect all" : "Select all"}
+                    </Button>
                   )}
-                />
-              ))}
-            </FormGroup>
-            {note && (
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ mt: 0.5 }}
-              >
-                {note}
-              </Typography>
-            )}
-          </>
+                  <FormGroup
+                    sx={
+                      isMultiColumn
+                        ? {
+                            display: "grid",
+                            gridTemplateColumns:
+                              "repeat(auto-fill, minmax(220px, 1fr))",
+                            width: "100%",
+                            maxHeight: 400,
+                            overflowY: "auto",
+                            pr: 1,
+                          }
+                        : undefined
+                    }
+                  >
+                    {sortedOptions.map((option) => (
+                      <FormControlLabel
+                        key={option.concept_id}
+                        sx={{
+                          minWidth: 0,
+                          alignItems: "flex-start",
+                          "& .MuiFormControlLabel-label": {
+                            mt: "9px",
+                            whiteSpace: "normal",
+                            overflowWrap: "anywhere",
+                          },
+                        }}
+                        control={
+                          <SquareCheckbox
+                            checked={isChecked(option.concept_id)}
+                            onChange={(_e, checked) =>
+                              handleToggle(
+                                demographicOptionToConcept(option),
+                                checked,
+                              )
+                            }
+                          />
+                        }
+                        label={capitaliseFirstLetter(
+                          option.concept_name.toLocaleLowerCase(),
+                        )}
+                      />
+                    ))}
+                  </FormGroup>
+                  {note && (
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mt: 0.5 }}
+                    >
+                      {note}
+                    </Typography>
+                  )}
+                </>
+              );
+            }}
+          />
         )
       }
     >

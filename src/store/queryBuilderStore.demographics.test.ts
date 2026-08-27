@@ -1,14 +1,12 @@
 import { Concept } from "@/types/api";
 import {
   DEFAULT_QUERY,
+  EMPTY_DEMOGRAPHICS,
   useQueryBuilderStore,
 } from "@/store/queryBuilderStore";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import { FeatureFlag, FeatureName } from "@/types/features";
-import {
-  DemographicConceptField,
-  DemographicDomain,
-} from "@/config/demographics";
+import { DemographicDomain } from "@/config/demographics";
 
 const concept = (
   concept_id: number,
@@ -55,74 +53,37 @@ describe("queryBuilderStore demographics", () => {
     expect(demographics()).toBeUndefined();
   });
 
-  it("setDemographicsAge writes the age range into the block", () => {
-    store().addDemographics();
-    store().setDemographicsAge([18, 65]);
-    expect(demographics()?.age).toEqual([18, 65]);
-  });
-
-  it("setDemographicsLocation writes and clears the location without touching age", () => {
-    store().addDemographics();
-    store().setDemographicsAge([18, 65]);
-
+  it("setDemographics writes the whole block in one go", () => {
     const location = { lat: 51.5, lon: -0.1, radius: 50000, address: "London" };
-    store().setDemographicsLocation(location);
-    expect(demographics()?.location).toEqual(location);
-    expect(demographics()?.age).toEqual([18, 65]);
+    store().setDemographics({
+      age: [18, 65],
+      sex: [female, male],
+      race: [white],
+      location,
+    });
 
-    store().setDemographicsLocation(null);
-    expect(demographics()?.location).toBeNull();
-    expect(demographics()?.age).toEqual([18, 65]);
+    expect(demographics()).toEqual({
+      age: [18, 65],
+      sex: [female, male],
+      race: [white],
+      location,
+    });
   });
 
-  it("toggleDemographicsConcept adds and removes sex without duplicating", () => {
-    store().toggleDemographicsConcept(DemographicConceptField.Sex, female, true);
-    store().toggleDemographicsConcept(DemographicConceptField.Sex, female, true);
-    expect(demographics()?.sex).toEqual([female]);
+  it("setDemographics replaces the previous block rather than merging", () => {
+    store().setDemographics({ ...EMPTY_DEMOGRAPHICS, age: [18, 65] });
+    store().setDemographics({ ...EMPTY_DEMOGRAPHICS, race: [white, black] });
 
-    store().toggleDemographicsConcept(DemographicConceptField.Sex, male, true);
-    expect(demographics()?.sex).toHaveLength(2);
-
-    store().toggleDemographicsConcept(DemographicConceptField.Sex, female, false);
-    expect(demographics()?.sex).toEqual([male]);
-  });
-
-  it("toggleDemographicsConcept adds and removes race without duplicating", () => {
-    store().toggleDemographicsConcept(DemographicConceptField.Race, white, true);
-    store().toggleDemographicsConcept(DemographicConceptField.Race, white, true);
-    expect(demographics()?.race).toEqual([white]);
-
-    store().toggleDemographicsConcept(DemographicConceptField.Race, black, true);
-    expect(demographics()?.race).toHaveLength(2);
-
-    store().toggleDemographicsConcept(DemographicConceptField.Race, white, false);
-    expect(demographics()?.race).toEqual([black]);
-  });
-
-  it("setDemographicsConcept replaces the whole list (select all)", () => {
-    store().toggleDemographicsConcept(DemographicConceptField.Race, white, true);
-    store().setDemographicsConcept(DemographicConceptField.Race, [white, black]);
-    expect(demographics()?.race).toEqual([white, black]);
-  });
-
-  it("clearDemographicsConcept empties sex without touching age", () => {
-    store().setDemographicsAge([0, 30]);
-    store().toggleDemographicsConcept(DemographicConceptField.Sex, female, true);
-    store().clearDemographicsConcept(DemographicConceptField.Sex);
-    expect(demographics()?.sex).toEqual([]);
-    expect(demographics()?.age).toEqual([0, 30]);
-  });
-
-  it("clearDemographicsConcept empties race without touching sex", () => {
-    store().toggleDemographicsConcept(DemographicConceptField.Sex, female, true);
-    store().toggleDemographicsConcept(DemographicConceptField.Race, white, true);
-    store().clearDemographicsConcept(DemographicConceptField.Race);
-    expect(demographics()?.race).toEqual([]);
-    expect(demographics()?.sex).toEqual([female]);
+    expect(demographics()).toEqual({
+      age: null,
+      sex: [],
+      race: [white, black],
+      location: null,
+    });
   });
 
   it("keeps demographics inside queryBuilderJson (single source of truth)", () => {
-    store().toggleDemographicsConcept(DemographicConceptField.Sex, male, true);
+    store().setDemographics({ ...EMPTY_DEMOGRAPHICS, sex: [male] });
     expect(store().queryBuilderJson.demographics?.sex).toEqual([male]);
   });
 
@@ -133,12 +94,12 @@ describe("queryBuilderStore demographics", () => {
     });
 
     it("is valid with a demographic age set and no rules", () => {
-      store().setDemographicsAge([50, 80]);
+      store().setDemographics({ ...EMPTY_DEMOGRAPHICS, age: [50, 80] });
       expect(isValid()).toBe(true);
     });
 
     it("is valid with a demographic sex set and no rules", () => {
-      store().toggleDemographicsConcept(DemographicConceptField.Sex, female, true);
+      store().setDemographics({ ...EMPTY_DEMOGRAPHICS, sex: [female] });
       expect(isValid()).toBe(true);
     });
 
@@ -148,15 +109,15 @@ describe("queryBuilderStore demographics", () => {
     });
 
     it("becomes invalid again once demographics are cleared", () => {
-      store().setDemographicsAge([50, 80]);
+      store().setDemographics({ ...EMPTY_DEMOGRAPHICS, age: [50, 80] });
       expect(isValid()).toBe(true);
 
-      store().setDemographicsAge(null);
+      store().setDemographics({ ...EMPTY_DEMOGRAPHICS, age: null });
       expect(isValid()).toBe(false);
     });
 
     it("becomes invalid when the whole block is removed", () => {
-      store().toggleDemographicsConcept(DemographicConceptField.Sex, female, true);
+      store().setDemographics({ ...EMPTY_DEMOGRAPHICS, sex: [female] });
       expect(isValid()).toBe(true);
 
       store().removeDemographics();
@@ -167,7 +128,7 @@ describe("queryBuilderStore demographics", () => {
   it("stays invalid with demographics set when the flag is off", () => {
     setDemographicRuleFlag(false);
     store().setQueryBuilderJson(DEFAULT_QUERY);
-    store().setDemographicsAge([50, 80]);
+    store().setDemographics({ ...EMPTY_DEMOGRAPHICS, age: [50, 80] });
     expect(isValid()).toBe(false);
   });
 });
