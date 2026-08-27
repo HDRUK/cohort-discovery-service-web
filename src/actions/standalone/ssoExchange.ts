@@ -1,6 +1,6 @@
 "use server";
 
-import { ApiResponse, SignInPost, SignInResponse } from "@/types/api";
+import { ApiResponse, SignInResponse } from "@/types/api";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { apiPost } from "@/lib/apiClient";
 import { cookies, headers } from "next/headers";
@@ -8,11 +8,11 @@ import { ApiError } from "@/lib/https";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
-const standaloneSignIn = async (payload: SignInPost): Promise<boolean> => {
+const ssoExchange = async (code: string): Promise<boolean> => {
   try {
-    const response = await apiPost<ApiResponse<SignInResponse>, SignInPost>(
-      API_ROUTES.signIn,
-      payload,
+    const response = await apiPost<ApiResponse<SignInResponse>, { code: string }>(
+      API_ROUTES.ssoExchange,
+      { code },
     );
 
     const token = response.data?.access_token;
@@ -49,4 +49,4 @@ const standaloneSignIn = async (payload: SignInPost): Promise<boolean> => {
   }
 };
 
-export default standaloneSignIn;
+export default ssoExchange;
