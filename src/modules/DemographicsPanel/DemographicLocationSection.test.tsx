@@ -87,6 +87,11 @@ describe("DemographicLocationSection", () => {
     expect(screen.getByText(/drop a pin/i)).toBeInTheDocument();
   });
 
+  it("keeps the header plain while editing", () => {
+    render(<Harness editing />);
+    expect(screen.queryByText(/LatLng/)).not.toBeInTheDocument();
+  });
+
   it("clears the location via Clear all", async () => {
     setLondon();
     const onClear = jest.fn();

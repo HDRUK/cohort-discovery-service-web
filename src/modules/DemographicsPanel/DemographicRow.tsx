@@ -41,7 +41,7 @@ const DemographicRow = ({
       <Stack
         direction="row"
         justifyContent="space-between"
-        alignItems="space-between"
+        alignItems="flex-start"
         spacing={1}
         sx={{ py: 1, width: "100%" }}
       >
@@ -49,17 +49,17 @@ const DemographicRow = ({
           title={label}
           size={"small"}
           subTitle={editing ? " " : children}
-          wrapperSx={{ width: "100%" }}
+          flexShrink={0}
+          wrapperSx={{ width: "100%", alignItems: "flex-start" }}
         >
           {editing && (
-            <Stack sx={{ width: "100%" }}>
-              <Box sx={{ width: "100%", py: 1 }}>{renderEditing}</Box>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Box sx={{ width: "100%", pb: 1 }}>{renderEditing}</Box>
 
               {!hideActions && (
                 <DemographicSaveButton onReset={onReset} onSave={onSave} />
               )}
-              <Divider />
-            </Stack>
+            </Box>
           )}
         </Title>
 

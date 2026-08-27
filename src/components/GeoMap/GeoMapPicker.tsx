@@ -1,17 +1,13 @@
 "use client";
 
 import L from "leaflet";
-import { Marker, useMap, useMapEvents } from "react-leaflet";
+import { Marker, useMap, useMapEvents, ZoomControl } from "react-leaflet";
 import AddressSearch from "./AddressSearch";
 import { useEffect, useState } from "react";
-import {
-  Box,
-  FormControlLabel,
-  Slider,
-  Stack,
-  Switch,
-  Typography,
-} from "@mui/material";
+import { Box, Slider, Stack, Typography } from "@mui/material";
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
+import ToggleAction from "@/components/ToggleAction";
 import { GeoRadiusLocation } from "@/types/rules";
 import { formatRadius } from "./formatRadius";
 import GeoMapFrame from "./GeoMapFrame";
@@ -79,6 +75,11 @@ export default function GeoMapPicker({
   const [address, setAddress] = useState<string | undefined>(value?.address);
   const [flyTarget, setFlyTarget] = useState<L.LatLngTuple | null>(null);
   const [showBoundaries, setShowBoundaries] = useState(true);
+  // Frame the saved radius on first render — a fixed zoom would otherwise
+  // ignore how wide an existing location's radius actually is.
+  const [initialBounds] = useState(() =>
+    value ? L.latLng(value.lat, value.lon).toBounds(value.radius * 2) : undefined,
+  );
 
   const handlePinDrop = (pos: L.LatLngTuple) => {
     setPosition(pos);
@@ -101,33 +102,15 @@ export default function GeoMapPicker({
   };
 
   return (
-    <Stack spacing={2}>
-      <Stack
-        direction={{ xs: "column", sm: "row" }}
-        spacing={1}
-        alignItems={{ sm: "center" }}
-      >
-        <Box sx={{ flex: 1, minWidth: 0 }}>
-          <AddressSearch onSelect={handleSearchSelect} />
-        </Box>
-        <FormControlLabel
-          control={
-            <Switch
-              size="small"
-              checked={showBoundaries}
-              onChange={(_, checked) => setShowBoundaries(checked)}
-            />
-          }
-          label={<Typography variant="body2">Show LSOA boundaries</Typography>}
-          sx={{ flexShrink: 0, mr: 0 }}
-        />
-      </Stack>
-
+    <Box sx={{ position: "relative" }}>
       <GeoMapFrame
         height={mapHeight}
         center={position ?? DEFAULT_MAP_CENTER}
         zoom={position ? PINNED_MAP_ZOOM : DEFAULT_MAP_ZOOM}
+        fitBounds={initialBounds}
+        zoomControl={false}
       >
+        <ZoomControl position="bottomright" />
         <FlyTo target={flyTarget} />
         <LSOABoundaries
           pinPosition={position}
@@ -142,33 +125,77 @@ export default function GeoMapPicker({
         {position && <RadiusCircle center={position} radius={radius} />}
       </GeoMapFrame>
 
-      <Stack spacing={0.5} px={1}>
-        <Typography variant="body2" fontWeight={500}>
-          Radius: {formatRadius(radius)}
-        </Typography>
-        <Slider
-          value={metersToSlider(radius)}
-          onChange={(_, v) => handleRadiusChange(sliderToMeters(v as number))}
-          min={0}
-          max={100}
-          step={0.5}
-          aria-label="Radius"
+      <Stack
+        direction="row"
+        alignItems="center"
+        spacing={1.5}
+        sx={{
+          position: "absolute",
+          top: 12,
+          left: 12,
+          right: 12,
+          zIndex: 1000,
+          bgcolor: "background.paper",
+          borderRadius: 5,
+          boxShadow: 1,
+          px: 1.5,
+          py: 0.75,
+        }}
+      >
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <AddressSearch onSelect={handleSearchSelect} />
+        </Box>
+        <ToggleAction
+          size={25}
+          active={showBoundaries}
+          onToggle={() => setShowBoundaries((prev) => !prev)}
+          activeIcon={CheckIcon}
+          inactiveIcon={CloseIcon}
         />
-        <Stack direction="row" justifyContent="space-between">
-          <Typography variant="caption" color="text.secondary">
-            5 km
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            1000 km
-          </Typography>
-        </Stack>
+        <Typography variant="body2" sx={{ flexShrink: 0 }}>
+          LSOA boundaries
+        </Typography>
       </Stack>
 
-      <Typography variant="caption" color="text.secondary" textAlign="center">
-        {position
-          ? `${position[0].toFixed(5)}, ${position[1].toFixed(5)}`
-          : "Click on the map to drop a pin"}
-      </Typography>
-    </Stack>
+      {position && (
+        <Stack
+          direction="row"
+          alignItems="center"
+          spacing={1}
+          sx={{
+            position: "absolute",
+            bottom: 12,
+            left: 12,
+            zIndex: 1000,
+            bgcolor: "background.paper",
+            borderRadius: 5,
+            boxShadow: 1,
+            px: 1.5,
+            py: 0.5,
+          }}
+        >
+          <Typography variant="body2" fontWeight={500} sx={{ flexShrink: 0 }}>
+            Radius
+          </Typography>
+          <Slider
+            value={metersToSlider(radius)}
+            onChange={(_, v) => handleRadiusChange(sliderToMeters(v as number))}
+            min={0}
+            max={100}
+            step={0.5}
+            aria-label="Radius"
+            size="small"
+            sx={{ width: 120 }}
+          />
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ flexShrink: 0 }}
+          >
+            +{formatRadius(radius)}
+          </Typography>
+        </Stack>
+      )}
+    </Box>
   );
 }

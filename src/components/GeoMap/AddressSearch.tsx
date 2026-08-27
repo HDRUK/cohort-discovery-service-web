@@ -1,4 +1,10 @@
-import { Autocomplete, CircularProgress, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  CircularProgress,
+  InputAdornment,
+  TextField,
+} from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 import { useEffect, useRef, useState } from "react";
 import type { LatLngTuple } from "leaflet";
 
@@ -74,13 +80,19 @@ export default function AddressSearch({ onSelect }: AddressSearchProps) {
         setOptions([]);
       }}
       size="small"
+      forcePopupIcon={false}
       renderInput={(params) => (
         <TextField
           {...params}
-          placeholder="Search by postcode, county or location…"
+          placeholder="Search by address, postcode or location…"
           slotProps={{
             input: {
               ...params.InputProps,
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" color="action" />
+                </InputAdornment>
+              ),
               endAdornment: (
                 <>
                   {loading && <CircularProgress size={16} />}
