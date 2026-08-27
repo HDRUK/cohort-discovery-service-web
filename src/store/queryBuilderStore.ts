@@ -8,7 +8,6 @@ import {
   RuleGroupType,
   RuleNodeType,
   Demographics,
-  GeoRadiusLocation,
 } from "@/types/rules";
 import {
   buildIndexFromModel,
@@ -29,8 +28,7 @@ import { UniqueIdentifier } from "@dnd-kit/core";
 import { removeFalseKeys } from "@/utils/numbers";
 import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
 import { DatasetErrors } from "@/utils/datasets";
-import { Collection, Concept } from "@/types/api";
-import { DemographicConceptField } from "@/config/demographics";
+import { Collection } from "@/types/api";
 import { FeatureName } from "@/types/features";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import { intersection } from "lodash";
@@ -62,23 +60,12 @@ export const Creators: Record<string, NodeFactory> = {
 export const DEFAULT_QUERY: RuleGroupType =
   process.env.NEXT_PUBLIC_USE_EXAMPLE_QUERY === "true" ? EXAMPLE_1 : NO_QUERY;
 
-const EMPTY_DEMOGRAPHICS: Demographics = {
+export const EMPTY_DEMOGRAPHICS: Demographics = {
   age: null,
   sex: [],
   race: [],
   location: null,
 };
-
-const withDemographics = (
-  qb: RuleGroupType,
-  updater: (d: Demographics) => Demographics,
-): RuleGroupType => ({
-  ...qb,
-  demographics: updater(qb.demographics ?? EMPTY_DEMOGRAPHICS),
-});
-
-const withoutConcept = (concepts: Concept[], concept: Concept): Concept[] =>
-  concepts.filter((c) => c.concept_id !== concept.concept_id);
 
 export interface QueryBuilderStoreState {
   queryName: string;
@@ -135,18 +122,7 @@ export interface QueryBuilderStoreState {
 
   addDemographics: () => void;
   removeDemographics: () => void;
-  setDemographicsAge: (age: [number, number] | null) => void;
-  setDemographicsLocation: (location: GeoRadiusLocation | null) => void;
-  toggleDemographicsConcept: (
-    field: DemographicConceptField,
-    concept: Concept,
-    selected: boolean,
-  ) => void;
-  setDemographicsConcept: (
-    field: DemographicConceptField,
-    concepts: Concept[],
-  ) => void;
-  clearDemographicsConcept: (field: DemographicConceptField) => void;
+  setDemographics: (demographics: Demographics) => void;
 
   queryAsText: string;
   getQueryFromText: (
@@ -406,45 +382,9 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     const { queryBuilderJson, setQueryBuilderJson } = get();
     setQueryBuilderJson({ ...queryBuilderJson, demographics: undefined }, true);
   },
-  setDemographicsAge: (age) => {
+  setDemographics: (demographics) => {
     const { queryBuilderJson, setQueryBuilderJson } = get();
-    setQueryBuilderJson(
-      withDemographics(queryBuilderJson, (d) => ({ ...d, age })),
-      true,
-    );
-  },
-  setDemographicsLocation: (location) => {
-    const { queryBuilderJson, setQueryBuilderJson } = get();
-    setQueryBuilderJson(
-      withDemographics(queryBuilderJson, (d) => ({ ...d, location })),
-      true,
-    );
-  },
-  toggleDemographicsConcept: (field, concept, selected) => {
-    const { queryBuilderJson, setQueryBuilderJson } = get();
-    setQueryBuilderJson(
-      withDemographics(queryBuilderJson, (d) => ({
-        ...d,
-        [field]: selected
-          ? [...withoutConcept(d[field], concept), concept]
-          : withoutConcept(d[field], concept),
-      })),
-      true,
-    );
-  },
-  setDemographicsConcept: (field, concepts) => {
-    const { queryBuilderJson, setQueryBuilderJson } = get();
-    setQueryBuilderJson(
-      withDemographics(queryBuilderJson, (d) => ({ ...d, [field]: concepts })),
-      true,
-    );
-  },
-  clearDemographicsConcept: (field) => {
-    const { queryBuilderJson, setQueryBuilderJson } = get();
-    setQueryBuilderJson(
-      withDemographics(queryBuilderJson, (d) => ({ ...d, [field]: [] })),
-      true,
-    );
+    setQueryBuilderJson({ ...queryBuilderJson, demographics }, true);
   },
 
   queryAsText: queryToText(DEFAULT_QUERY),

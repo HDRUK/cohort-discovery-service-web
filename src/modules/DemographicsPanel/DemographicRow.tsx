@@ -1,15 +1,23 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import { Box, Button, Divider, IconButton, Stack } from "@mui/material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import Title from "@/components/Title";
+import DemographicSaveButton from "./DemographicSaveButton";
 
-interface DemographicRowProps {
+export interface DemographicRowActionProps {
+  editing: boolean;
+  disabled: boolean;
+  hideActions: boolean;
+  onEditStart: () => void;
+  onSave: () => void;
+  onReset: () => void;
+  onClear: () => void;
+}
+
+interface DemographicRowProps extends DemographicRowActionProps {
   label: string;
-  onEdit?: () => void;
-  onSave?: () => void;
-  onClear?: () => void;
   showClear?: boolean;
   children: ReactNode;
   renderEditing: ReactNode;
@@ -17,29 +25,17 @@ interface DemographicRowProps {
 
 const DemographicRow = ({
   label,
-  onEdit,
+  editing,
+  disabled,
+  hideActions,
+  onEditStart,
   onSave,
+  onReset,
   onClear,
   showClear = false,
   children,
   renderEditing,
 }: DemographicRowProps) => {
-  const [editing, setEditing] = useState(false);
-
-  const handleEdit = () => {
-    setEditing(true);
-    onEdit?.();
-  };
-
-  const handleClear = () => {
-    setEditing(false);
-    onClear?.();
-  };
-  const handleSave = () => {
-    setEditing(false);
-    onSave?.();
-  };
-
   return (
     <>
       <Stack
@@ -59,23 +55,9 @@ const DemographicRow = ({
             <Stack sx={{ width: "100%" }}>
               <Box sx={{ width: "100%", py: 1 }}>{renderEditing}</Box>
 
-              <Stack
-                direction={"row"}
-                spacing={1}
-                justifyContent={"flex-end"}
-                my={1}
-              >
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  onClick={handleClear}
-                >
-                  Reset Selection
-                </Button>
-                <Button color="secondary" onClick={handleSave}>
-                  Save Selection and Collapse
-                </Button>
-              </Stack>
+              {!hideActions && (
+                <DemographicSaveButton onReset={onReset} onSave={onSave} />
+              )}
               <Divider />
             </Stack>
           )}
@@ -91,7 +73,8 @@ const DemographicRow = ({
             <IconButton
               size="small"
               aria-label={`Edit ${label}`}
-              onClick={handleEdit}
+              disabled={disabled}
+              onClick={onEditStart}
             >
               <EditOutlinedIcon fontSize="small" color="secondary" />
             </IconButton>
@@ -101,7 +84,7 @@ const DemographicRow = ({
               variant="text"
               size="small"
               color="secondary"
-              onClick={handleClear}
+              onClick={onClear}
             >
               Clear all
             </Button>
