@@ -33,11 +33,13 @@ const setLondon = () =>
 
 const Harness = ({
   editing = false,
+  locationAvailable = true,
   onSave = jest.fn(),
   onReset = jest.fn(),
   onClear = jest.fn(),
 }: {
   editing?: boolean;
+  locationAvailable?: boolean;
   onSave?: () => void;
   onReset?: () => void;
   onClear?: () => void;
@@ -50,6 +52,7 @@ const Harness = ({
     <FormProvider {...form}>
       <DemographicLocationSection
         editing={editing}
+        locationAvailable={locationAvailable}
         disabled={false}
         hideActions={false}
         onEditStart={() => {}}
@@ -102,6 +105,14 @@ describe("DemographicLocationSection", () => {
     render(<Harness editing />);
     expect(screen.getByTestId("geo-map-picker")).toBeInTheDocument();
     expect(screen.getByText(/drop a pin/i)).toBeInTheDocument();
+  });
+
+  it("explains that location is unavailable instead of showing the picker", () => {
+    render(<Harness editing locationAvailable={false} />);
+    expect(
+      screen.getByText(/location filtering is not available/i),
+    ).toBeInTheDocument();
+    expect(screen.queryByTestId("geo-map-picker")).not.toBeInTheDocument();
   });
 
   it("keeps the header plain while editing", () => {

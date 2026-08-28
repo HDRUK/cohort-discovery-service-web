@@ -18,6 +18,9 @@ export const demographicGuidance = (demographic: string): string =>
 export const locationGuidance =
   "Search for a place or click the map to drop a pin, then set a radius to match patients whose recorded location falls within that area. Leave blank to include all locations.";
 
+export const locationUnavailableGuidance =
+  "Location filtering is not available — the collections you have selected do not contain location data.";
+
 export const demographicOptionToConcept = (
   option: TermDirectoryEntry,
 ): Concept => ({
