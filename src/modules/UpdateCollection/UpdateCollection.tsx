@@ -41,11 +41,7 @@ import { useThreePane } from "@/providers/ThreePaneProvider";
 import { FieldConfigMap, useSaveChanges } from "@/hooks/useSaveChanges";
 import { useUserDataStore } from "@/hooks/userDataStore";
 import { useIsAdminSection } from "@/contexts/AdminSectionContext";
-import ToggleSynthetic from "@/components/ToggleSynthetic";
 import { getFrequencyModeKey } from "@/utils/frequency";
-import ToggleLocation from "@/components/ToggleLocation";
-import ToggleDeath from "@/components/ToggleDeath";
-import useFeatures from "@/hooks/useFeatures";
 
 export type UpdateCollectionProps = {
   collection: CollectionWithHosts;
