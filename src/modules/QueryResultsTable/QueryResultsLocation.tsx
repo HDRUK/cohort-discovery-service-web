@@ -22,7 +22,6 @@ interface QueryResultsLocationProps {
 
 const QueryResultsLocation = ({ location }: QueryResultsLocationProps) => (
   <Stack spacing={1} data-testid="query-results-location">
-    <Title title="Location" size="small" />
     <GeoMapReadOnly location={location} mapHeight={MAP_HEIGHT} />
   </Stack>
 );
