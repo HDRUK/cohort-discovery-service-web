@@ -49,6 +49,7 @@ const DemographicRow = ({
           title={label}
           size={"small"}
           subTitle={editing ? " " : children}
+          subTitleWrap
           flexShrink={0}
           wrapperSx={{ width: "100%", alignItems: "flex-start" }}
         >

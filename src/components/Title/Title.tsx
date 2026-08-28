@@ -11,6 +11,7 @@ export interface TitleProps extends Omit<BoxProps, "title"> {
   wrapperSx?: BoxProps;
   titleOverflow?: "ellipsis" | "scroll" | "wrap" | "visible";
   centerTitleContent?: boolean;
+  subTitleWrap?: boolean;
 }
 
 const Title = ({
@@ -23,6 +24,7 @@ const Title = ({
   wrapperSx,
   titleOverflow = "ellipsis",
   centerTitleContent = false,
+  subTitleWrap = false,
   ...rest
 }: TitleProps) => {
   const titleVariant =
@@ -68,12 +70,14 @@ const Title = ({
       sx={{
         display: "flex",
         overflow: "wrap",
+        ...(subTitleWrap && { minWidth: 0 }),
       }}
       {...wrapperSx}
     >
       <Box
         display="flex"
         alignItems={centerTitleContent ? "center" : "baseline"}
+        sx={subTitleWrap ? { width: "100%", minWidth: 0 } : undefined}
         {...rest}
       >
         <Typography
@@ -94,8 +98,13 @@ const Title = ({
           <Typography
             variant={subTitleVariant}
             component="span"
-            noWrap
-            sx={{ flexShrink: 0, mx: 1 }}
+            noWrap={!subTitleWrap}
+            sx={{
+              mx: 1,
+              ...(subTitleWrap
+                ? { flex: 1, minWidth: 0, whiteSpace: "normal" }
+                : { flexShrink: 0 }),
+            }}
           >
             {subTitle}
           </Typography>
