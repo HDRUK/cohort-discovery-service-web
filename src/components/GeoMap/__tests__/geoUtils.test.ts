@@ -1,12 +1,59 @@
 import { haversineMetres } from "../haversine";
 import { pointInPolygon } from "../pointInPolygon";
 import { formatRadius } from "../formatRadius";
+import { extractPostcode } from "../extractPostcode";
 
 describe("formatRadius", () => {
   it("formats metres as kilometres to one decimal place", () => {
     expect(formatRadius(50000)).toBe("50.0 km");
     expect(formatRadius(5000)).toBe("5.0 km");
     expect(formatRadius(1234)).toBe("1.2 km");
+  });
+});
+
+describe("extractPostcode", () => {
+  it("extracts the postcode from a realistic Nominatim display_name", () => {
+    expect(
+      extractPostcode(
+        "10 Downing Street, Westminster, London, Greater London, England, SW1A 2AA, United Kingdom",
+      ),
+    ).toBe("SW1A 2AA");
+  });
+
+  it("returns null when no postcode-shaped substring exists", () => {
+    expect(
+      extractPostcode("Buckingham Palace, London, England, United Kingdom"),
+    ).toBeNull();
+  });
+
+  it("matches a postcode at the start of the string", () => {
+    expect(extractPostcode("SW1A 2AA, Westminster, London")).toBe(
+      "SW1A 2AA",
+    );
+  });
+
+  it("matches a postcode at the end with no trailing comma", () => {
+    expect(extractPostcode("Greater London, England, SW1A 2AA")).toBe(
+      "SW1A 2AA",
+    );
+  });
+
+  it("is case-insensitive on input and upper-cases the output", () => {
+    expect(
+      extractPostcode("10 downing street, london, sw1a 2aa, united kingdom"),
+    ).toBe("SW1A 2AA");
+  });
+
+  it("normalises irregular spacing", () => {
+    expect(extractPostcode("England, SW1A2AA, United Kingdom")).toBe(
+      "SW1A 2AA",
+    );
+  });
+
+  it("prefers the last match when an earlier postcode-shaped substring exists", () => {
+    expect(
+      extractPostcode("AA1 1AA Business Park, Leeds, LS1 4DY, United Kingdom"),
+    ).toBe("LS1 4DY");
   });
 });
 

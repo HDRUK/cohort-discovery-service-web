@@ -16,7 +16,7 @@ import {
 } from "@/utils/rules";
 import { MAX_AGE_FILTER, MIN_AGE_FILTER } from "@/config/rules";
 import { UniqueIdentifier } from "@dnd-kit/core";
-import { formatRadius } from "@/components/GeoMap";
+import { extractPostcode, formatRadius } from "@/components/GeoMap";
 import { getDomainPhrase } from "./omop";
 
 type Piece = { verb?: string | null; text: string };
@@ -429,7 +429,9 @@ const formatLocationPhrase = (
 ): string | null => {
   if (!location) return null;
   const { lat, lon, radius, address } = location;
-  const place = address ?? `(${lat.toFixed(4)}, ${lon.toFixed(4)})`;
+  const place = address
+    ? (extractPostcode(address) ?? address)
+    : `(${lat.toFixed(4)}, ${lon.toFixed(4)})`;
   return `living within ${formatRadius(radius)} of ${place}`;
 };
 

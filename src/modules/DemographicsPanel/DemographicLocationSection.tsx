@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { Controller, useFormContext } from "react-hook-form";
 import { Box, Chip, Skeleton, Stack, Typography } from "@mui/material";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import { formatRadius } from "@/components/GeoMap";
+import { extractPostcode, formatRadius } from "@/components/GeoMap";
 import { locationGuidance } from "@/config/demographics";
 import { Demographics } from "@/types/rules";
 import DemographicRow, { DemographicRowActionProps } from "./DemographicRow";
@@ -24,6 +24,7 @@ const DemographicLocationSection = (props: DemographicRowActionProps) => {
 
   const summaryLabel = location
     ? `Within ${formatRadius(location.radius)} of ${
+        (location.address && extractPostcode(location.address)) ??
         location.address ??
         `(${location.lat.toFixed(4)}, ${location.lon.toFixed(4)})`
       }`
