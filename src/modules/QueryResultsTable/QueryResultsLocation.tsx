@@ -3,7 +3,6 @@
 import dynamic from "next/dynamic";
 import { Skeleton, Stack } from "@mui/material";
 import { GeoRadiusLocation } from "@/types/rules";
-import Title from "@/components/Title";
 
 const MAP_HEIGHT = 400;
 
@@ -22,7 +21,6 @@ interface QueryResultsLocationProps {
 
 const QueryResultsLocation = ({ location }: QueryResultsLocationProps) => (
   <Stack spacing={1} data-testid="query-results-location">
-    <Title title="Location" size="small" />
     <GeoMapReadOnly location={location} mapHeight={MAP_HEIGHT} />
   </Stack>
 );

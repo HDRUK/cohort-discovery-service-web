@@ -77,7 +77,6 @@ describe("QueryResultsTable", () => {
     });
 
     expect(screen.getByTestId("query-results-location")).toBeInTheDocument();
-    expect(screen.getByText("Location")).toBeInTheDocument();
     expect(screen.getByTestId("geo-map-read-only")).toHaveTextContent("London");
   });
 
