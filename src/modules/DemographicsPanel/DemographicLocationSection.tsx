@@ -38,7 +38,7 @@ const DemographicLocationSection = (props: DemographicRowActionProps) => {
         <Box
           sx={{ maxHeight: 450, overflowY: "auto", overflowX: "hidden", pr: 1 }}
         >
-          <Stack spacing={1} marginX={10}>
+          <Stack spacing={1}>
             <Controller
               name="location"
               control={control}
