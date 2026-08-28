@@ -14,10 +14,6 @@ import { useEffect, useMemo } from "react";
 import ErrorHeader from "@/components/ErrorHeader";
 import { useUserDataStore } from "@/hooks/userDataStore";
 import { useAdminDataStore } from "@/store/adminDataStore";
-import ToggleSynthetic from "@/components/ToggleSynthetic";
-import ToggleLocation from "@/components/ToggleLocation";
-import ToggleDeath from "@/components/ToggleDeath";
-import useFeatures from "@/hooks/useFeatures";
 
 interface CreateCollectionProps {
   onCancel?: () => void;
@@ -33,8 +29,6 @@ const CreateCollection = ({ onCancel }: CreateCollectionProps) => {
   const custodians = useUserDataStore((s) => s.custodians);
 
   const isAdmin = !currentCustodian;
-
-  const { queryBuilderUseLocation, queryBuilderUseDeath } = useFeatures();
 
   const notify = useNotify();
 
@@ -228,19 +222,6 @@ const CreateCollection = ({ onCancel }: CreateCollectionProps) => {
                 />
               )}
             />
-
-            <Stack direction={"row"}>
-              <ToggleSynthetic
-                label={"Collection type"}
-                disabled={!selectedHostId}
-              />
-              {queryBuilderUseLocation && (
-                <ToggleLocation disabled={!selectedHostId} />
-              )}
-              {queryBuilderUseDeath && (
-                <ToggleDeath disabled={!selectedHostId} />
-              )}
-            </Stack>
 
             {/* // component disabled anyway, it should not be shown
             <Controller
