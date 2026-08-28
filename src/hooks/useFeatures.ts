@@ -52,6 +52,7 @@ const useFeatures = () => {
           flags[FeatureName.QueryBuilderUseValueAsNumber],
         queryBuilderUseLocation: flags[FeatureName.QueryBuilderUseLocation],
         queryBuilderUseDeath: flags[FeatureName.QueryBuilderUseDeath],
+        queryBuilderUseRace: flags[FeatureName.QueryBuilderUseRace],
 
         queryBuilderUseDemographicRule:
           flags[FeatureName.QueryBuilderUseDemographicRule],

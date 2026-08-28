@@ -7,6 +7,8 @@ import {
   EMPTY_DEMOGRAPHICS,
   useQueryBuilderStore,
 } from "@/store/queryBuilderStore";
+import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
+import { FeatureFlag, FeatureName } from "@/types/features";
 import { MAX_AGE_FILTER } from "@/config/rules";
 import DemographicsPanel from "./DemographicsPanel";
 
@@ -138,6 +140,36 @@ describe("DemographicsPanel", () => {
       );
       expect(demographics()?.age).toEqual([30, MAX_AGE_FILTER]);
       expect(demographics()?.sex).toEqual([]);
+    });
+  });
+
+  describe("query-builder-use-race feature flag", () => {
+    beforeEach(() => {
+      store().setQueryBuilderJson(DEFAULT_QUERY);
+      store().setDemographics({ ...EMPTY_DEMOGRAPHICS, sex: [female] });
+    });
+
+    afterEach(() => {
+      useFeatureFlagsStore.setState({ flags: null });
+    });
+
+    it("shows the Race row by default", () => {
+      renderPanel();
+
+      expect(
+        screen.getByRole("button", { name: /edit race/i }),
+      ).toBeInTheDocument();
+    });
+
+    it("hides the Race row when the flag is disabled", () => {
+      useFeatureFlagsStore.setState({
+        flags: { [FeatureName.QueryBuilderUseRace]: false } as FeatureFlag,
+      });
+      renderPanel();
+
+      expect(
+        screen.queryByRole("button", { name: /edit race/i }),
+      ).not.toBeInTheDocument();
     });
   });
 });
