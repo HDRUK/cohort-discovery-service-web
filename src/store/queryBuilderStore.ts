@@ -65,6 +65,7 @@ export const EMPTY_DEMOGRAPHICS: Demographics = {
   sex: [],
   race: [],
   location: null,
+  death: [],
 };
 
 export interface QueryBuilderStoreState {

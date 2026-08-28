@@ -30,6 +30,7 @@ import getTermDirectory from "@/actions/termDirectory/getTermDirectory";
 import { OmopTableName } from "@/types/omop";
 import { useUserDataStore } from "@/hooks/userDataStore";
 import useFeatures from "@/hooks/useFeatures";
+import { useQueryBuilderStore } from "@/store/queryBuilderStore";
 
 const DemographicsPanel = ({
   initialExpand = true,
@@ -45,12 +46,14 @@ const DemographicsPanel = ({
     }));
   const user = useUserDataStore((s) => s.user);
   const userCollections = useUserDataStore((s) => s.userCollections);
-  const { queryBuilderUseLocation, queryBuilderUseRace } = useFeatures();
+  const { queryBuilderUseLocation, queryBuilderUseRace, queryBuilderUseDeath } =
+    useFeatures();
 
   const age = demographics?.age ?? null;
   const sex = demographics?.sex ?? [];
   const race = demographics?.race ?? [];
   const location = demographics?.location ?? null;
+  const death = demographics?.death ?? [];
 
   const [expanded, setExpanded] = useState(initialExpand);
 
@@ -174,6 +177,16 @@ const DemographicsPanel = ({
               {...propsFor("location")}
             />
           )}
+
+          {/* {queryBuilderUseDeath && (
+            <DemographicCheckboxSection
+              label="Death"
+              field="death"
+              options={["dead", "alive", "unknown"]}
+              selected={death}
+              {...propsFor("death")}
+            />
+          )} */}
 
           {allOpen && (
             <Stack direction="row" justifyContent="flex-end" sx={{ mt: 1 }}>

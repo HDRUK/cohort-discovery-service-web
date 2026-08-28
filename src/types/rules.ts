@@ -34,6 +34,7 @@ export interface Demographics {
   sex: Concept[];
   race: Concept[];
   location: GeoRadiusLocation | null;
+  death: string[];
 }
 
 type Node = {
