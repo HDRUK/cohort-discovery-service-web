@@ -44,7 +44,7 @@ const DemographicsPanel = ({
       selectedDatasets: qb.selectedDatasets,
     }));
   const user = useUserDataStore((s) => s.user);
-  const { queryBuilderUseLocation } = useFeatures();
+  const { queryBuilderUseLocation, queryBuilderUseRace } = useFeatures();
 
   const age = demographics?.age ?? null;
   const sex = demographics?.sex ?? [];
@@ -61,7 +61,7 @@ const DemographicsPanel = ({
   const summary = [
     formatAgeSummary(age),
     formatConceptCountSummary("Sex", sex),
-    formatConceptCountSummary("Race", race),
+    ...(queryBuilderUseRace ? [formatConceptCountSummary("Race", race)] : []),
     ...(queryBuilderUseLocation ? [formatLocationSummary(location)] : []),
   ].join(" · ");
 
@@ -150,13 +150,15 @@ const DemographicsPanel = ({
             {...propsFor("sex")}
           />
 
-          <DemographicCheckboxSection
-            label="Race"
-            field="race"
-            options={raceConcepts ?? []}
-            selected={race}
-            {...propsFor("race")}
-          />
+          {queryBuilderUseRace && (
+            <DemographicCheckboxSection
+              label="Race"
+              field="race"
+              options={raceConcepts ?? []}
+              selected={race}
+              {...propsFor("race")}
+            />
+          )}
 
           {queryBuilderUseLocation && (
             <DemographicLocationSection {...propsFor("location")} />
