@@ -11,7 +11,8 @@ const isDemographicsEmpty = (d?: Demographics) =>
   (d.age === null &&
     d.sex.length === 0 &&
     d.race.length === 0 &&
-    d.location === null);
+    d.location === null &&
+    d.death === null);
 
 const useDemographicFieldEditing = (
   demographics: Demographics | undefined,
@@ -21,9 +22,7 @@ const useDemographicFieldEditing = (
     defaultValues: demographics ?? EMPTY_DEMOGRAPHICS,
   });
 
-  const [activeField, setActiveField] = useState<DemographicField | null>(
-    null,
-  );
+  const [activeField, setActiveField] = useState<DemographicField | null>(null);
   const [allOpen, setAllOpen] = useState(() =>
     isDemographicsEmpty(demographics),
   );

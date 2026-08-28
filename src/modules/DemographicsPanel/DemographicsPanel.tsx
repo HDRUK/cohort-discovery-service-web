@@ -67,6 +67,7 @@ const DemographicsPanel = ({
     formatConceptCountSummary("Sex", sex),
     ...(queryBuilderUseRace ? [formatConceptCountSummary("Race", race)] : []),
     ...(queryBuilderUseLocation ? [formatLocationSummary(location)] : []),
+    // to do - add death
   ].join(" · ");
 
   const collectionPids = [...selectedDatasets].sort();
