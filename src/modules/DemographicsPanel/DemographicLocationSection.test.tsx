@@ -73,11 +73,28 @@ describe("DemographicLocationSection", () => {
     expect(screen.getByText("Any")).toBeInTheDocument();
   });
 
-  it("summarises a set location", () => {
+  it("summarises a set location, falling back to the full address when no postcode can be extracted", () => {
     setLondon();
     render(<Harness />);
     expect(
       screen.getByText("Within 50.0 km of London"),
+    ).toBeInTheDocument();
+  });
+
+  it("truncates the address to its postcode when the address contains one", () => {
+    store().setDemographics({
+      ...(store().queryBuilderJson.demographics ?? EMPTY_DEMOGRAPHICS),
+      location: {
+        lat: 51.5,
+        lon: -0.1,
+        radius: 50000,
+        address:
+          "10 Downing Street, Westminster, London, Greater London, England, SW1A 2AA, United Kingdom",
+      },
+    });
+    render(<Harness />);
+    expect(
+      screen.getByText("Within 50.0 km of SW1A 2AA"),
     ).toBeInTheDocument();
   });
 

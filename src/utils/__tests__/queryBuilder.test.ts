@@ -337,7 +337,26 @@ describe("queryToText — demographics", () => {
     ).toBe("People between 18 and 65");
   });
 
-  it("phrases a location with an address", () => {
+  it("phrases a location with an address, truncated to the postcode", () => {
+    expect(
+      queryToText(
+        demographicsOnly({
+          age: null,
+          sex: [],
+          race: [],
+          location: {
+            lat: 51.5,
+            lon: -0.1,
+            radius: 50000,
+            address:
+              "10 Downing Street, Westminster, London, Greater London, England, SW1A 2AA, United Kingdom",
+          },
+        }),
+      ),
+    ).toBe("People living within 50.0 km of SW1A 2AA");
+  });
+
+  it("falls back to the full address when no postcode can be extracted", () => {
     expect(
       queryToText(
         demographicsOnly({
@@ -379,11 +398,12 @@ describe("queryToText — demographics", () => {
             lat: 51.5,
             lon: -0.1,
             radius: 50000,
-            address: "London",
+            address:
+              "10 Downing Street, Westminster, London, Greater London, England, SW1A 2AA, United Kingdom",
           },
         }),
       ),
-    ).toBe("Males over 85 living within 50.0 km of London");
+    ).toBe("Males over 85 living within 50.0 km of SW1A 2AA");
   });
 
   it("folds demographics into the concept-rule text", () => {
