@@ -3,7 +3,6 @@
 import dynamic from "next/dynamic";
 import { Skeleton, Stack } from "@mui/material";
 import { GeoRadiusLocation } from "@/types/rules";
-import Title from "@/components/Title";
 
 const MAP_HEIGHT = 400;
 
