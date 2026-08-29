@@ -473,6 +473,7 @@ export interface CreateCollectionConfigPost {
 export interface Workgroup {
   id: number;
   name: string;
+  claim_value?: string;
   external_name?: string;
   users?: User[];
   collections?: Collection[];

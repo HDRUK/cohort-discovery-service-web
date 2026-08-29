@@ -9,12 +9,21 @@ import { useApplicationMode } from "@/providers/ApplicationModeProvider";
 
 const REDIRECT_URL = process?.env?.NEXT_PUBLIC_LOGIN_URL;
 
-const LoginClient = () => {
+interface LoginClientProps {
+  oidcEnabled: boolean;
+}
+
+const LoginClient = ({ oidcEnabled }: LoginClientProps) => {
   const { isStandalone } = useApplicationMode();
   const router = useRouter();
   const [showForm, setShowForm] = useState(false);
 
-  const onClick = () => {
+  const onClick = async () => {
+    if (oidcEnabled) {
+      router.push("/auth/signin/oidc?callbackUrl=%2F");
+      return;
+    }
+
     if (!isStandalone) {
       router.push(REDIRECT_URL || "");
       return;

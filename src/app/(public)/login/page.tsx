@@ -1,13 +1,15 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import LoginClient from "./components/LoginClient";
 import { Box } from "@mui/material";
-import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import TabsShell from "@/components/TabsShell";
+import { getAccessToken } from "@/lib/auth";
+import { isOidcEnabled } from "@/lib/oidc";
 export default async function LoginPage() {
-  if ((await cookies()).get(ACCESS_TOKEN_NAME)) {
+  if (await getAccessToken()) {
     redirect("/");
   }
+
+  const oidcEnabled = isOidcEnabled();
 
   const tabs = [
     {
@@ -24,7 +26,7 @@ export default async function LoginPage() {
             bgcolor: "",
           }}
         >
-          <LoginClient />
+          <LoginClient oidcEnabled={oidcEnabled} />
         </Box>
       ),
     },
