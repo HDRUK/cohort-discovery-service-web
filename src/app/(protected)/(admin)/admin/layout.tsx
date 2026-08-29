@@ -8,9 +8,12 @@ const ProtectedAdminPageLayout = async ({
 }: {
   children: React.ReactNode;
 }) => {
-  const { data: collectionHosts } = await getCollectionHosts();
-  const { data: collections } = await getCollections();
-  const { data: users } = await getUsersList();
+  const [{ data: collectionHosts }, { data: collections }, { data: users }] =
+    await Promise.all([
+      getCollectionHosts(),
+      getCollections(),
+      getUsersList(),
+    ]);
 
   return (
     <AdminSectionProvider
