@@ -54,32 +54,20 @@ const DemographicLocationSection = (props: DemographicRowActionProps) => {
           <Controller
             name="death"
             control={control}
-            render={({ field }) => {
-              console.log("field: ", field);
-
-              return (
-                <>
-                  <ToggleButtonGroup
-                    value={field.value}
-                    onChange={(_e, val) => {
-                      console.log(
-                        " ======EVENT=====",
-                        _e,
-                        "======VALUE=======",
-                        val,
-                      );
-                      field.onChange(val);
-                    }}
-                    aria-label="Death options"
-                  >
-                    {children}
-                  </ToggleButtonGroup>
-                  <Typography variant="body2" color="text.secondary">
-                    {note}
-                  </Typography>
-                </>
-              );
-            }}
+            render={({ field }) => (
+              <>
+                <ToggleButtonGroup
+                  value={field.value}
+                  onChange={(_e, val) => field.onChange(val)}
+                  aria-label="Death options"
+                >
+                  {children}
+                </ToggleButtonGroup>
+                <Typography variant="body2" color="text.secondary">
+                  {note}
+                </Typography>
+              </>
+            )}
           />
         </Box>
       }
