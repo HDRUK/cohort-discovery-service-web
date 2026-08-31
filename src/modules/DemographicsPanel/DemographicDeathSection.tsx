@@ -18,6 +18,29 @@ const DemographicLocationSection = (props: DemographicRowActionProps) => {
 
   const size = 24;
 
+  const boxSx = (field: { value: string }, deathState: string) => ({
+    width: "fit-content",
+    height: size,
+    minWidth: size,
+    minHeight: size,
+    borderRadius: size,
+    bgcolor: field.value === deathState ? "white" : "grey.400",
+    border: field.value === deathState ? 1 : 0,
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    px: 2,
+    zIndex: 1,
+    "& svg": {
+      transition: "transform 0.15s ease",
+    },
+
+    "&:hover svg": {
+      transform: "scale(1.15)",
+    },
+  });
+
   useQueryBuilderStore((qb) => {
     console.log(qb);
   });
@@ -68,31 +91,7 @@ const DemographicLocationSection = (props: DemographicRowActionProps) => {
                         onClick={(e) => {
                           field.onChange(e.currentTarget.innerText);
                         }}
-                        sx={{
-                          width: "fit-content",
-                          height: size,
-                          minWidth: size,
-                          minHeight: size,
-                          borderRadius: size,
-                          bgcolor:
-                            field.value === "Unknown/Alive"
-                              ? "white"
-                              : "grey.400",
-                          border: field.value === "Unknown/Alive" ? 1 : 0,
-                          cursor: "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          px: 2,
-                          zIndex: 1,
-                          "& svg": {
-                            transition: "transform 0.15s ease",
-                          },
-
-                          "&:hover svg": {
-                            transform: "scale(1.15)",
-                          },
-                        }}
+                        sx={boxSx(field, "Unknown/Alive")}
                       >
                         <Typography
                           variant="body2"
@@ -108,31 +107,7 @@ const DemographicLocationSection = (props: DemographicRowActionProps) => {
                         onClick={(e) =>
                           field.onChange(e.currentTarget.innerText)
                         }
-                        sx={{
-                          width: "fit-content",
-                          height: size,
-                          minWidth: size,
-                          minHeight: size,
-                          borderRadius: size,
-                          bgcolor:
-                            field.value === "Death recorded"
-                              ? "white"
-                              : "grey.400",
-                          border: field.value === "Death recorded" ? 1 : 0,
-                          cursor: "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          px: 2,
-                          zIndex: 1,
-                          "& svg": {
-                            transition: "transform 0.15s ease",
-                          },
-
-                          "&:hover svg": {
-                            transform: "scale(1.15)",
-                          },
-                        }}
+                        sx={boxSx(field, "Death recorded")}
                       >
                         <Typography
                           variant="body2"
