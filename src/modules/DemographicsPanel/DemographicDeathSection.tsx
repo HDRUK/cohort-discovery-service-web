@@ -18,7 +18,7 @@ const DemographicLocationSection = (props: DemographicRowActionProps) => {
 
   const size = 24;
 
-  const boxSx = (field: { value: string }, deathState: string) => ({
+  const boxSx = (field: { value: string | null }, deathState: string) => ({
     width: "fit-content",
     height: size,
     minWidth: size,
