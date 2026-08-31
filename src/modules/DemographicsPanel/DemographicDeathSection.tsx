@@ -6,12 +6,7 @@ import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { demographicGuidance } from "@/config/demographics";
 import { Demographics } from "@/types/rules";
 import DemographicRow, { DemographicRowActionProps } from "./DemographicRow";
-
-import * as React from "react";
-import ToggleButton from "@mui/material/ToggleButton";
-import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import { useQueryBuilderStore } from "@/store/queryBuilderStore";
-import { useState } from "react";
 
 const DemographicLocationSection = (props: DemographicRowActionProps) => {
   const { control } = useFormContext<Demographics>();
@@ -19,26 +14,7 @@ const DemographicLocationSection = (props: DemographicRowActionProps) => {
     death: qb.queryBuilderJson.demographics?.death ?? null,
   }));
 
-  const [active, setActive] = useState(false);
-
-  const { location } = useQueryBuilder((qb) => ({
-    location: qb.queryBuilderJson.demographics?.location ?? null,
-  }));
-
   const note = demographicGuidance("death");
-
-  const children = [
-    <ToggleButton value="Unknown/Alive" key="Unknown/Alive">
-      <Typography variant="body2" color="text.secondary">
-        Unknown/Alive
-      </Typography>
-    </ToggleButton>,
-    <ToggleButton value="Death recorded" key="Death recorded">
-      <Typography variant="body2" color="text.secondary">
-        Death recorded
-      </Typography>
-    </ToggleButton>,
-  ];
 
   const size = 24;
 
@@ -169,6 +145,13 @@ const DemographicLocationSection = (props: DemographicRowActionProps) => {
                       </Box>
                     </Stack>
                   </Box>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mt: 1 }}
+                  >
+                    {note}
+                  </Typography>
                 </>
               );
             }}
