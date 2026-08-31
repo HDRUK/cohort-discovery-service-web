@@ -25,12 +25,12 @@ const DemographicLocationSection = (props: DemographicRowActionProps) => {
   const note = demographicGuidance("death");
 
   const children = [
-    <ToggleButton value="unknown/alive" key="unknown/alive">
+    <ToggleButton value="Unknown/Alive" key="Unknown/Alive">
       <Typography variant="body2" color="text.secondary">
         Unknown/Alive
       </Typography>
     </ToggleButton>,
-    <ToggleButton value="death_recorded" key="death_recorded">
+    <ToggleButton value="Death recorded" key="Death recorded">
       <Typography variant="body2" color="text.secondary">
         Death recorded
       </Typography>
@@ -40,7 +40,7 @@ const DemographicLocationSection = (props: DemographicRowActionProps) => {
   useQueryBuilderStore((qb) => {
     console.log(qb);
   });
-  console.log("control: ", control);
+  console.log("death from qb: ", death);
 
   return (
     <DemographicRow
@@ -72,7 +72,11 @@ const DemographicLocationSection = (props: DemographicRowActionProps) => {
         </Box>
       }
     >
-      <Chip variant="outlined" sx={{ bgcolor: "white" }} label={"test"} />
+      <Chip
+        variant="outlined"
+        sx={{ bgcolor: "white" }}
+        label={death ?? "Any"}
+      />
     </DemographicRow>
   );
 };
