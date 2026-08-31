@@ -53,7 +53,7 @@ const DemographicsPanel = ({
   const sex = demographics?.sex ?? [];
   const race = demographics?.race ?? [];
   const location = demographics?.location ?? null;
-  const death = demographics?.death ?? [];
+  const death = demographics?.death ?? null;
 
   const [expanded, setExpanded] = useState(initialExpand);
 
