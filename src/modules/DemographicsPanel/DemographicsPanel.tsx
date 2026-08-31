@@ -31,6 +31,7 @@ import { OmopTableName } from "@/types/omop";
 import { useUserDataStore } from "@/hooks/userDataStore";
 import useFeatures from "@/hooks/useFeatures";
 import { useQueryBuilderStore } from "@/store/queryBuilderStore";
+import DemographicDeathSection from "./DemographicDeathSection";
 
 const DemographicsPanel = ({
   initialExpand = true,
@@ -179,15 +180,9 @@ const DemographicsPanel = ({
             />
           )}
 
-          {/* {queryBuilderUseDeath && (
-            <DemographicCheckboxSection
-              label="Death"
-              field="death"
-              options={["dead", "alive", "unknown"]}
-              selected={death}
-              {...propsFor("death")}
-            />
-          )} */}
+          {queryBuilderUseDeath && (
+            <DemographicDeathSection {...propsFor("death")} />
+          )}
 
           {allOpen && (
             <Stack direction="row" justifyContent="flex-end" sx={{ mt: 1 }}>
