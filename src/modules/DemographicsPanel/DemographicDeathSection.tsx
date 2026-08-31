@@ -60,6 +60,7 @@ const DemographicLocationSection = (props: DemographicRowActionProps) => {
                   value={field.value}
                   onChange={(_e, val) => field.onChange(val)}
                   aria-label="Death options"
+                  exclusive
                 >
                   {children}
                 </ToggleButtonGroup>
