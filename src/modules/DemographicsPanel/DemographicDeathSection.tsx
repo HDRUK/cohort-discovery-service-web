@@ -7,6 +7,7 @@ import { demographicGuidance } from "@/config/demographics";
 import { Demographics } from "@/types/rules";
 import DemographicRow, { DemographicRowActionProps } from "./DemographicRow";
 import { useQueryBuilderStore } from "@/store/queryBuilderStore";
+import { deathEnum } from "@/types/rules";
 
 const DemographicLocationSection = (props: DemographicRowActionProps) => {
   const { control } = useFormContext<Demographics>();
@@ -89,33 +90,37 @@ const DemographicLocationSection = (props: DemographicRowActionProps) => {
                       <Box
                         data-testid="toggle-action-off"
                         onClick={(e) => {
-                          field.onChange(e.currentTarget.innerText);
+                          field.onChange(deathEnum.UNKNOWN_OR_ALIVE);
                         }}
-                        sx={boxSx(field, "Unknown/Alive")}
+                        sx={boxSx(field, deathEnum.UNKNOWN_OR_ALIVE)}
                       >
                         <Typography
                           variant="body2"
                           color={
-                            field.value === "Unknown/Alive" ? "green" : "white"
+                            field.value === deathEnum.UNKNOWN_OR_ALIVE
+                              ? "green"
+                              : "white"
                           }
                         >
-                          Unknown/Alive
+                          {deathEnum.UNKNOWN_OR_ALIVE}
                         </Typography>
                       </Box>
                       <Box
                         data-testid="toggle-action-on"
                         onClick={(e) =>
-                          field.onChange(e.currentTarget.innerText)
+                          field.onChange(deathEnum.DEATH_RECORDED)
                         }
-                        sx={boxSx(field, "Death recorded")}
+                        sx={boxSx(field, deathEnum.DEATH_RECORDED)}
                       >
                         <Typography
                           variant="body2"
                           color={
-                            field.value === "Death recorded" ? "green" : "white"
+                            field.value === deathEnum.DEATH_RECORDED
+                              ? "green"
+                              : "white"
                           }
                         >
-                          Death recorded
+                          {deathEnum.DEATH_RECORDED}
                         </Typography>
                       </Box>
                     </Stack>

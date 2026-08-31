@@ -29,6 +29,11 @@ export type GeoRadiusLocation = {
   address?: string;
 };
 
+export enum deathEnum {
+  UNKNOWN_OR_ALIVE = "Unknown/Alive",
+  DEATH_RECORDED = "Death recorded",
+}
+
 export interface Demographics {
   age: [number, number] | null;
   sex: Concept[];
