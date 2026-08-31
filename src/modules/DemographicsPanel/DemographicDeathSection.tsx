@@ -25,12 +25,12 @@ const DemographicLocationSection = (props: DemographicRowActionProps) => {
   const note = demographicGuidance("death");
 
   const children = [
-    <ToggleButton value="left" key="left">
+    <ToggleButton value="unknown/alive" key="unknown/alive">
       <Typography variant="body2" color="text.secondary">
         Unknown/Alive
       </Typography>
     </ToggleButton>,
-    <ToggleButton value="center" key="center">
+    <ToggleButton value="death_recorded" key="death_recorded">
       <Typography variant="body2" color="text.secondary">
         Death recorded
       </Typography>
@@ -61,7 +61,15 @@ const DemographicLocationSection = (props: DemographicRowActionProps) => {
                 <>
                   <ToggleButtonGroup
                     value={field.value}
-                    onChange={field.onChange}
+                    onChange={(_e, val) => {
+                      console.log(
+                        " ======EVENT=====",
+                        _e,
+                        "======VALUE=======",
+                        val,
+                      );
+                      field.onChange(val);
+                    }}
                     aria-label="Death options"
                   >
                     {children}
