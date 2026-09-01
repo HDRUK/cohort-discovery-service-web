@@ -1,7 +1,7 @@
 "use client";
 
 import { Controller, useFormContext } from "react-hook-form";
-import { Box, Chip, Skeleton, Stack, Typography } from "@mui/material";
+import { Box, Chip, Stack, Typography } from "@mui/material";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { demographicGuidance } from "@/config/demographics";
 import { Demographics } from "@/types/rules";
@@ -47,11 +47,6 @@ const DemographicLocationSection = (props: DemographicRowActionProps) => {
     },
   });
 
-  useQueryBuilderStore((qb) => {
-    console.log(qb);
-  });
-  console.log("death from qb: ", death);
-
   return (
     <DemographicRow
       label="Death"
@@ -66,8 +61,6 @@ const DemographicLocationSection = (props: DemographicRowActionProps) => {
             name="death"
             control={control}
             render={({ field }) => {
-              console.log("death field: ", field);
-
               return (
                 <>
                   <Box
@@ -95,7 +88,7 @@ const DemographicLocationSection = (props: DemographicRowActionProps) => {
                     <Stack direction={"row"} gap={0.3}>
                       <Box
                         data-testid="toggle-action-off"
-                        onClick={(e) => {
+                        onClick={() => {
                           field.onChange(deathEnum.UNKNOWN_OR_ALIVE);
                         }}
                         sx={boxSx(field, deathEnum.UNKNOWN_OR_ALIVE)}
@@ -113,9 +106,7 @@ const DemographicLocationSection = (props: DemographicRowActionProps) => {
                       </Box>
                       <Box
                         data-testid="toggle-action-on"
-                        onClick={(e) =>
-                          field.onChange(deathEnum.DEATH_RECORDED)
-                        }
+                        onClick={() => field.onChange(deathEnum.DEATH_RECORDED)}
                         sx={boxSx(field, deathEnum.DEATH_RECORDED)}
                       >
                         <Typography

@@ -31,7 +31,6 @@ import getTermDirectory from "@/actions/termDirectory/getTermDirectory";
 import { OmopTableName } from "@/types/omop";
 import { useUserDataStore } from "@/hooks/userDataStore";
 import useFeatures from "@/hooks/useFeatures";
-import { useQueryBuilderStore } from "@/store/queryBuilderStore";
 import DemographicDeathSection from "./DemographicDeathSection";
 
 const DemographicsPanel = ({
