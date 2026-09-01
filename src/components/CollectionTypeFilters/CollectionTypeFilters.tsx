@@ -1,6 +1,6 @@
 "use client";
 
-import { FormControlLabel, Stack, Typography } from "@mui/material";
+import { FormControlLabel, Stack } from "@mui/material";
 import { useCallback, useMemo } from "react";
 import { Collection } from "@/types/api";
 import { useUserDataStore } from "@/hooks/userDataStore";
