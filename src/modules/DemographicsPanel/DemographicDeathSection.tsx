@@ -10,7 +10,7 @@ import { useQueryBuilderStore } from "@/store/queryBuilderStore";
 import { deathEnum } from "@/types/rules";
 
 const DemographicLocationSection = (props: DemographicRowActionProps) => {
-  const { control } = useFormContext<Demographics>();
+  const { control, setValue } = useFormContext<Demographics>();
   const { death } = useQueryBuilder((qb) => ({
     death: qb.queryBuilderJson.demographics?.death ?? null,
   }));
@@ -18,6 +18,11 @@ const DemographicLocationSection = (props: DemographicRowActionProps) => {
   const note = demographicGuidance("death");
 
   const size = 24;
+
+  const handleEditStart = () => {
+    props.onEditStart();
+    if (!death) setValue("death", deathEnum.UNKNOWN_OR_ALIVE);
+  };
 
   const boxSx = (field: { value: string | null }, deathState: string) => ({
     width: "fit-content",
@@ -51,6 +56,7 @@ const DemographicLocationSection = (props: DemographicRowActionProps) => {
     <DemographicRow
       label="Death"
       {...props}
+      onEditStart={handleEditStart}
       showClear={death !== null}
       renderEditing={
         <Box
