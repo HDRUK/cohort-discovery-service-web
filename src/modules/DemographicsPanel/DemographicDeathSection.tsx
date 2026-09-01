@@ -6,7 +6,6 @@ import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { demographicGuidance } from "@/config/demographics";
 import { Demographics } from "@/types/rules";
 import DemographicRow, { DemographicRowActionProps } from "./DemographicRow";
-import { useQueryBuilderStore } from "@/store/queryBuilderStore";
 import { deathEnum } from "@/types/rules";
 
 const DemographicLocationSection = (props: DemographicRowActionProps) => {
