@@ -8,6 +8,8 @@
     "constrain-for-bunny-v1": true,
     "query-builder-allow-nested-groups": true,
     "flatten-nested-groups": true,
+    "query-builder-use-location": true,
+    "query-builder-use-death": true,
     "query-nlp": false,
     "in-app-messenger": false,
     "integrated-sync-workgroups-every-request": false,

@@ -2,7 +2,6 @@ import "@testing-library/jest-dom";
 import { render, screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import getCollections from "@/actions/collection/getCollections";
-import { getMockCollections } from "@/actions/collection/__mocks__/getCollections";
 import SelectDatasets from "./SelectDatasets";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 
@@ -98,82 +97,7 @@ describe("SelectDatasets", () => {
     expect(matches).not.toHaveLength(0);
   });
 
-  it("selected synthetic datasets when toggle is clicked", async () => {
-    const mockCollections = getMockCollections(10, [1, 2, 3, 4]);
-    const syntheticPids = mockCollections
-      .filter((c) => c.is_synthetic)
-      .map((c) => c.pid);
-
-    const setSelectedDatasets = jest.fn();
-    const user = userEvent.setup();
-
-    render(
-      <MockCohortDiscoveryServiceStore
-        overrides={{
-          queryBuilder: {
-            openSelectDatasetsPanel: true,
-            selectedDatasets: [],
-            setSelectedDatasets,
-          },
-          user: {
-            userCollections: mockCollections,
-          },
-        }}
-      >
-        <SelectDatasets />
-      </MockCohortDiscoveryServiceStore>,
-    );
-
-    const toggle = screen.getByTestId("toggle-action-on");
-    await user.click(toggle);
-
-    expect(setSelectedDatasets).toHaveBeenCalledWith(
-      expect.arrayContaining(syntheticPids),
-    );
-    expect(setSelectedDatasets).toHaveBeenCalledTimes(1);
-    expect(setSelectedDatasets.mock.calls[0][0]).toHaveLength(
-      syntheticPids.length,
-    );
-  });
-
-  it("removes synthetic datasets when all synthetic are already selected", async () => {
-    const mockCollections = getMockCollections(10, [1, 2, 3, 4]);
-    const syntheticPids = mockCollections
-      .filter((c) => c.is_synthetic)
-      .map((c) => c.pid);
-
-    const setSelectedDatasets = jest.fn();
-
-    const user = userEvent.setup();
-
-    render(
-      <MockCohortDiscoveryServiceStore
-        overrides={{
-          queryBuilder: {
-            openSelectDatasetsPanel: true,
-            selectedDatasets: syntheticPids,
-            setSelectedDatasets,
-            hasSelectedSyntheticDatasets: syntheticPids.length > 0,
-          },
-          user: {
-            userCollections: mockCollections,
-          },
-        }}
-      >
-        <SelectDatasets />
-      </MockCohortDiscoveryServiceStore>,
-    );
-
-    expect(screen.getByText("Including")).toBeInTheDocument();
-    expect(screen.getByText("Synthetic Data Collections")).toBeInTheDocument();
-
-    const toggle = screen.getByTestId("toggle-action-on");
-    await user.click(toggle);
-
-    expect(setSelectedDatasets).toHaveBeenCalledWith([]);
-  });
-
-  it("shows excluding synthetic title when includeSynthetic is false", async () => {
+  it("renders the collection type filters", async () => {
     const collections = await getCollections();
 
     render(
@@ -181,6 +105,7 @@ describe("SelectDatasets", () => {
         overrides={{
           queryBuilder: {
             openSelectDatasetsPanel: true,
+            selectedDatasets: [],
           },
           user: {
             userCollections: collections.data,
@@ -191,8 +116,10 @@ describe("SelectDatasets", () => {
       </MockCohortDiscoveryServiceStore>,
     );
 
-    expect(screen.getByText("Excluding")).toBeInTheDocument();
-    expect(screen.getByText("Synthetic Data Collections")).toBeInTheDocument();
+    expect(screen.getByText("Collection Type")).toBeInTheDocument();
+    expect(
+      screen.queryByText("Synthetic Data Collections"),
+    ).not.toBeInTheDocument();
   });
 
   it("restores previous selection and closes on cancel", async () => {

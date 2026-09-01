@@ -9,7 +9,6 @@ import {
   Paper,
   Box,
   Button,
-  Stack,
   Accordion,
 } from "@mui/material";
 import { useCallback, useMemo, useState } from "react";
@@ -19,11 +18,9 @@ import SelectNetworkDatasets, {
 } from "../SelectNetworkDatasets";
 import RefreshButton from "../RefreshButton";
 import { TAG_COLLECTIONS } from "@/config/tags";
-import ToggleAction from "../ToggleAction";
-import CheckIcon from "@mui/icons-material/Check";
-import CloseIcon from "@mui/icons-material/Close";
 import { useUserDataStore } from "@/hooks/userDataStore";
 import SquareCheckbox from "../SquareCheckbox";
+import CollectionTypeFilters from "../CollectionTypeFilters";
 import { addPids, removePids } from "@/utils/collections";
 import SearchBox from "../SearchBox";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -32,9 +29,6 @@ const SelectDatasets = () => {
   const collections = useUserDataStore((s) => s.userCollections);
   const selectedDatasets = useQueryBuilder((qb) => qb.selectedDatasets);
   const setSelectedDatasets = useQueryBuilder((qb) => qb.setSelectedDatasets);
-  const hasSelectedSyntheticDatasets = useQueryBuilder(
-    (qb) => qb.hasSelectedSyntheticDatasets,
-  );
 
   const open = useQueryBuilder((qb) => qb.openSelectDatasetsPanel);
   const setOpen = useQueryBuilder((qb) => qb.setOpenSelectDatasetsPanel);
@@ -97,49 +91,17 @@ const SelectDatasets = () => {
 
   const allPids = useMemo(() => collections.map((c) => c.pid), [collections]);
 
-  const allSyntheticPids = useMemo(
-    () =>
-      collections
-        .filter((collection) => collection.is_synthetic)
-        .map((c) => c.pid),
-    [collections],
-  );
-
   const selectedSet = useMemo(
     () => new Set(selectedDatasets),
     [selectedDatasets],
   );
   const allPidSet = useMemo(() => new Set(allPids), [allPids]);
-  const allSyntheticPidSet = useMemo(
-    () => new Set(allSyntheticPids),
-    [allSyntheticPids],
-  );
 
   const nTotal = allPids.length;
   const nSelected = allPids.filter((pid) => selectedSet.has(pid)).length;
-  const nSyntheticSelected = allSyntheticPids.filter((pid) =>
-    selectedSet.has(pid),
-  ).length;
 
   const noDatasets = nSelected === 0;
   const allSelected = nTotal > 0 && nSelected === nTotal;
-  const allSyntheticSelected =
-    allSyntheticPids.length > 0 &&
-    nSyntheticSelected === allSyntheticPids.length;
-
-  const handleToggleIncludeSynthetic = useCallback(() => {
-    const next = allSyntheticSelected
-      ? removePids(selectedDatasets, allSyntheticPidSet)
-      : addPids(selectedDatasets, allSyntheticPids);
-
-    setSelectedDatasets(next);
-  }, [
-    allSyntheticSelected,
-    allSyntheticPidSet,
-    allSyntheticPids,
-    selectedDatasets,
-    setSelectedDatasets,
-  ]);
 
   const handleToggleAll = useCallback(() => {
     const next = allSelected
@@ -173,20 +135,7 @@ const SelectDatasets = () => {
           bgcolor: "white",
         }}
       >
-        <Stack direction="row" gap={1} padding={2}>
-          <ToggleAction
-            size={25}
-            active={hasSelectedSyntheticDatasets}
-            onToggle={handleToggleIncludeSynthetic}
-            activeIcon={CheckIcon}
-            inactiveIcon={CloseIcon}
-          />
-          <Title
-            title={hasSelectedSyntheticDatasets ? "Including" : "Excluding"}
-            subTitle={"Synthetic Data Collections"}
-            useSeparator={false}
-          />
-        </Stack>
+        <CollectionTypeFilters />
 
         <Accordion
           defaultExpanded

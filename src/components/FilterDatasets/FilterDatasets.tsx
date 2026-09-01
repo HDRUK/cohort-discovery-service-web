@@ -41,6 +41,7 @@ const FilterDatasets = () => {
           variant="error"
         >
           <Chip
+            data-testid="filter-datasets-chip"
             variant={noDatasets ? "outlined" : "filled"}
             disabled={disabled}
             onClick={() => {
