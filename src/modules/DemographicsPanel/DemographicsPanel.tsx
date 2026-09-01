@@ -24,6 +24,7 @@ import {
   formatAgeSummary,
   formatConceptCountSummary,
   formatLocationSummary,
+  formatDeathSummary,
 } from "./summary";
 import { useQuery } from "@tanstack/react-query";
 import getTermDirectory from "@/actions/termDirectory/getTermDirectory";
@@ -68,7 +69,7 @@ const DemographicsPanel = ({
     formatConceptCountSummary("Sex", sex),
     ...(queryBuilderUseRace ? [formatConceptCountSummary("Race", race)] : []),
     ...(queryBuilderUseLocation ? [formatLocationSummary(location)] : []),
-    // to do - add death
+    ...(queryBuilderUseDeath ? [formatDeathSummary(death)] : []),
   ].join(" · ");
 
   const collectionPids = [...selectedDatasets].sort();
