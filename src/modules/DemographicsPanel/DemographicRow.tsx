@@ -77,7 +77,10 @@ const DemographicRow = ({
               disabled={disabled}
               onClick={onEditStart}
             >
-              <EditOutlinedIcon fontSize="small" color="secondary" />
+              <EditOutlinedIcon
+                fontSize="small"
+                color={disabled ? "disabled" : "secondary"}
+              />
             </IconButton>
           )}
           {showClear && !editing && (

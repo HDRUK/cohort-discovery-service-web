@@ -44,6 +44,7 @@ const DemographicsPanel = ({
       selectedDatasets: qb.selectedDatasets,
     }));
   const user = useUserDataStore((s) => s.user);
+  const userCollections = useUserDataStore((s) => s.userCollections);
   const { queryBuilderUseLocation, queryBuilderUseRace } = useFeatures();
 
   const age = demographics?.age ?? null;
@@ -91,6 +92,13 @@ const DemographicsPanel = ({
       ),
     [personConcepts],
   );
+
+  const locationAvailable = useMemo(() => {
+    const selected = new Set(selectedDatasets);
+    return userCollections.some(
+      (c) => selected.has(c.pid) && c.location_enabled,
+    );
+  }, [userCollections, selectedDatasets]);
 
   return (
     <Box data-marquee-ignore="true">
@@ -161,7 +169,10 @@ const DemographicsPanel = ({
           )}
 
           {queryBuilderUseLocation && (
-            <DemographicLocationSection {...propsFor("location")} />
+            <DemographicLocationSection
+              locationAvailable={locationAvailable}
+              {...propsFor("location")}
+            />
           )}
 
           {allOpen && (

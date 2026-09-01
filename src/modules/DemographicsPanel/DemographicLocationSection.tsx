@@ -5,7 +5,10 @@ import { Controller, useFormContext } from "react-hook-form";
 import { Box, Chip, Skeleton, Stack, Typography } from "@mui/material";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { extractPostcode, formatRadius } from "@/components/GeoMap";
-import { locationGuidance } from "@/config/demographics";
+import {
+  locationGuidance,
+  locationUnavailableGuidance,
+} from "@/config/demographics";
 import { Demographics } from "@/types/rules";
 import DemographicRow, { DemographicRowActionProps } from "./DemographicRow";
 
@@ -16,7 +19,14 @@ const GeoMapPicker = dynamic(() => import("@/components/GeoMap/GeoMapPicker"), {
   loading: () => <Skeleton variant="rectangular" height={500} />,
 });
 
-const DemographicLocationSection = (props: DemographicRowActionProps) => {
+interface DemographicLocationSectionProps extends DemographicRowActionProps {
+  locationAvailable: boolean;
+}
+
+const DemographicLocationSection = ({
+  locationAvailable,
+  ...props
+}: DemographicLocationSectionProps) => {
   const { control } = useFormContext<Demographics>();
   const { location } = useQueryBuilder((qb) => ({
     location: qb.queryBuilderJson.demographics?.location ?? null,
@@ -36,26 +46,37 @@ const DemographicLocationSection = (props: DemographicRowActionProps) => {
       {...props}
       showClear={location !== null}
       renderEditing={
-        <Box
-          sx={{ maxHeight: 450, overflowY: "auto", overflowX: "hidden", pr: 1 }}
-        >
-          <Stack spacing={1}>
-            <Controller
-              name="location"
-              control={control}
-              render={({ field }) => (
-                <GeoMapPicker
-                  value={field.value}
-                  onChange={field.onChange}
-                  mapHeight={400}
-                />
-              )}
-            />
-            <Typography variant="body2" color="text.secondary">
-              {locationGuidance}
-            </Typography>
-          </Stack>
-        </Box>
+        !locationAvailable ? (
+          <Typography variant="body2" color="text.secondary">
+            {locationUnavailableGuidance}
+          </Typography>
+        ) : (
+          <Box
+            sx={{
+              maxHeight: 450,
+              overflowY: "auto",
+              overflowX: "hidden",
+              pr: 1,
+            }}
+          >
+            <Stack spacing={1}>
+              <Controller
+                name="location"
+                control={control}
+                render={({ field }) => (
+                  <GeoMapPicker
+                    value={field.value}
+                    onChange={field.onChange}
+                    mapHeight={400}
+                  />
+                )}
+              />
+              <Typography variant="body2" color="text.secondary">
+                {locationGuidance}
+              </Typography>
+            </Stack>
+          </Box>
+        )
       }
     >
       <Chip variant="outlined" sx={{ bgcolor: "white" }} label={summaryLabel} />

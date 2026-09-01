@@ -10,7 +10,22 @@ import {
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import { FeatureFlag, FeatureName } from "@/types/features";
 import { MAX_AGE_FILTER } from "@/config/rules";
+import { useUserDataStore } from "@/hooks/userDataStore";
+import { Collection } from "@/types/api";
+import { getMockCollection } from "@/actions/collection/__mocks__/getCollections";
 import DemographicsPanel from "./DemographicsPanel";
+
+// The real picker pulls in leaflet (touches `window` at import) — replace it
+// with a light stub and make next/dynamic return it synchronously.
+jest.mock("@/components/GeoMap/GeoMapPicker", () => ({
+  __esModule: true,
+  default: () => <div data-testid="geo-map-picker" />,
+}));
+
+jest.mock("next/dynamic", () => ({
+  __esModule: true,
+  default: () => jest.requireMock("@/components/GeoMap/GeoMapPicker").default,
+}));
 
 const store = () => useQueryBuilderStore.getState();
 const demographics = () => store().queryBuilderJson.demographics;
@@ -170,6 +185,80 @@ describe("DemographicsPanel", () => {
       expect(
         screen.queryByRole("button", { name: /edit race/i }),
       ).not.toBeInTheDocument();
+    });
+  });
+
+  describe("location availability", () => {
+    const withLocation = getMockCollection({
+      pid: "pid-with-location",
+      location_enabled: true,
+    });
+    const withoutLocation = getMockCollection({
+      pid: "pid-without-location",
+      location_enabled: false,
+    });
+
+    const setUp = (
+      userCollections: Collection[],
+      selectedDatasets: string[],
+    ) => {
+      useUserDataStore.setState({ userCollections });
+      store().setQueryBuilderJson(DEFAULT_QUERY);
+      store().setDemographics({ ...EMPTY_DEMOGRAPHICS, sex: [female] });
+      store().setSelectedDatasets(selectedDatasets);
+    };
+
+    beforeEach(() => {
+      useFeatureFlagsStore.setState({
+        flags: { [FeatureName.QueryBuilderUseLocation]: true } as FeatureFlag,
+      });
+    });
+
+    afterEach(() => {
+      useFeatureFlagsStore.setState({ flags: null });
+      useUserDataStore.setState({ userCollections: [] });
+    });
+
+    const openLocationRow = () =>
+      userEvent.click(screen.getByRole("button", { name: /edit location/i }));
+
+    it("shows the map picker when a selected collection has location enabled", async () => {
+      setUp(
+        [withLocation, withoutLocation],
+        [withLocation.pid, withoutLocation.pid],
+      );
+      renderPanel();
+
+      await openLocationRow();
+
+      expect(screen.getByTestId("geo-map-picker")).toBeInTheDocument();
+      expect(
+        screen.queryByText(/location filtering is not available/i),
+      ).not.toBeInTheDocument();
+    });
+
+    it("explains that location is unavailable when no collection has it enabled", async () => {
+      setUp([withoutLocation], [withoutLocation.pid]);
+      renderPanel();
+
+      await openLocationRow();
+
+      expect(
+        screen.getByText(/location filtering is not available/i),
+      ).toBeInTheDocument();
+      expect(screen.queryByTestId("geo-map-picker")).not.toBeInTheDocument();
+    });
+
+    it("ignores location-enabled collections that aren't selected", async () => {
+      setUp([withLocation, withoutLocation], [withoutLocation.pid]);
+      renderPanel();
+
+      await openLocationRow();
+
+      expect(
+        screen.getByText(/location filtering is not available/i),
+      ).toBeInTheDocument();
+      expect(screen.queryByTestId("geo-map-picker")).not.toBeInTheDocument();
     });
   });
 });
