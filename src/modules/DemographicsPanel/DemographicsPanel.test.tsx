@@ -77,7 +77,7 @@ describe("DemographicsPanel", () => {
       expect(demographics()?.age).toBeNull();
     });
 
-    it("commits every field at once and collapses on Save", async () => {
+    it("commits every field at once and collapses the panel on Save", async () => {
       renderPanel();
 
       await setAgeMin("20");
@@ -87,10 +87,7 @@ describe("DemographicsPanel", () => {
 
       expect(demographics()?.age).toEqual([20, MAX_AGE_FILTER]);
       expect(
-        screen.queryByRole("button", { name: /save selection and collapse/i }),
-      ).not.toBeInTheDocument();
-      expect(
-        screen.getByRole("button", { name: /edit age/i }),
+        screen.getByRole("button", { name: /expand demographics/i }),
       ).toBeInTheDocument();
     });
   });
@@ -139,6 +136,9 @@ describe("DemographicsPanel", () => {
 
       expect(demographics()?.age).toEqual([30, MAX_AGE_FILTER]);
       expect(demographics()?.sex).toEqual([female]);
+      expect(
+        screen.getByRole("button", { name: /expand demographics/i }),
+      ).toBeInTheDocument();
     });
 
     it("Clear all on a different row commits immediately and survives a later Save elsewhere", async () => {
