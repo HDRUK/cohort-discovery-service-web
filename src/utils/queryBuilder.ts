@@ -1,6 +1,7 @@
 import { Concept } from "@/types/api";
 import {
   ConceptOperator,
+  deathEnum,
   GeoRadiusLocation,
   RuleGroupType,
   RuleNodeType,
@@ -165,7 +166,9 @@ const queryRulesToText = (
     }
 
     if (isMultipleConcept(c)) {
-      const names = c.map((concept) => cleanDescription(concept.name)).join(" or ");
+      const names = c
+        .map((concept) => cleanDescription(concept.name))
+        .join(" or ");
       const verb = getVerb(c[0].category, exclude);
       return { verb, text: names, category: c[0].category };
     }
@@ -435,6 +438,18 @@ const formatLocationPhrase = (
   return `living within ${formatRadius(radius)} of ${place}`;
 };
 
+const formatDeathPhrase = (death: string | null): string | null => {
+  if (death === deathEnum.UNKNOWN_OR_ALIVE) {
+    return "with death status unknown/alive";
+  }
+
+  if (death === deathEnum.DEATH_RECORDED) {
+    return "with a death record";
+  }
+
+  return null;
+};
+
 /**
  * Builds a demographic subject noun-phrase for the query preview, e.g.
  * "Males over 85 living within 5.0 km of London". Returns null when none of
@@ -444,16 +459,19 @@ const formatDemographicSubject = (
   age: [number, number] | null,
   sex: Concept[],
   location: GeoRadiusLocation | null = null,
+  death: string | null = null,
 ): string | null => {
   const noun = formatSexNoun(sex);
   const agePhrase = formatAgePhrase(age);
   const locationPhrase = formatLocationPhrase(location);
+  const deathPhrase = formatDeathPhrase(death);
 
-  if (!noun && !agePhrase && !locationPhrase) return null;
+  if (!noun && !agePhrase && !locationPhrase && !deathPhrase) return null;
 
   const parts = [noun ?? PREVIEW_SUBJECT_NOUN];
   if (agePhrase) parts.push(agePhrase);
   if (locationPhrase) parts.push(locationPhrase);
+  if (deathPhrase) parts.push(deathPhrase);
   return parts.join(" ");
 };
 
@@ -461,7 +479,10 @@ const formatDemographicSubject = (
  * Splices a demographic subject into a preview sentence by replacing the
  * leading "People" noun (e.g. "People who ..." -> "Males over 85 who ...").
  */
-const applyDemographicSubject = (queryText: string, subject: string): string => {
+const applyDemographicSubject = (
+  queryText: string,
+  subject: string,
+): string => {
   if (queryText.length === 0) return subject;
   if (queryText.startsWith(`${PREVIEW_SUBJECT_NOUN} `)) {
     return `${subject}${queryText.slice(PREVIEW_SUBJECT_NOUN.length)}`;
@@ -493,6 +514,7 @@ const queryToText = (
         demographics.age,
         demographics.sex,
         demographics.location,
+        demographics.death,
       )
     : null;
   return subject ? applyDemographicSubject(queryText, subject) : queryText;
