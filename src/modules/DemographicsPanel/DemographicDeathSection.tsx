@@ -8,7 +8,7 @@ import { Demographics } from "@/types/rules";
 import DemographicRow, { DemographicRowActionProps } from "./DemographicRow";
 import { deathEnum } from "@/types/rules";
 
-const DemographicLocationSection = (props: DemographicRowActionProps) => {
+const DemographicDeathSection = (props: DemographicRowActionProps) => {
   const { control, setValue } = useFormContext<Demographics>();
   const { death } = useQueryBuilder((qb) => ({
     death: qb.queryBuilderJson.demographics?.death ?? null,
@@ -144,4 +144,4 @@ const DemographicLocationSection = (props: DemographicRowActionProps) => {
   );
 };
 
-export default DemographicLocationSection;
+export default DemographicDeathSection;
