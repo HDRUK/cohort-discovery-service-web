@@ -256,18 +256,21 @@ describe("stage 3 health check columns", () => {
     ]);
   });
 
-  it("shows the actual count and passes when the test passed", () => {
+  it("shows time since the last run, matching the other columns", () => {
     const row = health({}, [
       buildTest("test-a", "Basic cohort", [
         { pid: COLLECTION_PID, last_passed: true, count: 1234 },
       ]),
     ]);
-    expect(getCheck(row, regressionCheckId("test-a"))).toMatchObject({
+    const check = getCheck(row, regressionCheckId("test-a"));
+    expect(check).toMatchObject({
       level: "ok",
-      value: "1,234",
+      value: "1s",
       expected: 100,
       linked: true,
     });
+    // The count moves to the tooltip rather than disappearing.
+    expect(check?.detail).toContain("got 1,234");
   });
 
   it("fails and reports expected versus actual when the test failed", () => {

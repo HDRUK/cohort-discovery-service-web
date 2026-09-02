@@ -30,6 +30,9 @@ export const API_ROUTES = {
     `${API_URL}/custodians/${pid}/collection_hosts`,
   custodianCollections: (pid: string) =>
     `${API_URL}/custodians/${pid}/collections`,
+  collectionHealth: (id: string) => `${API_URL}/collections/${id}/health`,
+  collectionTaskHistory: (id: string) =>
+    `${API_URL}/collections/${id}/task-history`,
   adminCollections: `${API_URL}/admin/collections`,
   userCollections: `${API_URL}/user/collections`,
   collectionConfig: `${API_URL}/collection_config`,

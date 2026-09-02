@@ -1,15 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
 import AddIcon from "@mui/icons-material/Add";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import {
   Box,
   Button,
   Chip,
   CircularProgress,
-  IconButton,
   Stack,
   Tooltip,
   Typography,
@@ -21,18 +19,13 @@ import createRegressionTest from "@/actions/regressionTest/createRegressionTest"
 import getRegressionTests from "@/actions/regressionTest/getRegressionTests";
 import runRegressionTest from "@/actions/regressionTest/runRegressionTest";
 import updateRegressionTest from "@/actions/regressionTest/updateRegressionTest";
-import rerunDistributions from "@/actions/rerunDistributions";
+import SkeletonFull from "@/components/SkeletonFull";
 import SyntheticChip from "@/components/SyntheticChip";
 import Table from "@/components/Table";
-import { useConfirmBool } from "@/hooks/useConfirm";
 import { useTable } from "@/hooks/useTable";
 import useTaskPolling from "@/hooks/useTaskPolling";
-import {
-  CollectionWithHosts,
-  DistributionType,
-  Paginated,
-  RegressionTest,
-} from "@/types/api";
+import { CollectionWithHosts, Paginated, RegressionTest } from "@/types/api";
+import { getDatetime } from "@/utils/date";
 import AddHealthCheckDialog from "./AddHealthCheckDialog";
 import ExpectedValue from "./ExpectedValue";
 import {
@@ -45,9 +38,28 @@ import {
 import HealthDetailPanel from "./HealthDetailPanel";
 import HealthIndicator, { HealthIcon } from "./HealthIndicator";
 
-const REFRESH_INTERVAL = 15_000;
-const AGE_TICK_INTERVAL = 5_000;
 const COLLECTIONS_PER_PAGE = "500";
+const REFRESH_INTERVAL = 10_000;
+
+// Refetch on the interval and on demand only — window focus and reconnect
+// would otherwise refresh at unpredictable moments.
+const REFRESH_OPTIONS = {
+  refetchInterval: REFRESH_INTERVAL,
+  refetchOnWindowFocus: false,
+  refetchOnReconnect: false,
+} as const;
+
+// Stable reference, or useSyncExternalStore resubscribes on every render.
+const subscribeNoop = () => () => {};
+
+const STAGE_DIVIDER_SX = {
+  borderLeft: "2px solid",
+  borderLeftColor: "divider",
+} as const;
+
+const TOOLBAR_HEIGHT_PX = 32;
+const COUNT_CHIP_WIDTH_PX = 128;
+const ICON_SLOT_PX = 20;
 
 const QUERY_KEY_COLLECTIONS = ["collection-health", "collections"];
 const QUERY_KEY_REGRESSION = ["collection-health", "regression-tests"];
@@ -69,42 +81,65 @@ const OVERALL_COLOURS: Record<HealthLevel, "success" | "warning" | "error"> = {
 
 const CollectionHealth = ({
   initialCollections,
+  fetchedAt,
 }: {
   initialCollections: CollectionWithHosts[];
+  fetchedAt: number;
 }) => {
   const queryClient = useQueryClient();
-  const confirm = useConfirmBool();
 
-  const [now, setNow] = useState(() => Date.now());
+  // The table is derived from wall-clock ages, so server and client would
+  // disagree at hydration. Render it in the browser only.
+  const isClient = useSyncExternalStore(
+    subscribeNoop,
+    () => true,
+    () => false,
+  );
+
   const [runStates, setRunStates] = useState<Record<string, Set<string>>>({});
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  useEffect(() => {
-    const interval = setInterval(() => setNow(Date.now()), AGE_TICK_INTERVAL);
-    return () => clearInterval(interval);
-  }, []);
+  const {
+    data: collectionsResponse,
+    isFetching: isFetchingCollections,
+    dataUpdatedAt: collectionsUpdatedAt,
+  } = useQuery({
+    queryKey: QUERY_KEY_COLLECTIONS,
+    queryFn: () =>
+      getAdminCollections({
+        params: new URLSearchParams({ per_page: COLLECTIONS_PER_PAGE }),
+        cacheOptions: { useCache: false },
+      }),
+    initialData: {
+      message: "",
+      data: { data: initialCollections } as Paginated<CollectionWithHosts>,
+    },
+    // Stamp the seed data with the server's fetch time rather than letting
+    // React Query default it to Date.now() in the browser.
+    initialDataUpdatedAt: fetchedAt,
+    ...REFRESH_OPTIONS,
+  });
 
-  const { data: collectionsResponse, isFetching: isFetchingCollections } =
-    useQuery({
-      queryKey: QUERY_KEY_COLLECTIONS,
-      queryFn: () =>
-        getAdminCollections({
-          params: new URLSearchParams({ per_page: COLLECTIONS_PER_PAGE }),
-          cacheOptions: { useCache: false },
-        }),
-      refetchInterval: REFRESH_INTERVAL,
-      initialData: {
-        message: "",
-        data: { data: initialCollections } as Paginated<CollectionWithHosts>,
-      },
-    });
+  const {
+    data: regressionResponse,
+    isFetching: isFetchingRegression,
+    dataUpdatedAt: regressionUpdatedAt,
+  } = useQuery({
+    queryKey: QUERY_KEY_REGRESSION,
+    queryFn: () => getRegressionTests(),
+    ...REFRESH_OPTIONS,
+  });
 
-  const { data: regressionResponse, isFetching: isFetchingRegression } =
-    useQuery({
-      queryKey: QUERY_KEY_REGRESSION,
-      queryFn: () => getRegressionTests(),
-      refetchInterval: REFRESH_INTERVAL,
-    });
+  const isFetching = isFetchingCollections || isFetchingRegression;
+
+  // Ages are measured against the last fetch, not the wall clock, so a stale
+  // page cannot drift from green to red without new data to justify it.
+  const now = useMemo(
+    () =>
+      Math.max(collectionsUpdatedAt || 0, regressionUpdatedAt || 0) ||
+      fetchedAt,
+    [collectionsUpdatedAt, regressionUpdatedAt, fetchedAt],
+  );
 
   const collections = useMemo(
     () => collectionsResponse?.data?.data ?? [],
@@ -173,50 +208,26 @@ const CollectionHealth = ({
     [invalidate, tests],
   );
 
-  const handleRunChecks = useCallback(
-    async (row: CollectionHealthRow) => {
-      const confirmed = await confirm({
-        title: `Run checks for ${row.name}?`,
-        description: `This triggers a live concept scan and demographics scan on the collection host, plus ${row.regressionTestPids.length} health check(s) linked to this collection. These run against the custodian's real database.`,
-        confirmText: "Run checks",
-        confirmColor: "primary",
-        confirmVariant: "contained",
-        cancelText: "Cancel",
-      });
-
-      if (!confirmed) return;
-
-      const distributionRuns = [
-        DistributionType.GENERIC,
-        DistributionType.DEMOGRAPHICS,
-      ].map((queryType) =>
-        rerunDistributions(row.pid, { query_type: queryType }),
-      );
-
-      const regressionRuns = row.regressionTestPids.map((testPid) =>
-        runRegressionTest(testPid, row.pid),
-      );
-
-      const [distributionResults, regressionResults] = await Promise.all([
-        Promise.all(distributionRuns),
-        Promise.all(regressionRuns),
-      ]);
-
-      const taskPids = new Set<string>([
-        ...distributionResults.flatMap(
-          (result) => result.data?.tasks?.map((task) => task.pid) ?? [],
-        ),
-        ...regressionResults.flatMap((result) => result.data?.task_pids ?? []),
-      ]);
-
+  // No task pids means nothing was queued, so just refresh rather than showing
+  // a spinner that would never resolve.
+  const trackRun = useCallback(
+    (collectionPid: string, taskPids: Set<string>) => {
       if (taskPids.size === 0) {
         invalidate();
         return;
       }
 
-      setRunStates((previous) => ({ ...previous, [row.pid]: taskPids }));
+      setRunStates((previous) => ({ ...previous, [collectionPid]: taskPids }));
     },
-    [confirm, invalidate],
+    [invalidate],
+  );
+
+  const handleRunTest = useCallback(
+    async (testPid: string, collectionPid: string) => {
+      const result = await runRegressionTest(testPid, collectionPid);
+      trackRun(collectionPid, new Set(result.data?.task_pids ?? []));
+    },
+    [trackRun],
   );
 
   const checkColumn = useCallback(
@@ -312,6 +323,21 @@ const CollectionHealth = ({
         ),
       },
       {
+        id: "overall",
+        header: "Overall",
+        size: 130,
+        accessorFn: (row) => LEVEL_RANK[row.overall.level],
+        Cell: ({ row }) => (
+          <Chip
+            size="small"
+            variant="outlined"
+            color={OVERALL_COLOURS[row.original.overall.level]}
+            icon={<HealthIcon level={row.original.overall.level} />}
+            label={row.original.overall.label}
+          />
+        ),
+      },
+      {
         id: "stage_1",
         header: "Stage 1: Connectivity",
         columns: [
@@ -338,43 +364,23 @@ const CollectionHealth = ({
             } as MRT_ColumnDef<CollectionHealthRow>,
           ]
         : []),
-      {
-        id: "overall",
-        header: "Overall",
-        size: 130,
-        accessorFn: (row) => LEVEL_RANK[row.overall.level],
-        Cell: ({ row }) => (
-          <Chip
-            size="small"
-            variant="outlined"
-            color={OVERALL_COLOURS[row.original.overall.level]}
-            icon={<HealthIcon level={row.original.overall.level} />}
-            label={row.original.overall.label}
-          />
-        ),
-      },
-      {
-        id: "controls",
-        header: "",
-        size: 60,
-        enableSorting: false,
-        muiTableBodyCellProps: { sx: { whiteSpace: "nowrap" } },
-        Cell: ({ row }) => {
-          if (runStates[row.original.pid]) return <CircularProgress size={16} />;
-
-          return (
-            <Tooltip title="Run concept scan, demographics scan and linked health checks">
-              <IconButton
-                size="small"
-                onClick={() => handleRunChecks(row.original)}>
-                <PlayArrowIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          );
-        },
-      },
     ],
-    [checkColumn, handleRunChecks, regressionColumn, runStates, tests],
+    [checkColumn, regressionColumn, tests],
+  );
+
+  // Columns that begin a stage get a left border, so the three stage bands read
+  // as distinct blocks rather than one continuous run of icons.
+  const stageStartIds = useMemo(
+    () =>
+      new Set([
+        "stage_1",
+        "stage_2",
+        "stage_3",
+        "ping_a",
+        "cohort_query",
+        ...(tests.length ? [regressionCheckId(tests[0].pid)] : []),
+      ]),
+    [tests],
   );
 
   const table = useTable({
@@ -384,17 +390,42 @@ const CollectionHealth = ({
     enableRowSelection: false,
     enableSorting: true,
     enableExpanding: true,
+    // Honour the per-column `size` values so column widths stay put when a
+    // cell's text changes on refresh (e.g. "4s" to "never").
+    layoutMode: "grid",
     // Default ordering only — clicking a column header still re-sorts.
     initialState: {
       density: "compact",
       sorting: [{ id: "overall", desc: false }],
     },
+    // These overrides replace useTable's versions wholesale, so they must keep
+    // hiding MRT's built-in select column — nothing here uses row selection.
+    muiTableHeadCellProps: ({ column }) => ({
+      sx: {
+        backgroundColor: "table.main",
+        fontWeight: "bold",
+        ...(column.id === "mrt-row-select" && { display: "none" }),
+        ...(stageStartIds.has(column.id) ? STAGE_DIVIDER_SX : {}),
+      },
+    }),
+    muiTableBodyCellProps: ({ column }) => ({
+      sx: {
+        ...(column.id === "mrt-row-select" && { display: "none" }),
+        ...(stageStartIds.has(column.id) ? STAGE_DIVIDER_SX : {}),
+      },
+    }),
+    // Must always return an element: MRT calls this per row to decide whether
+    // that row's expand button is enabled, so returning null disables it.
+    // Laziness lives inside the panel instead, via isExpanded.
     renderDetailPanel: ({ row }) => (
       <HealthDetailPanel
         row={row.original}
+        isExpanded={row.getIsExpanded()}
+        isRunning={!!runStates[row.original.pid]}
         onUpdateExpected={(testPid, expected) =>
           handleUpdateExpected(testPid, expected, row.original.pid)
         }
+        onRunTest={(testPid) => handleRunTest(testPid, row.original.pid)}
       />
     ),
     state: { isLoading: !collectionsResponse && !regressionResponse },
@@ -412,20 +443,25 @@ const CollectionHealth = ({
     [rows],
   );
 
+  if (!isClient) return <SkeletonFull sx={{ minHeight: 400 }} />;
+
   return (
     <Box
       sx={{ display: "flex", flexDirection: "column", minHeight: 0, flex: 1 }}>
+      {/* Fixed heights and widths throughout: this bar must not reflow when a
+          count changes or a refresh starts, or the table below resizes. */}
       <Stack
         direction="row"
         spacing={2}
         alignItems="center"
-        sx={{ mb: 2, flexWrap: "wrap" }}>
+        sx={{ mb: 2, flexWrap: "nowrap", minHeight: TOOLBAR_HEIGHT_PX }}>
         <Chip
           size="small"
           color="success"
           variant="outlined"
           icon={<HealthIcon level="ok" />}
           label={`${counts.ok} live`}
+          sx={{ minWidth: COUNT_CHIP_WIDTH_PX, flexShrink: 0 }}
         />
         <Chip
           size="small"
@@ -433,6 +469,7 @@ const CollectionHealth = ({
           variant="outlined"
           icon={<HealthIcon level="warn" />}
           label={`${counts.warn} degraded`}
+          sx={{ minWidth: COUNT_CHIP_WIDTH_PX, flexShrink: 0 }}
         />
         <Chip
           size="small"
@@ -440,28 +477,49 @@ const CollectionHealth = ({
           variant="outlined"
           icon={<HealthIcon level="fail" />}
           label={`${counts.fail} failing`}
+          sx={{ minWidth: COUNT_CHIP_WIDTH_PX, flexShrink: 0 }}
         />
 
-        <Typography variant="caption" color="text.secondary">
-          Auto-refreshing every {REFRESH_INTERVAL / 1000}s. Counts are
-          obfuscated by BUNNY, so a result of 0 is not treated as a failure.
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          noWrap
+          suppressHydrationWarning
+          sx={{ flex: 1, minWidth: 0 }}>
+          Updated {getDatetime(new Date(now).toISOString())}, refreshing every{" "}
+          {REFRESH_INTERVAL / 1000}s. Counts are obfuscated by BUNNY, so a
+          result of 0 is not treated as a failure.
         </Typography>
 
-        <Stack direction="row" spacing={1} sx={{ ml: "auto" }}>
+        <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}>
           <Button
             size="small"
             variant="outlined"
             color="secondary"
-            startIcon={<RefreshIcon />}
-            disabled={isFetchingCollections || isFetchingRegression}
-            onClick={invalidate}>
+            startIcon={
+              <Box
+                sx={{
+                  width: ICON_SLOT_PX,
+                  height: ICON_SLOT_PX,
+                  display: "grid",
+                  placeItems: "center",
+                }}>
+                {isFetching ? (
+                  <CircularProgress size={16} color="inherit" />
+                ) : (
+                  <RefreshIcon sx={{ fontSize: ICON_SLOT_PX }} />
+                )}
+              </Box>
+            }
+            onClick={invalidate}
+            sx={{ minWidth: 116 }}>
             Refresh
           </Button>
           <Button
             size="small"
             variant="contained"
             color="secondary"
-            startIcon={<AddIcon />}
+            startIcon={<AddIcon sx={{ fontSize: ICON_SLOT_PX }} />}
             onClick={() => setDialogOpen(true)}>
             Add health check
           </Button>

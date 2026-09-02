@@ -151,6 +151,126 @@ export interface CollectionMetadata {
   threshold: string;
 }
 
+export type HealthBin = "minute" | "hour" | "day" | "week" | "month";
+
+export interface PingBin {
+  bin: string;
+  n: number;
+  minutes: number;
+  silent_minutes: number;
+  // n / minutes — the series to chart. Null only when minutes is 0, i.e. a bin
+  // wholly in the future.
+  per_minute: number | null;
+}
+
+export interface PingSummary {
+  last_ping_at: string | null;
+  pings: number;
+  per_minute: number | null;
+  minutes: number;
+  silent_minutes: number;
+  bins: number;
+  empty_bins: number;
+  longest_gap_bins: number;
+}
+
+export interface CollectionHealthSeries {
+  collection_id: number;
+  // Echo of the resolved bin width — a named unit, or a custom multiple like
+  // "10m" (HealthBin's fixed enum no longer covers every value the API accepts).
+  bin: string;
+  from: string;
+  to: string;
+  summary: { a: PingSummary; b: PingSummary };
+  series: { a: PingBin[]; b: PingBin[] };
+}
+
+/** Null throughout when no run settled in the window the stats cover. */
+export interface DurationStats {
+  runs_measured: number;
+  min: number | null;
+  avg: number | null;
+  p50: number | null;
+  p95: number | null;
+  max: number | null;
+}
+
+export interface TaskHistoryBin {
+  bin: string;
+  minutes: number;
+  // Tasks created in the bin, against runs that settled in it — the two differ
+  // whenever a task spans a bin boundary or is retried.
+  started: number;
+  finished: number;
+  succeeded: number;
+  failed: number;
+  // Runs in flight, averaged over the bin (overlap-minutes / bin minutes) and
+  // at its peak. Null only when minutes is 0, i.e. a bin wholly in the future.
+  concurrency_avg: number | null;
+  concurrency_max: number | null;
+  // Attributed by finished_at, so it covers the same runs as `finished`.
+  duration_ms: DurationStats;
+  queued_for_ms_avg: number | null;
+}
+
+export interface TaskHistorySummary {
+  tasks: number;
+  succeeded: number;
+  failed: number;
+  in_flight: number;
+  pending: number;
+  // Keyed by task type — "a" cohort queries, "b" distributions.
+  task_types: Record<string, number>;
+  attempts: { total: number; retried_tasks: number; max: number };
+  duration_ms: DurationStats;
+}
+
+export interface TaskHistoryRun {
+  attempt: number;
+  worker_id: string | null;
+  claimed_at: string | null;
+  started_at: string | null;
+  // Null for a run that never settled — a timeout leaves no end and no
+  // duration, so it has to be handled apart from the ones that finished.
+  finished_at: string | null;
+  duration_ms: number | null;
+  result_status: string | null;
+  error_class: string | null;
+  error_message: string | null;
+}
+
+export type TaskHistoryStatus =
+  | "succeeded"
+  | "failed"
+  | "in_flight"
+  | "pending";
+
+export interface TaskHistoryTask {
+  pid: string;
+  task_type: string;
+  status: TaskHistoryStatus;
+  attempts: number;
+  created_at: string;
+  attempted_at: string | null;
+  completed_at: string | null;
+  failed_at: string | null;
+  // Created to first claimed — queue latency, not execution time.
+  queued_for_ms: number | null;
+  // The attempt that settled the task, against every attempt summed.
+  duration_ms: number | null;
+  total_duration_ms: number | null;
+  query: { pid: string; name: string; query_type: string | null } | null;
+  runs: TaskHistoryRun[];
+}
+
+export interface CollectionTaskHistory {
+  collection_id: number;
+  from: string;
+  to: string;
+  summary: TaskHistorySummary;
+  tasks: Paginated<TaskHistoryTask>;
+}
+
 export interface Activity extends WithTimestamps {
   id: number;
   collection_id: number;

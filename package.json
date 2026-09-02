@@ -37,6 +37,7 @@
     "@mui/lab": "^7.0.0-beta.14",
     "@mui/material": "^7.2.0",
     "@mui/material-nextjs": "^7.2.0",
+    "@mui/x-charts": "^8.29.3",
     "@mui/x-date-pickers": "^8.18.0",
     "@next/mdx": "16.0.1",
     "@ngneat/falso": "^8.0.2",

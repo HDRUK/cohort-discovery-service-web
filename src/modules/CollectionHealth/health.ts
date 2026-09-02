@@ -219,6 +219,7 @@ const buildMetadataCheck = (
 export const buildRegressionCheck = (
   test: RegressionTest,
   collectionPid: string,
+  now: number = Date.now(),
 ): HealthCheck => {
   const base = {
     id: regressionCheckId(test.pid),
@@ -262,15 +263,11 @@ export const buildRegressionCheck = (
   return {
     ...base,
     level: link.last_passed ? "ok" : "fail",
-    value:
-      actual !== undefined && actual !== null
-        ? actual.toLocaleString()
-        : link.last_passed
-          ? "pass"
-          : "fail",
+    // Matches the other columns: how long ago it last ran, not the count.
+    value: formatAge(link.last_run_at, now),
     expected,
     linked: true,
-    detail: `Expected ${expected?.toLocaleString() ?? "not set"}, got ${actual?.toLocaleString() ?? "no result"}. Last run ${getDatetime(link.last_run_at ?? undefined)}. Passed ${link.pass_rate ?? 0}% of ${link.run_count} run(s).`,
+    detail: `Expected ${expected?.toLocaleString() ?? "not set"}, got ${actual?.toLocaleString() ?? "no result"}. Last run ${getDatetime(link.last_run_at ?? undefined)} (${formatAge(link.last_run_at, now)} ago). Passed ${link.pass_rate ?? 0}% of ${link.run_count} run(s).`,
   };
 };
 
@@ -296,7 +293,7 @@ export const buildCollectionHealth = (
   now: number = Date.now(),
 ): CollectionHealthRow => {
   const regressionChecks = tests.map((test) =>
-    buildRegressionCheck(test, collection.pid),
+    buildRegressionCheck(test, collection.pid, now),
   );
 
   const checks: HealthCheck[] = [
