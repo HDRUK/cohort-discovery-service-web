@@ -57,6 +57,7 @@ const DemographicsPanel = ({
   const { form, allOpen, save, propsFor } = useDemographicFieldEditing(
     demographics,
     setDemographics,
+    () => setExpanded(false),
   );
 
   const summary = [
