@@ -4,9 +4,8 @@ import { Controller, useFormContext } from "react-hook-form";
 import { Box, Chip, Stack, Typography } from "@mui/material";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { demographicGuidance } from "@/config/demographics";
-import { Demographics } from "@/types/rules";
+import { Demographics, deathEnum } from "@/types/rules";
 import DemographicRow, { DemographicRowActionProps } from "./DemographicRow";
-import { deathEnum } from "@/types/rules";
 
 const DemographicDeathSection = (props: DemographicRowActionProps) => {
   const { control, setValue } = useFormContext<Demographics>();
