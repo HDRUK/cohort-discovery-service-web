@@ -14,20 +14,15 @@ import GeoMapFrame from "./GeoMapFrame";
 import LSOABoundaries from "./LSOABoundaries";
 import RadiusCircle from "./RadiusCircle";
 import usePinIcon from "./usePinIcon";
+import { metersToSlider, sliderToMeters } from "./radiusScale";
 import {
   DEFAULT_MAP_CENTER,
   DEFAULT_MAP_ZOOM,
   DEFAULT_RADIUS,
   FLY_TO_ZOOM,
-  MAX_RADIUS,
-  MIN_RADIUS,
   PINNED_MAP_ZOOM,
 } from "@/config/map";
-
-const sliderToMeters = (v: number) =>
-  Math.round(MIN_RADIUS * Math.pow(MAX_RADIUS / MIN_RADIUS, v / 100));
-const metersToSlider = (m: number) =>
-  (Math.log(m / MIN_RADIUS) / Math.log(MAX_RADIUS / MIN_RADIUS)) * 100;
+import { useDefaults } from "@/providers/DefaultProvider";
 
 function FlyTo({ target }: { target: L.LatLngTuple | null }) {
   const map = useMap();
@@ -67,6 +62,7 @@ export default function GeoMapPicker({
   mapHeight = 500,
 }: GeoMapPickerProps) {
   const pinIcon = usePinIcon();
+  const { locationMinRadius } = useDefaults();
 
   const [position, setPosition] = useState<L.LatLngTuple | null>(
     value ? [value.lat, value.lon] : null,
@@ -186,8 +182,10 @@ export default function GeoMapPicker({
             Radius
           </Typography>
           <Slider
-            value={metersToSlider(radius)}
-            onChange={(_, v) => handleRadiusChange(sliderToMeters(v as number))}
+            value={metersToSlider(radius, locationMinRadius)}
+            onChange={(_, v) =>
+              handleRadiusChange(sliderToMeters(v as number, locationMinRadius))
+            }
             min={0}
             max={100}
             step={0.5}
