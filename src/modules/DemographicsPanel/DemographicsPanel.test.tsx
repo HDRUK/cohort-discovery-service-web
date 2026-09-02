@@ -110,7 +110,12 @@ describe("DemographicsPanel", () => {
       ).toBeInTheDocument();
     });
 
-    it("Reset Selection discards the draft without writing to the store", async () => {
+    it("Reset Selection clears the field, saves it, and keeps the row open", async () => {
+      store().setDemographics({
+        ...EMPTY_DEMOGRAPHICS,
+        sex: [female],
+        age: [20, MAX_AGE_FILTER],
+      });
       renderPanel();
 
       await userEvent.click(screen.getByRole("button", { name: /edit age/i }));
@@ -120,9 +125,21 @@ describe("DemographicsPanel", () => {
       );
 
       expect(demographics()?.age).toBeNull();
+      expect(demographics()?.sex).toEqual([female]);
       expect(
-        screen.getByRole("button", { name: /edit sex/i }),
-      ).not.toBeDisabled();
+        screen.getByRole("button", { name: /reset selection/i }),
+      ).toBeInTheDocument();
+    });
+
+    it("Reset Selection clears a saved Sex selection", async () => {
+      renderPanel();
+
+      await userEvent.click(screen.getByRole("button", { name: /edit sex/i }));
+      await userEvent.click(
+        screen.getByRole("button", { name: /reset selection/i }),
+      );
+
+      expect(demographics()?.sex).toEqual([]);
     });
 
     it("Save Selection and Collapse commits only the field that was edited", async () => {

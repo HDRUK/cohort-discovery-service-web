@@ -55,8 +55,8 @@ const useDemographicFieldEditing = (
         },
     onReset: () => {
       const current = demographics ?? EMPTY_DEMOGRAPHICS;
-      form.resetField(field, { defaultValue: current[field] });
-      setActiveField(null);
+      form.resetField(field, { defaultValue: EMPTY_DEMOGRAPHICS[field] });
+      setDemographics({ ...current, [field]: EMPTY_DEMOGRAPHICS[field] });
     },
     onClear: () => {
       const current = demographics ?? EMPTY_DEMOGRAPHICS;
