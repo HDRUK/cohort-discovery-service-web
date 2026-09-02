@@ -2,6 +2,7 @@
 
 import { createContext, useContext, ReactNode, useMemo } from "react";
 import * as defaults from "@/config/defaults";
+import { MIN_RADIUS } from "@/config/map";
 
 export const envInt = (raw: string | undefined, fallback: number) => {
   if (raw == null || raw.trim() === "") return fallback;
@@ -15,6 +16,7 @@ export type DefaultConfig = {
   searchPrefetch: number;
   searchWaitTime: number;
   searchSuggestionRotation: number;
+  locationMinRadius: number;
   serviceDeskUrl: string;
   serviceDeskSupportSuffix: string;
   serviceDeskReportBugSuffix: string;
@@ -37,6 +39,7 @@ export const DefaultProvider = ({
       searchPrefetch: defaults.DEFAULT_SEARCH_PREFETCH,
       searchWaitTime: defaults.DEFAULT_SEARCH_WAIT_TIME,
       searchSuggestionRotation: defaults.DEFAULT_SEARCH_SUGGESTION_ROTATION,
+      locationMinRadius: MIN_RADIUS,
       serviceDeskUrl: "",
       serviceDeskSupportSuffix: "",
       serviceDeskReportBugSuffix: "",
