@@ -1,5 +1,5 @@
 import { Concept } from "@/types/api";
-import { GeoRadiusLocation } from "@/types/rules";
+import { deathLabel, DeathStatus, GeoRadiusLocation } from "@/types/rules";
 import { formatRadius } from "@/components/GeoMap";
 
 export const formatAgeSummary = (age: [number, number] | null): string =>
@@ -12,8 +12,8 @@ export const formatLocationSummary = (
     ? `Location within ${formatRadius(location.radius)}`
     : "Location Any";
 
-export const formatDeathSummary = (death: string | null): string =>
-  death ?? "Death Any";
+export const formatDeathSummary = (death: DeathStatus | null): string =>
+  deathLabel(death) ?? "Death Any";
 
 export const formatConceptCountSummary = (
   label: string,

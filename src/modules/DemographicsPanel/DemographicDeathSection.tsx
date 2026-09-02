@@ -4,7 +4,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import { Box, Chip, Stack, Typography } from "@mui/material";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { demographicGuidance } from "@/config/demographics";
-import { Demographics, deathEnum } from "@/types/rules";
+import { Demographics, DeathStatus, deathLabel } from "@/types/rules";
 import DemographicRow, { DemographicRowActionProps } from "./DemographicRow";
 
 const DemographicDeathSection = (props: DemographicRowActionProps) => {
@@ -19,7 +19,7 @@ const DemographicDeathSection = (props: DemographicRowActionProps) => {
 
   const handleEditStart = () => {
     props.onEditStart();
-    if (!death) setValue("death", deathEnum.UNKNOWN_OR_ALIVE);
+    if (!death) setValue("death", DeathStatus.UNKNOWN_OR_ALIVE);
   };
 
   const boxSx = (field: { value: string | null }, deathState: string) => ({
@@ -87,35 +87,37 @@ const DemographicDeathSection = (props: DemographicRowActionProps) => {
                       <Box
                         data-testid="toggle-action-off"
                         onClick={() => {
-                          field.onChange(deathEnum.UNKNOWN_OR_ALIVE);
+                          field.onChange(DeathStatus.UNKNOWN_OR_ALIVE);
                         }}
-                        sx={boxSx(field, deathEnum.UNKNOWN_OR_ALIVE)}
+                        sx={boxSx(field, DeathStatus.UNKNOWN_OR_ALIVE)}
                       >
                         <Typography
                           variant="body2"
                           color={
-                            field.value === deathEnum.UNKNOWN_OR_ALIVE
+                            field.value === DeathStatus.UNKNOWN_OR_ALIVE
                               ? "green"
                               : "white"
                           }
                         >
-                          {deathEnum.UNKNOWN_OR_ALIVE}
+                          {deathLabel(DeathStatus.UNKNOWN_OR_ALIVE)}
                         </Typography>
                       </Box>
                       <Box
                         data-testid="toggle-action-on"
-                        onClick={() => field.onChange(deathEnum.DEATH_RECORDED)}
-                        sx={boxSx(field, deathEnum.DEATH_RECORDED)}
+                        onClick={() =>
+                          field.onChange(DeathStatus.DEATH_RECORDED)
+                        }
+                        sx={boxSx(field, DeathStatus.DEATH_RECORDED)}
                       >
                         <Typography
                           variant="body2"
                           color={
-                            field.value === deathEnum.DEATH_RECORDED
+                            field.value === DeathStatus.DEATH_RECORDED
                               ? "green"
                               : "white"
                           }
                         >
-                          {deathEnum.DEATH_RECORDED}
+                          {deathLabel(DeathStatus.DEATH_RECORDED)}
                         </Typography>
                       </Box>
                     </Stack>
@@ -137,7 +139,7 @@ const DemographicDeathSection = (props: DemographicRowActionProps) => {
       <Chip
         variant="outlined"
         sx={{ bgcolor: "white" }}
-        label={death ?? "Any"}
+        label={deathLabel(death) ?? "Any"}
       />
     </DemographicRow>
   );

@@ -1,7 +1,8 @@
 import { Concept } from "@/types/api";
 import {
   ConceptOperator,
-  deathEnum,
+  DeathStatus,
+  deathLabel,
   GeoRadiusLocation,
   RuleGroupType,
   RuleNodeType,
@@ -438,12 +439,12 @@ const formatLocationPhrase = (
   return `living within ${formatRadius(radius)} of ${place}`;
 };
 
-const formatDeathPhrase = (death: string | null): string | null => {
-  if (death === deathEnum.UNKNOWN_OR_ALIVE) {
+const formatDeathPhrase = (death: DeathStatus | null): string | null => {
+  if (death === DeathStatus.UNKNOWN_OR_ALIVE) {
     return "with death status unknown/alive";
   }
 
-  if (death === deathEnum.DEATH_RECORDED) {
+  if (death === DeathStatus.DEATH_RECORDED) {
     return "with a death record";
   }
 
@@ -459,7 +460,7 @@ const formatDemographicSubject = (
   age: [number, number] | null,
   sex: Concept[],
   location: GeoRadiusLocation | null = null,
-  death: string | null = null,
+  death: DeathStatus | null = null,
 ): string | null => {
   const noun = formatSexNoun(sex);
   const agePhrase = formatAgePhrase(age);
