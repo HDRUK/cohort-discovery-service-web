@@ -105,7 +105,7 @@ const DemographicDeathSection = ({
                     >
                       <Stack direction={"row"} gap={0.3}>
                         <Box
-                          data-testid="toggle-action-off"
+                          data-testid="toggle-1st-death-action"
                           onClick={() =>
                             field.onChange(
                               field.value === DeathStatus.UNKNOWN_OR_ALIVE
@@ -128,7 +128,7 @@ const DemographicDeathSection = ({
                           </Typography>
                         </Box>
                         <Box
-                          data-testid="toggle-action-on"
+                          data-testid="toggle-2nd-death-action"
                           onClick={() =>
                             field.onChange(
                               field.value === DeathStatus.DEATH_RECORDED
@@ -170,6 +170,7 @@ const DemographicDeathSection = ({
       <Chip
         variant="outlined"
         sx={{ bgcolor: "white" }}
+        data-testid="death-chip"
         label={deathLabel(death) ?? "Any"}
       />
     </DemographicRow>
