@@ -106,9 +106,13 @@ const DemographicDeathSection = ({
                       <Stack direction={"row"} gap={0.3}>
                         <Box
                           data-testid="toggle-action-off"
-                          onClick={() => {
-                            field.onChange(DeathStatus.UNKNOWN_OR_ALIVE);
-                          }}
+                          onClick={() =>
+                            field.onChange(
+                              field.value === DeathStatus.UNKNOWN_OR_ALIVE
+                                ? null
+                                : DeathStatus.UNKNOWN_OR_ALIVE,
+                            )
+                          }
                           sx={boxSx(field, DeathStatus.UNKNOWN_OR_ALIVE)}
                         >
                           <Typography
@@ -118,6 +122,7 @@ const DemographicDeathSection = ({
                                 ? "green"
                                 : "white"
                             }
+                            sx={{ userSelect: "none" }}
                           >
                             {deathLabel(DeathStatus.UNKNOWN_OR_ALIVE)}
                           </Typography>
@@ -125,7 +130,11 @@ const DemographicDeathSection = ({
                         <Box
                           data-testid="toggle-action-on"
                           onClick={() =>
-                            field.onChange(DeathStatus.DEATH_RECORDED)
+                            field.onChange(
+                              field.value === DeathStatus.DEATH_RECORDED
+                                ? null
+                                : DeathStatus.DEATH_RECORDED,
+                            )
                           }
                           sx={boxSx(field, DeathStatus.DEATH_RECORDED)}
                         >
@@ -136,6 +145,7 @@ const DemographicDeathSection = ({
                                 ? "green"
                                 : "white"
                             }
+                            sx={{ userSelect: "none" }}
                           >
                             {deathLabel(DeathStatus.DEATH_RECORDED)}
                           </Typography>
