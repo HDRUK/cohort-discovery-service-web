@@ -105,6 +105,11 @@ const DemographicsPanel = ({
     );
   }, [userCollections, selectedDatasets]);
 
+  const deathAvailable = useMemo(() => {
+    const selected = new Set(selectedDatasets);
+    return userCollections.some((c) => selected.has(c.pid) && c.death_enabled);
+  }, [userCollections, selectedDatasets]);
+
   return (
     <Box data-marquee-ignore="true">
       <Stack
@@ -181,7 +186,10 @@ const DemographicsPanel = ({
           )}
 
           {queryBuilderUseDeath && (
-            <DemographicDeathSection {...propsFor("death")} />
+            <DemographicDeathSection
+              deathAvailable={deathAvailable}
+              {...propsFor("death")}
+            />
           )}
 
           {allOpen && (

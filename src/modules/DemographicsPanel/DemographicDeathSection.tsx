@@ -3,11 +3,21 @@
 import { Controller, useFormContext } from "react-hook-form";
 import { Box, Chip, Stack, Typography } from "@mui/material";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import { demographicGuidance } from "@/config/demographics";
+import {
+  demographicGuidance,
+  demographicUnavailableGuidance,
+} from "@/config/demographics";
 import { Demographics, DeathStatus, deathLabel } from "@/types/rules";
 import DemographicRow, { DemographicRowActionProps } from "./DemographicRow";
 
-const DemographicDeathSection = (props: DemographicRowActionProps) => {
+interface DemographicDeathSectionProps extends DemographicRowActionProps {
+  deathAvailable: boolean;
+}
+
+const DemographicDeathSection = ({
+  deathAvailable,
+  ...props
+}: DemographicDeathSectionProps) => {
   const { control, setValue } = useFormContext<Demographics>();
   const { death } = useQueryBuilder((qb) => ({
     death: qb.queryBuilderJson.demographics?.death ?? null,
@@ -52,88 +62,99 @@ const DemographicDeathSection = (props: DemographicRowActionProps) => {
       onEditStart={handleEditStart}
       showClear={death !== null}
       renderEditing={
-        <Box
-          sx={{ maxHeight: 450, overflowY: "auto", overflowX: "hidden", pr: 1 }}
-        >
-          <Controller
-            name="death"
-            control={control}
-            render={({ field }) => {
-              return (
-                <>
-                  <Box
-                    sx={{
-                      position: "relative",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      width: "fit-content",
-                      maxWidth: "fit-content",
-
-                      "&::after": {
-                        content: '""',
-                        position: "absolute",
-                        left: size / 2,
-                        right: size / 2,
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        height: size * 0.5,
-                        bgcolor: "grey.500",
-                        zIndex: 0,
-                        pointerEvents: "none",
-                      },
-                    }}
-                  >
-                    <Stack direction={"row"} gap={0.3}>
-                      <Box
-                        data-testid="toggle-action-off"
-                        onClick={() => {
-                          field.onChange(DeathStatus.UNKNOWN_OR_ALIVE);
-                        }}
-                        sx={boxSx(field, DeathStatus.UNKNOWN_OR_ALIVE)}
-                      >
-                        <Typography
-                          variant="body2"
-                          color={
-                            field.value === DeathStatus.UNKNOWN_OR_ALIVE
-                              ? "green"
-                              : "white"
-                          }
-                        >
-                          {deathLabel(DeathStatus.UNKNOWN_OR_ALIVE)}
-                        </Typography>
-                      </Box>
-                      <Box
-                        data-testid="toggle-action-on"
-                        onClick={() =>
-                          field.onChange(DeathStatus.DEATH_RECORDED)
-                        }
-                        sx={boxSx(field, DeathStatus.DEATH_RECORDED)}
-                      >
-                        <Typography
-                          variant="body2"
-                          color={
-                            field.value === DeathStatus.DEATH_RECORDED
-                              ? "green"
-                              : "white"
-                          }
-                        >
-                          {deathLabel(DeathStatus.DEATH_RECORDED)}
-                        </Typography>
-                      </Box>
-                    </Stack>
-                  </Box>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ mt: 1 }}
-                  >
-                    {note}
-                  </Typography>
-                </>
-              );
+        !deathAvailable ? (
+          <Typography variant="body2" color="text.secondary">
+            {demographicUnavailableGuidance("death")}
+          </Typography>
+        ) : (
+          <Box
+            sx={{
+              maxHeight: 450,
+              overflowY: "auto",
+              overflowX: "hidden",
+              pr: 1,
             }}
-          />
-        </Box>
+          >
+            <Controller
+              name="death"
+              control={control}
+              render={({ field }) => {
+                return (
+                  <>
+                    <Box
+                      sx={{
+                        position: "relative",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        width: "fit-content",
+                        maxWidth: "fit-content",
+
+                        "&::after": {
+                          content: '""',
+                          position: "absolute",
+                          left: size / 2,
+                          right: size / 2,
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          height: size * 0.5,
+                          bgcolor: "grey.500",
+                          zIndex: 0,
+                          pointerEvents: "none",
+                        },
+                      }}
+                    >
+                      <Stack direction={"row"} gap={0.3}>
+                        <Box
+                          data-testid="toggle-action-off"
+                          onClick={() => {
+                            field.onChange(DeathStatus.UNKNOWN_OR_ALIVE);
+                          }}
+                          sx={boxSx(field, DeathStatus.UNKNOWN_OR_ALIVE)}
+                        >
+                          <Typography
+                            variant="body2"
+                            color={
+                              field.value === DeathStatus.UNKNOWN_OR_ALIVE
+                                ? "green"
+                                : "white"
+                            }
+                          >
+                            {deathLabel(DeathStatus.UNKNOWN_OR_ALIVE)}
+                          </Typography>
+                        </Box>
+                        <Box
+                          data-testid="toggle-action-on"
+                          onClick={() =>
+                            field.onChange(DeathStatus.DEATH_RECORDED)
+                          }
+                          sx={boxSx(field, DeathStatus.DEATH_RECORDED)}
+                        >
+                          <Typography
+                            variant="body2"
+                            color={
+                              field.value === DeathStatus.DEATH_RECORDED
+                                ? "green"
+                                : "white"
+                            }
+                          >
+                            {deathLabel(DeathStatus.DEATH_RECORDED)}
+                          </Typography>
+                        </Box>
+                      </Stack>
+                    </Box>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mt: 1 }}
+                    >
+                      {note}
+                    </Typography>
+                  </>
+                );
+              }}
+            />
+          </Box>
+        )
       }
     >
       <Chip

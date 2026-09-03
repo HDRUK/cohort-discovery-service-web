@@ -6,8 +6,8 @@ import { Box, Chip, Skeleton, Stack, Typography } from "@mui/material";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { extractPostcode, formatRadius } from "@/components/GeoMap";
 import {
+  demographicUnavailableGuidance,
   locationGuidance,
-  locationUnavailableGuidance,
 } from "@/config/demographics";
 import { Demographics } from "@/types/rules";
 import DemographicRow, { DemographicRowActionProps } from "./DemographicRow";
@@ -48,7 +48,7 @@ const DemographicLocationSection = ({
       renderEditing={
         !locationAvailable ? (
           <Typography variant="body2" color="text.secondary">
-            {locationUnavailableGuidance}
+            {demographicUnavailableGuidance("location")}
           </Typography>
         ) : (
           <Box
