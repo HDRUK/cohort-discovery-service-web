@@ -2,7 +2,6 @@ import { Concept } from "@/types/api";
 import {
   ConceptOperator,
   DeathStatus,
-  deathLabel,
   GeoRadiusLocation,
   RuleGroupType,
   RuleNodeType,
