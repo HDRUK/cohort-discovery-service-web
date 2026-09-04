@@ -278,4 +278,96 @@ describe("DemographicsPanel", () => {
       expect(screen.queryByTestId("geo-map-picker")).not.toBeInTheDocument();
     });
   });
+
+  describe("query-builder-use-death feature flag", () => {
+    beforeEach(() => {
+      store().setQueryBuilderJson(DEFAULT_QUERY);
+      store().setDemographics({ ...EMPTY_DEMOGRAPHICS, sex: [female] });
+    });
+
+    afterEach(() => {
+      useFeatureFlagsStore.setState({ flags: null });
+    });
+
+    it("hides the Death row by default", () => {
+      renderPanel();
+
+      expect(
+        screen.queryByRole("button", { name: /edit death/i }),
+      ).not.toBeInTheDocument();
+    });
+
+    it("shows the Death row when the flag is enabled", () => {
+      useFeatureFlagsStore.setState({
+        flags: { [FeatureName.QueryBuilderUseDeath]: true } as FeatureFlag,
+      });
+      renderPanel();
+
+      expect(
+        screen.getByRole("button", { name: /edit death/i }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  describe("death selection", () => {
+    const withDeath = getMockCollection({
+      pid: "pid-with-death",
+      death_enabled: true,
+    });
+
+    beforeEach(() => {
+      useUserDataStore.setState({ userCollections: [withDeath] });
+      store().setQueryBuilderJson(DEFAULT_QUERY);
+      store().addDemographics();
+      store().setSelectedDatasets([withDeath.pid]);
+      useFeatureFlagsStore.setState({
+        flags: { [FeatureName.QueryBuilderUseDeath]: true } as FeatureFlag,
+      });
+    });
+
+    afterEach(() => {
+      useFeatureFlagsStore.setState({ flags: null });
+      useUserDataStore.setState({ userCollections: [] });
+    });
+
+    it("doesn't write to the store until Save is clicked for Death", async () => {
+      renderPanel();
+
+      await userEvent.click(screen.getByTestId("toggle-1st-death-action"));
+
+      expect(demographics()?.death).toBeNull();
+    });
+
+    it("commits death field and collapses on Save", async () => {
+      renderPanel();
+
+      await userEvent.click(screen.getByTestId("toggle-1st-death-action"));
+
+      await userEvent.click(
+        screen.getByRole("button", { name: /save selection and collapse/i }),
+      );
+
+      expect(demographics()?.death).toEqual("unknown_or_alive");
+      expect(
+        screen.queryByRole("button", {
+          name: /save selection and collapse/i,
+        }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /edit death/i }),
+      ).toBeInTheDocument();
+    });
+
+    it("shows correct Death summary label after saving", async () => {
+      renderPanel();
+
+      await userEvent.click(screen.getByTestId("toggle-1st-death-action"));
+
+      await userEvent.click(
+        screen.getByRole("button", { name: /save selection and collapse/i }),
+      );
+
+      expect(screen.getByText(/Unknown\/Alive/i)).toBeInTheDocument();
+    });
+  });
 });

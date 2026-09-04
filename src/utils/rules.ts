@@ -448,7 +448,8 @@ export const hasDemographicsContent = (demographics?: Demographics): boolean =>
   (demographics.age !== null ||
     demographics.sex.length > 0 ||
     demographics.race.length > 0 ||
-    demographics.location !== null);
+    demographics.location !== null ||
+    demographics.death !== null);
 
 export function validateRuleTree(
   root: RuleGroupType,
