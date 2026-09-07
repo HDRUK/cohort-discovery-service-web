@@ -61,10 +61,17 @@ export default async function ProtectedLayout({
     redirect("/403?reason=missing-role");
   }
 
-  const { data: flags } = await getFeatureFlags();
-  const { data: custodians } = await getCustodians();
-  const { data: workgroups } = await getWorkgroups();
-  const { data: collections } = await getUserCollections();
+  const [
+    { data: flags },
+    { data: custodians },
+    { data: workgroups },
+    { data: collections },
+  ] = await Promise.all([
+    getFeatureFlags(),
+    getCustodians(),
+    getWorkgroups(),
+    getUserCollections(),
+  ]);
 
   const combinedUser = { ...me, token_user: user } as unknown as CombinedUser;
 

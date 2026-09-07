@@ -74,8 +74,16 @@ export const getMockCollection = (
   updated_at: "2025-01-01 00:00:00",
   demographics: getMockDemographics({ collection_id: 1, n: count }),
   custodian: getCustodian(),
-  latest_concept: getMockDistribution({ collection_id: 1, count }),
   is_synthetic: false,
+  host: [],
+  config: {
+    id: 1,
+    enabled: true,
+    frequency_mode: 1,
+    run_time_frequency: 1,
+    run_time_hour: 0,
+    run_time_minute: 0,
+  },
   ...rest,
 });
 
@@ -93,10 +101,6 @@ export const getMockCollections = (
       demographics: getMockDemographics({
         collection_id: id,
         n: id < 1 ? 1213 : 603,
-      }),
-      latest_concept: getMockDistribution({
-        collection_id: id,
-        count: id < 1 ? 1213 : 603,
       }),
     }),
   );
