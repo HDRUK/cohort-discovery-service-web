@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import {
   Alert,
@@ -9,53 +10,32 @@ import {
   Button,
   Chip,
   CircularProgress,
+  IconButton,
   Stack,
   Tooltip,
   Typography,
 } from "@mui/material";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { MRT_ColumnDef } from "material-react-table";
-import getAdminCollections from "@/actions/collection/getAdminCollections";
-import createRegressionTest from "@/actions/regressionTest/createRegressionTest";
-import getRegressionTests from "@/actions/regressionTest/getRegressionTests";
-import runRegressionTest from "@/actions/regressionTest/runRegressionTest";
-import updateRegressionTest from "@/actions/regressionTest/updateRegressionTest";
+import Link from "next/link";
+import { routes } from "@/config/routes";
 import SkeletonFull from "@/components/SkeletonFull";
 import SyntheticChip from "@/components/SyntheticChip";
 import ExpectedValue from "@/components/ExpectedValue";
 import Table from "@/components/Table";
 import useHasMounted from "@/hooks/useHasMounted";
 import { useTable } from "@/hooks/useTable";
-import useTaskPolling from "@/hooks/useTaskPolling";
-import { useNotify } from "@/providers/NotifyProvider";
-import { useDefaults } from "@/providers/DefaultProvider";
-import {
-  TAG_COLLECTION_HEALTH,
-  TAG_COLLECTIONS_ADMIN,
-  TAG_REGRESSION_TESTS,
-} from "@/config/tags";
-import { CollectionWithHosts, Paginated, RegressionTest } from "@/types/api";
+import { CollectionWithHosts, RegressionTest } from "@/types/api";
 import { getDatetime } from "@/utils/date";
 import AddHealthCheckDialog from "./AddHealthCheckDialog";
+import useCollectionHealth, { REFRESH_INTERVAL } from "./useCollectionHealth";
 import {
-  buildHealthRows,
   CollectionHealthRow,
   getCheck,
   HealthLevel,
-  HealthThresholds,
   regressionCheckId,
 } from "./health";
 import HealthDetailPanel from "./HealthDetailPanel";
 import HealthIndicator, { HealthIcon } from "./HealthIndicator";
-
-const COLLECTIONS_PER_PAGE = "500";
-const REFRESH_INTERVAL = 10_000;
-
-const REFRESH_OPTIONS = {
-  refetchInterval: REFRESH_INTERVAL,
-  refetchOnWindowFocus: false,
-  refetchOnReconnect: false,
-} as const;
 
 const STAGE_DIVIDER_SX = {
   borderLeft: "2px solid",
@@ -65,9 +45,6 @@ const STAGE_DIVIDER_SX = {
 const TOOLBAR_HEIGHT_PX = 32;
 const COUNT_CHIP_WIDTH_PX = 128;
 const ICON_SLOT_PX = 20;
-
-const QUERY_KEY_COLLECTIONS = [TAG_COLLECTION_HEALTH, TAG_COLLECTIONS_ADMIN];
-const QUERY_KEY_REGRESSION = [TAG_COLLECTION_HEALTH, TAG_REGRESSION_TESTS];
 
 const LEVEL_RANK: Record<HealthLevel, number> = {
   ok: 0,
@@ -90,178 +67,27 @@ const CollectionHealth = ({
   initialCollections: CollectionWithHosts[];
   fetchedAt: number;
 }) => {
-  const queryClient = useQueryClient();
-  const notify = useNotify();
   const hasMounted = useHasMounted();
-
-  const [runStates, setRunStates] = useState<Record<string, Set<string>>>({});
   const [dialogOpen, setDialogOpen] = useState(false);
-  const defaults = useDefaults();
 
   const {
-    data: collectionsResponse,
-    isFetching: isFetchingCollections,
-    isError: isCollectionsError,
-    dataUpdatedAt: collectionsUpdatedAt,
-  } = useQuery({
-    queryKey: QUERY_KEY_COLLECTIONS,
-    queryFn: () =>
-      getAdminCollections({
-        params: new URLSearchParams({ per_page: COLLECTIONS_PER_PAGE }),
-        cacheOptions: { useCache: false },
-      }),
-    initialData: {
-      message: "",
-      data: { data: initialCollections } as Paginated<CollectionWithHosts>,
-    },
+    rows,
+    tests,
+    collections,
+    now,
+    runStates,
+    isFetching,
+    isFetchingRegression,
+    hasRegressionResponse,
+    isError,
+    invalidate,
+    addHealthCheck,
+    updateExpected,
+    runTest,
+  } = useCollectionHealth({ initialCollections, fetchedAt });
 
-    initialDataUpdatedAt: fetchedAt,
-    ...REFRESH_OPTIONS,
-  });
-
-  const {
-    data: regressionResponse,
-    isFetching: isFetchingRegression,
-    isError: isRegressionError,
-    dataUpdatedAt: regressionUpdatedAt,
-  } = useQuery({
-    queryKey: QUERY_KEY_REGRESSION,
-    queryFn: () => getRegressionTests(),
-    ...REFRESH_OPTIONS,
-  });
-
-  const isFetching = isFetchingCollections || isFetchingRegression;
-  const isError = isCollectionsError || isRegressionError;
-
-  const now = useMemo(
-    () =>
-      Math.max(collectionsUpdatedAt || 0, regressionUpdatedAt || 0) ||
-      fetchedAt,
-    [collectionsUpdatedAt, regressionUpdatedAt, fetchedAt],
-  );
-
-  const collections = useMemo(
-    () => collectionsResponse?.data?.data ?? [],
-    [collectionsResponse],
-  );
-
-  const tests = useMemo<RegressionTest[]>(
-    () => regressionResponse?.data ?? [],
-    [regressionResponse],
-  );
-
-  const thresholds = useMemo<HealthThresholds>(
-    () => ({
-      pingA: {
-        warnAfterMs: defaults.pingAWarnMs,
-        failAfterMs: defaults.pingAFailMs,
-      },
-      pingB: {
-        warnAfterMs: defaults.pingBWarnMs,
-        failAfterMs: defaults.pingBFailMs,
-      },
-    }),
-    [
-      defaults.pingAWarnMs,
-      defaults.pingAFailMs,
-      defaults.pingBWarnMs,
-      defaults.pingBFailMs,
-    ],
-  );
-
-  const rows = useMemo(
-    () => buildHealthRows(collections, tests, now, thresholds),
-    [collections, tests, now, thresholds],
-  );
-
-  const invalidate = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: QUERY_KEY_COLLECTIONS });
-    queryClient.invalidateQueries({ queryKey: QUERY_KEY_REGRESSION });
-  }, [queryClient]);
-
-  const handleTaskComplete = useCallback(
-    (collectionPid: string, taskPid: string) => {
-      setRunStates((previous) => {
-        const remaining = new Set(previous[collectionPid] ?? []);
-        remaining.delete(taskPid);
-
-        if (remaining.size === 0) {
-          const { [collectionPid]: _removed, ...rest } = previous;
-          return rest;
-        }
-
-        return { ...previous, [collectionPid]: remaining };
-      });
-      invalidate();
-    },
-    [invalidate],
-  );
-
-  useTaskPolling(runStates, handleTaskComplete);
-
-  const handleAddHealthCheck = useCallback(
-    async (values: Parameters<typeof createRegressionTest>[0]) => {
-      const result = await createRegressionTest(values);
-      if (result.error) {
-        notify.error(`Could not add the health check: ${result.error}`);
-        return;
-      }
-
-      notify.success("Health check added");
-      invalidate();
-    },
-    [invalidate, notify],
-  );
-
-  const handleUpdateExpected = useCallback(
-    async (testPid: string, expected: number | null, collectionPid: string) => {
-      const test = tests.find((candidate) => candidate.pid === testPid);
-      if (!test) return;
-
-      const result = await updateRegressionTest(testPid, {
-        collections: test.collections.map((collection) => ({
-          pid: collection.pid,
-          expected_result:
-            collection.pid === collectionPid
-              ? expected
-              : collection.expected_result,
-        })),
-      });
-
-      if (result.error) {
-        notify.error(`Could not save the expected count: ${result.error}`);
-        return;
-      }
-
-      invalidate();
-    },
-    [invalidate, notify, tests],
-  );
-
-  const trackRun = useCallback(
-    (collectionPid: string, taskPids: Set<string>) => {
-      if (taskPids.size === 0) {
-        invalidate();
-        return;
-      }
-
-      setRunStates((previous) => ({ ...previous, [collectionPid]: taskPids }));
-    },
-    [invalidate],
-  );
-
-  const handleRunTest = useCallback(
-    async (testPid: string, collectionPid: string) => {
-      const result = await runRegressionTest(testPid, collectionPid);
-      if (result.error) {
-        notify.error(`Could not run the health check: ${result.error}`);
-        return;
-      }
-
-      trackRun(collectionPid, new Set(result.data?.task_pids ?? []));
-    },
-    [notify, trackRun],
-  );
+  const handleUpdateExpected = updateExpected;
+  const handleRunTest = runTest;
 
   const checkColumn = useCallback(
     (
@@ -331,10 +157,31 @@ const CollectionHealth = ({
                 minWidth: 0,
               }}
             >
-              <Typography variant="body2" component="span" noWrap>
-                {row.original.name}
-              </Typography>
+              <Link
+                href={routes.adminCollectionHealthDetail(row.original.pid)}
+                style={{ minWidth: 0, textDecoration: "none" }}
+              >
+                <Typography
+                  variant="body2"
+                  component="span"
+                  color="link.main"
+                  noWrap
+                  sx={{ "&:hover": { textDecoration: "underline" } }}
+                >
+                  {row.original.name}
+                </Typography>
+              </Link>
               {row.original.isSynthetic && <SyntheticChip isSynthetic />}
+              <Tooltip title="Open this collection's health on its own page">
+                <IconButton
+                  size="small"
+                  component={Link}
+                  href={routes.adminCollectionHealthDetail(row.original.pid)}
+                  sx={{ flexShrink: 0 }}
+                >
+                  <OpenInNewIcon sx={{ fontSize: 14 }} />
+                </IconButton>
+              </Tooltip>
             </Box>
             <Typography
               variant="caption"
@@ -458,7 +305,7 @@ const CollectionHealth = ({
         onRunTest={(testPid) => handleRunTest(testPid, row.original.pid)}
       />
     ),
-    state: { isLoading: isFetchingRegression && !regressionResponse },
+    state: { isLoading: isFetchingRegression && !hasRegressionResponse },
   });
 
   const counts = useMemo(
@@ -579,7 +426,7 @@ const CollectionHealth = ({
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         collectionPids={collections.map((collection) => collection.pid)}
-        onSubmit={handleAddHealthCheck}
+        onSubmit={addHealthCheck}
       />
     </Box>
   );
