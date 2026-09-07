@@ -1,5 +1,11 @@
 import dayjs from "dayjs";
 import {
+  DEFAULT_PING_A_FAIL_MS,
+  DEFAULT_PING_A_WARN_MS,
+  DEFAULT_PING_B_FAIL_MS,
+  DEFAULT_PING_B_WARN_MS,
+} from "@/config/defaults";
+import {
   Activity,
   CollectionMetadata,
   CollectionWithHosts,
@@ -41,11 +47,28 @@ export interface CollectionHealthRow {
   regressionTestPids: string[];
 }
 
-// BUNNY polls every POLLING_INTERVAL (default 5s) and backs off to a 60s cap on
-// error, so anything under two minutes is healthy. Thirty minutes is
-// COLLECTION_INACTIVITY_MINUTES, the point at which the API auto-suspends.
-export const PING_OK_MS = 2 * 60 * 1000;
-export const PING_WARN_MS = 30 * 60 * 1000;
+export interface PingThresholds {
+  warnAfterMs: number;
+  failAfterMs: number;
+}
+
+export interface HealthThresholds {
+  pingA: PingThresholds;
+  pingB: PingThresholds;
+}
+
+// Overridable per deployment via DEFAULT_PING_* in the environment — see
+// ServerDefaultProvider.
+export const DEFAULT_HEALTH_THRESHOLDS: HealthThresholds = {
+  pingA: {
+    warnAfterMs: DEFAULT_PING_A_WARN_MS,
+    failAfterMs: DEFAULT_PING_A_FAIL_MS,
+  },
+  pingB: {
+    warnAfterMs: DEFAULT_PING_B_WARN_MS,
+    failAfterMs: DEFAULT_PING_B_FAIL_MS,
+  },
+};
 
 // Distribution scans are scheduled weekly at their most frequent, so a scan
 // older than 30 days means the schedule has stopped firing.
@@ -96,6 +119,7 @@ const buildPingCheck = (
   id: string,
   label: string,
   activity: Activity | null | undefined,
+  thresholds: PingThresholds,
   now: number,
 ): HealthCheck => {
   const age = ageMs(activity?.updated_at, now);
@@ -112,7 +136,11 @@ const buildPingCheck = (
   }
 
   const level: HealthLevel =
-    age <= PING_OK_MS ? "ok" : age <= PING_WARN_MS ? "warn" : "fail";
+    age <= thresholds.warnAfterMs
+      ? "ok"
+      : age <= thresholds.failAfterMs
+        ? "warn"
+        : "fail";
 
   return {
     id,
@@ -291,14 +319,27 @@ export const buildCollectionHealth = (
   collection: CollectionWithHosts,
   tests: RegressionTest[],
   now: number = Date.now(),
+  thresholds: HealthThresholds = DEFAULT_HEALTH_THRESHOLDS,
 ): CollectionHealthRow => {
   const regressionChecks = tests.map((test) =>
     buildRegressionCheck(test, collection.pid, now),
   );
 
   const checks: HealthCheck[] = [
-    buildPingCheck("ping_a", "A-type ping", collection.last_ping?.a, now),
-    buildPingCheck("ping_b", "B-type ping", collection.last_ping?.b, now),
+    buildPingCheck(
+      "ping_a",
+      "A-type ping",
+      collection.last_ping?.a,
+      thresholds.pingA,
+      now,
+    ),
+    buildPingCheck(
+      "ping_b",
+      "B-type ping",
+      collection.last_ping?.b,
+      thresholds.pingB,
+      now,
+    ),
     buildCohortQueryCheck(collection.last_successful_query, now),
     buildScanCheck(
       "concept_scan",
@@ -338,9 +379,10 @@ export const buildHealthRows = (
   collections: CollectionWithHosts[],
   tests: RegressionTest[],
   now: number = Date.now(),
+  thresholds: HealthThresholds = DEFAULT_HEALTH_THRESHOLDS,
 ): CollectionHealthRow[] =>
   collections.map((collection) =>
-    buildCollectionHealth(collection, tests, now),
+    buildCollectionHealth(collection, tests, now, thresholds),
   );
 
 export const getCheck = (row: CollectionHealthRow, id: string) =>

@@ -24,6 +24,7 @@ import SyntheticChip from "@/components/SyntheticChip";
 import Table from "@/components/Table";
 import { useTable } from "@/hooks/useTable";
 import useTaskPolling from "@/hooks/useTaskPolling";
+import { useDefaults } from "@/providers/DefaultProvider";
 import { CollectionWithHosts, Paginated, RegressionTest } from "@/types/api";
 import { getDatetime } from "@/utils/date";
 import AddHealthCheckDialog from "./AddHealthCheckDialog";
@@ -33,6 +34,7 @@ import {
   CollectionHealthRow,
   getCheck,
   HealthLevel,
+  HealthThresholds,
   regressionCheckId,
 } from "./health";
 import HealthDetailPanel from "./HealthDetailPanel";
@@ -98,6 +100,7 @@ const CollectionHealth = ({
 
   const [runStates, setRunStates] = useState<Record<string, Set<string>>>({});
   const [dialogOpen, setDialogOpen] = useState(false);
+  const defaults = useDefaults();
 
   const {
     data: collectionsResponse,
@@ -151,9 +154,28 @@ const CollectionHealth = ({
     [regressionResponse],
   );
 
+  const thresholds = useMemo<HealthThresholds>(
+    () => ({
+      pingA: {
+        warnAfterMs: defaults.pingAWarnMs,
+        failAfterMs: defaults.pingAFailMs,
+      },
+      pingB: {
+        warnAfterMs: defaults.pingBWarnMs,
+        failAfterMs: defaults.pingBFailMs,
+      },
+    }),
+    [
+      defaults.pingAWarnMs,
+      defaults.pingAFailMs,
+      defaults.pingBWarnMs,
+      defaults.pingBFailMs,
+    ],
+  );
+
   const rows = useMemo(
-    () => buildHealthRows(collections, tests, now),
-    [collections, tests, now],
+    () => buildHealthRows(collections, tests, now, thresholds),
+    [collections, tests, now, thresholds],
   );
 
   const invalidate = useCallback(() => {

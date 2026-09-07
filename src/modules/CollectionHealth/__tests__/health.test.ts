@@ -7,13 +7,14 @@ import {
 } from "@/types/api";
 import {
   buildCollectionHealth,
+  DEFAULT_HEALTH_THRESHOLDS,
   formatAge,
   getCheck,
-  PING_OK_MS,
-  PING_WARN_MS,
   regressionCheckId,
   SCAN_STALE_MS,
 } from "../health";
+
+const { pingA, pingB } = DEFAULT_HEALTH_THRESHOLDS;
 
 const NOW = new Date("2026-09-01T12:00:00Z").getTime();
 
@@ -138,23 +139,29 @@ describe("formatAge", () => {
 });
 
 describe("ping checks", () => {
-  it("is ok inside the 2 minute window", () => {
+  it("uses a tighter window for the A-type ping than the B-type ping", () => {
+    expect(pingA).toEqual({ warnAfterMs: 60_000, failAfterMs: 600_000 });
+    expect(pingB).toEqual({ warnAfterMs: 600_000, failAfterMs: 3_600_000 });
+  });
+
+  it("is ok inside the A-type warn window", () => {
     const row = health({
-      last_ping: { a: activity(PING_OK_MS - 1000), b: activity(1000) },
+      last_ping: { a: activity(pingA.warnAfterMs - 1000), b: activity(1000) },
     });
     expect(getCheck(row, "ping_a")?.level).toBe("ok");
   });
 
-  it("warns between 2 and 30 minutes", () => {
+  it("warns once the A-type ping passes its warn threshold", () => {
     const row = health({
-      last_ping: { a: activity(PING_OK_MS + 1000), b: activity(1000) },
+      last_ping: { a: activity(pingA.warnAfterMs + 1000), b: activity(1000) },
     });
     expect(getCheck(row, "ping_a")?.level).toBe("warn");
+    expect(row.overall.label).toBe("Degraded");
   });
 
-  it("fails beyond 30 minutes, the point the API auto-suspends", () => {
+  it("fails once the A-type ping passes its fail threshold", () => {
     const row = health({
-      last_ping: { a: activity(PING_WARN_MS + 1000), b: activity(1000) },
+      last_ping: { a: activity(pingA.failAfterMs + 1000), b: activity(1000) },
     });
     expect(getCheck(row, "ping_a")?.level).toBe("fail");
     expect(row.overall.label).toBe("Offline");
@@ -168,11 +175,34 @@ describe("ping checks", () => {
     });
   });
 
+  it.each([
+    [pingA.warnAfterMs + 1000, "warn", "ok"],
+    [pingA.failAfterMs + 1000, "fail", "warn"],
+  ])(
+    "grades the same %ims age as %s for A and %s for B",
+    (age, expectedA, expectedB) => {
+      const row = health({
+        last_ping: { a: activity(age), b: activity(age) },
+      });
+      expect(getCheck(row, "ping_a")?.level).toBe(expectedA);
+      expect(getCheck(row, "ping_b")?.level).toBe(expectedB);
+    },
+  );
+
   it("tracks the B-type ping independently of the A-type ping", () => {
     const row = health({
-      last_ping: { a: activity(1000), b: activity(PING_WARN_MS + 1000) },
+      last_ping: { a: activity(1000), b: activity(pingB.failAfterMs + 1000) },
     });
     expect(getCheck(row, "ping_a")?.level).toBe("ok");
+    expect(getCheck(row, "ping_b")?.level).toBe("fail");
+  });
+
+  it("honours overridden thresholds", () => {
+    const row = buildCollectionHealth(buildCollection(), [], NOW, {
+      pingA: { warnAfterMs: 1, failAfterMs: 2 },
+      pingB: { warnAfterMs: 1, failAfterMs: 2 },
+    });
+    expect(getCheck(row, "ping_a")?.level).toBe("fail");
     expect(getCheck(row, "ping_b")?.level).toBe("fail");
   });
 
