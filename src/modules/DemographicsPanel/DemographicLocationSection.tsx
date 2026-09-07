@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { Controller, useFormContext } from "react-hook-form";
-import { Box, Chip, Skeleton, Stack, Typography } from "@mui/material";
+import { Chip, Skeleton, Stack, Typography } from "@mui/material";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { extractPostcode, formatRadius } from "@/components/GeoMap";
 import {
@@ -12,11 +12,13 @@ import {
 import { Demographics } from "@/types/rules";
 import DemographicRow, { DemographicRowActionProps } from "./DemographicRow";
 
+const MAP_HEIGHT = 300;
+
 // Leaflet touches `window` at module load, so the map must never render on the
 // server — load it only in the browser once the row is being edited.
 const GeoMapPicker = dynamic(() => import("@/components/GeoMap/GeoMapPicker"), {
   ssr: false,
-  loading: () => <Skeleton variant="rectangular" height={500} />,
+  loading: () => <Skeleton variant="rectangular" height={MAP_HEIGHT} />,
 });
 
 interface DemographicLocationSectionProps extends DemographicRowActionProps {
@@ -51,31 +53,22 @@ const DemographicLocationSection = ({
             {locationUnavailableGuidance}
           </Typography>
         ) : (
-          <Box
-            sx={{
-              maxHeight: 450,
-              overflowY: "auto",
-              overflowX: "hidden",
-              pr: 1,
-            }}
-          >
-            <Stack spacing={1}>
-              <Controller
-                name="location"
-                control={control}
-                render={({ field }) => (
-                  <GeoMapPicker
-                    value={field.value}
-                    onChange={field.onChange}
-                    mapHeight={400}
-                  />
-                )}
-              />
-              <Typography variant="body2" color="text.secondary">
-                {locationGuidance}
-              </Typography>
-            </Stack>
-          </Box>
+          <Stack spacing={1} sx={{ pr: 1 }}>
+            <Controller
+              name="location"
+              control={control}
+              render={({ field }) => (
+                <GeoMapPicker
+                  value={field.value}
+                  onChange={field.onChange}
+                  mapHeight={MAP_HEIGHT}
+                />
+              )}
+            />
+            <Typography variant="body2" color="text.secondary">
+              {locationGuidance}
+            </Typography>
+          </Stack>
         )
       }
     >

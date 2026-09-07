@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import { FormProvider } from "react-hook-form";
 import {
   Box,
-  Button,
   Collapse,
   IconButton,
   Stack,
@@ -19,6 +18,7 @@ import Title from "@/components/Title";
 import DemographicAgeSection from "./DemographicAgeSection";
 import DemographicCheckboxSection from "./DemographicCheckboxSection";
 import DemographicLocationSection from "./DemographicLocationSection";
+import DemographicSaveButton from "./DemographicSaveButton";
 import useDemographicFieldEditing from "./useDemographicFieldEditing";
 import {
   formatAgeSummary,
@@ -176,13 +176,7 @@ const DemographicsPanel = ({
             />
           )}
 
-          {allOpen && (
-            <Stack direction="row" justifyContent="flex-end" sx={{ mt: 1 }}>
-              <Button color="secondary" onClick={save}>
-                Save Selection and Collapse
-              </Button>
-            </Stack>
-          )}
+          {allOpen && <DemographicSaveButton onSave={save} />}
         </FormProvider>
       </Collapse>
     </Box>

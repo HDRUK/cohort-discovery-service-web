@@ -98,7 +98,7 @@ export default function GeoMapPicker({
   };
 
   return (
-    <Box sx={{ position: "relative" }}>
+    <Box sx={{ position: "relative", zIndex: 0 }}>
       <GeoMapFrame
         height={mapHeight}
         center={position ?? DEFAULT_MAP_CENTER}

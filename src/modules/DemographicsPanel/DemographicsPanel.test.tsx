@@ -69,6 +69,16 @@ describe("DemographicsPanel", () => {
       ).not.toBeInTheDocument();
     });
 
+    it("pins the Save button to the bottom of the scroll area", () => {
+      renderPanel();
+
+      const save = screen.getByRole("button", {
+        name: /save selection and collapse/i,
+      });
+
+      expect(save.parentElement).toHaveStyle({ position: "sticky" });
+    });
+
     it("doesn't write to the store until Save is clicked", async () => {
       renderPanel();
 
