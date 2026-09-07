@@ -19,7 +19,9 @@ import DemographicAgeSection from "./DemographicAgeSection";
 import DemographicCheckboxSection from "./DemographicCheckboxSection";
 import DemographicLocationSection from "./DemographicLocationSection";
 import DemographicSaveButton from "./DemographicSaveButton";
-import useDemographicFieldEditing from "./useDemographicFieldEditing";
+import useDemographicFieldEditing, {
+  isDemographicsEmpty,
+} from "./useDemographicFieldEditing";
 import {
   formatAgeSummary,
   formatConceptCountSummary,
@@ -31,11 +33,7 @@ import { OmopTableName } from "@/types/omop";
 import { useUserDataStore } from "@/hooks/userDataStore";
 import useFeatures from "@/hooks/useFeatures";
 
-const DemographicsPanel = ({
-  initialExpand = true,
-}: {
-  initialExpand?: boolean;
-}) => {
+const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
   const { demographics, setDemographics, remove, selectedDatasets } =
     useQueryBuilder((qb) => ({
       demographics: qb.queryBuilderJson.demographics,
@@ -52,7 +50,11 @@ const DemographicsPanel = ({
   const race = demographics?.race ?? [];
   const location = demographics?.location ?? null;
 
-  const [expanded, setExpanded] = useState(initialExpand);
+  // A block that arrives already populated (NLP, or a saved query) opens
+  // collapsed — the same state the Save action leaves it in.
+  const [expanded, setExpanded] = useState(
+    initialExpand ?? isDemographicsEmpty(demographics),
+  );
 
   const { form, allOpen, save, propsFor } = useDemographicFieldEditing(
     demographics,

@@ -6,7 +6,7 @@ import { DemographicRowActionProps } from "./DemographicRow";
 
 type DemographicField = keyof Demographics;
 
-const isDemographicsEmpty = (d?: Demographics) =>
+export const isDemographicsEmpty = (d?: Demographics) =>
   !d ||
   (d.age === null &&
     d.sex.length === 0 &&
