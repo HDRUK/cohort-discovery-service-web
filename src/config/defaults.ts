@@ -15,6 +15,11 @@ export const DEFAULT_SEARCH_SUGGESTION_ROTATION = 2000;
 export const DEFAULT_SEARCH_RESULTS_MAX_HEIGHT = 420;
 export const DEFAULT_ACCESS_BANNER_AUTO_HIDE = 30000;
 
+export const DEFAULT_PING_A_WARN_MS = 60 * 1000;
+export const DEFAULT_PING_A_FAIL_MS = 10 * 60 * 1000;
+export const DEFAULT_PING_B_WARN_MS = 10 * 60 * 1000;
+export const DEFAULT_PING_B_FAIL_MS = 60 * 60 * 1000;
+
 export const DEFAULT_STATUS_LABELS: Record<string, string> = {
   ok: "Successful",
   error: "Failed",
