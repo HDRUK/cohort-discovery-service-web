@@ -3,18 +3,31 @@
 import { Button, Stack } from "@mui/material";
 
 interface DemographicSaveButtonProps {
-  onReset: () => void;
   onSave: () => void;
+  onReset?: () => void;
 }
 
 const DemographicSaveButton = ({
-  onReset,
   onSave,
+  onReset,
 }: DemographicSaveButtonProps) => (
-  <Stack direction={"row"} spacing={1} justifyContent={"flex-end"} my={1}>
-    <Button variant="outlined" color="secondary" onClick={onReset}>
-      Reset Selection
-    </Button>
+  <Stack
+    direction={"row"}
+    spacing={1}
+    justifyContent={"flex-end"}
+    sx={{
+      position: "sticky",
+      bottom: 0,
+      zIndex: 1,
+      bgcolor: "background.paper",
+      py: 1,
+    }}
+  >
+    {onReset && (
+      <Button variant="outlined" color="secondary" onClick={onReset}>
+        Reset Selection
+      </Button>
+    )}
     <Button color="secondary" onClick={onSave}>
       Save Selection and Collapse
     </Button>

@@ -13,8 +13,10 @@ import DemographicLocationSection from "./DemographicLocationSection";
 // with a light stub and make next/dynamic return it synchronously.
 jest.mock("@/components/GeoMap/GeoMapPicker", () => ({
   __esModule: true,
-  default: ({ value }: { value: unknown }) => (
-    <div data-testid="geo-map-picker">{value ? "picker:set" : "picker:empty"}</div>
+  default: ({ value, mapHeight }: { value: unknown; mapHeight?: number }) => (
+    <div data-testid="geo-map-picker" data-map-height={mapHeight}>
+      {value ? "picker:set" : "picker:empty"}
+    </div>
   ),
 }));
 
@@ -105,6 +107,17 @@ describe("DemographicLocationSection", () => {
     render(<Harness editing />);
     expect(screen.getByTestId("geo-map-picker")).toBeInTheDocument();
     expect(screen.getByText(/drop a pin/i)).toBeInTheDocument();
+  });
+
+  it("renders the map short enough to keep the row actions in view", () => {
+    render(<Harness editing />);
+    expect(screen.getByTestId("geo-map-picker")).toHaveAttribute(
+      "data-map-height",
+      "300",
+    );
+    expect(
+      screen.getByRole("button", { name: /save selection and collapse/i }),
+    ).toBeInTheDocument();
   });
 
   it("explains that location is unavailable instead of showing the picker", () => {
