@@ -7,13 +7,13 @@ import ScienceIcon from "@mui/icons-material/Science";
 import {
   Box,
   Chip,
-  Divider,
   IconButton,
   Stack,
   Tooltip,
   Typography,
 } from "@mui/material";
 import DetailRow from "@/components/DetailRow";
+import SectionCard from "@/components/SectionCard";
 import CollectionTelemetry from "./CollectionTelemetry";
 import { CollectionHealthRow, HealthCheck, HealthStage } from "./health";
 import ExpectedValue from "@/components/ExpectedValue";
@@ -116,12 +116,21 @@ const HealthDetailPanel = ({
   onUpdateExpected,
   onRunTest,
 }: HealthDetailPanelProps) => (
-  <Box sx={{ p: 2 }}>
-    <Box sx={{ display: "flex", gap: 4, flexWrap: "wrap", mb: 2 }}>
-      <Box sx={{ flexShrink: 0, minWidth: 380 }}>
-        <Typography variant="subtitle2" gutterBottom>
-          Collection
-        </Typography>
+  <Box
+    sx={{
+      p: 2,
+      bgcolor: "background.default",
+      borderTop: 1,
+      borderBottom: 1,
+      borderColor: "divider",
+      boxShadow: "inset 0 1px 3px rgba(0, 0, 0, 0.07)",
+    }}
+  >
+    <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 2 }}>
+      <SectionCard
+        title="Collection"
+        sx={{ flexShrink: 0, width: 380, maxWidth: "100%" }}
+      >
         <Stack spacing={0.25}>
           <DetailRow label="PID" value={row.pid} />
           <DetailRow label="Custodian" value={row.custodianName} />
@@ -138,7 +147,7 @@ const HealthDetailPanel = ({
           direction="row"
           spacing={0.75}
           useFlexGap
-          sx={{ flexWrap: "wrap", mt: 1 }}
+          sx={{ flexWrap: "wrap", mt: 1.5 }}
         >
           <Chip size="small" variant="outlined" label={row.stateSlug} />
           <FeatureChip
@@ -171,26 +180,27 @@ const HealthDetailPanel = ({
             </Tooltip>
           )}
         </Stack>
-      </Box>
+      </SectionCard>
 
       <Box sx={{ flex: 1, minWidth: 420 }}>
         {isExpanded && <CollectionTelemetry collectionPid={row.pid} />}
       </Box>
     </Box>
 
-    <Divider sx={{ mb: 2 }} />
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+        gap: 2,
+      }}
+    >
+      {([1, 2, 3] as HealthStage[]).map((stage) => {
+        const checks = row.checks.filter((check) => check.stage === stage);
 
-    <Box sx={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-      {([1, 2, 3] as HealthStage[]).map((stage) => (
-        <Box key={stage} sx={{ minWidth: 320, flex: 1 }}>
-          <Typography variant="subtitle2" gutterBottom>
-            {STAGE_LABELS[stage]}
-          </Typography>
-
-          <Stack spacing={1}>
-            {row.checks
-              .filter((check) => check.stage === stage)
-              .map((check) => (
+        return (
+          <SectionCard key={stage} title={STAGE_LABELS[stage]}>
+            <Stack spacing={1}>
+              {checks.map((check) => (
                 <CheckRow
                   key={check.id}
                   check={check}
@@ -200,14 +210,15 @@ const HealthDetailPanel = ({
                 />
               ))}
 
-            {stage === 3 && !row.checks.some((check) => check.stage === 3) && (
-              <Typography variant="caption" color="text.secondary">
-                No health checks configured yet.
-              </Typography>
-            )}
-          </Stack>
-        </Box>
-      ))}
+              {stage === 3 && checks.length === 0 && (
+                <Typography variant="caption" color="text.secondary">
+                  No health checks configured yet.
+                </Typography>
+              )}
+            </Stack>
+          </SectionCard>
+        );
+      })}
     </Box>
   </Box>
 );
