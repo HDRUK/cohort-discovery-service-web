@@ -4,7 +4,6 @@ import { useCallback, useMemo, useState } from "react";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import {
   Alert,
-  Box,
   Button,
   FormControl,
   MenuItem,
@@ -15,6 +14,7 @@ import {
 } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs, { Dayjs } from "dayjs";
+import SectionCard from "@/components/SectionCard";
 import useSearchParams from "@/hooks/useSearchParams";
 import PingHistoryChart from "./PingHistoryChart";
 import TaskHistoryChart from "./TaskHistoryChart";
@@ -124,76 +124,78 @@ const CollectionTelemetry = ({ collectionPid }: CollectionTelemetryProps) => {
   };
 
   return (
-    <Box sx={{ minWidth: 0 }}>
-      <Stack
-        direction="row"
-        spacing={1}
-        alignItems="center"
-        sx={{ mb: 1, flexWrap: "wrap" }}
-      >
-        <TextField
-          size="small"
-          type="number"
-          label="Bin every"
-          value={binDraft.value}
-          onChange={(event) =>
-            setSearchParams({ [PARAM_BIN]: event.target.value })
-          }
-          sx={{ width: 100 }}
-          slotProps={{ htmlInput: { min: 1, max: 99999 } }}
-        />
-
-        <FormControl size="small" sx={{ minWidth: 110 }}>
-          <Select
-            value={binDraft.unit}
-            onChange={(event) =>
-              setSearchParams({ [PARAM_BIN_UNIT]: event.target.value })
-            }
-          >
-            {BIN_UNIT_OPTIONS.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <DateTimePicker
-          label="From"
-          value={dayjs(range.from)}
-          onChange={handleFromChange}
-          slotProps={{ textField: { size: "small" } }}
-        />
-        <DateTimePicker
-          label="To"
-          value={dayjs(range.to)}
-          onChange={handleToChange}
-          slotProps={{ textField: { size: "small" } }}
-        />
-
-        <Button
-          size="small"
-          variant="text"
-          color="secondary"
-          startIcon={<RestartAltIcon />}
-          onClick={handleReset}
-          sx={{ ml: "auto" }}
+    <Stack spacing={2} sx={{ minWidth: 0 }}>
+      <SectionCard title="Time range">
+        <Stack
+          direction="row"
+          spacing={1}
+          alignItems="center"
+          sx={{ mb: 1, flexWrap: "wrap" }}
         >
-          Reset
-        </Button>
-      </Stack>
+          <TextField
+            size="small"
+            type="number"
+            label="Bin every"
+            value={binDraft.value}
+            onChange={(event) =>
+              setSearchParams({ [PARAM_BIN]: event.target.value })
+            }
+            sx={{ width: 100 }}
+            slotProps={{ htmlInput: { min: 1, max: 99999 } }}
+          />
 
-      {validationMessage && (
-        <Alert severity="warning" sx={{ mb: 1 }}>
-          {validationMessage}
-        </Alert>
-      )}
+          <FormControl size="small" sx={{ minWidth: 110 }}>
+            <Select
+              value={binDraft.unit}
+              onChange={(event) =>
+                setSearchParams({ [PARAM_BIN_UNIT]: event.target.value })
+              }
+            >
+              {BIN_UNIT_OPTIONS.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
-      <Typography variant="caption" color="text.secondary" sx={{ mb: 1 }}>
-        Drag across any plot to narrow the range — every plot below follows it.
-      </Typography>
+          <DateTimePicker
+            label="From"
+            value={dayjs(range.from)}
+            onChange={handleFromChange}
+            slotProps={{ textField: { size: "small" } }}
+          />
+          <DateTimePicker
+            label="To"
+            value={dayjs(range.to)}
+            onChange={handleToChange}
+            slotProps={{ textField: { size: "small" } }}
+          />
 
-      <Stack spacing={3} sx={{ mt: 1 }}>
+          <Button
+            size="small"
+            variant="text"
+            color="secondary"
+            startIcon={<RestartAltIcon />}
+            onClick={handleReset}
+            sx={{ ml: "auto" }}
+          >
+            Reset
+          </Button>
+        </Stack>
+
+        {validationMessage && (
+          <Alert severity="warning" sx={{ mb: 1 }}>
+            {validationMessage}
+          </Alert>
+        )}
+
+        <Typography variant="caption" color="text.secondary" component="div">
+          Drag across any plot to narrow the range — every plot follows it.
+        </Typography>
+      </SectionCard>
+
+      <SectionCard title="Host polling">
         <PingHistoryChart
           collectionPid={collectionPid}
           bin={bin}
@@ -201,6 +203,9 @@ const CollectionTelemetry = ({ collectionPid }: CollectionTelemetryProps) => {
           enabled={isQueryValid}
           onSelectRange={handleSelectRange}
         />
+      </SectionCard>
+
+      <SectionCard title="Task activity">
         <TaskHistoryChart
           collectionPid={collectionPid}
           bin={bin}
@@ -208,8 +213,8 @@ const CollectionTelemetry = ({ collectionPid }: CollectionTelemetryProps) => {
           enabled={isQueryValid}
           onSelectRange={handleSelectRange}
         />
-      </Stack>
-    </Box>
+      </SectionCard>
+    </Stack>
   );
 };
 

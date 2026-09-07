@@ -200,8 +200,6 @@ const TaskHistoryChart = ({
 
   return (
     <Box sx={{ minWidth: 0 }}>
-      <Typography variant="subtitle2">Task activity</Typography>
-
       {enabled && isLoading && (
         <Skeleton variant="rectangular" height={CHART_HEIGHT} sx={{ mb: 1 }} />
       )}

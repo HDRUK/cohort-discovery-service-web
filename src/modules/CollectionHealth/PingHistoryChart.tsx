@@ -126,8 +126,6 @@ const PingHistoryChart = ({
 
   return (
     <Box sx={{ minWidth: 0 }}>
-      <Typography variant="subtitle2">Host polling</Typography>
-
       {enabled && isLoading && (
         <Skeleton variant="rectangular" height={CHART_HEIGHT} sx={{ mb: 1 }} />
       )}
