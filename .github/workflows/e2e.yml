@@ -160,3 +160,161 @@ jobs:
           name: next-log-${{ matrix.app_mode }}
           path: next.log
           retention-days: 3
+
+  oidc-e2e-tests:
+    name: Cypress OIDC E2E
+    runs-on: ubuntu-latest
+    # Only run on open (non-draft) PRs
+    if: ${{ github.event_name != 'pull_request' || (github.event.pull_request.state == 'open' && github.event.pull_request.draft == false) }}
+
+    env:
+      APPLICATION_MODE: standalone
+      API_BASE_URL: http://localhost:8100
+      NEXT_PUBLIC_LOGIN_URL: http://localhost:3000/login
+      NEXT_PUBLIC_TASK_URL: http://localhost:8100/api/v1
+      NEXT_PUBLIC_USE_EXAMPLE_QUERY: "false"
+      NEXT_PUBLIC_USE_DEBUG_LOGS: "false"
+      NODE_ENV: test
+      CYPRESS: "true"
+      OIDC_ENABLED: "true"
+      OIDC_ISSUER_URL: http://localhost:4011
+      OIDC_CLIENT_ID: auth-code-client
+      OIDC_SCOPES: openid profile email
+      OIDC_PROVIDER_NAME: Lifescience Login
+      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET || 'cypress-nextauth-secret' }}
+      NEXTAUTH_URL: http://localhost:3000/auth
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "${{ vars.NODE_VERSION }}"
+          cache: "npm"
+
+      - name: Cache Node modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            ~/.npm
+          key: e2e-node-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: e2e-node-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Cache Cypress binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: e2e-cypress-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: e2e-cypress-${{ runner.os }}-
+
+      - name: Build Next.js app
+        env:
+          APPLICATION_MODE: standalone
+          CYPRESS: "true"
+          OIDC_ENABLED: "true"
+          OIDC_ISSUER_URL: http://localhost:4011
+          OIDC_CLIENT_ID: auth-code-client
+          OIDC_SCOPES: openid profile email
+          OIDC_PROVIDER_NAME: Lifescience Login
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET || 'cypress-nextauth-secret' }}
+          NEXTAUTH_URL: http://localhost:3000/auth
+        run: npm run build
+
+      - name: Start OIDC mock server
+        run: |
+          docker compose -f .github/oidc-mock/docker-compose.yml up -d oidc-server-mock
+          echo "Waiting for OIDC mock server..."
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:4011/.well-known/openid-configuration > /dev/null 2>&1; then
+              echo "OIDC mock server is up."
+              break
+            fi
+            echo "  attempt $i..."
+            sleep 2
+          done
+
+      - name: Start mock API server
+        run: |
+          nohup node cypress/support/mock-server.js > mock-api.log 2>&1 &
+          echo "Waiting for mock API..."
+          for i in $(seq 1 20); do
+            if curl -sf http://localhost:8100/health > /dev/null 2>&1; then
+              echo "Mock API is up."
+              break
+            fi
+            echo "  attempt $i..."
+            sleep 1
+          done
+
+      - name: Start Next.js server
+        env:
+          APPLICATION_MODE: standalone
+          CYPRESS: "true"
+          OIDC_ENABLED: "true"
+          OIDC_ISSUER_URL: http://localhost:4011
+          OIDC_CLIENT_ID: auth-code-client
+          OIDC_SCOPES: openid profile email
+          OIDC_PROVIDER_NAME: Lifescience Login
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET || 'cypress-nextauth-secret' }}
+          NEXTAUTH_URL: http://localhost:3000/auth
+        run: |
+          nohup npm run start > next.log 2>&1 &
+          echo "Waiting for Next.js..."
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3000 > /dev/null 2>&1; then
+              echo "Next.js is up."
+              break
+            fi
+            echo "  attempt $i..."
+            sleep 2
+          done
+
+      - name: Run OIDC Cypress tests
+        uses: cypress-io/github-action@v6
+        with:
+          browser: chrome
+          headed: false
+          install: false
+          spec: cypress/e2e/auth/oidc-login.cy.ts
+        env:
+          APPLICATION_MODE: standalone
+          CYPRESS: "true"
+          CYPRESS_OIDC_ENABLED: "true"
+
+      - name: Upload screenshots on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-screenshots-oidc
+          path: cypress/screenshots
+          retention-days: 7
+
+      - name: Upload videos
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cypress-videos-oidc
+          path: cypress/videos
+          retention-days: 7
+
+      - name: Upload mock API log on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: mock-api-log-oidc
+          path: mock-api.log
+          retention-days: 3
+
+      - name: Upload Next.js log on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: next-log-oidc
+          path: next.log
+          retention-days: 3

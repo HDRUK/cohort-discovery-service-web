@@ -1,0 +1,10 @@
+{
+  "AccessTokenJwtType": "at+jwt",
+  "Discovery": {
+    "ShowKeySet": true
+  },
+  "Authentication": {
+    "CookieSameSiteMode": "Lax",
+    "CheckSessionCookieSameSiteMode": "Lax"
+  }
+}

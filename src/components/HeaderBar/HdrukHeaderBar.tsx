@@ -1,12 +1,14 @@
 "use client";
 import Image from "next/image";
 import Link, { type LinkProps } from "next/link";
+import { useRouter } from "next/navigation";
 import logo from "@/assets/logo.svg";
 import { Header } from "@hdruk/ui";
 import useUserStore from "@/hooks/useUserStore";
 import { type AnchorHTMLAttributes } from "react";
 import { checkIsAdmin } from "@/utils/user";
 import { routes } from "@/config/routes";
+import { useApplicationMode } from "@/providers/ApplicationModeProvider";
 
 const NEXT_PUBLIC_LOGIN_URL =
   process.env.NEXT_PUBLIC_LOGIN_URL ?? "https://healthdatagateway.org";
@@ -29,7 +31,10 @@ const HeaderLink = ({ href, rel, ...props }: HeaderLinkProps) => {
 };
 
 const HdrukHeader = () => {
+  const router = useRouter();
   const user = useUserStore((s) => s.user);
+  const setUser = useUserStore((s) => s.setUser);
+  const { isStandalone } = useApplicationMode();
   const [first, last] = (user?.name ?? "").trim().split(/\s+/, 2);
 
   return (
@@ -56,6 +61,17 @@ const HdrukHeader = () => {
                 {
                   label: "Regression Tests",
                   href: routes.adminRegression,
+                },
+              ]
+            : []),
+          ...(isStandalone
+            ? [
+                {
+                  label: "Logout",
+                  action: () => {
+                    setUser(null);
+                    router.push("/auth/logout");
+                  },
                 },
               ]
             : []),

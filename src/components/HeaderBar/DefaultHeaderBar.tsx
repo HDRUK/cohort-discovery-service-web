@@ -7,25 +7,28 @@ import PositionedMenu, { PositionedMenuItem } from "../PositionedMenu";
 import { useRouter } from "next/navigation";
 import useUserStore from "@/hooks/useUserStore";
 import { useApplicationMode } from "@/providers/ApplicationModeProvider";
+import useFeatures from "@/hooks/useFeatures";
 
 const NEXT_PUBLIC_LOGIN_URL =
   process.env.NEXT_PUBLIC_LOGIN_URL ?? "https://healthdatagateway.org";
+const NEXT_PUBLIC_HEADER_LOGO_URL = process.env.NEXT_PUBLIC_HEADER_LOGO_URL;
 
 const DefaultHeaderBar = () => {
   const router = useRouter();
   const user = useUserStore((s) => s.user);
   const setUser = useUserStore((s) => s.setUser);
   const { isStandalone } = useApplicationMode();
+  const { hdrukTheme: hdrukThemeEnabled } = useFeatures();
 
   const links: PositionedMenuItem[] = [
-    ...(isStandalone
+    ...(isStandalone || !hdrukThemeEnabled
       ? [
           {
             id: "logout",
             label: "Logout",
             onClick: () => {
               setUser(null);
-              router.push("/api/auth/logout");
+              router.push("/auth/logout");
             },
           },
         ]
@@ -52,7 +55,20 @@ const DefaultHeaderBar = () => {
       <Toolbar sx={{ justifyContent: "space-between" }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Box sx={{ py: 0.5 }}>
-            <b> image</b>
+            {NEXT_PUBLIC_HEADER_LOGO_URL ? (
+              <Image
+                src={NEXT_PUBLIC_HEADER_LOGO_URL}
+                alt="Cohort Discovery logo"
+                width={120}
+                height={30}
+                unoptimized
+                style={{ height: 30, width: "auto", display: "block" }}
+              />
+            ) : (
+              <Typography component="span" fontWeight="bold">
+                Cohort Discovery
+              </Typography>
+            )}
           </Box>
         </Box>
 
