@@ -31,6 +31,7 @@ export interface SwimLaneProps extends GridProps {
   hideOnTransiton?: boolean;
   paperSx?: PaperProps["sx"];
   enableBlocker?: boolean;
+  topSlot?: React.ReactNode;
 }
 
 const SwimLane = ({
@@ -40,6 +41,7 @@ const SwimLane = ({
   size,
   paperSx,
   enableBlocker = false,
+  topSlot,
   ...rest
 }: SwimLaneProps) => {
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -137,6 +139,18 @@ const SwimLane = ({
           {...rest}
           size={size}
         >
+          {topSlot && (
+            <Paper
+              sx={{
+                flexShrink: 0,
+                p: 2,
+                mr: 1,
+                mb: 2,
+              }}
+            >
+              {!isTransitioning && topSlot}
+            </Paper>
+          )}
           <Paper
             sx={{
               display: "flex",

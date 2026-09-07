@@ -23,6 +23,7 @@ export type EditableTextProps = {
   showIcon?: boolean;
   singleClick?: boolean;
   editing?: boolean;
+  autoFocus?: boolean;
 };
 
 type FormValues = {
@@ -41,8 +42,9 @@ const EditableText = ({
   showIcon = false,
   singleClick = false,
   editing: editingProp,
+  autoFocus = true,
 }: EditableTextProps) => {
-  const [editing, setEditing] = useState(!defaultValue);
+  const [editing, setEditing] = useState(autoFocus ? !defaultValue : false);
   const [hovering, setHovering] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -160,7 +162,7 @@ const EditableText = ({
             render={({ field, fieldState: { error } }) => (
               <TextField
                 id={STABLE_ID}
-                autoFocus
+                autoFocus={autoFocus}
                 inputRef={inputRef}
                 {...field}
                 error={!!error}

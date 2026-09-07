@@ -23,6 +23,9 @@ export type TabType = {
   page: React.ReactNode;
   id?: string;
   label: string;
+  icon?: React.ReactElement | string;
+  iconOnly?: boolean;
+  alignRight?: boolean;
   href?: string;
   route?: string;
   onCloseHref?: string;
@@ -39,7 +42,6 @@ type TabsShellProps = {
   tabListSx?: BoxProps["sx"];
   tabContentSx?: BoxProps["sx"];
   forceValue?: boolean;
-  endIcon?: React.ReactNode;
 };
 
 export default function TabsShell({
@@ -51,7 +53,6 @@ export default function TabsShell({
   tabListSx,
   tabContentSx,
   forceValue = false,
-  endIcon = null,
 }: TabsShellProps) {
   const router = useRouter();
   const [internalValue, setInternalValue] = React.useState(
@@ -83,43 +84,63 @@ export default function TabsShell({
             scrollButtons="auto"
           >
             {tabs.map(
-              ({ id, label, href, onCloseHref, disabled = false }, i) => {
+              (
+                {
+                  id,
+                  label,
+                  icon,
+                  iconOnly,
+                  href,
+                  onCloseHref,
+                  disabled = false,
+                },
+                i,
+              ) => {
                 return (
                   <Tab
                     disabled={disabled}
                     value={id || i}
                     key={id || label}
+                    aria-label={iconOnly ? label : undefined}
+                    icon={icon}
+                    iconPosition="start"
                     label={
-                      <Typography
-                        variant="body1"
-                        component="span"
-                        sx={mergeSx(
-                          { p: 0, m: 0 },
-                          internalValue.toString() === (id ?? i).toString()
-                            ? { fontWeight: "600" }
-                            : {},
-                          disabled ? { display: "none" } : {},
-                        )}
-                      >
-                        {label}
-                        {onCloseHref && (
-                          <IconButton
-                            size="small"
-                            onClick={async (e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              router.replace(onCloseHref);
-                            }}
-                          >
-                            <CloseIcon />
-                          </IconButton>
-                        )}
-                      </Typography>
+                      iconOnly && !onCloseHref ? undefined : (
+                        <Typography
+                          variant="body1"
+                          component="span"
+                          sx={mergeSx(
+                            { p: 0, m: 0 },
+                            internalValue.toString() === (id ?? i).toString()
+                              ? { fontWeight: "600" }
+                              : {},
+                            disabled ? { display: "none" } : {},
+                          )}
+                        >
+                          {!iconOnly && label}
+                          {onCloseHref && (
+                            <IconButton
+                              size="small"
+                              onClick={async (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                router.replace(onCloseHref);
+                              }}
+                            >
+                              <CloseIcon />
+                            </IconButton>
+                          )}
+                        </Typography>
+                      )
                     }
                     component={href ? Link : "a"}
                     href={href ?? undefined}
                     sx={mergeSx(
                       defaultTabSx,
+                      iconOnly ? { minWidth: 50 } : {},
+                      i === tabs.findIndex((tab) => tab.alignRight)
+                        ? { ml: "auto" }
+                        : {},
                       tabSx,
                       disabled ? { display: "none" } : {},
                     )}
@@ -131,7 +152,6 @@ export default function TabsShell({
               },
             )}
           </TabList>
-          <Box alignContent="center">{endIcon}</Box>
         </Box>
 
         {kids.length > 0 && (

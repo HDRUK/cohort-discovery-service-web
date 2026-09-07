@@ -21,6 +21,15 @@ export enum FeatureName {
   HdrukTheme = "hdruk-uk-theme",
 
   AdminMoreCollectionDetails = "admin-more-collection-details",
+
+  QueryBuilderUseValueAsNumber = "query-builder-use-value-as-number",
+  QueryBuilderUseLocation = "query-builder-use-location",
+  QueryBuilderUseDeath = "query-builder-use-death",
+  QueryBuilderUseRace = "query-builder-use-race",
+
+  QueryBuilderUseDemographicRule = "query-builder-use-demographic-rule",
+
+  AccessBanner = "access-banner",
 }
 
 export type FeatureFlag = Record<FeatureName, boolean>;
@@ -50,4 +59,13 @@ export const DEFAULT_FLAGS: FeatureFlag = {
   [FeatureName.ManageWorkgroupsInternally]: true,
 
   [FeatureName.AdminMoreCollectionDetails]: false,
+
+  [FeatureName.QueryBuilderUseValueAsNumber]: false,
+  [FeatureName.QueryBuilderUseLocation]: false,
+  [FeatureName.QueryBuilderUseDeath]: false,
+  [FeatureName.QueryBuilderUseRace]: true,
+
+  [FeatureName.QueryBuilderUseDemographicRule]: false,
+
+  [FeatureName.AccessBanner]: false,
 };

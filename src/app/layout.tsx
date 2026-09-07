@@ -5,6 +5,7 @@ import { Box } from "@mui/material";
 import ThemeRegistry from "@/components/ThemeRegistry";
 import TopMenu from "@/components/TopMenu";
 import HeaderBar from "@/components/HeaderBar";
+import AccessBanner from "@/components/AccessBanner";
 import { isStandalone } from "@/utils/modes";
 import Footer from "@/components/Footer";
 import ServerDefaultProvider from "@/providers/ServerDefaultProvider";
@@ -53,6 +54,8 @@ export default async function RootLayout({
                   {!standalone && <SupportPopOut />}
 
                   {!hideNav && <HeaderBar />}
+
+                  {!hideNav && <AccessBanner />}
 
                   <Box
                     sx={{

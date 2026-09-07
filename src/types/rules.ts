@@ -7,14 +7,34 @@ export enum CombinatorType {
   FOLLOWED_BY = "followed_by",
 }
 
+export enum ValueAsNumberOperator {
+  GREATER_THAN = "≥",
+  LESS_THAN = "<",
+  BETWEEN = "↔",
+}
+
 export enum SingleSidedOperator {
-  GREATER_THAN = "gt",
-  LESS_THAN = "lt",
+  GREATER_THAN = "≥",
+  LESS_THAN = "<",
 }
 
 export type ConceptOperator = {
   concept: Concept | Concept[] | null;
 };
+
+export type GeoRadiusLocation = {
+  lat: number;
+  lon: number;
+  radius: number;
+  address?: string;
+};
+
+export interface Demographics {
+  age: [number, number] | null;
+  sex: Concept[];
+  race: Concept[];
+  location: GeoRadiusLocation | null;
+}
 
 type Node = {
   id: string;
@@ -27,6 +47,8 @@ type Node = {
   timeConstraintOperator?: SingleSidedOperator;
   ageConstraint?: [number | null, number | null];
   ageConstraintOperator?: SingleSidedOperator;
+  valueAsNumber?: [number | null, number | null];
+  valueAsNumberOperator?: ValueAsNumberOperator;
 };
 
 export interface OperatorType extends Node {
@@ -35,6 +57,7 @@ export interface OperatorType extends Node {
 
 export interface RuleGroupType extends Node {
   rules: Array<RuleNodeType>;
+  demographics?: Demographics;
 }
 
 export interface RuleLeafType extends Node {

@@ -8,6 +8,7 @@ import {
 } from "@/types/omop";
 import { capitaliseFirstLetter } from "./string";
 import { DOMAIN_MAP } from "@/config/domains";
+import { VALUE_AS_NUMBER_DOMAINS } from "@/config/rules";
 
 const codesToOption = (codes: Code[]): Option[] =>
   codes
@@ -62,4 +63,20 @@ const getUniqueDomains = (concept: Concept | Concept[] | null): Set<string> => {
   );
 };
 
-export { codesToOption, getDomainPhrase, getDomainPastPhrase, getDomain, getUniqueDomains };
+const isValueAsNumberDomain = (concept: Concept | Concept[] | null): boolean => {
+  if (concept == null) return false;
+  const matches = (c: Concept) =>
+    VALUE_AS_NUMBER_DOMAINS.has(c.category.toLowerCase() as OmopTableName);
+  if (Array.isArray(concept)) return concept.length > 0 && concept.every(matches);
+  return matches(concept);
+};
+
+const NO_SELECTOR_DOMAINS = new Set<OmopTableName>([
+  OmopTableName.Gender,
+  OmopTableName.Race,
+]);
+
+const categoryHasSelectors = (category: string): boolean =>
+  !NO_SELECTOR_DOMAINS.has(category.toLowerCase() as OmopTableName);
+
+export { codesToOption, getDomainPhrase, getDomainPastPhrase, getDomain, getUniqueDomains, isValueAsNumberDomain, categoryHasSelectors };

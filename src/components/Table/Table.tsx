@@ -1,4 +1,4 @@
-import { Box, BoxProps, Divider, Grid, Typography } from "@mui/material";
+import { Box, BoxProps, Grid, Typography } from "@mui/material";
 import {
   MaterialReactTable,
   MaterialReactTableProps,
@@ -137,11 +137,7 @@ const Table = <TData extends MRT_RowData>({
         </Grid>
       )}
 
-      {details && (
-        <Box sx={{ pb: 1 }}>
-          <Divider /> {details}
-        </Box>
-      )}
+      {details && <Box sx={{ pb: 1 }}>{details}</Box>}
 
       {emptyMessage && nrows === 0 ? (
         <Box

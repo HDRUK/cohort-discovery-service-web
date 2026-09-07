@@ -10,8 +10,8 @@ import ClearQueryButton from "@/components/ClearQueryButton";
 import ShowJsonButton from "@/components/ShowJsonButton";
 
 const CohortQueryPreview = () => {
+  const previewText = useQueryBuilder((qb) => qb.queryAsText);
   const warnings = useQueryBuilder((qb) => qb.queryBuilderJson.warnings ?? []);
-  const queryAsText = useQueryBuilder((qb) => qb.queryAsText);
 
   return (
     <Stack
@@ -23,7 +23,7 @@ const CohortQueryPreview = () => {
       width="100%"
     >
       <Stack>
-        <Typography>{queryAsText}</Typography>
+        <Typography>{previewText}</Typography>
         <CohortErrors />
       </Stack>
       <Stack gap={1} direction={"row"}>

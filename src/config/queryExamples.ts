@@ -4,13 +4,33 @@ import { v4 as uuidv4 } from "uuid";
 import query1 from "@/data/examples/query_1.json";
 import query2 from "@/data/examples/query_2.json";
 import query3 from "@/data/examples/query_3.json";
+import query1WithDemo from "@/data/examples/with_demo/query_1.json";
+import query2WithDemo from "@/data/examples/with_demo/query_2.json";
+
+const WOMEN_OVER_18 = "E.g. Women over 18 with Covid";
+const ADULTS_DIABETES =
+  "E.g. Adults with diabetes on insulin (glargine or detemir)";
+const COVID_VACCINES = "E.g. Covid and moderna or pfizer";
 
 export const EXAMPLES: Record<string, RuleGroupType> = {
-  "E.g. Women over 18 with Covid": query1 as RuleGroupType,
-  "E.g. Adults with diabetes on insulin (glargine or detemir)":
-    query2 as RuleGroupType,
-  "E.g. Covid and moderna or pfizer": query3 as RuleGroupType,
+  [WOMEN_OVER_18]: query1 as RuleGroupType,
+  [ADULTS_DIABETES]: query2 as RuleGroupType,
+  [COVID_VACCINES]: query3 as RuleGroupType,
 };
+
+// Variants used when the `query-builder-use-demographic-rule` flag is on: age
+// and sex live in a `demographics` block instead of standalone age-filter /
+// Gender-concept rule nodes. query_3 has no age/sex, so it is shared as-is.
+export const DEMOGRAPHIC_EXAMPLES: Record<string, RuleGroupType> = {
+  [WOMEN_OVER_18]: query1WithDemo as unknown as RuleGroupType,
+  [ADULTS_DIABETES]: query2WithDemo as unknown as RuleGroupType,
+  [COVID_VACCINES]: query3 as RuleGroupType,
+};
+
+export const getExamples = (
+  useDemographicRule: boolean,
+): Record<string, RuleGroupType> =>
+  useDemographicRule ? DEMOGRAPHIC_EXAMPLES : EXAMPLES;
 
 export const NO_QUERY: RuleGroupType = {
   id: uuidv4(),

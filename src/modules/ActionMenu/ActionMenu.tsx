@@ -36,8 +36,13 @@ const ActionMenu: React.FC = () => {
         defaultExpanded
         underline
       >
-        {actions.map(({ action, label }) => (
-          <AddButton key={label} onClick={action} label={label} />
+        {actions.map(({ action, label, disabled }) => (
+          <AddButton
+            key={label}
+            onClick={action}
+            label={label}
+            disabled={disabled}
+          />
         ))}
       </ActionMenuSection>
       <ActionMenuSection

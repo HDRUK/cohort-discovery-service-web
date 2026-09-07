@@ -4,6 +4,7 @@
   *  OMOP domain name
   * @property {[string | null, string | null] | undefined} timeConstraint
   * @property {[number | null, number | null] | undefined} ageConstraint
+  * @property {[number | null, number | null] | undefined} valueAsNumber
   * @property {boolean} showSelectors
   */}
 
@@ -25,6 +26,7 @@
     <>
       <AddTimeFrameButton label="Add timeframe" />
       <AddAgeButton label="Add age" />
+      <AddValueAsNumberButton label="Add value" />
     </>
   }
 </Box>
@@ -52,6 +54,20 @@
           </Box>
         </Box>
       </CollapsibleGuidance>
+
+      {props.valueAsNumber && (
+        <CollapsibleGuidance keyPrefix="RuleValueAsNumberSelector" title="Set Value">
+          <RuleValueAsNumberSelector>
+            <DeleteValueAsNumberButton label="Remove value from this rule" />
+          </RuleValueAsNumberSelector>
+          <Box>
+            Filter patients by their recorded numeric value for this concept. Use <strong>≥</strong> or <strong>&lt;</strong> for a one-sided bound, or <strong>↔</strong> to set a range with both a lower and upper limit.
+          </Box>
+          <Box sx={{ color: "error.main" }}>
+            This is a filter on the raw measurement value, at current it does not taking into account the units of the measurement
+          </Box>
+        </CollapsibleGuidance>
+      )}
     </>
   }
 </Box>

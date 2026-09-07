@@ -9,6 +9,7 @@ import {
   BoardIndex,
   OperatorType,
   AgeFilterType,
+  Demographics,
 } from "@/types/rules";
 import { UniqueIdentifier } from "@dnd-kit/core";
 import { v4 as uuidv4 } from "uuid";
@@ -171,8 +172,7 @@ export const hasAlternatives = (
 
 export const isMultipleConcept = (
   concept: Concept | Concept[] | null,
-): concept is Concept[] =>
-  Array.isArray(concept) && concept.length > 0;
+): concept is Concept[] => Array.isArray(concept) && concept.length > 0;
 
 export const getPrimaryConcept = (
   concept: Concept | Concept[] | null,
@@ -443,15 +443,24 @@ export const buildIndexFromModel = (root: RuleGroupType): BoardIndex => {
   return { containers, itemsByGroup };
 };
 
+export const hasDemographicsContent = (demographics?: Demographics): boolean =>
+  !!demographics &&
+  (demographics.age !== null ||
+    demographics.sex.length > 0 ||
+    demographics.race.length > 0 ||
+    demographics.location !== null);
+
 export function validateRuleTree(
   root: RuleGroupType,
   options?: {
     constrainForBunnyV1: boolean;
     allowNestedGroups: boolean;
+    allowDemographicsOnly?: boolean;
   },
 ): RuleGroupType {
   const constrainForBunnyV1 = options?.constrainForBunnyV1 ?? false;
   const allowNestedGroups = options?.allowNestedGroups ?? false;
+  const allowDemographicsOnly = options?.allowDemographicsOnly ?? false;
 
   const isContent = (n: RuleNodeType) =>
     isRuleLeaf(n) || isRuleGroup(n) || isAgeFilter(n);
@@ -686,7 +695,12 @@ export function validateRuleTree(
   };
 
   if (root.rules.length === 0) {
-    return { ...validateNode(root), valid: false } as RuleGroupType;
+    const demographicsOnlyValid =
+      allowDemographicsOnly && hasDemographicsContent(root.demographics);
+    return {
+      ...validateNode(root),
+      valid: demographicsOnlyValid,
+    } as RuleGroupType;
   }
 
   const validatedRoot = validateGroup(root);

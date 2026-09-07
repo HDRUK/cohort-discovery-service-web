@@ -8,6 +8,7 @@ interface Payload {
   query: string;
   ignore_synthetic?: boolean;
   prefer_non_synthetic?: boolean;
+  collections?: string[];
 }
 
 const parseQuery = async (
@@ -15,12 +16,14 @@ const parseQuery = async (
   options?: {
     ignoreSynthetic?: boolean;
     preferNonSynthetic?: boolean;
+    collections?: string[];
   },
 ): Promise<ApiResponse<string>> => {
   return await apiPost<ApiResponse<string>, Payload>(API_ROUTES.parseQuery, {
     query,
     ignore_synthetic: options?.ignoreSynthetic,
     prefer_non_synthetic: options?.preferNonSynthetic,
+    collections: options?.collections,
   });
 };
 

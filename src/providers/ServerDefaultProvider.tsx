@@ -22,6 +22,7 @@ export default async function ServerDefaultProvider({
     searchSuggestionRotation: envInt(
       process.env.DEFAULT_SEARCH_SUGGESTION_ROTATION,
     ),
+    locationMinRadius: envInt(process.env.DEFAULT_LOCATION_MIN_RADIUS),
     serviceDeskUrl: process.env.CONFIG_SERVICE_DESK_URL,
     serviceDeskSupportSuffix: process.env.CONFIG_SERVICE_DESK_SUPPORT_SUFFIX,
     serviceDeskReportBugSuffix:

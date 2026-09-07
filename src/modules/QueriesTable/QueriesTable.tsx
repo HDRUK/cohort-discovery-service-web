@@ -324,7 +324,9 @@ const QueriesTable = ({
             },
           }}
           rightAction={{
-            sortProps: { field: "name" },
+            sortProps: {
+              fields: [{ field: "name", displayName: "Name", numeric: false }],
+            },
           }}
         />
       }

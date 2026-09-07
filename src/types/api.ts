@@ -1,3 +1,4 @@
+import { DomainTab } from "@/config/domainFilters";
 import { QueryContext } from "./context";
 import { Role, RoleName } from "./roles";
 import { RuleGroupType } from "./rules";
@@ -32,6 +33,11 @@ export interface QueryHistorySearchParams extends ApiSearchParams {
 export interface ConceptSearchParams extends ApiSearchParams {
   domain?: string;
   collections?: string[];
+}
+
+export interface TermDirectorySearchParams extends ApiSearchParams {
+  domain?: DomainTab;
+  collections?: string;
 }
 
 export interface CacheOptions {
@@ -173,6 +179,8 @@ export interface Collection extends WithTimestamps {
   custodian_id?: number;
   model_state: ModelState;
   is_synthetic?: boolean;
+  location_enabled?: boolean;
+  death_enabled?: boolean;
 }
 
 export interface CollectionConfig {
@@ -226,6 +234,14 @@ export interface CodeStat extends Code {
   total_count: number;
   collections_count: number;
   collections_pct: number;
+}
+
+export interface TermDirectoryEntry {
+  concept_id: number;
+  concept_name: string;
+  domain_id: string;
+  count: number;
+  ncollections: number;
 }
 
 export interface TaskRun {
@@ -431,6 +447,8 @@ export interface CreateCollectionPost {
   pid: string;
   model_state?: ModelState;
   is_synthetic?: boolean;
+  location_enabled?: boolean;
+  death_enabled?: boolean;
 }
 
 export interface UpdateCollectionPayload {

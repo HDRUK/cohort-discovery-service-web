@@ -31,6 +31,7 @@ export const tabContentSx: Sx = {
 };
 
 export const tabListSx: Sx = {
+  width: "100%",
   "& .MuiTabs-indicator": {
     top: 0,
     bottom: "auto",

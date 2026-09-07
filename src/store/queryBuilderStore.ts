@@ -7,6 +7,7 @@ import {
   BoardIndex,
   RuleGroupType,
   RuleNodeType,
+  Demographics,
 } from "@/types/rules";
 import {
   buildIndexFromModel,
@@ -58,6 +59,13 @@ export const Creators: Record<string, NodeFactory> = {
 
 export const DEFAULT_QUERY: RuleGroupType =
   process.env.NEXT_PUBLIC_USE_EXAMPLE_QUERY === "true" ? EXAMPLE_1 : NO_QUERY;
+
+export const EMPTY_DEMOGRAPHICS: Demographics = {
+  age: null,
+  sex: [],
+  race: [],
+  location: null,
+};
 
 export interface QueryBuilderStoreState {
   queryName: string;
@@ -112,10 +120,18 @@ export interface QueryBuilderStoreState {
   createNewOperator: () => RuleNodeType;
   createNewAgeFilter: () => RuleNodeType;
 
+  addDemographics: () => void;
+  removeDemographics: () => void;
+  setDemographics: (demographics: Demographics) => void;
+
   queryAsText: string;
   getQueryFromText: (
     input: string,
-    options?: { commit?: boolean; ignoreSynthetic?: boolean },
+    options?: {
+      commit?: boolean;
+      ignoreSynthetic?: boolean;
+      collections?: string[];
+    },
   ) => Promise<RuleGroupType>;
 
   previouslySelectedDatasets: string[];
@@ -354,6 +370,23 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
   createNewOperator: () => get().createNewNode(NodeKind.OPERATOR),
   createNewAgeFilter: () => get().createNewNode(NodeKind.AGE_FILTER),
 
+  addDemographics: () => {
+    const { queryBuilderJson, setQueryBuilderJson } = get();
+    if (queryBuilderJson.demographics) return;
+    setQueryBuilderJson(
+      { ...queryBuilderJson, demographics: { ...EMPTY_DEMOGRAPHICS } },
+      true,
+    );
+  },
+  removeDemographics: () => {
+    const { queryBuilderJson, setQueryBuilderJson } = get();
+    setQueryBuilderJson({ ...queryBuilderJson, demographics: undefined }, true);
+  },
+  setDemographics: (demographics) => {
+    const { queryBuilderJson, setQueryBuilderJson } = get();
+    setQueryBuilderJson({ ...queryBuilderJson, demographics }, true);
+  },
+
   queryAsText: queryToText(DEFAULT_QUERY),
 
   setQueryBuilderJson: (
@@ -520,7 +553,12 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     {
       commit = false,
       ignoreSynthetic = false,
-    }: { commit?: boolean; ignoreSynthetic?: boolean } = {},
+      collections,
+    }: {
+      commit?: boolean;
+      ignoreSynthetic?: boolean;
+      collections?: string[];
+    } = {},
   ) => {
     const cleanQuery = (queryString: string) => {
       const query = JSON.parse(queryString) as RuleGroupType;
@@ -531,7 +569,9 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     };
     const { data: newQueryString } = await parseQuery(input, {
       ignoreSynthetic,
+      collections,
     });
+
     const newQuery = cleanQuery(newQueryString);
     return commit ? get().setQueryBuilderJson(newQuery) : newQuery;
   },
@@ -544,6 +584,8 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
         featureFlags?.[FeatureName.ConstrainForBunnyV1] || false,
       allowNestedGroups:
         featureFlags?.[FeatureName.QueryBuilderAllowNestedGroups] || false,
+      allowDemographicsOnly:
+        featureFlags?.[FeatureName.QueryBuilderUseDemographicRule] || false,
     });
   },
 

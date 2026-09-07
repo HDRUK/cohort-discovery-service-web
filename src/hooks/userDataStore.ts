@@ -127,11 +127,7 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
       useQueryBuilderStore.getState();
     const queryName = name ? name : null;
 
-    const res = await submitQuery(
-      queryBuilderJson,
-      queryName,
-      selectedDatasets,
-    );
+    const res = await submitQuery(queryBuilderJson, queryName, selectedDatasets);
 
     if (reset) {
       useQueryBuilderStore.getState().setQueryBuilderJson(DEFAULT_QUERY);

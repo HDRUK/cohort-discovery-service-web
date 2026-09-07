@@ -20,6 +20,7 @@ export enum OmopTableName {
   Gender = "gender",
   Race = "race",
   Ethnicity = "ethnicity",
+  Person = "person",
 }
 
 export type DomainPhrase = {
@@ -145,6 +146,14 @@ export const DOMAIN_PHRASES: Record<OmopTableName, DomainPhrase> = {
     verbPast: "recorded",
     pastPrefix: "was",
     noun: "ethnicity",
+    include: "were recorded as being",
+    exclude: "were not recorded as being",
+  },
+  [OmopTableName.Person]: {
+    verb: "record",
+    verbPast: "recorded",
+    pastPrefix: "was",
+    noun: "person",
     include: "were recorded as being",
     exclude: "were not recorded as being",
   },

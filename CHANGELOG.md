@@ -1,3 +1,51 @@
+## [1.9.0](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.8.0...v1.9.0) (2026-08-21)
+
+### ✨ Features
+
+* **DP-1000:** match the "X collections" pill design from figma in term directory (#454) ([3e96f24](https://github.com/HDRUK/cohort-discovery-service-web/commit/3e96f248540650621fe3c1986835ccb392d513d5)), closes [DP-1000](undefinedDP-1000)
+* **DP-1018:** add SDE access banner (#463) ([4687240](https://github.com/HDRUK/cohort-discovery-service-web/commit/468724053a6ed1d7da207f9bbea959cca4642db3)), closes [DP-1018](undefinedDP-1018)
+* **DP-1055:** help tutorials in MDX with a route per section (#473) ([3717b79](https://github.com/HDRUK/cohort-discovery-service-web/commit/3717b79879ce6097c7ca032aa1a75e2ce14c9f59)), closes [DP-1055](undefinedDP-1055)
+* **DP-1056:** Update example for useDemographic rule (#468) ([183ec0e](https://github.com/HDRUK/cohort-discovery-service-web/commit/183ec0e04b4c55ef26a52ea161e224fbed6e87bc)), closes [DP-1056](undefinedDP-1056)
+* **DP-857:** demographics panel in the query builder (#467) ([66f9e26](https://github.com/HDRUK/cohort-discovery-service-web/commit/66f9e267f0c2ed50c935fdf24cf9dcd10f36914d)), closes [DP-857](undefinedDP-857)
+* **DP-905:** add term directory collection filter (#443) ([b3d5874](https://github.com/HDRUK/cohort-discovery-service-web/commit/b3d58740a46ce469850fb10218808abcaa1bd44d)), closes [DP-905](undefinedDP-905)
+* **DP-917:** add term directory navigation (#449) ([1f051f2](https://github.com/HDRUK/cohort-discovery-service-web/commit/1f051f2493aee76917b68ef5bda80c8f03e20259)), closes [DP-917](undefinedDP-917) [navigation](undefinedgation)
+* **DP-997:** add an "All" domain filter tab in term directory (#450) ([460c1d0](https://github.com/HDRUK/cohort-discovery-service-web/commit/460c1d053a6ced6811b77a920792ae58321443a1)), closes [DP-997](undefinedDP-997)
+* **DP-998:** add Domain column to term directory table (#452) ([b25678d](https://github.com/HDRUK/cohort-discovery-service-web/commit/b25678d1069b446a70f6ad4affccff48b8d53a7f)), closes [DP-998](undefinedDP-998)
+
+### 🐛 Bug Fixes
+
+* **DP-1032:** temporarily disable sorting in term directory (#458) ([6ace765](https://github.com/HDRUK/cohort-discovery-service-web/commit/6ace7651a5f7f0678fdab08a9735de9e141d1338)), closes [DP-1032](undefinedDP-1032)
+* **DP-1040:** UI improvements for term directory 2 (#466) ([ef74df2](https://github.com/HDRUK/cohort-discovery-service-web/commit/ef74df26501336e0e18bfd985f8e095089cbd708)), closes [DP-1040](undefinedDP-1040)
+* **DP-1057:** stop stale demographics block leaking when editing another query (#469) ([54bf218](https://github.com/HDRUK/cohort-discovery-service-web/commit/54bf2180964ef0323a22fa1c00b4701be8c73588)), closes [DP-1057](undefinedDP-1057)
+* **DP-1058:** stop search overlay flashing open on first click after load (#471) ([0f98e65](https://github.com/HDRUK/cohort-discovery-service-web/commit/0f98e65de62484325258ba990611308380d75c51)), closes [DP-1058](undefinedDP-1058)
+* **DP-955:** search bar auto select on initial load (#445) ([074e747](https://github.com/HDRUK/cohort-discovery-service-web/commit/074e7477a0d79e28d062f8ed66cb1034826d2c63)), closes [DP-955](undefinedDP-955)
+* **DP-983:** drag overlay crash from missing CloseGuardProvider (#455) ([97f1dd4](https://github.com/HDRUK/cohort-discovery-service-web/commit/97f1dd4660370f46345520421db8156a92addd18)), closes [DP-983](undefinedDP-983) [CloseGuardProvider](undefineddProvider)
+* **DP-999:** UI improvements for term directory (#453) ([eef2a6c](https://github.com/HDRUK/cohort-discovery-service-web/commit/eef2a6cc2fdf2452386831a9fc57925a750f63b1)), closes [DP-999](undefinedDP-999)
+
+## [1.8.0](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.7.1...v1.8.0) (2026-07-29)
+
+### ✨ Features
+
+* **DP-903:** term directory page foundation & browse (#433) ([d734e91](https://github.com/HDRUK/cohort-discovery-service-web/commit/d734e91db67a7bbd2920527a70603d790bc5992a)), closes [DP-903](undefinedDP-903)
+* **DP-904:** add term directory search (#438) ([96d57bc](https://github.com/HDRUK/cohort-discovery-service-web/commit/96d57bc463e9107783dd1759ac02d7a00efdbec8)), closes [DP-904](undefinedDP-904)
+* **DP-906:** add Term Directory "copy OMOP ID" button (#442) ([543e250](https://github.com/HDRUK/cohort-discovery-service-web/commit/543e250dbe3764865f93b63b6cdc4d717313d7a8)), closes [DP-906](undefinedDP-906)
+* **DP-913:** Adding Rule for value as number selector (#427) ([fbd2d8d](https://github.com/HDRUK/cohort-discovery-service-web/commit/fbd2d8dcf62969aeaad60aa4a5d911c6e1095efd)), closes [DP-913](undefinedDP-913)
+* **DP-929:** Update for query parser to send collections (#434) ([4997adf](https://github.com/HDRUK/cohort-discovery-service-web/commit/4997adfc1481206574440538e0235abd6ae8600a)), closes [DP-929](undefinedDP-929)
+* **DP-932:** New workflow for deploying to dev standalone (#430) ([077b724](https://github.com/HDRUK/cohort-discovery-service-web/commit/077b724a92ff32767d6c4302dc63e556bdf471cb)), closes [DP-932](undefinedDP-932)
+* **DP-941:** add term directory domain filters (#440) ([46600d7](https://github.com/HDRUK/cohort-discovery-service-web/commit/46600d7abc68f3e5c2f4d8d673da1d79d309b9ee)), closes [DP-941](undefinedDP-941)
+
+### 🐛 Bug Fixes
+
+* **DP-932:** updated dev deployment pipeline for standalone so it can run on manual… (#436) ([8442ca0](https://github.com/HDRUK/cohort-discovery-service-web/commit/8442ca0f4471b1ec3deffacb235dbc35229ba639)), closes [DP-932](undefinedDP-932)
+* **DP-932:** updated dev pipeline to run standalone when tag has been added (#439) ([95d9d3b](https://github.com/HDRUK/cohort-discovery-service-web/commit/95d9d3b5b8ea78cdfa6e58d7456edd84f6d7521a)), closes [DP-932](undefinedDP-932)
+* **GAT-8999:** removed args duplicates from the pipelines (#428) ([f304441](https://github.com/HDRUK/cohort-discovery-service-web/commit/f304441d62eca89f22636e55724cbea89bb80fca)), closes [GAT-8999](undefinedGAT-8999)
+
+## [1.7.1](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.7.0...v1.7.1) (2026-06-29)
+
+### 🐛 Bug Fixes
+
+* **DP-861:** Truncate long concept names with "..." (#417) ([a64f25d](https://github.com/HDRUK/cohort-discovery-service-web/commit/a64f25d8aae0d3e3c481a14fb71c3e8d0ad99b79)), closes [DP-861](undefinedDP-861)
+
 ## [1.7.0](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.6.0...v1.7.0) (2026-06-12)
 
 ### ✨ Features

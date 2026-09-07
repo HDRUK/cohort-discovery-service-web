@@ -1,0 +1,68 @@
+{
+  "id": "32f036e6-4a6c-4f33-b998-db011f07563f",
+  "rules": [
+    {
+      "id": "d852d24b-de59-46b6-a66c-de9e4a532d50",
+      "exclude": false,
+      "rule": {
+        "concept": {
+          "concept_id": 201826,
+          "name": "Type 2 diabetes mellitus",
+          "category": "Condition",
+          "children": []
+        }
+      }
+    },
+    {
+      "id": "09cd14b2-96aa-40e3-b2a4-d4d815f0f650",
+      "combinator": "and",
+      "exclude": false
+    },
+    {
+      "id": "2e542e7c-385a-4192-a93a-d596f94b0d7c",
+      "rules": [
+        {
+          "id": "2f2256c6-184e-458a-a033-010be05906b1",
+          "rule": {
+            "concept": {
+              "name": "3 ML Insulin Glargine 100 UNT/ML Injectable Suspension",
+              "count": "109505",
+              "category": "Drug",
+              "children": [],
+              "concept_id": 44191029
+            }
+          },
+          "exclude": false
+        },
+        {
+          "id": "2cb286d0-cf73-4bb4-afe8-f12ab40a1638",
+          "combinator": "or"
+        },
+        {
+          "id": "b799412b-d60f-4ae5-91ff-f03a797acc5c",
+          "rule": {
+            "concept": {
+              "name": "3 ML insulin detemir 100 UNT/ML Prefilled Syringe",
+              "count": "124634",
+              "category": "Drug",
+              "children": [],
+              "concept_id": 21136739
+            }
+          },
+          "exclude": false,
+          "ageConstraintOperator": "≥",
+          "timeConstraintOperator": "≥"
+        }
+      ]
+    }
+  ],
+  "demographics": {
+    "age": [18, 120],
+    "sex": [],
+    "race": []
+  },
+  "constraints": {
+    "ageConstraint": [null, null],
+    "timeConstraint": [null, null]
+  }
+}

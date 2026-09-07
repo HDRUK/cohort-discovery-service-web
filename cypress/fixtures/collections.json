@@ -11,6 +11,9 @@
       "created_at": "2025-01-01T00:00:00Z",
       "updated_at": "2025-01-01T00:00:00Z",
       "last_active": null,
+      "is_synthetic": false,
+      "location_enabled": false,
+      "death_enabled": false,
       "model_state": {
         "id": 1,
         "state": { "id": 1, "name": "DRAFT", "slug": "draft" },
@@ -41,6 +44,9 @@
       "created_at": "2025-01-02T00:00:00Z",
       "updated_at": "2025-01-02T00:00:00Z",
       "last_active": "2025-01-02T10:00:00Z",
+      "is_synthetic": false,
+      "location_enabled": false,
+      "death_enabled": false,
       "model_state": {
         "id": 2,
         "state": { "id": 3, "name": "ACTIVE", "slug": "active" },
@@ -48,6 +54,105 @@
         "stateable_id": 2,
         "stateable_type": "App\\Models\\Collection",
         "updated_at": "2025-01-02 00:00:00"
+      },
+      "custodian": {
+        "id": 1,
+        "pid": "cust-pid-1",
+        "name": "Test Custodian",
+        "external_custodian_id": 100,
+        "external_custodian_name": "External Test Custodian",
+        "created_at": "2025-01-01T00:00:00Z",
+        "updated_at": "2025-01-01T00:00:00Z"
+      },
+      "host": [],
+      "config": null
+    },
+    {
+      "id": 3,
+      "pid": "col-pid-3",
+      "name": "Test Dataset Gamma",
+      "description": "Synthetic test dataset for E2E",
+      "url": null,
+      "type": "BUNNY",
+      "created_at": "2025-01-03T00:00:00Z",
+      "updated_at": "2025-01-03T00:00:00Z",
+      "last_active": "2025-01-03T10:00:00Z",
+      "is_synthetic": true,
+      "location_enabled": false,
+      "death_enabled": false,
+      "model_state": {
+        "id": 3,
+        "state": { "id": 3, "name": "ACTIVE", "slug": "active" },
+        "state_id": 3,
+        "stateable_id": 3,
+        "stateable_type": "App\\Models\\Collection",
+        "updated_at": "2025-01-03 00:00:00"
+      },
+      "custodian": {
+        "id": 1,
+        "pid": "cust-pid-1",
+        "name": "Test Custodian",
+        "external_custodian_id": 100,
+        "external_custodian_name": "External Test Custodian",
+        "created_at": "2025-01-01T00:00:00Z",
+        "updated_at": "2025-01-01T00:00:00Z"
+      },
+      "host": [],
+      "config": null
+    },
+    {
+      "id": 4,
+      "pid": "col-pid-4",
+      "name": "Test Dataset Delta",
+      "description": "Death-enabled test dataset for E2E",
+      "url": null,
+      "type": "BUNNY",
+      "created_at": "2025-01-04T00:00:00Z",
+      "updated_at": "2025-01-04T00:00:00Z",
+      "last_active": "2025-01-04T10:00:00Z",
+      "is_synthetic": false,
+      "location_enabled": false,
+      "death_enabled": true,
+      "model_state": {
+        "id": 4,
+        "state": { "id": 3, "name": "ACTIVE", "slug": "active" },
+        "state_id": 3,
+        "stateable_id": 4,
+        "stateable_type": "App\\Models\\Collection",
+        "updated_at": "2025-01-04 00:00:00"
+      },
+      "custodian": {
+        "id": 1,
+        "pid": "cust-pid-1",
+        "name": "Test Custodian",
+        "external_custodian_id": 100,
+        "external_custodian_name": "External Test Custodian",
+        "created_at": "2025-01-01T00:00:00Z",
+        "updated_at": "2025-01-01T00:00:00Z"
+      },
+      "host": [],
+      "config": null
+    },
+    {
+      "id": 5,
+      "pid": "col-pid-5",
+      "name": "Test Dataset Epsilon",
+      "description": "Location-enabled test dataset for E2E",
+      "url": null,
+      "type": "BUNNY",
+      "created_at": "2025-01-05T00:00:00Z",
+      "updated_at": "2025-01-05T00:00:00Z",
+      "last_active": "2025-01-05T10:00:00Z",
+      "is_synthetic": false,
+      "location_enabled": true,
+      "death_enabled": false,
+      "model_state": {
+        "id": 5,
+        "state": { "id": 3, "name": "ACTIVE", "slug": "active" },
+        "state_id": 3,
+        "stateable_id": 5,
+        "stateable_type": "App\\Models\\Collection",
+        "updated_at": "2025-01-05 00:00:00"
       },
       "custodian": {
         "id": 1,
