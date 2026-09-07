@@ -26,6 +26,7 @@ import {
   RegressionTestCollectionInput,
 } from "@/types/api";
 import { useTable } from "@/hooks/useTable";
+import ExpectedValue from "@/components/ExpectedValue";
 import Table from "@/components/Table";
 import { getDatetime, getDurationSeconds } from "@/utils/date";
 import getRegressionTests from "@/actions/regressionTest/getRegressionTests";
@@ -34,7 +35,6 @@ import updateRegressionTest from "@/actions/regressionTest/updateRegressionTest"
 import deleteRegressionTest from "@/actions/regressionTest/deleteRegressionTest";
 import runRegressionTest from "@/actions/regressionTest/runRegressionTest";
 import PassFailChip from "./PassFailChip";
-import EditableExpected from "./EditableExpected";
 import AddRegressionTestDialog from "./AddRegressionTestDialog";
 import useTaskPolling from "@/hooks/useTaskPolling";
 import { useConfirmBool } from "@/hooks/useConfirm";
@@ -243,8 +243,8 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
           if (row.original.kind !== "collection") return null;
           const { test, col } = row.original;
           return (
-            <EditableExpected
-              col={col}
+            <ExpectedValue
+              value={col.expected_result}
               onSave={(val) => handleUpdateExpected(test, col.pid, val)}
             />
           );
