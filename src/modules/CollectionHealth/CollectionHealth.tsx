@@ -450,6 +450,7 @@ const CollectionHealth = ({
     renderDetailPanel: ({ row }) => (
       <HealthDetailPanel
         row={row.original}
+        isExpanded={row.getIsExpanded()}
         isRunning={!!runStates[row.original.pid]}
         onUpdateExpected={(testPid, expected) =>
           handleUpdateExpected(testPid, expected, row.original.pid)
