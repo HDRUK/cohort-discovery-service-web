@@ -1,4 +1,5 @@
 import { create, StateCreator } from "zustand";
+import { v4 as uuidv4 } from "uuid";
 import { persist, createJSONStorage } from "zustand/middleware";
 import parseQuery from "@/actions/query/parseQuery";
 import { queryToText } from "@/utils/queryBuilder";
@@ -394,7 +395,14 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     validate = true,
     defaultInvalidText = "People who ...",
   ) => {
-    const updatedQuery = validate ? get().validateRules(query) : query;
+    const validated = validate ? get().validateRules(query) : query;
+    const updatedQuery =
+      validated.demographics && !validated.demographics.id
+        ? {
+            ...validated,
+            demographics: { ...validated.demographics, id: uuidv4() },
+          }
+        : validated;
 
     let text = "";
 

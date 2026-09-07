@@ -43,6 +43,7 @@ describe("queryBuilderStore demographics", () => {
   it("addDemographics creates an empty block; removeDemographics drops it", () => {
     store().addDemographics();
     expect(demographics()).toEqual({
+      id: expect.any(String),
       age: null,
       sex: [],
       race: [],
@@ -63,6 +64,7 @@ describe("queryBuilderStore demographics", () => {
     });
 
     expect(demographics()).toEqual({
+      id: expect.any(String),
       age: [18, 65],
       sex: [female, male],
       race: [white],
@@ -75,6 +77,7 @@ describe("queryBuilderStore demographics", () => {
     store().setDemographics({ ...EMPTY_DEMOGRAPHICS, race: [white, black] });
 
     expect(demographics()).toEqual({
+      id: expect.any(String),
       age: null,
       sex: [],
       race: [white, black],
@@ -85,6 +88,58 @@ describe("queryBuilderStore demographics", () => {
   it("keeps demographics inside queryBuilderJson (single source of truth)", () => {
     store().setDemographics({ ...EMPTY_DEMOGRAPHICS, sex: [male] });
     expect(store().queryBuilderJson.demographics?.sex).toEqual([male]);
+  });
+
+  describe("block id (what the panel is keyed on)", () => {
+    const id = () => demographics()?.id;
+
+    beforeEach(() => {
+      store().setDemographics({ ...EMPTY_DEMOGRAPHICS, age: [18, 65] });
+    });
+
+    it("is assigned when the block is created", () => {
+      expect(id()).toEqual(expect.any(String));
+    });
+
+    it("survives an edit written by the panel", () => {
+      const before = demographics() ?? EMPTY_DEMOGRAPHICS;
+
+      store().setDemographics({ ...before, age: [20, 65] });
+
+      expect(id()).toBe(before.id);
+    });
+
+    it("changes when a new query replaces the block", () => {
+      const before = id();
+
+      store().setQueryBuilderJson({
+        ...store().queryBuilderJson,
+        demographics: { ...EMPTY_DEMOGRAPHICS, sex: [female] },
+      });
+
+      expect(id()).toEqual(expect.any(String));
+      expect(id()).not.toBe(before);
+    });
+
+    it("keeps an id that comes in with a saved definition", () => {
+      store().setQueryBuilderJson({
+        ...store().queryBuilderJson,
+        demographics: { ...EMPTY_DEMOGRAPHICS, id: "saved-id", sex: [female] },
+      });
+
+      expect(id()).toBe("saved-id");
+    });
+
+    it("survives a query update that leaves the block alone", () => {
+      const before = id();
+
+      store().setQueryBuilderJson({
+        ...store().queryBuilderJson,
+        rules: [...store().queryBuilderJson.rules],
+      });
+
+      expect(id()).toBe(before);
+    });
   });
 
   describe("run-query validity (demographic-rule flag on)", () => {

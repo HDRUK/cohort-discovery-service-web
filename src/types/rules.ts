@@ -30,6 +30,7 @@ export type GeoRadiusLocation = {
 };
 
 export interface Demographics {
+  id?: string;
   age: [number, number] | null;
   sex: Concept[];
   race: Concept[];
