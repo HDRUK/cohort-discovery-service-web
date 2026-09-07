@@ -32,11 +32,11 @@ const demographics = () => store().queryBuilderJson.demographics;
 
 const female = { concept_id: 8532, name: "Female", category: "Gender" };
 
-const renderPanel = () =>
+const renderPanel = (initialExpand?: boolean) =>
   render(
     <QueryClientProvider client={new QueryClient()}>
       <ApplicationModeProvider>
-        <DemographicsPanel />
+        <DemographicsPanel initialExpand={initialExpand} />
       </ApplicationModeProvider>
     </QueryClientProvider>,
   );
@@ -87,6 +87,18 @@ describe("DemographicsPanel", () => {
       expect(demographics()?.age).toBeNull();
     });
 
+    it("keeps the block id on Save, so the panel is not remounted", async () => {
+      const before = demographics()?.id;
+      renderPanel();
+
+      await setAgeMin("20");
+      await userEvent.click(
+        screen.getByRole("button", { name: /save selection and collapse/i }),
+      );
+
+      expect(demographics()?.id).toBe(before);
+    });
+
     it("commits every field at once and collapses the panel on Save", async () => {
       renderPanel();
 
@@ -102,6 +114,36 @@ describe("DemographicsPanel", () => {
     });
   });
 
+  describe("pre-populated on load (NLP or a saved query)", () => {
+    beforeEach(() => {
+      store().setQueryBuilderJson(DEFAULT_QUERY);
+    });
+
+    it("starts fully collapsed, showing only the summary", () => {
+      store().setDemographics({
+        ...EMPTY_DEMOGRAPHICS,
+        age: [18, MAX_AGE_FILTER],
+      });
+      renderPanel();
+
+      expect(
+        screen.getByRole("button", { name: /expand demographics/i }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(new RegExp(`^Age 18–${MAX_AGE_FILTER} · Sex Any`)),
+      ).toBeInTheDocument();
+    });
+
+    it("stays open when the block is added with nothing set", () => {
+      store().addDemographics();
+      renderPanel();
+
+      expect(
+        screen.getByRole("button", { name: /collapse demographics/i }),
+      ).toBeInTheDocument();
+    });
+  });
+
   describe("after the first save (one row editable at a time)", () => {
     beforeEach(() => {
       store().setQueryBuilderJson(DEFAULT_QUERY);
@@ -109,7 +151,7 @@ describe("DemographicsPanel", () => {
     });
 
     it("disables the other rows' Edit buttons while a row is being edited", async () => {
-      renderPanel();
+      renderPanel(true);
 
       await userEvent.click(screen.getByRole("button", { name: /edit age/i }));
 
@@ -126,7 +168,7 @@ describe("DemographicsPanel", () => {
         sex: [female],
         age: [20, MAX_AGE_FILTER],
       });
-      renderPanel();
+      renderPanel(true);
 
       await userEvent.click(screen.getByRole("button", { name: /edit age/i }));
       await setAgeMin("40");
@@ -142,7 +184,7 @@ describe("DemographicsPanel", () => {
     });
 
     it("Reset Selection clears a saved Sex selection", async () => {
-      renderPanel();
+      renderPanel(true);
 
       await userEvent.click(screen.getByRole("button", { name: /edit sex/i }));
       await userEvent.click(
@@ -153,7 +195,7 @@ describe("DemographicsPanel", () => {
     });
 
     it("Save Selection and Collapse commits only the field that was edited", async () => {
-      renderPanel();
+      renderPanel(true);
 
       await userEvent.click(screen.getByRole("button", { name: /edit age/i }));
       await setAgeMin("30");
@@ -169,7 +211,7 @@ describe("DemographicsPanel", () => {
     });
 
     it("Clear all on a different row commits immediately and survives a later Save elsewhere", async () => {
-      renderPanel();
+      renderPanel(true);
 
       await userEvent.click(screen.getByRole("button", { name: /edit age/i }));
       await setAgeMin("30");
@@ -196,7 +238,7 @@ describe("DemographicsPanel", () => {
     });
 
     it("shows the Race row by default", () => {
-      renderPanel();
+      renderPanel(true);
 
       expect(
         screen.getByRole("button", { name: /edit race/i }),
@@ -207,7 +249,7 @@ describe("DemographicsPanel", () => {
       useFeatureFlagsStore.setState({
         flags: { [FeatureName.QueryBuilderUseRace]: false } as FeatureFlag,
       });
-      renderPanel();
+      renderPanel(true);
 
       expect(
         screen.queryByRole("button", { name: /edit race/i }),
@@ -254,7 +296,7 @@ describe("DemographicsPanel", () => {
         [withLocation, withoutLocation],
         [withLocation.pid, withoutLocation.pid],
       );
-      renderPanel();
+      renderPanel(true);
 
       await openLocationRow();
 
@@ -266,7 +308,7 @@ describe("DemographicsPanel", () => {
 
     it("explains that location is unavailable when no collection has it enabled", async () => {
       setUp([withoutLocation], [withoutLocation.pid]);
-      renderPanel();
+      renderPanel(true);
 
       await openLocationRow();
 
@@ -278,7 +320,7 @@ describe("DemographicsPanel", () => {
 
     it("ignores location-enabled collections that aren't selected", async () => {
       setUp([withLocation, withoutLocation], [withoutLocation.pid]);
-      renderPanel();
+      renderPanel(true);
 
       await openLocationRow();
 

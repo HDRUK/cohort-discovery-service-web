@@ -30,12 +30,9 @@ import getTermDirectory from "@/actions/termDirectory/getTermDirectory";
 import { OmopTableName } from "@/types/omop";
 import { useUserDataStore } from "@/hooks/userDataStore";
 import useFeatures from "@/hooks/useFeatures";
+import { hasDemographicsContent } from "@/utils/rules";
 
-const DemographicsPanel = ({
-  initialExpand = true,
-}: {
-  initialExpand?: boolean;
-}) => {
+const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
   const { demographics, setDemographics, remove, selectedDatasets } =
     useQueryBuilder((qb) => ({
       demographics: qb.queryBuilderJson.demographics,
@@ -52,7 +49,9 @@ const DemographicsPanel = ({
   const race = demographics?.race ?? [];
   const location = demographics?.location ?? null;
 
-  const [expanded, setExpanded] = useState(initialExpand);
+  const [expanded, setExpanded] = useState(
+    initialExpand ?? !hasDemographicsContent(demographics),
+  );
 
   const { form, allOpen, save, propsFor } = useDemographicFieldEditing(
     demographics,

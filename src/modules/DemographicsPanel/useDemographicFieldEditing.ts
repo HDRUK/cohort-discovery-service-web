@@ -2,16 +2,10 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { EMPTY_DEMOGRAPHICS } from "@/store/queryBuilderStore";
 import { Demographics } from "@/types/rules";
+import { hasDemographicsContent } from "@/utils/rules";
 import { DemographicRowActionProps } from "./DemographicRow";
 
 type DemographicField = keyof Demographics;
-
-const isDemographicsEmpty = (d?: Demographics) =>
-  !d ||
-  (d.age === null &&
-    d.sex.length === 0 &&
-    d.race.length === 0 &&
-    d.location === null);
 
 const useDemographicFieldEditing = (
   demographics: Demographics | undefined,
@@ -25,8 +19,8 @@ const useDemographicFieldEditing = (
   const [activeField, setActiveField] = useState<DemographicField | null>(
     null,
   );
-  const [allOpen, setAllOpen] = useState(() =>
-    isDemographicsEmpty(demographics),
+  const [allOpen, setAllOpen] = useState(
+    () => !hasDemographicsContent(demographics),
   );
 
   const save = form.handleSubmit((values) => {
