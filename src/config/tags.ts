@@ -64,3 +64,5 @@ export const getTagUserProfile = (userId: string | number) =>
 
 export const getTagTermDirectory = (userId: string | number) =>
   `term-directory-${userId}`;
+
+export const TAG_COLLECTION_HEALTH = "collection-health";
