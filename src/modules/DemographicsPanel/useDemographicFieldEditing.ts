@@ -16,9 +16,7 @@ const useDemographicFieldEditing = (
     defaultValues: demographics ?? EMPTY_DEMOGRAPHICS,
   });
 
-  const [activeField, setActiveField] = useState<DemographicField | null>(
-    null,
-  );
+  const [activeField, setActiveField] = useState<DemographicField | null>(null);
   const [allOpen, setAllOpen] = useState(
     () => !hasDemographicsContent(demographics),
   );

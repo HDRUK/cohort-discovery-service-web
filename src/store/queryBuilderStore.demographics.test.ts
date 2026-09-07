@@ -48,6 +48,7 @@ describe("queryBuilderStore demographics", () => {
       sex: [],
       race: [],
       location: null,
+      death: null,
     });
 
     store().removeDemographics();
@@ -82,6 +83,7 @@ describe("queryBuilderStore demographics", () => {
       sex: [],
       race: [white, black],
       location: null,
+      death: null,
     });
   });
 
