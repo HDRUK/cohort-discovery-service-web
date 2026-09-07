@@ -14,17 +14,17 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import FormatIndentIncreaseIcon from "@mui/icons-material/FormatIndentIncrease";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
-import { CollectionWithHosts, RegressionTest, RegressionTestCollectionInput } from "@/types/api";
+import {
+  CollectionWithHosts,
+  RegressionTest,
+  RegressionTestCollectionInput,
+} from "@/types/api";
 import { RuleGroupType } from "@/types/rules";
 import Modal from "@/components/Modal";
-import CodeBlock from "@/components/CodeBlock";
+import QueryDefinitionField from "@/components/QueryDefinitionField";
 import { useChangedFieldValues } from "@/hooks/useChangedFieldValues";
 import { useConfirm } from "@/hooks/useConfirm";
-import { tryParseJson } from "@/utils/helpers";
 
 interface CollectionRow {
   collectionPid: string;
@@ -158,8 +158,6 @@ const AddRegressionTestDialog = ({
     handleFormSubmit,
   ]);
 
-  const parsedJson = tryParseJson(jsonText);
-
   return (
     <Modal
       open={open}
@@ -189,74 +187,14 @@ const AddRegressionTestDialog = ({
             helperText={errors.name?.message}
           />
 
-          <Box sx={{ position: "relative" }}>
-            {jsonPreview && parsedJson ? (
-              <CodeBlock code={parsedJson} />
-            ) : (
-              <TextField
-                label="Query JSON"
-                multiline
-                rows={6}
-                fullWidth
-                value={jsonText}
-                onChange={(e) => {
-                  setJsonText(e.target.value);
-                  setJsonError(null);
-                  setJsonPreview(false);
-                }}
-                error={!!jsonError}
-                helperText={
-                  jsonError ?? "Paste a valid query definition JSON object"
-                }
-                slotProps={{
-                  htmlInput: {
-                    style: { fontFamily: "monospace", fontSize: 12 },
-                  },
-                }}
-              />
-            )}
-            <Stack
-              direction="row"
-              spacing={0.5}
-              sx={{ position: "absolute", top: 4, right: 4 }}
-            >
-              <Tooltip title="Format JSON">
-                <span>
-                  <IconButton
-                    size="small"
-                    disabled={!jsonText || jsonPreview}
-                    onClick={() => {
-                      try {
-                        setJsonText(
-                          JSON.stringify(JSON.parse(jsonText), null, 2),
-                        );
-                        setJsonError(null);
-                      } catch {
-                        setJsonError("Invalid JSON");
-                      }
-                    }}
-                  >
-                    <FormatIndentIncreaseIcon fontSize="small" />
-                  </IconButton>
-                </span>
-              </Tooltip>
-              <Tooltip title={jsonPreview ? "Edit JSON" : "Preview"}>
-                <span>
-                  <IconButton
-                    size="small"
-                    disabled={!jsonText || (!!jsonError && !jsonPreview)}
-                    onClick={() => setJsonPreview((p) => !p)}
-                  >
-                    {jsonPreview ? (
-                      <EditIcon fontSize="small" />
-                    ) : (
-                      <VisibilityIcon fontSize="small" />
-                    )}
-                  </IconButton>
-                </span>
-              </Tooltip>
-            </Stack>
-          </Box>
+          <QueryDefinitionField
+            value={jsonText}
+            onChange={setJsonText}
+            error={jsonError}
+            onError={setJsonError}
+            isPreview={jsonPreview}
+            onPreviewChange={setJsonPreview}
+          />
 
           <Divider />
 
