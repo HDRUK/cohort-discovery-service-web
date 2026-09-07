@@ -8,7 +8,9 @@ const ClearQueryButton = () => {
     (qb) => qb.resetQueryBuilderJson,
   );
   const disabled = useQueryBuilder(
-    (qb) => qb.queryBuilderJson.rules.length === 0,
+    (qb) =>
+      qb.queryBuilderJson.rules.length === 0 &&
+      !qb.queryBuilderJson.demographics,
   );
 
   return (

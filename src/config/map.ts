@@ -8,7 +8,7 @@ export const PINNED_MAP_ZOOM = 10;
 export const FLY_TO_ZOOM = 12;
 export const MAX_MAP_ZOOM = 13;
 
-export const MIN_RADIUS = 5_000;
+export const MIN_RADIUS = 25_000;
 export const MAX_RADIUS = 1_000_000;
 export const DEFAULT_RADIUS = 50_000;
 

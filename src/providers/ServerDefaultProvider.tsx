@@ -22,10 +22,14 @@ export default async function ServerDefaultProvider({
     searchSuggestionRotation: envInt(
       process.env.DEFAULT_SEARCH_SUGGESTION_ROTATION,
     ),
+<<<<<<< HEAD
     pingAWarnMs: envInt(process.env.DEFAULT_PING_A_WARN_MS),
     pingAFailMs: envInt(process.env.DEFAULT_PING_A_FAIL_MS),
     pingBWarnMs: envInt(process.env.DEFAULT_PING_B_WARN_MS),
     pingBFailMs: envInt(process.env.DEFAULT_PING_B_FAIL_MS),
+=======
+    locationMinRadius: envInt(process.env.DEFAULT_LOCATION_MIN_RADIUS),
+>>>>>>> origin/dev
     serviceDeskUrl: process.env.CONFIG_SERVICE_DESK_URL,
     serviceDeskSupportSuffix: process.env.CONFIG_SERVICE_DESK_SUPPORT_SUFFIX,
     serviceDeskReportBugSuffix:

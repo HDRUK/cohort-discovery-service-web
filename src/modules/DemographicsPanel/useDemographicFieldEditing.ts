@@ -16,6 +16,7 @@ const isDemographicsEmpty = (d?: Demographics) =>
 const useDemographicFieldEditing = (
   demographics: Demographics | undefined,
   setDemographics: (demographics: Demographics) => void,
+  onSaved?: () => void,
 ) => {
   const form = useForm<Demographics>({
     defaultValues: demographics ?? EMPTY_DEMOGRAPHICS,
@@ -32,6 +33,7 @@ const useDemographicFieldEditing = (
     setDemographics(values);
     setActiveField(null);
     setAllOpen(false);
+    onSaved?.();
   });
 
   const propsFor = (field: DemographicField): DemographicRowActionProps => ({
@@ -49,11 +51,12 @@ const useDemographicFieldEditing = (
           const current = demographics ?? EMPTY_DEMOGRAPHICS;
           setDemographics({ ...current, [field]: form.getValues(field) });
           setActiveField(null);
+          onSaved?.();
         },
     onReset: () => {
       const current = demographics ?? EMPTY_DEMOGRAPHICS;
-      form.resetField(field, { defaultValue: current[field] });
-      setActiveField(null);
+      form.resetField(field, { defaultValue: EMPTY_DEMOGRAPHICS[field] });
+      setDemographics({ ...current, [field]: EMPTY_DEMOGRAPHICS[field] });
     },
     onClear: () => {
       const current = demographics ?? EMPTY_DEMOGRAPHICS;

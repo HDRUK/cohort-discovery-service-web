@@ -2,6 +2,7 @@
 
 import { createContext, useContext, ReactNode, useMemo } from "react";
 import * as defaults from "@/config/defaults";
+import { MIN_RADIUS } from "@/config/map";
 
 export const envInt = (raw: string | undefined, fallback: number) => {
   if (raw == null || raw.trim() === "") return fallback;
@@ -15,10 +16,14 @@ export type DefaultConfig = {
   searchPrefetch: number;
   searchWaitTime: number;
   searchSuggestionRotation: number;
+<<<<<<< HEAD
   pingAWarnMs: number;
   pingAFailMs: number;
   pingBWarnMs: number;
   pingBFailMs: number;
+=======
+  locationMinRadius: number;
+>>>>>>> origin/dev
   serviceDeskUrl: string;
   serviceDeskSupportSuffix: string;
   serviceDeskReportBugSuffix: string;
@@ -46,10 +51,14 @@ export const DefaultProvider = ({
       searchPrefetch: defaults.DEFAULT_SEARCH_PREFETCH,
       searchWaitTime: defaults.DEFAULT_SEARCH_WAIT_TIME,
       searchSuggestionRotation: defaults.DEFAULT_SEARCH_SUGGESTION_ROTATION,
+<<<<<<< HEAD
       pingAWarnMs: defaults.DEFAULT_PING_A_WARN_MS,
       pingAFailMs: defaults.DEFAULT_PING_A_FAIL_MS,
       pingBWarnMs: defaults.DEFAULT_PING_B_WARN_MS,
       pingBFailMs: defaults.DEFAULT_PING_B_FAIL_MS,
+=======
+      locationMinRadius: MIN_RADIUS,
+>>>>>>> origin/dev
       serviceDeskUrl: "",
       serviceDeskSupportSuffix: "",
       serviceDeskReportBugSuffix: "",
