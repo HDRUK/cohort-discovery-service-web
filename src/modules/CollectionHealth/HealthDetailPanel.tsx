@@ -33,6 +33,14 @@ interface HealthDetailPanelProps {
   onRunTest: (testPid: string) => void;
 }
 
+export interface CollectionHealthDetailProps {
+  row: CollectionHealthRow;
+  showTelemetry: boolean;
+  isRunning: boolean;
+  onUpdateExpected: (testPid: string, expected: number | null) => void;
+  onRunTest: (testPid: string) => void;
+}
+
 const FeatureChip = ({
   label,
   enabled,
@@ -109,23 +117,14 @@ const CheckRow = ({
   </Box>
 );
 
-const HealthDetailPanel = ({
+export const CollectionHealthDetail = ({
   row,
-  isExpanded,
+  showTelemetry,
   isRunning,
   onUpdateExpected,
   onRunTest,
-}: HealthDetailPanelProps) => (
-  <Box
-    sx={{
-      p: 2,
-      bgcolor: "background.default",
-      borderTop: 1,
-      borderBottom: 1,
-      borderColor: "divider",
-      boxShadow: "inset 0 1px 3px rgba(0, 0, 0, 0.07)",
-    }}
-  >
+}: CollectionHealthDetailProps) => (
+  <Box>
     <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 2 }}>
       <SectionCard
         title="Collection"
@@ -183,7 +182,7 @@ const HealthDetailPanel = ({
       </SectionCard>
 
       <Box sx={{ flex: 1, minWidth: 420 }}>
-        {isExpanded && <CollectionTelemetry collectionPid={row.pid} />}
+        {showTelemetry && <CollectionTelemetry collectionPid={row.pid} />}
       </Box>
     </Box>
 
@@ -220,6 +219,33 @@ const HealthDetailPanel = ({
         );
       })}
     </Box>
+  </Box>
+);
+
+const HealthDetailPanel = ({
+  row,
+  isExpanded,
+  isRunning,
+  onUpdateExpected,
+  onRunTest,
+}: HealthDetailPanelProps) => (
+  <Box
+    sx={{
+      p: 2,
+      bgcolor: "background.default",
+      borderTop: 1,
+      borderBottom: 1,
+      borderColor: "divider",
+      boxShadow: "inset 0 1px 3px rgba(0, 0, 0, 0.07)",
+    }}
+  >
+    <CollectionHealthDetail
+      row={row}
+      showTelemetry={isExpanded}
+      isRunning={isRunning}
+      onUpdateExpected={onUpdateExpected}
+      onRunTest={onRunTest}
+    />
   </Box>
 );
 
