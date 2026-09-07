@@ -3,8 +3,6 @@ import getAdminCollections from "@/actions/collection/getAdminCollections";
 import Title from "@/components/Title";
 import CollectionHealth from "@/modules/CollectionHealth/CollectionHealth";
 
-// Stamped alongside the fetch, not during render, so the client measures ping
-// ages from when the data was actually read rather than from hydration.
 const loadCollections = async () => {
   const result = await getAdminCollections({
     params: new URLSearchParams({ per_page: "500" }),
@@ -25,7 +23,8 @@ const AdminCollectionHealthPage = async () => {
         minHeight: 0,
         p: 2,
         bgcolor: "background.default",
-      }}>
+      }}
+    >
       <Title title="Admin" subTitle="Collection Health" />
       <Divider sx={{ mb: 2 }} />
       <CollectionHealth

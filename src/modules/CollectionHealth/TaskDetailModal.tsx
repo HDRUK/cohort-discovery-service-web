@@ -1,57 +1,38 @@
 "use client";
 
 import { useState } from "react";
+import CodeIcon from "@mui/icons-material/Code";
+import NotesIcon from "@mui/icons-material/Notes";
 import {
   Alert,
   Box,
   Chip,
   Divider,
+  IconButton,
   List,
   ListItemButton,
   ListItemText,
   Skeleton,
   Stack,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import getQuery from "@/actions/query/getQuery";
+import { getTagsQuery } from "@/config/tags";
+import CodeBlock from "@/components/CodeBlock";
+import DetailRow from "@/components/DetailRow";
 import Modal from "@/components/Modal";
 import { TaskHistoryRun, TaskHistoryTask } from "@/types/api";
-import { getDatetime } from "@/utils/date";
+import { formatDuration, getDatetime } from "@/utils/date";
 import { queryToText } from "@/utils/queryBuilder";
-import { formatDuration, NO_VALUE } from "./taskHistory";
 
-const DetailRow = ({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | null;
-}) => (
-  <Box sx={{ display: "flex", gap: 1 }}>
-    <Typography
-      variant="caption"
-      color="text.secondary"
-      sx={{ minWidth: 110, flexShrink: 0 }}
-    >
-      {label}
-    </Typography>
-    <Typography variant="caption" sx={{ wordBreak: "break-all" }}>
-      {value ?? NO_VALUE}
-    </Typography>
-  </Box>
-);
-
-/**
- * The query the task ran, in prose. Fetched on open rather than with the task
- * list — a range holds hundreds of tasks and only the opened one needs its
- * definition. B-type tasks are distributions and carry no query at all.
- */
 const QuerySummary = ({ task }: { task: TaskHistoryTask }) => {
   const queryPid = task.query?.pid ?? null;
+  const [showJson, setShowJson] = useState(false);
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["query", queryPid],
+    queryKey: getTagsQuery(queryPid as string),
     queryFn: () => getQuery(queryPid as string),
     enabled: queryPid !== null,
     refetchOnWindowFocus: false,
@@ -70,9 +51,33 @@ const QuerySummary = ({ task }: { task: TaskHistoryTask }) => {
 
   return (
     <Stack spacing={0.5}>
-      <Typography variant="subtitle2">
-        {task.query?.name ?? queryPid}
-      </Typography>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <Typography variant="subtitle2" sx={{ minWidth: 0 }} noWrap>
+          {task.query?.name ?? queryPid}
+        </Typography>
+        <Tooltip
+          title={
+            showJson
+              ? "Show the plain-text translation"
+              : "Show the full query definition JSON"
+          }
+        >
+          <span>
+            <IconButton
+              size="small"
+              disabled={!definition}
+              aria-label={showJson ? "Show text" : "Show JSON"}
+              onClick={() => setShowJson((current) => !current)}
+            >
+              {showJson ? (
+                <NotesIcon fontSize="small" />
+              ) : (
+                <CodeIcon fontSize="small" />
+              )}
+            </IconButton>
+          </span>
+        </Tooltip>
+      </Box>
 
       {isLoading && <Skeleton variant="text" height={48} />}
 
@@ -82,9 +87,12 @@ const QuerySummary = ({ task }: { task: TaskHistoryTask }) => {
         </Alert>
       )}
 
-      {definition && (
-        <Typography variant="body2">{queryToText(definition)}</Typography>
-      )}
+      {definition &&
+        (showJson ? (
+          <CodeBlock code={definition} />
+        ) : (
+          <Typography variant="body2">{queryToText(definition)}</Typography>
+        ))}
 
       <DetailRow label="Query PID" value={queryPid} />
     </Stack>
@@ -180,10 +188,6 @@ interface TaskDetailModalProps {
   tasks: TaskHistoryTask[];
 }
 
-/**
- * What ran in one bin. A bin holding a single task opens straight to its
- * detail; anything wider needs picking from first.
- */
 const TaskDetailModal = ({
   open,
   onClose,
@@ -193,7 +197,6 @@ const TaskDetailModal = ({
 }: TaskDetailModalProps) => {
   const [selectedPid, setSelectedPid] = useState<string | null>(null);
 
-  // The picked task, or the only one there is — a lone task needs no picking.
   const picked = tasks.find((task) => task.pid === selectedPid) ?? null;
   const selected = picked ?? (tasks.length === 1 ? tasks[0] : null);
 

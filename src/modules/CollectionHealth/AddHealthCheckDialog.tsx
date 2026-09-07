@@ -1,24 +1,12 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import EditIcon from "@mui/icons-material/Edit";
-import FormatIndentIncreaseIcon from "@mui/icons-material/FormatIndentIncrease";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import {
-  Alert,
-  Box,
-  Button,
-  IconButton,
-  Stack,
-  TextField,
-  Tooltip,
-} from "@mui/material";
+import { Alert, Box, Button, Stack, TextField } from "@mui/material";
 import { useForm } from "react-hook-form";
-import CodeBlock from "@/components/CodeBlock";
 import Modal from "@/components/Modal";
+import QueryDefinitionField from "@/components/QueryDefinitionField";
 import { RegressionTestCollectionInput } from "@/types/api";
 import { RuleGroupType } from "@/types/rules";
-import { tryParseJson } from "@/utils/helpers";
 
 interface FormValues {
   name: string;
@@ -77,8 +65,6 @@ const AddHealthCheckDialog = ({
     [collectionPids, jsonText, onClose, onSubmit],
   );
 
-  const parsedJson = tryParseJson(jsonText);
-
   return (
     <Modal
       open={open}
@@ -89,107 +75,58 @@ const AddHealthCheckDialog = ({
       additionalActions={
         <Button
           variant="outlined"
-          onClick={() => handleSubmit(handleFormSubmit)()}>
+          onClick={() => handleSubmit(handleFormSubmit)()}
+        >
           Add
         </Button>
-      }>
+      }
+    >
       <Box component="form" onSubmit={handleSubmit(handleFormSubmit)}>
         <Stack spacing={2}>
           <Alert severity="info">
             This creates a regression test linked to all {collectionPids.length}{" "}
-            collections and adds it as a new Stage 3 column. Set a per-collection
-            expected count from the expanded row — a check with no expected count
-            can never pass.
+            collections and adds it as a new Stage 3 column. Set a
+            per-collection expected count from the expanded row — a check with
+            no expected count can never pass.
           </Alert>
 
           <TextField
             label="Name"
             fullWidth
-            helperText="Used as the column header, so keep it short"
             {...register("name", {
               required: "Required",
               minLength: { value: 3, message: "At least 3 characters" },
             })}
             error={!!errors.name}
+            helperText={
+              errors.name?.message ??
+              "Used as the column header, so keep it short"
+            }
           />
 
-          <Box sx={{ position: "relative" }}>
-            {jsonPreview && parsedJson ? (
-              <CodeBlock code={parsedJson} />
-            ) : (
-              <TextField
-                label="Query JSON"
-                multiline
-                rows={6}
-                fullWidth
-                value={jsonText}
-                onChange={(event) => {
-                  setJsonText(event.target.value);
-                  setJsonError(null);
-                  setJsonPreview(false);
-                }}
-                error={!!jsonError}
-                helperText={
-                  jsonError ?? "Paste a valid query definition JSON object"
-                }
-                slotProps={{
-                  htmlInput: {
-                    style: { fontFamily: "monospace", fontSize: 12 },
-                  },
-                }}
-              />
-            )}
-            <Stack
-              direction="row"
-              spacing={0.5}
-              sx={{ position: "absolute", top: 4, right: 4 }}>
-              <Tooltip title="Format JSON">
-                <span>
-                  <IconButton
-                    size="small"
-                    disabled={!jsonText || jsonPreview}
-                    onClick={() => {
-                      try {
-                        setJsonText(
-                          JSON.stringify(JSON.parse(jsonText), null, 2),
-                        );
-                        setJsonError(null);
-                      } catch {
-                        setJsonError("Invalid JSON");
-                      }
-                    }}>
-                    <FormatIndentIncreaseIcon fontSize="small" />
-                  </IconButton>
-                </span>
-              </Tooltip>
-              <Tooltip title={jsonPreview ? "Edit JSON" : "Preview"}>
-                <span>
-                  <IconButton
-                    size="small"
-                    disabled={!jsonText || (!!jsonError && !jsonPreview)}
-                    onClick={() => setJsonPreview((preview) => !preview)}>
-                    {jsonPreview ? (
-                      <EditIcon fontSize="small" />
-                    ) : (
-                      <VisibilityIcon fontSize="small" />
-                    )}
-                  </IconButton>
-                </span>
-              </Tooltip>
-            </Stack>
-          </Box>
+          <QueryDefinitionField
+            value={jsonText}
+            onChange={setJsonText}
+            error={jsonError}
+            onError={setJsonError}
+            isPreview={jsonPreview}
+            onPreviewChange={setJsonPreview}
+          />
 
           <TextField
             label="Expected result for every collection"
             type="number"
             sx={{ width: 320 }}
-            helperText="Optional — leave blank to set per collection later"
             {...register("expectedResult", {
               setValueAs: (value: string) =>
                 value === "" || value == null ? null : Number(value),
               min: { value: 0, message: "≥ 0" },
             })}
             error={!!errors.expectedResult}
+            helperText={
+              errors.expectedResult?.message ??
+              "Optional — leave blank to set per collection later"
+            }
           />
         </Stack>
       </Box>

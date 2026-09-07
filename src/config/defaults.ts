@@ -15,9 +15,6 @@ export const DEFAULT_SEARCH_SUGGESTION_ROTATION = 2000;
 export const DEFAULT_SEARCH_RESULTS_MAX_HEIGHT = 420;
 export const DEFAULT_ACCESS_BANNER_AUTO_HIDE = 30000;
 
-// Collection health ping ages, in milliseconds. BUNNY polls for A-type tasks
-// every few seconds, so an A ping older than a minute means something is wrong.
-// B-type polling is far less frequent and gets an order of magnitude more slack.
 export const DEFAULT_PING_A_WARN_MS = 60 * 1000;
 export const DEFAULT_PING_A_FAIL_MS = 10 * 60 * 1000;
 export const DEFAULT_PING_B_WARN_MS = 10 * 60 * 1000;

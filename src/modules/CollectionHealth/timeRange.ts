@@ -1,19 +1,16 @@
 import dayjs from "dayjs";
-import { HealthBin } from "@/types/api";
+import { HealthBin, TimeRange } from "@/types/api";
 
-// Mirrors COLLECTION_HEALTH_MAX_BINS on the API. It is server-configured, so
-// this only avoids obviously doomed requests — a 422 must still be handled.
+export type { TimeRange };
+
 export const MAX_BINS = 2000;
 
-// "1m" rather than the named "minute": the bin control is a number + unit, so
-// the default has to decompose back into those two inputs.
 export const DEFAULT_BIN = "1m";
 export const DEFAULT_BIN_DRAFT: { value: number; unit: BinUnit } = {
   value: 1,
   unit: "m",
 };
 
-/** Hours the default range covers, back from now. */
 export const DEFAULT_RANGE_HOURS = 1;
 
 export type BinUnit = "m" | "h" | "d" | "w";
@@ -25,13 +22,6 @@ export const BIN_UNIT_OPTIONS: { value: BinUnit; label: string }[] = [
   { value: "w", label: "weeks" },
 ];
 
-/** An explicit ISO-8601 span. `to` is exclusive, matching the API. */
-export interface TimeRange {
-  from: string;
-  to: string;
-}
-
-/** The last hour, which is where the chart opens and what Reset returns to. */
 export const defaultRange = (): TimeRange => {
   const now = dayjs();
 
@@ -59,12 +49,8 @@ const UNIT_MINUTES: Record<BinUnit, number> = {
 const isNamedBin = (bin: string): bin is HealthBin =>
   Object.prototype.hasOwnProperty.call(NAMED_BIN_MINUTES, bin);
 
-// Mirrors the API's HealthBinWidth grammar: a positive multiplier (1-5
-// digits) of m/h/d/w. `month` has no multiple form, so it is deliberately
-// absent here — it only exists as a named unit.
 const CUSTOM_BIN_WIDTH_PATTERN = /^([1-9]\d{0,4})([mhdw])$/;
 
-/** Width of a `minute`/`10m`/`6h`/… bin in minutes, or null if malformed. */
 export const binWidthMinutes = (bin: string): number | null => {
   if (isNamedBin(bin)) return NAMED_BIN_MINUTES[bin];
 
@@ -77,11 +63,9 @@ export const binWidthMinutes = (bin: string): number | null => {
 export const isValidBinWidth = (bin: string): boolean =>
   binWidthMinutes(bin) !== null;
 
-/** Builds e.g. `"45m"` from the custom bin entry's number + unit select. */
 export const composeBinWidth = (value: number, unit: BinUnit): string =>
   `${value}${unit}`;
 
-/** Duration of a range in minutes, or null if malformed / not positive. */
 export const rangeMinutes = (range: TimeRange): number | null => {
   const from = dayjs(range.from);
   const to = dayjs(range.to);
@@ -91,7 +75,6 @@ export const rangeMinutes = (range: TimeRange): number | null => {
   return minutes > 0 ? minutes : null;
 };
 
-/** Bins the API would return for a bin width over a range. */
 export const binCount = (bin: string, range: TimeRange): number | null => {
   const width = binWidthMinutes(bin);
   const minutes = rangeMinutes(range);
@@ -100,14 +83,8 @@ export const binCount = (bin: string, range: TimeRange): number | null => {
   return Math.ceil(minutes / width);
 };
 
-/** Bins a dragged range is resolved to, and the default 1h/minute view. */
 export const TARGET_BINS = 60;
 
-/**
- * Bin width holding roughly `target` bins across `spanMinutes`. Rounds within
- * the largest unit that fits so the width stays readable ("3h", not "168m"),
- * and floors at one minute — the API's finest resolution.
- */
 export const autoBinWidth = (
   spanMinutes: number,
   target = TARGET_BINS,
@@ -121,7 +98,6 @@ export const autoBinWidth = (
   return `${Math.round(raw / (60 * 24 * 7))}w`;
 };
 
-/** Splits a composed width back into the custom bin entry's number + unit. */
 export const decomposeBinWidth = (
   bin: string,
 ): { value: number; unit: BinUnit } | null => {
@@ -146,7 +122,6 @@ const CUSTOM_BIN_LABEL_FORMAT: Record<BinUnit, string> = {
   w: "DD/MM",
 };
 
-/** Bin start formatted for the x-axis. Bins arrive as UTC Zulu. */
 export const formatBinLabel = (iso: string, bin: string): string => {
   const parsed = dayjs(iso);
   if (!parsed.isValid()) return "";
@@ -158,18 +133,9 @@ export const formatBinLabel = (iso: string, bin: string): string => {
   return parsed.format(CUSTOM_BIN_LABEL_FORMAT[unit]);
 };
 
-/**
- * Show roughly `target` x-axis labels — 60+ bins cannot each carry one without
- * colliding.
- */
 export const tickStep = (binCountValue: number, target = 6): number =>
   Math.max(1, Math.ceil(binCountValue / target));
 
-/**
- * The range a dragged span of bins covers. `to` is the last selected bin's end,
- * clamped to `servedTo` — the final bin is usually still filling, so its
- * nominal end lies in the future.
- */
 export const rangeFromBins = (
   binStarts: string[],
   startIndex: number,

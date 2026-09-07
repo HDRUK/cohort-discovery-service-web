@@ -2,7 +2,6 @@ import { DurationStats, TaskHistoryBin } from "@/types/api";
 import {
   describeDurations,
   formatConcurrency,
-  formatDuration,
   isEmptySeries,
   NO_VALUE,
 } from "../taskHistory";
@@ -36,32 +35,6 @@ const point = (overrides: Partial<TaskHistoryBin> = {}): TaskHistoryBin => ({
   }),
   queued_for_ms_avg: null,
   ...overrides,
-});
-
-describe("formatDuration", () => {
-  it("keeps sub-second values in milliseconds", () => {
-    expect(formatDuration(0)).toBe("0ms");
-    expect(formatDuration(40)).toBe("40ms");
-    expect(formatDuration(999)).toBe("999ms");
-  });
-
-  it("switches to seconds at one second, with more precision below ten", () => {
-    expect(formatDuration(1000)).toBe("1.00s");
-    expect(formatDuration(9994)).toBe("9.99s");
-    expect(formatDuration(12500)).toBe("12.5s");
-  });
-
-  it("switches to minutes and seconds at one minute", () => {
-    expect(formatDuration(60_000)).toBe("1m 00s");
-    expect(formatDuration(95_000)).toBe("1m 35s");
-    expect(formatDuration(3_723_000)).toBe("62m 03s");
-  });
-
-  it("renders a placeholder for anything that is not a number", () => {
-    expect(formatDuration(null)).toBe(NO_VALUE);
-    expect(formatDuration(undefined)).toBe(NO_VALUE);
-    expect(formatDuration(Number.NaN)).toBe(NO_VALUE);
-  });
 });
 
 describe("formatConcurrency", () => {

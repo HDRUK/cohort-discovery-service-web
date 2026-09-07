@@ -60,3 +60,21 @@ export const TAG_ADMIN_USERS = "admin-users";
 
 export const getTagTermDirectory = (userId: string | number) =>
   `term-directory-${userId}`;
+
+export const TAG_COLLECTION_HEALTH = "collection-health";
+
+export const getTagsCollectionHealth = (
+  pid: string,
+  bin: string,
+  range: { from: string; to: string },
+) => [TAG_COLLECTION_HEALTH, "series", pid, bin, range.from, range.to];
+
+export const getTagsCollectionTaskHistory = (
+  pid: string,
+  range: { from: string; to: string },
+) => [TAG_COLLECTION_HEALTH, "task-history", pid, range.from, range.to];
+
+export const TAGS_COLLECTION_HEALTH_ROWS = [
+  TAG_COLLECTION_HEALTH,
+  TAG_COLLECTIONS_ADMIN,
+];

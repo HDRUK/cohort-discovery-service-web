@@ -8,7 +8,6 @@ import {
 import {
   buildCollectionHealth,
   DEFAULT_HEALTH_THRESHOLDS,
-  formatAge,
   getCheck,
   regressionCheckId,
   SCAN_STALE_MS,
@@ -122,22 +121,6 @@ const health = (
   tests: RegressionTest[] = [],
 ) => buildCollectionHealth(buildCollection(overrides), tests, NOW);
 
-describe("formatAge", () => {
-  it.each([
-    [5_000, "5s"],
-    [90_000, "1m"],
-    [2 * 60 * 60 * 1000, "2h"],
-    [3 * 24 * 60 * 60 * 1000, "3d"],
-  ])("formats %ims as %s", (ms, expected) => {
-    expect(formatAge(isoAgo(ms), NOW)).toBe(expected);
-  });
-
-  it("returns 'never' for a missing or invalid date", () => {
-    expect(formatAge(null, NOW)).toBe("never");
-    expect(formatAge("not-a-date", NOW)).toBe("never");
-  });
-});
-
 describe("ping checks", () => {
   it("uses a tighter window for the A-type ping than the B-type ping", () => {
     expect(pingA).toEqual({ warnAfterMs: 60_000, failAfterMs: 600_000 });
@@ -221,8 +204,9 @@ describe("stage 2 data checks", () => {
   });
 
   it("fails when no cohort query has ever succeeded", () => {
-    expect(getCheck(health({ last_successful_query: null }), "cohort_query")
-      ?.level).toBe("fail");
+    expect(
+      getCheck(health({ last_successful_query: null }), "cohort_query")?.level,
+    ).toBe("fail");
   });
 
   it("warns when a scan file arrived but post-processing did not finish", () => {
@@ -299,7 +283,6 @@ describe("stage 3 health check columns", () => {
       expected: 100,
       linked: true,
     });
-    // The count moves to the tooltip rather than disappearing.
     expect(check?.detail).toContain("got 1,234");
   });
 

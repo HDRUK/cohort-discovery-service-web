@@ -16,7 +16,9 @@ import {
   TARGET_BINS,
 } from "../timeRange";
 
-/** A range spanning `minutes`, anchored at a fixed instant. */
+const MINUTES_IN_HOUR = 60;
+const MINUTES_IN_DAY = MINUTES_IN_HOUR * 24;
+
 const spanOf = (minutes: number): TimeRange => ({
   from: "2026-09-02T00:00:00Z",
   to: new Date(Date.UTC(2026, 8, 2) + minutes * 60_000).toISOString(),
@@ -128,7 +130,6 @@ describe("binCount", () => {
   });
 
   it("flags a combination the API would reject", () => {
-    // Minute bins over 7 days is 10,080 — well over the ceiling.
     expect(binCount("minute", spanOf(10080))).toBeGreaterThan(MAX_BINS);
   });
 });
@@ -160,11 +161,11 @@ describe("decomposeBinWidth", () => {
 
 describe("autoBinWidth", () => {
   it.each([
-    [60, "1m"], // 1 hour
-    [60 * 7, "7m"], // 7 hours
-    [60 * 24, "24m"], // 1 day
-    [60 * 24 * 7, "3h"], // 7 days
-    [60 * 24 * 30, "12h"], // 30 days
+    [MINUTES_IN_HOUR, "1m"],
+    [MINUTES_IN_HOUR * 7, "7m"],
+    [MINUTES_IN_DAY, "24m"],
+    [MINUTES_IN_DAY * 7, "3h"],
+    [MINUTES_IN_DAY * 30, "12h"],
   ])("resolves a %s minute span to %s", (spanMinutes, expected) => {
     expect(autoBinWidth(spanMinutes)).toBe(expected);
   });
@@ -186,8 +187,6 @@ describe("autoBinWidth", () => {
 
       expect(count).not.toBeNull();
       expect(count).toBeLessThanOrEqual(MAX_BINS);
-      // Rounding to a readable unit trades exactness for legibility, so allow
-      // a spread around the target rather than demanding it hits 60.
       expect(count).toBeGreaterThanOrEqual(TARGET_BINS / 2);
       expect(count).toBeLessThanOrEqual(TARGET_BINS * 2);
     });

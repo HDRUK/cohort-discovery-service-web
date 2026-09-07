@@ -3,17 +3,16 @@
 import { useState } from "react";
 import { Chip, TextField, Tooltip } from "@mui/material";
 
+const formatted = (value: number | null | undefined) =>
+  value != null ? value.toLocaleString() : "—";
+
 interface ExpectedValueProps {
   value: number | null | undefined;
   onSave: (value: number | null) => void;
   prefix?: string;
 }
 
-const ExpectedValue = ({
-  value,
-  onSave,
-  prefix = "Expected",
-}: ExpectedValueProps) => {
+const ExpectedValue = ({ value, onSave, prefix }: ExpectedValueProps) => {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value?.toString() ?? "");
 
@@ -48,7 +47,7 @@ const ExpectedValue = ({
   return (
     <Tooltip title="Click to set the expected count for this collection">
       <Chip
-        label={`${prefix} ${value != null ? value.toLocaleString() : "—"}`}
+        label={prefix ? `${prefix} ${formatted(value)}` : formatted(value)}
         size="small"
         variant="outlined"
         onClick={() => setEditing(true)}

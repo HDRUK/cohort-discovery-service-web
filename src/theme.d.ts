@@ -11,6 +11,7 @@ declare module "@mui/material/styles" {
     table?: Palette["primary"];
     tooltip?: Palette["primary"];
     yellowCustom?: Palette["primary"];
+    chart?: { series: string[] };
   }
   interface PaletteOptions {
     tertiary?: PaletteOptions["primary"];
@@ -19,6 +20,7 @@ declare module "@mui/material/styles" {
     table?: PaletteOptions["primary"];
     tooltip?: PaletteOptions["primary"];
     yellowCustom?: PaletteOptions["primary"];
+    chart?: { series: string[] };
   }
   interface TypographyVariants {
     guidance1: React.CSSProperties;

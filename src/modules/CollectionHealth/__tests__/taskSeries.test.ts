@@ -3,7 +3,6 @@ import { buildTaskSeries, groupByTaskType } from "../taskSeries";
 
 const RANGE = { from: "2026-09-02T12:20:02Z", to: "2026-09-02T13:20:02Z" };
 
-// Well past the range, so no bin is still filling.
 const NOW = Date.parse("2026-09-02T14:00:00Z");
 
 const task = (overrides: Partial<TaskHistoryTask> = {}): TaskHistoryTask => ({
@@ -35,7 +34,6 @@ const task = (overrides: Partial<TaskHistoryTask> = {}): TaskHistoryTask => ({
   ...overrides,
 });
 
-/** The three tasks the API returns for this collection over this hour. */
 const TASKS: TaskHistoryTask[] = [
   task({
     pid: "04c754b6",
@@ -88,8 +86,6 @@ describe("buildTaskSeries", () => {
   it("reproduces the API's whole-range summary when the range is one bin", () => {
     const [only] = buildTaskSeries(TASKS, "1h", RANGE, NOW);
 
-    // The API reports min 2132, avg 2339, p50 2334, p95 2552, max 2552 over
-    // these same three runs — nearest-rank matches its CUME_DIST().
     expect(only.duration_ms).toEqual({
       runs_measured: 3,
       min: 2132,
@@ -120,7 +116,6 @@ describe("buildTaskSeries", () => {
   it("attributes each task to the bin it ran in", () => {
     const series = buildTaskSeries(TASKS, "10m", RANGE, NOW);
 
-    // Two tasks at 13:06 and 13:07, one at 13:11.
     expect(series[4].started).toBe(2);
     expect(series[4].succeeded).toBe(2);
     expect(series[4].duration_ms.runs_measured).toBe(2);
@@ -134,9 +129,6 @@ describe("buildTaskSeries", () => {
   it("averages concurrency over the bin's own length", () => {
     const series = buildTaskSeries(TASKS, "10m", RANGE, NOW);
 
-    // Two runs of 13:06:44-46 and 13:07:06-08 inside a 600s bin. The overlap is
-    // computed from the run timestamps, which the API truncates to whole
-    // seconds — so it is 2s + 2s, not the finer-grained duration_ms.
     expect(series[4].concurrency_avg).toBeCloseTo(4000 / 600_000, 6);
     expect(series[4].concurrency_max).toBe(1);
   });
@@ -192,7 +184,6 @@ describe("buildTaskSeries", () => {
 
     const series = buildTaskSeries(stuck, "10m", RANGE, NOW);
 
-    // Running for the rest of the bin, but never measured.
     expect(series[4].concurrency_max).toBe(1);
     expect(series[4].concurrency_avg).toBeGreaterThan(0);
     expect(series[4].duration_ms.runs_measured).toBe(0);

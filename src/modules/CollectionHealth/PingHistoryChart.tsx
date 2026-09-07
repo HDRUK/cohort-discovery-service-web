@@ -5,21 +5,29 @@ import { Alert, Box, Skeleton, Stack, Typography } from "@mui/material";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { useQuery } from "@tanstack/react-query";
 import getCollectionHealth from "@/actions/collection/getCollectionHealth";
+import { getTagsCollectionHealth } from "@/config/tags";
 import { PingBin, PingSummary } from "@/types/api";
 import { getDatetime } from "@/utils/date";
 import DragRangeOverlay from "./DragRangeOverlay";
 import {
   CHART_HEIGHT,
-  SERIES_A_COLOUR,
-  SERIES_B_COLOUR,
+  useSeriesColours,
   X_AXIS_HEIGHT,
   Y_AXIS_WIDTH,
 } from "./telemetryChart";
-import { formatBinLabel, rangeFromBins, tickStep, TimeRange } from "./timeRange";
+import {
+  formatBinLabel,
+  rangeFromBins,
+  tickStep,
+  TimeRange,
+} from "./timeRange";
 
-// per_minute is normalised by the API, so this holds at every bin width — the
-// bin control changes resolution, never scale.
 const Y_AXIS_LABEL = "polls / min";
+
+const toRates = (points: PingBin[] | undefined) =>
+  points?.map((point) =>
+    point.per_minute !== null && point.per_minute > 0 ? point.per_minute : null,
+  );
 
 const SummaryLine = ({
   label,
@@ -70,36 +78,32 @@ const PingHistoryChart = ({
   enabled,
   onSelectRange,
 }: PingHistoryChartProps) => {
+  const [seriesAColour, seriesBColour] = useSeriesColours();
+
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["collection-health-series", collectionPid, bin, range],
+    queryKey: getTagsCollectionHealth(collectionPid, bin, range),
     queryFn: () => getCollectionHealth(collectionPid, bin, range),
     enabled,
     refetchOnWindowFocus: false,
-    // No polling: the range is an explicit from/to span, so refetching it
-    // returns the same bins. Reset re-seeds the range to the last hour, which
-    // is how you pull the view forward to now.
   });
 
   const health = data?.data;
 
-  // The API zero-fills and sorts ascending, so both series align with the same
-  // bin list and need no gap-filling here — the zeros are the signal.
   const labels = useMemo(
     () => health?.series.a.map((point) => formatBinLabel(point.bin, bin)) ?? [],
     [health, bin],
   );
 
-  // per_minute rather than n — the rate is what stays comparable across bin
-  // widths. Nulls are kept in place: MUI draws them as a gap, which is the
-  // right reading for "no data can exist yet", and it keeps both series
-  // index-aligned with the labels.
-  const ratesA = health?.series.a.map((point) => point.per_minute);
-  const ratesB = health?.series.b.map((point) => point.per_minute);
+  const ratesA = useMemo(() => toRates(health?.series.a), [health]);
+  const ratesB = useMemo(() => toRates(health?.series.b), [health]);
 
-  // n and silent_minutes belong in the tooltip and nowhere else — silence is
-  // what separates an outage from a host polling on a slower cadence.
   const formatPoint = (point: PingBin | undefined, value: number | null) => {
-    if (value === null || !point) return "no data yet";
+    if (!point) return "no data yet";
+    if (value === null) {
+      return point.minutes === 0
+        ? "no data yet"
+        : `no pings · ${point.silent_minutes} min silent`;
+    }
 
     return `${value.toFixed(2)} /min · ${point.n.toLocaleString()} pings · ${point.silent_minutes} min silent`;
   };
@@ -142,10 +146,10 @@ const PingHistoryChart = ({
               {
                 scaleType: "point",
                 data: labels,
-                // Explicit height: the axis needs its own band for tick labels.
+
                 height: X_AXIS_HEIGHT,
                 tickLabelStyle: { fontSize: 11 },
-                // 60+ bins cannot each carry a label without colliding.
+
                 tickLabelInterval: (_, index) =>
                   index % tickStep(labels.length) === 0,
               },
@@ -155,32 +159,33 @@ const PingHistoryChart = ({
               {
                 data: ratesA,
                 label: "A-type",
-                color: SERIES_A_COLOUR,
-                showMark: true,
+                color: seriesAColour,
+                showMark: ({ index }) => (ratesA?.[index] ?? null) !== null,
                 valueFormatter: (value, { dataIndex }) =>
                   formatPoint(health.series.a[dataIndex], value),
               },
               {
                 data: ratesB,
                 label: "B-type",
-                color: SERIES_B_COLOUR,
-                showMark: true,
+                color: seriesBColour,
+                showMark: ({ index }) => (ratesB?.[index] ?? null) !== null,
                 valueFormatter: (value, { dataIndex }) =>
                   formatPoint(health.series.b[dataIndex], value),
               },
-            ]}>
+            ]}
+          >
             <DragRangeOverlay onSelect={handleDragSelect} />
           </LineChart>
 
           <Stack spacing={0.25}>
             <SummaryLine
               label="A-type"
-              colour={SERIES_A_COLOUR}
+              colour={seriesAColour}
               summary={health.summary.a}
             />
             <SummaryLine
               label="B-type"
-              colour={SERIES_B_COLOUR}
+              colour={seriesBColour}
               summary={health.summary.b}
             />
             <Typography variant="caption" color="text.secondary">

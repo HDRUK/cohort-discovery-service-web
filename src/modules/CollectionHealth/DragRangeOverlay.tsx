@@ -4,22 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import { useTheme } from "@mui/material/styles";
 import { useDrawingArea, useSvgRef, useXScale } from "@mui/x-charts/hooks";
 
-// A drag has to cover at least this many bins to count as a range selection —
-// below it the gesture is a click, and is left to the chart's own handlers.
 const MIN_DRAG_BINS = 2;
 
 interface DragRangeOverlayProps {
-  /** Bin indices the drag covers, always ascending. */
   onSelect: (startIndex: number, endIndex: number) => void;
 }
 
-/**
- * Drag-to-select a time range on the plot. Renders inside the chart's SVG, so
- * it has access to the drawing area and x scale.
- *
- * Listeners sit on the SVG root rather than on a hit-testing rect, so the
- * chart's own tooltip and highlight handlers keep firing underneath.
- */
 const DragRangeOverlay = ({ onSelect }: DragRangeOverlayProps) => {
   const { left, top, width, height } = useDrawingArea();
   const xScale = useXScale();
@@ -28,15 +18,10 @@ const DragRangeOverlay = ({ onSelect }: DragRangeOverlayProps) => {
 
   const [drag, setDrag] = useState<{ from: number; to: number } | null>(null);
 
-  // Positions of every bin, in SVG user space. Derived from the scale rather
-  // than assumed, so it holds whatever padding MUI gives the point scale.
   const positions = xScale
     .domain()
     .map((value) => xScale(value as never) as number);
 
-  // The scale is a fresh object each render and a drag re-renders on every
-  // move, so the listeners read through refs instead of closing over values —
-  // otherwise the effect would tear down mid-drag and lose the start index.
   const startIndexRef = useRef<number | null>(null);
   const latestRef = useRef({ positions, left, width, onSelect });
   useEffect(() => {
@@ -47,8 +32,6 @@ const DragRangeOverlay = ({ onSelect }: DragRangeOverlayProps) => {
     const svg = svgRef.current;
     if (!svg) return;
 
-    // Screen -> SVG user space, via the element's own transform matrix, so
-    // viewBox scaling and any page zoom are handled for us.
     const toSvgX = (clientX: number, clientY: number) => {
       const matrix = svg.getScreenCTM();
       if (!matrix) return null;
@@ -111,16 +94,26 @@ const DragRangeOverlay = ({ onSelect }: DragRangeOverlayProps) => {
       }
     };
 
-    svg.addEventListener("pointerdown", handlePointerDown);
-    // Move and release are tracked on the window so a drag that leaves the
-    // chart still resolves rather than sticking.
-    window.addEventListener("pointermove", handlePointerMove);
-    window.addEventListener("pointerup", handlePointerUp);
+    const handlePointerUpAndStop = (event: PointerEvent) => {
+      handlePointerUp(event);
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUpAndStop);
+    };
+
+    const handlePointerDownAndTrack = (event: PointerEvent) => {
+      handlePointerDown(event);
+      if (startIndexRef.current === null) return;
+
+      window.addEventListener("pointermove", handlePointerMove);
+      window.addEventListener("pointerup", handlePointerUpAndStop);
+    };
+
+    svg.addEventListener("pointerdown", handlePointerDownAndTrack);
 
     return () => {
-      svg.removeEventListener("pointerdown", handlePointerDown);
+      svg.removeEventListener("pointerdown", handlePointerDownAndTrack);
       window.removeEventListener("pointermove", handlePointerMove);
-      window.removeEventListener("pointerup", handlePointerUp);
+      window.removeEventListener("pointerup", handlePointerUpAndStop);
     };
   }, [svgRef]);
 

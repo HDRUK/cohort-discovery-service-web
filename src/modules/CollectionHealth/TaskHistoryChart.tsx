@@ -6,7 +6,9 @@ import { LineChart } from "@mui/x-charts/LineChart";
 import { LineItemIdentifier } from "@mui/x-charts/models";
 import { useQuery } from "@tanstack/react-query";
 import getCollectionTaskHistory from "@/actions/collection/getCollectionTaskHistory";
+import { getTagsCollectionTaskHistory } from "@/config/tags";
 import { TaskHistoryTask, TaskHistorySummary } from "@/types/api";
+import { formatDuration, MS_PER_SECOND } from "@/utils/date";
 import {
   buildTaskSeries,
   groupByTaskType,
@@ -17,12 +19,11 @@ import TaskDetailModal from "./TaskDetailModal";
 import {
   describeDurations,
   formatConcurrency,
-  formatDuration,
   isEmptySeries,
 } from "./taskHistory";
 import {
   CHART_HEIGHT,
-  TASK_TYPE_COLOURS,
+  useSeriesColours,
   X_AXIS_HEIGHT,
   Y_AXIS_WIDTH,
 } from "./telemetryChart";
@@ -34,14 +35,9 @@ import {
   TimeRange,
 } from "./timeRange";
 
-// Durations are plotted in seconds: milliseconds put five digits on every tick
-// and the axis label then has to carry the unit anyway.
-const MS_PER_SECOND = 1000;
-
 const toSeconds = (ms: number | null): number | null =>
   ms === null ? null : ms / MS_PER_SECOND;
 
-/** A task type, its colour and its own binned series. */
 interface TypeGroup {
   type: string;
   label: string;
@@ -52,8 +48,6 @@ interface TypeGroup {
 const CONCURRENCY_SERIES = "concurrency-max";
 const DURATION_SERIES = "duration-p50";
 
-// A series belongs to one measure and one task type. The type goes last so a
-// clicked mark maps straight back to its group, whatever the type is named.
 const seriesId = (measure: string, type: string) => `${measure}::${type}`;
 
 const summaryLine = (summary: TaskHistorySummary): string => {
@@ -96,8 +90,10 @@ const TaskHistoryChart = ({
   enabled,
   onSelectRange,
 }: TaskHistoryChartProps) => {
+  const seriesColours = useSeriesColours();
+
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["collection-task-history", collectionPid, bin, range],
+    queryKey: getTagsCollectionTaskHistory(collectionPid, range),
     queryFn: () => getCollectionTaskHistory(collectionPid, range),
     enabled,
     refetchOnWindowFocus: false,
@@ -111,27 +107,19 @@ const TaskHistoryChart = ({
     tasks: TaskHistoryTask[];
   } | null>(null);
 
-  // The endpoint serves a task list, not a series, so the bins are built here.
-  // Everything they need — each run's claim, finish and duration — is on the
-  // tasks already, so this needs no extra request. One series per task type:
-  // an A-type cohort query and a B-type distribution are not the same workload.
   const groups = useMemo<TypeGroup[]>(
     () =>
       [...groupByTaskType(tasks)].map(([type, group], index) => ({
         type,
         label: `${type.toUpperCase()}-type`,
-        colour: TASK_TYPE_COLOURS[index % TASK_TYPE_COLOURS.length],
+        colour: seriesColours[index % seriesColours.length],
         points: buildTaskSeries(group, bin, range),
       })),
-    [tasks, bin, range],
+    [tasks, bin, range, seriesColours],
   );
 
-  // Bins come from the range alone, so an empty task list still gives the axis
-  // its labels and every group stays index-aligned with them.
   const bins = useMemo(() => buildTaskSeries([], bin, range), [bin, range]);
 
-  // A range holding more tasks than the action will page through plots only
-  // what it fetched, so say so rather than showing a quietly partial chart.
   const omitted = (history?.tasks.total ?? 0) - tasks.length;
 
   const labels = useMemo(
@@ -157,8 +145,6 @@ const TaskHistoryChart = ({
     [history, bins, bin, onSelectRange],
   );
 
-  // Series ids carry their type as a suffix, so a clicked mark resolves to the
-  // group it belongs to and from there to the tasks that made up that bin.
   const handleMarkClick = useCallback(
     (_: unknown, { seriesId: id, dataIndex }: LineItemIdentifier) => {
       if (dataIndex === undefined) return;
@@ -168,6 +154,7 @@ const TaskHistoryChart = ({
       const point = group?.points[dataIndex];
       if (!group || !point) return;
 
+      const inBin = new Set(point.taskPids);
       const width = binWidthMinutes(bin) ?? 0;
       const start = formatBinLabel(point.bin, bin);
       const end = formatBinLabel(
@@ -178,7 +165,7 @@ const TaskHistoryChart = ({
       setOpenBin({
         label: `${start} – ${end}`,
         typeLabel: group.label,
-        tasks: tasks.filter((task) => point.taskPids.includes(task.pid)),
+        tasks: tasks.filter((task) => inBin.has(task.pid)),
       });
     },
     [groups, tasks, bin],
@@ -225,8 +212,7 @@ const TaskHistoryChart = ({
         </Alert>
       )}
 
-      {/* The summary is whole-range, so it stands on its own when there is no
-          per-bin series to plot — the endpoint does not serve one yet. */}
+      {}
       {history && isEmpty && (
         <Stack spacing={0.25}>
           {history.summary.tasks === 0 ? (
@@ -248,8 +234,7 @@ const TaskHistoryChart = ({
 
       {history && !isEmpty && (
         <>
-          {/* Side by side while the panel is wide enough for both, stacking
-              on its own once it is not. */}
+          {}
           <Box
             sx={{
               display: "grid",
@@ -267,9 +252,7 @@ const TaskHistoryChart = ({
                 data: group.points.map((point) => point.concurrency_max),
                 label: group.label,
                 color: group.colour,
-                // Only bins that actually ran something carry a mark — a zero
-                // is a real value here, so marking every one of them draws a
-                // dotted line along the baseline and hides the peaks.
+
                 showMark: ({ index }) =>
                   (group.points[index]?.concurrency_max ?? 0) > 0,
                 valueFormatter: (value, { dataIndex }) =>
@@ -325,7 +308,6 @@ const TaskHistoryChart = ({
 
       {openBin && (
         <TaskDetailModal
-          // A fresh bin is a fresh modal, so no selection carries across.
           key={`${openBin.typeLabel}-${openBin.label}`}
           open
           onClose={() => setOpenBin(null)}

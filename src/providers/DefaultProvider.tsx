@@ -27,8 +27,6 @@ export type DefaultConfig = {
 
 const DefaultContext = createContext<DefaultConfig | null>(null);
 
-// Overrides arrive with a key per env var, unset ones being `undefined`. Spread
-// as-is they would blank the defaults they are meant to fall back to.
 const definedOnly = (overrides: Partial<DefaultConfig> = {}) =>
   Object.fromEntries(
     Object.entries(overrides).filter(([, value]) => value !== undefined),

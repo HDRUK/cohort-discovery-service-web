@@ -36,10 +36,6 @@ interface CollectionTelemetryProps {
   collectionPid: string;
 }
 
-/**
- * Owns the bin width and range for every plot below it, so the charts stack
- * against one time axis and a drag on either re-ranges both.
- */
 const CollectionTelemetry = ({ collectionPid }: CollectionTelemetryProps) => {
   const [binDraft, setBinDraft] = useState(DEFAULT_BIN_DRAFT);
   const [range, setRange] = useState<TimeRange>(defaultRange);
@@ -63,8 +59,6 @@ const CollectionTelemetry = ({ collectionPid }: CollectionTelemetryProps) => {
 
   const isQueryValid = validationMessage === null;
 
-  // Dragging picks a span of bins; the range becomes those bins' bounds and the
-  // bin width is re-resolved so the narrower span still holds ~60 points.
   const handleSelectRange = useCallback((next: TimeRange) => {
     const minutes = rangeMinutes(next);
     if (minutes === null) return;

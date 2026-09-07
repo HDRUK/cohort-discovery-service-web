@@ -13,7 +13,7 @@ import {
   ResultFile,
   Task,
 } from "@/types/api";
-import { getDatetime } from "@/utils/date";
+import { formatAge, getDatetime } from "@/utils/date";
 
 export type HealthLevel = "ok" | "warn" | "fail" | "none";
 
@@ -26,7 +26,7 @@ export interface HealthCheck {
   level: HealthLevel;
   value: string;
   detail: string;
-  // Stage 3 only — lets the detail panel edit the expected result inline.
+
   testPid?: string;
   expected?: number | null;
   linked?: boolean;
@@ -42,6 +42,8 @@ export interface CollectionHealthRow {
   url: string | null;
   createdAt: string;
   bunnyVersion: string | null;
+  locationEnabled: boolean;
+  deathEnabled: boolean;
   checks: HealthCheck[];
   overall: { level: HealthLevel; label: string };
   regressionTestPids: string[];
@@ -57,8 +59,6 @@ export interface HealthThresholds {
   pingB: PingThresholds;
 }
 
-// Overridable per deployment via DEFAULT_PING_* in the environment — see
-// ServerDefaultProvider.
 export const DEFAULT_HEALTH_THRESHOLDS: HealthThresholds = {
   pingA: {
     warnAfterMs: DEFAULT_PING_A_WARN_MS,
@@ -70,38 +70,12 @@ export const DEFAULT_HEALTH_THRESHOLDS: HealthThresholds = {
   },
 };
 
-// Distribution scans are scheduled weekly at their most frequent, so a scan
-// older than 30 days means the schedule has stopped firing.
 export const SCAN_STALE_MS = 30 * 24 * 60 * 60 * 1000;
 
 export const REGRESSION_CHECK_PREFIX = "regression:";
 
 export const regressionCheckId = (testPid: string) =>
   `${REGRESSION_CHECK_PREFIX}${testPid}`;
-
-export const formatAge = (
-  date?: string | null,
-  now: number = Date.now(),
-): string => {
-  if (!date) return "never";
-
-  const parsed = dayjs(date);
-  if (!parsed.isValid()) return "never";
-
-  const ms = now - parsed.valueOf();
-  if (ms < 0) return "now";
-
-  const seconds = Math.floor(ms / 1000);
-  if (seconds < 60) return `${seconds}s`;
-
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m`;
-
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h`;
-
-  return `${Math.floor(hours / 24)}d`;
-};
 
 const ageMs = (
   date?: string | null,
@@ -291,7 +265,7 @@ export const buildRegressionCheck = (
   return {
     ...base,
     level: link.last_passed ? "ok" : "fail",
-    // Matches the other columns: how long ago it last ran, not the count.
+
     value: formatAge(link.last_run_at, now),
     expected,
     linked: true,
@@ -367,6 +341,8 @@ export const buildCollectionHealth = (
     url: collection.url ?? null,
     createdAt: getDatetime(collection.created_at),
     bunnyVersion: collection.latest_metadata?.bclink ?? null,
+    locationEnabled: !!collection.location_enabled,
+    deathEnabled: !!collection.death_enabled,
     checks,
     overall: buildOverall(checks),
     regressionTestPids: regressionChecks

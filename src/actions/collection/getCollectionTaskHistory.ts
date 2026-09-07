@@ -2,15 +2,10 @@
 
 import { apiGet } from "@/lib/apiClient";
 import { API_ROUTES } from "@/lib/apiRoutes";
-import { ApiResponse, CollectionTaskHistory } from "@/types/api";
-import { TimeRange } from "@/modules/CollectionHealth/timeRange";
+import { ApiResponse, CollectionTaskHistory, TimeRange } from "@/types/api";
 
-// The endpoint's own ceiling. Anything under it costs one request.
 const PER_PAGE = 100;
 
-// The series is binned from the task list, so a truncated list is a truncated
-// plot. Pages are cheap, but this stops a very wide range fanning out forever —
-// the caller compares total against what it got and says when it was cut.
 const MAX_PAGES = 10;
 
 const fetchPage = (pid: string, range: TimeRange, page: number) =>

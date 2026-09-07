@@ -2,8 +2,7 @@
 
 import { apiGet } from "@/lib/apiClient";
 import { API_ROUTES } from "@/lib/apiRoutes";
-import { ApiResponse, CollectionHealthSeries } from "@/types/api";
-import { TimeRange } from "@/modules/CollectionHealth/timeRange";
+import { ApiResponse, CollectionHealthSeries, TimeRange } from "@/types/api";
 
 const getCollectionHealth = async (
   pid: string,

@@ -1,6 +1,9 @@
 "use client";
 
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import ScienceIcon from "@mui/icons-material/Science";
 import {
   Box,
   Chip,
@@ -10,8 +13,9 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import DetailRow from "@/components/DetailRow";
 import { CollectionHealthRow, HealthCheck, HealthStage } from "./health";
-import ExpectedValue from "./ExpectedValue";
+import ExpectedValue from "@/components/ExpectedValue";
 import { HealthIcon } from "./HealthIndicator";
 import CollectionTelemetry from "./CollectionTelemetry";
 
@@ -29,19 +33,30 @@ interface HealthDetailPanelProps {
   onRunTest: (testPid: string) => void;
 }
 
-const DetailRow = ({ label, value }: { label: string; value: string }) => (
-  <Box sx={{ display: "flex", gap: 1 }}>
-    <Typography
-      variant="caption"
-      color="text.secondary"
-      sx={{ minWidth: 96, flexShrink: 0 }}
-    >
-      {label}
-    </Typography>
-    <Typography variant="caption" sx={{ wordBreak: "break-all" }}>
-      {value}
-    </Typography>
-  </Box>
+const FeatureChip = ({
+  label,
+  enabled,
+  title,
+}: {
+  label: string;
+  enabled: boolean;
+  title: string;
+}) => (
+  <Tooltip title={title}>
+    <Chip
+      size="small"
+      variant="outlined"
+      color={enabled ? "success" : "default"}
+      icon={
+        enabled ? (
+          <CheckIcon fontSize="small" />
+        ) : (
+          <CloseIcon fontSize="small" />
+        )
+      }
+      label={label}
+    />
+  </Tooltip>
 );
 
 const CheckRow = ({
@@ -102,7 +117,7 @@ const HealthDetailPanel = ({
   onRunTest,
 }: HealthDetailPanelProps) => (
   <Box sx={{ p: 2 }}>
-    {/* Details are narrow and fixed; the plots take the rest of the width. */}
+    {}
     <Box sx={{ display: "flex", gap: 4, flexWrap: "wrap", mb: 2 }}>
       <Box sx={{ flexShrink: 0, minWidth: 380 }}>
         <Typography variant="subtitle2" gutterBottom>
@@ -111,7 +126,6 @@ const HealthDetailPanel = ({
         <Stack spacing={0.25}>
           <DetailRow label="PID" value={row.pid} />
           <DetailRow label="Custodian" value={row.custodianName} />
-          <DetailRow label="State" value={row.stateSlug} />
           <DetailRow label="Context type" value={row.contextType} />
           <DetailRow label="URL" value={row.url ?? "—"} />
           <DetailRow label="Created" value={row.createdAt} />
@@ -119,12 +133,48 @@ const HealthDetailPanel = ({
             label="BUNNY version"
             value={row.bunnyVersion ?? "unknown"}
           />
-          <DetailRow label="Synthetic" value={row.isSynthetic ? "Yes" : "No"} />
+        </Stack>
+
+        <Stack
+          direction="row"
+          spacing={0.75}
+          useFlexGap
+          sx={{ flexWrap: "wrap", mt: 1 }}
+        >
+          <Chip size="small" variant="outlined" label={row.stateSlug} />
+          <FeatureChip
+            label="Location"
+            enabled={row.locationEnabled}
+            title={
+              row.locationEnabled
+                ? "Location-based rules can be queried against this collection"
+                : "Location is disabled — location rules will not run here"
+            }
+          />
+          <FeatureChip
+            label="Death"
+            enabled={row.deathEnabled}
+            title={
+              row.deathEnabled
+                ? "Death data is available on this collection"
+                : "Death data is disabled on this collection"
+            }
+          />
+          {row.isSynthetic && (
+            <Tooltip title="This collection has been marked as being synthetic data">
+              <Chip
+                size="small"
+                variant="outlined"
+                color="info"
+                icon={<ScienceIcon fontSize="small" />}
+                label="Synthetic"
+              />
+            </Tooltip>
+          )}
         </Stack>
       </Box>
 
-      {/* MRT renders every row's panel, collapsed ones included, so the charts
-          only mount once the row is actually open — one request per open row. */}
+      {}
       <Box sx={{ flex: 1, minWidth: 420 }}>
         {isExpanded && <CollectionTelemetry collectionPid={row.pid} />}
       </Box>
