@@ -36,10 +36,9 @@ const AdminCollectionHealthDetailPage = async ({
   return (
     <Box
       sx={{
-        height: "100%",
+        minHeight: "100%",
         display: "flex",
         flexDirection: "column",
-        minHeight: 0,
         p: 2,
         bgcolor: "background.default",
       }}
