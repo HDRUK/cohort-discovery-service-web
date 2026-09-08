@@ -1,15 +1,29 @@
+import { Suspense } from "react";
 import { Box, Divider } from "@mui/material";
 import getAdminCollections from "@/actions/collection/getAdminCollections";
+import SkeletonFull from "@/components/SkeletonFull";
 import Title from "@/components/Title";
 import CollectionHealthDetailView from "@/modules/CollectionHealth/CollectionHealthDetailView";
 
-const loadCollections = async () => {
+const loadCollection = async (pid: string) => {
   const result = await getAdminCollections({
-    params: new URLSearchParams({ per_page: "500" }),
+    params: new URLSearchParams({ pid }),
     cacheOptions: { useCache: false },
   });
 
   return { collections: result.data?.data ?? [], fetchedAt: Date.now() };
+};
+
+const CollectionHealthLoader = async ({ pid }: { pid: string }) => {
+  const { collections, fetchedAt } = await loadCollection(pid);
+
+  return (
+    <CollectionHealthDetailView
+      pid={pid}
+      initialCollections={collections}
+      fetchedAt={fetchedAt}
+    />
+  );
 };
 
 const AdminCollectionHealthDetailPage = async ({
@@ -18,8 +32,6 @@ const AdminCollectionHealthDetailPage = async ({
   params: Promise<{ pid: string }>;
 }) => {
   const { pid } = await params;
-  const { collections, fetchedAt } = await loadCollections();
-  const collection = collections.find((candidate) => candidate.pid === pid);
 
   return (
     <Box
@@ -32,16 +44,11 @@ const AdminCollectionHealthDetailPage = async ({
         bgcolor: "background.default",
       }}
     >
-      <Title
-        title="Collection Health"
-        subTitle={collection?.name ?? "Unknown collection"}
-      />
+      <Title title="Admin" subTitle="Collection Health" />
       <Divider sx={{ mb: 2 }} />
-      <CollectionHealthDetailView
-        pid={pid}
-        initialCollections={collections}
-        fetchedAt={fetchedAt}
-      />
+      <Suspense fallback={<SkeletonFull sx={{ minHeight: 400 }} />}>
+        <CollectionHealthLoader pid={pid} />
+      </Suspense>
     </Box>
   );
 };

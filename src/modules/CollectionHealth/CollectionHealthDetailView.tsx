@@ -85,6 +85,10 @@ const CollectionHealthDetailView = ({
           All collections
         </Button>
 
+        <Typography variant="subtitle1" noWrap sx={{ minWidth: 0 }}>
+          {row?.name ?? pid}
+        </Typography>
+
         {row && (
           <Chip
             size="small"
