@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs, { Dayjs } from "dayjs";
+import useSearchParams from "@/hooks/useSearchParams";
 import PingHistoryChart from "./PingHistoryChart";
 import TaskHistoryChart from "./TaskHistoryChart";
 import {
@@ -32,13 +33,36 @@ import {
   TimeRange,
 } from "./timeRange";
 
+export const PARAM_BIN = "bin";
+export const PARAM_BIN_UNIT = "binUnit";
+export const PARAM_FROM = "from";
+export const PARAM_TO = "to";
+
+const isBinUnit = (value: string | null): value is BinUnit =>
+  BIN_UNIT_OPTIONS.some((option) => option.value === value);
+
 interface CollectionTelemetryProps {
   collectionPid: string;
 }
 
 const CollectionTelemetry = ({ collectionPid }: CollectionTelemetryProps) => {
-  const [binDraft, setBinDraft] = useState(DEFAULT_BIN_DRAFT);
-  const [range, setRange] = useState<TimeRange>(defaultRange);
+  const { searchParams, setSearchParams } = useSearchParams();
+
+  const [fallbackRange] = useState<TimeRange>(defaultRange);
+
+  const rawBin = Number(searchParams.get(PARAM_BIN));
+  const rawUnit = searchParams.get(PARAM_BIN_UNIT);
+
+  const binDraft = {
+    value:
+      Number.isFinite(rawBin) && rawBin > 0 ? rawBin : DEFAULT_BIN_DRAFT.value,
+    unit: isBinUnit(rawUnit) ? rawUnit : DEFAULT_BIN_DRAFT.unit,
+  };
+
+  const from = searchParams.get(PARAM_FROM) ?? fallbackRange.from;
+  const to = searchParams.get(PARAM_TO) ?? fallbackRange.to;
+
+  const range = useMemo<TimeRange>(() => ({ from, to }), [from, to]);
 
   const bin = composeBinWidth(binDraft.value, binDraft.unit);
 
@@ -59,29 +83,44 @@ const CollectionTelemetry = ({ collectionPid }: CollectionTelemetryProps) => {
 
   const isQueryValid = validationMessage === null;
 
-  const handleSelectRange = useCallback((next: TimeRange) => {
-    const minutes = rangeMinutes(next);
-    if (minutes === null) return;
+  const handleSelectRange = useCallback(
+    (next: TimeRange) => {
+      const minutes = rangeMinutes(next);
+      if (minutes === null) return;
 
-    const decomposed = decomposeBinWidth(autoBinWidth(minutes));
-    if (decomposed) setBinDraft(decomposed);
+      const decomposed = decomposeBinWidth(autoBinWidth(minutes));
 
-    setRange(next);
-  }, []);
+      setSearchParams({
+        [PARAM_FROM]: next.from,
+        [PARAM_TO]: next.to,
+        ...(decomposed && {
+          [PARAM_BIN]: String(decomposed.value),
+          [PARAM_BIN_UNIT]: decomposed.unit,
+        }),
+      });
+    },
+    [setSearchParams],
+  );
 
   const handleReset = () => {
-    setBinDraft(DEFAULT_BIN_DRAFT);
-    setRange(defaultRange());
+    const next = defaultRange();
+
+    setSearchParams({
+      [PARAM_BIN]: String(DEFAULT_BIN_DRAFT.value),
+      [PARAM_BIN_UNIT]: DEFAULT_BIN_DRAFT.unit,
+      [PARAM_FROM]: next.from,
+      [PARAM_TO]: next.to,
+    });
   };
 
   const handleFromChange = (value: Dayjs | null) => {
     if (!value?.isValid()) return;
-    setRange((current) => ({ ...current, from: value.toISOString() }));
+    setSearchParams({ [PARAM_FROM]: value.toISOString() });
   };
 
   const handleToChange = (value: Dayjs | null) => {
     if (!value?.isValid()) return;
-    setRange((current) => ({ ...current, to: value.toISOString() }));
+    setSearchParams({ [PARAM_TO]: value.toISOString() });
   };
 
   return (
@@ -98,10 +137,7 @@ const CollectionTelemetry = ({ collectionPid }: CollectionTelemetryProps) => {
           label="Bin every"
           value={binDraft.value}
           onChange={(event) =>
-            setBinDraft((current) => ({
-              ...current,
-              value: Number(event.target.value),
-            }))
+            setSearchParams({ [PARAM_BIN]: event.target.value })
           }
           sx={{ width: 100 }}
           slotProps={{ htmlInput: { min: 1, max: 99999 } }}
@@ -111,10 +147,7 @@ const CollectionTelemetry = ({ collectionPid }: CollectionTelemetryProps) => {
           <Select
             value={binDraft.unit}
             onChange={(event) =>
-              setBinDraft((current) => ({
-                ...current,
-                unit: event.target.value as BinUnit,
-              }))
+              setSearchParams({ [PARAM_BIN_UNIT]: event.target.value })
             }
           >
             {BIN_UNIT_OPTIONS.map((option) => (
