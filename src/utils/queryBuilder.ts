@@ -442,7 +442,7 @@ const formatDeathPhrase = (death: Option | null): string | null => {
   if (!death) return null;
 
   if (death.value === 0) {
-    return "with death status unknown/alive";
+    return "without a known death record";
   }
 
   if (death.value === 1) {
