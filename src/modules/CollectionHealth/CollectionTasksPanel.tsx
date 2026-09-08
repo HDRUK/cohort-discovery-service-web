@@ -82,6 +82,27 @@ const CollectionTasksPanel = ({
   const columns = useMemo<MRT_ColumnDef<TaskHistoryTask>[]>(
     () => [
       {
+        id: "task_type",
+        header: "Type",
+        size: 90,
+        accessorFn: (task) => task.task_type,
+        Cell: ({ row }) => (
+          <Tooltip
+            title={
+              row.original.task_type === "b"
+                ? "B-type — a distribution job, which runs no cohort query"
+                : "A-type — a cohort query"
+            }
+          >
+            <Chip
+              size="small"
+              variant="outlined"
+              label={`${row.original.task_type.toUpperCase()}-type`}
+            />
+          </Tooltip>
+        ),
+      },
+      {
         id: "name",
         header: "Name",
         size: 180,
