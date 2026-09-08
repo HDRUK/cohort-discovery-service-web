@@ -441,11 +441,11 @@ const formatLocationPhrase = (
 const formatDeathPhrase = (death: Option | null): string | null => {
   if (!death) return null;
 
-  if (death.label === "Unknown/Alive") {
+  if (death.value === 0) {
     return "with death status unknown/alive";
   }
 
-  if (death.label === "Death recorded") {
+  if (death.value === 1) {
     return "with a death record";
   }
 
