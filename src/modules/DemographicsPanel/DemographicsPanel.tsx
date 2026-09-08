@@ -18,12 +18,14 @@ import Title from "@/components/Title";
 import DemographicAgeSection from "./DemographicAgeSection";
 import DemographicCheckboxSection from "./DemographicCheckboxSection";
 import DemographicLocationSection from "./DemographicLocationSection";
+import DemographicDeathSection from "./DemographicDeathSection";
 import DemographicSaveButton from "./DemographicSaveButton";
 import useDemographicFieldEditing from "./useDemographicFieldEditing";
 import {
   formatAgeSummary,
   formatConceptCountSummary,
   formatLocationSummary,
+  formatDeathSummary,
 } from "./summary";
 import { useQuery } from "@tanstack/react-query";
 import getTermDirectory from "@/actions/termDirectory/getTermDirectory";
@@ -42,12 +44,14 @@ const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
     }));
   const user = useUserDataStore((s) => s.user);
   const userCollections = useUserDataStore((s) => s.userCollections);
-  const { queryBuilderUseLocation, queryBuilderUseRace } = useFeatures();
+  const { queryBuilderUseLocation, queryBuilderUseRace, queryBuilderUseDeath } =
+    useFeatures();
 
   const age = demographics?.age ?? null;
   const sex = demographics?.sex ?? [];
   const race = demographics?.race ?? [];
   const location = demographics?.location ?? null;
+  const death = demographics?.death ?? null;
 
   const [expanded, setExpanded] = useState(
     initialExpand ?? !hasDemographicsContent(demographics),
@@ -64,6 +68,7 @@ const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
     formatConceptCountSummary("Sex", sex),
     ...(queryBuilderUseRace ? [formatConceptCountSummary("Race", race)] : []),
     ...(queryBuilderUseLocation ? [formatLocationSummary(location)] : []),
+    ...(queryBuilderUseDeath ? [formatDeathSummary(death)] : []),
   ].join(" · ");
 
   const collectionPids = [...selectedDatasets].sort();
@@ -98,6 +103,11 @@ const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
     return userCollections.some(
       (c) => selected.has(c.pid) && c.location_enabled,
     );
+  }, [userCollections, selectedDatasets]);
+
+  const deathAvailable = useMemo(() => {
+    const selected = new Set(selectedDatasets);
+    return userCollections.some((c) => selected.has(c.pid) && c.death_enabled);
   }, [userCollections, selectedDatasets]);
 
   return (
@@ -172,6 +182,13 @@ const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
             <DemographicLocationSection
               locationAvailable={locationAvailable}
               {...propsFor("location")}
+            />
+          )}
+
+          {queryBuilderUseDeath && (
+            <DemographicDeathSection
+              deathAvailable={deathAvailable}
+              {...propsFor("death")}
             />
           )}
 

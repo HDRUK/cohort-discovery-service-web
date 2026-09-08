@@ -1,5 +1,6 @@
 import { UniqueIdentifier } from "@dnd-kit/core";
 import { Concept } from "./api";
+import { Option } from "./common";
 
 export enum CombinatorType {
   AND = "and",
@@ -29,12 +30,18 @@ export type GeoRadiusLocation = {
   address?: string;
 };
 
+export const DEATH_OPTIONS: Option[] = [
+  { value: 0, label: "Unknown/Alive" },
+  { value: 1, label: "Death recorded" },
+];
+
 export interface Demographics {
   id?: string;
   age: [number, number] | null;
   sex: Concept[];
   race: Concept[];
   location: GeoRadiusLocation | null;
+  death: Option | null;
 }
 
 type Node = {
