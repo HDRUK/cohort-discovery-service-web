@@ -27,19 +27,31 @@ const REFRESH_OPTIONS = {
   refetchOnReconnect: false,
 } as const;
 
-const QUERY_KEY_COLLECTIONS = [TAG_COLLECTION_HEALTH, TAG_COLLECTIONS_ADMIN];
 const QUERY_KEY_REGRESSION = [TAG_COLLECTION_HEALTH, TAG_REGRESSION_TESTS];
+
+const collectionsQueryKey = (pid?: string) => [
+  TAG_COLLECTION_HEALTH,
+  TAG_COLLECTIONS_ADMIN,
+  ...(pid ? [pid] : []),
+];
+
+const collectionsParams = (pid?: string) =>
+  new URLSearchParams(pid ? { pid } : { per_page: COLLECTIONS_PER_PAGE });
 
 const useCollectionHealth = ({
   initialCollections,
   fetchedAt,
+  pid,
 }: {
   initialCollections: CollectionWithHosts[];
   fetchedAt: number;
+  pid?: string;
 }) => {
   const queryClient = useQueryClient();
   const notify = useNotify();
   const defaults = useDefaults();
+
+  const queryKeyCollections = useMemo(() => collectionsQueryKey(pid), [pid]);
 
   const [runStates, setRunStates] = useState<Record<string, Set<string>>>({});
 
@@ -49,10 +61,10 @@ const useCollectionHealth = ({
     isError: isCollectionsError,
     dataUpdatedAt: collectionsUpdatedAt,
   } = useQuery({
-    queryKey: QUERY_KEY_COLLECTIONS,
+    queryKey: queryKeyCollections,
     queryFn: () =>
       getAdminCollections({
-        params: new URLSearchParams({ per_page: COLLECTIONS_PER_PAGE }),
+        params: collectionsParams(pid),
         cacheOptions: { useCache: false },
       }),
     initialData: {
@@ -116,9 +128,9 @@ const useCollectionHealth = ({
   );
 
   const invalidate = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: QUERY_KEY_COLLECTIONS });
+    queryClient.invalidateQueries({ queryKey: queryKeyCollections });
     queryClient.invalidateQueries({ queryKey: QUERY_KEY_REGRESSION });
-  }, [queryClient]);
+  }, [queryClient, queryKeyCollections]);
 
   const handleTaskComplete = useCallback(
     (collectionPid: string, taskPid: string) => {
