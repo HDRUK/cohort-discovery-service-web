@@ -704,18 +704,17 @@ export function validateRuleTree(
   };
 
   if (root.rules.length === 0) {
-    const demographicsOnlyValid =
-      allowDemographicsOnly && hasDemographicsContent(root.demographics);
-    const node = validateNode(root);
+    const hasDemographics = hasDemographicsContent(root.demographics);
+    const demographicsBlockIsEmpty = !!root.demographics && !hasDemographics;
 
-    if (demographicsOnlyValid || !root.demographics) {
-      return { ...node, valid: demographicsOnlyValid } as RuleGroupType;
-    }
+    const invalidReason = demographicsBlockIsEmpty
+      ? [RuleErrors.DEMOGRAPHICS_BLOCK_IS_EMPTY]
+      : undefined;
 
     return {
-      ...node,
-      valid: false,
-      invalidReason: [RuleErrors.DEMOGRAPHICS_BLOCK_IS_EMPTY],
+      ...validateNode(root),
+      valid: allowDemographicsOnly && hasDemographics,
+      invalidReason,
     } as RuleGroupType;
   }
 
