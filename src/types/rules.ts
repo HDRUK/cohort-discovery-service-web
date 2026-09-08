@@ -31,8 +31,8 @@ export type GeoRadiusLocation = {
 };
 
 export const DEATH_OPTIONS: Option[] = [
-  { value: 0, label: "Unknown/Alive" },
-  { value: 1, label: "Death recorded" },
+  { value: 0, label: "Not recorded" },
+  { value: 1, label: "Recorded" },
 ];
 
 export interface Demographics {

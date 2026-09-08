@@ -62,7 +62,7 @@ describe("queryBuilderStore demographics", () => {
       sex: [female, male],
       race: [white],
       location,
-      death: { value: 0, label: "Unknown/Alive" },
+      death: { value: 0, label: "Not recorded" },
     });
 
     expect(demographics()).toEqual({
@@ -71,7 +71,7 @@ describe("queryBuilderStore demographics", () => {
       sex: [female, male],
       race: [white],
       location,
-      death: { value: 0, label: "Unknown/Alive" },
+      death: { value: 0, label: "Not recorded" },
     });
   });
 

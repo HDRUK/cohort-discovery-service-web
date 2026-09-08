@@ -399,7 +399,7 @@ describe("DemographicsPanel", () => {
         screen.getByRole("button", { name: /save selection and collapse/i }),
       );
 
-      expect(demographics()?.death?.label).toEqual("Unknown/Alive");
+      expect(demographics()?.death?.label).toEqual("Not recorded");
       expect(
         screen.queryByRole("button", {
           name: /save selection and collapse/i,
@@ -420,7 +420,7 @@ describe("DemographicsPanel", () => {
       );
 
       expect(screen.getByTestId("death-chip")).toHaveTextContent(
-        "Unknown/Alive",
+        "Not recorded",
       );
     });
   });
