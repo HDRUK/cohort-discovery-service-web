@@ -14,9 +14,9 @@ const DEFAULT_AGE_RANGE: [number, number] = [MIN_AGE_FILTER, MAX_AGE_FILTER];
 const DemographicAgeSection = (props: DemographicRowActionProps) => {
   const { control, setValue } = useFormContext<Demographics>();
 
-  const { age } = useQueryBuilder((qb) => ({
-    age: qb.queryBuilderJson.demographics?.age ?? null,
-  }));
+  const age = useQueryBuilder(
+    (qb) => qb.queryBuilderJson.demographics?.age ?? null,
+  );
 
   const handleEditStart = () => {
     props.onEditStart();

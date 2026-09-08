@@ -4,7 +4,7 @@ import { Option } from "@/types/common";
 import { formatRadius } from "@/components/GeoMap";
 
 export const formatAgeSummary = (age: [number, number] | null): string =>
-  age ? `Age ${age[0]}–${age[1]}` : "Age Any";
+  age ? `Age ${age[0]}–${age[1]}` : "Age not selected";
 
 export const formatLocationSummary = (
   location: GeoRadiusLocation | null,

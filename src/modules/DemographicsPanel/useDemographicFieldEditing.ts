@@ -2,7 +2,10 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { EMPTY_DEMOGRAPHICS } from "@/store/queryBuilderStore";
 import { Demographics } from "@/types/rules";
-import { hasDemographicsContent } from "@/utils/rules";
+import {
+  hasDemographicsContent,
+  withDefaultAgeWhenEmpty,
+} from "@/utils/rules";
 import { DemographicRowActionProps } from "./DemographicRow";
 
 type DemographicField = keyof Demographics;
@@ -10,6 +13,7 @@ type DemographicField = keyof Demographics;
 const useDemographicFieldEditing = (
   demographics: Demographics | undefined,
   setDemographics: (demographics: Demographics) => void,
+  hasRules: boolean,
   onSaved?: () => void,
 ) => {
   const form = useForm<Demographics>({
@@ -22,7 +26,7 @@ const useDemographicFieldEditing = (
   );
 
   const save = form.handleSubmit((values) => {
-    setDemographics(values);
+    setDemographics(hasRules ? values : withDefaultAgeWhenEmpty(values));
     setActiveField(null);
     setAllOpen(false);
     onSaved?.();

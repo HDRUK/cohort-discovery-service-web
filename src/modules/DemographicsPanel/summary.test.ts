@@ -9,9 +9,9 @@ const concept = (concept_id: number): Concept =>
   ({ concept_id, name: `c${concept_id}`, category: "Gender" }) as Concept;
 
 describe("demographics summary formatters", () => {
-  it("formats age range and Any", () => {
+  it("formats an age range, and marks a null age as not selected", () => {
     expect(formatAgeSummary([18, 65])).toBe("Age 18–65");
-    expect(formatAgeSummary(null)).toBe("Age Any");
+    expect(formatAgeSummary(null)).toBe("Age not selected");
   });
 
   it("formats concept counts with pluralisation and Any", () => {

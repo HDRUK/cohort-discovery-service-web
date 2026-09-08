@@ -31,6 +31,7 @@ export enum RuleErrors {
   CANNOT_CONSTRAIN_AGE_AND_TIME = "A rule can only be constrained by either age OR time currently.",
   HAS_ALTERNATIVES = "The term has alternatives, please select the intended concept in the rule block(s) below.",
   NO_QUERY_FOUND = "No valid query could be found for your search term.",
+  DEMOGRAPHICS_BLOCK_IS_EMPTY = "Set at least one demographic filter, or add a rule, before running the query.",
 }
 
 export const insertMissingOperators = (
@@ -445,11 +446,18 @@ export const buildIndexFromModel = (root: RuleGroupType): BoardIndex => {
 
 export const hasDemographicsContent = (demographics?: Demographics): boolean =>
   !!demographics &&
-  (demographics.age !== null ||
-    demographics.sex.length > 0 ||
-    demographics.race.length > 0 ||
-    demographics.location !== null ||
-    demographics.death !== null);
+  (demographics.age != null ||
+    (demographics.sex ?? []).length > 0 ||
+    (demographics.race ?? []).length > 0 ||
+    demographics.location != null ||
+    demographics.death != null);
+
+export const withDefaultAgeWhenEmpty = (
+  demographics: Demographics,
+): Demographics =>
+  hasDemographicsContent(demographics)
+    ? demographics
+    : { ...demographics, age: [MIN_AGE_FILTER, MAX_AGE_FILTER] };
 
 export function validateRuleTree(
   root: RuleGroupType,
@@ -698,9 +706,16 @@ export function validateRuleTree(
   if (root.rules.length === 0) {
     const demographicsOnlyValid =
       allowDemographicsOnly && hasDemographicsContent(root.demographics);
+    const node = validateNode(root);
+
+    if (demographicsOnlyValid || !root.demographics) {
+      return { ...node, valid: demographicsOnlyValid } as RuleGroupType;
+    }
+
     return {
-      ...validateNode(root),
-      valid: demographicsOnlyValid,
+      ...node,
+      valid: false,
+      invalidReason: [RuleErrors.DEMOGRAPHICS_BLOCK_IS_EMPTY],
     } as RuleGroupType;
   }
 

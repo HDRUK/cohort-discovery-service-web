@@ -35,12 +35,13 @@ import useFeatures from "@/hooks/useFeatures";
 import { hasDemographicsContent } from "@/utils/rules";
 
 const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
-  const { demographics, setDemographics, remove, selectedDatasets } =
+  const { demographics, setDemographics, remove, selectedDatasets, hasRules } =
     useQueryBuilder((qb) => ({
       demographics: qb.queryBuilderJson.demographics,
       setDemographics: qb.setDemographics,
       remove: qb.removeDemographics,
       selectedDatasets: qb.selectedDatasets,
+      hasRules: qb.queryBuilderJson.rules.length > 0,
     }));
   const user = useUserDataStore((s) => s.user);
   const userCollections = useUserDataStore((s) => s.userCollections);
@@ -60,6 +61,7 @@ const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
   const { form, allOpen, save, propsFor } = useDemographicFieldEditing(
     demographics,
     setDemographics,
+    hasRules,
     () => setExpanded(false),
   );
 
