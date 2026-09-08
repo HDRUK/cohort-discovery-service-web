@@ -15,6 +15,8 @@ import {
 import DetailRow from "@/components/DetailRow";
 import SectionCard from "@/components/SectionCard";
 import CollectionTelemetry from "./CollectionTelemetry";
+import CollectionTasksPanel from "./CollectionTasksPanel";
+import useTelemetryRange from "./useTelemetryRange";
 import { CollectionHealthRow, HealthCheck, HealthStage } from "./health";
 import ExpectedValue from "@/components/ExpectedValue";
 import { HealthIcon } from "./HealthIndicator";
@@ -35,7 +37,7 @@ interface HealthDetailPanelProps {
 
 export interface CollectionHealthDetailProps {
   row: CollectionHealthRow;
-  showTelemetry: boolean;
+  isActive: boolean;
   isRunning: boolean;
   onUpdateExpected: (testPid: string, expected: number | null) => void;
   onRunTest: (testPid: string) => void;
@@ -119,12 +121,15 @@ const CheckRow = ({
 
 export const CollectionHealthDetail = ({
   row,
-  showTelemetry,
+  isActive,
   isRunning,
   onUpdateExpected,
   onRunTest,
-}: CollectionHealthDetailProps) => (
-  <Box>
+}: CollectionHealthDetailProps) => {
+  const telemetry = useTelemetryRange();
+
+  return (
+    <Box>
     <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 2 }}>
       <SectionCard
         title="Collection"
@@ -182,7 +187,9 @@ export const CollectionHealthDetail = ({
       </SectionCard>
 
       <Box sx={{ flex: 1, minWidth: 420 }}>
-        {showTelemetry && <CollectionTelemetry collectionPid={row.pid} />}
+        {isActive && (
+          <CollectionTelemetry collectionPid={row.pid} telemetry={telemetry} />
+        )}
       </Box>
     </Box>
 
@@ -218,9 +225,17 @@ export const CollectionHealthDetail = ({
           </SectionCard>
         );
       })}
+      </Box>
+
+      <CollectionTasksPanel
+        collectionPid={row.pid}
+        range={telemetry.range}
+        enabled={isActive && telemetry.isQueryValid}
+        sx={{ mt: 2 }}
+      />
     </Box>
-  </Box>
-);
+  );
+};
 
 const HealthDetailPanel = ({
   row,
@@ -241,7 +256,7 @@ const HealthDetailPanel = ({
   >
     <CollectionHealthDetail
       row={row}
-      showTelemetry={isExpanded}
+      isActive={isExpanded}
       isRunning={isRunning}
       onUpdateExpected={onUpdateExpected}
       onRunTest={onRunTest}

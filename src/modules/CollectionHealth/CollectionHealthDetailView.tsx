@@ -144,7 +144,7 @@ const CollectionHealthDetailView = ({
       {row && (
         <CollectionHealthDetail
           row={row}
-          showTelemetry
+          isActive
           isRunning={!!runStates[row.pid]}
           onUpdateExpected={handleUpdateExpected}
           onRunTest={handleRunTest}
