@@ -19,3 +19,5 @@ yalc.lock
 cypress/videos
 cypress/screenshots
 cypress/reports
+
+*.tsbuildinfo
