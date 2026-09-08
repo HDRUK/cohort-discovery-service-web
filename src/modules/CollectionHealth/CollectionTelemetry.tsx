@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs, { Dayjs } from "dayjs";
+import { getDatetime } from "@/utils/date";
 import SectionCard from "@/components/SectionCard";
 import useSearchParams from "@/hooks/useSearchParams";
 import PingHistoryChart from "./PingHistoryChart";
@@ -125,7 +126,14 @@ const CollectionTelemetry = ({ collectionPid }: CollectionTelemetryProps) => {
 
   return (
     <Stack spacing={2} sx={{ minWidth: 0 }}>
-      <SectionCard title="Time range">
+      <SectionCard
+        title="Time range"
+        collapsible
+        summary={`${binDraft.value} ${
+          BIN_UNIT_OPTIONS.find((option) => option.value === binDraft.unit)
+            ?.label ?? binDraft.unit
+        } · ${getDatetime(range.from)} — ${getDatetime(range.to)}`}
+      >
         <Stack
           direction="row"
           spacing={1}
