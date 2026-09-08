@@ -14,7 +14,7 @@ export const formatLocationSummary = (
     : "Location Any";
 
 export const formatDeathSummary = (death: Option | null): string =>
-  death?.label ?? "Death Any";
+  death ? `Death ${death?.label.toLowerCase()}` : "Death Any";
 
 export const formatConceptCountSummary = (
   label: string,
