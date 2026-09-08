@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import CodeIcon from "@mui/icons-material/Code";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   Alert,
   Box,
@@ -45,13 +44,12 @@ const CollectionTasksPanel = ({
   enabled,
   sx,
 }: CollectionTasksPanelProps) => {
-  const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [openTask, setOpenTask] = useState<TaskHistoryTask | null>(null);
 
   const { debounced: debouncedSearchTerm } = useDebounce(searchTerm, {});
 
-  const isActive = enabled && isOpen;
+  const isActive = enabled;
 
   const { data, isLoading, isError } = useQuery({
     queryKey: getTagsCollectionTaskHistory(collectionPid, range),
@@ -205,44 +203,25 @@ const CollectionTasksPanel = ({
     <SectionCard
       title="All tasks"
       sx={sx}
+      collapsible
+      defaultExpanded
+      summary={
+        isActive && !isError
+          ? `${rows.length.toLocaleString()} of ${tasks.length.toLocaleString()}`
+          : undefined
+      }
       action={
-        <Stack direction="row" spacing={1} alignItems="center">
-          {isOpen && (
-            <SearchBox
-              size="small"
-              collapsible={false}
-              placeholder="Search the query"
-              value={searchTerm}
-              onChange={(event) => setSearchTerm(event.target.value)}
-              inputBgColor="background.default"
-            />
-          )}
-          <Tooltip title={isOpen ? "Hide tasks" : "Show tasks"}>
-            <IconButton
-              size="small"
-              aria-label={isOpen ? "Hide tasks" : "Show tasks"}
-              aria-expanded={isOpen}
-              onClick={() => setIsOpen((open) => !open)}
-            >
-              <ExpandMoreIcon
-                fontSize="small"
-                sx={{
-                  transform: isOpen ? "rotate(180deg)" : "none",
-                  transition: "transform 150ms",
-                }}
-              />
-            </IconButton>
-          </Tooltip>
-        </Stack>
+        <SearchBox
+          size="small"
+          collapsible={false}
+          placeholder="Search the query"
+          value={searchTerm}
+          onChange={(event) => setSearchTerm(event.target.value)}
+          inputBgColor="background.default"
+        />
       }
     >
-      {!isOpen && (
-        <Typography variant="caption" color="text.secondary">
-          Every task in the selected range, latest first. Expand to load them.
-        </Typography>
-      )}
-
-      {isOpen && !enabled && (
+      {!enabled && (
         <Typography variant="caption" color="text.secondary">
           Choose a valid time range to load tasks.
         </Typography>
