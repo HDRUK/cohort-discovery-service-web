@@ -26,7 +26,9 @@ import { TaskHistoryTask, TimeRange } from "@/types/api";
 import { formatDuration, getDatetime, getTimestamp } from "@/utils/date";
 import TaskDetailModal from "./TaskDetailModal";
 import TaskStatusChip from "./TaskStatusChip";
+import { groupByTaskType } from "./taskSeries";
 import { countMissingText, filterTasks } from "./taskTable";
+import { useSeriesColours } from "./telemetryChart";
 import useQueryDefinitions from "./useQueryDefinitions";
 
 const NO_VALUE = "—";
@@ -48,6 +50,7 @@ const CollectionTasksPanel = ({
   const [openTask, setOpenTask] = useState<TaskHistoryTask | null>(null);
 
   const { debounced: debouncedSearchTerm } = useDebounce(searchTerm, {});
+  const seriesColours = useSeriesColours();
 
   const isActive = enabled;
 
@@ -74,6 +77,17 @@ const CollectionTasksPanel = ({
     [tasks, debouncedSearchTerm, textByPid],
   );
 
+  const colourByType = useMemo(
+    () =>
+      Object.fromEntries(
+        [...groupByTaskType(tasks)].map(([type], index) => [
+          type,
+          seriesColours[index % seriesColours.length],
+        ]),
+      ),
+    [tasks, seriesColours],
+  );
+
   const missingText = useMemo(
     () => countMissingText(tasks, textByPid),
     [tasks, textByPid],
@@ -98,6 +112,10 @@ const CollectionTasksPanel = ({
               size="small"
               variant="outlined"
               label={`${row.original.task_type.toUpperCase()}-type`}
+              sx={{
+                borderColor: colourByType[row.original.task_type],
+                color: colourByType[row.original.task_type],
+              }}
             />
           </Tooltip>
         ),
@@ -203,7 +221,7 @@ const CollectionTasksPanel = ({
         ),
       },
     ],
-    [isLoadingText, textByPid],
+    [colourByType, isLoadingText, textByPid],
   );
 
   const table = useTable({
