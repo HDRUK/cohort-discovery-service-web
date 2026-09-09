@@ -32,6 +32,7 @@ export const themeOptions: ThemeOptions = {
       disabledBackground: "#F0F0F0",
     },
     tooltip: { main: "#475da7" },
+    chart: { series: ["#2a78d6", "#eb6834", "#1baf7a"] },
     yellowCustom: {
       main: "#F4E751",
       light: "#E9DB5D",
