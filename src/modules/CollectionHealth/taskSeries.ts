@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { DurationStats, TaskHistoryBin, TaskHistoryTask } from "@/types/api";
-import { binWidthMinutes, TimeRange } from "./timeRange";
+import { binWidthMinutes, MAX_BINS, TimeRange } from "./timeRange";
 
 const MS_PER_MINUTE = 60_000;
 
@@ -121,7 +121,7 @@ export const buildTaskSeries = (
 
   const widthMs = width * MS_PER_MINUTE;
   const count = Math.ceil((to - from) / widthMs);
-  if (count <= 0) return [];
+  if (count <= 0 || count > MAX_BINS) return [];
 
   const binStartAt = (index: number) => from + index * widthMs;
   const binEndAt = (index: number) => Math.min(binStartAt(index) + widthMs, to);

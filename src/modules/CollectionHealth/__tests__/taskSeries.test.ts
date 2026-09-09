@@ -1,5 +1,6 @@
 import { TaskHistoryTask } from "@/types/api";
 import { buildTaskSeries, groupByTaskType } from "../taskSeries";
+import { MAX_BINS } from "../timeRange";
 
 const RANGE = { from: "2026-09-02T12:20:02Z", to: "2026-09-02T13:20:02Z" };
 
@@ -195,6 +196,55 @@ describe("buildTaskSeries", () => {
     expect(
       buildTaskSeries(TASKS, "10m", { from: RANGE.to, to: RANGE.from }, NOW),
     ).toEqual([]);
+  });
+
+  it("returns nothing when the range needs more bins than the ceiling allows", () => {
+    const decade = { from: "2016-01-01T00:00:00Z", to: "2026-01-01T00:00:00Z" };
+
+    expect(buildTaskSeries(TASKS, "1m", decade, NOW)).toEqual([]);
+    expect(buildTaskSeries([], "1m", decade, NOW)).toEqual([]);
+  });
+
+  it("still bins a range that sits exactly on the ceiling", () => {
+    const ceiling = {
+      from: "2026-01-01T00:00:00Z",
+      to: "2026-01-02T09:20:00Z",
+    };
+
+    expect(buildTaskSeries([], "1m", ceiling, NOW)).toHaveLength(MAX_BINS);
+  });
+
+  it("counts a failure in the bin it failed in, not the bin it started in", () => {
+    const failed = [
+      task({
+        pid: "failer",
+        created_at: "2026-09-02T12:25:00Z",
+        attempted_at: "2026-09-02T12:25:01Z",
+        completed_at: null,
+        failed_at: "2026-09-02T13:05:00Z",
+        status: "failed",
+        runs: [
+          {
+            attempt: 1,
+            worker_id: "127.0.0.1",
+            claimed_at: "2026-09-02T12:25:01Z",
+            started_at: "2026-09-02T12:25:01Z",
+            finished_at: "2026-09-02T13:05:00Z",
+            duration_ms: 2399000,
+            result_status: null,
+            error_class: "Timeout",
+            error_message: "No result received.",
+          },
+        ],
+      }),
+    ];
+
+    const series = buildTaskSeries(failed, "10m", RANGE, NOW);
+
+    expect(series[0].started).toBe(1);
+    expect(series[0].failed).toBe(0);
+    expect(series[4].failed).toBe(1);
+    expect(series[4].succeeded).toBe(0);
   });
 
   it("names the tasks each bin drew on, and only those", () => {

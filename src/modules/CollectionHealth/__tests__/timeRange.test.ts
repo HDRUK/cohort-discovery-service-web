@@ -1,15 +1,18 @@
+import dayjs from "dayjs";
 import {
   autoBinWidth,
   binCount,
   binWidthMinutes,
   composeBinWidth,
   decomposeBinWidth,
+  formatBinLabel,
   DEFAULT_BIN,
   DEFAULT_BIN_DRAFT,
   defaultRange,
   DEFAULT_RANGE_HOURS,
   TimeRange,
   isValidBinWidth,
+  tickStep,
   MAX_BINS,
   rangeFromBins,
   rangeMinutes,
@@ -175,6 +178,15 @@ describe("autoBinWidth", () => {
     expect(autoBinWidth(1)).toBe("1m");
   });
 
+  it.each([
+    [MINUTES_IN_DAY * 60, "1d"],
+    [MINUTES_IN_DAY * 360, "6d"],
+    [MINUTES_IN_DAY * 420, "1w"],
+    [MINUTES_IN_DAY * 1680, "4w"],
+  ])("steps up to coarser units for a %s minute span", (span, expected) => {
+    expect(autoBinWidth(span)).toBe(expected);
+  });
+
   it("always produces a width the API would accept", () => {
     [15, 60, 360, 1440, 10080, 43200, 60 * 24 * 365].forEach((span) => {
       expect(isValidBinWidth(autoBinWidth(span))).toBe(true);
@@ -227,5 +239,62 @@ describe("rangeFromBins", () => {
     expect(rangeFromBins(bins, 0, 9, "10m", servedTo)).toBeNull();
     expect(rangeFromBins(bins, 0, 2, "10x", servedTo)).toBeNull();
     expect(rangeFromBins([], 0, 0, "10m", servedTo)).toBeNull();
+  });
+});
+
+describe("formatBinLabel", () => {
+  const AT = "2026-09-02T13:05:00Z";
+  const formatted = (pattern: string) => dayjs(AT).format(pattern);
+
+  it("shows only the time for minute-scale bins", () => {
+    expect(formatBinLabel(AT, "1m")).toBe(formatted("HH:mm"));
+    expect(formatBinLabel(AT, "10m")).toBe(formatted("HH:mm"));
+    expect(formatBinLabel(AT, "minute")).toBe(formatted("HH:mm"));
+  });
+
+  it("adds the date once bins span hours, so adjacent days stay distinct", () => {
+    expect(formatBinLabel(AT, "6h")).toBe(formatted("DD/MM HH:mm"));
+    expect(formatBinLabel(AT, "hour")).toBe(formatted("DD/MM HH:mm"));
+  });
+
+  it("drops the time for day and week bins", () => {
+    expect(formatBinLabel(AT, "2d")).toBe(formatted("DD/MM"));
+    expect(formatBinLabel(AT, "day")).toBe(formatted("DD/MM"));
+    expect(formatBinLabel(AT, "4w")).toBe(formatted("DD/MM"));
+    expect(formatBinLabel(AT, "week")).toBe(formatted("DD/MM"));
+  });
+
+  it("names the month for month bins", () => {
+    expect(formatBinLabel(AT, "month")).toBe(formatted("MMM YY"));
+  });
+
+  it("falls back to the minute format for a malformed bin width", () => {
+    expect(formatBinLabel(AT, "10x")).toBe(formatted("HH:mm"));
+  });
+
+  it("returns nothing for an unparseable timestamp", () => {
+    expect(formatBinLabel("not-a-date", "10m")).toBe("");
+  });
+});
+
+describe("tickStep", () => {
+  it("labels every bin when they already fit the target", () => {
+    expect(tickStep(6)).toBe(1);
+    expect(tickStep(1)).toBe(1);
+  });
+
+  it("thins the labels just enough to reach the target", () => {
+    expect(tickStep(12)).toBe(2);
+    expect(tickStep(13)).toBe(3);
+    expect(tickStep(2000)).toBe(334);
+  });
+
+  it("never returns zero, so no caller divides by it", () => {
+    expect(tickStep(0)).toBe(1);
+    expect(tickStep(-5)).toBe(1);
+  });
+
+  it("honours a different target", () => {
+    expect(tickStep(100, 10)).toBe(10);
   });
 });

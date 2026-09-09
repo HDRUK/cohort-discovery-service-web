@@ -13,7 +13,7 @@ declare module "@mui/material/styles" {
     yellowCustom?: Palette["primary"];
     secondaryBlack: Palette["primary"];
     sage: Palette["primary"];
-    chart?: { series: string[] };
+    chart: { series: string[] };
   }
   interface PaletteOptions {
     tertiary?: PaletteOptions["primary"];

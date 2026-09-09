@@ -111,16 +111,14 @@ const CollectionTelemetry = ({
           </Button>
         </Stack>
 
-        {validationMessage && (
-          <Alert severity="warning" sx={{ mb: 1 }}>
-            {validationMessage}
-          </Alert>
-        )}
-
         <Typography variant="caption" color="text.secondary" component="div">
           Drag across any plot to narrow the range — every plot follows it.
         </Typography>
       </SectionCard>
+
+      {validationMessage && (
+        <Alert severity="warning">{validationMessage}</Alert>
+      )}
 
       <SectionCard title="Host polling">
         <PingHistoryChart

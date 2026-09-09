@@ -1,5 +1,5 @@
 import { TaskHistoryTask } from "@/types/api";
-import { countMissingText, distinctQueryPids, filterTasks } from "../taskTable";
+import { filterTasks } from "../taskTable";
 
 const task = (
   pid: string,
@@ -22,24 +22,8 @@ const task = (
   }) as TaskHistoryTask;
 
 const A = task("t1", { pid: "q1", name: "Under 60 and female" });
-const B = task("t2", { pid: "q1", name: "Under 60 and female" });
 const C = task("t3", { pid: "q2", name: "CKD cohort" });
 const DISTRIBUTION = task("t4", null);
-
-describe("distinctQueryPids", () => {
-  it("dedupes pids shared by several tasks", () => {
-    expect(distinctQueryPids([A, B, C])).toEqual(["q1", "q2"]);
-  });
-
-  it("ignores tasks with no query, since B-type runs distributions", () => {
-    expect(distinctQueryPids([DISTRIBUTION])).toEqual([]);
-    expect(distinctQueryPids([A, DISTRIBUTION, C])).toEqual(["q1", "q2"]);
-  });
-
-  it("preserves first-seen order so colours and requests stay stable", () => {
-    expect(distinctQueryPids([C, A])).toEqual(["q2", "q1"]);
-  });
-});
 
 describe("filterTasks", () => {
   const textByPid = {
@@ -64,25 +48,11 @@ describe("filterTasks", () => {
     expect(filterTasks([A, C], "FEMALE", textByPid)).toEqual([A]);
   });
 
-  it("excludes tasks whose text has not loaded and whose name does not match", () => {
+  it("excludes tasks with no definition text whose name does not match either", () => {
     expect(filterTasks([A, C], "kidney", {})).toEqual([]);
   });
 
   it("never matches a task with no query", () => {
     expect(filterTasks([DISTRIBUTION], "anything", textByPid)).toEqual([]);
-  });
-});
-
-describe("countMissingText", () => {
-  it("counts only tasks that have a query but no loaded text", () => {
-    expect(countMissingText([A, C, DISTRIBUTION], { q1: "loaded" })).toBe(1);
-  });
-
-  it("is zero when every query has text", () => {
-    expect(countMissingText([A, C], { q1: "x", q2: "y" })).toBe(0);
-  });
-
-  it("does not count distribution tasks, which never have a query", () => {
-    expect(countMissingText([DISTRIBUTION], {})).toBe(0);
   });
 });

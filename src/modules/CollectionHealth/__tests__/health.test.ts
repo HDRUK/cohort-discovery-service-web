@@ -225,6 +225,20 @@ describe("stage 2 data checks", () => {
     expect(getCheck(row, "demographics_scan")?.level).toBe("warn");
   });
 
+  it("fails when a scan has never been returned, the usual state for a new collection", () => {
+    const row = health({
+      latest_successful_concept_result_file: null,
+      latest_successful_demographic_result_file: null,
+    });
+
+    expect(getCheck(row, "concept_scan")?.level).toBe("fail");
+    expect(getCheck(row, "concept_scan")?.value).toBe("never");
+    expect(getCheck(row, "demographics_scan")?.level).toBe("fail");
+    expect(getCheck(row, "demographics_scan")?.detail).toContain(
+      "has ever been returned",
+    );
+  });
+
   it("surfaces the BUNNY version from metadata", () => {
     const row = health();
     expect(getCheck(row, "metadata")?.value).toBe("1.4.2");

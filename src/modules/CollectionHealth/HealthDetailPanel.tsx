@@ -12,6 +12,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import DetailRow from "@/components/DetailRow";
 import SectionCard from "@/components/SectionCard";
 import CollectionTelemetry from "./CollectionTelemetry";
@@ -130,101 +131,104 @@ export const CollectionHealthDetail = ({
 
   return (
     <Box>
-    <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 2 }}>
-      <SectionCard
-        title="Collection"
-        sx={{ flexShrink: 0, width: 380, maxWidth: "100%" }}
-      >
-        <Stack spacing={0.25}>
-          <DetailRow label="PID" value={row.pid} />
-          <DetailRow label="Custodian" value={row.custodianName} />
-          <DetailRow label="Context type" value={row.contextType} />
-          <DetailRow label="URL" value={row.url ?? "—"} />
-          <DetailRow label="Created" value={row.createdAt} />
-          <DetailRow
-            label="BUNNY version"
-            value={row.bunnyVersion ?? "unknown"}
-          />
-        </Stack>
-
-        <Stack
-          direction="row"
-          spacing={0.75}
-          useFlexGap
-          sx={{ flexWrap: "wrap", mt: 1.5 }}
+      <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 2 }}>
+        <SectionCard
+          title="Collection"
+          sx={{ flexShrink: 0, width: 380, maxWidth: "100%" }}
         >
-          <Chip size="small" variant="outlined" label={row.stateSlug} />
-          <FeatureChip
-            label="Location"
-            enabled={row.locationEnabled}
-            title={
-              row.locationEnabled
-                ? "Location-based rules can be queried against this collection"
-                : "Location is disabled — location rules will not run here"
-            }
-          />
-          <FeatureChip
-            label="Death"
-            enabled={row.deathEnabled}
-            title={
-              row.deathEnabled
-                ? "Death data is available on this collection"
-                : "Death data is disabled on this collection"
-            }
-          />
-          {row.isSynthetic && (
-            <Tooltip title="This collection has been marked as being synthetic data">
-              <Chip
-                size="small"
-                variant="outlined"
-                color="info"
-                icon={<ScienceIcon fontSize="small" />}
-                label="Synthetic"
-              />
-            </Tooltip>
-          )}
-        </Stack>
-      </SectionCard>
+          <Stack spacing={0.25}>
+            <DetailRow label="PID" value={row.pid} />
+            <DetailRow label="Custodian" value={row.custodianName} />
+            <DetailRow label="Context type" value={row.contextType} />
+            <DetailRow label="URL" value={row.url ?? "—"} />
+            <DetailRow label="Created" value={row.createdAt} />
+            <DetailRow
+              label="BUNNY version"
+              value={row.bunnyVersion ?? "unknown"}
+            />
+          </Stack>
 
-      <Box sx={{ flex: 1, minWidth: 420 }}>
-        {isActive && (
-          <CollectionTelemetry collectionPid={row.pid} telemetry={telemetry} />
-        )}
-      </Box>
-    </Box>
-
-    <Box
-      sx={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-        gap: 2,
-      }}
-    >
-      {([1, 2, 3] as HealthStage[]).map((stage) => {
-        const checks = row.checks.filter((check) => check.stage === stage);
-
-        return (
-          <SectionCard key={stage} title={STAGE_LABELS[stage]}>
-            <Stack spacing={1}>
-              {checks.map((check) => (
-                <CheckRow
-                  key={check.id}
-                  check={check}
-                  isRunning={isRunning}
-                  onUpdateExpected={onUpdateExpected}
-                  onRunTest={onRunTest}
+          <Stack
+            direction="row"
+            spacing={0.75}
+            useFlexGap
+            sx={{ flexWrap: "wrap", mt: 1.5 }}
+          >
+            <Chip size="small" variant="outlined" label={row.stateSlug} />
+            <FeatureChip
+              label="Location"
+              enabled={row.locationEnabled}
+              title={
+                row.locationEnabled
+                  ? "Location-based rules can be queried against this collection"
+                  : "Location is disabled — location rules will not run here"
+              }
+            />
+            <FeatureChip
+              label="Death"
+              enabled={row.deathEnabled}
+              title={
+                row.deathEnabled
+                  ? "Death data is available on this collection"
+                  : "Death data is disabled on this collection"
+              }
+            />
+            {row.isSynthetic && (
+              <Tooltip title="This collection has been marked as being synthetic data">
+                <Chip
+                  size="small"
+                  variant="outlined"
+                  color="info"
+                  icon={<ScienceIcon fontSize="small" />}
+                  label="Synthetic"
                 />
-              ))}
+              </Tooltip>
+            )}
+          </Stack>
+        </SectionCard>
 
-              {stage === 3 && checks.length === 0 && (
-                <Typography variant="caption" color="text.secondary">
-                  No health checks configured yet.
-                </Typography>
-              )}
-            </Stack>
-          </SectionCard>
-        );
-      })}
+        <Box sx={{ flex: 1, minWidth: 420 }}>
+          {isActive && (
+            <CollectionTelemetry
+              collectionPid={row.pid}
+              telemetry={telemetry}
+            />
+          )}
+        </Box>
+      </Box>
+
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+          gap: 2,
+        }}
+      >
+        {([1, 2, 3] as HealthStage[]).map((stage) => {
+          const checks = row.checks.filter((check) => check.stage === stage);
+
+          return (
+            <SectionCard key={stage} title={STAGE_LABELS[stage]}>
+              <Stack spacing={1}>
+                {checks.map((check) => (
+                  <CheckRow
+                    key={check.id}
+                    check={check}
+                    isRunning={isRunning}
+                    onUpdateExpected={onUpdateExpected}
+                    onRunTest={onRunTest}
+                  />
+                ))}
+
+                {stage === 3 && checks.length === 0 && (
+                  <Typography variant="caption" color="text.secondary">
+                    No health checks configured yet.
+                  </Typography>
+                )}
+              </Stack>
+            </SectionCard>
+          );
+        })}
       </Box>
 
       <CollectionTasksPanel
@@ -251,7 +255,8 @@ const HealthDetailPanel = ({
       borderTop: 1,
       borderBottom: 1,
       borderColor: "divider",
-      boxShadow: "inset 0 1px 3px rgba(0, 0, 0, 0.07)",
+      boxShadow: (theme) =>
+        `inset 0 1px 3px ${alpha(theme.palette.common.black, 0.07)}`,
     }}
   >
     <CollectionHealthDetail

@@ -23,6 +23,7 @@ import {
 } from "./taskHistory";
 import {
   CHART_HEIGHT,
+  STALE_TIME_TELEMETRY,
   useSeriesColours,
   X_AXIS_HEIGHT,
   Y_AXIS_WIDTH,
@@ -97,8 +98,10 @@ const TaskHistoryChart = ({
     queryFn: () => getCollectionTaskHistory(collectionPid, range),
     enabled,
     refetchOnWindowFocus: false,
+    staleTime: STALE_TIME_TELEMETRY,
   });
   const history = data?.data;
+  const hasFailed = isError || !!data?.error;
   const tasks = useMemo(() => history?.tasks.data ?? [], [history]);
 
   const [openBin, setOpenBin] = useState<{
@@ -204,7 +207,7 @@ const TaskHistoryChart = ({
         <Skeleton variant="rectangular" height={CHART_HEIGHT} sx={{ mb: 1 }} />
       )}
 
-      {enabled && isError && (
+      {enabled && hasFailed && (
         <Alert severity="error" sx={{ mb: 1 }}>
           Could not load task history for this collection.
         </Alert>
@@ -309,6 +312,7 @@ const TaskHistoryChart = ({
           binLabel={openBin.label}
           typeLabel={openBin.typeLabel}
           tasks={openBin.tasks}
+          definitionsByPid={history?.definitionsByPid ?? {}}
         />
       )}
     </Box>

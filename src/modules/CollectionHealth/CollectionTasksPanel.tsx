@@ -7,7 +7,6 @@ import {
   Box,
   Chip,
   IconButton,
-  Skeleton,
   Stack,
   Tooltip,
   Typography,
@@ -24,12 +23,12 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useTable } from "@/hooks/useTable";
 import { TaskHistoryTask, TimeRange } from "@/types/api";
 import { formatDuration, getDatetime, getTimestamp } from "@/utils/date";
+import { queryToText } from "@/utils/queryBuilder";
 import TaskDetailModal from "./TaskDetailModal";
 import TaskStatusChip from "./TaskStatusChip";
 import { groupByTaskType } from "./taskSeries";
-import { countMissingText, filterTasks } from "./taskTable";
-import { useSeriesColours } from "./telemetryChart";
-import useQueryDefinitions from "./useQueryDefinitions";
+import { filterTasks } from "./taskTable";
+import { STALE_TIME_TELEMETRY, useSeriesColours } from "./telemetryChart";
 
 const NO_VALUE = "—";
 
@@ -60,21 +59,29 @@ const CollectionTasksPanel = ({
     enabled: isActive,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
+    staleTime: STALE_TIME_TELEMETRY,
   });
 
   const history = data?.data;
+  const hasFailed = isError || !!data?.error;
   const tasks = useMemo(() => history?.tasks.data ?? [], [history]);
   const omitted = (history?.tasks.total ?? 0) - tasks.length;
 
-  const {
-    textByPid,
-    isLoading: isLoadingText,
-    cappedAt,
-  } = useQueryDefinitions(tasks, isActive);
+  const textByPid = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.entries(history?.definitionsByPid ?? {}).map(
+          ([pid, definition]) => [pid, queryToText(definition)],
+        ),
+      ),
+    [history],
+  );
+
+  const term = debouncedSearchTerm ?? "";
 
   const rows = useMemo(
-    () => filterTasks(tasks, debouncedSearchTerm ?? "", textByPid),
-    [tasks, debouncedSearchTerm, textByPid],
+    () => filterTasks(tasks, term, textByPid),
+    [tasks, term, textByPid],
   );
 
   const colourByType = useMemo(
@@ -86,11 +93,6 @@ const CollectionTasksPanel = ({
         ]),
       ),
     [tasks, seriesColours],
-  );
-
-  const missingText = useMemo(
-    () => countMissingText(tasks, textByPid),
-    [tasks, textByPid],
   );
 
   const columns = useMemo<MRT_ColumnDef<TaskHistoryTask>[]>(
@@ -149,11 +151,9 @@ const CollectionTasksPanel = ({
 
           const text = textByPid[pid];
           if (!text) {
-            return isLoadingText ? (
-              <Skeleton variant="text" width={220} />
-            ) : (
+            return (
               <Typography variant="caption" color="text.secondary">
-                Not loaded
+                {NO_VALUE}
               </Typography>
             );
           }
@@ -221,7 +221,7 @@ const CollectionTasksPanel = ({
         ),
       },
     ],
-    [colourByType, isLoadingText, textByPid],
+    [colourByType, textByPid],
   );
 
   const table = useTable({
@@ -245,7 +245,7 @@ const CollectionTasksPanel = ({
       collapsible
       defaultExpanded
       summary={
-        isActive && !isError
+        isActive && !hasFailed
           ? `${rows.length.toLocaleString()} of ${tasks.length.toLocaleString()}`
           : undefined
       }
@@ -266,13 +266,13 @@ const CollectionTasksPanel = ({
         </Typography>
       )}
 
-      {isActive && isError && (
+      {isActive && hasFailed && (
         <Alert severity="error">
           Could not load tasks for this collection.
         </Alert>
       )}
 
-      {isActive && !isError && (
+      {isActive && !hasFailed && (
         <Box sx={{ minWidth: 0 }}>
           <Stack
             direction="row"
@@ -291,21 +291,16 @@ const CollectionTasksPanel = ({
                 the most recent {tasks.length.toLocaleString()} were loaded.
               </Typography>
             )}
-            {cappedAt !== null && (
-              <Typography variant="caption" color="warning.main">
-                Query text loaded for the first {cappedAt} distinct queries
-                only; search cannot match the rest.
-              </Typography>
-            )}
-            {cappedAt === null && missingText > 0 && !isLoadingText && (
-              <Typography variant="caption" color="text.secondary">
-                {missingText} task(s) have no query text loaded, so search
-                cannot match them.
-              </Typography>
-            )}
           </Stack>
 
-          <Table table={table} emptyMessage="No tasks match this search" />
+          <Table
+            table={table}
+            emptyMessage={
+              term
+                ? `No tasks match “${term}”.`
+                : `No tasks ran on this collection between ${getDatetime(range.from)} and ${getDatetime(range.to)}.`
+            }
+          />
         </Box>
       )}
 
@@ -313,10 +308,9 @@ const CollectionTasksPanel = ({
         <TaskDetailModal
           open
           onClose={() => setOpenTask(null)}
-          binLabel=""
-          typeLabel=""
           title={openTask.query?.name ?? openTask.pid}
           tasks={[openTask]}
+          definitionsByPid={history?.definitionsByPid ?? {}}
         />
       )}
     </SectionCard>

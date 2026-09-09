@@ -49,7 +49,7 @@ const CollectionHealthDetailView = ({
     invalidate,
     updateExpected,
     runTest,
-  } = useCollectionHealth({ initialCollections, fetchedAt });
+  } = useCollectionHealth({ initialCollections, fetchedAt, pid });
 
   const row = rows.find((candidate) => candidate.pid === pid);
 

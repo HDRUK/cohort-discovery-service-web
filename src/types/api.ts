@@ -246,8 +246,15 @@ export interface TaskHistoryTask {
   queued_for_ms: number | null;
   duration_ms: number | null;
   total_duration_ms: number | null;
-  query: { pid: string; name: string; query_type: string | null } | null;
+  query: TaskHistoryQuery | null;
   runs: TaskHistoryRun[];
+}
+
+export interface TaskHistoryQuery {
+  pid: string;
+  name: string;
+  query_type: string | null;
+  definition?: RuleGroupType;
 }
 
 export interface CollectionTaskHistory {
@@ -256,6 +263,7 @@ export interface CollectionTaskHistory {
   to: string;
   summary: TaskHistorySummary;
   tasks: Paginated<TaskHistoryTask>;
+  definitionsByPid: Record<string, RuleGroupType>;
 }
 
 export interface Activity extends WithTimestamps {
