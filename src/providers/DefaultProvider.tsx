@@ -16,6 +16,10 @@ export type DefaultConfig = {
   searchPrefetch: number;
   searchWaitTime: number;
   searchSuggestionRotation: number;
+  pingAWarnMs: number;
+  pingAFailMs: number;
+  pingBWarnMs: number;
+  pingBFailMs: number;
   locationMinRadius: number;
   serviceDeskUrl: string;
   serviceDeskSupportSuffix: string;
@@ -44,6 +48,10 @@ export const DefaultProvider = ({
       searchPrefetch: defaults.DEFAULT_SEARCH_PREFETCH,
       searchWaitTime: defaults.DEFAULT_SEARCH_WAIT_TIME,
       searchSuggestionRotation: defaults.DEFAULT_SEARCH_SUGGESTION_ROTATION,
+      pingAWarnMs: defaults.DEFAULT_PING_A_WARN_MS,
+      pingAFailMs: defaults.DEFAULT_PING_A_FAIL_MS,
+      pingBWarnMs: defaults.DEFAULT_PING_B_WARN_MS,
+      pingBFailMs: defaults.DEFAULT_PING_B_FAIL_MS,
       locationMinRadius: MIN_RADIUS,
       serviceDeskUrl: "",
       serviceDeskSupportSuffix: "",
