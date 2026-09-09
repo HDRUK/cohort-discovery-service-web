@@ -2,10 +2,12 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { Alert, Box, Skeleton, Stack, Typography } from "@mui/material";
-import { LineChart } from "@mui/x-charts/LineChart";
-import { LineItemIdentifier } from "@mui/x-charts/models";
 import { useQuery } from "@tanstack/react-query";
 import getCollectionTaskHistory from "@/actions/collection/getCollectionTaskHistory";
+import MultiSeriesLineChart, {
+  CHART_HEIGHT,
+  ChartSeries,
+} from "@/components/MultiSeriesLineChart";
 import { getTagsCollectionTaskHistory } from "@/config/tags";
 import { TaskHistoryTask, TaskHistorySummary } from "@/types/api";
 import { formatDuration, MS_PER_SECOND } from "@/utils/date";
@@ -14,25 +16,17 @@ import {
   groupByTaskType,
   TaskSeriesPoint,
 } from "./taskSeries";
-import DragRangeOverlay from "./DragRangeOverlay";
 import TaskDetailModal from "./TaskDetailModal";
 import {
   describeDurations,
   formatConcurrency,
   isEmptySeries,
 } from "./taskHistory";
-import {
-  CHART_HEIGHT,
-  STALE_TIME_TELEMETRY,
-  useSeriesColours,
-  X_AXIS_HEIGHT,
-  Y_AXIS_WIDTH,
-} from "./telemetryChart";
+import { STALE_TIME_TELEMETRY, useSeriesColours } from "./telemetryChart";
 import {
   binWidthMinutes,
   formatBinLabel,
   rangeFromBins,
-  tickStep,
   TimeRange,
 } from "./timeRange";
 
@@ -46,10 +40,25 @@ interface TypeGroup {
   points: TaskSeriesPoint[];
 }
 
-const CONCURRENCY_SERIES = "concurrency-max";
-const DURATION_SERIES = "duration-p50";
+const formatConcurrencyPoint = (
+  point: TaskSeriesPoint | undefined,
+  value: number | null,
+) => {
+  if (value === null || !point) return "no data yet";
 
-const seriesId = (measure: string, type: string) => `${measure}::${type}`;
+  return `${formatConcurrency(value)} at peak · ${point.started} started · ${point.finished} finished`;
+};
+
+const formatDurationPoint = (
+  point: TaskSeriesPoint | undefined,
+  value: number | null,
+) => {
+  if (value === null || !point) return "no runs settled";
+
+  return `${formatDuration(value * MS_PER_SECOND)} · ${describeDurations(point.duration_ms)}`;
+};
+
+const TASK_TYPE_COLOUR_SLOT: Record<string, number> = { a: 0, b: 1 };
 
 const summaryLine = (summary: TaskHistorySummary): string => {
   const byType = Object.entries(summary.task_types)
@@ -115,7 +124,10 @@ const TaskHistoryChart = ({
       [...groupByTaskType(tasks)].map(([type, group], index) => ({
         type,
         label: `${type.toUpperCase()}-type`,
-        colour: seriesColours[index % seriesColours.length],
+        colour:
+          seriesColours[
+            TASK_TYPE_COLOUR_SLOT[type] ?? index % seriesColours.length
+          ],
         points: buildTaskSeries(group, bin, range),
       })),
     [tasks, bin, range, seriesColours],
@@ -131,6 +143,36 @@ const TaskHistoryChart = ({
   );
 
   const isEmpty = groups.every((group) => isEmptySeries(group.points));
+
+  const concurrencySeries = useMemo<ChartSeries[]>(
+    () =>
+      groups.map((group) => ({
+        key: group.type,
+        label: group.label,
+        colour: group.colour,
+        data: group.points.map((point) => point.concurrency_max),
+        showMark: (index: number) =>
+          (group.points[index]?.concurrency_max ?? 0) > 0,
+        valueFormatter: (value: number | null, dataIndex: number) =>
+          formatConcurrencyPoint(group.points[dataIndex], value),
+      })),
+    [groups],
+  );
+
+  const durationSeries = useMemo<ChartSeries[]>(
+    () =>
+      groups.map((group) => ({
+        key: group.type,
+        label: group.label,
+        colour: group.colour,
+        data: group.points.map((point) => toSeconds(point.duration_ms.p50)),
+        showMark: (index: number) =>
+          group.points[index]?.duration_ms.p50 !== null,
+        valueFormatter: (value: number | null, dataIndex: number) =>
+          formatDurationPoint(group.points[dataIndex], value),
+      })),
+    [groups],
+  );
 
   const handleDragSelect = useCallback(
     (startIndex: number, endIndex: number) => {
@@ -148,11 +190,8 @@ const TaskHistoryChart = ({
     [history, bins, bin, onSelectRange],
   );
 
-  const handleMarkClick = useCallback(
-    (_: unknown, { seriesId: id, dataIndex }: LineItemIdentifier) => {
-      if (dataIndex === undefined) return;
-
-      const type = String(id).split("::")[1];
+  const handlePointClick = useCallback(
+    (type: string, dataIndex: number) => {
       const group = groups.find((candidate) => candidate.type === type);
       const point = group?.points[dataIndex];
       if (!group || !point) return;
@@ -173,33 +212,6 @@ const TaskHistoryChart = ({
     },
     [groups, tasks, bin],
   );
-
-  const formatConcurrencyPoint = (
-    point: TaskSeriesPoint | undefined,
-    value: number | null,
-  ) => {
-    if (value === null || !point) return "no data yet";
-
-    return `${formatConcurrency(value)} at peak · ${point.started} started · ${point.finished} finished`;
-  };
-
-  const formatDurationPoint = (
-    point: TaskSeriesPoint | undefined,
-    value: number | null,
-  ) => {
-    if (value === null || !point) return "no runs settled";
-
-    return `${formatDuration(value * MS_PER_SECOND)} · ${describeDurations(point.duration_ms)}`;
-  };
-
-  const sharedXAxis = {
-    scaleType: "point" as const,
-    data: labels,
-    height: X_AXIS_HEIGHT,
-    tickLabelStyle: { fontSize: 11 },
-    tickLabelInterval: (_: unknown, index: number) =>
-      index % tickStep(labels.length) === 0,
-  };
 
   return (
     <Box sx={{ minWidth: 0 }}>
@@ -240,46 +252,21 @@ const TaskHistoryChart = ({
               gap: 2,
             }}
           >
-            <LineChart
-              height={CHART_HEIGHT}
-              xAxis={[{ ...sharedXAxis }]}
-              yAxis={[{ label: "runs in flight", min: 0, width: Y_AXIS_WIDTH }]}
-              onMarkClick={handleMarkClick}
-              series={groups.map((group) => ({
-                id: seriesId(CONCURRENCY_SERIES, group.type),
-                data: group.points.map((point) => point.concurrency_max),
-                label: group.label,
-                color: group.colour,
+            <MultiSeriesLineChart
+              labels={labels}
+              series={concurrencySeries}
+              yAxisLabel="runs in flight"
+              onSelectRange={handleDragSelect}
+              onPointClick={handlePointClick}
+            />
 
-                showMark: ({ index }) =>
-                  (group.points[index]?.concurrency_max ?? 0) > 0,
-                valueFormatter: (value, { dataIndex }) =>
-                  formatConcurrencyPoint(group.points[dataIndex], value),
-              }))}
-            >
-              <DragRangeOverlay onSelect={handleDragSelect} />
-            </LineChart>
-
-            <LineChart
-              height={CHART_HEIGHT}
-              xAxis={[{ ...sharedXAxis }]}
-              yAxis={[{ label: "seconds", min: 0, width: Y_AXIS_WIDTH }]}
-              onMarkClick={handleMarkClick}
-              series={groups.map((group) => ({
-                id: seriesId(DURATION_SERIES, group.type),
-                data: group.points.map((point) =>
-                  toSeconds(point.duration_ms.p50),
-                ),
-                label: group.label,
-                color: group.colour,
-                showMark: ({ index }) =>
-                  group.points[index]?.duration_ms.p50 !== null,
-                valueFormatter: (value, { dataIndex }) =>
-                  formatDurationPoint(group.points[dataIndex], value),
-              }))}
-            >
-              <DragRangeOverlay onSelect={handleDragSelect} />
-            </LineChart>
+            <MultiSeriesLineChart
+              labels={labels}
+              series={durationSeries}
+              yAxisLabel="seconds"
+              onSelectRange={handleDragSelect}
+              onPointClick={handlePointClick}
+            />
           </Box>
 
           <Stack spacing={0.25}>

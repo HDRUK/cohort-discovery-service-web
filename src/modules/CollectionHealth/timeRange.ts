@@ -133,9 +133,6 @@ export const formatBinLabel = (iso: string, bin: string): string => {
   return parsed.format(CUSTOM_BIN_LABEL_FORMAT[unit]);
 };
 
-export const tickStep = (binCountValue: number, target = 6): number =>
-  Math.max(1, Math.ceil(binCountValue / target));
-
 export const rangeFromBins = (
   binStarts: string[],
   startIndex: number,

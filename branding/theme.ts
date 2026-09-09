@@ -29,7 +29,18 @@ const brandingTheme: ThemeOptions = {
       disabledBackground: "#F0F0F0",
     },
     tooltip: { main: "#475da7" },
-    chart: { series: ["#2a78d6", "#eb6834", "#1baf7a"] },
+    chart: {
+      series: [
+        "#2a78d6",
+        "#eb6834",
+        "#1baf7a",
+        "#eda100",
+        "#e87ba4",
+        "#008300",
+        "#4a3aa7",
+        "#e34948",
+      ],
+    },
     yellowCustom: {
       main: "#F4E751",
       light: "#E9DB5D",

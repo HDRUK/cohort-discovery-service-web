@@ -18,7 +18,7 @@ import { routes } from "@/config/routes";
 import useHasMounted from "@/hooks/useHasMounted";
 import { CollectionWithHosts } from "@/types/api";
 import { getDatetime } from "@/utils/date";
-import { CollectionHealthDetail } from "./HealthDetailPanel";
+import CollectionHealthDetail from "./CollectionHealthDetail";
 import { HealthIcon } from "./HealthIndicator";
 import useCollectionHealth, { REFRESH_INTERVAL } from "./useCollectionHealth";
 

@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import { MRT_ColumnDef } from "material-react-table";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { routes } from "@/config/routes";
 import SkeletonFull from "@/components/SkeletonFull";
 import SyntheticChip from "@/components/SyntheticChip";
@@ -32,9 +33,9 @@ import {
   CollectionHealthRow,
   getCheck,
   HealthLevel,
+  LEVEL_RANK,
   regressionCheckId,
 } from "./health";
-import HealthDetailPanel from "./HealthDetailPanel";
 import HealthIndicator, { HealthIcon } from "./HealthIndicator";
 
 const STAGE_DIVIDER_SX = {
@@ -45,13 +46,6 @@ const STAGE_DIVIDER_SX = {
 const TOOLBAR_HEIGHT_PX = 32;
 const COUNT_CHIP_WIDTH_PX = 128;
 const ICON_SLOT_PX = 20;
-
-const LEVEL_RANK: Record<HealthLevel, number> = {
-  ok: 0,
-  warn: 1,
-  none: 2,
-  fail: 3,
-};
 
 const OVERALL_COLOURS: Record<HealthLevel, "success" | "warning" | "error"> = {
   ok: "success",
@@ -70,12 +64,13 @@ const CollectionHealth = ({
   const hasMounted = useHasMounted();
   const [dialogOpen, setDialogOpen] = useState(false);
 
+  const router = useRouter();
+
   const {
     rows,
     tests,
     collections,
     now,
-    runStates,
     isFetching,
     isFetchingRegression,
     hasRegressionResponse,
@@ -83,11 +78,7 @@ const CollectionHealth = ({
     invalidate,
     addHealthCheck,
     updateExpected,
-    runTest,
   } = useCollectionHealth({ initialCollections, fetchedAt });
-
-  const handleUpdateExpected = updateExpected;
-  const handleRunTest = runTest;
 
   const checkColumn = useCallback(
     (
@@ -128,7 +119,7 @@ const CollectionHealth = ({
                   prefix="Exp"
                   value={check.expected}
                   onSave={(expected) =>
-                    handleUpdateExpected(test.pid, expected, row.original.pid)
+                    updateExpected(test.pid, expected, row.original.pid)
                   }
                 />
               )}
@@ -137,7 +128,7 @@ const CollectionHealth = ({
         },
       };
     },
-    [handleUpdateExpected],
+    [updateExpected],
   );
 
   const columns = useMemo<MRT_ColumnDef<CollectionHealthRow>[]>(
@@ -270,7 +261,6 @@ const CollectionHealth = ({
     getRowId: (row) => row?.pid ?? "",
     enableRowSelection: false,
     enableSorting: true,
-    enableExpanding: true,
 
     layoutMode: "grid",
 
@@ -294,17 +284,25 @@ const CollectionHealth = ({
       },
     }),
 
-    renderDetailPanel: ({ row }) => (
-      <HealthDetailPanel
-        row={row.original}
-        isExpanded={row.getIsExpanded()}
-        isRunning={!!runStates[row.original.pid]}
-        onUpdateExpected={(testPid, expected) =>
-          handleUpdateExpected(testPid, expected, row.original.pid)
+    muiTableBodyRowProps: ({ row }) => ({
+      onClick: (event) => {
+        const target = event.target as HTMLElement | null;
+        if (
+          target?.closest("input") ||
+          target?.closest("button") ||
+          target?.closest("a") ||
+          target?.closest("svg")
+        ) {
+          return;
         }
-        onRunTest={(testPid) => handleRunTest(testPid, row.original.pid)}
-      />
-    ),
+
+        router.push(routes.adminCollectionHealthDetail(row.original.pid));
+      },
+      sx: {
+        backgroundColor: "transparent !important",
+        cursor: "pointer",
+      },
+    }),
     state: { isLoading: isFetchingRegression && !hasRegressionResponse },
   });
 

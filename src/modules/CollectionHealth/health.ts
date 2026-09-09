@@ -70,6 +70,13 @@ export const DEFAULT_HEALTH_THRESHOLDS: HealthThresholds = {
   },
 };
 
+export const LEVEL_RANK: Record<HealthLevel, number> = {
+  ok: 0,
+  warn: 1,
+  none: 2,
+  fail: 3,
+};
+
 export const SCAN_STALE_MS = 30 * 24 * 60 * 60 * 1000;
 
 export const REGRESSION_CHECK_PREFIX = "regression:";

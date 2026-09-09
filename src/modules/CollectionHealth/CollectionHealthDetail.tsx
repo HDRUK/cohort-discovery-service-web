@@ -12,7 +12,6 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { alpha } from "@mui/material/styles";
 import DetailRow from "@/components/DetailRow";
 import SectionCard from "@/components/SectionCard";
 import CollectionTelemetry from "./CollectionTelemetry";
@@ -27,14 +26,6 @@ const STAGE_LABELS: Record<HealthStage, string> = {
   2: "Stage 2 — Data returned",
   3: "Stage 3 — Validation",
 };
-
-interface HealthDetailPanelProps {
-  row: CollectionHealthRow;
-  isExpanded: boolean;
-  isRunning: boolean;
-  onUpdateExpected: (testPid: string, expected: number | null) => void;
-  onRunTest: (testPid: string) => void;
-}
 
 export interface CollectionHealthDetailProps {
   row: CollectionHealthRow;
@@ -78,8 +69,8 @@ const CheckRow = ({
 }: {
   check: HealthCheck;
   isRunning: boolean;
-  onUpdateExpected: HealthDetailPanelProps["onUpdateExpected"];
-  onRunTest: HealthDetailPanelProps["onRunTest"];
+  onUpdateExpected: CollectionHealthDetailProps["onUpdateExpected"];
+  onRunTest: CollectionHealthDetailProps["onRunTest"];
 }) => (
   <Box sx={{ display: "flex", gap: 1 }}>
     <HealthIcon level={check.level} />
@@ -120,7 +111,7 @@ const CheckRow = ({
   </Box>
 );
 
-export const CollectionHealthDetail = ({
+const CollectionHealthDetail = ({
   row,
   isActive,
   isRunning,
@@ -241,32 +232,4 @@ export const CollectionHealthDetail = ({
   );
 };
 
-const HealthDetailPanel = ({
-  row,
-  isExpanded,
-  isRunning,
-  onUpdateExpected,
-  onRunTest,
-}: HealthDetailPanelProps) => (
-  <Box
-    sx={{
-      p: 2,
-      bgcolor: "background.default",
-      borderTop: 1,
-      borderBottom: 1,
-      borderColor: "divider",
-      boxShadow: (theme) =>
-        `inset 0 1px 3px ${alpha(theme.palette.common.black, 0.07)}`,
-    }}
-  >
-    <CollectionHealthDetail
-      row={row}
-      isActive={isExpanded}
-      isRunning={isRunning}
-      onUpdateExpected={onUpdateExpected}
-      onRunTest={onRunTest}
-    />
-  </Box>
-);
-
-export default HealthDetailPanel;
+export default CollectionHealthDetail;

@@ -1,34 +1,35 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
-import { Alert, Box, Skeleton, Stack, Typography } from "@mui/material";
-import { LineChart } from "@mui/x-charts/LineChart";
+import { Box, Stack, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import getCollectionHealth from "@/actions/collection/getCollectionHealth";
+import MultiSeriesLineChart, {
+  ChartSeries,
+} from "@/components/MultiSeriesLineChart";
 import { getTagsCollectionHealth } from "@/config/tags";
 import { PingBin, PingSummary } from "@/types/api";
 import { getDatetime } from "@/utils/date";
-import DragRangeOverlay from "./DragRangeOverlay";
-import {
-  CHART_HEIGHT,
-  STALE_TIME_TELEMETRY,
-  useSeriesColours,
-  X_AXIS_HEIGHT,
-  Y_AXIS_WIDTH,
-} from "./telemetryChart";
-import {
-  formatBinLabel,
-  rangeFromBins,
-  tickStep,
-  TimeRange,
-} from "./timeRange";
+import { STALE_TIME_TELEMETRY, useSeriesColours } from "./telemetryChart";
+import { formatBinLabel, rangeFromBins, TimeRange } from "./timeRange";
 
 const Y_AXIS_LABEL = "polls / min";
 
-const toRates = (points: PingBin[] | undefined) =>
+const toRates = (points: PingBin[] | undefined): (number | null)[] =>
   points?.map((point) =>
     point.per_minute !== null && point.per_minute > 0 ? point.per_minute : null,
-  );
+  ) ?? [];
+
+const formatPoint = (point: PingBin | undefined, value: number | null) => {
+  if (!point) return "no data yet";
+  if (value === null) {
+    return point.minutes === 0
+      ? "no data yet"
+      : `no pings · ${point.silent_minutes} min silent`;
+  }
+
+  return `${value.toFixed(2)} /min · ${point.n.toLocaleString()} pings · ${point.silent_minutes} min silent`;
+};
 
 const SummaryLine = ({
   label,
@@ -97,19 +98,24 @@ const PingHistoryChart = ({
     [health, bin],
   );
 
-  const ratesA = useMemo(() => toRates(health?.series.a), [health]);
-  const ratesB = useMemo(() => toRates(health?.series.b), [health]);
+  const series = useMemo<ChartSeries[]>(() => {
+    if (!health) return [];
 
-  const formatPoint = (point: PingBin | undefined, value: number | null) => {
-    if (!point) return "no data yet";
-    if (value === null) {
-      return point.minutes === 0
-        ? "no data yet"
-        : `no pings · ${point.silent_minutes} min silent`;
-    }
+    return (["a", "b"] as const).map((type) => {
+      const points = health.series[type];
+      const rates = toRates(points);
 
-    return `${value.toFixed(2)} /min · ${point.n.toLocaleString()} pings · ${point.silent_minutes} min silent`;
-  };
+      return {
+        key: type,
+        label: `${type.toUpperCase()}-type`,
+        colour: type === "a" ? seriesAColour : seriesBColour,
+        data: rates,
+        showMark: (index: number) => rates[index] !== null,
+        valueFormatter: (value: number | null, dataIndex: number) =>
+          formatPoint(points[dataIndex], value),
+      };
+    });
+  }, [health, seriesAColour, seriesBColour]);
 
   const handleDragSelect = useCallback(
     (startIndex: number, endIndex: number) => {
@@ -128,76 +134,38 @@ const PingHistoryChart = ({
   );
 
   return (
-    <Box sx={{ minWidth: 0 }}>
-      {enabled && isLoading && (
-        <Skeleton variant="rectangular" height={CHART_HEIGHT} sx={{ mb: 1 }} />
-      )}
-
-      {enabled && hasFailed && (
-        <Alert severity="error" sx={{ mb: 1 }}>
-          Could not load ping history for this collection.
-        </Alert>
-      )}
-
-      {health && (
-        <>
-          <LineChart
-            height={CHART_HEIGHT}
-            xAxis={[
-              {
-                scaleType: "point",
-                data: labels,
-
-                height: X_AXIS_HEIGHT,
-                tickLabelStyle: { fontSize: 11 },
-
-                tickLabelInterval: (_, index) =>
-                  index % tickStep(labels.length) === 0,
-              },
-            ]}
-            yAxis={[{ label: Y_AXIS_LABEL, min: 0, width: Y_AXIS_WIDTH }]}
-            series={[
-              {
-                data: ratesA,
-                label: "A-type",
-                color: seriesAColour,
-                showMark: ({ index }) => (ratesA?.[index] ?? null) !== null,
-                valueFormatter: (value, { dataIndex }) =>
-                  formatPoint(health.series.a[dataIndex], value),
-              },
-              {
-                data: ratesB,
-                label: "B-type",
-                color: seriesBColour,
-                showMark: ({ index }) => (ratesB?.[index] ?? null) !== null,
-                valueFormatter: (value, { dataIndex }) =>
-                  formatPoint(health.series.b[dataIndex], value),
-              },
-            ]}
-          >
-            <DragRangeOverlay onSelect={handleDragSelect} />
-          </LineChart>
-
-          <Stack spacing={0.25}>
-            <SummaryLine
-              label="A-type"
-              colour={seriesAColour}
-              summary={health.summary.a}
-            />
-            <SummaryLine
-              label="B-type"
-              colour={seriesBColour}
-              summary={health.summary.b}
-            />
-            <Typography variant="caption" color="text.secondary">
-              A ping is a poll for work, not a query. Rates are not comparable
-              between collections, so empty bins and gaps are the signal rather
-              than any uptime figure.
-            </Typography>
-          </Stack>
-        </>
-      )}
-    </Box>
+    <MultiSeriesLineChart
+      labels={labels}
+      series={series}
+      yAxisLabel={Y_AXIS_LABEL}
+      isLoading={enabled && isLoading}
+      isEmpty={!health}
+      errorMessage={
+        enabled && hasFailed
+          ? "Could not load ping history for this collection."
+          : null
+      }
+      onSelectRange={handleDragSelect}
+      footer={
+        <Stack spacing={0.25}>
+          <SummaryLine
+            label="A-type"
+            colour={seriesAColour}
+            summary={health?.summary.a}
+          />
+          <SummaryLine
+            label="B-type"
+            colour={seriesBColour}
+            summary={health?.summary.b}
+          />
+          <Typography variant="caption" color="text.secondary">
+            A ping is a poll for work, not a query. Rates are not comparable
+            between collections, so empty bins and gaps are the signal rather
+            than any uptime figure.
+          </Typography>
+        </Stack>
+      }
+    />
   );
 };
 
