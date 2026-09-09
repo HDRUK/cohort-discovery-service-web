@@ -186,6 +186,7 @@ interface TaskDetailModalProps {
   binLabel: string;
   typeLabel: string;
   tasks: TaskHistoryTask[];
+  title?: string;
 }
 
 const TaskDetailModal = ({
@@ -194,6 +195,7 @@ const TaskDetailModal = ({
   binLabel,
   typeLabel,
   tasks,
+  title,
 }: TaskDetailModalProps) => {
   const [selectedPid, setSelectedPid] = useState<string | null>(null);
 
@@ -204,7 +206,7 @@ const TaskDetailModal = ({
     <Modal
       open={open}
       onClose={onClose}
-      title={`${typeLabel} · ${binLabel}`}
+      title={title ?? `${typeLabel} · ${binLabel}`}
       maxWidth="md"
       secondaryActionLabel={picked ? "Back to list" : undefined}
       onSecondaryAction={picked ? () => setSelectedPid(null) : undefined}
