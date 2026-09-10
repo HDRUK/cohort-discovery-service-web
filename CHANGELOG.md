@@ -1,3 +1,41 @@
+## [1.10.0](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.9.0...v1.10.0) (2026-09-10)
+
+### ✨ Features
+
+* **DP-1019:** collection type filters in the collections filter dropdown (#497) ([938e972](https://github.com/HDRUK/cohort-discovery-service-web/commit/938e972c91f96b58decef5c2547a3260275c6fb7)), closes [DP-1019](undefinedDP-1019)
+* **DP-1021:** Redesign of the query results (#485) ([5a59978](https://github.com/HDRUK/cohort-discovery-service-web/commit/5a599786009295b9524c76c3d15208b7ce5fe14e)), closes [DP-1021](undefinedDP-1021)
+* **DP-1024:** Make sort button configurable and add it to term directory (#487) ([1c7c3d8](https://github.com/HDRUK/cohort-discovery-service-web/commit/1c7c3d8aaa98964fbea34e12401d47191fa0024b)), closes [DP-1024](undefinedDP-1024)
+* **DP-1037:** add flag-gated location & death collection toggles (#479) ([6edb504](https://github.com/HDRUK/cohort-discovery-service-web/commit/6edb504391667ab9e99bf098d457109a8414348f)), closes [DP-1037](undefinedDP-1037) [flag-gated](undefinedgated)
+* **DP-1059:** add Race demographic filter with dataset-scoped concept fetching (#474) ([1430742](https://github.com/HDRUK/cohort-discovery-service-web/commit/1430742a547e01a47f8b2348d4a7946af6837b70)), closes [DP-1059](undefinedDP-1059)
+* **DP-1061:** add Location demographic filter with OpenStreetMap map (#476) ([eee2bd5](https://github.com/HDRUK/cohort-discovery-service-web/commit/eee2bd5fa0ed803579fd41495c167b420b758e31)), closes [DP-1061](undefinedDP-1061)
+* **DP-1062:** show query location in results (#486) ([56e9d45](https://github.com/HDRUK/cohort-discovery-service-web/commit/56e9d45b0fc4d1175b21801280b45a268091a01c)), closes [DP-1062](undefinedDP-1062)
+* **DP-1063:** show location in query preview (#477) ([6cc9e4b](https://github.com/HDRUK/cohort-discovery-service-web/commit/6cc9e4b812c1e668b082be52f2661f8c33bbe4b2)), closes [DP-1063](undefinedDP-1063)
+* **DP-1092:** redesign location map picker (#489) ([5e35f9a](https://github.com/HDRUK/cohort-discovery-service-web/commit/5e35f9aea136554e82d6f5ab94e2db7087d3071b)), closes [DP-1092](undefinedDP-1092)
+* **DP-1094:** truncate addresses in query preview (#492) ([09c6f28](https://github.com/HDRUK/cohort-discovery-service-web/commit/09c6f2895885e0625d47af0c5ca066c67c08dd3d)), closes [DP-1094](undefinedDP-1094)
+* **DP-1099:** disable location when not enabled (#496) ([50daea8](https://github.com/HDRUK/cohort-discovery-service-web/commit/50daea81d58f747bf5964ddce48499062118d249)), closes [DP-1099](undefinedDP-1099)
+* **DP-1107:** gate Race demographic filter behind feature flag (#494) ([77a861f](https://github.com/HDRUK/cohort-discovery-service-web/commit/77a861f492a4a04572cb84b2f2555ea04d121961)), closes [DP-1107](undefinedDP-1107) [gate](undefinedgate)
+* **DP-1108:** Rearrange and realign of the collection settings (#495) ([30d818b](https://github.com/HDRUK/cohort-discovery-service-web/commit/30d818b4d7225359ca911b477aeba16900f70620)), closes [DP-1108](undefinedDP-1108)
+* **DP-1122:** keep the demographics confirm action in view (#504) ([2a785bd](https://github.com/HDRUK/cohort-discovery-service-web/commit/2a785bd8df0e71277f2c7debc00d1bf4ac332dcb)), closes [DP-1122](undefinedDP-1122)
+* **DP-1123:** collapse the demographics block when NLP pre-populates it (#505) ([bd83cf3](https://github.com/HDRUK/cohort-discovery-service-web/commit/bd83cf36ecb1b7cd2418413c4ae525ed6b1316ee)), closes [DP-1123](undefinedDP-1123)
+* **DP-1129:** change death labels (#516) ([32e5969](https://github.com/HDRUK/cohort-discovery-service-web/commit/32e59698328d5021d859a2f723ed6a48ee2d16f6)), closes [DP-1129](undefinedDP-1129)
+* **DP-887:** add demographic filter with Death selector (#498) ([cd6239d](https://github.com/HDRUK/cohort-discovery-service-web/commit/cd6239db928ddbd5c63d299f35d1c0b5464edd42)), closes [DP-887](undefinedDP-887)
+* **DP-946:** Register clicks on links to collections (#484) ([ebb6305](https://github.com/HDRUK/cohort-discovery-service-web/commit/ebb6305985a95d81dcaacf8e9186ff091c51b185)), closes [DP-946](undefinedDP-946)
+
+### 🐛 Bug Fixes
+
+* **DP-1007:** fix paginated tables not resetting to page 1 when a filter or search changes (#472) ([47183af](https://github.com/HDRUK/cohort-discovery-service-web/commit/47183af420a158c1444368c3775ba19d329a0b0f))
+* **DP-1060:** show demographics in query preview text everywhere (#482) ([fbcbdf7](https://github.com/HDRUK/cohort-discovery-service-web/commit/fbcbdf7b5747e106ebfed156a01b484286bae83c)), closes [DP-1060](undefinedDP-1060)
+* **DP-1069:** allow query to run when only location is enabled (#481) ([24682eb](https://github.com/HDRUK/cohort-discovery-service-web/commit/24682eb818d20db9a2be589c31647120a8f8b6ba)), closes [DP-1069](undefinedDP-1069)
+* **DP-1073:** populate location/death collection toggles from fetched value (#483) ([ab2d4d1](https://github.com/HDRUK/cohort-discovery-service-web/commit/ab2d4d15f0d065e1eab370276cb59473a2194d37)), closes [DP-1073](undefinedDP-1073)
+* **DP-1093:** Remove rogue title (#491) ([e6980ee](https://github.com/HDRUK/cohort-discovery-service-web/commit/e6980eef683a935badee29cbaf630c39b059874d)), closes [DP-1093](undefinedDP-1093)
+* **DP-1098:** Race content chips overlap Clear all (#493) ([871e95a](https://github.com/HDRUK/cohort-discovery-service-web/commit/871e95a8fa0facc72cbfe667f5649a36a9619a92)), closes [DP-1098](undefinedDP-1098)
+* **DP-1117:** persist Reset Selection in the demographics panel (#501) ([843f9dc](https://github.com/HDRUK/cohort-discovery-service-web/commit/843f9dc693c3ebc3d7d688f9aca82388459aaa30)), closes [DP-1117](undefinedDP-1117)
+* **DP-1118:** allow Clear Query when only demographics are set (#499) ([5a16f46](https://github.com/HDRUK/cohort-discovery-service-web/commit/5a16f46e1dd65de6a1766610ad1077323583851e)), closes [DP-1118](undefinedDP-1118)
+* **DP-1119:** fully collapse the demographics panel on save (#500) ([5b04255](https://github.com/HDRUK/cohort-discovery-service-web/commit/5b0425547e86be2080dd10d9a64e3a7185aa370d)), closes [DP-1119](undefinedDP-1119)
+* **DP-1121:** raise minimum location radius to 25km (#502) ([87ce92c](https://github.com/HDRUK/cohort-discovery-service-web/commit/87ce92c0643efed333e8e7bea2dd5ff82d340c2f)), closes [DP-1121](undefinedDP-1121)
+* **DP-1127:** Issues with empty age rule (#515) ([d625bd0](https://github.com/HDRUK/cohort-discovery-service-web/commit/d625bd0f5e945e171537459f17114d4bb741fc99)), closes [DP-1127](undefinedDP-1127)
+* **DP-1130:** update formatDeathSummary (#517) ([d35760f](https://github.com/HDRUK/cohort-discovery-service-web/commit/d35760fe18f10a3d7c136a2162bb9e3f51b157e5)), closes [DP-1130](undefinedDP-1130)
+
 ## [1.9.0](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.8.0...v1.9.0) (2026-08-21)
 
 ### ✨ Features
