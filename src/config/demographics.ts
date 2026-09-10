@@ -1,31 +1,31 @@
-import { Concept } from "@/types/api";
+import { Concept, TermDirectoryEntry } from "@/types/api";
+import { capitaliseFirstLetter } from "@/utils/string";
 
-/**
- * Fixed demographic concept options rendered as checkboxes in the Demographics
- * panel. Curated by hand here so the shown values can be decided without a
- * round-trip to the API. This could be sourced from an endpoint in the future.
- *
- * concept_id values should be confirmed against the OMOP vocabulary in use.
- */
-export interface DemographicOption {
-  concept_id: number;
-  name: string;
+/** Concept-array fields on the demographics block (keys of `Demographics`). */
+export enum DemographicConceptField {
+  Sex = "sex",
+  Race = "race",
 }
 
-export const SEX_CONCEPTS: DemographicOption[] = [
-  { concept_id: 8532, name: "Female" },
-  { concept_id: 8507, name: "Male" },
-  { concept_id: 0, name: "No matching concept" },
-  { concept_id: 8551, name: "Unknown" },
-];
+/** OMOP `domain_id` values used to bucket person-level concepts. */
+export enum DemographicDomain {
+  Gender = "Gender",
+  Race = "Race",
+}
 
-export const SEX_GUIDANCE =
-  "Define the patient sex criteria that should apply. Patient sex information may be unavailable or incomplete in some records.";
+export const demographicGuidance = (demographic: string): string =>
+  `Define the patient ${demographic} criteria that should apply. Patient ${demographic} information may be unavailable or incomplete in some records.`;
+
+export const locationGuidance =
+  "Search for a place or click the map to drop a pin, then set a radius to match patients whose recorded location falls within that area. Leave blank to include all locations.";
+
+export const demographicUnavailableGuidance = (demographic: string): string =>
+  `${capitaliseFirstLetter(demographic)} filtering is not available — the collections you have selected do not contain ${demographic} data.`;
 
 export const demographicOptionToConcept = (
-  option: DemographicOption,
+  option: TermDirectoryEntry,
 ): Concept => ({
   concept_id: option.concept_id,
-  name: option.name,
-  category: "Gender",
+  name: option.concept_name,
+  category: option.domain_id,
 });

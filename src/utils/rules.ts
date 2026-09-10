@@ -31,6 +31,7 @@ export enum RuleErrors {
   CANNOT_CONSTRAIN_AGE_AND_TIME = "A rule can only be constrained by either age OR time currently.",
   HAS_ALTERNATIVES = "The term has alternatives, please select the intended concept in the rule block(s) below.",
   NO_QUERY_FOUND = "No valid query could be found for your search term.",
+  DEMOGRAPHICS_BLOCK_IS_EMPTY = "Set at least one demographic filter, or add a rule, before running the query.",
 }
 
 export const insertMissingOperators = (
@@ -172,8 +173,7 @@ export const hasAlternatives = (
 
 export const isMultipleConcept = (
   concept: Concept | Concept[] | null,
-): concept is Concept[] =>
-  Array.isArray(concept) && concept.length > 0;
+): concept is Concept[] => Array.isArray(concept) && concept.length > 0;
 
 export const getPrimaryConcept = (
   concept: Concept | Concept[] | null,
@@ -444,13 +444,20 @@ export const buildIndexFromModel = (root: RuleGroupType): BoardIndex => {
   return { containers, itemsByGroup };
 };
 
-export const hasDemographicsContent = (
-  demographics?: Demographics,
-): boolean =>
+export const hasDemographicsContent = (demographics?: Demographics): boolean =>
   !!demographics &&
-  (demographics.age !== null ||
-    demographics.sex.length > 0 ||
-    demographics.race.length > 0);
+  (demographics.age != null ||
+    (demographics.sex ?? []).length > 0 ||
+    (demographics.race ?? []).length > 0 ||
+    demographics.location != null ||
+    demographics.death != null);
+
+export const withDefaultAgeWhenEmpty = (
+  demographics: Demographics,
+): Demographics =>
+  hasDemographicsContent(demographics)
+    ? demographics
+    : { ...demographics, age: [MIN_AGE_FILTER, MAX_AGE_FILTER] };
 
 export function validateRuleTree(
   root: RuleGroupType,
@@ -697,11 +704,17 @@ export function validateRuleTree(
   };
 
   if (root.rules.length === 0) {
-    const demographicsOnlyValid =
-      allowDemographicsOnly && hasDemographicsContent(root.demographics);
+    const hasDemographics = hasDemographicsContent(root.demographics);
+    const demographicsBlockIsEmpty = !!root.demographics && !hasDemographics;
+
+    const invalidReason = demographicsBlockIsEmpty
+      ? [RuleErrors.DEMOGRAPHICS_BLOCK_IS_EMPTY]
+      : undefined;
+
     return {
       ...validateNode(root),
-      valid: demographicsOnlyValid,
+      valid: allowDemographicsOnly && hasDemographics,
+      invalidReason,
     } as RuleGroupType;
   }
 

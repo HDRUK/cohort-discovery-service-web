@@ -75,7 +75,9 @@ const QueryBuilder = ({
           }
           middleProps={{
             ref: boardRef,
-            topSlot: showDemographics ? <DemographicsPanel /> : undefined,
+            topSlot: showDemographics ? (
+              <DemographicsPanel key={queryBuilderJson.demographics?.id} />
+            ) : undefined,
           }}
           right={<RuleMenu />}
           rightDisabled={

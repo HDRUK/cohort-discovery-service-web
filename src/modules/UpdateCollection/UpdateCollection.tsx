@@ -41,7 +41,6 @@ import { useThreePane } from "@/providers/ThreePaneProvider";
 import { FieldConfigMap, useSaveChanges } from "@/hooks/useSaveChanges";
 import { useUserDataStore } from "@/hooks/userDataStore";
 import { useIsAdminSection } from "@/contexts/AdminSectionContext";
-import ToggleSynthetic from "@/components/ToggleSynthetic";
 import { getFrequencyModeKey } from "@/utils/frequency";
 
 export type UpdateCollectionProps = {
@@ -59,6 +58,8 @@ const getDefaultValues = (collection: CollectionWithHosts | null) => {
         model_state: undefined,
         workgroups: [],
         is_synthetic: false,
+        location_enabled: false,
+        death_enabled: false,
       },
       config: {
         frequency_mode: Number(FrequencyMode.WEEKLY),
@@ -78,6 +79,8 @@ const getDefaultValues = (collection: CollectionWithHosts | null) => {
     model_state,
     workgroups,
     is_synthetic,
+    location_enabled,
+    death_enabled,
   } = collection;
   const [host] = hosts;
   return {
@@ -89,6 +92,8 @@ const getDefaultValues = (collection: CollectionWithHosts | null) => {
       model_state: model_state,
       workgroups: workgroups,
       is_synthetic: is_synthetic,
+      location_enabled: location_enabled ?? false,
+      death_enabled: death_enabled ?? false,
     },
     config: {
       frequency_mode: config.frequency_mode,
@@ -319,9 +324,6 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
       rightExtras={<ErrorHeader errors={errors} depth={2} editing />}
     >
       <FormProvider {...formMethods}>
-        <FormLabel underlined>Collection Type</FormLabel>
-        <ToggleSynthetic disabled={!expandedRight} />
-
         <FormLabel underlined>Collection Status</FormLabel>
         <ManageCollectionStatus
           collection={collection}
@@ -591,11 +593,11 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
             mt: 2,
           }}
         >
+          <CollectionConfig disabled={!expandedRight} keepExpanded />
           <DistributionStatus
             disabled={!expandedRight}
             collection={collection}
           />
-          <CollectionConfig disabled={!expandedRight} keepExpanded />
         </ActionMenuSection>
       </FormProvider>
     </UpdatePanel>

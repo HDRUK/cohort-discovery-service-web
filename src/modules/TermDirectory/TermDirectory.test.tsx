@@ -8,6 +8,15 @@ import { mockTermDirectoryEntries } from "@/actions/termDirectory/__mocks__/getT
 import { paginateData } from "@/utils/mock";
 import { TermDirectoryEntry, Paginated } from "@/types/api";
 
+const mockReplace = jest.fn();
+let mockSearchParams = new URLSearchParams("page=1&per_page=5");
+
+jest.mock("next/navigation", () => ({
+  useSearchParams: () => mockSearchParams,
+  usePathname: () => "/term-directory",
+  useRouter: () => ({ push: jest.fn(), replace: mockReplace }),
+}));
+
 const renderComponent = (entries: Paginated<TermDirectoryEntry>) =>
   render(
     <DefaultProvider>
@@ -18,6 +27,11 @@ const renderComponent = (entries: Paginated<TermDirectoryEntry>) =>
   );
 
 describe("TermDirectory", () => {
+  beforeEach(() => {
+    mockReplace.mockClear();
+    mockSearchParams = new URLSearchParams();
+  });
+
   it("renders the correct column headers", () => {
     renderComponent(paginateData({ data: mockTermDirectoryEntries }));
 
@@ -107,5 +121,111 @@ describe("TermDirectory", () => {
       name: /Myocardial infarction/i,
     });
     expect(within(secondRow).getByText("Observation")).toBeInTheDocument();
+  });
+
+  it("takes the current page from the URL, so a filter resetting to page 1 is not overridden by the table", () => {
+    const entries = {
+      ...paginateData({ data: mockTermDirectoryEntries, perPage: 5 }),
+      total: 100,
+    };
+
+    mockSearchParams = new URLSearchParams("page=3&per_page=5");
+    const { rerender } = renderComponent(entries);
+
+    expect(screen.getByText("11-15 of 100")).toBeInTheDocument();
+
+    // a filter (eg the domain tabs) puts the user back on page 1
+    mockSearchParams = new URLSearchParams("page=1&per_page=5");
+    rerender(
+      <DefaultProvider>
+        <NotifyProvider>
+          <TermDirectory entries={entries} />
+        </NotifyProvider>
+      </DefaultProvider>,
+    );
+
+    expect(screen.getByText("1-5 of 100")).toBeInTheDocument();
+  });
+
+  it("renders a sort button with the correct fields", async () => {
+    const user = userEvent.setup();
+
+    renderComponent(paginateData({ data: mockTermDirectoryEntries }));
+
+    expect(screen.getByLabelText("Sort")).toBeInTheDocument();
+
+    await user.click(screen.getByLabelText("Sort"));
+
+    // The sort options menu and its items
+    expect(await screen.getByRole("tooltip")).toBeInTheDocument();
+
+    expect(
+      await screen.getByRole("menuitem", { name: "Clear sorting" }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.getByRole("menuitem", { name: "Sort by Term Name (A-Z)" }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.getByRole("menuitem", { name: "Sort by Term Name (Z-A)" }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.getByRole("menuitem", { name: "Sort by Count (Low-High)" }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.getByRole("menuitem", { name: "Sort by Count (High-Low)" }),
+    ).toBeInTheDocument();
+  });
+
+  it("updates the URL search params when sort options are clicked", async () => {
+    const user = userEvent.setup();
+
+    mockSearchParams = new URLSearchParams("page=1&per_page=5");
+
+    renderComponent(paginateData({ data: mockTermDirectoryEntries }));
+
+    await user.click(screen.getByLabelText("Sort"));
+    await user.click(
+      screen.getByRole("menuitem", { name: "Sort by Term Name (A-Z)" }),
+    );
+
+    expect(mockReplace).toHaveBeenCalledWith(
+      "?page=1&per_page=5&sort=concept_name%3Aasc",
+    );
+
+    mockReplace.mockClear();
+
+    await user.click(screen.getByLabelText("Sort"));
+    await user.click(
+      screen.getByRole("menuitem", { name: "Sort by Count (High-Low)" }),
+    );
+
+    expect(mockReplace).toHaveBeenCalledWith(
+      "?page=1&per_page=5&sort=count%3Adesc",
+    );
+  });
+
+  it("removes the sort parameter when clear sorting is clicked", async () => {
+    const user = userEvent.setup();
+
+    mockSearchParams = new URLSearchParams("page=1&per_page=5");
+
+    renderComponent(paginateData({ data: mockTermDirectoryEntries }));
+
+    await user.click(screen.getByLabelText("Sort"));
+    await user.click(
+      screen.getByRole("menuitem", { name: "Sort by Term Name (A-Z)" }),
+    );
+
+    expect(mockReplace).toHaveBeenCalledWith(
+      "?page=1&per_page=5&sort=concept_name%3Aasc",
+    );
+
+    mockReplace.mockClear();
+    mockSearchParams = new URLSearchParams();
+
+    await user.click(screen.getByLabelText("Sort"));
+    await user.click(screen.getByRole("menuitem", { name: "Clear sorting" }));
+
+    expect(mockReplace).toHaveBeenCalledWith("/term-directory");
   });
 });

@@ -1,4 +1,5 @@
 import { create, StateCreator } from "zustand";
+import { v4 as uuidv4 } from "uuid";
 import { persist, createJSONStorage } from "zustand/middleware";
 import parseQuery from "@/actions/query/parseQuery";
 import { queryToText } from "@/utils/queryBuilder";
@@ -28,7 +29,7 @@ import { UniqueIdentifier } from "@dnd-kit/core";
 import { removeFalseKeys } from "@/utils/numbers";
 import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
 import { DatasetErrors } from "@/utils/datasets";
-import { Collection, Concept } from "@/types/api";
+import { Collection } from "@/types/api";
 import { FeatureName } from "@/types/features";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import { intersection } from "lodash";
@@ -60,18 +61,13 @@ export const Creators: Record<string, NodeFactory> = {
 export const DEFAULT_QUERY: RuleGroupType =
   process.env.NEXT_PUBLIC_USE_EXAMPLE_QUERY === "true" ? EXAMPLE_1 : NO_QUERY;
 
-const EMPTY_DEMOGRAPHICS: Demographics = { age: null, sex: [], race: [] };
-
-const withDemographics = (
-  qb: RuleGroupType,
-  updater: (d: Demographics) => Demographics,
-): RuleGroupType => ({
-  ...qb,
-  demographics: updater(qb.demographics ?? EMPTY_DEMOGRAPHICS),
-});
-
-const withoutConcept = (concepts: Concept[], concept: Concept): Concept[] =>
-  concepts.filter((c) => c.concept_id !== concept.concept_id);
+export const EMPTY_DEMOGRAPHICS: Demographics = {
+  age: null,
+  sex: [],
+  race: [],
+  location: null,
+  death: null,
+};
 
 export interface QueryBuilderStoreState {
   queryName: string;
@@ -128,11 +124,7 @@ export interface QueryBuilderStoreState {
 
   addDemographics: () => void;
   removeDemographics: () => void;
-  setDemographicsAge: (age: [number, number] | null) => void;
-  toggleDemographicsSex: (concept: Concept, selected: boolean) => void;
-  clearDemographicsSex: () => void;
-  toggleDemographicsRace: (concept: Concept, selected: boolean) => void;
-  clearDemographicsRace: () => void;
+  setDemographics: (demographics: Demographics) => void;
 
   queryAsText: string;
   getQueryFromText: (
@@ -392,50 +384,9 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     const { queryBuilderJson, setQueryBuilderJson } = get();
     setQueryBuilderJson({ ...queryBuilderJson, demographics: undefined }, true);
   },
-  setDemographicsAge: (age) => {
+  setDemographics: (demographics) => {
     const { queryBuilderJson, setQueryBuilderJson } = get();
-    setQueryBuilderJson(
-      withDemographics(queryBuilderJson, (d) => ({ ...d, age })),
-      true,
-    );
-  },
-  toggleDemographicsSex: (concept, selected) => {
-    const { queryBuilderJson, setQueryBuilderJson } = get();
-    setQueryBuilderJson(
-      withDemographics(queryBuilderJson, (d) => ({
-        ...d,
-        sex: selected
-          ? [...withoutConcept(d.sex, concept), concept]
-          : withoutConcept(d.sex, concept),
-      })),
-      true,
-    );
-  },
-  clearDemographicsSex: () => {
-    const { queryBuilderJson, setQueryBuilderJson } = get();
-    setQueryBuilderJson(
-      withDemographics(queryBuilderJson, (d) => ({ ...d, sex: [] })),
-      true,
-    );
-  },
-  toggleDemographicsRace: (concept, selected) => {
-    const { queryBuilderJson, setQueryBuilderJson } = get();
-    setQueryBuilderJson(
-      withDemographics(queryBuilderJson, (d) => ({
-        ...d,
-        race: selected
-          ? [...withoutConcept(d.race, concept), concept]
-          : withoutConcept(d.race, concept),
-      })),
-      true,
-    );
-  },
-  clearDemographicsRace: () => {
-    const { queryBuilderJson, setQueryBuilderJson } = get();
-    setQueryBuilderJson(
-      withDemographics(queryBuilderJson, (d) => ({ ...d, race: [] })),
-      true,
-    );
+    setQueryBuilderJson({ ...queryBuilderJson, demographics }, true);
   },
 
   queryAsText: queryToText(DEFAULT_QUERY),
@@ -445,7 +396,14 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     validate = true,
     defaultInvalidText = "People who ...",
   ) => {
-    const updatedQuery = validate ? get().validateRules(query) : query;
+    const validated = validate ? get().validateRules(query) : query;
+    const updatedQuery =
+      validated.demographics && !validated.demographics.id
+        ? {
+            ...validated,
+            demographics: { ...validated.demographics, id: uuidv4() },
+          }
+        : validated;
 
     let text = "";
 

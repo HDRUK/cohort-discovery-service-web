@@ -1,5 +1,17 @@
-import { RuleGroupType, RuleLeafType, RuleNodeType } from "@/types/rules";
-import { findRulesWithAlternatives } from "@/utils/rules";
+import { Concept } from "@/types/api";
+import {
+  Demographics,
+  RuleGroupType,
+  RuleLeafType,
+  RuleNodeType,
+} from "@/types/rules";
+import {
+  findRulesWithAlternatives,
+  hasDemographicsContent,
+  RuleErrors,
+  validateRuleTree,
+  withDefaultAgeWhenEmpty,
+} from "@/utils/rules";
 
 const makeLeaf = (id: string, hasAlts = false): RuleLeafType =>
   ({
@@ -48,5 +60,82 @@ describe("findRulesWithAlternatives", () => {
     const inner = makeGroup("group-inner", [makeLeaf("nested", true)]);
     const rules: RuleNodeType[] = [makeLeaf("top", true), inner];
     expect(findRulesWithAlternatives(rules)).toEqual(["top", "nested"]);
+  });
+});
+
+const EMPTY_BLOCK: Demographics = {
+  age: null,
+  sex: [],
+  race: [],
+  location: null,
+  death: null,
+};
+
+const FEMALE = { concept_id: 8532, name: "Female" } as Concept;
+
+const makeDemographics = (
+  overrides: Partial<Demographics> = {},
+): Demographics => ({ ...EMPTY_BLOCK, ...overrides });
+
+const PARTIAL_BLOCK = { age: null, race: [] } as unknown as Demographics;
+
+const demographicsOnlyQuery = (demographics?: Demographics): RuleGroupType =>
+  ({ id: "root", rules: [], demographics }) as RuleGroupType;
+
+const DEMOGRAPHICS_ONLY_OPTIONS = {
+  constrainForBunnyV1: false,
+  allowNestedGroups: false,
+  allowDemographicsOnly: true,
+};
+
+describe("hasDemographicsContent", () => {
+  it("reads a block with keys missing rather than throwing", () => {
+    expect(() => hasDemographicsContent(PARTIAL_BLOCK)).not.toThrow();
+    expect(hasDemographicsContent(PARTIAL_BLOCK)).toBe(false);
+  });
+});
+
+describe("withDefaultAgeWhenEmpty", () => {
+  it("falls back to the full age range when nothing is set", () => {
+    expect(withDefaultAgeWhenEmpty(EMPTY_BLOCK).age).toEqual([0, 120]);
+  });
+
+  it("leaves a null age alone when another field is set", () => {
+    const block = makeDemographics({ sex: [FEMALE] });
+    expect(withDefaultAgeWhenEmpty(block)).toBe(block);
+  });
+});
+
+describe("validateRuleTree — demographics-only queries", () => {
+  it("rejects an empty demographics block and says why", () => {
+    const result = validateRuleTree(
+      demographicsOnlyQuery(EMPTY_BLOCK),
+      DEMOGRAPHICS_ONLY_OPTIONS,
+    );
+
+    expect(result.valid).toBe(false);
+    expect(result.invalidReason).toEqual([
+      RuleErrors.DEMOGRAPHICS_BLOCK_IS_EMPTY,
+    ]);
+  });
+
+  it("stays silent on a blank query with no demographics block", () => {
+    const result = validateRuleTree(
+      demographicsOnlyQuery(),
+      DEMOGRAPHICS_ONLY_OPTIONS,
+    );
+
+    expect(result.valid).toBe(false);
+    expect(result.invalidReason).toBeUndefined();
+  });
+
+  it("accepts a null age when another demographic is set", () => {
+    const result = validateRuleTree(
+      demographicsOnlyQuery(makeDemographics({ sex: [FEMALE] })),
+      DEMOGRAPHICS_ONLY_OPTIONS,
+    );
+
+    expect(result.valid).toBe(true);
+    expect(result.invalidReason).toBeUndefined();
   });
 });

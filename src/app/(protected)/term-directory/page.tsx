@@ -20,6 +20,7 @@ const TermDirectoryPageContent = async ({ searchParams }: PageProps) => {
     params?.search_term,
     params?.domain,
     params?.collections?.split(","),
+    params?.sort,
   );
 
   return (

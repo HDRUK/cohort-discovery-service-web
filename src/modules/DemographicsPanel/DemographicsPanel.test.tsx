@@ -1,0 +1,427 @@
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import ApplicationModeProvider from "@/providers/ApplicationModeProvider";
+import {
+  DEFAULT_QUERY,
+  EMPTY_DEMOGRAPHICS,
+  useQueryBuilderStore,
+} from "@/store/queryBuilderStore";
+import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
+import { FeatureFlag, FeatureName } from "@/types/features";
+import { MAX_AGE_FILTER } from "@/config/rules";
+import { useUserDataStore } from "@/hooks/userDataStore";
+import { Collection } from "@/types/api";
+import { getMockCollection } from "@/actions/collection/__mocks__/getCollections";
+import DemographicsPanel from "./DemographicsPanel";
+
+// The real picker pulls in leaflet (touches `window` at import) — replace it
+// with a light stub and make next/dynamic return it synchronously.
+jest.mock("@/components/GeoMap/GeoMapPicker", () => ({
+  __esModule: true,
+  default: () => <div data-testid="geo-map-picker" />,
+}));
+
+jest.mock("next/dynamic", () => ({
+  __esModule: true,
+  default: () => jest.requireMock("@/components/GeoMap/GeoMapPicker").default,
+}));
+
+const store = () => useQueryBuilderStore.getState();
+const demographics = () => store().queryBuilderJson.demographics;
+
+const female = { concept_id: 8532, name: "Female", category: "Gender" };
+
+const renderPanel = (initialExpand?: boolean) =>
+  render(
+    <QueryClientProvider client={new QueryClient()}>
+      <ApplicationModeProvider>
+        <DemographicsPanel initialExpand={initialExpand} />
+      </ApplicationModeProvider>
+    </QueryClientProvider>,
+  );
+
+const setAgeMin = async (value: string) => {
+  const [minInput] = screen.getAllByRole("spinbutton");
+  await userEvent.clear(minInput);
+  await userEvent.type(minInput, value);
+  await userEvent.keyboard("{Enter}");
+};
+
+describe("DemographicsPanel", () => {
+  describe("first open (freshly added, nothing saved yet)", () => {
+    beforeEach(() => {
+      store().setQueryBuilderJson(DEFAULT_QUERY);
+      store().addDemographics();
+    });
+
+    it("opens every row for editing with a single Save button at the bottom", () => {
+      renderPanel();
+
+      expect(
+        screen.getAllByRole("button", { name: /save selection and collapse/i }),
+      ).toHaveLength(1);
+      expect(
+        screen.queryByRole("button", { name: /reset selection/i }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: /edit age/i }),
+      ).not.toBeInTheDocument();
+    });
+
+    it("pins the Save button to the bottom of the scroll area", () => {
+      renderPanel();
+
+      const save = screen.getByRole("button", {
+        name: /save selection and collapse/i,
+      });
+
+      expect(save.parentElement).toHaveStyle({ position: "sticky" });
+    });
+
+    it("doesn't write to the store until Save is clicked", async () => {
+      renderPanel();
+
+      await setAgeMin("20");
+
+      expect(demographics()?.age).toBeNull();
+    });
+
+    it("keeps the block id on Save, so the panel is not remounted", async () => {
+      const before = demographics()?.id;
+      renderPanel();
+
+      await setAgeMin("20");
+      await userEvent.click(
+        screen.getByRole("button", { name: /save selection and collapse/i }),
+      );
+
+      expect(demographics()?.id).toBe(before);
+    });
+
+    it("commits every field at once and collapses the panel on Save", async () => {
+      renderPanel();
+
+      await setAgeMin("20");
+      await userEvent.click(
+        screen.getByRole("button", { name: /save selection and collapse/i }),
+      );
+
+      expect(demographics()?.age).toEqual([20, MAX_AGE_FILTER]);
+      expect(
+        screen.getByRole("button", { name: /expand demographics/i }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  describe("pre-populated on load (NLP or a saved query)", () => {
+    beforeEach(() => {
+      store().setQueryBuilderJson(DEFAULT_QUERY);
+    });
+
+    it("starts fully collapsed, showing only the summary", () => {
+      store().setDemographics({
+        ...EMPTY_DEMOGRAPHICS,
+        age: [18, MAX_AGE_FILTER],
+      });
+      renderPanel();
+
+      expect(
+        screen.getByRole("button", { name: /expand demographics/i }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(new RegExp(`^Age 18–${MAX_AGE_FILTER} · Sex Any`)),
+      ).toBeInTheDocument();
+    });
+
+    it("stays open when the block is added with nothing set", () => {
+      store().addDemographics();
+      renderPanel();
+
+      expect(
+        screen.getByRole("button", { name: /collapse demographics/i }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  describe("after the first save (one row editable at a time)", () => {
+    beforeEach(() => {
+      store().setQueryBuilderJson(DEFAULT_QUERY);
+      store().setDemographics({ ...EMPTY_DEMOGRAPHICS, sex: [female] });
+    });
+
+    it("disables the other rows' Edit buttons while a row is being edited", async () => {
+      renderPanel(true);
+
+      await userEvent.click(screen.getByRole("button", { name: /edit age/i }));
+
+      expect(screen.getByRole("button", { name: /edit sex/i })).toBeDisabled();
+      expect(screen.getByRole("button", { name: /edit race/i })).toBeDisabled();
+      expect(
+        screen.getByRole("button", { name: /reset selection/i }),
+      ).toBeInTheDocument();
+    });
+
+    it("Reset Selection clears the field, saves it, and keeps the row open", async () => {
+      store().setDemographics({
+        ...EMPTY_DEMOGRAPHICS,
+        sex: [female],
+        age: [20, MAX_AGE_FILTER],
+      });
+      renderPanel(true);
+
+      await userEvent.click(screen.getByRole("button", { name: /edit age/i }));
+      await setAgeMin("40");
+      await userEvent.click(
+        screen.getByRole("button", { name: /reset selection/i }),
+      );
+
+      expect(demographics()?.age).toBeNull();
+      expect(demographics()?.sex).toEqual([female]);
+      expect(
+        screen.getByRole("button", { name: /reset selection/i }),
+      ).toBeInTheDocument();
+    });
+
+    it("Reset Selection clears a saved Sex selection", async () => {
+      renderPanel(true);
+
+      await userEvent.click(screen.getByRole("button", { name: /edit sex/i }));
+      await userEvent.click(
+        screen.getByRole("button", { name: /reset selection/i }),
+      );
+
+      expect(demographics()?.sex).toEqual([]);
+    });
+
+    it("Save Selection and Collapse commits only the field that was edited", async () => {
+      renderPanel(true);
+
+      await userEvent.click(screen.getByRole("button", { name: /edit age/i }));
+      await setAgeMin("30");
+      await userEvent.click(
+        screen.getByRole("button", { name: /save selection and collapse/i }),
+      );
+
+      expect(demographics()?.age).toEqual([30, MAX_AGE_FILTER]);
+      expect(demographics()?.sex).toEqual([female]);
+      expect(
+        screen.getByRole("button", { name: /expand demographics/i }),
+      ).toBeInTheDocument();
+    });
+
+    it("Clear all on a different row commits immediately and survives a later Save elsewhere", async () => {
+      renderPanel(true);
+
+      await userEvent.click(screen.getByRole("button", { name: /edit age/i }));
+      await setAgeMin("30");
+
+      await userEvent.click(screen.getByRole("button", { name: /clear all/i }));
+      expect(demographics()?.sex).toEqual([]);
+
+      await userEvent.click(
+        screen.getByRole("button", { name: /save selection and collapse/i }),
+      );
+      expect(demographics()?.age).toEqual([30, MAX_AGE_FILTER]);
+      expect(demographics()?.sex).toEqual([]);
+    });
+  });
+
+  describe("query-builder-use-race feature flag", () => {
+    beforeEach(() => {
+      store().setQueryBuilderJson(DEFAULT_QUERY);
+      store().setDemographics({ ...EMPTY_DEMOGRAPHICS, sex: [female] });
+    });
+
+    afterEach(() => {
+      useFeatureFlagsStore.setState({ flags: null });
+    });
+
+    it("shows the Race row by default", () => {
+      renderPanel(true);
+
+      expect(
+        screen.getByRole("button", { name: /edit race/i }),
+      ).toBeInTheDocument();
+    });
+
+    it("hides the Race row when the flag is disabled", () => {
+      useFeatureFlagsStore.setState({
+        flags: { [FeatureName.QueryBuilderUseRace]: false } as FeatureFlag,
+      });
+      renderPanel(true);
+
+      expect(
+        screen.queryByRole("button", { name: /edit race/i }),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  describe("location availability", () => {
+    const withLocation = getMockCollection({
+      pid: "pid-with-location",
+      location_enabled: true,
+    });
+    const withoutLocation = getMockCollection({
+      pid: "pid-without-location",
+      location_enabled: false,
+    });
+
+    const setUp = (
+      userCollections: Collection[],
+      selectedDatasets: string[],
+    ) => {
+      useUserDataStore.setState({ userCollections });
+      store().setQueryBuilderJson(DEFAULT_QUERY);
+      store().setDemographics({ ...EMPTY_DEMOGRAPHICS, sex: [female] });
+      store().setSelectedDatasets(selectedDatasets);
+    };
+
+    beforeEach(() => {
+      useFeatureFlagsStore.setState({
+        flags: { [FeatureName.QueryBuilderUseLocation]: true } as FeatureFlag,
+      });
+    });
+
+    afterEach(() => {
+      useFeatureFlagsStore.setState({ flags: null });
+      useUserDataStore.setState({ userCollections: [] });
+    });
+
+    const openLocationRow = () =>
+      userEvent.click(screen.getByRole("button", { name: /edit location/i }));
+
+    it("shows the map picker when a selected collection has location enabled", async () => {
+      setUp(
+        [withLocation, withoutLocation],
+        [withLocation.pid, withoutLocation.pid],
+      );
+      renderPanel(true);
+
+      await openLocationRow();
+
+      expect(screen.getByTestId("geo-map-picker")).toBeInTheDocument();
+      expect(
+        screen.queryByText(/location filtering is not available/i),
+      ).not.toBeInTheDocument();
+    });
+
+    it("explains that location is unavailable when no collection has it enabled", async () => {
+      setUp([withoutLocation], [withoutLocation.pid]);
+      renderPanel(true);
+
+      await openLocationRow();
+
+      expect(
+        screen.getByText(/location filtering is not available/i),
+      ).toBeInTheDocument();
+      expect(screen.queryByTestId("geo-map-picker")).not.toBeInTheDocument();
+    });
+
+    it("ignores location-enabled collections that aren't selected", async () => {
+      setUp([withLocation, withoutLocation], [withoutLocation.pid]);
+      renderPanel(true);
+
+      await openLocationRow();
+
+      expect(
+        screen.getByText(/location filtering is not available/i),
+      ).toBeInTheDocument();
+      expect(screen.queryByTestId("geo-map-picker")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("query-builder-use-death feature flag", () => {
+    beforeEach(() => {
+      store().setQueryBuilderJson(DEFAULT_QUERY);
+      store().setDemographics({ ...EMPTY_DEMOGRAPHICS, sex: [female] });
+    });
+
+    afterEach(() => {
+      useFeatureFlagsStore.setState({ flags: null });
+    });
+
+    it("hides the Death row by default", () => {
+      renderPanel(true);
+
+      expect(
+        screen.queryByRole("button", { name: /edit death/i }),
+      ).not.toBeInTheDocument();
+    });
+
+    it("shows the Death row when the flag is enabled", () => {
+      useFeatureFlagsStore.setState({
+        flags: { [FeatureName.QueryBuilderUseDeath]: true } as FeatureFlag,
+      });
+      renderPanel(true);
+
+      expect(
+        screen.getByRole("button", { name: /edit death/i }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  describe("death selection", () => {
+    const withDeath = getMockCollection({
+      pid: "pid-with-death",
+      death_enabled: true,
+    });
+
+    beforeEach(() => {
+      useUserDataStore.setState({ userCollections: [withDeath] });
+      store().setQueryBuilderJson(DEFAULT_QUERY);
+      store().addDemographics();
+      store().setSelectedDatasets([withDeath.pid]);
+      useFeatureFlagsStore.setState({
+        flags: { [FeatureName.QueryBuilderUseDeath]: true } as FeatureFlag,
+      });
+    });
+
+    afterEach(() => {
+      useFeatureFlagsStore.setState({ flags: null });
+      useUserDataStore.setState({ userCollections: [] });
+    });
+
+    it("doesn't write to the store until Save is clicked for Death", async () => {
+      renderPanel();
+
+      await userEvent.click(screen.getByTestId("toggle-death-action-0"));
+
+      expect(demographics()?.death).toBeNull();
+    });
+
+    it("commits death field and collapses on Save", async () => {
+      renderPanel();
+
+      await userEvent.click(screen.getByTestId("toggle-death-action-0"));
+
+      await userEvent.click(
+        screen.getByRole("button", { name: /save selection and collapse/i }),
+      );
+
+      expect(demographics()?.death?.label).toEqual("Not recorded");
+      expect(
+        screen.queryByRole("button", {
+          name: /save selection and collapse/i,
+        }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /edit death/i }),
+      ).toBeInTheDocument();
+    });
+
+    it("shows correct Death summary label after saving", async () => {
+      renderPanel();
+
+      await userEvent.click(screen.getByTestId("toggle-death-action-0"));
+
+      await userEvent.click(
+        screen.getByRole("button", { name: /save selection and collapse/i }),
+      );
+
+      expect(screen.getByTestId("death-chip")).toHaveTextContent(
+        "Not recorded",
+      );
+    });
+  });
+});

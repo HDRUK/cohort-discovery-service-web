@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   MRT_ColumnDef,
   MRT_RowData,
   MRT_TableOptions,
   MRT_SortingState,
+  MRT_PaginationState,
+  MRT_Updater,
 } from "material-react-table";
 import { useTable } from "./useTable";
 import { buildRowsPerPageOptions } from "@/utils/pagination";
@@ -51,10 +53,26 @@ export function usePaginatedTable<TData extends MRT_RowData>({
   );
   const rowsPerPageOptions = buildRowsPerPageOptions(resolvedPerPageDefault);
 
-  const [pagination, setPagination] = useState({
-    pageIndex: page - 1,
-    pageSize: perPage,
-  });
+  const pagination = useMemo(
+    () => ({ pageIndex: page - 1, pageSize: perPage }),
+    [page, perPage],
+  );
+
+  const handlePaginationChange = (
+    updaterOrValue: MRT_Updater<MRT_PaginationState>,
+  ) => {
+    const nextPagination =
+      typeof updaterOrValue === "function"
+        ? updaterOrValue(pagination)
+        : updaterOrValue;
+
+    const params = new URLSearchParams(searchParams.toString());
+
+    params.set(pageParam, String(nextPagination.pageIndex + 1));
+    params.set(perPageParam, String(nextPagination.pageSize));
+
+    router.replace(`?${params.toString()}`);
+  };
 
   const [sorting, setSorting] = useState<MRT_SortingState>([]);
 
@@ -70,30 +88,6 @@ export function usePaginatedTable<TData extends MRT_RowData>({
   }, [sorting, router, searchParams]);
   */
 
-  useEffect(() => {
-    const currentPage = (pagination.pageIndex + 1).toString();
-    const currentPerPage = pagination.pageSize.toString();
-
-    if (
-      currentPage === searchParams.get(pageParam) &&
-      currentPerPage === searchParams.get(perPageParam)
-    )
-      return;
-
-    const params = new URLSearchParams(searchParams.toString());
-    params.set(pageParam, currentPage);
-    params.set(perPageParam, currentPerPage);
-
-    router.replace(`?${params.toString()}`);
-  }, [
-    pagination.pageIndex,
-    pagination.pageSize,
-    router,
-    searchParams,
-    pageParam,
-    perPageParam,
-  ]);
-
   const firstRowId = getRowId(data?.[0]);
   const expanded = useMemo(() => {
     return firstRowId && expandFirstRow ? { [firstRowId]: true } : {};
@@ -107,7 +101,7 @@ export function usePaginatedTable<TData extends MRT_RowData>({
     enablePagination: true,
     manualPagination: true,
     enableSorting: true,
-    onPaginationChange: setPagination,
+    onPaginationChange: handlePaginationChange,
     onSortingChange: setSorting,
     initialState: {
       ...initialState,

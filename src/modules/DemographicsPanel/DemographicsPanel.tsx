@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { FormProvider } from "react-hook-form";
 import {
   Box,
   Collapse,
@@ -11,36 +12,99 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import AccordionExpandIcon from "@/components/AccordionExpandIcon";
-import { SEX_CONCEPTS, SEX_GUIDANCE } from "@/config/demographics";
+import { DemographicDomain } from "@/config/demographics";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import Title from "@/components/Title";
 import DemographicAgeSection from "./DemographicAgeSection";
 import DemographicCheckboxSection from "./DemographicCheckboxSection";
-import { formatAgeSummary, formatConceptCountSummary } from "./summary";
+import DemographicLocationSection from "./DemographicLocationSection";
+import DemographicDeathSection from "./DemographicDeathSection";
+import DemographicSaveButton from "./DemographicSaveButton";
+import useDemographicFieldEditing from "./useDemographicFieldEditing";
+import {
+  formatAgeSummary,
+  formatConceptCountSummary,
+  formatLocationSummary,
+  formatDeathSummary,
+} from "./summary";
+import { useQuery } from "@tanstack/react-query";
+import getTermDirectory from "@/actions/termDirectory/getTermDirectory";
+import { OmopTableName } from "@/types/omop";
+import { useUserDataStore } from "@/hooks/userDataStore";
+import useFeatures from "@/hooks/useFeatures";
+import { hasDemographicsContent } from "@/utils/rules";
 
-const DemographicsPanel = ({
-  initialExpand = true,
-}: {
-  initialExpand?: boolean;
-}) => {
-  const { demographics, remove, toggleSex, clearSex } = useQueryBuilder(
-    (qb) => ({
-      demographics: qb.queryBuilderJson.demographics,
-      remove: qb.removeDemographics,
-      toggleSex: qb.toggleDemographicsSex,
-      clearSex: qb.clearDemographicsSex,
-    }),
-  );
+const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
+  const { demographics, remove, selectedDatasets } = useQueryBuilder((qb) => ({
+    demographics: qb.queryBuilderJson.demographics,
+    remove: qb.removeDemographics,
+    selectedDatasets: qb.selectedDatasets,
+  }));
+  const user = useUserDataStore((s) => s.user);
+  const userCollections = useUserDataStore((s) => s.userCollections);
+  const { queryBuilderUseLocation, queryBuilderUseRace, queryBuilderUseDeath } =
+    useFeatures();
 
   const age = demographics?.age ?? null;
   const sex = demographics?.sex ?? [];
+  const race = demographics?.race ?? [];
+  const location = demographics?.location ?? null;
+  const death = demographics?.death ?? null;
 
-  const [expanded, setExpanded] = useState(initialExpand);
+  const [expanded, setExpanded] = useState(
+    initialExpand ?? !hasDemographicsContent(demographics),
+  );
+
+  const { form, allOpen, save, propsFor } = useDemographicFieldEditing(() =>
+    setExpanded(false),
+  );
 
   const summary = [
     formatAgeSummary(age),
     formatConceptCountSummary("Sex", sex),
+    ...(queryBuilderUseRace ? [formatConceptCountSummary("Race", race)] : []),
+    ...(queryBuilderUseLocation ? [formatLocationSummary(location)] : []),
+    ...(queryBuilderUseDeath ? [formatDeathSummary(death)] : []),
   ].join(" · ");
+
+  const collectionPids = [...selectedDatasets].sort();
+
+  //this will be different for different users and what collectionPids are selected
+  const { data: personConcepts } = useQuery({
+    queryKey: [`demographics-${user?.id}`, collectionPids],
+    queryFn: async () =>
+      await getTermDirectory(1, 100, "", OmopTableName.Person, collectionPids),
+    enabled: !!user?.id,
+    staleTime: 10 * 60_000,
+  });
+
+  const sexConcepts = useMemo(
+    () =>
+      personConcepts?.data.data.filter(
+        (c) => c.domain_id === DemographicDomain.Gender,
+      ),
+    [personConcepts],
+  );
+
+  const raceConcepts = useMemo(
+    () =>
+      personConcepts?.data.data.filter(
+        (c) => c.domain_id === DemographicDomain.Race,
+      ),
+    [personConcepts],
+  );
+
+  const locationAvailable = useMemo(() => {
+    const selected = new Set(selectedDatasets);
+    return userCollections.some(
+      (c) => selected.has(c.pid) && c.location_enabled,
+    );
+  }, [userCollections, selectedDatasets]);
+
+  const deathAvailable = useMemo(() => {
+    const selected = new Set(selectedDatasets);
+    return userCollections.some((c) => selected.has(c.pid) && c.death_enabled);
+  }, [userCollections, selectedDatasets]);
 
   return (
     <Box data-marquee-ignore="true">
@@ -89,16 +153,43 @@ const DemographicsPanel = ({
       </Stack>
 
       <Collapse in={expanded}>
-        <DemographicAgeSection />
+        <FormProvider {...form}>
+          <DemographicAgeSection {...propsFor("age")} />
 
-        <DemographicCheckboxSection
-          label="Sex"
-          options={SEX_CONCEPTS}
-          selected={sex}
-          onToggle={toggleSex}
-          onClear={clearSex}
-          note={SEX_GUIDANCE}
-        />
+          <DemographicCheckboxSection
+            label="Sex"
+            field="sex"
+            options={sexConcepts ?? []}
+            selected={sex}
+            {...propsFor("sex")}
+          />
+
+          {queryBuilderUseRace && (
+            <DemographicCheckboxSection
+              label="Race"
+              field="race"
+              options={raceConcepts ?? []}
+              selected={race}
+              {...propsFor("race")}
+            />
+          )}
+
+          {queryBuilderUseLocation && (
+            <DemographicLocationSection
+              locationAvailable={locationAvailable}
+              {...propsFor("location")}
+            />
+          )}
+
+          {queryBuilderUseDeath && (
+            <DemographicDeathSection
+              deathAvailable={deathAvailable}
+              {...propsFor("death")}
+            />
+          )}
+
+          {allOpen && <DemographicSaveButton onSave={save} />}
+        </FormProvider>
       </Collapse>
     </Box>
   );

@@ -179,6 +179,8 @@ export interface Collection extends WithTimestamps {
   custodian_id?: number;
   model_state: ModelState;
   is_synthetic?: boolean;
+  location_enabled?: boolean;
+  death_enabled?: boolean;
 }
 
 export interface CollectionConfig {
@@ -445,6 +447,8 @@ export interface CreateCollectionPost {
   pid: string;
   model_state?: ModelState;
   is_synthetic?: boolean;
+  location_enabled?: boolean;
+  death_enabled?: boolean;
 }
 
 export interface UpdateCollectionPayload {

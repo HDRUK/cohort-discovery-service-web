@@ -1,15 +1,23 @@
 "use client";
 
-import { ReactNode, useState } from "react";
-import { Button, Divider, IconButton, Stack } from "@mui/material";
+import { ReactNode } from "react";
+import { Box, Button, Divider, IconButton, Stack } from "@mui/material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import Title from "@/components/Title";
+import DemographicSaveButton from "./DemographicSaveButton";
 
-interface DemographicRowProps {
+export interface DemographicRowActionProps {
+  editing: boolean;
+  disabled: boolean;
+  hideActions: boolean;
+  onEditStart: () => void;
+  onSave: () => void;
+  onReset: () => void;
+  onClear: () => void;
+}
+
+interface DemographicRowProps extends DemographicRowActionProps {
   label: string;
-  onEdit?: () => void;
-  onSave?: () => void;
-  onClear?: () => void;
   showClear?: boolean;
   children: ReactNode;
   renderEditing: ReactNode;
@@ -17,44 +25,44 @@ interface DemographicRowProps {
 
 const DemographicRow = ({
   label,
-  onEdit,
+  editing,
+  disabled,
+  hideActions,
+  onEditStart,
   onSave,
+  onReset,
   onClear,
   showClear = false,
   children,
   renderEditing,
 }: DemographicRowProps) => {
-  const [editing, setEditing] = useState(false);
-
-  const handleEdit = () => {
-    setEditing(true);
-    onEdit?.();
-  };
-
-  const handleClear = () => {
-    setEditing(false);
-    onClear?.();
-  };
-  const handleSave = () => {
-    setEditing(false);
-    onSave?.();
-  };
-
   return (
     <>
       <Stack
         direction="row"
         justifyContent="space-between"
-        alignItems="space-between"
+        alignItems="flex-start"
         spacing={1}
         sx={{ py: 1, width: "100%" }}
       >
         <Title
           title={label}
           size={"small"}
-          subTitle={editing ? renderEditing : children}
-          wrapperSx={{ width: "100%" }}
-        />
+          subTitle={editing ? " " : children}
+          subTitleWrap={!editing}
+          flexShrink={0}
+          wrapperSx={{ width: "100%", alignItems: "flex-start" }}
+        >
+          {editing && (
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Box sx={{ width: "100%", pb: 1 }}>{renderEditing}</Box>
+
+              {!hideActions && (
+                <DemographicSaveButton onReset={onReset} onSave={onSave} />
+              )}
+            </Box>
+          )}
+        </Title>
 
         <Stack
           direction="row"
@@ -66,9 +74,13 @@ const DemographicRow = ({
             <IconButton
               size="small"
               aria-label={`Edit ${label}`}
-              onClick={handleEdit}
+              disabled={disabled}
+              onClick={onEditStart}
             >
-              <EditOutlinedIcon fontSize="small" color="secondary" />
+              <EditOutlinedIcon
+                fontSize="small"
+                color={disabled ? "disabled" : "secondary"}
+              />
             </IconButton>
           )}
           {showClear && !editing && (
@@ -76,7 +88,7 @@ const DemographicRow = ({
               variant="text"
               size="small"
               color="secondary"
-              onClick={handleClear}
+              onClick={onClear}
             >
               Clear all
             </Button>
@@ -84,24 +96,6 @@ const DemographicRow = ({
         </Stack>
       </Stack>
       <Divider />
-      {editing && (
-        <>
-          <Stack
-            direction={"row"}
-            spacing={1}
-            justifyContent={"flex-end"}
-            my={1}
-          >
-            <Button variant="outlined" color="secondary" onClick={handleClear}>
-              Reset Selection
-            </Button>
-            <Button color="secondary" onClick={handleSave}>
-              Save Selection and Collapse
-            </Button>
-          </Stack>
-          <Divider />
-        </>
-      )}
     </>
   );
 };

@@ -25,11 +25,43 @@ const DemographicConceptSection = ({
   onToggle,
   onClear,
 }: DemographicConceptSectionProps) => {
-  const [selected, setSelected] = useState<Record<number, boolean>>({});
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState<Record<number, boolean>>({});
+  const [draftConcepts, setDraftConcepts] = useState<Record<number, Concept>>(
+    {},
+  );
 
-  const handleRemove = (concept: Concept) => {
-    setSelected((prev) => ({ ...prev, [concept.concept_id]: false }));
-    onToggle(concept, false);
+  const handleEditStart = () => {
+    setDraft(toSelectedMap(concepts));
+    setDraftConcepts(
+      Object.fromEntries(concepts.map((c) => [c.concept_id, c])),
+    );
+    setEditing(true);
+  };
+
+  const handleDraftToggle = (concept: Concept, selected: boolean) => {
+    setDraft((prev) => ({ ...prev, [concept.concept_id]: selected }));
+    setDraftConcepts((prev) => ({ ...prev, [concept.concept_id]: concept }));
+  };
+
+  const handleSave = () => {
+    const committedIds = new Set(concepts.map((c) => c.concept_id));
+    const draftIds = new Set(
+      Object.entries(draft)
+        .filter(([, selected]) => selected)
+        .map(([id]) => Number(id)),
+    );
+
+    concepts.forEach((concept) => {
+      if (!draftIds.has(concept.concept_id)) onToggle(concept, false);
+    });
+    draftIds.forEach((id) => {
+      if (!committedIds.has(id) && draftConcepts[id]) {
+        onToggle(draftConcepts[id], true);
+      }
+    });
+
+    setEditing(false);
   };
 
   const selectedChips = concepts.length > 0 && (
@@ -40,7 +72,7 @@ const DemographicConceptSection = ({
           concept={c}
           onDelete={(e) => {
             e.stopPropagation();
-            handleRemove(c);
+            onToggle(c, false);
           }}
         />
       ))}
@@ -50,7 +82,12 @@ const DemographicConceptSection = ({
   return (
     <DemographicRow
       label={label}
-      onEdit={() => setSelected(toSelectedMap(concepts))}
+      editing={editing}
+      disabled={false}
+      hideActions={false}
+      onEditStart={handleEditStart}
+      onSave={handleSave}
+      onReset={() => setEditing(false)}
       onClear={onClear}
       showClear={concepts.length > 0}
       renderEditing={
@@ -58,11 +95,10 @@ const DemographicConceptSection = ({
           <SearchConcepts
             domain={domain}
             multiple
-            selected={selected}
-            setSelected={setSelected}
-            onToggle={onToggle}
+            selected={draft}
+            setSelected={setDraft}
+            onToggle={handleDraftToggle}
           />
-          {selectedChips}
         </Box>
       }
     >

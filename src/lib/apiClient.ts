@@ -7,7 +7,7 @@ import { notFound, redirect } from "next/navigation";
 import { DEFAULT_REVALIDATE } from "@/config/defaults";
 import { getTokenUser } from "./auth";
 import { CacheOptions } from "@/types/api";
-import { paramsToString } from "@/utils/string";
+import { hashString, canonicaliseQueryString } from "@/utils/string";
 
 const baseURL = process.env.API_BASE_URL ?? "http://localhost:8100";
 const isCypress = process.env.CYPRESS === "true";
@@ -47,15 +47,21 @@ const buildCachedRequest = async ({
 }: CachedGetArgs) => {
   const { useCache = true } = cacheOptions ?? {};
 
-  const queryString = paramsToString(params);
+  // Canonicalise so param ordering doesn't fragment the cache (same request,
+  // different order → same URL and tag).
+  const queryString = canonicaliseQueryString(params);
   const finalUrl = queryString ? `${url}?${queryString}` : url;
 
   const {
     user: { id: userId },
   } = await getTokenUser();
 
+  // Hash the (canonicalised) query string so the per-query tag is always a
+  // stable, bounded length — Next.js rejects cache tags over 256 characters,
+  // which a raw query string with many params can easily exceed.
+  const queryHash = queryString ? hashString(queryString) : "";
   const queryTags =
-    queryString && tags ? tags.map((t) => `${t}-${queryString}`) : [];
+    queryString && tags ? tags.map((t) => `${t}-${queryHash}`) : [];
 
   const allTags = [
     "admin",

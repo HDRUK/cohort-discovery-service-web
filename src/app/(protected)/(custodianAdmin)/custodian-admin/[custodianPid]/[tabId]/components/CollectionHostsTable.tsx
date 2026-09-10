@@ -73,7 +73,13 @@ const CollectionHostsTable = ({
           titleProps: {
             title: "Collection Hosts",
             subTitle: "All",
-            children: <SortButton field="name" />,
+            children: (
+              <SortButton
+                fields={[
+                  { field: "name", displayName: "Name", numeric: false },
+                ]}
+              />
+            ),
             wrapperSx: {
               sx: {
                 display: "flex",
