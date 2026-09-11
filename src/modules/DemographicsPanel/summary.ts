@@ -1,5 +1,5 @@
 import { Concept } from "@/types/api";
-import { GeoRadiusLocation } from "@/types/rules";
+import { GeoRadiusLocation, DEATH_OPTIONS } from "@/types/rules";
 import { Option } from "@/types/common";
 import { formatRadius } from "@/components/GeoMap";
 
@@ -13,8 +13,17 @@ export const formatLocationSummary = (
     ? `Location within ${formatRadius(location.radius)}`
     : "Location Any";
 
-export const formatDeathSummary = (death: Option | null): string =>
-  death ? `Death ${death?.label.toLowerCase()}` : "Death Any";
+export const formatDeathSummary = (death: Option | null): string => {
+  return death
+    ? `Death ${
+        death?.value === 0
+          ? // No death recorded
+            DEATH_OPTIONS[0].label.toLowerCase()
+          : // Death recorded
+            DEATH_OPTIONS[1].label.toLowerCase()
+      }`
+    : "Death Any";
+};
 
 export const formatConceptCountSummary = (
   label: string,
