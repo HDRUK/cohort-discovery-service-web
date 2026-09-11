@@ -15,7 +15,13 @@ export const formatLocationSummary = (
 
 export const formatDeathSummary = (death: Option | null): string => {
   return death
-    ? `Death ${death?.value === 0 ? DEATH_OPTIONS[0].label.toLowerCase() : DEATH_OPTIONS[1].label.toLowerCase()}`
+    ? `Death ${
+        death?.value === 0
+          ? // No death recorded
+            DEATH_OPTIONS[0].label.toLowerCase()
+          : // Death recorded
+            DEATH_OPTIONS[1].label.toLowerCase()
+      }`
     : "Death Any";
 };
 
