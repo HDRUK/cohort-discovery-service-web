@@ -33,11 +33,15 @@ const useDemographicFieldEditing = (onSaved?: () => void) => {
 
   const propsFor = (field: DemographicField): DemographicRowActionProps => ({
     editing: allOpen || activeField === field,
-    disabled: !allOpen && activeField !== null && activeField !== field,
+    // disabled: !allOpen && activeField !== null && activeField !== field,
+    disabled: false,
     hideActions: allOpen,
     onEditStart: () => {
       const current = demographics ?? EMPTY_DEMOGRAPHICS;
       form.resetField(field, { defaultValue: current[field] });
+      form.handleSubmit((values) => {
+        setDemographics(hasRules ? values : withDefaultAgeWhenEmpty(values));
+      })();
       setActiveField(field);
     },
     onSave: allOpen
