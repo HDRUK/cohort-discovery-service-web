@@ -57,9 +57,9 @@ const DemographicRow = ({
             <Box sx={{ flex: 1, minWidth: 0 }}>
               <Box sx={{ width: "100%", pb: 1 }}>{renderEditing}</Box>
 
-              {!hideActions && (
+              {/* {!hideActions && (
                 <DemographicSaveButton onReset={onReset} onSave={onSave} />
-              )}
+              )} */}
             </Box>
           )}
         </Title>

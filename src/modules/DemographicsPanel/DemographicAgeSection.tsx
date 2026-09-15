@@ -21,6 +21,7 @@ const DemographicAgeSection = (props: DemographicRowActionProps) => {
   const handleEditStart = () => {
     props.onEditStart();
     if (!age) setValue("age", DEFAULT_AGE_RANGE);
+    console.log("test?");
   };
 
   return (

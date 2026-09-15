@@ -3,10 +3,7 @@ import { useForm } from "react-hook-form";
 import { EMPTY_DEMOGRAPHICS } from "@/store/queryBuilderStore";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { Demographics } from "@/types/rules";
-import {
-  hasDemographicsContent,
-  withDefaultAgeWhenEmpty,
-} from "@/utils/rules";
+import { hasDemographicsContent, withDefaultAgeWhenEmpty } from "@/utils/rules";
 import { DemographicRowActionProps } from "./DemographicRow";
 
 type DemographicField = keyof Demographics;
@@ -62,7 +59,7 @@ const useDemographicFieldEditing = (onSaved?: () => void) => {
     },
   });
 
-  return { form, allOpen, save, propsFor };
+  return { form, activeField, allOpen, save, propsFor };
 };
 
 export default useDemographicFieldEditing;
