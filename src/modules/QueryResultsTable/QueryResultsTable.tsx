@@ -110,11 +110,12 @@ const QueryResultsTable = ({
                 },
               });
             }}
-            sx={{
+            sx={(theme) => ({
               display: "inline-flex",
               textDecoration: "none",
               "&:hover": { textDecoration: "underline" },
-            }}
+              "&:visited": { color: theme.palette.link.dark },
+            })}
           >
             {name}
             <LaunchIcon
