@@ -55,7 +55,7 @@ const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
     initialExpand ?? !hasDemographicsContent(demographics),
   );
 
-  const { form, activeField, allOpen, save, propsFor } =
+  const { form, activeField, allOpen, save, reset, propsFor } =
     useDemographicFieldEditing(() => setExpanded(false));
 
   const summary = [
@@ -105,8 +105,6 @@ const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
     return userCollections.some((c) => selected.has(c.pid) && c.death_enabled);
   }, [userCollections, selectedDatasets]);
 
-  // useQueryBuilder((qb) => console.log(qb));
-
   return (
     <Box data-marquee-ignore="true">
       <Stack
@@ -126,7 +124,7 @@ const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
             useSeparator={false}
             subTitle={
               !expanded && (
-                <Typography variant="body1" color="text.secondary" noWrap>
+                <Typography variant="body1" noWrap>
                   {summary}
                 </Typography>
               )
@@ -189,7 +187,12 @@ const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
             />
           )}
 
-          {(allOpen || activeField) && <DemographicSaveButton onSave={save} />}
+          {(allOpen || activeField) && (
+            <DemographicSaveButton
+              onReset={() => reset(activeField ?? "age")}
+              onSave={save}
+            />
+          )}
         </FormProvider>
       </Collapse>
     </Box>
