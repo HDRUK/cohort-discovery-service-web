@@ -101,6 +101,7 @@ const Title = ({
             noWrap={!subTitleWrap}
             sx={{
               mx: 1,
+              color: "#53575A",
               ...(subTitleWrap
                 ? { flex: 1, minWidth: 0, whiteSpace: "normal" }
                 : { flexShrink: 0 }),
