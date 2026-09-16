@@ -8,6 +8,7 @@ import { Demographics } from "@/types/rules";
 import AgeRangeInput from "@/components/RuleAgeSelector/AgeRangeInput";
 import DemographicRow, { DemographicRowActionProps } from "./DemographicRow";
 import { formatAgeSummary } from "./summary";
+import DemographicChip from "./DemographicChip";
 
 const DEFAULT_AGE_RANGE: [number, number] = [MIN_AGE_FILTER, MAX_AGE_FILTER];
 
@@ -48,11 +49,7 @@ const DemographicAgeSection = (props: DemographicRowActionProps) => {
         </Box>
       }
     >
-      <Chip
-        variant="outlined"
-        sx={{ bgcolor: "white" }}
-        label={formatAgeSummary(age)}
-      />
+      <DemographicChip label={formatAgeSummary(age)} />
     </DemographicRow>
   );
 };

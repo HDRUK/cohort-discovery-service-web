@@ -9,6 +9,7 @@ import {
 } from "@/config/demographics";
 import { Demographics, DEATH_OPTIONS } from "@/types/rules";
 import DemographicRow, { DemographicRowActionProps } from "./DemographicRow";
+import DemographicChip from "./DemographicChip";
 
 interface DemographicDeathSectionProps extends DemographicRowActionProps {
   deathAvailable: boolean;
@@ -143,10 +144,7 @@ const DemographicDeathSection = ({
         )
       }
     >
-      <Chip
-        variant="outlined"
-        sx={{ bgcolor: "white" }}
-        data-testid="death-chip"
+      <DemographicChip
         label={DEATH_OPTIONS[death?.value as number]?.label ?? "Any"}
       />
     </DemographicRow>

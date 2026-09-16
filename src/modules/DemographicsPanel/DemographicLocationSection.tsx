@@ -11,6 +11,7 @@ import {
 } from "@/config/demographics";
 import { Demographics } from "@/types/rules";
 import DemographicRow, { DemographicRowActionProps } from "./DemographicRow";
+import DemographicChip from "./DemographicChip";
 
 const MAP_HEIGHT = 300;
 
@@ -72,7 +73,7 @@ const DemographicLocationSection = ({
         )
       }
     >
-      <Chip variant="outlined" sx={{ bgcolor: "white" }} label={summaryLabel} />
+      <DemographicChip label={summaryLabel} />
     </DemographicRow>
   );
 };
