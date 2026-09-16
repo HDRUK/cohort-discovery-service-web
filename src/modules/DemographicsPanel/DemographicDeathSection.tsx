@@ -147,7 +147,7 @@ const DemographicDeathSection = ({
         variant="outlined"
         sx={{ bgcolor: "white" }}
         data-testid="death-chip"
-        label={death?.label ?? "Any"}
+        label={DEATH_OPTIONS[death?.value as number]?.label ?? "Any"}
       />
     </DemographicRow>
   );
