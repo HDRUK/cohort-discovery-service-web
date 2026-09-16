@@ -1,3 +1,9 @@
+## [1.10.1](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.10.0...v1.10.1) (2026-09-16)
+
+### 🐛 Bug Fixes
+
+* **DP-894:** fix death demographics selection/summary text (#519) ([b310008](https://github.com/HDRUK/cohort-discovery-service-web/commit/b3100084f81b17f9cb43440dea338f0ac2145b89))
+
 ## [1.10.0](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.9.0...v1.10.0) (2026-09-10)
 
 ### ✨ Features
