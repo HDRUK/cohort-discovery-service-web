@@ -191,6 +191,7 @@ const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
             <DemographicSaveButton
               onReset={() => reset(activeField ?? "age")}
               onSave={save}
+              allOpen={allOpen}
             />
           )}
         </FormProvider>

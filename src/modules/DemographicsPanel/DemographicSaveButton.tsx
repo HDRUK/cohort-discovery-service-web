@@ -5,11 +5,13 @@ import { Button, Stack } from "@mui/material";
 interface DemographicSaveButtonProps {
   onSave: () => void;
   onReset?: () => void;
+  allOpen?: boolean;
 }
 
 const DemographicSaveButton = ({
   onSave,
   onReset,
+  allOpen,
 }: DemographicSaveButtonProps) => (
   <Stack
     direction={"row"}
@@ -23,7 +25,7 @@ const DemographicSaveButton = ({
       py: 1,
     }}
   >
-    {onReset && (
+    {onReset && !allOpen && (
       <Button variant="outlined" color="secondary" onClick={onReset}>
         Reset Selection
       </Button>
