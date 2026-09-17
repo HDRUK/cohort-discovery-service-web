@@ -172,16 +172,18 @@ const DemographicCheckboxSection = ({
             <DemographicChip
               key={c.concept_id}
               label={capitaliseFirstLetter(c.name.toLocaleLowerCase())}
+              field={field}
             />
           ))}
           {selected.length > MAX_VISIBLE_CHIPS && (
             <DemographicChip
               label={`+${selected.length - MAX_VISIBLE_CHIPS} more`}
+              field={field}
             />
           )}
         </Stack>
       ) : (
-        <DemographicChip label="Any" />
+        <DemographicChip label="Any" field={field} />
       )}
     </DemographicRow>
   );

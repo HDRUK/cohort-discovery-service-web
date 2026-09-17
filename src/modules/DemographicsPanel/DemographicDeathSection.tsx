@@ -146,6 +146,7 @@ const DemographicDeathSection = ({
     >
       <DemographicChip
         label={DEATH_OPTIONS[death?.value as number]?.label ?? "Any"}
+        field="death"
       />
     </DemographicRow>
   );

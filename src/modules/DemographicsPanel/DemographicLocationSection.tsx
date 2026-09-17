@@ -73,7 +73,7 @@ const DemographicLocationSection = ({
         )
       }
     >
-      <DemographicChip label={summaryLabel} />
+      <DemographicChip label={summaryLabel} field="location" />
     </DemographicRow>
   );
 };

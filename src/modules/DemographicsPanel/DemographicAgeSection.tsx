@@ -48,7 +48,7 @@ const DemographicAgeSection = (props: DemographicRowActionProps) => {
         </Box>
       }
     >
-      <DemographicChip label={formatAgeSummary(age)} />
+      <DemographicChip label={formatAgeSummary(age)} field="age" />
     </DemographicRow>
   );
 };
