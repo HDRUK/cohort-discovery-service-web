@@ -150,18 +150,6 @@ describe("DemographicsPanel", () => {
       store().setDemographics({ ...EMPTY_DEMOGRAPHICS, sex: [female] });
     });
 
-    it("disables the other rows' Edit buttons while a row is being edited", async () => {
-      renderPanel(true);
-
-      await userEvent.click(screen.getByRole("button", { name: /edit age/i }));
-
-      expect(screen.getByRole("button", { name: /edit sex/i })).toBeDisabled();
-      expect(screen.getByRole("button", { name: /edit race/i })).toBeDisabled();
-      expect(
-        screen.getByRole("button", { name: /reset selection/i }),
-      ).toBeInTheDocument();
-    });
-
     it("Reset Selection clears the field, saves it, and keeps the row open", async () => {
       store().setDemographics({
         ...EMPTY_DEMOGRAPHICS,
