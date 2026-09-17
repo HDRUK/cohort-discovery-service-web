@@ -105,12 +105,18 @@ export default function TopMenu() {
   const currentTabValue =
     tabs.find((tab) => {
       const matchPath = tab?.route ?? tab.href;
+
+      console.log("matchPath: ", matchPath);
+      console.log("pathname: ", pathname);
+
       if (!matchPath) return false;
 
       return pathname === matchPath || pathname.startsWith(matchPath + "/");
     })?.id ??
     tabs[0]?.id ??
     0;
+
+  console.log("currentTabValue: ", currentTabValue);
 
   return (
     <>

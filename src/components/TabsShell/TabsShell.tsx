@@ -59,13 +59,22 @@ export default function TabsShell({
     value ? value : tabs[0]?.id || 0,
   );
   const handleChange = (_: React.SyntheticEvent, newValue: string) => {
+    console.log("newValue: ", newValue);
+    console.log("value: ", value);
+    console.log("internalValue: ", internalValue);
+    console.log("==========");
     if (value && value === internalValue) return;
+
     setInternalValue(newValue);
   };
 
   const pages = tabs.map((tab) => tab.page);
 
   const kids = React.Children.toArray(pages);
+
+  React.useEffect(() => {
+    if (value) setInternalValue(value);
+  }, [value]);
 
   return (
     <Box sx={mergeSx(defaultRootSx, sx)}>
