@@ -58,10 +58,6 @@ const useDemographicFieldEditing = (onSaved?: () => void) => {
           onSaved?.();
         },
     onReset: () => reset(field),
-    onClear: () => {
-      const current = demographics ?? EMPTY_DEMOGRAPHICS;
-      setDemographics({ ...current, [field]: EMPTY_DEMOGRAPHICS[field] });
-    },
   });
 
   return { form, activeField, allOpen, save, reset, propsFor };

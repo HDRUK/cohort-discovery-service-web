@@ -12,7 +12,6 @@ export interface DemographicRowActionProps {
   onEditStart: () => void;
   onSave: () => void;
   onReset: () => void;
-  onClear: () => void;
 }
 
 interface DemographicRowProps extends DemographicRowActionProps {
@@ -27,7 +26,7 @@ const DemographicRow = ({
   editing,
   disabled,
   onEditStart,
-  onClear,
+  onReset,
   showClear = false,
   children,
   renderEditing,
@@ -80,7 +79,7 @@ const DemographicRow = ({
               variant="text"
               size="small"
               color="secondary"
-              onClick={onClear}
+              onClick={onReset}
             >
               Clear all
             </Button>
