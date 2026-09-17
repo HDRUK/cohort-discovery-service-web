@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { Controller, useFormContext } from "react-hook-form";
-import { Chip, Skeleton, Stack, Typography } from "@mui/material";
+import { Skeleton, Stack, Typography } from "@mui/material";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { extractPostcode, formatRadius } from "@/components/GeoMap";
 import {

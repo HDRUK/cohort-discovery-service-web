@@ -1,7 +1,7 @@
 "use client";
 
 import { Controller, useFormContext } from "react-hook-form";
-import { Box, Chip } from "@mui/material";
+import { Box } from "@mui/material";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { MAX_AGE_FILTER, MIN_AGE_FILTER } from "@/config/rules";
 import { Demographics } from "@/types/rules";
