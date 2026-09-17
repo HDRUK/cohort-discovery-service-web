@@ -39,7 +39,6 @@ const useDemographicFieldEditing = (onSaved?: () => void) => {
 
   const propsFor = (field: DemographicField): DemographicRowActionProps => ({
     editing: allOpen || activeField === field,
-    // disabled: !allOpen && activeField !== null && activeField !== field,
     disabled: false,
     hideActions: allOpen,
     onEditStart: () => {
