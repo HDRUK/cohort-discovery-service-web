@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { usePathname } from "next/navigation";
 
 import TabsShell from "@/components/TabsShell";
@@ -12,11 +12,21 @@ import { HelpIcon } from "@/icons/HelpIcon";
 import HelpTooltip from "../HelpTooltip";
 import { useApplicationMode } from "@/providers/ApplicationModeProvider";
 import { TermDirectoryIcon } from "@/icons/TermDirectoryIcon";
+import { Stack, Typography } from "@mui/material";
 
 export default function TopMenu() {
   const pathname = usePathname();
   const user = useUserStore((s) => s.user);
   const { isStandalone } = useApplicationMode();
+
+  const [openTDTooltip, setOpenTDTooltip] = useState(true);
+
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setOpenTDTooltip(false);
+    }, 10000);
+    return () => clearTimeout(id);
+  }, []);
 
   const userCustodians = useMemo(
     () => user?.custodians ?? [],
@@ -90,7 +100,33 @@ export default function TopMenu() {
         route: routes.termDirectory,
         page: null,
         icon: (
-          <HelpTooltip title="Term Directory">
+          <HelpTooltip
+            title={
+              <Stack
+                direction="row"
+                spacing={0.5}
+                alignItems="center"
+                useFlexGap
+                flexWrap="wrap"
+              >
+                <Typography
+                  component="span"
+                  fontWeight={700}
+                  sx={{ color: "yellowCustom.main" }}
+                >
+                  New!
+                </Typography>
+                <Typography component="span" fontWeight={700}>
+                  Term Directory
+                </Typography>
+              </Stack>
+            }
+            placement="left"
+            open={openTDTooltip && !!user}
+            onOpen={() => setOpenTDTooltip(true)}
+            onClose={() => setOpenTDTooltip(false)}
+            sx={{ zIndex: 1250 }}
+          >
             <TermDirectoryIcon />
           </HelpTooltip>
         ),
@@ -100,7 +136,7 @@ export default function TopMenu() {
     ];
 
     return baseTabs;
-  }, [isStandalone, user, userCustodians]);
+  }, [isStandalone, openTDTooltip, user, userCustodians]);
 
   const currentTabValue =
     tabs.find((tab) => {
