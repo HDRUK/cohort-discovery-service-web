@@ -3,10 +3,7 @@ import { useForm } from "react-hook-form";
 import { EMPTY_DEMOGRAPHICS } from "@/store/queryBuilderStore";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { Demographics } from "@/types/rules";
-import {
-  hasDemographicsContent,
-  withDefaultAgeWhenEmpty,
-} from "@/utils/rules";
+import { hasDemographicsContent, withDefaultAgeWhenEmpty } from "@/utils/rules";
 import { DemographicRowActionProps } from "./DemographicRow";
 
 type DemographicField = keyof Demographics;
@@ -34,13 +31,22 @@ const useDemographicFieldEditing = (onSaved?: () => void) => {
     onSaved?.();
   });
 
+  const reset = (field: DemographicField) => {
+    const current = demographics ?? EMPTY_DEMOGRAPHICS;
+    form.resetField(field, { defaultValue: EMPTY_DEMOGRAPHICS[field] });
+    setDemographics({ ...current, [field]: EMPTY_DEMOGRAPHICS[field] });
+  };
+
   const propsFor = (field: DemographicField): DemographicRowActionProps => ({
     editing: allOpen || activeField === field,
-    disabled: !allOpen && activeField !== null && activeField !== field,
+    disabled: false,
     hideActions: allOpen,
     onEditStart: () => {
       const current = demographics ?? EMPTY_DEMOGRAPHICS;
       form.resetField(field, { defaultValue: current[field] });
+      form.handleSubmit((values) => {
+        setDemographics(hasRules ? values : withDefaultAgeWhenEmpty(values));
+      })();
       setActiveField(field);
     },
     onSave: allOpen
@@ -51,18 +57,10 @@ const useDemographicFieldEditing = (onSaved?: () => void) => {
           setActiveField(null);
           onSaved?.();
         },
-    onReset: () => {
-      const current = demographics ?? EMPTY_DEMOGRAPHICS;
-      form.resetField(field, { defaultValue: EMPTY_DEMOGRAPHICS[field] });
-      setDemographics({ ...current, [field]: EMPTY_DEMOGRAPHICS[field] });
-    },
-    onClear: () => {
-      const current = demographics ?? EMPTY_DEMOGRAPHICS;
-      setDemographics({ ...current, [field]: EMPTY_DEMOGRAPHICS[field] });
-    },
+    onReset: () => reset(field),
   });
 
-  return { form, allOpen, save, propsFor };
+  return { form, activeField, allOpen, save, reset, propsFor };
 };
 
 export default useDemographicFieldEditing;

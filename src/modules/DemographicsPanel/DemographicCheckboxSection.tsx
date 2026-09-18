@@ -3,7 +3,6 @@
 import { Controller, useFormContext } from "react-hook-form";
 import {
   Button,
-  Chip,
   FormControlLabel,
   FormGroup,
   Stack,
@@ -18,6 +17,7 @@ import {
 } from "@/config/demographics";
 import DemographicRow, { DemographicRowActionProps } from "./DemographicRow";
 import { capitaliseFirstLetter } from "@/utils/string";
+import DemographicChip from "./DemographicChip";
 
 // Above this many options the checkboxes flow into a scrollable multi-column
 // grid; at or below it they stay as a simple single column.
@@ -71,7 +71,8 @@ const DemographicCheckboxSection = ({
               const isChecked = (conceptId: number) =>
                 draft.some((c) => c.concept_id === conceptId);
               const allSelected =
-                options.length > 0 && options.every((o) => isChecked(o.concept_id));
+                options.length > 0 &&
+                options.every((o) => isChecked(o.concept_id));
 
               const handleToggleAll = () =>
                 draftField.onChange(
@@ -168,23 +169,21 @@ const DemographicCheckboxSection = ({
       {selected.length > 0 ? (
         <Stack direction="row" flexWrap="wrap" gap={0.5}>
           {selected.slice(0, MAX_VISIBLE_CHIPS).map((c) => (
-            <Chip
+            <DemographicChip
               key={c.concept_id}
-              variant="outlined"
-              sx={{ bgcolor: "white" }}
               label={capitaliseFirstLetter(c.name.toLocaleLowerCase())}
+              field={field}
             />
           ))}
           {selected.length > MAX_VISIBLE_CHIPS && (
-            <Chip
-              variant="outlined"
-              sx={{ bgcolor: "white" }}
+            <DemographicChip
               label={`+${selected.length - MAX_VISIBLE_CHIPS} more`}
+              field={field}
             />
           )}
         </Stack>
       ) : (
-        <Chip variant="outlined" sx={{ bgcolor: "white" }} label="Any" />
+        <DemographicChip label="Any" field={field} />
       )}
     </DemographicRow>
   );

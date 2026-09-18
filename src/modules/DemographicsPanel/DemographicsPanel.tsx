@@ -55,9 +55,8 @@ const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
     initialExpand ?? !hasDemographicsContent(demographics),
   );
 
-  const { form, allOpen, save, propsFor } = useDemographicFieldEditing(() =>
-    setExpanded(false),
-  );
+  const { form, activeField, allOpen, reset, propsFor } =
+    useDemographicFieldEditing(() => setExpanded(false));
 
   const summary = [
     formatAgeSummary(age),
@@ -125,7 +124,7 @@ const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
             useSeparator={false}
             subTitle={
               !expanded && (
-                <Typography variant="body1" color="text.secondary" noWrap>
+                <Typography variant="body1" noWrap>
                   {summary}
                 </Typography>
               )
@@ -188,7 +187,13 @@ const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
             />
           )}
 
-          {allOpen && <DemographicSaveButton onSave={save} />}
+          {(allOpen || activeField) && (
+            <DemographicSaveButton
+              onReset={() => reset(activeField ?? "age")}
+              onSave={propsFor(activeField ?? "age").onSave}
+              allOpen={allOpen}
+            />
+          )}
         </FormProvider>
       </Collapse>
     </Box>
