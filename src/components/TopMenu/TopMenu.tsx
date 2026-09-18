@@ -105,7 +105,6 @@ export default function TopMenu() {
   const currentTabValue =
     tabs.find((tab) => {
       const matchPath = tab?.route ?? tab.href;
-
       if (!matchPath) return false;
 
       return pathname === matchPath || pathname.startsWith(matchPath + "/");
