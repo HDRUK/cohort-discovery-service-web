@@ -17,7 +17,7 @@ interface RuleSearchProps {
 }
 
 const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
-  const [isMultiSelect, setIsMultiSelect] = useState(false);
+  const [isMultiSelect, setIsMultiSelect] = useState(true);
   const [hasOptions, setHasOptions] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Record<number, boolean>>({});
 
