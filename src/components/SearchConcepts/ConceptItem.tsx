@@ -153,7 +153,14 @@ export const ConceptItem = ({
           label={labelEl}
         />
       ) : (
-        labelEl
+        <Box
+          sx={{
+            px: 2,
+            py: 1,
+          }}
+        >
+          {labelEl}
+        </Box>
       )}
     </ConceptWrapper>
   );
