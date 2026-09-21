@@ -25,6 +25,7 @@ import useUserStore from "@/hooks/useUserStore";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import {
   DEFAULT_CODES_PER_PAGE,
+  DEFAULT_RULE_CONTAINER_MAX_HEIGHT,
   DEFAULT_SEARCH_RESULTS_MAX_HEIGHT,
 } from "@/config/defaults";
 import useFeatures from "@/hooks/useFeatures";
@@ -238,7 +239,7 @@ const SearchConcepts = ({
     loadedCount < activeResult.total;
 
   return (
-    <Box>
+    <Box sx={{ maxHeight: DEFAULT_RULE_CONTAINER_MAX_HEIGHT }}>
       <SearchBar
         placeholder="Term search..."
         loading={isLoading}
