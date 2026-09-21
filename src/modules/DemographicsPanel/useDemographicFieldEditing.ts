@@ -31,12 +31,6 @@ const useDemographicFieldEditing = (onSaved?: () => void) => {
     onSaved?.();
   });
 
-  const reset = (field: DemographicField) => {
-    const current = demographics ?? EMPTY_DEMOGRAPHICS;
-    form.resetField(field, { defaultValue: EMPTY_DEMOGRAPHICS[field] });
-    setDemographics({ ...current, [field]: EMPTY_DEMOGRAPHICS[field] });
-  };
-
   const propsFor = (field: DemographicField): DemographicRowActionProps => ({
     editing: allOpen || activeField === field,
     disabled: false,
@@ -57,10 +51,14 @@ const useDemographicFieldEditing = (onSaved?: () => void) => {
           setActiveField(null);
           onSaved?.();
         },
-    onReset: () => reset(field),
+    onReset: () => {
+      const current = demographics ?? EMPTY_DEMOGRAPHICS;
+      form.resetField(field, { defaultValue: EMPTY_DEMOGRAPHICS[field] });
+      setDemographics({ ...current, [field]: EMPTY_DEMOGRAPHICS[field] });
+    },
   });
 
-  return { form, activeField, allOpen, save, reset, propsFor };
+  return { form, activeField, allOpen, propsFor };
 };
 
 export default useDemographicFieldEditing;

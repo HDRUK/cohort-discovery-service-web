@@ -55,8 +55,9 @@ const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
     initialExpand ?? !hasDemographicsContent(demographics),
   );
 
-  const { form, activeField, allOpen, reset, propsFor } =
-    useDemographicFieldEditing(() => setExpanded(false));
+  const { form, activeField, allOpen, propsFor } = useDemographicFieldEditing(
+    () => setExpanded(false),
+  );
 
   const summary = [
     formatAgeSummary(age),
@@ -189,7 +190,7 @@ const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
 
           {(allOpen || activeField) && (
             <DemographicSaveButton
-              onReset={() => reset(activeField ?? "age")}
+              onReset={() => propsFor(activeField ?? "age").onReset}
               onSave={propsFor(activeField ?? "age").onSave}
               allOpen={allOpen}
             />
