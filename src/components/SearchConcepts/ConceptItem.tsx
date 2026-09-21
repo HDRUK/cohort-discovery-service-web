@@ -53,6 +53,7 @@ const ConceptWrapper = ({
     sx={{
       ...rowSx,
       bgcolor: !isSelected ? rowSx.bgcolor : "action.hover",
+      p: 0,
     }}
     onClick={onClick}
   >
@@ -136,7 +137,8 @@ export const ConceptItem = ({
       {multiple ? (
         <FormControlLabel
           sx={{
-            p: 0,
+            px: 2,
+            py: 1,
             m: 0,
             width: "100%",
             "& .MuiFormControlLabel-label": { width: "100%" },
@@ -145,7 +147,7 @@ export const ConceptItem = ({
             <SquareCheckbox
               checked={isSelected}
               onChange={(e) => handleClick(id, e)}
-              sx={{ p: 0 }}
+              sx={{ p: 0, pr: 0.5 }}
             />
           }
           label={labelEl}
