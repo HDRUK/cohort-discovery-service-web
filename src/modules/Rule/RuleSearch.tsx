@@ -149,6 +149,34 @@ const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
     </Stack>
   ) : null;
 
+  const confirmButtons = isMultiSelect && hasOptions && (
+    <Stack direction="row" justifyContent="flex-end" gap={1} pt={1}>
+      <Button
+        variant="outlined"
+        color="secondary"
+        size="small"
+        onClick={(e) => {
+          e.stopPropagation();
+          clearAll();
+        }}
+      >
+        Cancel
+      </Button>
+      <Button
+        variant="contained"
+        color="secondary"
+        size="small"
+        disabled={selectedConcepts.length < 1}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleConfirm();
+        }}
+      >
+        Confirm selection
+      </Button>
+    </Stack>
+  );
+
   return (
     <Box
       data-testid="rule-search-container"
@@ -166,43 +194,8 @@ const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
         onClick={!isMultiSelect ? handleSingleSelect : undefined}
         onHasOptions={setHasOptions}
         headerSlot={toggleRow}
+        confirmSlot={confirmButtons}
       />
-      {isMultiSelect && hasOptions && (
-        <>
-          <Divider sx={{ mt: 1 }} />
-          <SelectedConceptsPanel
-            concepts={selectedConcepts}
-            onRemove={handleRemove}
-            onClearAll={clearAll}
-          />
-          <Divider sx={{ mt: 1 }} />
-          <Stack direction="row" justifyContent="flex-end" gap={1} pt={1}>
-            <Button
-              variant="outlined"
-              color="secondary"
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                clearAll();
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
-              size="small"
-              disabled={selectedConcepts.length < 1}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleConfirm();
-              }}
-            >
-              Confirm selection
-            </Button>
-          </Stack>
-        </>
-      )}
     </Box>
   );
 };
