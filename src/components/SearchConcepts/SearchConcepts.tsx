@@ -206,7 +206,6 @@ const SearchConcepts = ({
         handleToggle(id);
         onToggle?.(c, !selected?.[c.concept_id]);
         e.stopPropagation();
-        e.preventDefault();
       }}
       showCode
       showCounts={queryBuilderShowConceptStats}
