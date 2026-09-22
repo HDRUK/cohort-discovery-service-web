@@ -25,7 +25,6 @@ import useUserStore from "@/hooks/useUserStore";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import {
   DEFAULT_CODES_PER_PAGE,
-  DEFAULT_RULE_CONTAINER_MAX_HEIGHT,
   DEFAULT_SEARCH_RESULTS_MAX_HEIGHT,
 } from "@/config/defaults";
 import useFeatures from "@/hooks/useFeatures";
@@ -239,7 +238,7 @@ const SearchConcepts = ({
     loadedCount < activeResult.total;
 
   return (
-    <Box sx={{ maxHeight: DEFAULT_RULE_CONTAINER_MAX_HEIGHT }}>
+    <Box>
       <SearchBar
         placeholder="Term search..."
         loading={isLoading}
@@ -257,7 +256,7 @@ const SearchConcepts = ({
       <FormGroup
         ref={resultsContainerRef}
         data-testid="search-concepts-results"
-        sx={mergeSx(searchResultsSx, { mt: headerSlot ? 0 : 2 })}
+        sx={mergeSx(searchResultsSx, { mt: headerSlot ? 0 : 1 })}
       >
         {multiple && !hideSelectAll && visibleOptions.length > 0 && (
           <>
@@ -288,10 +287,11 @@ const SearchConcepts = ({
       </FormGroup>
       <Stack direction="row" justifyContent="space-between">
         {hasMoreResults && (
-          <Box sx={{ mt: 1 }}>
+          <Box>
             <Button
               variant="text"
               disabled={isLoading}
+              sx={{ py: "10px" }}
               onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();

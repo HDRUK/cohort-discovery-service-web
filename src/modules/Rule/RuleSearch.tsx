@@ -153,7 +153,7 @@ const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
       />
       {isMultiSelect && hasOptions && (
         <>
-          <Divider sx={{ mt: 1 }} />
+          <Divider />
           <Stack direction="row" justifyContent="flex-end" gap={1} pt={1}>
             <Button
               variant="outlined"
