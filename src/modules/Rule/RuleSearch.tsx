@@ -1,11 +1,10 @@
 "use client";
 
 import { Concept } from "@/types/api";
-import { Box, Button, Divider, Stack, Typography } from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import SearchConcepts from "@/components/SearchConcepts";
-import SelectedConceptsPanel from "@/components/SelectedConceptsPanel";
 import { useSaveChanges } from "@/hooks/useSaveChanges";
 
 type FormValues = { concepts: Record<number, Concept> };
@@ -52,24 +51,6 @@ const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
     setSelectedIds({});
     reset({ concepts: {} });
   }, [reset]);
-
-  const handleRemove = useCallback(
-    (concept: Concept) => {
-      setSelectedIds((prev) => {
-        const next = { ...prev };
-        delete next[concept.concept_id];
-        return next;
-      });
-      const next = { ...conceptsMap };
-      delete next[concept.concept_id];
-      if (Object.keys(next).length === 0) {
-        reset({ concepts: {} });
-      } else {
-        setValue("concepts", next, { shouldDirty: true });
-      }
-    },
-    [conceptsMap, setValue, reset],
-  );
 
   const handleConfirm = useCallback(() => {
     const clean = selectedConcepts.map(
