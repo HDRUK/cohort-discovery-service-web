@@ -204,18 +204,12 @@ describe("DemographicsPanel", () => {
       await userEvent.click(screen.getByRole("button", { name: /edit age/i }));
       await setAgeMin("30");
 
-      console.log("demos even before: ", demographics());
-
       await userEvent.click(screen.getByRole("button", { name: /clear all/i }));
       expect(demographics()?.sex).toEqual([]);
-
-      console.log("demos before: ", demographics());
 
       await userEvent.click(
         screen.getByRole("button", { name: /save selection and collapse/i }),
       );
-
-      console.log("demos after: ", demographics());
 
       expect(demographics()?.age).toEqual([30, MAX_AGE_FILTER]);
       expect(demographics()?.sex).toEqual([]);
