@@ -6,23 +6,25 @@ import { RuleLeafType } from "@/types/rules";
 import ConceptChip from "@/components/ConceptChip";
 import SquareCheckbox from "@/components/SquareCheckbox";
 import ErrorIcon from "@/components/ErrorIcon";
-import {
-  Button,
-  FormControlLabel,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Button, FormControlLabel, Stack, Typography } from "@mui/material";
 import DomainChip from "@/components/DomainChip/DomainChip";
 import { useCallback, useMemo, useState } from "react";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import useNodeActions from "@/hooks/useNodeActions";
-import { findRulesWithAlternatives, hasAlternatives, isRuleLeaf, updateById } from "@/utils/rules";
+import {
+  findRulesWithAlternatives,
+  hasAlternatives,
+  isRuleLeaf,
+  updateById,
+} from "@/utils/rules";
 import { useCohortBuilderContext } from "@/providers/CohortBuilderProvider";
 import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 
-interface RuleAlternativesProps
-  extends Omit<RuleWrapperProps, "node" | "type" | "render"> {
+interface RuleAlternativesProps extends Omit<
+  RuleWrapperProps,
+  "node" | "type" | "render"
+> {
   rule: RuleLeafType;
   groupId?: string;
 }
@@ -39,21 +41,26 @@ const RuleAlternatives = ({
 
   const { actions } = useNodeActions(rule);
 
-  const { queryBuilderJson, setQueryBuilderJson, showDescendants, isSelected, select, deselect } =
-    useQueryBuilder((qb) => ({
-      queryBuilderJson: qb.queryBuilderJson,
-      setQueryBuilderJson: qb.setQueryBuilderJson,
-      showDescendants: qb.showDescendants[id],
-      isSelected: !!qb.selected[id],
-      select: qb.select,
-      deselect: qb.deselect,
-    }));
+  const {
+    queryBuilderJson,
+    setQueryBuilderJson,
+    showDescendants,
+    isSelected,
+    select,
+    deselect,
+  } = useQueryBuilder((qb) => ({
+    queryBuilderJson: qb.queryBuilderJson,
+    setQueryBuilderJson: qb.setQueryBuilderJson,
+    showDescendants: qb.showDescendants[id],
+    isSelected: !!qb.selected[id],
+    select: qb.select,
+    deselect: qb.deselect,
+  }));
 
   const { scrollToNode } = useCohortBuilderContext();
 
   const conceptOptions = useMemo(
-    () =>
-      hasAlternatives(concept) ? [concept, ...concept.alternatives] : [],
+    () => (hasAlternatives(concept) ? [concept, ...concept.alternatives] : []),
     [concept],
   );
 
@@ -86,9 +93,9 @@ const RuleAlternatives = ({
   const clearAll = () => setSelectedConceptIds([]);
 
   const handleConfirm = useCallback(() => {
-    const otherAlternativeIds = findRulesWithAlternatives(queryBuilderJson.rules).filter(
-      (rid) => rid !== id,
-    );
+    const otherAlternativeIds = findRulesWithAlternatives(
+      queryBuilderJson.rules,
+    ).filter((rid) => rid !== id);
 
     const selected = conceptOptions.filter((c) =>
       selectedConceptIds.includes(c.concept_id),
@@ -99,9 +106,7 @@ const RuleAlternatives = ({
       };
       setConcept(single);
     } else if (selected.length > 1) {
-      setConcept(
-        selected.map(({ alternatives: _omit, ...c }) => c as Concept),
-      );
+      setConcept(selected.map(({ alternatives: _omit, ...c }) => c as Concept));
     }
 
     if (otherAlternativeIds.length > 0) {
@@ -110,7 +115,16 @@ const RuleAlternatives = ({
       select(nextId);
       scrollToNode(nextId);
     }
-  }, [conceptOptions, selectedConceptIds, setConcept, queryBuilderJson, id, deselect, select, scrollToNode]);
+  }, [
+    conceptOptions,
+    selectedConceptIds,
+    setConcept,
+    queryBuilderJson,
+    id,
+    deselect,
+    select,
+    scrollToNode,
+  ]);
 
   const handleDelete = useCallback(
     (toDelete: Concept) => {
@@ -147,7 +161,13 @@ const RuleAlternatives = ({
       py={0.75}
       gap={1}
     >
-      <Stack direction="row" alignItems="center" gap={1} flexShrink={1} minWidth={0}>
+      <Stack
+        direction="row"
+        alignItems="center"
+        gap={1}
+        flexShrink={1}
+        minWidth={0}
+      >
         <ErrorIcon />
         <Typography variant="body2" noWrap>
           A rule has alternatives, please select one or more concepts
@@ -193,7 +213,7 @@ const RuleAlternatives = ({
       headerExtra={<DomainChip concept={concept} />}
       renderFooter={footer}
       render={() => (
-        <Stack component="form" spacing={1} py={1}>
+        <Stack component="form" spacing="10px" py="10px">
           {conceptOptions.map((conceptOption) => (
             <Stack
               direction="row"
@@ -205,7 +225,9 @@ const RuleAlternatives = ({
                 <FormControlLabel
                   control={
                     <SquareCheckbox
-                      checked={selectedConceptIds.includes(conceptOption.concept_id)}
+                      checked={selectedConceptIds.includes(
+                        conceptOption.concept_id,
+                      )}
                       onChange={() => toggleConcept(conceptOption.concept_id)}
                       onClick={(e) => e.stopPropagation()}
                       sx={{ p: 0 }}

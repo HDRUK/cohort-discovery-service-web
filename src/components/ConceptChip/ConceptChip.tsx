@@ -128,7 +128,7 @@ export const ConceptChip = ({
           variant="outlined"
         />
       </ParentWrapper>
-      <IconButton onClick={onDelete}>
+      <IconButton onClick={onDelete} sx={{ px: 0.5, py: 0 }}>
         <CancelIcon />
       </IconButton>
       {children}
