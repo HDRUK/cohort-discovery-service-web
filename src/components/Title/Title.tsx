@@ -99,15 +99,14 @@ const Title = ({
             variant={subTitleVariant}
             component="span"
             noWrap={!subTitleWrap}
-            sx={{
+            sx={(theme) => ({
               mx: 1,
               // Color/Text/secondaryBlack / HDRUK - Library
-              // TO BE UPDATED WHEN COMPONENT LIBRARY IS OUT
-              color: "#3C3C3B",
+              color: theme.palette.secondaryBlack.main,
               ...(subTitleWrap
                 ? { flex: 1, minWidth: 0, whiteSpace: "normal" }
                 : { flexShrink: 0 }),
-            }}
+            })}
           >
             {subTitle}
           </Typography>

@@ -38,6 +38,9 @@ export const themeOptions: ThemeOptions = {
       dark: "#A29415",
       contrastText: "#3C3C3B",
     },
+    secondaryBlack: {
+      main: "#3C3C3B",
+    },
   },
   zIndex: {
     drawer: 2,

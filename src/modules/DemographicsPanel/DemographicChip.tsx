@@ -12,12 +12,12 @@ const DemographicChip = ({ label, field }: DemographicChipProps) => {
     <Chip
       variant="outlined"
       data-testid={`${field}-chip`}
-      sx={{
+      sx={(theme) => ({
         bgcolor: "white",
         // Color/Text/secondaryBlack / HDRUK - Library
-        color: "#3C3C3B",
+        color: theme.palette.secondaryBlack.main,
         fontWeight: "400",
-      }}
+      })}
       label={label}
     />
   );
