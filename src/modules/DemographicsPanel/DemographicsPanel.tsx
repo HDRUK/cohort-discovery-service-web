@@ -190,7 +190,7 @@ const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
 
           {(allOpen || activeField) && (
             <DemographicSaveButton
-              onReset={() => propsFor(activeField ?? "age").onReset}
+              onReset={propsFor(activeField ?? "age").onReset}
               onSave={propsFor(activeField ?? "age").onSave}
               allOpen={allOpen}
             />
