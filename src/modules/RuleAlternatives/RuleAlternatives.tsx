@@ -213,7 +213,12 @@ const RuleAlternatives = ({
       headerExtra={<DomainChip concept={concept} />}
       renderFooter={footer}
       render={() => (
-        <Stack component="form" spacing="10px" py="10px">
+        <Stack
+          component="form"
+          spacing="10px"
+          py="10px"
+          sx={{ maxHeight: 270, overflowY: "scroll" }}
+        >
           {conceptOptions.map((conceptOption) => (
             <Stack
               direction="row"
