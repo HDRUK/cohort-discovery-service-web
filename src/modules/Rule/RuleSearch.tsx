@@ -141,7 +141,7 @@ const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
           clearAll();
         }}
       >
-        Clear selection
+        Clear all
       </Button>
       <Button
         variant="contained"
