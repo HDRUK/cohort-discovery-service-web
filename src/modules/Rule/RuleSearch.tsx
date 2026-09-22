@@ -1,7 +1,7 @@
 "use client";
 
 import { Concept } from "@/types/api";
-import { Box, Button, Divider, Stack, Typography } from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import SearchConcepts from "@/components/SearchConcepts";
@@ -130,6 +130,34 @@ const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
     </Stack>
   ) : null;
 
+  const confirmButtons = isMultiSelect && hasOptions && (
+    <Stack direction="row" justifyContent="flex-end" gap={1} pt={1}>
+      <Button
+        variant="outlined"
+        color="secondary"
+        size="small"
+        onClick={(e) => {
+          e.stopPropagation();
+          clearAll();
+        }}
+      >
+        Clear selection
+      </Button>
+      <Button
+        variant="contained"
+        color="secondary"
+        size="small"
+        disabled={selectedConcepts.length < 1}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleConfirm();
+        }}
+      >
+        Confirm selection
+      </Button>
+    </Stack>
+  );
+
   return (
     <Box
       data-testid="rule-search-container"
@@ -150,37 +178,8 @@ const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
         // If we find that multi-select works fine, then need to delete this,
         // and other related single-select code in the future.
         // headerSlot={toggleRow}
+        confirmSlot={confirmButtons}
       />
-      {isMultiSelect && hasOptions && (
-        <>
-          <Divider />
-          <Stack direction="row" justifyContent="flex-end" gap={1} pt={1}>
-            <Button
-              variant="outlined"
-              color="secondary"
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                clearAll();
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
-              size="small"
-              disabled={selectedConcepts.length < 1}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleConfirm();
-              }}
-            >
-              Confirm selection
-            </Button>
-          </Stack>
-        </>
-      )}
     </Box>
   );
 };
