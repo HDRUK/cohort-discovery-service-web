@@ -174,7 +174,10 @@ const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
         onToggle={isMultiSelect ? handleOnToggle : undefined}
         onClick={!isMultiSelect ? handleSingleSelect : undefined}
         onHasOptions={setHasOptions}
-        headerSlot={toggleRow}
+        // Commented out option to toggle between single/multi-select modes.
+        // If we find that multi-select works fine, then need to delete this,
+        // and other related single-select code in the future.
+        // headerSlot={toggleRow}
         confirmSlot={confirmButtons}
       />
     </Box>
