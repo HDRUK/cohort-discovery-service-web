@@ -81,7 +81,7 @@ const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
     onSave: handleConfirm,
     onDiscard: () => {
       clearAll();
-      setIsMultiSelect(false);
+      setIsMultiSelect(true);
     },
     saveText: "Confirm selection",
     discardText: "Discard",
@@ -97,7 +97,7 @@ const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
        */
       // eslint-disable-next-line react-hooks/set-state-in-effect
       clearAll();
-      setIsMultiSelect(false);
+      setIsMultiSelect(true);
     }
   }, [isSelected, clearAll]);
 
