@@ -89,20 +89,19 @@ export default function TopMenu() {
         href: routes.help(),
         route: routes.help(),
         page: null,
-        // Tooltip turned off for now, to be reimplemented with the component library
-        // The icon used to be wrapped in:
-        // <HelpTooltip
-        //   title="Tool guidance can be found here"
-        //   placement="left"
-        //   open={(helpTooltipOpen && !!user) || helpHoverOpen}
-        //   onOpen={() => setHelpHoverOpen(true)}
-        //   onClose={() => {
-        //     setHelpHoverOpen(false);
-        //     setHelpTooltipOpen(false);
-        //   }}
-        //   sx={{ zIndex: 1250 }}
-        // >
-        icon: <HelpIcon />,
+        icon: (
+          <HelpTooltip
+            title={
+              <Typography component="span" fontWeight={700}>
+                Tool guidance can be found here
+              </Typography>
+            }
+            placement="left"
+            sx={{ zIndex: 1250 }}
+          >
+            <HelpIcon />
+          </HelpTooltip>
+        ),
         iconOnly: true,
         alignRight: true,
       },
