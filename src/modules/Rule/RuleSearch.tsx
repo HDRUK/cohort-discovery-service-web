@@ -107,28 +107,31 @@ const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
     clearAll();
   }, [clearAll]);
 
-  const toggleRow = hasOptions ? (
-    <Stack
-      direction="row"
-      justifyContent="flex-start"
-      alignItems="center"
-      py={0.75}
-    >
-      <Typography variant="body2" color="text.secondary">
-        {isMultiSelect
-          ? "Want to select only one at a time?"
-          : "Want to select more at once?"}
-      </Typography>
-      <Button
-        variant="text"
-        size="small"
-        color="secondary"
-        onClick={isMultiSelect ? switchToSingle : switchToMulti}
-      >
-        {isMultiSelect ? "Enable Single-select" : "Enable Multi-select"}
-      </Button>
-    </Stack>
-  ) : null;
+  // Commenting out the single/multi-select toggle panel
+  // until we figure out whether multi-select-only works well
+  //
+  // const toggleRow = hasOptions ? (
+  //   <Stack
+  //     direction="row"
+  //     justifyContent="flex-start"
+  //     alignItems="center"
+  //     py={0.75}
+  //   >
+  //     <Typography variant="body2" color="text.secondary">
+  //       {isMultiSelect
+  //         ? "Want to select only one at a time?"
+  //         : "Want to select more at once?"}
+  //     </Typography>
+  //     <Button
+  //       variant="text"
+  //       size="small"
+  //       color="secondary"
+  //       onClick={isMultiSelect ? switchToSingle : switchToMulti}
+  //     >
+  //       {isMultiSelect ? "Enable Single-select" : "Enable Multi-select"}
+  //     </Button>
+  //   </Stack>
+  // ) : null;
 
   const confirmButtons = isMultiSelect && hasOptions && (
     <Stack direction="row" justifyContent="flex-end" gap={1} pt={1}>
