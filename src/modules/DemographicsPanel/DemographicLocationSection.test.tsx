@@ -8,6 +8,9 @@ import {
 } from "@/store/queryBuilderStore";
 import { Demographics } from "@/types/rules";
 import DemographicLocationSection from "./DemographicLocationSection";
+import { HdrukUiProvider } from "@hdruk/ui";
+import { themeOptions } from "@/config/theme";
+import { ThemeOptions } from "@mui/material";
 
 // The real picker pulls in leaflet (touches `window` at import) — replace it
 // with a light stub and make next/dynamic return it synchronously.
@@ -50,17 +53,19 @@ const Harness = ({
   });
 
   return (
-    <FormProvider {...form}>
-      <DemographicLocationSection
-        editing={editing}
-        locationAvailable={locationAvailable}
-        disabled={false}
-        hideActions={false}
-        onEditStart={() => {}}
-        onSave={onSave}
-        onReset={onReset}
-      />
-    </FormProvider>
+    <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
+      <FormProvider {...form}>
+        <DemographicLocationSection
+          editing={editing}
+          locationAvailable={locationAvailable}
+          disabled={false}
+          hideActions={false}
+          onEditStart={() => {}}
+          onSave={onSave}
+          onReset={onReset}
+        />
+      </FormProvider>
+    </HdrukUiProvider>
   );
 };
 
