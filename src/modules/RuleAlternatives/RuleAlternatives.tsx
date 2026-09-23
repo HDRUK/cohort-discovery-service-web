@@ -20,6 +20,7 @@ import {
 import { useCohortBuilderContext } from "@/providers/CohortBuilderProvider";
 import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
+import { DEFAULT_SEARCH_RESULTS_MAX_HEIGHT } from "@/config/defaults";
 
 interface RuleAlternativesProps extends Omit<
   RuleWrapperProps,
@@ -217,7 +218,10 @@ const RuleAlternatives = ({
           component="form"
           spacing="10px"
           py="10px"
-          sx={{ maxHeight: 270, overflowY: "scroll" }}
+          sx={{
+            maxHeight: DEFAULT_SEARCH_RESULTS_MAX_HEIGHT,
+            overflowY: "scroll",
+          }}
         >
           {conceptOptions.map((conceptOption) => (
             <Stack
