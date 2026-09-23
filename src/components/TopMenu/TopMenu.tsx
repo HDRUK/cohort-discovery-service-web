@@ -31,6 +31,7 @@ export default function TopMenu() {
 
   useEffect(() => {
     if (!dismissed) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setOpenTDTooltip(true);
     }
 
