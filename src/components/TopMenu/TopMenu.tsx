@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { usePathname } from "next/navigation";
 
 import TabsShell from "@/components/TabsShell";
@@ -13,20 +13,33 @@ import HelpTooltip from "../HelpTooltip";
 import { useApplicationMode } from "@/providers/ApplicationModeProvider";
 import { TermDirectoryIcon } from "@/icons/TermDirectoryIcon";
 import { Stack, Typography } from "@mui/material";
+import { useUiPreferences } from "@/store/uiPreferencesStore";
 
 export default function TopMenu() {
   const pathname = usePathname();
   const user = useUserStore((s) => s.user);
   const { isStandalone } = useApplicationMode();
 
-  const [openTDTooltip, setOpenTDTooltip] = useState(true);
+  const dismissed = useUiPreferences((s) => s.dismissed.termDirectoryTooltip);
+  const dismiss = useUiPreferences((s) => s.dismiss);
+  const dismissTooltip = useCallback(
+    () => dismiss("termDirectoryTooltip"),
+    [dismiss],
+  );
+
+  const [openTDTooltip, setOpenTDTooltip] = useState(false);
 
   useEffect(() => {
+    if (!dismissed) {
+      setOpenTDTooltip(true);
+    }
+
     const id = setTimeout(() => {
       setOpenTDTooltip(false);
+      dismissTooltip();
     }, 10000);
     return () => clearTimeout(id);
-  }, []);
+  }, [dismissTooltip, dismissed]);
 
   const userCustodians = useMemo(
     () => user?.custodians ?? [],
@@ -122,7 +135,7 @@ export default function TopMenu() {
               </Stack>
             }
             placement="left"
-            open={openTDTooltip && !!user}
+            open={(openTDTooltip && !!user) || !dismissed}
             onOpen={() => setOpenTDTooltip(true)}
             onClose={() => setOpenTDTooltip(false)}
             sx={{ zIndex: 1250 }}
@@ -136,7 +149,7 @@ export default function TopMenu() {
     ];
 
     return baseTabs;
-  }, [isStandalone, openTDTooltip, user, userCustodians]);
+  }, [dismissed, isStandalone, openTDTooltip, user, userCustodians]);
 
   const currentTabValue =
     tabs.find((tab) => {
