@@ -1,7 +1,7 @@
 "use client";
 
 import { Concept } from "@/types/api";
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { Box, Button, Stack } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import SearchConcepts from "@/components/SearchConcepts";
@@ -101,15 +101,15 @@ const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
     }
   }, [isSelected, clearAll]);
 
-  const switchToMulti = useCallback(() => setIsMultiSelect(true), []);
-  const switchToSingle = useCallback(() => {
-    setIsMultiSelect(false);
-    clearAll();
-  }, [clearAll]);
-
-  // Commenting out the single/multi-select toggle panel
+  // Commenting out the single/multi-select toggle related behavior
   // until we figure out whether multi-select-only works well
   //
+  // const switchToMulti = useCallback(() => setIsMultiSelect(true), []);
+  // const switchToSingle = useCallback(() => {
+  //   setIsMultiSelect(false);
+  //   clearAll();
+  // }, [clearAll]);
+
   // const toggleRow = hasOptions ? (
   //   <Stack
   //     direction="row"
