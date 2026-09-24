@@ -18,7 +18,6 @@ import { trueKeys } from "@/utils/numbers";
 import SquareRadio from "../SquareRadio";
 import useHoverable from "@/hooks/useHoverable";
 import { useCohortBuilderContext } from "@/providers/CohortBuilderProvider";
-import { useCallback } from "react";
 
 type HierarchyItemProps = {
   node: RuleNodeType;
