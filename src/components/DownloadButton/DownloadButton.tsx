@@ -17,6 +17,7 @@ export interface DownloadButtonProps extends Omit<
   entity?: string;
   formats?: AvailableFormats[];
   isIcon?: boolean;
+  isTermDirectory?: boolean;
 }
 
 const DownloadButton = ({
@@ -25,10 +26,30 @@ const DownloadButton = ({
   formats = [AvailableFormats.JSON],
   disabled,
   isIcon = true,
+  isTermDirectory,
 }: DownloadButtonProps) => {
   const notify = useNotify();
 
   const download = async (format: AvailableFormats) => {
+    // this could be made more concise without duplicated code?
+    if (isTermDirectory) {
+      const url = "/api/download/term-directory";
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.target = "_self";
+      a.rel = "noopener noreferrer";
+      document.body.appendChild(a);
+      setTimeout(() => {
+        a.click();
+        notify.success(
+          `Export of term directory data as ${format} has started`,
+        );
+      }, 100);
+
+      return;
+    }
+
     if (disabled || !ids || ids.length === 0 || !entity) return;
     ids.map((id, idx) => {
       const url = `/api/download/${encodeURIComponent(
