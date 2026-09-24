@@ -1,13 +1,14 @@
 "use client";
 
 import { Controller, useFormContext } from "react-hook-form";
-import { Box, Chip } from "@mui/material";
+import { Box } from "@mui/material";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { MAX_AGE_FILTER, MIN_AGE_FILTER } from "@/config/rules";
 import { Demographics } from "@/types/rules";
 import AgeRangeInput from "@/components/RuleAgeSelector/AgeRangeInput";
 import DemographicRow, { DemographicRowActionProps } from "./DemographicRow";
 import { formatAgeSummary } from "./summary";
+import DemographicChip from "./DemographicChip";
 
 const DEFAULT_AGE_RANGE: [number, number] = [MIN_AGE_FILTER, MAX_AGE_FILTER];
 
@@ -47,11 +48,7 @@ const DemographicAgeSection = (props: DemographicRowActionProps) => {
         </Box>
       }
     >
-      <Chip
-        variant="outlined"
-        sx={{ bgcolor: "white" }}
-        label={formatAgeSummary(age)}
-      />
+      <DemographicChip label={formatAgeSummary(age)} field="age" />
     </DemographicRow>
   );
 };

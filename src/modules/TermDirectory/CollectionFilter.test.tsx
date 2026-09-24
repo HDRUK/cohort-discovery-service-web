@@ -5,6 +5,9 @@ import CollectionFilter from "./CollectionFilter";
 import { DefaultProvider } from "@/providers/DefaultProvider";
 import { getMockCollection } from "@/actions/collection/__mocks__/getCollections";
 import { useUserDataStore } from "@/hooks/userDataStore";
+import { HdrukUiProvider } from "@hdruk/ui";
+import { themeOptions } from "@/config/theme";
+import { ThemeOptions } from "@mui/material";
 
 const mockReplace = jest.fn();
 let mockSearchParams = new URLSearchParams();
@@ -26,7 +29,9 @@ const collections = [
 const renderComponent = () =>
   render(
     <DefaultProvider>
-      <CollectionFilter />
+      <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
+        <CollectionFilter />
+      </HdrukUiProvider>
     </DefaultProvider>,
   );
 

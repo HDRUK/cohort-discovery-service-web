@@ -8,6 +8,9 @@ import {
 } from "@/store/queryBuilderStore";
 import { Demographics } from "@/types/rules";
 import DemographicLocationSection from "./DemographicLocationSection";
+import { HdrukUiProvider } from "@hdruk/ui";
+import { themeOptions } from "@/config/theme";
+import { ThemeOptions } from "@mui/material";
 
 // The real picker pulls in leaflet (touches `window` at import) — replace it
 // with a light stub and make next/dynamic return it synchronously.
@@ -38,7 +41,6 @@ const Harness = ({
   locationAvailable = true,
   onSave = jest.fn(),
   onReset = jest.fn(),
-  onClear = jest.fn(),
 }: {
   editing?: boolean;
   locationAvailable?: boolean;
@@ -51,18 +53,19 @@ const Harness = ({
   });
 
   return (
-    <FormProvider {...form}>
-      <DemographicLocationSection
-        editing={editing}
-        locationAvailable={locationAvailable}
-        disabled={false}
-        hideActions={false}
-        onEditStart={() => {}}
-        onSave={onSave}
-        onReset={onReset}
-        onClear={onClear}
-      />
-    </FormProvider>
+    <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
+      <FormProvider {...form}>
+        <DemographicLocationSection
+          editing={editing}
+          locationAvailable={locationAvailable}
+          disabled={false}
+          hideActions={false}
+          onEditStart={() => {}}
+          onSave={onSave}
+          onReset={onReset}
+        />
+      </FormProvider>
+    </HdrukUiProvider>
   );
 };
 
@@ -81,9 +84,7 @@ describe("DemographicLocationSection", () => {
   it("summarises a set location, falling back to the full address when no postcode can be extracted", () => {
     setLondon();
     render(<Harness />);
-    expect(
-      screen.getByText("Within 50.0 km of London"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Within 50.0 km of London")).toBeInTheDocument();
   });
 
   it("truncates the address to its postcode when the address contains one", () => {
@@ -98,9 +99,7 @@ describe("DemographicLocationSection", () => {
       },
     });
     render(<Harness />);
-    expect(
-      screen.getByText("Within 50.0 km of SW1A 2AA"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Within 50.0 km of SW1A 2AA")).toBeInTheDocument();
   });
 
   it("reveals the map picker and guidance when editing", async () => {
@@ -115,9 +114,6 @@ describe("DemographicLocationSection", () => {
       "data-map-height",
       "300",
     );
-    expect(
-      screen.getByRole("button", { name: /save selection and collapse/i }),
-    ).toBeInTheDocument();
   });
 
   it("explains that location is unavailable instead of showing the picker", () => {
@@ -135,9 +131,9 @@ describe("DemographicLocationSection", () => {
 
   it("clears the location via Clear all", async () => {
     setLondon();
-    const onClear = jest.fn();
-    render(<Harness onClear={onClear} />);
+    const onReset = jest.fn();
+    render(<Harness onReset={onReset} />);
     await userEvent.click(screen.getByRole("button", { name: /clear all/i }));
-    expect(onClear).toHaveBeenCalled();
+    expect(onReset).toHaveBeenCalled();
   });
 });
