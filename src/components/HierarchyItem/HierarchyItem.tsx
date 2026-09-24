@@ -17,6 +17,8 @@ import useNodeActions from "@/hooks/useNodeActions";
 import { trueKeys } from "@/utils/numbers";
 import SquareRadio from "../SquareRadio";
 import useHoverable from "@/hooks/useHoverable";
+import { useCohortBuilderContext } from "@/providers/CohortBuilderProvider";
+import { useCallback } from "react";
 
 type HierarchyItemProps = {
   node: RuleNodeType;
@@ -70,6 +72,8 @@ export const HierarchyItem = ({
 
   const isGroup = isRuleGroup(node) && node.rules.length > 0;
 
+  const { scrollToNode } = useCohortBuilderContext();
+
   const toggleCheckbox = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -79,6 +83,7 @@ export const HierarchyItem = ({
 
     const nextParent = !selected[node.id];
     toggleSelected(node.id, !isShift);
+    scrollToNode(node.id);
     if (!isRuleGroup(node)) return;
 
     node.rules.forEach((r) => {
