@@ -1,11 +1,10 @@
 "use client";
 
 import { Concept } from "@/types/api";
-import { Box, Button, Divider, Stack, Typography } from "@mui/material";
+import { Box, Button, Stack } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import SearchConcepts from "@/components/SearchConcepts";
-import SelectedConceptsPanel from "@/components/SelectedConceptsPanel";
 import { useSaveChanges } from "@/hooks/useSaveChanges";
 
 type FormValues = { concepts: Record<number, Concept> };
@@ -17,7 +16,7 @@ interface RuleSearchProps {
 }
 
 const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
-  const [isMultiSelect, setIsMultiSelect] = useState(false);
+  const [isMultiSelect, setIsMultiSelect] = useState(true);
   const [hasOptions, setHasOptions] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Record<number, boolean>>({});
 
@@ -53,24 +52,6 @@ const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
     reset({ concepts: {} });
   }, [reset]);
 
-  const handleRemove = useCallback(
-    (concept: Concept) => {
-      setSelectedIds((prev) => {
-        const next = { ...prev };
-        delete next[concept.concept_id];
-        return next;
-      });
-      const next = { ...conceptsMap };
-      delete next[concept.concept_id];
-      if (Object.keys(next).length === 0) {
-        reset({ concepts: {} });
-      } else {
-        setValue("concepts", next, { shouldDirty: true });
-      }
-    },
-    [conceptsMap, setValue, reset],
-  );
-
   const handleConfirm = useCallback(() => {
     const clean = selectedConcepts.map(
       ({ alternatives: _omit, ...c }) => c as Concept,
@@ -100,7 +81,7 @@ const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
     onSave: handleConfirm,
     onDiscard: () => {
       clearAll();
-      setIsMultiSelect(false);
+      setIsMultiSelect(true);
     },
     saveText: "Confirm selection",
     discardText: "Discard",
@@ -116,38 +97,69 @@ const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
        */
       // eslint-disable-next-line react-hooks/set-state-in-effect
       clearAll();
-      setIsMultiSelect(false);
+      setIsMultiSelect(true);
     }
   }, [isSelected, clearAll]);
 
-  const switchToMulti = useCallback(() => setIsMultiSelect(true), []);
-  const switchToSingle = useCallback(() => {
-    setIsMultiSelect(false);
-    clearAll();
-  }, [clearAll]);
+  // Commenting out the single/multi-select toggle related behavior
+  // until we figure out whether multi-select-only works well
+  //
+  // const switchToMulti = useCallback(() => setIsMultiSelect(true), []);
+  // const switchToSingle = useCallback(() => {
+  //   setIsMultiSelect(false);
+  //   clearAll();
+  // }, [clearAll]);
 
-  const toggleRow = hasOptions ? (
-    <Stack
-      direction="row"
-      justifyContent="flex-start"
-      alignItems="center"
-      py={0.75}
-    >
-      <Typography variant="body2" color="text.secondary">
-        {isMultiSelect
-          ? "Want to select only one at a time?"
-          : "Want to select more at once?"}
-      </Typography>
+  // const toggleRow = hasOptions ? (
+  //   <Stack
+  //     direction="row"
+  //     justifyContent="flex-start"
+  //     alignItems="center"
+  //     py={0.75}
+  //   >
+  //     <Typography variant="body2" color="text.secondary">
+  //       {isMultiSelect
+  //         ? "Want to select only one at a time?"
+  //         : "Want to select more at once?"}
+  //     </Typography>
+  //     <Button
+  //       variant="text"
+  //       size="small"
+  //       color="secondary"
+  //       onClick={isMultiSelect ? switchToSingle : switchToMulti}
+  //     >
+  //       {isMultiSelect ? "Enable Single-select" : "Enable Multi-select"}
+  //     </Button>
+  //   </Stack>
+  // ) : null;
+
+  const confirmButtons = isMultiSelect && hasOptions && (
+    <Stack direction="row" justifyContent="flex-end" gap={1} pt={1}>
       <Button
-        variant="text"
-        size="small"
+        variant="outlined"
         color="secondary"
-        onClick={isMultiSelect ? switchToSingle : switchToMulti}
+        size="small"
+        onClick={(e) => {
+          e.stopPropagation();
+          clearAll();
+        }}
       >
-        {isMultiSelect ? "Enable Single-select" : "Enable Multi-select"}
+        Clear all
+      </Button>
+      <Button
+        variant="contained"
+        color="secondary"
+        size="small"
+        disabled={selectedConcepts.length < 1}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleConfirm();
+        }}
+      >
+        Confirm selection
       </Button>
     </Stack>
-  ) : null;
+  );
 
   return (
     <Box
@@ -165,44 +177,12 @@ const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
         onToggle={isMultiSelect ? handleOnToggle : undefined}
         onClick={!isMultiSelect ? handleSingleSelect : undefined}
         onHasOptions={setHasOptions}
-        headerSlot={toggleRow}
+        // Commented out option to toggle between single/multi-select modes.
+        // If we find that multi-select works fine, then need to delete this,
+        // and other related single-select code in the future.
+        // headerSlot={toggleRow}
+        confirmSlot={confirmButtons}
       />
-      {isMultiSelect && hasOptions && (
-        <>
-          <Divider sx={{ mt: 1 }} />
-          <SelectedConceptsPanel
-            concepts={selectedConcepts}
-            onRemove={handleRemove}
-            onClearAll={clearAll}
-          />
-          <Divider sx={{ mt: 1 }} />
-          <Stack direction="row" justifyContent="flex-end" gap={1} pt={1}>
-            <Button
-              variant="outlined"
-              color="secondary"
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                clearAll();
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
-              size="small"
-              disabled={selectedConcepts.length < 1}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleConfirm();
-              }}
-            >
-              Confirm selection
-            </Button>
-          </Stack>
-        </>
-      )}
     </Box>
   );
 };
