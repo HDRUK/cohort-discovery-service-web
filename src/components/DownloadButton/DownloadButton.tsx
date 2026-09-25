@@ -43,7 +43,8 @@ const DownloadButton = ({
       setTimeout(() => {
         a.click();
         notify.success(
-          `Export of term directory data as ${format} has started`,
+          `Downloading has started. Please allow up to a minute for the data generate.`,
+          5000,
         );
       }, 100);
 
