@@ -254,7 +254,10 @@ const RuleWrapper = ({
               {...(sortable ? listeners : {})}
               sx={dragButtonSx}
             >
-              <DragIndicator fontSize="small" sx={dragIconSx(effectiveIsDragging)} />
+              <DragIndicator
+                fontSize="small"
+                sx={dragIconSx(effectiveIsDragging)}
+              />
             </IconButton>
           </Fade>
         </Collapse>
@@ -386,10 +389,12 @@ const RuleWrapper = ({
                 {showFooter && <Divider variant="fullWidth" />}
                 <Box
                   minHeight={
-                    type === DragType.Rule && isSelected && !isAgeFilter(node) ? 40 : 0
+                    type === DragType.Rule && isSelected && !isAgeFilter(node)
+                      ? 40
+                      : 0
                   }
                 >
-                  {(isSelected && renderFooter) ||
+                  {renderFooter ||
                     (!valid && (
                       <InvalidRule
                         reasons={invalidReason ?? []}
@@ -411,7 +416,10 @@ const RuleWrapper = ({
             sx={{ display: "flex", alignItems: "center" }}
           >
             <IconButton aria-label="Drag" size="small" sx={{ opacity: 0 }}>
-              <DragIndicator fontSize="small" sx={dragIconSx(effectiveIsDragging)} />
+              <DragIndicator
+                fontSize="small"
+                sx={dragIconSx(effectiveIsDragging)}
+              />
             </IconButton>
           </Collapse>
         )}

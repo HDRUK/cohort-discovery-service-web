@@ -21,6 +21,7 @@ import { useCohortBuilderContext } from "@/providers/CohortBuilderProvider";
 import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import { DEFAULT_SEARCH_RESULTS_MAX_HEIGHT } from "@/config/defaults";
+import { mergeSx } from "@/utils/helpers";
 
 interface RuleAlternativesProps extends Omit<
   RuleWrapperProps,
@@ -170,8 +171,14 @@ const RuleAlternatives = ({
         minWidth={0}
       >
         <ErrorIcon />
-        <Typography variant="body2" noWrap>
-          A rule has alternatives, please select one or more concepts
+        <Typography
+          variant="body2"
+          noWrap
+          sx={mergeSx({ fontSize: 16 }, !isSelected ? { fontWeight: 700 } : {})}
+        >
+          {isSelected
+            ? "A rule has alternatives, please select one or more concepts"
+            : "Please confirm or clear your changes before continuing"}
         </Typography>
       </Stack>
       <Stack direction="row" gap={1} flexShrink={0}>
@@ -230,22 +237,20 @@ const RuleAlternatives = ({
               key={conceptOption.concept_id}
               spacing={1}
             >
-              {isSelected && (
-                <FormControlLabel
-                  control={
-                    <SquareCheckbox
-                      checked={selectedConceptIds.includes(
-                        conceptOption.concept_id,
-                      )}
-                      onChange={() => toggleConcept(conceptOption.concept_id)}
-                      onClick={(e) => e.stopPropagation()}
-                      sx={{ p: 0 }}
-                    />
-                  }
-                  label=""
-                  sx={{ m: 0 }}
-                />
-              )}
+              <FormControlLabel
+                control={
+                  <SquareCheckbox
+                    checked={selectedConceptIds.includes(
+                      conceptOption.concept_id,
+                    )}
+                    onChange={() => toggleConcept(conceptOption.concept_id)}
+                    onClick={(e) => e.stopPropagation()}
+                    sx={{ p: 0 }}
+                  />
+                }
+                label=""
+                sx={{ m: 0 }}
+              />
               <ConceptChip
                 indicateIfParent={showDescendants}
                 concept={conceptOption}
