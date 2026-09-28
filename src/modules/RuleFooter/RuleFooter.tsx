@@ -1,0 +1,118 @@
+import ErrorIcon from "@/components/ErrorIcon";
+import InvalidRule from "@/components/InvalidRule";
+import { Concept } from "@/types/api";
+import { RuleLeafType } from "@/types/rules";
+import { mergeSx } from "@/utils/helpers";
+import { Button, Stack, Typography } from "@mui/material";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useMemo,
+  useState,
+} from "react";
+import {
+  Control,
+  useForm,
+  UseFormReset,
+  UseFormSetValue,
+  useWatch,
+} from "react-hook-form";
+
+interface RuleSearchProps {
+  customInvalidRule: boolean;
+  handleConfirm: () => void;
+  clearAll: () => void;
+  rule: RuleLeafType;
+  selectedConceptsLength: number;
+  isSelected: boolean;
+  hasOptions?: boolean;
+  isNLP?: boolean;
+  // setHasOptions?: Dispatch<SetStateAction<boolean>>;
+  // selectedIds?: Record<number, boolean>;
+  // setSelectedIds?: Dispatch<SetStateAction<Record<number, boolean>>>;
+  // control?: Control<FormValues, unknown, FormValues>;
+  // setValue?: UseFormSetValue<FormValues>;
+  // reset?: UseFormReset<FormValues>;
+  // conceptsMap?: Record<number, Concept>;
+}
+
+const RuleFooter = ({
+  customInvalidRule,
+  handleConfirm,
+  clearAll,
+  rule,
+  selectedConceptsLength = 0,
+  isSelected,
+  hasOptions,
+  isNLP,
+}: RuleSearchProps) => {
+  return (
+    <Stack
+      direction="row"
+      alignItems="center"
+      justifyContent="space-between"
+      px={1}
+      py={0.75}
+      gap={1}
+    >
+      {customInvalidRule ? (
+        <Stack
+          direction="row"
+          alignItems="center"
+          gap={1}
+          flexShrink={1}
+          minWidth={0}
+        >
+          <ErrorIcon />
+          <Typography
+            variant="body2"
+            noWrap
+            sx={mergeSx(
+              { fontSize: 16 },
+              !isSelected ? { fontWeight: 700 } : {},
+            )}
+          >
+            {isSelected
+              ? "A rule has alternatives, please select one or more concepts"
+              : "Please confirm or clear your changes before continuing"}
+          </Typography>
+        </Stack>
+      ) : (
+        <InvalidRule
+          reasons={rule.invalidReason ?? []}
+          stackProps={{ sx: { pt: 1, pb: 1 } }}
+        />
+      )}
+      {(hasOptions || isNLP) && (
+        <Stack direction="row" justifyContent="flex-end" gap={1} pt={1}>
+          <Button
+            variant="outlined"
+            color="secondary"
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              clearAll();
+            }}
+          >
+            Clear all
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+            size="small"
+            disabled={selectedConceptsLength < 1}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleConfirm();
+            }}
+          >
+            Confirm selection
+          </Button>
+        </Stack>
+      )}
+    </Stack>
+  );
+};
+
+export default RuleFooter;

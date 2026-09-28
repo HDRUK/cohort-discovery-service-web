@@ -2,8 +2,21 @@
 
 import { Concept } from "@/types/api";
 import { Box, Button, Stack } from "@mui/material";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import {
+  Control,
+  useForm,
+  UseFormReset,
+  UseFormSetValue,
+  useWatch,
+} from "react-hook-form";
 import SearchConcepts from "@/components/SearchConcepts";
 import { useSaveChanges } from "@/hooks/useSaveChanges";
 
@@ -11,24 +24,27 @@ type FormValues = { concepts: Record<number, Concept> };
 
 interface RuleSearchProps {
   onConfirm: (concept: Concept | Concept[]) => void;
-  isSelected?: boolean;
   onSelect?: () => void;
+  conceptsMap: Record<number, Concept>;
+  control: Control<FormValues, unknown, FormValues>;
+  setValue: UseFormSetValue<FormValues>;
+  reset: UseFormReset<FormValues>;
+  selectedIds: Record<number, boolean>;
+  setSelectedIds: Dispatch<SetStateAction<Record<number, boolean>>>;
+  setHasOptions: Dispatch<SetStateAction<boolean>>;
 }
 
-const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
+const RuleSearch = ({
+  onConfirm,
+  onSelect,
+  conceptsMap,
+  setValue,
+  reset,
+  selectedIds,
+  setSelectedIds,
+  setHasOptions,
+}: RuleSearchProps) => {
   const [isMultiSelect, setIsMultiSelect] = useState(true);
-  const [hasOptions, setHasOptions] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<Record<number, boolean>>({});
-
-  const { control, setValue, reset } = useForm<FormValues>({
-    defaultValues: { concepts: {} },
-  });
-
-  const conceptsMap = useWatch({ control, name: "concepts", defaultValue: {} });
-  const selectedConcepts = useMemo(
-    () => Object.values(conceptsMap),
-    [conceptsMap],
-  );
 
   const handleOnToggle = useCallback(
     (concept: Concept, toggled: boolean) => {
@@ -47,24 +63,6 @@ const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
     [conceptsMap, setValue, reset],
   );
 
-  const clearAll = useCallback(() => {
-    setSelectedIds({});
-    reset({ concepts: {} });
-  }, [reset]);
-
-  const handleConfirm = useCallback(() => {
-    const clean = selectedConcepts.map(
-      ({ alternatives: _omit, ...c }) => c as Concept,
-    );
-    if (clean.length === 1) {
-      onConfirm(clean[0]);
-    } else if (clean.length > 1) {
-      onConfirm(clean);
-    }
-    reset({ concepts: {} });
-    setSelectedIds({});
-  }, [selectedConcepts, onConfirm, reset]);
-
   const handleSingleSelect = useCallback(
     (concept: Concept) => {
       const { alternatives: _omit, ...clean } = concept as Concept & {
@@ -75,31 +73,19 @@ const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
     [onConfirm],
   );
 
-  useSaveChanges({
-    control,
-    entityName: "rule selection",
-    onSave: handleConfirm,
-    onDiscard: () => {
-      clearAll();
-      setIsMultiSelect(true);
-    },
-    saveText: "Confirm selection",
-    discardText: "Discard",
-    showChanges: false,
-  });
-
-  useEffect(() => {
-    if (!isSelected) {
-      /*
-       * Intentional exception to react-hooks/set-state-in-effect:
-       * isSelected is external prop state — when the rule card loses selection,
-       * pending multi-select choices and the search mode must reset silently.
-       */
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      clearAll();
-      setIsMultiSelect(true);
-    }
-  }, [isSelected, clearAll]);
+  // Unsure if this is necessary? Seems to work without it
+  // useSaveChanges({
+  //   control,
+  //   entityName: "rule selection",
+  //   onSave: handleConfirm,
+  //   onDiscard: () => {
+  //     clearAll();
+  //     setIsMultiSelect(true);
+  //   },
+  //   saveText: "Confirm selection",
+  //   discardText: "Discard",
+  //   showChanges: false,
+  // });
 
   // Commenting out the single/multi-select toggle related behavior
   // until we figure out whether multi-select-only works well
@@ -133,34 +119,6 @@ const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
   //   </Stack>
   // ) : null;
 
-  const confirmButtons = isMultiSelect && hasOptions && (
-    <Stack direction="row" justifyContent="flex-end" gap={1} pt={1}>
-      <Button
-        variant="outlined"
-        color="secondary"
-        size="small"
-        onClick={(e) => {
-          e.stopPropagation();
-          clearAll();
-        }}
-      >
-        Clear all
-      </Button>
-      <Button
-        variant="contained"
-        color="secondary"
-        size="small"
-        disabled={selectedConcepts.length < 1}
-        onClick={(e) => {
-          e.stopPropagation();
-          handleConfirm();
-        }}
-      >
-        Confirm selection
-      </Button>
-    </Stack>
-  );
-
   return (
     <Box
       data-testid="rule-search-container"
@@ -181,7 +139,6 @@ const RuleSearch = ({ onConfirm, isSelected, onSelect }: RuleSearchProps) => {
         // If we find that multi-select works fine, then need to delete this,
         // and other related single-select code in the future.
         // headerSlot={toggleRow}
-        confirmSlot={confirmButtons}
       />
     </Box>
   );

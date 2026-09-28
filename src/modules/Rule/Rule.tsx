@@ -2,7 +2,7 @@ import { Box } from "@mui/material";
 import { DragType } from "@/types/dnd";
 import DomainChip from "@/components/DomainChip/DomainChip";
 import { Concept } from "@/types/api";
-import { useCallback } from "react";
+import { useCallback, useMemo, useState } from "react";
 import ConceptChip from "@/components/ConceptChip";
 import { RuleLeafType, SingleSidedOperator } from "@/types/rules";
 import RuleSearch from "./RuleSearch";
@@ -18,6 +18,8 @@ import {
 import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import useNodeActions from "@/hooks/useNodeActions";
+import RuleFooter from "../RuleFooter";
+import { useForm, useWatch } from "react-hook-form";
 
 export interface RuleProps extends Omit<
   RuleWrapperProps,
@@ -54,6 +56,27 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     [id, showDescendants, setShowDescendants],
   );
 
+  const [hasOptions, setHasOptions] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Record<number, boolean>>({});
+
+  type FormValues = { concepts: Record<number, Concept> };
+
+  const { control, setValue, reset } = useForm<FormValues>({
+    defaultValues: { concepts: {} },
+  });
+
+  const conceptsMap = useWatch({ control, name: "concepts", defaultValue: {} });
+
+  const selectedConcepts = useMemo(
+    () => Object.values(conceptsMap),
+    [conceptsMap],
+  );
+
+  const clearAll = useCallback(() => {
+    setSelectedIds({});
+    reset({ concepts: {} });
+  }, [reset]);
+
   const setConcept = useCallback(
     (c: Concept | Concept[]) => {
       setQueryBuilderJson(
@@ -70,6 +93,19 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     },
     [id, setQueryBuilderJson, queryBuilderJson],
   );
+
+  const handleConfirm = useCallback(() => {
+    const clean = selectedConcepts.map(
+      ({ alternatives: _omit, ...c }) => c as Concept,
+    );
+    if (clean.length === 1) {
+      setConcept(clean[0]);
+    } else if (clean.length > 1) {
+      setConcept(clean);
+    }
+    reset({ concepts: {} });
+    setSelectedIds({});
+  }, [selectedConcepts, reset, setConcept]);
 
   const clearConcept = useCallback(() => {
     setQueryBuilderJson(
@@ -111,13 +147,30 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       groupId={groupId}
       sortable={true}
       headerExtra={!isEmptyRule(rule) ? <DomainChip concept={concept} /> : null}
+      renderFooter={
+        <RuleFooter
+          customInvalidRule={false}
+          handleConfirm={handleConfirm}
+          clearAll={clearAll}
+          rule={rule}
+          selectedConceptsLength={selectedConcepts.length}
+          isSelected={isSelected}
+          hasOptions={hasOptions}
+        />
+      }
       render={() => (
         <Box py={1}>
           {isEmptyRule(rule) ? (
             <RuleSearch
               onConfirm={setConcept}
-              isSelected={isSelected}
               onSelect={() => select(id)}
+              conceptsMap={conceptsMap}
+              control={control}
+              setValue={setValue}
+              reset={reset}
+              selectedIds={selectedIds}
+              setSelectedIds={setSelectedIds}
+              setHasOptions={setHasOptions}
             />
           ) : (
             <>

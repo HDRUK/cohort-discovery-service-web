@@ -22,6 +22,7 @@ import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import { DEFAULT_SEARCH_RESULTS_MAX_HEIGHT } from "@/config/defaults";
 import { mergeSx } from "@/utils/helpers";
+import RuleFooter from "../RuleFooter";
 
 interface RuleAlternativesProps extends Omit<
   RuleWrapperProps,
@@ -154,64 +155,6 @@ const RuleAlternatives = ({
     [concept, setConcept],
   );
 
-  const footer = (
-    <Stack
-      direction="row"
-      alignItems="center"
-      justifyContent="space-between"
-      px={1}
-      py={0.75}
-      gap={1}
-    >
-      <Stack
-        direction="row"
-        alignItems="center"
-        gap={1}
-        flexShrink={1}
-        minWidth={0}
-      >
-        <ErrorIcon />
-        <Typography
-          variant="body2"
-          noWrap
-          sx={mergeSx({ fontSize: 16 }, !isSelected ? { fontWeight: 700 } : {})}
-        >
-          {isSelected
-            ? "A rule has alternatives, please select one or more concepts"
-            : "Please confirm or clear your changes before continuing"}
-        </Typography>
-      </Stack>
-      <Stack direction="row" gap={1} flexShrink={0}>
-        <Button
-          color="secondary"
-          size="small"
-          variant="outlined"
-          onClick={(e) => {
-            e.stopPropagation();
-            clearAll();
-          }}
-          sx={{ whiteSpace: "nowrap" }}
-        >
-          Clear all
-        </Button>
-        <Button
-          color="secondary"
-          size="small"
-          variant="contained"
-          disabled={selectedConceptIds.length < 1}
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            handleConfirm();
-          }}
-          sx={{ whiteSpace: "nowrap" }}
-        >
-          Confirm selection
-        </Button>
-      </Stack>
-    </Stack>
-  );
-
   return (
     <RuleWrapper
       node={rule}
@@ -219,7 +162,17 @@ const RuleAlternatives = ({
       groupId={groupId}
       sortable={true}
       headerExtra={<DomainChip concept={concept} />}
-      renderFooter={footer}
+      renderFooter={
+        <RuleFooter
+          customInvalidRule={true}
+          handleConfirm={handleConfirm}
+          clearAll={clearAll}
+          rule={rule}
+          selectedConceptsLength={selectedConceptIds.length}
+          isSelected={isSelected}
+          isNLP={true}
+        />
+      }
       render={() => (
         <Stack
           component="form"
