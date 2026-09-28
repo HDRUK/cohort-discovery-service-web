@@ -1,8 +1,12 @@
 /**
  * Standalone login flow.
- * Requires APPLICATION_MODE=standalone and the mock API server.
+ * Requires APPLICATION_MODE=standalone, OIDC disabled, and the mock API server.
  */
-describe("Login", () => {
+const oidcEnabled =
+  Cypress.env("OIDC_ENABLED") === true ||
+  Cypress.env("OIDC_ENABLED") === "true";
+
+(oidcEnabled ? describe.skip : describe)("Login", () => {
   beforeEach(() => {
     cy.clearCookie("token");
     cy.visit("/login");
