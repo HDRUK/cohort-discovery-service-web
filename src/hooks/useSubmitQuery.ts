@@ -22,13 +22,13 @@ const useSubmitQuery = () => {
     };
   }, [setIsLoading]);
 
-  const { selectedDatasets, queryName, queryBuilderJson } = useQueryBuilder(
-    (qb) => ({
+  const { selectedDatasets, queryName, queryBuilderJson, isParsingQuery } =
+    useQueryBuilder((qb) => ({
       selectedDatasets: qb.selectedDatasets,
       queryName: qb.queryName,
       queryBuilderJson: qb.queryBuilderJson,
-    }),
-  );
+      isParsingQuery: qb.isParsingQuery,
+    }));
 
   const { valid } = queryBuilderJson;
 
@@ -52,7 +52,8 @@ const useSubmitQuery = () => {
     }
   };
 
-  const disabled = selectedDatasets.length === 0 || !valid || isLoading;
+  const disabled =
+    selectedDatasets.length === 0 || !valid || isLoading || isParsingQuery;
 
   return { submit, disabled };
 };

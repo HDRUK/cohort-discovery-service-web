@@ -16,7 +16,8 @@ const ActionMenu: React.FC = () => {
   const { actions } = useCohortBuilderContext();
 
   const isLoading = useStateManagement((s) => s.isLoading);
-  if (isLoading) {
+  const isParsingQuery = useQueryBuilder((qb) => qb.isParsingQuery);
+  if (isLoading || isParsingQuery) {
     return <SkeletonFull />;
   }
 

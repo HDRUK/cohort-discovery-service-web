@@ -1,6 +1,7 @@
 "use client";
 
 import ToolGuidance from "@/content/guidance/queryBuilder/tool.mdx";
+import NlpSearchGuidance from "./NlpSearchGuidance";
 import RuleGuidance from "@/content/guidance/queryBuilder/rule.mdx";
 import OperatorGuidance from "@/content/guidance/queryBuilder/operator.mdx";
 import GroupGuidance from "@/content/guidance/queryBuilder/group.mdx";
@@ -108,13 +109,19 @@ export const baseComponents = {
 };
 
 const Guidance = () => {
-  const { boardIndex, queryBuilderJson, setQueryBuilderJson, selected } =
-    useQueryBuilder((qb) => ({
-      boardIndex: qb.boardIndex,
-      selected: qb.selected,
-      queryBuilderJson: qb.queryBuilderJson,
-      setQueryBuilderJson: qb.setQueryBuilderJson,
-    }));
+  const {
+    boardIndex,
+    queryBuilderJson,
+    setQueryBuilderJson,
+    selected,
+    isParsingQuery,
+  } = useQueryBuilder((qb) => ({
+    boardIndex: qb.boardIndex,
+    selected: qb.selected,
+    queryBuilderJson: qb.queryBuilderJson,
+    setQueryBuilderJson: qb.setQueryBuilderJson,
+    isParsingQuery: qb.isParsingQuery,
+  }));
 
   const selectedIds = useMemo(() => trueKeys(selected), [selected]);
   const selectedNode = useMemo(() => {
@@ -345,6 +352,9 @@ const Guidance = () => {
     ),
   });
 
+  if (isParsingQuery) {
+    return <NlpSearchGuidance />;
+  }
   if (selectedIds.length > 1) {
     return (
       <ActionMenuSection title={"Bulk Select Actions"} fixedExpanded>

@@ -6,6 +6,7 @@ import ActionMenu from "../ActionMenu";
 import RuleMenu from "../RuleMenu";
 
 import { QueryBuilderSkeleton } from "./QueryBuilderSkeleton";
+import { QueryBuilderThinkingSkeleton } from "./QueryBuilderThinkingSkeleton";
 import MarqueeSelection from "@/components/MarqueeSelection";
 import { Query } from "@/types/api";
 import ThreePaneSwimLaneLayout from "../ThreePaneSwimLaneLayout";
@@ -26,14 +27,20 @@ const QueryBuilder = ({
 }) => {
   const { queryBuilderLeaveConfirm, queryBuilderUseDemographicRule } =
     useFeatures();
-  const { queryBuilderJson, setQueryBuilderJson, select, deselect } =
-    useQueryBuilder((qb) => ({
-      queryBuilderJson: qb.queryBuilderJson,
-      setQueryBuilderJson: qb.setQueryBuilderJson,
-      select: qb.select,
-      deselect: qb.deselect,
-      selectedGuidance: qb.selectedGuidance,
-    }));
+  const {
+    queryBuilderJson,
+    setQueryBuilderJson,
+    select,
+    deselect,
+    isParsingQuery,
+  } = useQueryBuilder((qb) => ({
+    queryBuilderJson: qb.queryBuilderJson,
+    setQueryBuilderJson: qb.setQueryBuilderJson,
+    select: qb.select,
+    deselect: qb.deselect,
+    selectedGuidance: qb.selectedGuidance,
+    isParsingQuery: qb.isParsingQuery,
+  }));
 
   const showDemographics =
     queryBuilderUseDemographicRule && !!queryBuilderJson.demographics;
@@ -67,7 +74,9 @@ const QueryBuilder = ({
         <ThreePaneSwimLaneLayout
           left={<ActionMenu />}
           middle={
-            queryBuilderJson?.rules && queryBuilderJson.rules.length > 0 ? (
+            isParsingQuery ? (
+              <QueryBuilderThinkingSkeleton />
+            ) : queryBuilderJson?.rules && queryBuilderJson.rules.length > 0 ? (
               <RuleBoard ruleGroup={queryBuilderJson} scrollable />
             ) : (
               <QueryBuilderSkeleton />
@@ -75,7 +84,7 @@ const QueryBuilder = ({
           }
           middleProps={{
             ref: boardRef,
-            topSlot: showDemographics ? (
+            topSlot: showDemographics && !isParsingQuery ? (
               <DemographicsPanel key={queryBuilderJson.demographics?.id} />
             ) : undefined,
           }}

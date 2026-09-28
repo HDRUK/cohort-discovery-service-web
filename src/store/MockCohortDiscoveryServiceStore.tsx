@@ -134,6 +134,8 @@ const MockCohortDiscoveryServiceStore = ({
       errors: [],
       setErrors: (_rules: RuleGroupType, _pids: UniqueIdentifier[]) => NOOP,
       appendError: (_error: string) => NOOP,
+      isParsingQuery: false,
+      setIsParsingQuery: NOOP,
       ...(overrides?.queryBuilder ?? {}),
     } as QueryBuilderState,
     true,

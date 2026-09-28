@@ -3,7 +3,7 @@
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { Box, Typography } from "@mui/material";
 import { useCallback, useEffect, useRef, useState, useMemo } from "react";
-import { useIsFetching, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import SearchBox from "../SearchBox";
 import SearchIcon from "@mui/icons-material/Search";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
@@ -22,7 +22,7 @@ import SearchOverlay from "./SearchOverlay";
 import { useDefaults } from "@/providers/DefaultProvider";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import InlineChoiceButton from "./InlineChoiceButton";
-import { CombinatorType } from "@/types/rules";
+import { CombinatorType, RuleGroupType } from "@/types/rules";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 
 type FormValues = {
@@ -65,6 +65,7 @@ const CohortQueryInput = ({
   const selectedDatasets = useQueryBuilder((qb) => qb.selectedDatasets);
   const appendError = useQueryBuilder((qb) => qb.appendError);
   const select = useQueryBuilder((qb) => qb.select);
+  const setIsParsingQuery = useQueryBuilder((qb) => qb.setIsParsingQuery);
   const errors = useQueryBuilder((qb) => qb.errors ?? []);
   const warnings = useQueryBuilder((qb) => qb.queryBuilderJson.warnings ?? []);
 
@@ -122,7 +123,6 @@ const CohortQueryInput = ({
      *
      * Functional setter prevents redundant updates if already reset.
      */
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setQueryMode((current) => (current === null ? current : null));
   }, [rulesKey]);
 
@@ -217,15 +217,22 @@ const CohortQueryInput = ({
         return;
       }
 
-      const queryJson = await queryClient.fetchQuery({
-        queryKey: ["cohortRules", q, includeSynthetic, selectedDatasets],
-        queryFn: () =>
-          getQueryFromText(q, {
-            ignoreSynthetic: !includeSynthetic,
-            collections: selectedDatasets,
-          }),
-        staleTime: STALE_TIME,
-      });
+      setIsParsingQuery(true);
+
+      let queryJson: RuleGroupType;
+      try {
+        queryJson = await queryClient.fetchQuery({
+          queryKey: ["cohortRules", q, includeSynthetic, selectedDatasets],
+          queryFn: () =>
+            getQueryFromText(q, {
+              ignoreSynthetic: !includeSynthetic,
+              collections: selectedDatasets,
+            }),
+          staleTime: STALE_TIME,
+        });
+      } finally {
+        setIsParsingQuery(false);
+      }
 
       if (queryMode === QueryMode.APPEND) {
         const existingRules = convertToGroup
@@ -279,6 +286,7 @@ const CohortQueryInput = ({
       queryMode,
       queryBuilderJson,
       select,
+      setIsParsingQuery,
     ],
   );
 
@@ -304,8 +312,6 @@ const CohortQueryInput = ({
       shouldApplyImmediately,
     },
   );
-
-  const showLoader = useIsFetching({ queryKey: ["cohortRules"] }) > 0;
 
   useEffect(() => {
     if (!syncFromQueryAsText) return;
@@ -454,7 +460,6 @@ const CohortQueryInput = ({
                   }
                   fullWidth
                   variant="outlined"
-                  loading={showLoader}
                   warning={warnings.length > 0}
                   readOnly={showChoicePrompt}
                   disabled={searchDisabled}

@@ -164,6 +164,9 @@ export interface QueryBuilderStoreState {
 
   selectedGuidance: Record<string, boolean>;
   setSelectedGuidance: (id: string, value: boolean) => void;
+
+  isParsingQuery: boolean;
+  setIsParsingQuery: (value: boolean) => void;
 }
 
 const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
@@ -603,6 +606,13 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     set((state) => ({
       ...state,
       selectedGuidance: { [id]: value },
+    })),
+
+  isParsingQuery: false,
+  setIsParsingQuery: (value: boolean) =>
+    set((state) => ({
+      ...state,
+      isParsingQuery: value,
     })),
 });
 
