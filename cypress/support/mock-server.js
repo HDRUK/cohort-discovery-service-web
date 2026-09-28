@@ -147,6 +147,27 @@ async function handle(req, res) {
   }
 
   // -------------------------------------------------------------------------
+  // SSO
+  // -------------------------------------------------------------------------
+  if (method === "GET" && pathname === "/api/auth/sso/providers") {
+    return ok(res, [
+      {
+        slug: "default",
+        label: "Single Sign-On",
+        redirect_url: "http://localhost:8100/api/auth/sso/default/redirect",
+      },
+    ]);
+  }
+
+  if (method === "POST" && pathname === "/api/auth/sso/exchange") {
+    const body = await readBody(req);
+    if (!body.code || body.code.length !== 64) {
+      return json(res, 422, { error: "invalid code format" });
+    }
+    return ok(res, { access_token: makeToken() });
+  }
+
+  // -------------------------------------------------------------------------
   // Current user – return admin role / custodians based on the JWT payload
   // -------------------------------------------------------------------------
   if (method === "GET" && pathname === "/api/v1/user") {
