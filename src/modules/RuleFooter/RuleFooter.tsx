@@ -1,23 +1,8 @@
 import ErrorIcon from "@/components/ErrorIcon";
 import InvalidRule from "@/components/InvalidRule";
-import { Concept } from "@/types/api";
 import { RuleLeafType } from "@/types/rules";
 import { mergeSx } from "@/utils/helpers";
 import { Button, Stack, Typography } from "@mui/material";
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useMemo,
-  useState,
-} from "react";
-import {
-  Control,
-  useForm,
-  UseFormReset,
-  UseFormSetValue,
-  useWatch,
-} from "react-hook-form";
 
 interface RuleSearchProps {
   customInvalidRule: boolean;
@@ -28,13 +13,6 @@ interface RuleSearchProps {
   isSelected: boolean;
   hasOptions?: boolean;
   isNLP?: boolean;
-  // setHasOptions?: Dispatch<SetStateAction<boolean>>;
-  // selectedIds?: Record<number, boolean>;
-  // setSelectedIds?: Dispatch<SetStateAction<Record<number, boolean>>>;
-  // control?: Control<FormValues, unknown, FormValues>;
-  // setValue?: UseFormSetValue<FormValues>;
-  // reset?: UseFormReset<FormValues>;
-  // conceptsMap?: Record<number, Concept>;
 }
 
 const RuleFooter = ({
