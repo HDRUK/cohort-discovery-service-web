@@ -1,14 +1,26 @@
 "use client";
 
-import { Button, CircularProgress, Paper, Stack, Typography } from "@mui/material";
+import {
+  Button,
+  CircularProgress,
+  Divider,
+  Paper,
+  Stack,
+  Typography,
+} from "@mui/material";
+import MailOutlineRounded from "@mui/icons-material/MailOutlineRounded";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import StandaloneLoginForm from "./StandaloneLoginForm";
 import Circles from "./Circles";
+import Title from "@/components/Title";
 import { useApplicationMode } from "@/providers/ApplicationModeProvider";
 import { SsoProvider } from "@/types/api";
+import { getProviderIcon } from "@/utils/ssoProviders";
 
 const REDIRECT_URL = process?.env?.NEXT_PUBLIC_LOGIN_URL;
+
+type View = "landing" | "options" | "email";
 
 interface LoginClientProps {
   providers?: SsoProvider[];
@@ -17,7 +29,7 @@ interface LoginClientProps {
 const LoginClient = ({ providers = [] }: LoginClientProps) => {
   const { isStandalone } = useApplicationMode();
   const router = useRouter();
-  const [showForm, setShowForm] = useState(false);
+  const [view, setView] = useState<View>("landing");
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
 
   const onClick = () => {
@@ -25,46 +37,70 @@ const LoginClient = ({ providers = [] }: LoginClientProps) => {
       router.push(REDIRECT_URL || "");
       return;
     }
-    setShowForm(true);
+    setView("options");
   };
 
-  if (showForm) {
+  if (view === "email") {
     return (
-      <Stack direction="row" spacing={2} flexWrap="wrap" justifyContent="center">
-        <StandaloneLoginForm
-          onCancel={() => setShowForm(false)}
-          sx={{
-            minWidth: 400,
-            maxWidth: 500,
-          }}
-        />
-        {providers.length > 0 && (
-          <Paper sx={{ p: 2, minWidth: 250, maxWidth: 300 }}>
-            <Stack spacing={1}>
-              {providers.map((provider) => (
-                <Button
-                  key={provider.slug}
-                  component="a"
-                  href={provider.redirect_url}
-                  variant="outlined"
-                  fullWidth
-                  disabled={loadingProvider !== null}
-                  onClick={() => setLoadingProvider(provider.slug)}
-                  startIcon={
-                    loadingProvider === provider.slug ? (
-                      <CircularProgress size={20} />
-                    ) : undefined
-                  }
-                >
-                  {loadingProvider === provider.slug
-                    ? "Redirecting…"
-                    : provider.label}
-                </Button>
-              ))}
-            </Stack>
-          </Paper>
-        )}
-      </Stack>
+      <StandaloneLoginForm
+        onCancel={() => setView("options")}
+        sx={{ minWidth: 320, maxWidth: 400 }}
+      />
+    );
+  }
+
+  if (view === "options") {
+    return (
+      <Paper sx={{ p: 3, minWidth: 320, maxWidth: 400 }}>
+        <Stack spacing={2}>
+          <Title title="Sign in" />
+          <Stack spacing={1}>
+            <Button
+              variant="outlined"
+              fullWidth
+              size="large"
+              startIcon={<MailOutlineRounded />}
+              onClick={() => setView("email")}
+              sx={{ justifyContent: "flex-start" }}
+            >
+              Continue with email
+            </Button>
+
+            {providers.length > 0 && (
+              <>
+                <Divider sx={{ my: 1 }} />
+                {providers.map((provider) => {
+                  const ProviderIcon = getProviderIcon(provider.slug);
+                  const isLoading = loadingProvider === provider.slug;
+
+                  return (
+                    <Button
+                      key={provider.slug}
+                      component="a"
+                      href={provider.redirect_url}
+                      variant="outlined"
+                      fullWidth
+                      size="large"
+                      disabled={loadingProvider !== null}
+                      onClick={() => setLoadingProvider(provider.slug)}
+                      startIcon={
+                        isLoading ? (
+                          <CircularProgress size={20} />
+                        ) : (
+                          <ProviderIcon />
+                        )
+                      }
+                      sx={{ justifyContent: "flex-start" }}
+                    >
+                      {isLoading ? "Redirecting…" : provider.label}
+                    </Button>
+                  );
+                })}
+              </>
+            )}
+          </Stack>
+        </Stack>
+      </Paper>
     );
   }
 
