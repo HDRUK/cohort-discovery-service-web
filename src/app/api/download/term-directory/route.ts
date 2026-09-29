@@ -1,8 +1,6 @@
 import { DomainTab } from "@/config/domainFilters";
 import { cookies } from "next/headers";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
-import { apiGet } from "@/lib/apiClient";
-import { API_ROUTES } from "@/lib/apiRoutes";
 import { buildTermDirectoryParams } from "@/utils/buildTermDirectoryParams";
 
 const baseURL = process.env.API_BASE_URL!;

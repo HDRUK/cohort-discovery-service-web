@@ -1,6 +1,6 @@
 "use client";
 
-import { Stack, Tab, Tabs, Typography } from "@mui/material";
+import { Stack, Tab, Tabs } from "@mui/material";
 import { DOMAIN_TABS } from "@/config/domainFilters";
 import useSearchParams from "@/hooks/useSearchParams";
 import { getDomainPhrase } from "@/utils/omop";

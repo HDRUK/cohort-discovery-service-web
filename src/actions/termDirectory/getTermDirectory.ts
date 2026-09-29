@@ -5,7 +5,7 @@ import { apiGet } from "@/lib/apiClient";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { TermDirectoryEntry, ApiResponse, Paginated } from "@/types/api";
 import { DEFAULT_PER_PAGE } from "@/config/defaults";
-import { DOMAIN_TAB_FILTERS, DomainTab } from "@/config/domainFilters";
+import { DomainTab } from "@/config/domainFilters";
 import { getTagTermDirectory } from "@/config/tags";
 import { buildTermDirectoryParams } from "@/utils/buildTermDirectoryParams";
 
