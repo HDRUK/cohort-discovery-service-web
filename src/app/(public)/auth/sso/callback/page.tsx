@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import ssoExchange from "@/actions/standalone/ssoExchange";
 
 interface SsoCallbackPageProps {
   searchParams: Promise<{ code?: string; error?: string; provider?: string }>;
@@ -8,17 +7,12 @@ interface SsoCallbackPageProps {
 export default async function SsoCallbackPage({
   searchParams,
 }: SsoCallbackPageProps) {
-  const { code, error } = await searchParams;
+  const { code, error, provider } = await searchParams;
 
-  if (error) {
-    redirect(`/auth/sso/error?error=${encodeURIComponent(error)}`);
-  }
+  const params = new URLSearchParams();
+  if (code) params.append("code", code);
+  if (error) params.append("error", error);
+  if (provider) params.append("provider", provider);
 
-  if (!code) {
-    redirect("/auth/sso/error?error=invalid_callback");
-  }
-
-  const success = await ssoExchange(code);
-
-  redirect(success ? "/" : "/auth/sso/error?error=exchange_failed");
+  redirect(`/api/auth/sso/callback?${params.toString()}`);
 }

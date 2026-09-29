@@ -389,7 +389,7 @@ export interface TokenUser {
   is_nhse_sde_approval: boolean;
   organisation: string;
   provider: string;
-  workgroups: string[];
+  workgroups: Workgroup[];
   cohort_discovery_roles: RoleName[];
   cohort_admin_teams: ExternalCustodian[];
 }
