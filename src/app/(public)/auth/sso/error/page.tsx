@@ -1,5 +1,4 @@
 import { Button, Paper, Stack, Typography } from "@mui/material";
-import Link from "next/link";
 
 const ERROR_MESSAGES: Record<string, string> = {
   provider_not_configured: "This sign-in option is not available right now.",
@@ -40,7 +39,6 @@ export default async function SsoErrorPage({
       <Stack>
         <Button
           variant="outlined"
-          component={Link}
           href="/login"
           sx={{ mx: "auto" }}
         >
