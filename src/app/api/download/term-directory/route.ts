@@ -1,13 +1,32 @@
+import { DomainTab } from "@/config/domainFilters";
 import { cookies } from "next/headers";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
+import { apiGet } from "@/lib/apiClient";
+import { API_ROUTES } from "@/lib/apiRoutes";
+import { buildTermDirectoryParams } from "@/utils/buildTermDirectoryParams";
 
 const baseURL = process.env.API_BASE_URL!;
 
-export async function GET() {
+export async function GET(req: Request) {
+  const urlObj = new URL(req.url);
+  const search = urlObj.searchParams.get("search") ?? undefined;
+  const domain = urlObj.searchParams.get("domain") as DomainTab | undefined;
+  const collections = urlObj.searchParams.get("collections") ?? undefined;
+  const sort = urlObj.searchParams.get("sort") ?? undefined;
+
   const cookieStore = await cookies();
   const token = cookieStore.get(ACCESS_TOKEN_NAME)?.value;
 
-  const backendUrl = `${baseURL}/api/v1/term-directory/download`;
+  const parameters = buildTermDirectoryParams(
+    1,
+    100,
+    search,
+    domain,
+    collections?.split(","),
+    sort,
+  );
+
+  const backendUrl = `${baseURL}/api/v1/term-directory/download?${parameters}`;
 
   const backendRes = await fetch(backendUrl, {
     method: "GET",

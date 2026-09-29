@@ -3,6 +3,7 @@ import { IconButtonProps } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
 import PositionedMenu, { PositionedMenuItem } from "../PositionedMenu";
 import { useNotify } from "@/providers/NotifyProvider";
+import { useSearchParams } from "next/navigation";
 
 export enum AvailableFormats {
   JSON = "json",
@@ -30,10 +31,14 @@ const DownloadButton = ({
 }: DownloadButtonProps) => {
   const notify = useNotify();
 
+  const searchParams = useSearchParams();
+
   const download = async (format: AvailableFormats) => {
     // this could be made more concise without duplicated code?
     if (isTermDirectory) {
-      const url = "/api/download/term-directory";
+      const queryString = searchParams.toString();
+
+      const url = `/api/download/term-directory?${queryString}`;
 
       const a = document.createElement("a");
       a.href = url;
