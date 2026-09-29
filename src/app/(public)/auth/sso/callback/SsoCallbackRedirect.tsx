@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { CircularProgress, Paper, Stack, Typography } from "@mui/material";
 
 interface SsoCallbackRedirectProps {
   target: string;
@@ -13,20 +13,14 @@ const SsoCallbackRedirect = ({ target }: SsoCallbackRedirectProps) => {
   }, [target]);
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: 2,
-        mt: 20,
-      }}
-    >
-      <CircularProgress />
-      <Typography variant="body1" color="text.secondary">
-        Signing you in…
-      </Typography>
-    </Box>
+    <Paper sx={{ p: 4, maxWidth: 600, margin: "100px auto" }}>
+      <Stack alignItems="center" spacing={2}>
+        <CircularProgress />
+        <Typography variant="body1" color="text.secondary">
+          Signing you in…
+        </Typography>
+      </Stack>
+    </Paper>
   );
 };
 
