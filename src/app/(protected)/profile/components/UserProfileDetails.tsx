@@ -149,9 +149,7 @@ const UserProfileDetails = ({ user }: { user: CombinedUser }) => {
           <Section title="Current session">
             <Grid size={6}>
               <Field label="Signed in via">
-                {user.token_user.provider === "standalone"
-                  ? "Password"
-                  : user.token_user.provider}
+                {user.token_user.sso_provider ?? "Password"}
               </Field>
             </Grid>
             {user.token_user.orcid && (
