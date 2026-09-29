@@ -34,7 +34,6 @@ const DownloadButton = ({
   const searchParams = useSearchParams();
 
   const download = async (format: AvailableFormats) => {
-    // this could be made more concise without duplicated code?
     if (isTermDirectory) {
       const queryString = searchParams.toString();
 
