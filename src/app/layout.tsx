@@ -11,6 +11,7 @@ import Footer from "@/components/Footer";
 import ServerDefaultProvider from "@/providers/ServerDefaultProvider";
 import SupportPopOut from "@/components/SupportPopOut/SupportPopOut";
 import ApplicationModeProvider from "@/providers/ApplicationModeProvider";
+import SignOutOverlay from "@/components/SignOutOverlay";
 
 const sourceSans = Source_Sans_3({
   variable: "--font-source-sans-3",
@@ -85,6 +86,7 @@ export default async function RootLayout({
                 </Box>
                 <Footer />
               </Box>
+              <SignOutOverlay />
             </ServerDefaultProvider>
           </body>
         </html>
