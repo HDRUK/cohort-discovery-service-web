@@ -87,6 +87,11 @@ const DownloadButton = ({
     </PositionedMenu>
   ) : (
     <PositionedMenu
+      title={
+        isTermDirectory
+          ? "Export the full term directory with all selected filters applied"
+          : undefined
+      }
       data-testid="download-button"
       items={items}
       startIcon={<DownloadIcon />}
