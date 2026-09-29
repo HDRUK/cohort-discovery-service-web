@@ -48,8 +48,8 @@ const DownloadButton = ({
       setTimeout(() => {
         a.click();
         notify.success(
-          `Downloading has started. Please allow up to a minute for the data generate.`,
-          5000,
+          `Downloading has started. Please allow some time for it to complete.`,
+          3000,
         );
       }, 100);
 
