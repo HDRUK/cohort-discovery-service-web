@@ -388,7 +388,7 @@ export interface TokenUser {
   is_admin: boolean;
   is_nhse_sde_approval: boolean;
   organisation: string;
-  provider: string;
+  sso_provider?: string;
   workgroups: Workgroup[];
   cohort_discovery_roles: RoleName[];
   cohort_admin_teams: ExternalCustodian[];

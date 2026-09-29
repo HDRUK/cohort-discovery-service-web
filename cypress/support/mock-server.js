@@ -58,7 +58,6 @@ function makeToken(overrides = {}) {
       is_admin: false,
       is_nhse_sde_approval: false,
       organisation: "Test Org",
-      provider: "standalone",
       workgroups: [{ id: 1, name: "Test Workgroup" }],
       cohort_discovery_roles: ["user"],
       cohort_admin_teams: [],
