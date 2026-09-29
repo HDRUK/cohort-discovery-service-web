@@ -8,21 +8,31 @@ import { type AnchorHTMLAttributes } from "react";
 import { checkIsAdmin } from "@/utils/user";
 import { routes } from "@/config/routes";
 import { useApplicationMode } from "@/providers/ApplicationModeProvider";
+import { useSignOutStore } from "@/store/signOutStore";
 
 const NEXT_PUBLIC_LOGIN_URL =
   process.env.NEXT_PUBLIC_LOGIN_URL ?? "https://healthdatagateway.org";
 const GATEWAY_PROFILE_HREF = `${NEXT_PUBLIC_LOGIN_URL}/account/profile`;
+const LOGOUT_HREF = "/api/auth/logout";
 
 type HeaderLinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> &
   LinkProps;
 
-const HeaderLink = ({ href, rel, ...props }: HeaderLinkProps) => {
+const HeaderLink = ({ href, rel, onClick, ...props }: HeaderLinkProps) => {
   const isGatewayProfileLink = href.toString() === GATEWAY_PROFILE_HREF;
+  const isLogoutLink = href.toString() === LOGOUT_HREF;
+  const setSigningOut = useSignOutStore((s) => s.setSigningOut);
 
   return (
     <Link
       href={href}
       {...props}
+      onClick={(e) => {
+        if (isLogoutLink) {
+          setSigningOut(true);
+        }
+        onClick?.(e);
+      }}
       target={isGatewayProfileLink ? "_blank" : undefined}
       rel={isGatewayProfileLink ? "noopener noreferrer" : rel}
     />
