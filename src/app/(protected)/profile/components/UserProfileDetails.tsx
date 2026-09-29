@@ -19,7 +19,9 @@ const Field = ({ label, children }: FieldProps) => (
     <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 0.5 }}>
       {label}
     </Typography>
-    <Typography variant="body2">{children}</Typography>
+    <Typography variant="body2" component="div">
+      {children}
+    </Typography>
   </Box>
 );
 
