@@ -9,7 +9,7 @@ const baseURL = process.env.API_BASE_URL!;
 
 export async function GET(req: Request) {
   const urlObj = new URL(req.url);
-  const search = urlObj.searchParams.get("search") ?? undefined;
+  const search_term = urlObj.searchParams.get("search_term") ?? undefined;
   const domain = urlObj.searchParams.get("domain") as DomainTab | undefined;
   const collections = urlObj.searchParams.get("collections") ?? undefined;
   const sort = urlObj.searchParams.get("sort") ?? undefined;
@@ -20,7 +20,7 @@ export async function GET(req: Request) {
   const parameters = buildTermDirectoryParams(
     1,
     100,
-    search,
+    search_term,
     domain,
     collections?.split(","),
     sort,
