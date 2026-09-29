@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Paper, Stack, Typography } from "@mui/material";
+import { Button, CircularProgress, Paper, Stack, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import StandaloneLoginForm from "./StandaloneLoginForm";
@@ -18,6 +18,7 @@ const LoginClient = ({ providers = [] }: LoginClientProps) => {
   const { isStandalone } = useApplicationMode();
   const router = useRouter();
   const [showForm, setShowForm] = useState(false);
+  const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
 
   const onClick = () => {
     if (!isStandalone) {
@@ -47,8 +48,17 @@ const LoginClient = ({ providers = [] }: LoginClientProps) => {
                   href={provider.redirect_url}
                   variant="outlined"
                   fullWidth
+                  disabled={loadingProvider !== null}
+                  onClick={() => setLoadingProvider(provider.slug)}
+                  startIcon={
+                    loadingProvider === provider.slug ? (
+                      <CircularProgress size={20} />
+                    ) : undefined
+                  }
                 >
-                  {provider.label}
+                  {loadingProvider === provider.slug
+                    ? "Redirecting…"
+                    : provider.label}
                 </Button>
               ))}
             </Stack>
