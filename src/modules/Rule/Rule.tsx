@@ -149,7 +149,6 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       headerExtra={!isEmptyRule(rule) ? <DomainChip concept={concept} /> : null}
       renderFooter={
         <RuleFooter
-          customInvalidRule={false}
           handleConfirm={handleConfirm}
           clearAll={clearAll}
           rule={rule}

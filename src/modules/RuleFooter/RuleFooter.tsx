@@ -43,23 +43,29 @@ const RuleFooter = ({
           minWidth={0}
         >
           <ErrorIcon />
-          <Typography
-            variant="body2"
-            noWrap
-            sx={mergeSx(
-              { fontSize: 16 },
-              !isSelected ? { fontWeight: 700 } : {},
-            )}
-          >
+          <Typography variant="body2" noWrap sx={{ fontSize: 16 }}>
             {isSelected
               ? "A rule has alternatives, please select one or more concepts"
               : "Please confirm or clear your changes before continuing"}
           </Typography>
         </Stack>
+      ) : !isSelected ? (
+        <Stack
+          direction="row"
+          alignItems="center"
+          gap={1}
+          flexShrink={1}
+          minWidth={0}
+        >
+          <ErrorIcon />
+          <Typography variant="body2" noWrap sx={{ fontSize: 16 }}>
+            Please confirm or clear your changes before continuing
+          </Typography>
+        </Stack>
       ) : (
         <InvalidRule
           reasons={rule.invalidReason ?? []}
-          stackProps={{ sx: { pt: 1, pb: 1 } }}
+          stackProps={{ sx: { pt: 1, pb: 1, fontSize: 16 } }}
         />
       )}
       {(hasOptions || isNLP) && (
