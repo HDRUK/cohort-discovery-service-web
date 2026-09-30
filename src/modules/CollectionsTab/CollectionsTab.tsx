@@ -15,19 +15,20 @@ export const CollectionsSkeleton = () => (
 const CollectionsTab = async ({
   searchParams,
   custodianPid,
+  collectionsPromise,
 }: {
   searchParams: CollectionsSearchParams;
   custodianPid?: string;
+  collectionsPromise?: ReturnType<typeof getAdminCollections>;
 }) => {
   const params = buildCollectionParams(searchParams);
 
   const isAdmin = !custodianPid;
 
-  const [{ data: collections }] = await Promise.all([
-    isAdmin
+  const { data: collections } = await (collectionsPromise ??
+    (isAdmin
       ? getAdminCollections({ params })
-      : getCustodianCollections(custodianPid, { params }),
-  ]);
+      : getCustodianCollections(custodianPid, { params })));
 
   return <CollectionsManagement isAdmin={isAdmin} collections={collections} />;
 };
