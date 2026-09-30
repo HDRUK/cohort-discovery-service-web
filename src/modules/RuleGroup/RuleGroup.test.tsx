@@ -14,6 +14,7 @@ jest.mock("@/utils/rules", () => {
   };
 });
 import { removeById, updateById } from "@/utils/rules";
+import { CloseGuardProvider } from "@/providers/CloseGuardProvider";
 
 const setQueryBuilderJson = jest.fn();
 
@@ -57,13 +58,16 @@ describe("RuleGroup", () => {
     } as RuleGroupType;
 
     const rendered = render(
-      <MockCohortDiscoveryServiceStore
-        overrides={{
-          queryBuilder: { queryBuilderJson: query, setQueryBuilderJson },
-        }}
-      >
-        <RuleGroup {...rest} group={group} parentGroupId="outer-group" />
-      </MockCohortDiscoveryServiceStore>,
+      <CloseGuardProvider>
+        <MockCohortDiscoveryServiceStore
+          overrides={{
+            queryBuilder: { queryBuilderJson: query, setQueryBuilderJson },
+          }}
+        >
+          <RuleGroup {...rest} group={group} parentGroupId="outer-group" />
+        </MockCohortDiscoveryServiceStore>
+        ,
+      </CloseGuardProvider>,
     );
     return {
       query,
