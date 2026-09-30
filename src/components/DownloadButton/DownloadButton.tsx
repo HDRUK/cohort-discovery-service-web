@@ -18,7 +18,6 @@ export interface DownloadButtonProps extends Omit<
   entity?: string;
   formats?: AvailableFormats[];
   isIcon?: boolean;
-  isTermDirectory?: boolean;
 }
 
 const DownloadButton = ({
@@ -27,50 +26,52 @@ const DownloadButton = ({
   formats = [AvailableFormats.JSON],
   disabled,
   isIcon = true,
-  isTermDirectory,
 }: DownloadButtonProps) => {
   const notify = useNotify();
 
   const searchParams = useSearchParams();
+  const queryString = searchParams.toString();
+
+  const handleDownload = (
+    url: string,
+    notifyMessage: string,
+    notifyTime: number,
+  ) => {
+    const a = document.createElement("a");
+    a.href = url;
+    a.target = "_self";
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+    setTimeout(() => {
+      a.click();
+      notify.success(notifyMessage, notifyTime);
+    }, 100);
+  };
 
   const download = async (format: AvailableFormats) => {
-    if (isTermDirectory) {
-      const queryString = searchParams.toString();
-
-      const url = `/api/download/term-directory?${queryString}`;
-
-      const a = document.createElement("a");
-      a.href = url;
-      a.target = "_self";
-      a.rel = "noopener noreferrer";
-      document.body.appendChild(a);
-      setTimeout(() => {
-        a.click();
-        notify.success(
-          `Downloading has started. Please allow some time for it to complete.`,
-          3000,
-        );
-      }, 100);
-
+    if (!ids) {
+      handleDownload(
+        `/api/download/term-directory?${queryString}`,
+        "Downloading has started. Please allow some time for it to complete.",
+        3000,
+      );
       return;
     }
 
-    if (disabled || !ids || ids.length === 0 || !entity) return;
+    if (disabled || ids.length === 0 || !entity) return;
+
     ids.map((id, idx) => {
       const url = `/api/download/${encodeURIComponent(
         id,
       )}?entity=${encodeURIComponent(entity)}&format=${encodeURIComponent(
         format,
       )}`;
-      const a = document.createElement("a");
-      a.href = url;
-      a.target = "_self";
-      a.rel = "noopener noreferrer";
-      document.body.appendChild(a);
-      setTimeout(() => {
-        a.click();
-        notify.success(`Downloading ${entity} as ${format} has started`);
-      }, 100 * idx);
+
+      handleDownload(
+        url,
+        `Downloading ${entity} as ${format} has started`,
+        100 * idx,
+      );
     });
   };
 
@@ -87,7 +88,7 @@ const DownloadButton = ({
   ) : (
     <PositionedMenu
       title={
-        isTermDirectory
+        !ids
           ? "Export the full term directory with all selected filters applied"
           : undefined
       }
