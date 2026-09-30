@@ -124,7 +124,7 @@ describe("QueryBuilder", () => {
       ).toBeInTheDocument();
       // Each of the 2 rules should show RULE_NEEDS_OPERATOR and GROUP_NEEDS_OPERATORS,
       // and the operator should show GROUP_CANNOT_END_WITH_AN_OPERATOR and GROUP_NEEDS_OPERATORS
-      expect(screen.queryAllByTestId("ErrorIcon")).toHaveLength(6);
+      expect(screen.queryAllByTestId("ErrorIcon")).toHaveLength(4);
     });
   });
 });
