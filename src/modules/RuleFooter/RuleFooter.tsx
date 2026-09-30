@@ -1,7 +1,6 @@
 import ErrorIcon from "@/components/ErrorIcon";
 import InvalidRule from "@/components/InvalidRule";
 import { RuleLeafType } from "@/types/rules";
-import { mergeSx } from "@/utils/helpers";
 import { Button, Stack, Typography } from "@mui/material";
 
 interface RuleSearchProps {

@@ -5,8 +5,7 @@ import { DragType } from "@/types/dnd";
 import { RuleLeafType } from "@/types/rules";
 import ConceptChip from "@/components/ConceptChip";
 import SquareCheckbox from "@/components/SquareCheckbox";
-import ErrorIcon from "@/components/ErrorIcon";
-import { Button, FormControlLabel, Stack, Typography } from "@mui/material";
+import { FormControlLabel, Stack } from "@mui/material";
 import DomainChip from "@/components/DomainChip/DomainChip";
 import { useCallback, useMemo, useState } from "react";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
@@ -21,7 +20,6 @@ import { useCohortBuilderContext } from "@/providers/CohortBuilderProvider";
 import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import { DEFAULT_SEARCH_RESULTS_MAX_HEIGHT } from "@/config/defaults";
-import { mergeSx } from "@/utils/helpers";
 import RuleFooter from "../RuleFooter";
 
 interface RuleAlternativesProps extends Omit<

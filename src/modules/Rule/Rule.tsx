@@ -20,6 +20,7 @@ import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import useNodeActions from "@/hooks/useNodeActions";
 import RuleFooter from "../RuleFooter";
 import { useForm, useWatch } from "react-hook-form";
+import { useSaveChanges } from "@/hooks/useSaveChanges";
 
 export interface RuleProps extends Omit<
   RuleWrapperProps,
@@ -140,6 +141,19 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
 
   const { actions } = useNodeActions(rule);
 
+  useSaveChanges({
+    control,
+    entityName: "rule selection",
+    onSave: handleConfirm,
+    onDiscard: () => {
+      clearAll();
+      // setIsMultiSelect(true); this is currently always the case
+    },
+    saveText: "Confirm selection",
+    discardText: "Discard",
+    showChanges: false,
+  });
+
   return (
     <RuleWrapper
       node={rule}
@@ -149,6 +163,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       headerExtra={!isEmptyRule(rule) ? <DomainChip concept={concept} /> : null}
       renderFooter={
         <RuleFooter
+          customInvalidRule={false}
           handleConfirm={handleConfirm}
           clearAll={clearAll}
           rule={rule}

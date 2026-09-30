@@ -1,24 +1,10 @@
 "use client";
 
 import { Concept } from "@/types/api";
-import { Box, Button, Stack } from "@mui/material";
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import {
-  Control,
-  useForm,
-  UseFormReset,
-  UseFormSetValue,
-  useWatch,
-} from "react-hook-form";
+import { Box } from "@mui/material";
+import { Dispatch, SetStateAction, useCallback, useState } from "react";
+import { Control, UseFormReset, UseFormSetValue } from "react-hook-form";
 import SearchConcepts from "@/components/SearchConcepts";
-import { useSaveChanges } from "@/hooks/useSaveChanges";
 
 type FormValues = { concepts: Record<number, Concept> };
 
@@ -44,6 +30,9 @@ const RuleSearch = ({
   setSelectedIds,
   setHasOptions,
 }: RuleSearchProps) => {
+  // temporarily disabled unused vars warning for setIsMultiSelect
+  // until we figure out if we're gonna go for multi-select only
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isMultiSelect, setIsMultiSelect] = useState(true);
 
   const handleOnToggle = useCallback(
@@ -72,20 +61,6 @@ const RuleSearch = ({
     },
     [onConfirm],
   );
-
-  // Unsure if this is necessary? Seems to work without it
-  // useSaveChanges({
-  //   control,
-  //   entityName: "rule selection",
-  //   onSave: handleConfirm,
-  //   onDiscard: () => {
-  //     clearAll();
-  //     setIsMultiSelect(true);
-  //   },
-  //   saveText: "Confirm selection",
-  //   discardText: "Discard",
-  //   showChanges: false,
-  // });
 
   // Commenting out the single/multi-select toggle related behavior
   // until we figure out whether multi-select-only works well
