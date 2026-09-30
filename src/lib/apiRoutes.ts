@@ -19,7 +19,7 @@ export const API_ROUTES = {
   network: (id: number | string) => `${API_URL}/custodian_networks/${id}`,
   getMe: `${API_URL}/user`,
   signIn: `${API_AUTH_URL}/login`,
-  ssoProviders: `${API_AUTH_URL}/sso/providers`,
+  authMethods: `${API_AUTH_URL}/methods`,
   ssoExchange: `${API_AUTH_URL}/sso/exchange`,
   getQuery: (pid: string) => `${API_URL}/query/${pid}`,
   getCodes: (domain: string) => `${API_URL}/codes/${domain}`,

@@ -23,16 +23,28 @@ const HeaderLink = ({ href, rel, onClick, ...props }: HeaderLinkProps) => {
   const isLogoutLink = href.toString() === LOGOUT_HREF;
   const setSigningOut = useSignOutStore((s) => s.setSigningOut);
 
+  // Logout redirects on to the IdP, which lives on another origin. A Next
+  // <Link> transition cannot follow that - it fetches and fails CORS - so
+  // logout needs a plain anchor and a real browser navigation.
+  if (isLogoutLink) {
+    return (
+      <a
+        href={href.toString()}
+        {...props}
+        rel={rel}
+        onClick={(e) => {
+          setSigningOut(true);
+          onClick?.(e);
+        }}
+      />
+    );
+  }
+
   return (
     <Link
       href={href}
       {...props}
-      onClick={(e) => {
-        if (isLogoutLink) {
-          setSigningOut(true);
-        }
-        onClick?.(e);
-      }}
+      onClick={onClick}
       target={isGatewayProfileLink ? "_blank" : undefined}
       rel={isGatewayProfileLink ? "noopener noreferrer" : rel}
     />

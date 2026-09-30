@@ -28,7 +28,10 @@ const DefaultHeaderBar = () => {
             onClick: () => {
               setSigningOut(true);
               setUser(null);
-              router.push("/api/auth/logout");
+              // Full browser navigation, not router.push: logout redirects to
+              // the IdP on another origin, which a client-side transition
+              // cannot follow - it fetches instead and fails CORS.
+              window.location.href = "/api/auth/logout";
             },
           },
         ]

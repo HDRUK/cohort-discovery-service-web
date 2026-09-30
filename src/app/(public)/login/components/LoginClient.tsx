@@ -15,7 +15,7 @@ import StandaloneLoginForm from "./StandaloneLoginForm";
 import Circles from "./Circles";
 import Title from "@/components/Title";
 import { useApplicationMode } from "@/providers/ApplicationModeProvider";
-import { SsoProvider } from "@/types/api";
+import { AuthMethod } from "@/types/api";
 import { getProviderIcon } from "@/utils/ssoProviders";
 
 const REDIRECT_URL = process?.env?.NEXT_PUBLIC_LOGIN_URL;
@@ -23,14 +23,20 @@ const REDIRECT_URL = process?.env?.NEXT_PUBLIC_LOGIN_URL;
 type View = "landing" | "options" | "email";
 
 interface LoginClientProps {
-  providers?: SsoProvider[];
+  methods?: AuthMethod[];
 }
 
-const LoginClient = ({ providers = [] }: LoginClientProps) => {
+const LoginClient = ({ methods = [] }: LoginClientProps) => {
   const { isStandalone } = useApplicationMode();
   const router = useRouter();
   const [view, setView] = useState<View>("landing");
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
+
+  const passwordMethod = methods.find((method) => method.type === "password");
+  const providers = methods.filter(
+    (method): method is Extract<AuthMethod, { type: "oidc" }> =>
+      method.type === "oidc",
+  );
 
   const onClick = () => {
     if (!isStandalone) {
@@ -55,20 +61,22 @@ const LoginClient = ({ providers = [] }: LoginClientProps) => {
         <Stack spacing={2}>
           <Title title="Sign in" />
           <Stack spacing={1}>
-            <Button
-              variant="outlined"
-              fullWidth
-              size="large"
-              startIcon={<MailOutlineRounded />}
-              onClick={() => setView("email")}
-              sx={{ justifyContent: "flex-start" }}
-            >
-              Continue with email
-            </Button>
+            {passwordMethod && (
+              <Button
+                variant="outlined"
+                fullWidth
+                size="large"
+                startIcon={<MailOutlineRounded />}
+                onClick={() => setView("email")}
+                sx={{ justifyContent: "flex-start" }}
+              >
+                {passwordMethod.label}
+              </Button>
+            )}
 
             {providers.length > 0 && (
               <>
-                <Divider sx={{ my: 1 }} />
+                {passwordMethod && <Divider sx={{ my: 1 }} />}
                 {providers.map((provider) => {
                   const ProviderIcon = getProviderIcon(provider.slug);
                   const isLoading = loadingProvider === provider.slug;

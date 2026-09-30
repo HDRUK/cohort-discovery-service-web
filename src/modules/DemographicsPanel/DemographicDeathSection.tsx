@@ -1,7 +1,7 @@
 "use client";
 
 import { Controller, useFormContext } from "react-hook-form";
-import { Box, Chip, Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import {
   demographicGuidance,
@@ -9,6 +9,7 @@ import {
 } from "@/config/demographics";
 import { Demographics, DEATH_OPTIONS } from "@/types/rules";
 import DemographicRow, { DemographicRowActionProps } from "./DemographicRow";
+import DemographicChip from "./DemographicChip";
 
 interface DemographicDeathSectionProps extends DemographicRowActionProps {
   deathAvailable: boolean;
@@ -143,11 +144,9 @@ const DemographicDeathSection = ({
         )
       }
     >
-      <Chip
-        variant="outlined"
-        sx={{ bgcolor: "white" }}
-        data-testid="death-chip"
+      <DemographicChip
         label={DEATH_OPTIONS[death?.value as number]?.label ?? "Any"}
+        field="death"
       />
     </DemographicRow>
   );

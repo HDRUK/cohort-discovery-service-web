@@ -17,6 +17,7 @@ import {
   Box,
   Divider,
   Button,
+  Stack,
 } from "@mui/material";
 import SquareCheckbox from "@/components/SquareCheckbox";
 import { ConceptItem, ConceptItemProps } from "./ConceptItem";
@@ -43,6 +44,7 @@ interface SearchConceptsProps {
   onToggle?: (concept: Concept, isSelected: boolean) => void;
   onHasOptions?: (hasOptions: boolean) => void;
   headerSlot?: React.ReactNode;
+  confirmSlot?: React.ReactNode;
   slotProps?: SlotProps;
 }
 
@@ -65,6 +67,7 @@ const SearchConcepts = ({
   onToggle,
   onHasOptions,
   headerSlot,
+  confirmSlot,
   slotProps,
   multiple = false,
   hideSelectAll = false,
@@ -203,7 +206,6 @@ const SearchConcepts = ({
         handleToggle(id);
         onToggle?.(c, !selected?.[c.concept_id]);
         e.stopPropagation();
-        e.preventDefault();
       }}
       showCode
       showCounts={queryBuilderShowConceptStats}
@@ -254,7 +256,7 @@ const SearchConcepts = ({
       <FormGroup
         ref={resultsContainerRef}
         data-testid="search-concepts-results"
-        sx={mergeSx(searchResultsSx, { mt: headerSlot ? 0 : 2 })}
+        sx={mergeSx(searchResultsSx, { mt: headerSlot ? 0 : 1 })}
       >
         {multiple && !hideSelectAll && visibleOptions.length > 0 && (
           <>
@@ -283,21 +285,25 @@ const SearchConcepts = ({
           </>
         )}
       </FormGroup>
-      {hasMoreResults && (
-        <Box sx={{ mt: 1 }}>
-          <Button
-            variant="text"
-            disabled={isLoading}
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              handleShowMore();
-            }}
-          >
-            Show more ({loadedCount} / {activeResult.total})
-          </Button>
-        </Box>
-      )}
+      <Stack direction="row" justifyContent="space-between">
+        {hasMoreResults && (
+          <Box>
+            <Button
+              variant="text"
+              disabled={isLoading}
+              sx={{ py: "10px" }}
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                handleShowMore();
+              }}
+            >
+              Show more ({loadedCount} / {activeResult.total})
+            </Button>
+          </Box>
+        )}
+        {confirmSlot}
+      </Stack>
     </Box>
   );
 };
