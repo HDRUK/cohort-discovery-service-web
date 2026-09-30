@@ -44,11 +44,7 @@ const DomainFilterTabs = () => {
           />
         ))}
       </Tabs>
-      <DownloadButton
-        formats={[AvailableFormats.CSV]}
-        isIcon={false}
-        isTermDirectory={true}
-      />
+      <DownloadButton formats={[AvailableFormats.CSV]} isIcon={false} />
     </Stack>
   );
 };
