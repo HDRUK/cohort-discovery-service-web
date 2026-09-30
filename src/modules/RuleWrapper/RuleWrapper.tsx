@@ -394,13 +394,7 @@ const RuleWrapper = ({
                       : 0
                   }
                 >
-                  {renderFooter ||
-                    (!valid && (
-                      <InvalidRule
-                        reasons={invalidReason ?? []}
-                        stackProps={{ sx: { pt: 1, pb: 1 } }}
-                      />
-                    ))}
+                  {!valid && renderFooter}
                 </Box>
               </>
             )}
