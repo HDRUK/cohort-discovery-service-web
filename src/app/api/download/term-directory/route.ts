@@ -2,6 +2,9 @@ import { DomainTab } from "@/config/domainFilters";
 import { cookies } from "next/headers";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import { buildTermDirectoryParams } from "@/utils/buildTermDirectoryParams";
+import { API_ROUTES } from "@/lib/apiRoutes";
+import { apiGet } from "@/lib/apiClient";
+import { ApiResponse } from "@/types/api";
 
 const baseURL = process.env.API_BASE_URL!;
 
@@ -12,10 +15,7 @@ export async function GET(req: Request) {
   const collections = urlObj.searchParams.get("collections") ?? undefined;
   const sort = urlObj.searchParams.get("sort") ?? undefined;
 
-  const cookieStore = await cookies();
-  const token = cookieStore.get(ACCESS_TOKEN_NAME)?.value;
-
-  const parameters = buildTermDirectoryParams(
+  const params = buildTermDirectoryParams(
     1,
     100,
     search_term,
@@ -24,18 +24,10 @@ export async function GET(req: Request) {
     sort,
   );
 
-  const backendUrl = `${baseURL}/api/v1/term-directory/download?${parameters}`;
-
-  const backendRes = await fetch(backendUrl, {
-    method: "GET",
-    headers: {
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-  });
-
-  if (!backendRes.ok) {
-    return new Response("Download failed", { status: backendRes.status });
-  }
+  const backendRes = (await apiGet({
+    url: API_ROUTES.termDirectoryDownload,
+    params,
+  })) as Response;
 
   const body = backendRes.body;
 
