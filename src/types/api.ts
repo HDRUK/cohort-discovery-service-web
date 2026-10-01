@@ -362,6 +362,14 @@ export enum TaskType {
   B = "b",
 }
 
+export interface UserIdentity extends WithTimestamps {
+  id: number;
+  provider: string;
+  provider_sub: string;
+  email_at_link: string | null;
+  last_login_at: string | null;
+}
+
 export interface User extends WithTimestamps {
   id: number;
   email: string;
@@ -371,6 +379,7 @@ export interface User extends WithTimestamps {
   roles: Role[];
   custodians: Custodian[];
   workgroups?: Workgroup[];
+  identities?: UserIdentity[];
 }
 
 export interface ExternalCustodian {
