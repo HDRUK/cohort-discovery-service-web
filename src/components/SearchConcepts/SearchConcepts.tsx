@@ -17,7 +17,6 @@ import {
   Box,
   Divider,
   Button,
-  Stack,
 } from "@mui/material";
 import SquareCheckbox from "@/components/SquareCheckbox";
 import { ConceptItem, ConceptItemProps } from "./ConceptItem";
@@ -43,8 +42,6 @@ interface SearchConceptsProps {
   onClick?: (concept: Concept) => void;
   onToggle?: (concept: Concept, isSelected: boolean) => void;
   onHasOptions?: (hasOptions: boolean) => void;
-  headerSlot?: React.ReactNode;
-  confirmSlot?: React.ReactNode;
   slotProps?: SlotProps;
 }
 
@@ -66,8 +63,6 @@ const SearchConcepts = ({
   onClick,
   onToggle,
   onHasOptions,
-  headerSlot,
-  confirmSlot,
   slotProps,
   multiple = false,
   hideSelectAll = false,
@@ -252,11 +247,10 @@ const SearchConcepts = ({
         }
         debounceMs={400}
       />
-      {headerSlot}
       <FormGroup
         ref={resultsContainerRef}
         data-testid="search-concepts-results"
-        sx={mergeSx(searchResultsSx, { mt: headerSlot ? 0 : 1 })}
+        sx={mergeSx(searchResultsSx, { mt: 1 })}
       >
         {multiple && !hideSelectAll && visibleOptions.length > 0 && (
           <>
@@ -285,25 +279,22 @@ const SearchConcepts = ({
           </>
         )}
       </FormGroup>
-      <Stack direction="row" justifyContent="space-between">
-        {hasMoreResults && (
-          <Box>
-            <Button
-              variant="text"
-              disabled={isLoading}
-              sx={{ py: "10px" }}
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                handleShowMore();
-              }}
-            >
-              Show more ({loadedCount} / {activeResult.total})
-            </Button>
-          </Box>
-        )}
-        {confirmSlot}
-      </Stack>
+      {hasMoreResults && (
+        <Box>
+          <Button
+            variant="text"
+            disabled={isLoading}
+            sx={{ py: "10px" }}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              handleShowMore();
+            }}
+          >
+            Show more ({loadedCount} / {activeResult.total})
+          </Button>
+        </Box>
+      )}
     </Box>
   );
 };

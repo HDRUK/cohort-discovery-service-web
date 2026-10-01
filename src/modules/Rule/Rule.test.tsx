@@ -139,20 +139,30 @@ describe("Rule", () => {
   });
 
   it(
-    "shows the confirm footer with working buttons once a concept is picked",
+    "shows the invalid reason and the buttons in the same footer row once a concept is picked",
     async () => {
-      renderComponent({ rule: { concept: null } }, undefined, {
-        selected: { "rule-1": true },
-      });
+      renderComponent(
+        {
+          rule: { concept: null },
+          valid: false,
+          invalidReason: ["A rule cannot be empty."],
+        },
+        undefined,
+        { selected: { "rule-1": true } },
+      );
 
       await userEvent.type(screen.getByRole("textbox"), "diabetes");
       await userEvent.click(await findConceptCheckbox("201826"));
 
+      const footer = screen.getByTestId("rule-footer");
       expect(
-        screen.getByRole("button", { name: /confirm selection/i }),
+        within(footer).getByText("A rule cannot be empty."),
+      ).toBeInTheDocument();
+      expect(
+        within(footer).getByRole("button", { name: /confirm selection/i }),
       ).toBeEnabled();
       expect(
-        screen.getByRole("button", { name: /clear all/i }),
+        within(footer).getByRole("button", { name: /clear all/i }),
       ).toBeInTheDocument();
     },
     10000,
@@ -172,14 +182,15 @@ describe("Rule", () => {
         useQueryBuilderStore.setState({ selected: {} });
       });
 
+      const footer = screen.getByTestId("rule-footer");
       expect(
-        screen.getByText(/please confirm or clear your changes/i),
+        within(footer).getByText(/please confirm or clear your changes/i),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole("button", { name: /confirm selection/i }),
+        within(footer).getByRole("button", { name: /confirm selection/i }),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole("button", { name: /clear all/i }),
+        within(footer).getByRole("button", { name: /clear all/i }),
       ).toBeInTheDocument();
     },
     10000,

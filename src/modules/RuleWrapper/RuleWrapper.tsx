@@ -39,7 +39,7 @@ import { RuleNodeType } from "@/types/rules";
 import EditableText from "@/components/EditableText";
 import { useLogDependencyChanges } from "@/utils/deps";
 import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
-import InvalidRule from "@/components/InvalidRule";
+import RuleFooter from "../RuleFooter";
 import Title from "@/components/Title";
 import useRightClickMenu from "@/hooks/useRightClickMenu";
 import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
@@ -198,18 +198,15 @@ const RuleWrapper = ({
 
   const nodeName = useMemo(() => getNodeName(node), [node, getNodeName]);
 
-  const showFooter =
-    (type === DragType.Rule && isSelected && !isAgeFilter(node)) ||
-    (!valid && (invalidReason ?? []).length > 0);
-
   const footerContent =
     renderFooter ??
     (!valid && (invalidReason ?? []).length > 0 ? (
-      <InvalidRule
-        reasons={invalidReason ?? []}
-        stackProps={{ sx: { pt: 1, pb: 1 } }}
-      />
+      <RuleFooter invalidReason={invalidReason} />
     ) : null);
+
+  const showFooter =
+    (type === DragType.Rule && isSelected && !isAgeFilter(node)) ||
+    Boolean(footerContent);
 
   useLogDependencyChanges("wrapper " + node.id, {
     isSelected,

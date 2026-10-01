@@ -21,6 +21,9 @@ import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import useNodeActions from "@/hooks/useNodeActions";
 import RuleFooter from "../RuleFooter";
 
+const CONFIRM_OR_CLEAR_MESSAGE =
+  "Please confirm or clear your changes before continuing";
+
 export interface RuleProps extends Omit<
   RuleWrapperProps,
   "node" | "type" | "render"
@@ -124,12 +127,11 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       renderFooter={
         showSearchFooter ? (
           <RuleFooter
-            customInvalidRule={false}
-            isSelected={isSelected}
-            rule={rule}
-            handleConfirm={selection.handleConfirm}
-            clearAll={selection.clearAll}
-            selectedConceptsLength={selection.selectedConcepts.length}
+            message={isSelected ? undefined : CONFIRM_OR_CLEAR_MESSAGE}
+            invalidReason={rule.invalidReason}
+            onConfirm={selection.handleConfirm}
+            onClearAll={selection.clearAll}
+            confirmDisabled={selection.selectedConcepts.length < 1}
           />
         ) : undefined
       }

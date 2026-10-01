@@ -1,32 +1,25 @@
 import ErrorIcon from "@/components/ErrorIcon";
 import InvalidRule from "@/components/InvalidRule";
-import { RuleLeafType } from "@/types/rules";
 import { Button, Stack, Typography } from "@mui/material";
 
 export interface RuleFooterProps {
-  customInvalidRule: boolean;
-  isSelected: boolean;
-  rule: RuleLeafType;
-  handleConfirm: () => void;
-  clearAll: () => void;
-  selectedConceptsLength: number;
-  isNLP?: boolean;
+  invalidReason?: string[];
+  message?: string;
+  onConfirm?: () => void;
+  onClearAll?: () => void;
+  confirmDisabled?: boolean;
 }
 
 const RuleFooter = ({
-  customInvalidRule,
-  isSelected,
-  rule,
-  handleConfirm,
-  clearAll,
-  selectedConceptsLength,
+  invalidReason,
+  message,
+  onConfirm,
+  onClearAll,
+  confirmDisabled = false,
 }: RuleFooterProps) => {
-  const promptMessage = customInvalidRule
-    ? "A rule has alternatives, please select one or more concepts"
-    : "Please confirm or clear your changes before continuing";
-
   return (
     <Stack
+      data-testid="rule-footer"
       direction="row"
       alignItems="center"
       justifyContent="space-between"
@@ -34,7 +27,7 @@ const RuleFooter = ({
       py={0.75}
       gap={1}
     >
-      {customInvalidRule || !isSelected ? (
+      {message ? (
         <Stack
           direction="row"
           alignItems="center"
@@ -44,40 +37,48 @@ const RuleFooter = ({
         >
           <ErrorIcon />
           <Typography variant="body2" noWrap sx={{ fontSize: 16 }}>
-            {promptMessage}
+            {message}
           </Typography>
         </Stack>
       ) : (
         <InvalidRule
-          reasons={rule.invalidReason ?? []}
+          reasons={invalidReason ?? []}
           stackProps={{ sx: { pt: 1, pb: 1, fontSize: 16 } }}
         />
       )}
-      <Stack direction="row" justifyContent="flex-end" gap={1} pt={1}>
-        <Button
-          variant="outlined"
-          color="secondary"
-          size="small"
-          onClick={(e) => {
-            e.stopPropagation();
-            clearAll();
-          }}
+      {onConfirm && (
+        <Stack
+          direction="row"
+          justifyContent="flex-end"
+          gap={1}
+          pt={1}
+          flexShrink={0}
         >
-          Clear all
-        </Button>
-        <Button
-          variant="contained"
-          color="secondary"
-          size="small"
-          disabled={selectedConceptsLength < 1}
-          onClick={(e) => {
-            e.stopPropagation();
-            handleConfirm();
-          }}
-        >
-          Confirm selection
-        </Button>
-      </Stack>
+          <Button
+            variant="outlined"
+            color="secondary"
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClearAll?.();
+            }}
+          >
+            Clear all
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+            size="small"
+            disabled={confirmDisabled}
+            onClick={(e) => {
+              e.stopPropagation();
+              onConfirm();
+            }}
+          >
+            Confirm selection
+          </Button>
+        </Stack>
+      )}
     </Stack>
   );
 };

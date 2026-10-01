@@ -22,6 +22,9 @@ import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import { DEFAULT_SEARCH_RESULTS_MAX_HEIGHT } from "@/config/defaults";
 import RuleFooter from "../RuleFooter";
 
+const ALTERNATIVES_MESSAGE =
+  "A rule has alternatives, please select one or more concepts";
+
 interface RuleAlternativesProps extends Omit<
   RuleWrapperProps,
   "node" | "type" | "render"
@@ -163,12 +166,10 @@ const RuleAlternatives = ({
       renderFooter={
         isSelected ? (
           <RuleFooter
-            customInvalidRule
-            isSelected={isSelected}
-            rule={rule}
-            handleConfirm={handleConfirm}
-            clearAll={clearAll}
-            selectedConceptsLength={selectedConceptIds.length}
+            message={ALTERNATIVES_MESSAGE}
+            onConfirm={handleConfirm}
+            onClearAll={clearAll}
+            confirmDisabled={selectedConceptIds.length < 1}
           />
         ) : undefined
       }
