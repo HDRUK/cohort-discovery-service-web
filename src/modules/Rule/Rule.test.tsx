@@ -1,7 +1,8 @@
 import "@testing-library/jest-dom";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import Rule, { RuleProps } from "./Rule";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
+import { useQueryBuilderStore } from "@/store/queryBuilderStore";
 import { RuleLeafType, RuleGroupType } from "@/types/rules";
 import userEvent from "@testing-library/user-event";
 import { CloseGuardProvider } from "@/providers/CloseGuardProvider";
@@ -17,6 +18,15 @@ jest.mock("@/utils/rules", () => {
 import { removeById, updateById } from "@/utils/rules";
 
 const setQueryBuilderJson = jest.fn();
+
+const findConceptCheckbox = async (omopId: string) => {
+  const items = await screen.findAllByTestId("concept-item", undefined, {
+    timeout: 3000,
+  });
+  const match = items.find((item) => item.textContent?.includes(omopId));
+  if (!match) throw new Error(`No concept item found for OMOP id ${omopId}`);
+  return within(match).getByRole("checkbox");
+};
 
 describe("Rule", () => {
   const renderComponent = (
@@ -114,6 +124,107 @@ describe("Rule", () => {
 
     expect(mockSelect).toHaveBeenCalledWith("rule-1");
   });
+
+  it("does not show the confirm footer for a selected blank rule before any concept is picked", () => {
+    renderComponent({ rule: { concept: null } }, undefined, {
+      selected: { "rule-1": true },
+    });
+
+    expect(
+      screen.queryByRole("button", { name: /confirm selection/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /clear all/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it(
+    "shows the invalid reason and the buttons in the same footer row while nothing is picked",
+    async () => {
+      renderComponent(
+        {
+          rule: { concept: null },
+          valid: false,
+          invalidReason: ["A rule cannot be empty."],
+        },
+        undefined,
+        { selected: { "rule-1": true } },
+      );
+
+      await userEvent.type(screen.getByRole("textbox"), "diabetes");
+      await findConceptCheckbox("201826");
+
+      const footer = screen.getByTestId("rule-footer");
+      expect(
+        within(footer).getByText("A rule cannot be empty."),
+      ).toBeInTheDocument();
+      expect(
+        within(footer).getByRole("button", { name: /confirm selection/i }),
+      ).toBeDisabled();
+      expect(
+        within(footer).getByRole("button", { name: /clear all/i }),
+      ).toBeInTheDocument();
+    },
+    10000,
+  );
+
+  it(
+    "swaps to the confirm-or-clear prompt once a concept is picked",
+    async () => {
+      renderComponent(
+        {
+          rule: { concept: null },
+          valid: false,
+          invalidReason: ["A rule cannot be empty."],
+        },
+        undefined,
+        { selected: { "rule-1": true } },
+      );
+
+      await userEvent.type(screen.getByRole("textbox"), "diabetes");
+      await userEvent.click(await findConceptCheckbox("201826"));
+
+      const footer = screen.getByTestId("rule-footer");
+      expect(
+        within(footer).getByText(/please confirm or clear your changes/i),
+      ).toBeInTheDocument();
+      expect(
+        within(footer).queryByText("A rule cannot be empty."),
+      ).not.toBeInTheDocument();
+      expect(
+        within(footer).getByRole("button", { name: /confirm selection/i }),
+      ).toBeEnabled();
+    },
+    10000,
+  );
+
+  it(
+    "keeps the confirm footer visible with a deselect prompt after the rule loses selection",
+    async () => {
+      renderComponent({ rule: { concept: null } }, undefined, {
+        selected: { "rule-1": true },
+      });
+
+      await userEvent.type(screen.getByRole("textbox"), "diabetes");
+      await userEvent.click(await findConceptCheckbox("201826"));
+
+      act(() => {
+        useQueryBuilderStore.setState({ selected: {} });
+      });
+
+      const footer = screen.getByTestId("rule-footer");
+      expect(
+        within(footer).getByText(/please confirm or clear your changes/i),
+      ).toBeInTheDocument();
+      expect(
+        within(footer).getByRole("button", { name: /confirm selection/i }),
+      ).toBeInTheDocument();
+      expect(
+        within(footer).getByRole("button", { name: /clear all/i }),
+      ).toBeInTheDocument();
+    },
+    10000,
+  );
 
   it("calls setQueryBuilderJson with updated state when Delete action is triggered", async () => {
     const { query } = renderComponent();

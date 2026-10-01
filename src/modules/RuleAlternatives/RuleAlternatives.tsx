@@ -5,8 +5,7 @@ import { DragType } from "@/types/dnd";
 import { RuleLeafType } from "@/types/rules";
 import ConceptChip from "@/components/ConceptChip";
 import SquareCheckbox from "@/components/SquareCheckbox";
-import ErrorIcon from "@/components/ErrorIcon";
-import { Button, FormControlLabel, Stack, Typography } from "@mui/material";
+import { FormControlLabel, Stack } from "@mui/material";
 import DomainChip from "@/components/DomainChip/DomainChip";
 import { useCallback, useMemo, useState } from "react";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
@@ -21,6 +20,10 @@ import { useCohortBuilderContext } from "@/providers/CohortBuilderProvider";
 import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import { DEFAULT_SEARCH_RESULTS_MAX_HEIGHT } from "@/config/defaults";
+import RuleFooter from "../RuleFooter";
+
+const ALTERNATIVES_MESSAGE =
+  "A rule has alternatives, please select one or more concepts";
 
 interface RuleAlternativesProps extends Omit<
   RuleWrapperProps,
@@ -153,58 +156,6 @@ const RuleAlternatives = ({
     [concept, setConcept],
   );
 
-  const footer = (
-    <Stack
-      direction="row"
-      alignItems="center"
-      justifyContent="space-between"
-      px={1}
-      py={0.75}
-      gap={1}
-    >
-      <Stack
-        direction="row"
-        alignItems="center"
-        gap={1}
-        flexShrink={1}
-        minWidth={0}
-      >
-        <ErrorIcon />
-        <Typography variant="body2" noWrap>
-          A rule has alternatives, please select one or more concepts
-        </Typography>
-      </Stack>
-      <Stack direction="row" gap={1} flexShrink={0}>
-        <Button
-          color="secondary"
-          size="small"
-          variant="outlined"
-          onClick={(e) => {
-            e.stopPropagation();
-            clearAll();
-          }}
-          sx={{ whiteSpace: "nowrap" }}
-        >
-          Clear all
-        </Button>
-        <Button
-          color="secondary"
-          size="small"
-          variant="contained"
-          disabled={selectedConceptIds.length < 1}
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            handleConfirm();
-          }}
-          sx={{ whiteSpace: "nowrap" }}
-        >
-          Confirm selection
-        </Button>
-      </Stack>
-    </Stack>
-  );
-
   return (
     <RuleWrapper
       node={rule}
@@ -212,7 +163,16 @@ const RuleAlternatives = ({
       groupId={groupId}
       sortable={true}
       headerExtra={<DomainChip concept={concept} />}
-      renderFooter={footer}
+      renderFooter={
+        isSelected ? (
+          <RuleFooter
+            message={ALTERNATIVES_MESSAGE}
+            onConfirm={handleConfirm}
+            onClearAll={clearAll}
+            confirmDisabled={selectedConceptIds.length < 1}
+          />
+        ) : undefined
+      }
       render={() => (
         <Stack
           component="form"

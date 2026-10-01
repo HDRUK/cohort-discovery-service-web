@@ -6,6 +6,7 @@ import { useCallback } from "react";
 import ConceptChip from "@/components/ConceptChip";
 import { RuleLeafType, SingleSidedOperator } from "@/types/rules";
 import RuleSearch from "./RuleSearch";
+import useRuleConceptSelection from "./useRuleConceptSelection";
 
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import {
@@ -18,6 +19,10 @@ import {
 import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import useNodeActions from "@/hooks/useNodeActions";
+import RuleFooter from "../RuleFooter";
+
+const CONFIRM_OR_CLEAR_MESSAGE =
+  "Please confirm or clear your changes before continuing";
 
 export interface RuleProps extends Omit<
   RuleWrapperProps,
@@ -71,6 +76,8 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     [id, setQueryBuilderJson, queryBuilderJson],
   );
 
+  const selection = useRuleConceptSelection(setConcept);
+
   const clearConcept = useCallback(() => {
     setQueryBuilderJson(
       updateById(queryBuilderJson, id, (node) => {
@@ -104,6 +111,12 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
 
   const { actions } = useNodeActions(rule);
 
+  const pendingConceptCount = selection.selectedConcepts.length;
+
+  const showSearchFooter =
+    isEmptyRule(rule) &&
+    (isSelected ? selection.hasOptions : pendingConceptCount > 0);
+
   return (
     <RuleWrapper
       node={rule}
@@ -111,14 +124,23 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       groupId={groupId}
       sortable={true}
       headerExtra={!isEmptyRule(rule) ? <DomainChip concept={concept} /> : null}
+      renderFooter={
+        showSearchFooter ? (
+          <RuleFooter
+            message={
+              pendingConceptCount > 0 ? CONFIRM_OR_CLEAR_MESSAGE : undefined
+            }
+            invalidReason={rule.invalidReason}
+            onConfirm={selection.handleConfirm}
+            onClearAll={selection.clearAll}
+            confirmDisabled={pendingConceptCount < 1}
+          />
+        ) : undefined
+      }
       render={() => (
         <Box py={1}>
           {isEmptyRule(rule) ? (
-            <RuleSearch
-              onConfirm={setConcept}
-              isSelected={isSelected}
-              onSelect={() => select(id)}
-            />
+            <RuleSearch onSelect={() => select(id)} selection={selection} />
           ) : (
             <>
               {isSingleConcept(concept) && (
