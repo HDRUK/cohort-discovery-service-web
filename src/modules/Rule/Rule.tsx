@@ -111,11 +111,11 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
 
   const { actions } = useNodeActions(rule);
 
+  const pendingConceptCount = selection.selectedConcepts.length;
+
   const showSearchFooter =
     isEmptyRule(rule) &&
-    (isSelected
-      ? selection.hasOptions
-      : selection.selectedConcepts.length > 0);
+    (isSelected ? selection.hasOptions : pendingConceptCount > 0);
 
   return (
     <RuleWrapper
@@ -127,11 +127,13 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       renderFooter={
         showSearchFooter ? (
           <RuleFooter
-            message={isSelected ? undefined : CONFIRM_OR_CLEAR_MESSAGE}
+            message={
+              pendingConceptCount > 0 ? CONFIRM_OR_CLEAR_MESSAGE : undefined
+            }
             invalidReason={rule.invalidReason}
             onConfirm={selection.handleConfirm}
             onClearAll={selection.clearAll}
-            confirmDisabled={selection.selectedConcepts.length < 1}
+            confirmDisabled={pendingConceptCount < 1}
           />
         ) : undefined
       }

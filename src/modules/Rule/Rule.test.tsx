@@ -139,7 +139,37 @@ describe("Rule", () => {
   });
 
   it(
-    "shows the invalid reason and the buttons in the same footer row once a concept is picked",
+    "shows the invalid reason and the buttons in the same footer row while nothing is picked",
+    async () => {
+      renderComponent(
+        {
+          rule: { concept: null },
+          valid: false,
+          invalidReason: ["A rule cannot be empty."],
+        },
+        undefined,
+        { selected: { "rule-1": true } },
+      );
+
+      await userEvent.type(screen.getByRole("textbox"), "diabetes");
+      await findConceptCheckbox("201826");
+
+      const footer = screen.getByTestId("rule-footer");
+      expect(
+        within(footer).getByText("A rule cannot be empty."),
+      ).toBeInTheDocument();
+      expect(
+        within(footer).getByRole("button", { name: /confirm selection/i }),
+      ).toBeDisabled();
+      expect(
+        within(footer).getByRole("button", { name: /clear all/i }),
+      ).toBeInTheDocument();
+    },
+    10000,
+  );
+
+  it(
+    "swaps to the confirm-or-clear prompt once a concept is picked",
     async () => {
       renderComponent(
         {
@@ -156,14 +186,14 @@ describe("Rule", () => {
 
       const footer = screen.getByTestId("rule-footer");
       expect(
-        within(footer).getByText("A rule cannot be empty."),
+        within(footer).getByText(/please confirm or clear your changes/i),
       ).toBeInTheDocument();
+      expect(
+        within(footer).queryByText("A rule cannot be empty."),
+      ).not.toBeInTheDocument();
       expect(
         within(footer).getByRole("button", { name: /confirm selection/i }),
       ).toBeEnabled();
-      expect(
-        within(footer).getByRole("button", { name: /clear all/i }),
-      ).toBeInTheDocument();
     },
     10000,
   );
