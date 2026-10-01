@@ -6,6 +6,7 @@ import { useCallback } from "react";
 import ConceptChip from "@/components/ConceptChip";
 import { RuleLeafType, SingleSidedOperator } from "@/types/rules";
 import RuleSearch from "./RuleSearch";
+import useRuleConceptSelection from "./useRuleConceptSelection";
 
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import {
@@ -18,6 +19,7 @@ import {
 import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import useNodeActions from "@/hooks/useNodeActions";
+import RuleFooter from "../RuleFooter";
 
 export interface RuleProps extends Omit<
   RuleWrapperProps,
@@ -71,6 +73,8 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     [id, setQueryBuilderJson, queryBuilderJson],
   );
 
+  const selection = useRuleConceptSelection(setConcept);
+
   const clearConcept = useCallback(() => {
     setQueryBuilderJson(
       updateById(queryBuilderJson, id, (node) => {
@@ -104,6 +108,12 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
 
   const { actions } = useNodeActions(rule);
 
+  const showSearchFooter =
+    isEmptyRule(rule) &&
+    (isSelected
+      ? selection.hasOptions
+      : selection.selectedConcepts.length > 0);
+
   return (
     <RuleWrapper
       node={rule}
@@ -111,14 +121,22 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       groupId={groupId}
       sortable={true}
       headerExtra={!isEmptyRule(rule) ? <DomainChip concept={concept} /> : null}
+      renderFooter={
+        showSearchFooter ? (
+          <RuleFooter
+            customInvalidRule={false}
+            isSelected={isSelected}
+            rule={rule}
+            handleConfirm={selection.handleConfirm}
+            clearAll={selection.clearAll}
+            selectedConceptsLength={selection.selectedConcepts.length}
+          />
+        ) : undefined
+      }
       render={() => (
         <Box py={1}>
           {isEmptyRule(rule) ? (
-            <RuleSearch
-              onConfirm={setConcept}
-              isSelected={isSelected}
-              onSelect={() => select(id)}
-            />
+            <RuleSearch onSelect={() => select(id)} selection={selection} />
           ) : (
             <>
               {isSingleConcept(concept) && (

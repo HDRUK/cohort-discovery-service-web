@@ -202,6 +202,15 @@ const RuleWrapper = ({
     (type === DragType.Rule && isSelected && !isAgeFilter(node)) ||
     (!valid && (invalidReason ?? []).length > 0);
 
+  const footerContent =
+    renderFooter ??
+    (!valid && (invalidReason ?? []).length > 0 ? (
+      <InvalidRule
+        reasons={invalidReason ?? []}
+        stackProps={{ sx: { pt: 1, pb: 1 } }}
+      />
+    ) : null);
+
   useLogDependencyChanges("wrapper " + node.id, {
     isSelected,
     node,
@@ -389,13 +398,7 @@ const RuleWrapper = ({
                     type === DragType.Rule && isSelected && !isAgeFilter(node) ? 40 : 0
                   }
                 >
-                  {(isSelected && renderFooter) ||
-                    (!valid && (
-                      <InvalidRule
-                        reasons={invalidReason ?? []}
-                        stackProps={{ sx: { pt: 1, pb: 1 } }}
-                      />
-                    ))}
+                  {footerContent}
                 </Box>
               </>
             )}

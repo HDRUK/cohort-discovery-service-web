@@ -5,6 +5,7 @@ import RuleBoard from "./RuleBoard";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 import { CombinatorType, RuleGroupType, RuleNodeType } from "@/types/rules";
 import { validateRuleTree } from "@/utils/rules";
+import { CloseGuardProvider } from "@/providers/CloseGuardProvider";
 const setQueryBuilderJson = jest.fn();
 
 describe("QueryBuilder", () => {
@@ -41,16 +42,18 @@ describe("QueryBuilder", () => {
       rules,
     }) as RuleGroupType;
     const rendered = render(
-      <MockCohortDiscoveryServiceStore
-        overrides={{
-          queryBuilder: {
-            queryBuilderJson: group,
-            setQueryBuilderJson,
-          },
-        }}
-      >
-        <RuleBoard ruleGroup={group} />
-      </MockCohortDiscoveryServiceStore>,
+      <CloseGuardProvider>
+        <MockCohortDiscoveryServiceStore
+          overrides={{
+            queryBuilder: {
+              queryBuilderJson: group,
+              setQueryBuilderJson,
+            },
+          }}
+        >
+          <RuleBoard ruleGroup={group} />
+        </MockCohortDiscoveryServiceStore>
+      </CloseGuardProvider>,
     );
     return rendered;
   };
