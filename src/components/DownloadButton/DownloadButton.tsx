@@ -90,7 +90,7 @@ const DownloadButton = ({
   ) : (
     <PositionedMenu
       title={
-        !ids
+        downloadRoute === "term-directory"
           ? "Export the full term directory with all selected filters applied"
           : undefined
       }
