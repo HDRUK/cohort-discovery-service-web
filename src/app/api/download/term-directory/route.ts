@@ -1,12 +1,7 @@
 import { DomainTab } from "@/config/domainFilters";
-import { cookies } from "next/headers";
-import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import { buildTermDirectoryParams } from "@/utils/buildTermDirectoryParams";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { apiGet } from "@/lib/apiClient";
-import { ApiResponse } from "@/types/api";
-
-const baseURL = process.env.API_BASE_URL!;
 
 export async function GET(req: Request) {
   const urlObj = new URL(req.url);
