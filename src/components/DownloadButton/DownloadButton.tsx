@@ -18,6 +18,7 @@ export interface DownloadButtonProps extends Omit<
   entity?: string;
   formats?: AvailableFormats[];
   isIcon?: boolean;
+  downloadRoute?: string;
 }
 
 const DownloadButton = ({
@@ -26,6 +27,7 @@ const DownloadButton = ({
   formats = [AvailableFormats.JSON],
   disabled,
   isIcon = true,
+  downloadRoute,
 }: DownloadButtonProps) => {
   const notify = useNotify();
 
@@ -49,16 +51,16 @@ const DownloadButton = ({
   };
 
   const download = async (format: AvailableFormats) => {
-    if (!ids) {
+    if (downloadRoute) {
       handleDownload(
-        `/api/download/term-directory?${queryString}`,
+        `/api/download/${downloadRoute}?${queryString}`,
         "Downloading has started. Please allow some time for it to complete.",
         3000,
       );
       return;
     }
 
-    if (disabled || ids.length === 0 || !entity) return;
+    if (disabled || !ids || ids.length === 0 || !entity) return;
 
     ids.map((id, idx) => {
       const url = `/api/download/${encodeURIComponent(
