@@ -2,7 +2,7 @@ import { Box } from "@mui/material";
 import { DragType } from "@/types/dnd";
 import DomainChip from "@/components/DomainChip/DomainChip";
 import { Concept } from "@/types/api";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback } from "react";
 import ConceptChip from "@/components/ConceptChip";
 import { RuleLeafType, SingleSidedOperator } from "@/types/rules";
 import RuleSearch from "./RuleSearch";
@@ -19,8 +19,6 @@ import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import useNodeActions from "@/hooks/useNodeActions";
 import RuleFooter from "../RuleFooter";
-import { useForm, useWatch } from "react-hook-form";
-import { useSaveChanges } from "@/hooks/useSaveChanges";
 import useRuleConceptSelection from "./useRuleConceptSelection";
 
 export interface RuleProps extends Omit<

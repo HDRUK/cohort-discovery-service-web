@@ -43,7 +43,6 @@ interface SearchConceptsProps {
   onToggle?: (concept: Concept, isSelected: boolean) => void;
   onHasOptions?: (hasOptions: boolean) => void;
   headerSlot?: React.ReactNode;
-  confirmSlot?: React.ReactNode;
   slotProps?: SlotProps;
 }
 
@@ -66,7 +65,6 @@ const SearchConcepts = ({
   onToggle,
   onHasOptions,
   headerSlot,
-  confirmSlot,
   slotProps,
   multiple = false,
   hideSelectAll = false,
