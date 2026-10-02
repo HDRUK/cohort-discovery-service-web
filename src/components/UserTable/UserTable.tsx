@@ -5,9 +5,10 @@ import {
   MRT_RowSelectionState,
   MRT_SortingState,
   type MRT_ColumnDef,
+  type MRT_Row,
 } from "material-react-table";
 import { useEffect, useMemo, useState } from "react";
-import { Chip, Stack } from "@mui/material";
+import ChipList from "@/components/ChipList";
 import Table from "@/components/Table";
 import useSearchParams from "@/hooks/useSearchParams";
 import { capitaliseFirstLetter } from "@/utils/string";
@@ -24,6 +25,8 @@ import { DEFAULT_PER_PAGE, DEFAULT_USERS_PER_PAGE } from "@/config/defaults";
 import { TAG_ADMIN_USERS } from "@/config/tags";
 import { getTimestamp } from "@/utils/date";
 import { getLastName } from "@/utils/user";
+import { formatWorkgroupName } from "@/utils/workgroups";
+import { filterUsers } from "./userFilters";
 
 const PAGE_PARAM = "users_page";
 const PER_PAGE_PARAM = "users_per_page";
@@ -69,26 +72,18 @@ const UserTable = ({
     setSelectedUser(
       firstId ? (users.find((u) => String(u.id) === firstId) ?? null) : null,
     );
+
+    return () => setSelectedUser(null);
   }, [selectedUserIds, users, setSelectedUser]);
 
   const workgroups = useUserDataStore((s) => s.workgroups);
   const activeWorkgroup = workgroups.find((wg) => String(wg.id) === wgFilter);
 
-  // may have been better for this to be BE logic
-  // - we dont have a workgroup user filter on the BE now, so this will do
-  // - noted for future improvement
   const hydratedUsers = useMemo(() => {
-    let filtered = wgFilter
-      ? users.filter((u) =>
-          u.workgroups?.find((wg) => String(wg.id) === String(wgFilter)),
-        )
-      : users;
-
-    if (searchTerm) {
-      filtered = filtered.filter((u) =>
-        (u.name ?? "").toLowerCase().includes(searchTerm),
-      );
-    }
+    const filtered = filterUsers(users, {
+      workgroupId: wgFilter,
+      searchTerm,
+    });
 
     if (!sorting.length) {
       return [...filtered].sort(
@@ -190,21 +185,33 @@ const UserTable = ({
             {
               id: "roles",
               header: "Roles",
-              accessorFn: (row) =>
+              enableSorting: false,
+              accessorFn: (row: User) =>
                 row.roles?.map((role) => role.name).join(", ") ?? "",
-              Cell: ({ row }) => (
-                <Stack direction="row" gap={0.5} flexWrap="wrap">
-                  {row.original.roles?.map((role) => (
-                    <Chip key={role.id} label={role.name} size="small" />
-                  ))}
-                </Stack>
+              Cell: ({ row }: { row: MRT_Row<User> }) => (
+                <ChipList
+                  labels={row.original.roles?.map((role) => role.name) ?? []}
+                />
               ),
-            } as MRT_ColumnDef<User>,
+            },
             {
               id: "workgroups",
               header: "Workgroups",
-              accessorFn: (row) => row.workgroups?.length ?? 0,
-            } as MRT_ColumnDef<User>,
+              enableSorting: false,
+              accessorFn: (row: User) =>
+                row.workgroups
+                  ?.map((workgroup) => formatWorkgroupName(workgroup.name))
+                  .join(", ") ?? "",
+              Cell: ({ row }: { row: MRT_Row<User> }) => (
+                <ChipList
+                  labels={
+                    row.original.workgroups?.map((workgroup) =>
+                      formatWorkgroupName(workgroup.name),
+                    ) ?? []
+                  }
+                />
+              ),
+            },
           ]
         : []),
     ],
