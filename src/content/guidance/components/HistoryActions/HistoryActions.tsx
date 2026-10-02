@@ -18,8 +18,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import getQuery from "@/actions/query/getQuery";
 import rerunQuery from "@/actions/query/rerunQuery";
 import DeleteMenuItem from "@/components/DeleteMenuItem";
-import DownloadButton from "@/components/DownloadButton";
-import { AvailableFormats } from "@/config/downloads";
+import DownloadButton, { AvailableFormats } from "@/components/DownloadButton";
 import EditButton from "@/components/EditButton";
 import ReRunButton from "@/components/ReRunButton";
 import { routes } from "@/config/routes";
@@ -135,9 +134,10 @@ const HistoryActions = ({
       )}
       {!multiple && (
         <DownloadButton
-          pids={selectedIds}
           entity="queries"
+          label="query"
           formats={[AvailableFormats.JSON]}
+          pids={selectedIds}
           isIcon={false}
         />
       )}

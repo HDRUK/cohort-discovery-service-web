@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useTable } from "@/hooks/useTable";
 import Table from "./Table";
 import { MRT_ColumnDef } from "material-react-table";
-import { AvailableFormats } from "@/config/downloads";
+import { AvailableFormats } from "@/components/DownloadButton";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 jest.mock("@/actions/collection/getCustodianCollections");
 
@@ -53,8 +53,9 @@ const TableWithState = () => {
         rightAction={{
           deleteProps: { onClick: handleDeleteRows },
           downloadProps: {
-            pids: ["download-id"],
             entity: "queries",
+            label: "query",
+            pids: ["download-id"],
             formats: [AvailableFormats.JSON],
           },
         }}

@@ -2,8 +2,8 @@ import "@testing-library/jest-dom";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NotifyProvider } from "@/providers/NotifyProvider";
-import { AvailableFormats } from "@/config/downloads";
 import DownloadButton, { DownloadButtonProps } from "./DownloadButton";
+import { AvailableFormats } from "./downloadHref";
 
 const renderButton = (props: DownloadButtonProps) =>
   render(
@@ -66,6 +66,7 @@ describe("DownloadButton", () => {
 
     renderButton({
       entity: "queries",
+      label: "query",
       pids: ["0f3a-1234"],
       formats: [AvailableFormats.JSON],
     });
@@ -83,6 +84,7 @@ describe("DownloadButton", () => {
 
     renderButton({
       entity: "term-directory",
+      label: "term directory",
       params: "domain=Condition&search_term=asthma",
       formats: [AvailableFormats.CSV],
       isIcon: false,
@@ -108,6 +110,7 @@ describe("DownloadButton", () => {
 
     renderButton({
       entity: "queries",
+      label: "query",
       pids: ["one", "two"],
       formats: [AvailableFormats.JSON],
     });
@@ -125,6 +128,7 @@ describe("DownloadButton", () => {
 
     renderButton({
       entity: "queries",
+      label: "query",
       pids: [],
       formats: [AvailableFormats.JSON],
     });
@@ -139,6 +143,7 @@ describe("DownloadButton", () => {
 
     renderButton({
       entity: "queries",
+      label: "query",
       pids: ["0f3a-1234"],
       formats: [AvailableFormats.JSON],
       disabled: true,
@@ -149,8 +154,13 @@ describe("DownloadButton", () => {
     expect(anchors).toHaveLength(0);
   });
 
-  it("offers every format the registry allows when none are given", async () => {
-    renderButton({ entity: "queries", pids: ["0f3a-1234"] });
+  it("offers a menu item per format the caller allows", async () => {
+    renderButton({
+      entity: "queries",
+      label: "query",
+      pids: ["0f3a-1234"],
+      formats: [AvailableFormats.JSON, AvailableFormats.CSV],
+    });
 
     await user.click(screen.getByTestId("download-button"));
 

@@ -3,17 +3,18 @@ import PositionedMenu, { PositionedMenuItem } from "../PositionedMenu";
 import { useNotify } from "@/providers/NotifyProvider";
 import {
   AvailableFormats,
-  DOWNLOAD_NOTIFY_DURATION,
-  DOWNLOAD_TARGETS,
   DownloadEntity,
   downloadHref,
-} from "@/config/downloads";
+} from "./downloadHref";
+
+const NOTIFY_DURATION = 3000;
 
 export interface DownloadButtonProps {
   entity: DownloadEntity;
+  label: string;
+  formats: AvailableFormats[];
   pids?: string[];
   params?: string;
-  formats?: AvailableFormats[];
   isIcon?: boolean;
   disabled?: boolean;
   tooltip?: string;
@@ -21,9 +22,10 @@ export interface DownloadButtonProps {
 
 const DownloadButton = ({
   entity,
+  label,
+  formats,
   pids,
   params,
-  formats = DOWNLOAD_TARGETS[entity].formats,
   isIcon = true,
   disabled,
   tooltip,
@@ -40,18 +42,14 @@ const DownloadButton = ({
     setTimeout(() => {
       a.click();
       a.remove();
-      notify.success(notifyMessage, DOWNLOAD_NOTIFY_DURATION);
+      notify.success(notifyMessage, NOTIFY_DURATION);
     }, 100);
   };
 
   const download = (format: AvailableFormats) => {
-    const { label, requiresPid } = DOWNLOAD_TARGETS[entity];
+    if (disabled) return;
 
-    if (disabled || (requiresPid && !pids?.length)) return;
-
-    const targets = pids?.length ? pids : [undefined];
-
-    targets.forEach((pid) =>
+    (pids ?? [undefined]).forEach((pid) =>
       triggerDownload(
         downloadHref({ entity, pid, format, params }),
         `Downloading ${label} as ${format.toUpperCase()} has started. Please allow some time for it to complete.`,
