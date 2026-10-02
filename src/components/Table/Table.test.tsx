@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useTable } from "@/hooks/useTable";
 import Table from "./Table";
 import { MRT_ColumnDef } from "material-react-table";
-import { AvailableFormats } from "../DownloadButton/DownloadButton";
+import { AvailableFormats } from "@/config/downloads";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 jest.mock("@/actions/collection/getCustodianCollections");
 
@@ -53,8 +53,8 @@ const TableWithState = () => {
         rightAction={{
           deleteProps: { onClick: handleDeleteRows },
           downloadProps: {
-            ids: ["download-id"],
-            entity: "test-entity",
+            pids: ["download-id"],
+            entity: "queries",
             formats: [AvailableFormats.JSON],
           },
         }}
@@ -168,7 +168,7 @@ describe("Table", () => {
     expect(createdAnchor).not.toBeNull();
 
     expect(createdAnchor!.getAttribute("href")).toBe(
-      "/api/download/download-id?entity=test-entity&format=json",
+      "/api/download/queries/download-id?format=json",
     );
     createElementSpy.mockRestore();
   });

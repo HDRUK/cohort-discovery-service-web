@@ -122,10 +122,6 @@ async function request<TResponse, TBody = undefined>(
       throw new ApiError(response.status, errorText);
     }
 
-    if (response.headers.get("content-type")?.includes("text/csv")) {
-      return response as TResponse;
-    }
-
     return (await response.json()) as TResponse;
   } catch (error) {
     if (error instanceof ApiError) {

@@ -1,80 +1,62 @@
-import { IconButtonProps } from "@mui/material";
-
 import DownloadIcon from "@mui/icons-material/Download";
 import PositionedMenu, { PositionedMenuItem } from "../PositionedMenu";
 import { useNotify } from "@/providers/NotifyProvider";
-import { useSearchParams } from "next/navigation";
+import {
+  AvailableFormats,
+  DOWNLOAD_NOTIFY_DURATION,
+  DOWNLOAD_TARGETS,
+  DownloadEntity,
+  downloadHref,
+} from "@/config/downloads";
 
-export enum AvailableFormats {
-  JSON = "json",
-  CSV = "csv",
-}
-
-export interface DownloadButtonProps extends Omit<
-  IconButtonProps<"a">,
-  "ref" | "href" | "component"
-> {
-  ids?: string[];
-  entity?: string;
+export interface DownloadButtonProps {
+  entity: DownloadEntity;
+  pids?: string[];
+  params?: string;
   formats?: AvailableFormats[];
   isIcon?: boolean;
-  downloadRoute?: string;
+  disabled?: boolean;
+  tooltip?: string;
 }
 
 const DownloadButton = ({
-  ids,
   entity,
-  formats = [AvailableFormats.JSON],
-  disabled,
+  pids,
+  params,
+  formats = DOWNLOAD_TARGETS[entity].formats,
   isIcon = true,
-  downloadRoute,
+  disabled,
+  tooltip,
 }: DownloadButtonProps) => {
   const notify = useNotify();
 
-  const searchParams = useSearchParams();
-  const queryString = searchParams.toString();
-
-  const handleDownload = (
-    url: string,
-    notifyMessage: string,
-    notifyTime: number,
-  ) => {
+  const triggerDownload = (url: string, notifyMessage: string) => {
     const a = document.createElement("a");
     a.href = url;
     a.target = "_self";
     a.rel = "noopener noreferrer";
     document.body.appendChild(a);
+
     setTimeout(() => {
       a.click();
-      notify.success(notifyMessage, notifyTime);
+      a.remove();
+      notify.success(notifyMessage, DOWNLOAD_NOTIFY_DURATION);
     }, 100);
   };
 
-  const download = async (format: AvailableFormats) => {
-    if (downloadRoute) {
-      handleDownload(
-        `/api/download/${downloadRoute}?${queryString}`,
-        "Downloading has started. Please allow some time for it to complete.",
-        3000,
-      );
-      return;
-    }
+  const download = (format: AvailableFormats) => {
+    const { label, requiresPid } = DOWNLOAD_TARGETS[entity];
 
-    if (disabled || !ids || ids.length === 0 || !entity) return;
+    if (disabled || (requiresPid && !pids?.length)) return;
 
-    ids.map((id, idx) => {
-      const url = `/api/download/${encodeURIComponent(
-        id,
-      )}?entity=${encodeURIComponent(entity)}&format=${encodeURIComponent(
-        format,
-      )}`;
+    const targets = pids?.length ? pids : [undefined];
 
-      handleDownload(
-        url,
-        `Downloading ${entity} as ${format} has started`,
-        100 * idx,
-      );
-    });
+    targets.forEach((pid) =>
+      triggerDownload(
+        downloadHref({ entity, pid, format, params }),
+        `Downloading ${label} as ${format.toUpperCase()} has started. Please allow some time for it to complete.`,
+      ),
+    );
   };
 
   const items: PositionedMenuItem[] = formats.map((format) => ({
@@ -84,16 +66,17 @@ const DownloadButton = ({
   }));
 
   return isIcon ? (
-    <PositionedMenu data-testid="download-button" isIcon items={items}>
+    <PositionedMenu
+      title={tooltip}
+      data-testid="download-button"
+      isIcon
+      items={items}
+    >
       <DownloadIcon />
     </PositionedMenu>
   ) : (
     <PositionedMenu
-      title={
-        downloadRoute === "term-directory"
-          ? "Export the full term directory with all selected filters applied"
-          : undefined
-      }
+      title={tooltip}
       data-testid="download-button"
       items={items}
       startIcon={<DownloadIcon />}

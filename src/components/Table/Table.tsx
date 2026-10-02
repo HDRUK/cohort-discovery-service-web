@@ -31,9 +31,7 @@ export interface TableProps {
     deleteProps?: Omit<DeleteButtonProps, "onClick"> & {
       onClick?: (selectedRowIds: string[]) => void;
     };
-    downloadProps?: Omit<DownloadButtonProps, "onClick"> & {
-      onClick?: (selectedRowIds: string[]) => void;
-    };
+    downloadProps?: DownloadButtonProps;
     sortProps?: SortButtonProps;
     editProps?: Omit<EditButtonProps, "onClick"> & {
       onClick?: (selectedRowIds: string[]) => void;
@@ -70,8 +68,6 @@ const Table = <TData extends MRT_RowData>({
   } = rightAction || {};
 
   const { onClick: onDeleteClick, ...restDeleteProps } = deleteProps ?? {};
-  const { onClick: onDownloadClick, ...restDownloadProps } =
-    downloadProps ?? {};
   const { onClick: onEditClick, ...restEditProps } = editProps ?? {};
 
   const nrows = table?.getRowCount() ?? 0;
@@ -125,12 +121,7 @@ const Table = <TData extends MRT_RowData>({
                   />
                 )}
 
-                {downloadProps && (
-                  <DownloadButton
-                    {...restDownloadProps}
-                    onClick={() => onDownloadClick?.(selectedRows)} // note that this gets ignored by DownloadButton
-                  />
-                )}
+                {downloadProps && <DownloadButton {...downloadProps} />}
               </Box>
             )}
           </Grid>

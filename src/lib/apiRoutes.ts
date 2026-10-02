@@ -10,6 +10,8 @@ export const API_ROUTES = {
   query: `${API_URL}/query`,
   deleteQueriesBulk: `${API_URL}/queries/delete/bulk`,
   rerunQuery: (id: string) => `${API_URL}/query/re-run/${id}`,
+  queryDownload: (pid: string, format: string) =>
+    `${API_URL}/queries/${encodeURIComponent(pid)}/download/${format}`,
   parseQuery: `${API_URL}/parse-query`,
   collections: `${API_URL}/collections`,
   collection: (id: number | string) => `${API_URL}/collections/${id}`,

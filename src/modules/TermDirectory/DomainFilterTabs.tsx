@@ -6,10 +6,11 @@ import useSearchParams from "@/hooks/useSearchParams";
 import { getDomainPhrase } from "@/utils/omop";
 import { capitaliseFirstLetter } from "@/utils/string";
 import DownloadButton from "@/components/DownloadButton";
-import { AvailableFormats } from "@/components/DownloadButton/DownloadButton";
+import { AvailableFormats } from "@/config/downloads";
 
 const DomainFilterTabs = () => {
-  const { getSearchParam, setSearchParams } = useSearchParams("domain");
+  const { searchParams, getSearchParam, setSearchParams } =
+    useSearchParams("domain");
 
   const selected = getSearchParam() ?? "all";
 
@@ -45,9 +46,11 @@ const DomainFilterTabs = () => {
         ))}
       </Tabs>
       <DownloadButton
+        entity="term-directory"
         formats={[AvailableFormats.CSV]}
         isIcon={false}
-        downloadRoute="term-directory"
+        params={searchParams.toString()}
+        tooltip="Export the full term directory with all selected filters applied"
       />
     </Stack>
   );
