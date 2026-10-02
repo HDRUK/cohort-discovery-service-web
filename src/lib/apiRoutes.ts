@@ -1,5 +1,13 @@
 const API_URL = "/api/v1";
 const API_AUTH_URL = "/api/auth";
+const APP_API_URL = "/api";
+
+export const APP_API_ROUTES = {
+  download: (entity: string, pid?: string) =>
+    `${APP_API_URL}/download/${encodeURIComponent(entity)}${
+      pid ? `/${encodeURIComponent(pid)}` : ""
+    }`,
+};
 
 export const API_ROUTES = {
   task: `${API_URL}/task`,
