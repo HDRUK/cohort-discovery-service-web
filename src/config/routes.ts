@@ -12,6 +12,12 @@ const helpPath = (sectionId?: string, tutorialId?: string) =>
   `/help${sectionId ? `/${sectionId}${tutorialId ? `/${tutorialId}` : ""}` : ""}`;
 
 export const routes = {
+  home: "/",
+  login: "/login",
+  logout: "/api/auth/logout",
+  ssoCallback: "/api/auth/sso/callback",
+  ssoError: (error: string) =>
+    `/auth/sso/error?error=${encodeURIComponent(error)}`,
   dashboard: dashboardPath(),
   dashboardNewQuery: (openQueries?: string[], queryParams?: string) =>
     dashboardPath(

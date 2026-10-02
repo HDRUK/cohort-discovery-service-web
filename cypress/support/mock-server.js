@@ -16,6 +16,7 @@ const fs = require("fs");
 
 const PORT = 8100;
 const CYPRESS_JWT_SECRET = "cypress-test-secret";
+const OIDC_MOCK_URL = process.env.OIDC_MOCK_URL ?? "http://localhost:4011";
 
 // ---------------------------------------------------------------------------
 // Fixture loader
@@ -58,8 +59,7 @@ function makeToken(overrides = {}) {
       is_admin: false,
       is_nhse_sde_approval: false,
       organisation: "Test Org",
-      provider: "standalone",
-      workgroups: ["Test Workgroup"],
+      workgroups: [{ id: 1, name: "Test Workgroup" }],
       cohort_discovery_roles: ["user"],
       cohort_admin_teams: [],
       ...overrides,
@@ -142,6 +142,45 @@ async function handle(req, res) {
     const VALID_EMAIL = "test@example.com";
     if (!body.email || !body.password || body.email !== VALID_EMAIL) {
       return json(res, 401, { message: "Incorrect credentials" });
+    }
+    return ok(res, { access_token: makeToken() });
+  }
+
+  // -------------------------------------------------------------------------
+  // SSO
+  // -------------------------------------------------------------------------
+  if (method === "GET" && pathname === "/api/auth/methods") {
+    return ok(res, [
+      { type: "password", label: "Email and password" },
+      {
+        type: "oidc",
+        slug: "default",
+        label: "Single Sign-On",
+        redirect_url: "http://localhost:8100/api/auth/sso/default/redirect",
+      },
+    ]);
+  }
+
+  if (method === "GET" && pathname === "/api/auth/sso/default/redirect") {
+    const authorize = new URL(`${OIDC_MOCK_URL}/connect/authorize`);
+    authorize.searchParams.set("client_id", "auth-code-client");
+    authorize.searchParams.set("response_type", "code");
+    authorize.searchParams.set("scope", "openid profile email");
+    authorize.searchParams.set(
+      "redirect_uri",
+      "http://localhost:3000/auth/sso/callback",
+    );
+    authorize.searchParams.set("state", "cypress-state");
+    authorize.searchParams.set("nonce", "cypress-nonce");
+
+    res.writeHead(302, { Location: authorize.toString() });
+    return res.end();
+  }
+
+  if (method === "POST" && pathname === "/api/auth/sso/exchange") {
+    const body = await readBody(req);
+    if (!body.code) {
+      return json(res, 422, { error: "invalid code format" });
     }
     return ok(res, { access_token: makeToken() });
   }
