@@ -17,7 +17,6 @@ import {
   Box,
   Divider,
   Button,
-  Stack,
 } from "@mui/material";
 import SquareCheckbox from "@/components/SquareCheckbox";
 import { ConceptItem, ConceptItemProps } from "./ConceptItem";
@@ -44,7 +43,6 @@ interface SearchConceptsProps {
   onToggle?: (concept: Concept, isSelected: boolean) => void;
   onHasOptions?: (hasOptions: boolean) => void;
   headerSlot?: React.ReactNode;
-  confirmSlot?: React.ReactNode;
   slotProps?: SlotProps;
 }
 
@@ -67,7 +65,6 @@ const SearchConcepts = ({
   onToggle,
   onHasOptions,
   headerSlot,
-  confirmSlot,
   slotProps,
   multiple = false,
   hideSelectAll = false,
@@ -285,25 +282,22 @@ const SearchConcepts = ({
           </>
         )}
       </FormGroup>
-      <Stack direction="row" justifyContent="space-between">
-        {hasMoreResults && (
-          <Box>
-            <Button
-              variant="text"
-              disabled={isLoading}
-              sx={{ py: "10px" }}
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                handleShowMore();
-              }}
-            >
-              Show more ({loadedCount} / {activeResult.total})
-            </Button>
-          </Box>
-        )}
-        {confirmSlot}
-      </Stack>
+      {hasMoreResults && (
+        <Box>
+          <Button
+            variant="text"
+            disabled={isLoading}
+            sx={{ py: "10px" }}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              handleShowMore();
+            }}
+          >
+            Show more ({loadedCount} / {activeResult.total})
+          </Button>
+        </Box>
+      )}
     </Box>
   );
 };
