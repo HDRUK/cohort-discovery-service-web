@@ -78,6 +78,7 @@ export const ConceptChip = ({
         display: "flex",
         alignItems: "center",
         opacity: isDragging ? 0.4 : 1,
+        width: "95%",
       }}
     >
       {draggable && (
