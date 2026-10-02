@@ -3,10 +3,9 @@ const API_AUTH_URL = "/api/auth";
 const APP_API_URL = "/api";
 
 export const APP_API_ROUTES = {
-  download: (entity: string, pid?: string) =>
-    `${APP_API_URL}/download/${encodeURIComponent(entity)}${
-      pid ? `/${encodeURIComponent(pid)}` : ""
-    }`,
+  downloadQuery: (pid: string) =>
+    `${APP_API_URL}/download/queries/${encodeURIComponent(pid)}`,
+  downloadTermDirectory: `${APP_API_URL}/download/term-directory`,
 };
 
 export const API_ROUTES = {

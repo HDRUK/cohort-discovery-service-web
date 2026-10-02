@@ -19,6 +19,7 @@ import getQuery from "@/actions/query/getQuery";
 import rerunQuery from "@/actions/query/rerunQuery";
 import DeleteMenuItem from "@/components/DeleteMenuItem";
 import DownloadButton, { AvailableFormats } from "@/components/DownloadButton";
+import { APP_API_ROUTES } from "@/lib/apiRoutes";
 import EditButton from "@/components/EditButton";
 import ReRunButton from "@/components/ReRunButton";
 import { routes } from "@/config/routes";
@@ -134,10 +135,11 @@ const HistoryActions = ({
       )}
       {!multiple && (
         <DownloadButton
-          entity="queries"
           label="query"
           formats={[AvailableFormats.JSON]}
-          pids={selectedIds}
+          buildHref={(format) =>
+            `${APP_API_ROUTES.downloadQuery(selectedIds[0])}?format=${format}`
+          }
           isIcon={false}
         />
       )}

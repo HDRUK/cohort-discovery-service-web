@@ -1,40 +1,38 @@
 import DownloadIcon from "@mui/icons-material/Download";
 import PositionedMenu, { PositionedMenuItem } from "../PositionedMenu";
 import { useNotify } from "@/providers/NotifyProvider";
-import {
-  AvailableFormats,
-  DownloadEntity,
-  downloadHref,
-} from "./downloadHref";
 
 const NOTIFY_DURATION = 3000;
 
+export enum AvailableFormats {
+  JSON = "json",
+  CSV = "csv",
+}
+
 export interface DownloadButtonProps {
-  entity: DownloadEntity;
   label: string;
   formats: AvailableFormats[];
-  pids?: string[];
-  params?: string;
+  buildHref: (format: AvailableFormats) => string;
   isIcon?: boolean;
   disabled?: boolean;
   tooltip?: string;
 }
 
 const DownloadButton = ({
-  entity,
   label,
   formats,
-  pids,
-  params,
+  buildHref,
   isIcon = true,
   disabled,
   tooltip,
 }: DownloadButtonProps) => {
   const notify = useNotify();
 
-  const triggerDownload = (url: string, notifyMessage: string) => {
+  const download = (format: AvailableFormats) => {
+    if (disabled) return;
+
     const a = document.createElement("a");
-    a.href = url;
+    a.href = buildHref(format);
     a.target = "_self";
     a.rel = "noopener noreferrer";
     document.body.appendChild(a);
@@ -42,19 +40,11 @@ const DownloadButton = ({
     setTimeout(() => {
       a.click();
       a.remove();
-      notify.success(notifyMessage, NOTIFY_DURATION);
-    }, 100);
-  };
-
-  const download = (format: AvailableFormats) => {
-    if (disabled) return;
-
-    (pids ?? [undefined]).forEach((pid) =>
-      triggerDownload(
-        downloadHref({ entity, pid, format, params }),
+      notify.success(
         `Downloading ${label} as ${format.toUpperCase()} has started. Please allow some time for it to complete.`,
-      ),
-    );
+        NOTIFY_DURATION,
+      );
+    }, 100);
   };
 
   const items: PositionedMenuItem[] = formats.map((format) => ({

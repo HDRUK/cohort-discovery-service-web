@@ -53,10 +53,10 @@ const TableWithState = () => {
         rightAction={{
           deleteProps: { onClick: handleDeleteRows },
           downloadProps: {
-            entity: "queries",
             label: "query",
-            pids: ["download-id"],
             formats: [AvailableFormats.JSON],
+            buildHref: (format: AvailableFormats) =>
+              `/api/download/queries/download-id?format=${format}`,
           },
         }}
       />

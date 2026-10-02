@@ -2,8 +2,10 @@ import "@testing-library/jest-dom";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NotifyProvider } from "@/providers/NotifyProvider";
-import DownloadButton, { DownloadButtonProps } from "./DownloadButton";
-import { AvailableFormats } from "./downloadHref";
+import DownloadButton, {
+  AvailableFormats,
+  DownloadButtonProps,
+} from "./DownloadButton";
 
 const renderButton = (props: DownloadButtonProps) =>
   render(
@@ -61,14 +63,13 @@ describe("DownloadButton", () => {
     jest.restoreAllMocks();
   });
 
-  it("builds a pid-keyed href for a resource download", async () => {
+  it("navigates to the href the caller builds for the chosen format", async () => {
     const anchors = spyOnCreatedAnchor();
 
     renderButton({
-      entity: "queries",
       label: "query",
-      pids: ["0f3a-1234"],
       formats: [AvailableFormats.JSON],
+      buildHref: (format) => `/api/download/queries/0f3a-1234?format=${format}`,
     });
 
     await chooseFormat(user, AvailableFormats.JSON);
@@ -79,73 +80,28 @@ describe("DownloadButton", () => {
     );
   });
 
-  it("builds a pid-less href for an export, forwarding the caller's params", async () => {
-    const anchors = spyOnCreatedAnchor();
+  it("passes the chosen format to the caller", async () => {
+    const buildHref = jest.fn(() => "/api/download/term-directory");
 
     renderButton({
-      entity: "term-directory",
       label: "term directory",
-      params: "domain=Condition&search_term=asthma",
       formats: [AvailableFormats.CSV],
+      buildHref,
       isIcon: false,
     });
 
     await chooseFormat(user, AvailableFormats.CSV);
 
-    expect(anchors).toHaveLength(1);
-
-    const { pathname, searchParams } = new URL(
-      anchors[0].getAttribute("href")!,
-      "http://localhost",
-    );
-
-    expect(pathname).toBe("/api/download/term-directory");
-    expect(searchParams.get("domain")).toBe("Condition");
-    expect(searchParams.get("search_term")).toBe("asthma");
-    expect(searchParams.get("format")).toBe("csv");
-  });
-
-  it("downloads once per pid", async () => {
-    const anchors = spyOnCreatedAnchor();
-
-    renderButton({
-      entity: "queries",
-      label: "query",
-      pids: ["one", "two"],
-      formats: [AvailableFormats.JSON],
-    });
-
-    await chooseFormat(user, AvailableFormats.JSON);
-
-    expect(anchors.map((a) => a.getAttribute("href"))).toEqual([
-      "/api/download/queries/one?format=json",
-      "/api/download/queries/two?format=json",
-    ]);
-  });
-
-  it("does nothing when an entity needing a pid has none selected", async () => {
-    const anchors = spyOnCreatedAnchor();
-
-    renderButton({
-      entity: "queries",
-      label: "query",
-      pids: [],
-      formats: [AvailableFormats.JSON],
-    });
-
-    await chooseFormat(user, AvailableFormats.JSON);
-
-    expect(anchors).toHaveLength(0);
+    expect(buildHref).toHaveBeenCalledWith(AvailableFormats.CSV);
   });
 
   it("does nothing when disabled", async () => {
     const anchors = spyOnCreatedAnchor();
 
     renderButton({
-      entity: "queries",
       label: "query",
-      pids: ["0f3a-1234"],
       formats: [AvailableFormats.JSON],
+      buildHref: () => "/api/download/queries/0f3a-1234?format=json",
       disabled: true,
     });
 
@@ -156,10 +112,9 @@ describe("DownloadButton", () => {
 
   it("offers a menu item per format the caller allows", async () => {
     renderButton({
-      entity: "queries",
       label: "query",
-      pids: ["0f3a-1234"],
       formats: [AvailableFormats.JSON, AvailableFormats.CSV],
+      buildHref: (format) => `/api/download/queries/0f3a-1234?format=${format}`,
     });
 
     await user.click(screen.getByTestId("download-button"));

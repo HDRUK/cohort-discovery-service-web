@@ -6,6 +6,7 @@ import useSearchParams from "@/hooks/useSearchParams";
 import { getDomainPhrase } from "@/utils/omop";
 import { capitaliseFirstLetter } from "@/utils/string";
 import DownloadButton, { AvailableFormats } from "@/components/DownloadButton";
+import { APP_API_ROUTES } from "@/lib/apiRoutes";
 
 const DomainFilterTabs = () => {
   const { searchParams, getSearchParam, setSearchParams } =
@@ -45,10 +46,11 @@ const DomainFilterTabs = () => {
         ))}
       </Tabs>
       <DownloadButton
-        entity="term-directory"
         label="term directory"
         formats={[AvailableFormats.CSV]}
-        params={searchParams.toString()}
+        buildHref={() =>
+          `${APP_API_ROUTES.downloadTermDirectory}?${searchParams.toString()}`
+        }
         tooltip="Export the full term directory with all selected filters applied"
         isIcon={false}
       />
