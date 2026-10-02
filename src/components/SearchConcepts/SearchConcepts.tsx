@@ -17,7 +17,6 @@ import {
   Box,
   Divider,
   Button,
-  Stack,
 } from "@mui/material";
 import SquareCheckbox from "@/components/SquareCheckbox";
 import { ConceptItem, ConceptItemProps } from "./ConceptItem";
@@ -285,25 +284,22 @@ const SearchConcepts = ({
           </>
         )}
       </FormGroup>
-      <Stack direction="row" justifyContent="space-between">
-        {hasMoreResults && (
-          <Box>
-            <Button
-              variant="text"
-              disabled={isLoading}
-              sx={{ py: "10px" }}
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                handleShowMore();
-              }}
-            >
-              Show more ({loadedCount} / {activeResult.total})
-            </Button>
-          </Box>
-        )}
-        {confirmSlot}
-      </Stack>
+      {hasMoreResults && (
+        <Box>
+          <Button
+            variant="text"
+            disabled={isLoading}
+            sx={{ py: "10px" }}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              handleShowMore();
+            }}
+          >
+            Show more ({loadedCount} / {activeResult.total})
+          </Button>
+        </Box>
+      )}
     </Box>
   );
 };

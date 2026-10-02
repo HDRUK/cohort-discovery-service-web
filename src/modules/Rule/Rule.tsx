@@ -21,6 +21,7 @@ import useNodeActions from "@/hooks/useNodeActions";
 import RuleFooter from "../RuleFooter";
 import { useForm, useWatch } from "react-hook-form";
 import { useSaveChanges } from "@/hooks/useSaveChanges";
+import useRuleConceptSelection from "./useRuleConceptSelection";
 
 export interface RuleProps extends Omit<
   RuleWrapperProps,
@@ -57,27 +58,6 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     [id, showDescendants, setShowDescendants],
   );
 
-  const [hasOptions, setHasOptions] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<Record<number, boolean>>({});
-
-  type FormValues = { concepts: Record<number, Concept> };
-
-  const { control, setValue, reset } = useForm<FormValues>({
-    defaultValues: { concepts: {} },
-  });
-
-  const conceptsMap = useWatch({ control, name: "concepts", defaultValue: {} });
-
-  const selectedConcepts = useMemo(
-    () => Object.values(conceptsMap),
-    [conceptsMap],
-  );
-
-  const clearAll = useCallback(() => {
-    setSelectedIds({});
-    reset({ concepts: {} });
-  }, [reset]);
-
   const setConcept = useCallback(
     (c: Concept | Concept[]) => {
       setQueryBuilderJson(
@@ -94,19 +74,6 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     },
     [id, setQueryBuilderJson, queryBuilderJson],
   );
-
-  const handleConfirm = useCallback(() => {
-    const clean = selectedConcepts.map(
-      ({ alternatives: _omit, ...c }) => c as Concept,
-    );
-    if (clean.length === 1) {
-      setConcept(clean[0]);
-    } else if (clean.length > 1) {
-      setConcept(clean);
-    }
-    reset({ concepts: {} });
-    setSelectedIds({});
-  }, [selectedConcepts, reset, setConcept]);
 
   const clearConcept = useCallback(() => {
     setQueryBuilderJson(
@@ -141,18 +108,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
 
   const { actions } = useNodeActions(rule);
 
-  useSaveChanges({
-    control,
-    entityName: "rule selection",
-    onSave: handleConfirm,
-    onDiscard: () => {
-      clearAll();
-      // setIsMultiSelect(true); this is currently always the case
-    },
-    saveText: "Confirm selection",
-    discardText: "Discard",
-    showChanges: false,
-  });
+  const selection = useRuleConceptSelection(setConcept);
 
   return (
     <RuleWrapper
@@ -164,28 +120,18 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       renderFooter={
         <RuleFooter
           customInvalidRule={false}
-          handleConfirm={handleConfirm}
-          clearAll={clearAll}
-          rule={rule}
-          selectedConceptsLength={selectedConcepts.length}
+          handleConfirm={selection.handleConfirm}
+          clearAll={selection.clearAll}
+          invalidReason={rule.invalidReason}
+          selectedConceptsLength={selection.selectedConcepts.length}
           isSelected={isSelected}
-          hasOptions={hasOptions}
+          hasOptions={selection.hasOptions}
         />
       }
       render={() => (
         <Box py={1}>
           {isEmptyRule(rule) ? (
-            <RuleSearch
-              onConfirm={setConcept}
-              onSelect={() => select(id)}
-              conceptsMap={conceptsMap}
-              control={control}
-              setValue={setValue}
-              reset={reset}
-              selectedIds={selectedIds}
-              setSelectedIds={setSelectedIds}
-              setHasOptions={setHasOptions}
-            />
+            <RuleSearch onSelect={() => select(id)} selection={selection} />
           ) : (
             <>
               {isSingleConcept(concept) && (

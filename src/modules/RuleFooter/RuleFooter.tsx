@@ -1,13 +1,12 @@
 import ErrorIcon from "@/components/ErrorIcon";
 import InvalidRule from "@/components/InvalidRule";
-import { RuleLeafType } from "@/types/rules";
 import { Button, Stack, Typography } from "@mui/material";
 
 interface RuleSearchProps {
   customInvalidRule: boolean;
   handleConfirm: () => void;
   clearAll: () => void;
-  rule: RuleLeafType;
+  invalidReason: string[] | undefined;
   selectedConceptsLength: number;
   isSelected: boolean;
   hasOptions?: boolean;
@@ -18,7 +17,7 @@ const RuleFooter = ({
   customInvalidRule,
   handleConfirm,
   clearAll,
-  rule,
+  invalidReason,
   selectedConceptsLength = 0,
   isSelected,
   hasOptions,
@@ -63,7 +62,7 @@ const RuleFooter = ({
         </Stack>
       ) : (
         <InvalidRule
-          reasons={rule.invalidReason ?? []}
+          reasons={invalidReason ?? []}
           stackProps={{ sx: { pt: 1, pb: 1, fontSize: 16 } }}
         />
       )}
