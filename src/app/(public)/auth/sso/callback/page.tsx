@@ -1,18 +1,18 @@
-import SsoCallbackRedirect from "./SsoCallbackRedirect";
+import { redirect } from "next/navigation";
+import { routes } from "@/config/routes";
 
 interface SsoCallbackPageProps {
-  searchParams: Promise<{ code?: string; error?: string; provider?: string }>;
+  searchParams: Promise<{ code?: string; error?: string }>;
 }
 
 export default async function SsoCallbackPage({
   searchParams,
 }: SsoCallbackPageProps) {
-  const { code, error, provider } = await searchParams;
+  const { code, error } = await searchParams;
 
   const params = new URLSearchParams();
   if (code) params.append("code", code);
   if (error) params.append("error", error);
-  if (provider) params.append("provider", provider);
 
-  return <SsoCallbackRedirect target={`/api/auth/sso/callback?${params.toString()}`} />;
+  redirect(`${routes.ssoCallback}?${params.toString()}`);
 }

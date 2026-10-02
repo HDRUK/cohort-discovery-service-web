@@ -9,7 +9,7 @@ const SignOutOverlay = () => {
   return (
     <Backdrop
       open={isSigningOut}
-      sx={{ zIndex: (theme) => theme.zIndex.modal + 1, color: "#fff" }}
+      sx={{ zIndex: (theme) => theme.zIndex.modal + 1, color: "common.white" }}
     >
       <Stack alignItems="center" spacing={2}>
         <CircularProgress color="inherit" />

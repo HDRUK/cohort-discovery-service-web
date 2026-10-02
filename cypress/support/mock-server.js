@@ -16,6 +16,7 @@ const fs = require("fs");
 
 const PORT = 8100;
 const CYPRESS_JWT_SECRET = "cypress-test-secret";
+const OIDC_MOCK_URL = process.env.OIDC_MOCK_URL ?? "http://localhost:4011";
 
 // ---------------------------------------------------------------------------
 // Fixture loader
@@ -160,9 +161,25 @@ async function handle(req, res) {
     ]);
   }
 
+  if (method === "GET" && pathname === "/api/auth/sso/default/redirect") {
+    const authorize = new URL(`${OIDC_MOCK_URL}/connect/authorize`);
+    authorize.searchParams.set("client_id", "auth-code-client");
+    authorize.searchParams.set("response_type", "code");
+    authorize.searchParams.set("scope", "openid profile email");
+    authorize.searchParams.set(
+      "redirect_uri",
+      "http://localhost:3000/auth/sso/callback",
+    );
+    authorize.searchParams.set("state", "cypress-state");
+    authorize.searchParams.set("nonce", "cypress-nonce");
+
+    res.writeHead(302, { Location: authorize.toString() });
+    return res.end();
+  }
+
   if (method === "POST" && pathname === "/api/auth/sso/exchange") {
     const body = await readBody(req);
-    if (!body.code || body.code.length !== 64) {
+    if (!body.code) {
       return json(res, 422, { error: "invalid code format" });
     }
     return ok(res, { access_token: makeToken() });
