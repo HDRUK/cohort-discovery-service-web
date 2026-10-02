@@ -21,7 +21,6 @@ const UsersAdmin = () => {
       />
       <ThreePaneProvider>
         <ThreePaneSwimLaneLayout
-          rightDisabled={false}
           left={<UsersLeftPanel />}
           middle={<UsersMiddlePanel />}
           right={<UsersRightPanel />}

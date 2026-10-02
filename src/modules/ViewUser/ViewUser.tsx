@@ -1,8 +1,9 @@
 "use client";
 
 import { ReactNode } from "react";
-import { Box, Chip, Grid, Stack, Typography } from "@mui/material";
+import { Box, Grid, Stack, Typography } from "@mui/material";
 import ActionMenuSection from "@/components/ActionMenuSection";
+import ChipList from "@/components/ChipList";
 import UpdatePanel from "@/components/UpdatePanel";
 import { useThreePane } from "@/providers/ThreePaneProvider";
 import { User } from "@/types/api";
@@ -28,7 +29,7 @@ const DetailRow = ({ label, value }: DetailRowProps) => (
     </Grid>
     <Grid size={8}>
       <Typography variant="body2" sx={{ wordBreak: "break-word" }}>
-        {value ?? "-"}
+        {value ?? "—"}
       </Typography>
     </Grid>
   </>
@@ -96,16 +97,9 @@ const ViewUser = ({ user }: ViewUserProps) => {
 
       <ActionMenuSection title="Roles" fixedExpanded defaultExpanded underline>
         {roles.length ? (
-          <Stack
-            direction="row"
-            gap={0.5}
-            flexWrap="wrap"
-            sx={{ px: 2, py: 1 }}
-          >
-            {roles.map((role) => (
-              <Chip key={role.id} label={role.name} size="small" />
-            ))}
-          </Stack>
+          <Box sx={{ px: 2, py: 1 }}>
+            <ChipList labels={roles.map((role) => role.name)} />
+          </Box>
         ) : (
           <EmptyNote>No roles assigned yet.</EmptyNote>
         )}
@@ -118,20 +112,13 @@ const ViewUser = ({ user }: ViewUserProps) => {
         underline
       >
         {workgroups.length ? (
-          <Stack
-            direction="row"
-            gap={0.5}
-            flexWrap="wrap"
-            sx={{ px: 2, py: 1 }}
-          >
-            {workgroups.map((workgroup) => (
-              <Chip
-                key={workgroup.id}
-                label={formatWorkgroupName(workgroup.name)}
-                size="small"
-              />
-            ))}
-          </Stack>
+          <Box sx={{ px: 2, py: 1 }}>
+            <ChipList
+              labels={workgroups.map((workgroup) =>
+                formatWorkgroupName(workgroup.name),
+              )}
+            />
+          </Box>
         ) : (
           <EmptyNote>Not a member of any workgroup yet.</EmptyNote>
         )}

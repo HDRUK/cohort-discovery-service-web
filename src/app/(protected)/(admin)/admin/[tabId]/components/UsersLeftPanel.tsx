@@ -15,8 +15,8 @@ const UsersLeftPanel = () => {
     >
       <ActionMenuSection title={"Users"} defaultExpanded underline>
         <Typography variant="body2" color="text.secondary">
-          Browse all platform users. Select a user from the list to view
-          their roles and workgroups.
+          Everyone with an account on this deployment, newest first. Search by
+          name or email to narrow the list.
         </Typography>
       </ActionMenuSection>
     </Box>
