@@ -18,8 +18,12 @@
     "mock-api:start": "node cypress/support/mock-server.js",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
+    "cy:run:oidc": "cypress run --config excludeSpecPattern=[] --spec 'cypress/e2e/auth/*.idp.cy.ts'",
+    "oidc-mock:start": "docker compose -f .github/oidc-mock/docker-compose.yml up -d --wait",
+    "oidc-mock:stop": "docker compose -f .github/oidc-mock/docker-compose.yml down",
     "e2e": "APPLICATION_MODE=standalone CYPRESS=true start-server-and-test 'npm run mock-api:start' http-get://localhost:8100/health 'APPLICATION_MODE=standalone CYPRESS=true npm run start' http-get://localhost:3000 cy:run",
-    "e2e:dev": "APPLICATION_MODE=standalone CYPRESS=true start-server-and-test 'npm run mock-api:start' http-get://localhost:8100/health 'APPLICATION_MODE=standalone CYPRESS=true npm run dev' http-get://localhost:3000 cy:open"
+    "e2e:dev": "APPLICATION_MODE=standalone CYPRESS=true start-server-and-test 'npm run mock-api:start' http-get://localhost:8100/health 'APPLICATION_MODE=standalone CYPRESS=true npm run dev' http-get://localhost:3000 cy:open",
+    "e2e:oidc": "npm run oidc-mock:start && APPLICATION_MODE=standalone CYPRESS=true start-server-and-test 'npm run mock-api:start' http-get://localhost:8100/health 'APPLICATION_MODE=standalone CYPRESS=true npm run start' http-get://localhost:3000 cy:run:oidc; npm run oidc-mock:stop"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

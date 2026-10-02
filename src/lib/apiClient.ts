@@ -163,7 +163,7 @@ export async function apiGet<TResponse>(
   });
 }
 
-export async function apiGetPublic<TResponse>(
+export async function apiGetUncached<TResponse>(
   url: string,
   options?: RequestOptions<undefined>,
 ) {

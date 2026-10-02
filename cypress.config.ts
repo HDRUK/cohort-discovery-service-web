@@ -9,6 +9,7 @@ export default defineConfig({
   e2e: {
     baseUrl: "http://localhost:3000",
     specPattern: "cypress/e2e/**/*.cy.ts",
+    excludeSpecPattern: "cypress/e2e/**/*.idp.cy.ts",
     supportFile: "cypress/support/e2e.ts",
     fixturesFolder: "cypress/fixtures",
     video: true,
@@ -45,8 +46,7 @@ export default defineConfig({
               is_admin: isAdmin,
               is_nhse_sde_approval: false,
               organisation: "Test Org",
-              provider: "standalone",
-              workgroups: ["Test Workgroup"],
+              workgroups: [{ id: 1, name: "Test Workgroup" }],
               cohort_discovery_roles: [role],
               cohort_admin_teams: custodianPid
                 ? [{ id: 1, name: "Test Custodian" }]

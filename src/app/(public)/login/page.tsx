@@ -5,12 +5,13 @@ import { Box } from "@mui/material";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import TabsShell from "@/components/TabsShell";
 import getAuthMethods from "@/actions/standalone/getAuthMethods";
+import { routes } from "@/config/routes";
 export default async function LoginPage() {
   if ((await cookies()).get(ACCESS_TOKEN_NAME)) {
-    redirect("/");
+    redirect(routes.home);
   }
 
-  const methods = await getAuthMethods();
+  const { data: methods } = await getAuthMethods();
 
   const tabs = [
     {

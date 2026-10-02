@@ -1,4 +1,5 @@
 import { Button, Paper, Stack, Typography } from "@mui/material";
+import { routes } from "@/config/routes";
 
 const ERROR_MESSAGES: Record<string, string> = {
   provider_not_configured: "This sign-in option is not available right now.",
@@ -37,11 +38,7 @@ export default async function SsoErrorPage({
       <Typography sx={{ mb: 3 }}>{message}</Typography>
 
       <Stack>
-        <Button
-          variant="outlined"
-          href="/login"
-          sx={{ mx: "auto" }}
-        >
+        <Button variant="outlined" href={routes.login} sx={{ mx: "auto" }}>
           Back to login
         </Button>
       </Stack>

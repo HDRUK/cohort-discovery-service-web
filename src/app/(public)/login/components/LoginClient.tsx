@@ -89,8 +89,14 @@ const LoginClient = ({ methods = [] }: LoginClientProps) => {
                       variant="outlined"
                       fullWidth
                       size="large"
-                      disabled={loadingProvider !== null}
-                      onClick={() => setLoadingProvider(provider.slug)}
+                      aria-disabled={loadingProvider !== null}
+                      onClick={(event) => {
+                        if (loadingProvider !== null) {
+                          event.preventDefault();
+                          return;
+                        }
+                        setLoadingProvider(provider.slug);
+                      }}
                       startIcon={
                         isLoading ? (
                           <CircularProgress size={20} />

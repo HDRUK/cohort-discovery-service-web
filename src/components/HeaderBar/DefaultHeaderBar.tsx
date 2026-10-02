@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import useUserStore from "@/hooks/useUserStore";
 import { useApplicationMode } from "@/providers/ApplicationModeProvider";
 import { useSignOutStore } from "@/store/signOutStore";
+import { routes } from "@/config/routes";
 
 const NEXT_PUBLIC_LOGIN_URL =
   process.env.NEXT_PUBLIC_LOGIN_URL ?? "https://healthdatagateway.org";
@@ -28,10 +29,7 @@ const DefaultHeaderBar = () => {
             onClick: () => {
               setSigningOut(true);
               setUser(null);
-              // Full browser navigation, not router.push: logout redirects to
-              // the IdP on another origin, which a client-side transition
-              // cannot follow - it fetches instead and fails CORS.
-              window.location.href = "/api/auth/logout";
+              window.location.href = routes.logout;
             },
           },
         ]

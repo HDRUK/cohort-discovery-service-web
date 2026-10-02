@@ -6,6 +6,7 @@ import { isStandalone } from "@/utils/modes";
 import { Button, Paper, Stack, Typography } from "@mui/material";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { routes } from "@/config/routes";
 
 const NEXT_PUBLIC_LOGIN_URL =
   process.env.NEXT_PUBLIC_LOGIN_URL ?? "https://www.hdruk.ac.uk/";
@@ -16,7 +17,7 @@ export default function Custom403() {
   const reason = params.get("reason");
 
   const loginRedirect = isStandalone(applicationMode)
-    ? "/login"
+    ? routes.login
     : NEXT_PUBLIC_LOGIN_URL;
 
   const getContent = (): { messages: string[]; redirectUrl: string } => {

@@ -13,19 +13,15 @@ import { useSignOutStore } from "@/store/signOutStore";
 const NEXT_PUBLIC_LOGIN_URL =
   process.env.NEXT_PUBLIC_LOGIN_URL ?? "https://healthdatagateway.org";
 const GATEWAY_PROFILE_HREF = `${NEXT_PUBLIC_LOGIN_URL}/account/profile`;
-const LOGOUT_HREF = "/api/auth/logout";
 
 type HeaderLinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> &
   LinkProps;
 
 const HeaderLink = ({ href, rel, onClick, ...props }: HeaderLinkProps) => {
   const isGatewayProfileLink = href.toString() === GATEWAY_PROFILE_HREF;
-  const isLogoutLink = href.toString() === LOGOUT_HREF;
+  const isLogoutLink = href.toString() === routes.logout;
   const setSigningOut = useSignOutStore((s) => s.setSigningOut);
 
-  // Logout redirects on to the IdP, which lives on another origin. A Next
-  // <Link> transition cannot follow that - it fetches and fails CORS - so
-  // logout needs a plain anchor and a real browser navigation.
   if (isLogoutLink) {
     return (
       <a
@@ -85,7 +81,7 @@ const HdrukHeader = () => {
             : []),
         ],
         ...(isStandalone
-          ? { logout: { label: "Logout", href: "/api/auth/logout" } }
+          ? { logout: { label: "Logout", href: routes.logout } }
           : {}),
       }}
       linkComponent={HeaderLink}
