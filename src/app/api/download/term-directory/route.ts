@@ -1,42 +1,22 @@
+import { DEFAULT_PER_PAGE } from "@/config/defaults";
 import { DomainTab } from "@/config/domainFilters";
-import { buildTermDirectoryParams } from "@/utils/buildTermDirectoryParams";
 import { API_ROUTES } from "@/lib/apiRoutes";
-import { apiGet } from "@/lib/apiClient";
+import proxyDownload from "@/lib/downloadProxy";
+import { buildTermDirectoryParams } from "@/utils/buildTermDirectoryParams";
 
 export async function GET(req: Request) {
-  const urlObj = new URL(req.url);
-  const search_term = urlObj.searchParams.get("search_term") ?? undefined;
-  const domain = urlObj.searchParams.get("domain") as DomainTab | undefined;
-  const collections = urlObj.searchParams.get("collections") ?? undefined;
-  const sort = urlObj.searchParams.get("sort") ?? undefined;
+  const searchParams = new URL(req.url).searchParams;
 
-  const params = buildTermDirectoryParams(
-    1,
-    100,
-    search_term,
-    domain,
-    collections?.split(","),
-    sort,
-  );
-
-  const backendRes = (await apiGet({
+  return proxyDownload({
     url: API_ROUTES.termDirectoryDownload,
-    params,
-  })) as Response;
-
-  const body = backendRes.body;
-
-  const contentType =
-    backendRes.headers.get("content-type") ?? "application/octet-stream";
-  const contentDisposition =
-    backendRes.headers.get("content-disposition") ??
-    'attachment; filename="term-directory-exported.csv';
-
-  return new Response(body, {
-    status: 200,
-    headers: {
-      "Content-Type": contentType,
-      "Content-Disposition": contentDisposition,
-    },
+    params: buildTermDirectoryParams(
+      Number(searchParams.get("page")) || 1,
+      Number(searchParams.get("per_page")) || DEFAULT_PER_PAGE,
+      searchParams.get("search_term") ?? undefined,
+      (searchParams.get("domain") as DomainTab | null) ?? undefined,
+      searchParams.get("collections")?.split(","),
+      searchParams.get("sort") ?? undefined,
+    ),
+    fallbackFilename: "term-directory-exported.csv",
   });
 }
