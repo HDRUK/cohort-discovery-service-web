@@ -179,7 +179,7 @@ const QueryResultsTable = ({
               "data not yet available",
             )
           ) {
-            return DEFAULT_STATUS_LABELS["not_applicable"];
+            return DEFAULT_STATUS_LABELS["not_available"];
           }
           return DEFAULT_STATUS_LABELS["error"];
         }
