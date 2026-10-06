@@ -19,6 +19,7 @@ export interface BrandingConfig {
   loginHeadline: [string, string];
   loginSubheadline: string;
   copyrightHolder: string;
+  hdrukChromeInStandalone: boolean;
   links: BrandingLinks;
   legal: {
     termsAndConditions: BrandingLegalDocument;

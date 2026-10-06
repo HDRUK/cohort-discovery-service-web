@@ -9,6 +9,7 @@ const branding: BrandingConfig = {
   loginHeadline: ["The right cohort.", "A clearer discovery."],
   loginSubheadline: "Better questions. Meaningful connections.",
   copyrightHolder: "Cohort Discovery",
+  hdrukChromeInStandalone: false,
   links: {
     organisation: "https://healthdatagateway.org",
   },

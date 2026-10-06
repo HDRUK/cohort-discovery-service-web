@@ -95,7 +95,11 @@ The browser favicon and app icon are `src/app/favicon.ico` and `src/app/icon.svg
 
 The shared `@hdruk/ui` header and footer embed the Health Data Research Gateway logo and an HDR UK copyright line that your branding config cannot override. They are used only in `integrated` mode, where the app is served inside the Gateway and that chrome is correct.
 
-In `standalone` mode the app always renders its own header and footer, which take their logo, links and copyright from `branding/`. You do not need to configure anything to opt out. Setting the `hdruk-uk-theme` feature flag to false in the API also forces the neutral chrome in integrated mode.
+In `standalone` mode the app renders its own header and footer by default, taking their logo, links and copyright from `branding/`. You do not need to configure anything to opt out.
+
+To bring the Gateway chrome back in standalone — for an HDR UK-run standalone deployment, say — set `hdrukChromeInStandalone: true` in `branding.config.ts`. Note this is all or nothing: the Gateway logo is rendered by the `@hdruk/ui` header itself and there is no prop to show one without the other. If you only want a different mark in the standalone header, replace `branding/assets/logo.svg` instead.
+
+Setting the `hdruk-uk-theme` feature flag to false in the API forces the neutral chrome in both modes.
 
 ### Legal pages
 
