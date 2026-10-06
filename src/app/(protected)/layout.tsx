@@ -5,6 +5,8 @@ import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import { TokenUser, CombinedUser } from "@/types/api";
 import { RoleName } from "@/types/roles";
 import ProtectedPage from "./components/ProtectedPage";
+import AppShell from "@/components/AppShell";
+import { routes } from "@/config/routes";
 import getMe from "@/actions/getMe";
 import getCustodians from "@/actions/custodian/getCustodians";
 import getFeatureFlags from "@/actions/getFeatureFlags";
@@ -23,16 +25,20 @@ export default async function ProtectedLayout({
   const cookieStore = await cookies();
   const token = cookieStore.get(ACCESS_TOKEN_NAME)?.value;
   const decoded = token ? (jwt.decode(token) as JwtPayload) : undefined;
+  const h = await headers();
+
   if (!token || !decoded) {
     if (isStandalone(applicationMode)) {
       // No token — render the client SignIn component so users can sign in.
-      redirect("/login");
+      const requestedPath = h?.get("x-pathname");
+      redirect(
+        requestedPath ? routes.loginWithReturn(requestedPath) : routes.login,
+      );
     } else {
       redirect("/403?reason=no-token");
     }
   }
 
-  const h = await headers();
   const requestNow = h?.get("x-request-now");
   const now = requestNow !== null ? Math.floor(Number(requestNow)) : 0;
   if (decoded.exp && now >= Math.floor(decoded.exp)) {
@@ -69,14 +75,16 @@ export default async function ProtectedLayout({
   const combinedUser = { ...me, token_user: user } as unknown as CombinedUser;
 
   return (
-    <ProtectedPage
-      user={combinedUser}
-      collections={collections}
-      custodians={custodians}
-      workgroups={workgroups}
-      featureFlags={flags}
-    >
-      {children}
-    </ProtectedPage>
+    <AppShell>
+      <ProtectedPage
+        user={combinedUser}
+        collections={collections}
+        custodians={custodians}
+        workgroups={workgroups}
+        featureFlags={flags}
+      >
+        {children}
+      </ProtectedPage>
+    </AppShell>
   );
 }

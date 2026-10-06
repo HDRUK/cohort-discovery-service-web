@@ -14,6 +14,8 @@ const helpPath = (sectionId?: string, tutorialId?: string) =>
 export const routes = {
   home: "/",
   login: "/login",
+  loginWithReturn: (returnTo: string) =>
+    `/login?return_to=${encodeURIComponent(returnTo)}`,
   logout: "/api/auth/logout",
   ssoCallback: "/api/auth/sso/callback",
   ssoError: (error: string) =>

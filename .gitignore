@@ -21,3 +21,5 @@ cypress/screenshots
 cypress/reports
 
 *.tsbuildinfo
+
+prs

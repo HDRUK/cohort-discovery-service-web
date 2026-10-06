@@ -41,6 +41,9 @@ export const themeOptions: ThemeOptions = {
     secondaryBlack: {
       main: "#3C3C3B",
     },
+    sage: {
+      main: "#C6D9D4",
+    },
   },
   zIndex: {
     drawer: 2,
