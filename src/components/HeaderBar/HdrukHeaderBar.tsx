@@ -60,7 +60,7 @@ const HdrukHeader = () => {
       brandingLogoImage={
         <Image height={30} priority src={logo} alt={branding.logoAlt} />
       }
-      brandingLogoHref="/"
+      brandingLogoHref={user ? routes.dashboardNewQuery() : routes.home}
       accountName={{ first, last }}
       accountNavigation={{
         profile: {
