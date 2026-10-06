@@ -174,7 +174,14 @@ const QueryResultsTable = ({
       Cell: ({ cell, row: { original } }) => {
         const result = cell.getValue<Result>();
         if (original.failed_at) {
-          return "Failed";
+          if (
+            original.latest_run?.error_message.includes(
+              "data not yet available",
+            )
+          ) {
+            return DEFAULT_STATUS_LABELS["not_applicable"];
+          }
+          return DEFAULT_STATUS_LABELS["error"];
         }
         const rawStatus = result?.status ?? "pending";
         const displayStatus = DEFAULT_STATUS_LABELS[rawStatus] ?? rawStatus;
