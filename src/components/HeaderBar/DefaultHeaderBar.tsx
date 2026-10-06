@@ -12,6 +12,7 @@ import useUserStore from "@/hooks/useUserStore";
 import { useApplicationMode } from "@/providers/ApplicationModeProvider";
 import { useSignOutStore } from "@/store/signOutStore";
 import { routes } from "@/config/routes";
+import { checkIsAdmin } from "@/utils/user";
 import { getOrganisationUrl } from "@/config/externalLinks";
 
 const NEXT_PUBLIC_LOGIN_URL = getOrganisationUrl();
@@ -24,6 +25,29 @@ const DefaultHeaderBar = () => {
   const setSigningOut = useSignOutStore((s) => s.setSigningOut);
 
   const links: PositionedMenuItem[] = [
+    ...(isStandalone
+      ? [
+          {
+            id: "profile",
+            label: "My Profile",
+            onClick: () => router.push(routes.profile),
+          },
+        ]
+      : []),
+    ...(checkIsAdmin(user)
+      ? [
+          {
+            id: "config",
+            label: "Configuration",
+            onClick: () => router.push(routes.config),
+          },
+          {
+            id: "regression",
+            label: "Regression Tests",
+            onClick: () => router.push(routes.adminRegression),
+          },
+        ]
+      : []),
     ...(isStandalone
       ? [
           {

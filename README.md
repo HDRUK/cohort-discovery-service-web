@@ -91,9 +91,11 @@ Fonts are loaded in `src/app/layout.tsx` through `next/font/google`; swap the fo
 
 The browser favicon and app icon are `src/app/favicon.ico` and `src/app/icon.svg`. These cannot live under `branding/` because Next.js resolves them by filename from the app directory — replace them in place.
 
-### Removing HDR UK chrome
+### HDR UK chrome
 
-With the `hdruk-uk-theme` feature flag **on** (its default), the app renders the shared `@hdruk/ui` header and footer, which embed the Health Data Research Gateway logo and an HDR UK copyright line regardless of your branding config. Turn the flag off in the API to get the neutral header and footer, which take their logo and copyright from `branding/`.
+The shared `@hdruk/ui` header and footer embed the Health Data Research Gateway logo and an HDR UK copyright line that your branding config cannot override. They are used only in `integrated` mode, where the app is served inside the Gateway and that chrome is correct.
+
+In `standalone` mode the app always renders its own header and footer, which take their logo, links and copyright from `branding/`. You do not need to configure anything to opt out. Setting the `hdruk-uk-theme` feature flag to false in the API also forces the neutral chrome in integrated mode.
 
 ### Legal pages
 
