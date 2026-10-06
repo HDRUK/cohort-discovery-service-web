@@ -3,6 +3,7 @@
 import { Box, Typography, useTheme } from "@mui/material";
 import Fingerprint from "@mui/icons-material/Fingerprint";
 import Circles from "@/components/Circles";
+import branding from "@branding/branding.config";
 import {
   AUTH_CIRCLE_DIAMETER,
   BRAND_PANEL_WIDTH,
@@ -72,14 +73,15 @@ const LoginBrandPanel = ({ isAuth, showForm }: LoginBrandPanelProps) => {
               mb: 2,
             }}
           >
-            The right cohort.
-            <br />A clearer discovery.
+            {branding.loginHeadline[0]}
+            <br />
+            {branding.loginHeadline[1]}
           </Typography>
 
           <Typography
             sx={{ fontSize: 19, lineHeight: 1.45, color: "text.primary" }}
           >
-            Better questions. Meaningful connections.
+            {branding.loginSubheadline}
           </Typography>
         </Box>
       </Box>

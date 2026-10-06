@@ -1,7 +1,8 @@
 "use client";
 import Image from "next/image";
 import Link, { type LinkProps } from "next/link";
-import logo from "@/assets/logo.svg";
+import logo from "@branding/assets/logo.svg";
+import branding from "@branding/branding.config";
 import { Header } from "@hdruk/ui";
 import useUserStore from "@/hooks/useUserStore";
 import { type AnchorHTMLAttributes } from "react";
@@ -9,9 +10,9 @@ import { checkIsAdmin } from "@/utils/user";
 import { routes } from "@/config/routes";
 import { useApplicationMode } from "@/providers/ApplicationModeProvider";
 import { useSignOutStore } from "@/store/signOutStore";
+import { getOrganisationUrl } from "@/config/externalLinks";
 
-const NEXT_PUBLIC_LOGIN_URL =
-  process.env.NEXT_PUBLIC_LOGIN_URL ?? "https://healthdatagateway.org";
+const NEXT_PUBLIC_LOGIN_URL = getOrganisationUrl();
 const GATEWAY_PROFILE_HREF = `${NEXT_PUBLIC_LOGIN_URL}/account/profile`;
 
 type HeaderLinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> &
@@ -57,7 +58,7 @@ const HdrukHeader = () => {
       accountLoading={false}
       logoHref={NEXT_PUBLIC_LOGIN_URL}
       brandingLogoImage={
-        <Image height={30} priority src={logo} alt="Cohort Discovery logo" />
+        <Image height={30} priority src={logo} alt={branding.logoAlt} />
       }
       brandingLogoHref="/"
       accountName={{ first, last }}

@@ -1,6 +1,6 @@
 "use client";
 
-import PrivacyPolicy from "@/content/legal/privacyPolicy.mdx";
+import PrivacyPolicy from "@branding/legal/privacyPolicy.mdx";
 
 const PrivacyPolicyContent = () => <PrivacyPolicy />;
 

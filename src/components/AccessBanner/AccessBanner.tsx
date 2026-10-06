@@ -7,15 +7,14 @@ import useUserStore from "@/hooks/useUserStore";
 import { useUiPreferences } from "@/store/uiPreferencesStore";
 import { DEFAULT_ACCESS_BANNER_AUTO_HIDE } from "@/config/defaults";
 import { checkHasNhsSdeAccess } from "@/utils/user";
+import { getOrganisationUrl } from "@/config/externalLinks";
 
 const BANNER_LABEL = "New!";
 const BANNER_HEADING = "Optional NHS Research SDE Cohort";
 const BANNER_MESSAGE =
   "Additional datasets are available but require you go to through a separate approval process.";
 const BANNER_CTA_LABEL = "Apply for Data Access";
-const GATEWAY_URL =
-  process.env.NEXT_PUBLIC_LOGIN_URL ?? "https://healthdatagateway.org";
-const BANNER_CTA_URL = `${GATEWAY_URL}/account/profile/cohort-discovery-request`;
+const BANNER_CTA_URL = `${getOrganisationUrl()}/account/profile/cohort-discovery-request`;
 
 const AccessBanner = () => {
   const { accessBanner: accessBannerEnabled } = useFeatures();

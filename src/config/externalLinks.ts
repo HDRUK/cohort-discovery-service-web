@@ -1,17 +1,26 @@
+import branding from "@branding/branding.config";
 import { routes } from "@/config/routes";
 
-const gatewayBase = (
-  process.env.NEXT_PUBLIC_LOGIN_URL ?? "https://healthdatagateway.org"
-).replace(/\/+$/, "");
+const stripTrailingSlashes = (url: string) => url.replace(/\/+$/, "");
 
-export const GATEWAY_URL = gatewayBase;
+export const getOrganisationUrl = (): string =>
+  stripTrailingSlashes(
+    process.env.NEXT_PUBLIC_LOGIN_URL || branding.links.organisation,
+  );
+
+const organisationUrl = getOrganisationUrl();
+
+export const GATEWAY_URL = organisationUrl;
 
 export const externalLinks = {
-  hdrukSite: gatewayBase,
-  termsAndConditions: `${gatewayBase}/terms-and-conditions`,
-  privacyPolicy: `${gatewayBase}/about/privacy-policy`,
-  cookieNotice: `${gatewayBase}/about/cookie-notice`,
-  accessibilityStatement: `${gatewayBase}/about/accessibility-statement`,
+  hdrukSite: organisationUrl,
+  termsAndConditions: `${organisationUrl}/terms-and-conditions`,
+  privacyPolicy: `${organisationUrl}/about/privacy-policy`,
+  cookieNotice:
+    branding.links.cookieNotice ?? `${organisationUrl}/about/cookie-notice`,
+  accessibilityStatement:
+    branding.links.accessibilityStatement ??
+    `${organisationUrl}/about/accessibility-statement`,
 };
 
 export interface LegalLinks {
