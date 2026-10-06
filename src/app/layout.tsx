@@ -1,15 +1,8 @@
 import type { Metadata } from "next";
-import { Source_Sans_3, Geist_Mono } from "next/font/google";
+import { Source_Sans_3, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
-import { Box } from "@mui/material";
 import ThemeRegistry from "@/components/ThemeRegistry";
-import TopMenu from "@/components/TopMenu";
-import HeaderBar from "@/components/HeaderBar";
-import AccessBanner from "@/components/AccessBanner";
-import { isStandalone } from "@/utils/modes";
-import Footer from "@/components/Footer";
 import ServerDefaultProvider from "@/providers/ServerDefaultProvider";
-import SupportPopOut from "@/components/SupportPopOut/SupportPopOut";
 import ApplicationModeProvider from "@/providers/ApplicationModeProvider";
 import SignOutOverlay from "@/components/SignOutOverlay";
 
@@ -25,67 +18,32 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+  weight: ["700"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Cohort Discovery Service",
   description: "New cohort discovery tool",
 };
 
-const hideNav = process.env.HIDE_NAV === "1";
 const applicationMode = process.env.APPLICATION_MODE;
 
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const standalone = isStandalone(applicationMode);
-
   return (
     <ApplicationModeProvider applicationMode={applicationMode}>
       <ThemeRegistry>
         <html lang="en">
-          <body className={`${sourceSans.variable} ${geistMono.variable}`}>
+          <body
+            className={`${sourceSans.variable} ${geistMono.variable} ${inter.variable}`}
+          >
             <ServerDefaultProvider>
-              <Box>
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    height: "120vh",
-                  }}
-                >
-                  {!standalone && <SupportPopOut />}
-
-                  {!hideNav && <HeaderBar />}
-
-                  {!hideNav && <AccessBanner />}
-
-                  <Box
-                    sx={{
-                      py: hideNav ? 0 : 1,
-                      px: hideNav ? 0 : 2,
-                      bgcolor: "background.paper",
-                      display: "flex",
-                      flexDirection: "column",
-                      flex: 1,
-                      minHeight: 0,
-                    }}
-                  >
-                    {!hideNav && <TopMenu />}
-
-                    <Box
-                      component="main"
-                      sx={{
-                        flexGrow: 1,
-                        bgcolor: "secondary.main",
-                        p: 2,
-                        overflow: "auto",
-                      }}
-                    >
-                      {children}
-                    </Box>
-                  </Box>
-                </Box>
-                <Footer />
-              </Box>
+              {children}
               <SignOutOverlay />
             </ServerDefaultProvider>
           </body>
