@@ -1,58 +1,13 @@
 import { createTheme, Theme, ThemeOptions } from "@mui/material/styles";
 import { tooltipClasses } from "@mui/material/Tooltip";
+import { deepmerge } from "@mui/utils";
+import brandingTheme from "@branding/theme";
 
-export const themeOptions: ThemeOptions = {
-  palette: {
-    success: {
-      main: "#3db28c",
-      light: "#6edbb0",
-      dark: "#2b7e61",
-      contrastText: "#ffffff",
-    },
-    highlight: {
-      main: "#E9ECF4",
-    },
-    table: {
-      main: "#CCD7D5",
-    },
-    text: {
-      primary: "#4D5B59",
-      secondary: "#878E95",
-    },
-    background: {
-      default: "#F2F2F2",
-      paper: "#FAFAFA",
-    },
-    link: {
-      main: "#1976d2",
-      light: "#90caf9",
-      dark: "#0d47a1",
-    },
-    action: {
-      disabledBackground: "#F0F0F0",
-    },
-    tooltip: { main: "#475da7" },
-    yellowCustom: {
-      main: "#F4E751",
-      light: "#E9DB5D",
-      dark: "#A29415",
-      contrastText: "#3C3C3B",
-    },
-    secondaryBlack: {
-      main: "#3C3C3B",
-    },
-    sage: {
-      main: "#C6D9D4",
-    },
-  },
+const baseThemeOptions: ThemeOptions = {
   zIndex: {
     drawer: 2,
   },
   typography: {
-    fontFamily: '"Source Sans 3", sans-serif',
-    fontWeightLight: 100,
-    fontWeightRegular: 400,
-    fontWeightMedium: 700,
     h3: {
       fontSize: "1.8rem",
       fontWeight: 400,
@@ -308,13 +263,18 @@ export const themeOptions: ThemeOptions = {
   },
 };
 
+export const themeOptions: ThemeOptions = deepmerge(
+  baseThemeOptions,
+  brandingTheme,
+);
+
 let theme = createTheme(themeOptions);
 
 theme = createTheme(theme, {
   palette: {
     ...theme.palette,
     link: theme.palette.augmentColor({
-      color: { main: "#475da7" },
+      color: { main: theme.palette.link.main },
       name: "link",
     }),
   },
