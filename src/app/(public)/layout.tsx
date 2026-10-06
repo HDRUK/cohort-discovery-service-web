@@ -11,8 +11,8 @@ export default function PublicLayout({
       sx={{
         display: "flex",
         flexDirection: "column",
-        height: "100dvh",
-        overflow: "hidden",
+        minHeight: "100dvh",
+        maxHeight: "100dvh",
         bgcolor: "background.paper",
       }}
     >
@@ -25,6 +25,7 @@ export default function PublicLayout({
           minHeight: 0,
           display: "flex",
           flexDirection: "column",
+          overflow: "auto",
         }}
       >
         {children}
