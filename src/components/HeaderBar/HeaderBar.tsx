@@ -1,18 +1,12 @@
 "use client";
 
-import useFeatures from "@/hooks/useFeatures";
-import { useApplicationMode } from "@/providers/ApplicationModeProvider";
+import useHdrukChrome from "@/hooks/useHdrukChrome";
 import HdrukHeader from "./HdrukHeaderBar";
 import DefaultHeaderBar from "./DefaultHeaderBar";
 
 export const HeaderBar = () => {
-  const { hdrukTheme: hdrukThemeEnabled } = useFeatures();
-  const { isStandalone } = useApplicationMode();
+  const showHdrukChrome = useHdrukChrome();
 
-  return hdrukThemeEnabled && !isStandalone ? (
-    <HdrukHeader />
-  ) : (
-    <DefaultHeaderBar />
-  );
+  return showHdrukChrome ? <HdrukHeader /> : <DefaultHeaderBar />;
 };
 export default HeaderBar;

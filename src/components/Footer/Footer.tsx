@@ -3,7 +3,7 @@
 import { Footer as HdrFooter } from "@hdruk/ui";
 import { Box, Link, Typography } from "@mui/material";
 import branding from "@branding/branding.config";
-import useFeatures from "@/hooks/useFeatures";
+import useHdrukChrome from "@/hooks/useHdrukChrome";
 import { useApplicationMode } from "@/providers/ApplicationModeProvider";
 import { externalLinks, getLegalLinks } from "@/config/externalLinks";
 
@@ -18,7 +18,7 @@ interface FooterLink {
 }
 
 const Footer = () => {
-  const { hdrukTheme: hdrukThemeEnabled } = useFeatures();
+  const showHdrukChrome = useHdrukChrome();
   const { isStandalone } = useApplicationMode();
   const legalLinks = getLegalLinks(isStandalone);
 
@@ -55,7 +55,7 @@ const Footer = () => {
       : []),
   ];
 
-  if (hdrukThemeEnabled && !isStandalone) {
+  if (showHdrukChrome) {
     return (
       <HdrFooter
         linkGroups={[
