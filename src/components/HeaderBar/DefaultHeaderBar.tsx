@@ -23,6 +23,7 @@ const DefaultHeaderBar = () => {
   const setUser = useUserStore((s) => s.setUser);
   const { isStandalone } = useApplicationMode();
   const setSigningOut = useSignOutStore((s) => s.setSigningOut);
+  const logoHref = user ? routes.dashboardNewQuery() : routes.home;
 
   const links: PositionedMenuItem[] = [
     ...(isStandalone
@@ -82,7 +83,7 @@ const DefaultHeaderBar = () => {
     >
       <Toolbar sx={{ justifyContent: "space-between" }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Link href={routes.home} style={{ display: "flex", padding: "4px 0" }}>
+          <Link href={logoHref} style={{ display: "flex", padding: "4px 0" }}>
             <Image height={30} priority src={logo} alt={branding.logoAlt} />
           </Link>
         </Box>
