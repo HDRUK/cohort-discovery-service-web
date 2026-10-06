@@ -23,7 +23,7 @@ const DefaultHeaderBar = () => {
   const setUser = useUserStore((s) => s.setUser);
   const { isStandalone } = useApplicationMode();
   const setSigningOut = useSignOutStore((s) => s.setSigningOut);
-  const logoHref = user ? routes.dashboardNewQuery() : routes.home;
+  const logoHref = user ? routes.dashboardNewQuery() : routes.login;
 
   const links: PositionedMenuItem[] = [
     ...(isStandalone
