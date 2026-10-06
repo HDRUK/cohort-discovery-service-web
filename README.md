@@ -97,7 +97,9 @@ The shared `@hdruk/ui` header and footer embed the Health Data Research Gateway 
 
 In `standalone` mode the app renders its own header and footer by default, taking their logo, links and copyright from `branding/`. You do not need to configure anything to opt out.
 
-To bring the Gateway chrome back in standalone — for an HDR UK-run standalone deployment, say — set `hdrukChromeInStandalone: true` in `branding.config.ts`. Note this is all or nothing: the Gateway logo is rendered by the `@hdruk/ui` header itself and there is no prop to show one without the other. If you only want a different mark in the standalone header, replace `branding/assets/logo.svg` instead.
+To bring the Gateway chrome back in standalone — for an HDR UK-run standalone deployment, say — set `hdrukChromeInStandalone: true` in `branding.config.ts`. You then get the HDR UK Gateway logo and your own `branding/assets/logo.svg` side by side in the header, and the HDR UK footer below.
+
+It is all or nothing. The Gateway logo is rendered by the `@hdruk/ui` header itself and there is no prop to show the header without it, so you cannot take the two logos without also taking the HDR UK footer. If you want a single different mark instead, replace `branding/assets/logo.svg` and leave this switch off.
 
 Setting the `hdruk-uk-theme` feature flag to false in the API forces the neutral chrome in both modes.
 
