@@ -75,7 +75,7 @@ const QueryHistoryGuidance = ({
         issues persist please feel free to contact the Gateway Helpdesk.
       </Typography>
       <Typography>
-        <b>N/A</b> — The query cannot be run on this collection as this
+        <b>Unselected</b> — The query cannot be run on this collection as this
         collection does not support all the filter types selected.
       </Typography>
     </ActionMenuSection>
