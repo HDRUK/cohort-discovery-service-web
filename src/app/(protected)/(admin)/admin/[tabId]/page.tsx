@@ -1,8 +1,6 @@
 import { Suspense } from "react";
 import TabsShell from "@/components/TabsShell";
 import { notFound } from "next/navigation";
-import { ACCESS_TOKEN_NAME } from "@/config/internals";
-import { cookies } from "next/headers";
 import { routes } from "@/config/routes";
 import CollectionsTab, {
   CollectionsSkeleton,
@@ -12,6 +10,7 @@ import WorkgroupsTab, { WorkgroupsSkeleton } from "./components/WorkgroupsTab";
 import { SearchParams } from "@/types/api";
 import { isStandalone } from "@/utils/modes";
 import NetworksTab from "./components/NetworksTab";
+import { getAccessToken } from "@/lib/auth";
 
 type Params = Promise<{ tabId: string }>;
 
@@ -76,8 +75,7 @@ const CustodianAdminPage = async ({
 
   const isValidTabId = (tabId: string) => TABS.some((t) => t.id === tabId);
 
-  const cookieStore = await cookies();
-  const token = cookieStore.get(ACCESS_TOKEN_NAME)?.value;
+  const token = await getAccessToken();
 
   if (!isValidTabId(tabId)) return notFound();
 
