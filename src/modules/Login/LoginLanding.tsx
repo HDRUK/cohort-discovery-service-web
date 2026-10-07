@@ -4,10 +4,6 @@ import { Box, Button, Stack, Typography } from "@mui/material";
 import { FADE_MS } from "./loginStyles";
 import branding from "@branding/branding.config";
 
-const productNameSuffix = branding.productLongName
-  .replace(branding.productName, "")
-  .trim();
-
 interface LoginLandingProps {
   visible: boolean;
   onSignIn: () => void;
@@ -40,12 +36,12 @@ const LoginLanding = ({ visible, onSignIn }: LoginLandingProps) => (
         fontWeight: 600,
       }}
     >
-      {branding.productName}{" "}
+      {branding.loginTitle[0]}{" "}
       <Box
         component="span"
         sx={{ fontWeight: 400, color: "secondaryBlack.main" }}
       >
-        {productNameSuffix}
+        {branding.loginTitle[1]}
       </Box>
     </Typography>
 

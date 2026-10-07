@@ -16,6 +16,7 @@ export interface BrandingConfig {
   description: string;
   organisationName: string;
   logoAlt: string;
+  loginTitle: [string, string];
   loginHeadline: [string, string];
   loginSubheadline: string;
   copyrightHolder: string;

@@ -6,6 +6,7 @@ const branding: BrandingConfig = {
   description: "New cohort discovery tool",
   organisationName: "HDR UK",
   logoAlt: "Cohort Discovery logo",
+  loginTitle: ["Cohort Discovery", "Service"],
   loginHeadline: ["The right cohort.", "A clearer discovery."],
   loginSubheadline: "Better questions. Meaningful connections.",
   copyrightHolder: "Cohort Discovery",
