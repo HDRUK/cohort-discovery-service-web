@@ -1,5 +1,4 @@
 import ErrorIcon from "@/components/ErrorIcon";
-import InvalidRule from "@/components/InvalidRule";
 import { DEFAULT_CONFIRM_OR_CLEAR_MESSAGE } from "@/config/defaults";
 import { Button, Stack, Typography } from "@mui/material";
 
