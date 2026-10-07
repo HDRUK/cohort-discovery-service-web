@@ -14,6 +14,8 @@ export const DEFAULT_SEARCH_WAIT_TIME = 400;
 export const DEFAULT_SEARCH_SUGGESTION_ROTATION = 2000;
 export const DEFAULT_SEARCH_RESULTS_MAX_HEIGHT = 270;
 export const DEFAULT_ACCESS_BANNER_AUTO_HIDE = 30000;
+export const DEFAULT_CONFIRM_OR_CLEAR_MESSAGE =
+  "Please confirm or clear your changes before continuing";
 
 export const DEFAULT_STATUS_LABELS: Record<string, string> = {
   ok: "Successful",
