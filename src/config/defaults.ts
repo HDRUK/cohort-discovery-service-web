@@ -18,5 +18,6 @@ export const DEFAULT_ACCESS_BANNER_AUTO_HIDE = 30000;
 export const DEFAULT_STATUS_LABELS: Record<string, string> = {
   ok: "Successful",
   error: "Failed",
+  unselected: "Unselected",
   pending: "Pending",
 };

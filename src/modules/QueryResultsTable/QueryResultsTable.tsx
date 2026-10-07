@@ -174,7 +174,10 @@ const QueryResultsTable = ({
       Cell: ({ cell, row: { original } }) => {
         const result = cell.getValue<Result>();
         if (original.failed_at) {
-          return "Failed";
+          if (original.result?.status === "missing") {
+            return DEFAULT_STATUS_LABELS["unselected"];
+          }
+          return DEFAULT_STATUS_LABELS["error"];
         }
         const rawStatus = result?.status ?? "pending";
         const displayStatus = DEFAULT_STATUS_LABELS[rawStatus] ?? rawStatus;
