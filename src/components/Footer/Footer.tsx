@@ -1,7 +1,8 @@
 "use client";
 
 import { Footer as HdrFooter } from "@hdruk/ui";
-import { Box, Link, Typography } from "@mui/material";
+import { Box, Link as MuiLink, Typography } from "@mui/material";
+import Link from "next/link";
 import branding from "@branding/branding.config";
 import useHdrukChrome from "@/hooks/useHdrukChrome";
 import { useApplicationMode } from "@/providers/ApplicationModeProvider";
@@ -83,14 +84,15 @@ const Footer = () => {
     >
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
         {[...primaryLinks, ...secondaryLinks].map(({ href, label }) => (
-          <Link
+          <MuiLink
             key={label}
+            component={Link}
             href={href}
             underline="hover"
             sx={{ color: "inherit", typography: "body2" }}
           >
             {label}
-          </Link>
+          </MuiLink>
         ))}
       </Box>
 

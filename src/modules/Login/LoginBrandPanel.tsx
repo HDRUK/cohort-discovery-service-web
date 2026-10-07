@@ -51,7 +51,7 @@ const LoginBrandPanel = ({ isAuth, showForm }: LoginBrandPanelProps) => {
           diameter={diameter}
           opacities={isAuth ? AUTH_OPACITIES : LANDING_OPACITIES}
         >
-          <Box sx={fingerprintWrapperSx(diameter, showForm)}>
+          <Box sx={fingerprintWrapperSx(showForm)}>
             <Fingerprint sx={fingerprintIconSx} />
           </Box>
         </Circles>

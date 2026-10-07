@@ -1,5 +1,6 @@
 import { SxProps, Theme } from "@mui/material/styles";
 import {
+  AUTH_CIRCLE_DIAMETER,
   BRAND_PANEL_WIDTH,
   FADE_MS,
   PANEL_INSET,
@@ -71,10 +72,7 @@ export const circlesPositionSx =
     "@media (prefers-reduced-motion: reduce)": { transition: "none" },
   });
 
-export const fingerprintWrapperSx = (
-  diameter: string,
-  showForm: boolean,
-): SxProps<Theme> => ({
+export const fingerprintWrapperSx = (showForm: boolean): SxProps<Theme> => ({
   position: "absolute",
   left: "50%",
   top: "50%",
@@ -82,8 +80,8 @@ export const fingerprintWrapperSx = (
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  width: diameter,
-  height: diameter,
+  width: AUTH_CIRCLE_DIAMETER,
+  height: AUTH_CIRCLE_DIAMETER,
   zIndex: 10,
   opacity: showForm ? 1 : 0,
   transition: `opacity ${FADE_MS}ms ease-in-out`,
