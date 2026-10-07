@@ -173,12 +173,9 @@ const QueryResultsTable = ({
       header: "Status",
       Cell: ({ cell, row: { original } }) => {
         const result = cell.getValue<Result>();
+        console.log("original: ", original.result?.status);
         if (original.failed_at) {
-          if (
-            original.latest_run?.error_message.includes(
-              "data not yet available",
-            )
-          ) {
+          if (original.result?.status === "missing") {
             return DEFAULT_STATUS_LABELS["unselected"];
           }
           return DEFAULT_STATUS_LABELS["error"];
