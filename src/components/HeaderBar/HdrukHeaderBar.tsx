@@ -7,29 +7,49 @@ import useUserStore from "@/hooks/useUserStore";
 import { type AnchorHTMLAttributes } from "react";
 import { checkIsAdmin } from "@/utils/user";
 import { routes } from "@/config/routes";
+import { useApplicationMode } from "@/providers/ApplicationModeProvider";
+import { useSignOutStore } from "@/store/signOutStore";
 
 const NEXT_PUBLIC_LOGIN_URL =
   process.env.NEXT_PUBLIC_LOGIN_URL ?? "https://healthdatagateway.org";
-const PROFILE_HREF = `${NEXT_PUBLIC_LOGIN_URL}/account/profile`;
+const GATEWAY_PROFILE_HREF = `${NEXT_PUBLIC_LOGIN_URL}/account/profile`;
 
 type HeaderLinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> &
   LinkProps;
 
-const HeaderLink = ({ href, rel, ...props }: HeaderLinkProps) => {
-  const isProfileLink = href.toString() === PROFILE_HREF;
+const HeaderLink = ({ href, rel, onClick, ...props }: HeaderLinkProps) => {
+  const isGatewayProfileLink = href.toString() === GATEWAY_PROFILE_HREF;
+  const isLogoutLink = href.toString() === routes.logout;
+  const setSigningOut = useSignOutStore((s) => s.setSigningOut);
+
+  if (isLogoutLink) {
+    return (
+      <a
+        href={href.toString()}
+        {...props}
+        rel={rel}
+        onClick={(e) => {
+          setSigningOut(true);
+          onClick?.(e);
+        }}
+      />
+    );
+  }
 
   return (
     <Link
       href={href}
       {...props}
-      target={isProfileLink ? "_blank" : undefined}
-      rel={isProfileLink ? "noopener noreferrer" : rel}
+      onClick={onClick}
+      target={isGatewayProfileLink ? "_blank" : undefined}
+      rel={isGatewayProfileLink ? "noopener noreferrer" : rel}
     />
   );
 };
 
 const HdrukHeader = () => {
   const user = useUserStore((s) => s.user);
+  const { isStandalone } = useApplicationMode();
   const [first, last] = (user?.name ?? "").trim().split(/\s+/, 2);
 
   return (
@@ -44,7 +64,7 @@ const HdrukHeader = () => {
       accountNavigation={{
         profile: {
           label: "My Profile",
-          href: PROFILE_HREF,
+          href: isStandalone ? routes.profile : GATEWAY_PROFILE_HREF,
         },
         items: [
           ...(checkIsAdmin(user)
@@ -60,6 +80,9 @@ const HdrukHeader = () => {
               ]
             : []),
         ],
+        ...(isStandalone
+          ? { logout: { label: "Logout", href: routes.logout } }
+          : {}),
       }}
       linkComponent={HeaderLink}
       accountInitialsColour="#90D0EC"

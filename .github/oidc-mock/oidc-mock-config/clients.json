@@ -1,0 +1,29 @@
+[
+  {
+    "ClientId": "auth-code-client",
+    "Description": "Client for authorization code flow",
+    "AllowedGrantTypes": [
+      "authorization_code",
+      "refresh_token",
+      "password"
+    ],
+    "AllowAccessTokensViaBrowser": true,
+    "RedirectUris": [
+      "http://localhost:3000/auth/sso/callback"
+    ],
+    "AllowedScopes": [
+      "openid",
+      "profile",
+      "email"
+    ],
+    "PostLogoutRedirectUris": [
+      "http://localhost:3000",
+      "http://localhost:3000/login"
+    ],
+    "IdentityTokenLifetime": 36000,
+    "AccessTokenLifetime": 3600,
+    "AllowOfflineAccess": true,
+    "ClientClaimsPrefix": "",
+    "RequireClientSecret": false
+  }
+]
