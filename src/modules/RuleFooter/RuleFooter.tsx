@@ -1,5 +1,4 @@
 import ErrorIcon from "@/components/ErrorIcon";
-import { DEFAULT_CONFIRM_OR_CLEAR_MESSAGE } from "@/config/defaults";
 import { Button, Stack, Typography } from "@mui/material";
 
 interface RuleSearchProps {
@@ -23,6 +22,9 @@ const RuleFooter = ({
   hasOptions,
   isNLP,
 }: RuleSearchProps) => {
+  const DEFAULT_CONFIRM_OR_CLEAR_MESSAGE =
+    "Please confirm or clear your changes before continuing";
+
   return (
     <Stack
       direction="row"
