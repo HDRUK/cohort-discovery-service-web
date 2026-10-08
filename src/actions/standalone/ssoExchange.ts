@@ -1,16 +1,16 @@
 "use server";
 
-import { ApiResponse, SignInPost, SignInResponse } from "@/types/api";
+import { ApiResponse, SignInResponse } from "@/types/api";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { apiPost } from "@/lib/apiClient";
 import { ApiError } from "@/lib/https";
 import { setAuthCookie } from "./setAuthCookie";
 
-const standaloneSignIn = async (payload: SignInPost): Promise<boolean> => {
+const ssoExchange = async (code: string): Promise<boolean> => {
   try {
-    const response = await apiPost<ApiResponse<SignInResponse>, SignInPost>(
-      API_ROUTES.signIn,
-      payload,
+    const response = await apiPost<ApiResponse<SignInResponse>, { code: string }>(
+      API_ROUTES.ssoExchange,
+      { code },
     );
 
     const token = response.data?.access_token;
@@ -29,4 +29,4 @@ const standaloneSignIn = async (payload: SignInPost): Promise<boolean> => {
   }
 };
 
-export default standaloneSignIn;
+export default ssoExchange;

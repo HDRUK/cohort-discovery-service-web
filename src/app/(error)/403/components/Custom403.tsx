@@ -16,7 +16,7 @@ export default function Custom403() {
   const reason = params.get("reason");
 
   const loginRedirect = isStandalone(applicationMode)
-    ? "/sign-in"
+    ? "/login"
     : NEXT_PUBLIC_LOGIN_URL;
 
   const getContent = (): { messages: string[]; redirectUrl: string } => {

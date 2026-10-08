@@ -567,4 +567,14 @@ export interface SignInPost {
   password: string;
 }
 
+export interface SignInResponse {
+  access_token: string;
+}
+
+export interface SsoProvider {
+  slug: string;
+  label: string;
+  redirect_url: string;
+}
+
 export type GroupedCollection = { custodian: Custodian; items: Collection[] };

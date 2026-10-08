@@ -4,10 +4,13 @@ import LoginClient from "./components/LoginClient";
 import { Box } from "@mui/material";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import TabsShell from "@/components/TabsShell";
+import getSsoProviders from "@/actions/standalone/getSsoProviders";
 export default async function LoginPage() {
   if ((await cookies()).get(ACCESS_TOKEN_NAME)) {
     redirect("/");
   }
+
+  const providers = await getSsoProviders();
 
   const tabs = [
     {
@@ -24,7 +27,7 @@ export default async function LoginPage() {
             bgcolor: "",
           }}
         >
-          <LoginClient />
+          <LoginClient providers={providers} />
         </Box>
       ),
     },

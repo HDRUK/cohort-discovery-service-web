@@ -163,6 +163,13 @@ export async function apiGet<TResponse>(
   });
 }
 
+export async function apiGetPublic<TResponse>(
+  url: string,
+  options?: RequestOptions<undefined>,
+) {
+  return request<TResponse>("GET", url, options);
+}
+
 export async function apiPost<TResponse, TBody>(
   url: string,
   body?: TBody,
