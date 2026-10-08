@@ -5,7 +5,8 @@ import { Box, Button, Divider, Link, Stack, Typography } from "@mui/material";
 import ArrowBackRounded from "@mui/icons-material/ArrowBackRounded";
 import { AuthMethod } from "@/types/api";
 import { getProviderIcon } from "@/utils/ssoProviders";
-import { externalLinks } from "@/config/externalLinks";
+import { getLegalLinks } from "@/config/externalLinks";
+import { useApplicationMode } from "@/providers/ApplicationModeProvider";
 import { partitionAuthMethods } from "./authMethods";
 import LoginForm from "./LoginForm";
 import { BRAND_PANEL_WIDTH, FADE_MS } from "./loginStyles";
@@ -26,6 +27,8 @@ const LoginOptions = ({
   onBack,
 }: LoginOptionsProps) => {
   const [redirectingTo, setRedirectingTo] = useState<string | null>(null);
+  const { isStandalone } = useApplicationMode();
+  const legalLinks = getLegalLinks(isStandalone);
   const { passwordMethod, providers } = partitionAuthMethods(methods);
   const hasNoMethods = !passwordMethod && providers.length === 0;
 
@@ -136,20 +139,10 @@ const LoginOptions = ({
 
       <Stack spacing={1} alignItems="center" sx={{ flexShrink: 0, px: 8 }}>
         <Stack direction="row" spacing={3}>
-          <Link
-            href={externalLinks.privacyPolicy}
-            target="_blank"
-            rel="noopener noreferrer"
-            variant="caption"
-          >
+          <Link href={legalLinks.privacyPolicy} variant="caption">
             Privacy policy
           </Link>
-          <Link
-            href={externalLinks.termsAndConditions}
-            target="_blank"
-            rel="noopener noreferrer"
-            variant="caption"
-          >
+          <Link href={legalLinks.termsAndConditions} variant="caption">
             Terms of use
           </Link>
         </Stack>

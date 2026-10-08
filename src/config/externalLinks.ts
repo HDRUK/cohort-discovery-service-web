@@ -1,10 +1,31 @@
-export const GATEWAY_URL =
-  process.env.NEXT_PUBLIC_LOGIN_URL ?? "https://www.hdruk.ac.uk/";
+import { routes } from "@/config/routes";
+
+const gatewayBase = (
+  process.env.NEXT_PUBLIC_LOGIN_URL ?? "https://healthdatagateway.org"
+).replace(/\/+$/, "");
+
+export const GATEWAY_URL = gatewayBase;
 
 export const externalLinks = {
-  hdrukSite: GATEWAY_URL,
-  termsAndConditions: `${GATEWAY_URL}/terms-and-conditions`,
-  privacyPolicy: `${GATEWAY_URL}/about/privacy-policy`,
-  cookieNotice: `${GATEWAY_URL}/about/cookie-notice`,
-  accessibilityStatement: `${GATEWAY_URL}/about/accessibility-statement`,
+  hdrukSite: gatewayBase,
+  termsAndConditions: `${gatewayBase}/terms-and-conditions`,
+  privacyPolicy: `${gatewayBase}/about/privacy-policy`,
+  cookieNotice: `${gatewayBase}/about/cookie-notice`,
+  accessibilityStatement: `${gatewayBase}/about/accessibility-statement`,
 };
+
+export interface LegalLinks {
+  termsAndConditions: string;
+  privacyPolicy: string;
+}
+
+export const getLegalLinks = (isStandalone: boolean): LegalLinks =>
+  isStandalone
+    ? {
+        termsAndConditions: routes.termsAndConditions,
+        privacyPolicy: routes.privacyPolicy,
+      }
+    : {
+        termsAndConditions: externalLinks.termsAndConditions,
+        privacyPolicy: externalLinks.privacyPolicy,
+      };

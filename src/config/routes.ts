@@ -59,4 +59,6 @@ export const routes = {
   config: adminPath("configuration"),
   adminRegression: adminPath("regression"),
   termDirectory: "/term-directory",
+  termsAndConditions: "/terms-and-conditions",
+  privacyPolicy: "/about/privacy-policy",
 };
