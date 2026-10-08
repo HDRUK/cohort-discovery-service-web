@@ -148,9 +148,11 @@ async function handle(req, res) {
   // -------------------------------------------------------------------------
   // SSO
   // -------------------------------------------------------------------------
-  if (method === "GET" && pathname === "/api/auth/sso/providers") {
+  if (method === "GET" && pathname === "/api/auth/methods") {
     return ok(res, [
+      { type: "password", label: "Email and password" },
       {
+        type: "oidc",
         slug: "default",
         label: "Single Sign-On",
         redirect_url: "http://localhost:8100/api/auth/sso/default/redirect",

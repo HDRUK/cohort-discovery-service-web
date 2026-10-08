@@ -571,10 +571,8 @@ export interface SignInResponse {
   access_token: string;
 }
 
-export interface SsoProvider {
-  slug: string;
-  label: string;
-  redirect_url: string;
-}
+export type AuthMethod =
+  | { type: "password"; label: string }
+  | { type: "oidc"; slug: string; label: string; redirect_url: string };
 
 export type GroupedCollection = { custodian: Custodian; items: Collection[] };
