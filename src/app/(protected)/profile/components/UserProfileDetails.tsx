@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar, Box, Chip, Divider, Grid, Stack, Typography } from "@mui/material";
+import { Box, Chip, Divider, Grid, Stack, Typography } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PendingIcon from "@mui/icons-material/Pending";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
@@ -8,44 +8,9 @@ import BlockIcon from "@mui/icons-material/Block";
 import dayjs from "dayjs";
 import { CombinedUser } from "@/types/api";
 import { checkHasNhsSdeAccess, checkIsAdmin } from "@/utils/user";
-
-interface FieldProps {
-  label: string;
-  children: React.ReactNode;
-}
-
-const Field = ({ label, children }: FieldProps) => (
-  <Box>
-    <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 0.5 }}>
-      {label}
-    </Typography>
-    <Typography variant="body2" component="div">
-      {children}
-    </Typography>
-  </Box>
-);
-
-interface SectionProps {
-  title: string;
-  children: React.ReactNode;
-}
-
-const Section = ({ title, children }: SectionProps) => (
-  <Box>
-    <Typography variant="subtitle2" sx={{ mb: 1.5, color: "secondaryBlack.main" }}>
-      {title}
-    </Typography>
-    <Grid container spacing={2.5}>
-      {children}
-    </Grid>
-  </Box>
-);
-
-const getInitials = (name: string) => {
-  const parts = name.trim().split(/\s+/);
-  if (parts.length === 1) return parts[0][0]?.toUpperCase() ?? "";
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-};
+import Field from "./Field";
+import Section from "./Section";
+import UserInitials from "@/components/UserInitials";
 
 const UserProfileDetails = ({ user }: { user: CombinedUser }) => {
   const isAdmin = checkIsAdmin(user);
@@ -54,9 +19,7 @@ const UserProfileDetails = ({ user }: { user: CombinedUser }) => {
   return (
     <Stack spacing={3} sx={{ maxWidth: 720 }}>
       <Stack direction="row" spacing={2} alignItems="center">
-        <Avatar sx={{ width: 56, height: 56, bgcolor: "primary.main" }}>
-          {getInitials(user.name)}
-        </Avatar>
+        <UserInitials user={user} />
         <Box sx={{ flex: 1 }}>
           <Stack direction="row" spacing={1} alignItems="center">
             <Typography variant="h6">{user.name}</Typography>
@@ -96,7 +59,12 @@ const UserProfileDetails = ({ user }: { user: CombinedUser }) => {
             {user.workgroups?.length ? (
               <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
                 {user.workgroups.map((wg) => (
-                  <Chip color="secondary" key={wg.id} size="small" label={wg.name} />
+                  <Chip
+                    color="secondary"
+                    key={wg.id}
+                    size="small"
+                    label={wg.name}
+                  />
                 ))}
               </Stack>
             ) : (
@@ -133,12 +101,16 @@ const UserProfileDetails = ({ user }: { user: CombinedUser }) => {
       <Section title="Account">
         <Grid size={6}>
           <Field label="Member since">
-            {user.created_at ? dayjs(user.created_at).format("MMM D, YYYY") : "—"}
+            {user.created_at
+              ? dayjs(user.created_at).format("MMM D, YYYY")
+              : "—"}
           </Field>
         </Grid>
         <Grid size={6}>
           <Field label="Last updated">
-            {user.updated_at ? dayjs(user.updated_at).format("MMM D, YYYY HH:mm") : "—"}
+            {user.updated_at
+              ? dayjs(user.updated_at).format("MMM D, YYYY HH:mm")
+              : "—"}
           </Field>
         </Grid>
       </Section>
