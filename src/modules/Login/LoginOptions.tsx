@@ -10,6 +10,7 @@ import { useApplicationMode } from "@/providers/ApplicationModeProvider";
 import { partitionAuthMethods } from "./authMethods";
 import LoginForm from "./LoginForm";
 import { BRAND_PANEL_WIDTH, FADE_MS } from "./loginStyles";
+import branding from "@branding/branding.config";
 
 interface LoginOptionsProps {
   methods: AuthMethod[];
@@ -83,7 +84,7 @@ const LoginOptions = ({
             Welcome back.
           </Typography>
           <Typography sx={{ color: "text.secondary" }}>
-            Sign in to your Cohort Discovery workspace.
+            Sign in to your {branding.productName} workspace.
           </Typography>
         </Box>
 
@@ -147,7 +148,7 @@ const LoginOptions = ({
           </Link>
         </Stack>
         <Typography variant="caption" sx={{ color: "text.secondary" }}>
-          © {copyrightYear} Cohort Discovery
+          © {copyrightYear} {branding.copyrightHolder}
         </Typography>
       </Stack>
     </Box>

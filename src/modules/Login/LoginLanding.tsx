@@ -2,6 +2,7 @@
 
 import { Box, Button, Stack, Typography } from "@mui/material";
 import { FADE_MS } from "./loginStyles";
+import branding from "@branding/branding.config";
 
 interface LoginLandingProps {
   visible: boolean;
@@ -35,12 +36,12 @@ const LoginLanding = ({ visible, onSignIn }: LoginLandingProps) => (
         fontWeight: 600,
       }}
     >
-      Cohort Discovery{" "}
+      {branding.loginTitle[0]}{" "}
       <Box
         component="span"
         sx={{ fontWeight: 400, color: "secondaryBlack.main" }}
       >
-        Service
+        {branding.loginTitle[1]}
       </Box>
     </Typography>
 
