@@ -3,9 +3,7 @@
 import { Footer as HdrFooter } from "@hdruk/ui";
 import useFeatures from "@/hooks/useFeatures";
 import { useApplicationMode } from "@/providers/ApplicationModeProvider";
-
-const GATEWAY_URL =
-  process.env.NEXT_PUBLIC_LOGIN_URL ?? "https://www.hdruk.ac.uk/";
+import { externalLinks } from "@/config/externalLinks";
 
 // Note for future - this is a bit of an abuse of NEXT_PUBLIC_TASK_URL, and we should really have a
 // NEXT_PUBLIC_API_BASE_URL instead, but this avoids adding a new varied in about 4 repos and env stores,
@@ -20,15 +18,15 @@ const Footer = () => {
       title: "links1",
       items: [
         {
-          href: GATEWAY_URL,
+          href: externalLinks.hdrukSite,
           label: "Visit the HDR UK Site",
         },
         {
-          href: `${GATEWAY_URL}/terms-and-conditions`,
+          href: externalLinks.termsAndConditions,
           label: "Terms and conditions",
         },
         {
-          href: `${GATEWAY_URL}/about/privacy-policy`,
+          href: externalLinks.privacyPolicy,
           label: "Privacy policy",
         },
       ],
@@ -37,7 +35,7 @@ const Footer = () => {
       title: "links2",
       items: [
         {
-          href: `${GATEWAY_URL}/about/cookie-notice`,
+          href: externalLinks.cookieNotice,
           label: "Cookie notice",
         },
         {
@@ -45,7 +43,7 @@ const Footer = () => {
           label: "API docs",
         },
         {
-          href: `${GATEWAY_URL}/about/accessibility-statement`,
+          href: externalLinks.accessibilityStatement,
           label: "Accessibility Statement",
         },
       ],
