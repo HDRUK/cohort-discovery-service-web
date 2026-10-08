@@ -18,6 +18,8 @@ import {
 import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import useNodeActions from "@/hooks/useNodeActions";
+import RuleFooter from "../RuleFooter";
+import useRuleConceptSelection from "./useRuleConceptSelection";
 
 export interface RuleProps extends Omit<
   RuleWrapperProps,
@@ -104,6 +106,8 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
 
   const { actions } = useNodeActions(rule);
 
+  const selection = useRuleConceptSelection(setConcept);
+
   return (
     <RuleWrapper
       node={rule}
@@ -111,14 +115,21 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       groupId={groupId}
       sortable={true}
       headerExtra={!isEmptyRule(rule) ? <DomainChip concept={concept} /> : null}
+      renderFooter={
+        <RuleFooter
+          customInvalidRule={false}
+          handleConfirm={selection.handleConfirm}
+          clearAll={selection.clearAll}
+          invalidReason={rule.invalidReason}
+          selectedConceptsLength={selection.selectedConcepts.length}
+          isSelected={isSelected}
+          hasOptions={selection.hasOptions}
+        />
+      }
       render={() => (
         <Box py={1}>
           {isEmptyRule(rule) ? (
-            <RuleSearch
-              onConfirm={setConcept}
-              isSelected={isSelected}
-              onSelect={() => select(id)}
-            />
+            <RuleSearch onSelect={() => select(id)} selection={selection} />
           ) : (
             <>
               {isSingleConcept(concept) && (

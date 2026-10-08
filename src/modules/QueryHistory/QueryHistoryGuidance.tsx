@@ -70,9 +70,13 @@ const QueryHistoryGuidance = ({
         total count is finalised.
       </Typography>
       <Typography>
-        <b>Error</b> — The query could not be completed for this collection due
+        <b>Failed</b> — The query could not be completed for this collection due
         to an issue on the data custodian side. Please re-run the query and if
         issues persist please feel free to contact the Gateway Helpdesk.
+      </Typography>
+      <Typography>
+        <b>Unselected</b> — The query cannot be run on this collection as this
+        collection does not support all the filter types selected.
       </Typography>
     </ActionMenuSection>
   );

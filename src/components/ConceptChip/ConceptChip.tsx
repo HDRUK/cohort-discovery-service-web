@@ -78,6 +78,7 @@ export const ConceptChip = ({
         display: "flex",
         alignItems: "center",
         opacity: isDragging ? 0.4 : 1,
+        width: "95%",
       }}
     >
       {draggable && (
@@ -128,7 +129,7 @@ export const ConceptChip = ({
           variant="outlined"
         />
       </ParentWrapper>
-      <IconButton onClick={onDelete}>
+      <IconButton onClick={onDelete} sx={{ px: 0.5, py: 0 }}>
         <CancelIcon />
       </IconButton>
       {children}

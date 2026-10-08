@@ -67,9 +67,11 @@ export default function TabsShell({
 
   const kids = React.Children.toArray(pages);
 
+  const properValue = forceValue ? value || 0 : internalValue;
+
   return (
     <Box sx={mergeSx(defaultRootSx, sx)}>
-      <TabContext value={forceValue ? value || 0 : internalValue}>
+      <TabContext value={properValue}>
         <Box
           sx={mergeSx(defaultTabHeaderSx, tabHeaderSx)}
           display="flex"
@@ -111,7 +113,7 @@ export default function TabsShell({
                           component="span"
                           sx={mergeSx(
                             { p: 0, m: 0 },
-                            internalValue.toString() === (id ?? i).toString()
+                            properValue === (id ?? i).toString()
                               ? { fontWeight: "600" }
                               : {},
                             disabled ? { display: "none" } : {},

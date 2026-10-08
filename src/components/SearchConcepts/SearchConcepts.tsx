@@ -203,7 +203,6 @@ const SearchConcepts = ({
         handleToggle(id);
         onToggle?.(c, !selected?.[c.concept_id]);
         e.stopPropagation();
-        e.preventDefault();
       }}
       showCode
       showCounts={queryBuilderShowConceptStats}
@@ -254,7 +253,7 @@ const SearchConcepts = ({
       <FormGroup
         ref={resultsContainerRef}
         data-testid="search-concepts-results"
-        sx={mergeSx(searchResultsSx, { mt: headerSlot ? 0 : 2 })}
+        sx={mergeSx(searchResultsSx, { mt: headerSlot ? 0 : 1 })}
       >
         {multiple && !hideSelectAll && visibleOptions.length > 0 && (
           <>
@@ -284,10 +283,11 @@ const SearchConcepts = ({
         )}
       </FormGroup>
       {hasMoreResults && (
-        <Box sx={{ mt: 1 }}>
+        <Box>
           <Button
             variant="text"
             disabled={isLoading}
+            sx={{ py: "10px" }}
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();

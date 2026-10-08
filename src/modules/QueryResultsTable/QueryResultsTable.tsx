@@ -110,11 +110,12 @@ const QueryResultsTable = ({
                 },
               });
             }}
-            sx={{
+            sx={(theme) => ({
               display: "inline-flex",
               textDecoration: "none",
               "&:hover": { textDecoration: "underline" },
-            }}
+              "&:visited": { color: theme.palette.link.dark },
+            })}
           >
             {name}
             <LaunchIcon
@@ -173,7 +174,10 @@ const QueryResultsTable = ({
       Cell: ({ cell, row: { original } }) => {
         const result = cell.getValue<Result>();
         if (original.failed_at) {
-          return "Failed";
+          if (original.result?.status === "missing") {
+            return DEFAULT_STATUS_LABELS["unselected"];
+          }
+          return DEFAULT_STATUS_LABELS["error"];
         }
         const rawStatus = result?.status ?? "pending";
         const displayStatus = DEFAULT_STATUS_LABELS[rawStatus] ?? rawStatus;

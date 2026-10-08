@@ -4,7 +4,6 @@ import { ReactNode } from "react";
 import { Box, Button, Divider, IconButton, Stack } from "@mui/material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import Title from "@/components/Title";
-import DemographicSaveButton from "./DemographicSaveButton";
 
 export interface DemographicRowActionProps {
   editing: boolean;
@@ -13,7 +12,6 @@ export interface DemographicRowActionProps {
   onEditStart: () => void;
   onSave: () => void;
   onReset: () => void;
-  onClear: () => void;
 }
 
 interface DemographicRowProps extends DemographicRowActionProps {
@@ -27,11 +25,8 @@ const DemographicRow = ({
   label,
   editing,
   disabled,
-  hideActions,
   onEditStart,
-  onSave,
   onReset,
-  onClear,
   showClear = false,
   children,
   renderEditing,
@@ -56,10 +51,6 @@ const DemographicRow = ({
           {editing && (
             <Box sx={{ flex: 1, minWidth: 0 }}>
               <Box sx={{ width: "100%", pb: 1 }}>{renderEditing}</Box>
-
-              {!hideActions && (
-                <DemographicSaveButton onReset={onReset} onSave={onSave} />
-              )}
             </Box>
           )}
         </Title>
@@ -88,7 +79,7 @@ const DemographicRow = ({
               variant="text"
               size="small"
               color="secondary"
-              onClick={onClear}
+              onClick={onReset}
             >
               Clear all
             </Button>

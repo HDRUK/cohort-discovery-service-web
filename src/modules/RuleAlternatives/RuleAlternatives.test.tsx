@@ -17,9 +17,21 @@ import { updateById } from "@/utils/rules";
 
 const setQueryBuilderJson = jest.fn();
 
-const conceptMain = { concept_id: 100, name: "COVID-19", category: "Condition" };
-const conceptA = { concept_id: 200, name: "Acute COVID-19", category: "Condition" };
-const conceptB = { concept_id: 300, name: "Suspected COVID-19", category: "Observation" };
+const conceptMain = {
+  concept_id: 100,
+  name: "COVID-19",
+  category: "Condition",
+};
+const conceptA = {
+  concept_id: 200,
+  name: "Acute COVID-19",
+  category: "Condition",
+};
+const conceptB = {
+  concept_id: 300,
+  name: "Suspected COVID-19",
+  category: "Observation",
+};
 
 const ruleAlt: RuleLeafType = {
   id: "rule-alt",
@@ -36,7 +48,12 @@ const ruleAlt2: RuleLeafType = {
   exclude: false,
   valid: false,
   rule: {
-    concept: { concept_id: 400, name: "Type 2 Diabetes", category: "Condition", alternatives: [{ concept_id: 401, name: "DM2" }] },
+    concept: {
+      concept_id: 400,
+      name: "Type 2 Diabetes",
+      category: "Condition",
+      alternatives: [{ concept_id: 401, name: "DM2" }],
+    },
   },
 } as unknown as RuleLeafType;
 
@@ -79,31 +96,47 @@ describe("RuleAlternatives", () => {
     expect(screen.getAllByText(/COVID-19/i)).toHaveLength(3);
   });
 
-  it("does not show checkboxes or confirm footer when rule is not selected", () => {
+  it("shows checkboxes and confirm footer when rule is not selected", () => {
     renderComponent();
-    expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /confirm/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /clear all/i })).not.toBeInTheDocument();
+
+    expect(screen.getAllByRole("checkbox")).not.toHaveLength(0);
+
+    expect(
+      screen.queryByRole("button", { name: /confirm/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /clear all/i }),
+    ).toBeInTheDocument();
   });
 
   it("shows checkboxes and confirm footer when rule is selected", () => {
-    renderComponent(ruleAlt, makeQuery(ruleAlt), { selected: { "rule-alt": true } });
+    renderComponent(ruleAlt, makeQuery(ruleAlt), {
+      selected: { "rule-alt": true },
+    });
     const checkboxes = screen.getAllByRole("checkbox");
     expect(checkboxes).toHaveLength(3);
-    expect(screen.getByRole("button", { name: /confirm/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /clear all/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /confirm/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /clear all/i }),
+    ).toBeInTheDocument();
   });
 
   it("pre-checks only the first concept by default", () => {
-    renderComponent(ruleAlt, makeQuery(ruleAlt), { selected: { "rule-alt": true } });
+    renderComponent(ruleAlt, makeQuery(ruleAlt), {
+      selected: { "rule-alt": true },
+    });
     const checkboxes = screen.getAllByRole("checkbox");
-    expect(checkboxes[0]).toBeChecked();   // conceptMain
+    expect(checkboxes[0]).toBeChecked(); // conceptMain
     expect(checkboxes[1]).not.toBeChecked(); // conceptA
     expect(checkboxes[2]).not.toBeChecked(); // conceptB
   });
 
   it("clear all unchecks everything and disables Confirm", async () => {
-    renderComponent(ruleAlt, makeQuery(ruleAlt), { selected: { "rule-alt": true } });
+    renderComponent(ruleAlt, makeQuery(ruleAlt), {
+      selected: { "rule-alt": true },
+    });
     await userEvent.click(screen.getByRole("button", { name: /clear all/i }));
     const checkboxes = screen.getAllByRole("checkbox");
     checkboxes.forEach((cb) => expect(cb).not.toBeChecked());
@@ -111,7 +144,9 @@ describe("RuleAlternatives", () => {
   });
 
   it("confirm with single selection calls setConcept without alternatives field", async () => {
-    renderComponent(ruleAlt, makeQuery(ruleAlt), { selected: { "rule-alt": true } });
+    renderComponent(ruleAlt, makeQuery(ruleAlt), {
+      selected: { "rule-alt": true },
+    });
 
     await userEvent.click(screen.getByRole("button", { name: /confirm/i }));
 
@@ -131,7 +166,9 @@ describe("RuleAlternatives", () => {
   });
 
   it("confirm with multiple selections calls setConcept with an array", async () => {
-    renderComponent(ruleAlt, makeQuery(ruleAlt), { selected: { "rule-alt": true } });
+    renderComponent(ruleAlt, makeQuery(ruleAlt), {
+      selected: { "rule-alt": true },
+    });
 
     const checkboxes = screen.getAllByRole("checkbox");
     await userEvent.click(checkboxes[1]); // add conceptA

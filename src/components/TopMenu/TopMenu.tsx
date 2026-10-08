@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { usePathname } from "next/navigation";
 
 import TabsShell from "@/components/TabsShell";
@@ -12,11 +12,35 @@ import { HelpIcon } from "@/icons/HelpIcon";
 import HelpTooltip from "../HelpTooltip";
 import { useApplicationMode } from "@/providers/ApplicationModeProvider";
 import { TermDirectoryIcon } from "@/icons/TermDirectoryIcon";
+import { Stack, Typography } from "@mui/material";
+import { useUiPreferences } from "@/store/uiPreferencesStore";
 
 export default function TopMenu() {
   const pathname = usePathname();
   const user = useUserStore((s) => s.user);
   const { isStandalone } = useApplicationMode();
+
+  const dismissed = useUiPreferences((s) => s.dismissed.termDirectoryTooltip);
+  const dismiss = useUiPreferences((s) => s.dismiss);
+  const dismissTooltip = useCallback(
+    () => dismiss("termDirectoryTooltip"),
+    [dismiss],
+  );
+
+  const [openTDTooltip, setOpenTDTooltip] = useState(false);
+
+  useEffect(() => {
+    if (!dismissed) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setOpenTDTooltip(true);
+    }
+
+    const id = setTimeout(() => {
+      setOpenTDTooltip(false);
+      dismissTooltip();
+    }, 10000);
+    return () => clearTimeout(id);
+  }, [dismissTooltip, dismissed]);
 
   const userCustodians = useMemo(
     () => user?.custodians ?? [],
@@ -66,20 +90,19 @@ export default function TopMenu() {
         href: routes.help(),
         route: routes.help(),
         page: null,
-        // Tooltip turned off for now, to be reimplemented with the component library
-        // The icon used to be wrapped in:
-        // <HelpTooltip
-        //   title="Tool guidance can be found here"
-        //   placement="left"
-        //   open={(helpTooltipOpen && !!user) || helpHoverOpen}
-        //   onOpen={() => setHelpHoverOpen(true)}
-        //   onClose={() => {
-        //     setHelpHoverOpen(false);
-        //     setHelpTooltipOpen(false);
-        //   }}
-        //   sx={{ zIndex: 1250 }}
-        // >
-        icon: <HelpIcon />,
+        icon: (
+          <HelpTooltip
+            title={
+              <Typography component="span" fontWeight={700}>
+                Tool guidance can be found here
+              </Typography>
+            }
+            placement="left"
+            sx={{ zIndex: 1250 }}
+          >
+            <HelpIcon />
+          </HelpTooltip>
+        ),
         iconOnly: true,
         alignRight: true,
       },
@@ -90,7 +113,33 @@ export default function TopMenu() {
         route: routes.termDirectory,
         page: null,
         icon: (
-          <HelpTooltip title="Term Directory">
+          <HelpTooltip
+            title={
+              <Stack
+                direction="row"
+                spacing={0.5}
+                alignItems="center"
+                useFlexGap
+                flexWrap="wrap"
+              >
+                <Typography
+                  component="span"
+                  fontWeight={700}
+                  sx={{ color: "yellowCustom.main" }}
+                >
+                  New!
+                </Typography>
+                <Typography component="span" fontWeight={700}>
+                  Term Directory
+                </Typography>
+              </Stack>
+            }
+            placement="left"
+            open={(openTDTooltip && !!user) || !dismissed}
+            onOpen={() => setOpenTDTooltip(true)}
+            onClose={() => setOpenTDTooltip(false)}
+            sx={{ zIndex: 1250 }}
+          >
             <TermDirectoryIcon />
           </HelpTooltip>
         ),
@@ -100,7 +149,7 @@ export default function TopMenu() {
     ];
 
     return baseTabs;
-  }, [isStandalone, user, userCustodians]);
+  }, [dismissed, isStandalone, openTDTooltip, user, userCustodians]);
 
   const currentTabValue =
     tabs.find((tab) => {

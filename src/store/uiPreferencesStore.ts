@@ -4,7 +4,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
 // add a key here to make something dismissible, nothing else is needed
-export type DismissibleKey = "accessBanner";
+export type DismissibleKey = "accessBanner" | "termDirectoryTooltip";
 
 export interface UiPreferencesState {
   dismissed: Partial<Record<DismissibleKey, boolean>>;
