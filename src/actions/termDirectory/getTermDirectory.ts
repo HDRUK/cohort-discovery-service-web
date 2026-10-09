@@ -5,8 +5,9 @@ import { apiGet } from "@/lib/apiClient";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { TermDirectoryEntry, ApiResponse, Paginated } from "@/types/api";
 import { DEFAULT_PER_PAGE } from "@/config/defaults";
-import { DOMAIN_TAB_FILTERS, DomainTab } from "@/config/domainFilters";
+import { DomainTab } from "@/config/domainFilters";
 import { getTagTermDirectory } from "@/config/tags";
+import { buildTermDirectoryParams } from "@/utils/buildTermDirectoryParams";
 
 const getTermDirectory = async (
   page = 1,
@@ -20,31 +21,14 @@ const getTermDirectory = async (
     user: { id: userId },
   } = await getTokenUser();
 
-  const params = new URLSearchParams({
-    page: String(page),
-    per_page: String(per_page),
-  });
-
-  if (search) {
-    params.set("concept_name", search);
-    params.set("concept_id", search);
-  }
-
-  if (domain) {
-    const domainIds = DOMAIN_TAB_FILTERS[domain] ?? [];
-
-    if (domainIds.length > 1) {
-      params.set("domain_id__in", domainIds.join(","));
-    } else if (domainIds.length === 1) {
-      params.set("domain_id", domainIds[0]);
-    }
-  }
-
-  collections?.forEach((pid) => params.append("collection_pid[]", pid));
-
-  if (sort) {
-    params.set("sort", sort);
-  }
+  const params = buildTermDirectoryParams(
+    page,
+    per_page,
+    search,
+    domain,
+    collections,
+    sort,
+  );
 
   const result = await apiGet<ApiResponse<Paginated<TermDirectoryEntry>>>({
     url: API_ROUTES.termDirectory,

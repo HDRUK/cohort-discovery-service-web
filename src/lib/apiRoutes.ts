@@ -1,5 +1,12 @@
 const API_URL = "/api/v1";
 const API_AUTH_URL = "/api/auth";
+const APP_API_URL = "/api";
+
+export const APP_API_ROUTES = {
+  downloadQuery: (pid: string) =>
+    `${APP_API_URL}/download/queries/${encodeURIComponent(pid)}`,
+  downloadTermDirectory: `${APP_API_URL}/download/term-directory`,
+};
 
 export const API_ROUTES = {
   task: `${API_URL}/task`,
@@ -10,6 +17,8 @@ export const API_ROUTES = {
   query: `${API_URL}/query`,
   deleteQueriesBulk: `${API_URL}/queries/delete/bulk`,
   rerunQuery: (id: string) => `${API_URL}/query/re-run/${id}`,
+  queryDownload: (pid: string, format: string) =>
+    `${API_URL}/queries/${encodeURIComponent(pid)}/download/${format}`,
   parseQuery: `${API_URL}/parse-query`,
   collections: `${API_URL}/collections`,
   collection: (id: number | string) => `${API_URL}/collections/${id}`,
@@ -57,6 +66,7 @@ export const API_ROUTES = {
   featureFlags: `${API_URL}/features`,
   feature: (name: string) => `${API_URL}/features/${name}`,
   termDirectory: `${API_URL}/term-directory`,
+  termDirectoryDownload: `${API_URL}/term-directory/download`,
   clicks: `${API_URL}/clicks`,
 };
 
