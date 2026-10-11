@@ -1,5 +1,5 @@
 /**
- * Logout flow – the /api/auth/logout Next.js route clears the token cookie
+ * Logout flow – the /auth/logout Next.js route clears the token cookie
  * and redirects to /login.
  */
 import { routes } from "@/config/routes";
@@ -14,13 +14,13 @@ describe("Logout", () => {
   });
 
   it("clears the auth cookie and redirects to login", () => {
-    cy.visit("/api/auth/logout");
+    cy.visit("/auth/logout");
     cy.url({ timeout: 10000 }).should("include", "/login");
     cy.getCookie("token").should("be.null");
   });
 
   it("prevents access to dashboard after logout", () => {
-    cy.visit("/api/auth/logout");
+    cy.visit("/auth/logout");
     cy.url({ timeout: 10000 }).should("include", "/login");
     cy.visit(routes.dashboardNewQuery());
     cy.url({ timeout: 10000 }).should("include", "/login");

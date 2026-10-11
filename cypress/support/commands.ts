@@ -14,6 +14,12 @@ declare global {
         opts?: { isAdmin?: boolean; custodianPid?: string }
       ): Chainable<void>;
 
+      /**
+       * Seed the next-auth session cookie for OIDC mode.
+       * @param role - "user" | "admin" (default "user")
+       */
+      loginOidc(role?: "user" | "admin"): Chainable<void>;
+
       /** Remove the auth cookie, simulating a logged-out state. */
       logout(): Chainable<void>;
     }
@@ -42,8 +48,25 @@ Cypress.Commands.add(
   },
 );
 
+Cypress.Commands.add("loginOidc", (role = "user") => {
+  cy.task("generateOidcSessionToken", {
+    role,
+    isAdmin: role === "admin",
+  }).then((token) => {
+    // NextAuth v4 session cookie name on http localhost.
+    cy.setCookie("next-auth.session-token", token as string, {
+      domain: "localhost",
+      path: "/",
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+    });
+  });
+});
+
 Cypress.Commands.add("logout", () => {
   cy.clearCookie("token");
+  cy.clearCookie("next-auth.session-token");
 });
 
 export {};
