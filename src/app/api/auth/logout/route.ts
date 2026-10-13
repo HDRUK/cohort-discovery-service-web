@@ -6,6 +6,7 @@ import { isStandalone } from "@/utils/modes";
 
 const API_BASE_URL = process.env.API_BASE_URL;
 const GATEWAY_URL = process.env.NEXT_PUBLIC_LOGIN_URL;
+const applicationMode = process.env.APPLICATION_MODE;
 
 const ssoClaimsFrom = (
   token: string | undefined,
@@ -25,25 +26,27 @@ export async function GET(req: NextRequest) {
   const token = req.cookies.get(ACCESS_TOKEN_NAME)?.value;
   const { provider: ssoProvider, logoutTicket } = ssoClaimsFrom(token);
 
-  let url: URL;
+  let location: string;
 
   if (ssoProvider) {
-    url = new URL(
+    const ssoLogoutUrl = new URL(
       `/api/auth/sso/${encodeURIComponent(ssoProvider)}/logout`,
       API_BASE_URL,
     );
     if (logoutTicket) {
-      url.searchParams.set("ticket", logoutTicket);
+      ssoLogoutUrl.searchParams.set("ticket", logoutTicket);
     }
+    location = ssoLogoutUrl.toString();
+  } else if (isStandalone(applicationMode) || !GATEWAY_URL) {
+    location = routes.login;
   } else {
-    const loginBase = isStandalone(process.env.APPLICATION_MODE)
-      ? req.url
-      : (GATEWAY_URL ?? req.url);
-
-    url = new URL(routes.login, loginBase);
+    location = new URL(routes.login, GATEWAY_URL).toString();
   }
 
-  const response = NextResponse.redirect(url);
+  const response = new NextResponse(null, {
+    status: 307,
+    headers: { Location: location },
+  });
   // Delete via multiple strategies to handle domain-scoped cookies set by
   // different origins (e.g., Cypress test runner sets domain: "localhost").
   response.cookies.delete(ACCESS_TOKEN_NAME);
