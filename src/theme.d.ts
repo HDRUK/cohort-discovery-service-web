@@ -12,6 +12,7 @@ declare module "@mui/material/styles" {
     tooltip?: Palette["primary"];
     yellowCustom?: Palette["primary"];
     secondaryBlack: Palette["primary"];
+    sage: Palette["primary"];
   }
   interface PaletteOptions {
     tertiary?: PaletteOptions["primary"];
@@ -21,6 +22,7 @@ declare module "@mui/material/styles" {
     tooltip?: PaletteOptions["primary"];
     yellowCustom?: PaletteOptions["primary"];
     secondaryBlack: PaletteOptions["primary"];
+    sage?: PaletteOptions["primary"];
   }
   interface TypographyVariants {
     guidance1: React.CSSProperties;

@@ -1,11 +1,12 @@
 describe("SSO sign-in options", () => {
   beforeEach(() => {
     cy.visit("/login");
-    cy.contains("button", "Sign in").click();
+    cy.contains("button:visible", "Log in").click();
+    cy.get('input[type="email"]').should("be.visible");
   });
 
-  it("offers both the password method and the configured SSO provider", () => {
-    cy.contains("button", "Email and password").should("be.visible");
+  it("offers both the password form and the configured SSO provider", () => {
+    cy.get('input[type="password"]').should("be.visible");
     cy.contains("a", "Single Sign-On").should("be.visible");
   });
 
