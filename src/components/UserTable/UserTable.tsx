@@ -5,8 +5,10 @@ import {
   MRT_RowSelectionState,
   MRT_SortingState,
   type MRT_ColumnDef,
+  type MRT_Row,
 } from "material-react-table";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import ChipList from "@/components/ChipList";
 import Table from "@/components/Table";
 import useSearchParams from "@/hooks/useSearchParams";
 import { capitaliseFirstLetter } from "@/utils/string";
@@ -23,6 +25,8 @@ import { DEFAULT_PER_PAGE, DEFAULT_USERS_PER_PAGE } from "@/config/defaults";
 import { TAG_ADMIN_USERS } from "@/config/tags";
 import { getTimestamp } from "@/utils/date";
 import { getLastName } from "@/utils/user";
+import { formatWorkgroupName } from "@/utils/workgroups";
+import { filterUsers } from "./userFilters";
 
 const PAGE_PARAM = "users_page";
 const PER_PAGE_PARAM = "users_per_page";
@@ -33,12 +37,16 @@ export interface CollectionsTableProps extends TableProps {
   tableTitle?: string;
   tableSubTitle?: string;
   handleDelete?: (ids: string[]) => Promise<void>;
+  showRolesAndWorkgroupColumns?: boolean;
+  showCheckboxes?: boolean;
 }
 
 const UserTable = ({
   tableTitle,
   tableSubTitle,
   handleDelete,
+  showRolesAndWorkgroupColumns = false,
+  showCheckboxes = true,
   ...rest
 }: CollectionsTableProps) => {
   const { getSearchParam, searchParams } = useSearchParams("workgroup_filter");
@@ -51,6 +59,7 @@ const UserTable = ({
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
 
   const users = useAdminStore((s) => s.users);
+  const setSelectedUser = useAdminStore((s) => s.setSelectedUser);
   const [sorting, setSorting] = useState<MRT_SortingState>([]);
 
   const selectedUserIds = useMemo(
@@ -58,22 +67,23 @@ const UserTable = ({
     [rowSelection],
   );
 
+  useEffect(() => {
+    const [firstId] = selectedUserIds;
+    setSelectedUser(
+      firstId ? (users.find((u) => String(u.id) === firstId) ?? null) : null,
+    );
+
+    return () => setSelectedUser(null);
+  }, [selectedUserIds, users, setSelectedUser]);
+
   const workgroups = useUserDataStore((s) => s.workgroups);
   const activeWorkgroup = workgroups.find((wg) => String(wg.id) === wgFilter);
 
-  // may have been better for this to be BE logic
-  // - we dont have a workgroup user filter on the BE now, so this will do
-  // - noted for future improvement
   const hydratedUsers = useMemo(() => {
-    let filtered = users.filter((u) =>
-      u.workgroups?.find((wg) => String(wg.id) === String(wgFilter)),
-    );
-
-    if (searchTerm) {
-      filtered = filtered.filter((u) =>
-        (u.name ?? "").toLowerCase().includes(searchTerm),
-      );
-    }
+    const filtered = filterUsers(users, {
+      workgroupId: wgFilter,
+      searchTerm,
+    });
 
     if (!sorting.length) {
       return [...filtered].sort(
@@ -170,8 +180,42 @@ const UserTable = ({
             ? dayjs(cell.getValue<string>()).format("MMM D, YYYY HH:mm")
             : "—",
       },
+      ...(showRolesAndWorkgroupColumns
+        ? [
+            {
+              id: "roles",
+              header: "Roles",
+              enableSorting: false,
+              accessorFn: (row: User) =>
+                row.roles?.map((role) => role.name).join(", ") ?? "",
+              Cell: ({ row }: { row: MRT_Row<User> }) => (
+                <ChipList
+                  labels={row.original.roles?.map((role) => role.name) ?? []}
+                />
+              ),
+            },
+            {
+              id: "workgroups",
+              header: "Workgroups",
+              enableSorting: false,
+              accessorFn: (row: User) =>
+                row.workgroups
+                  ?.map((workgroup) => formatWorkgroupName(workgroup.name))
+                  .join(", ") ?? "",
+              Cell: ({ row }: { row: MRT_Row<User> }) => (
+                <ChipList
+                  labels={
+                    row.original.workgroups?.map((workgroup) =>
+                      formatWorkgroupName(workgroup.name),
+                    ) ?? []
+                  }
+                />
+              ),
+            },
+          ]
+        : []),
     ],
-    [isAdmin],
+    [isAdmin, showRolesAndWorkgroupColumns],
   );
 
   const table = usePaginatedTable<User>({
@@ -182,6 +226,7 @@ const UserTable = ({
     pageParam: PAGE_PARAM,
     perPageParam: PER_PAGE_PARAM,
     enableSorting: true,
+    enableRowSelection: showCheckboxes,
     manualPagination: true,
     manualSorting: true,
     onSortingChange: setSorting,
@@ -203,10 +248,12 @@ const UserTable = ({
         },
       }}
       rightAction={{
-        deleteProps: {
-          onClick: handleDelete,
-          disabled: selectedUserIds.length === 0,
-        },
+        ...(handleDelete && {
+          deleteProps: {
+            onClick: handleDelete,
+            disabled: selectedUserIds.length === 0,
+          },
+        }),
         refreshProps: {
           tag: TAG_ADMIN_USERS,
           label: "Refresh Users",
