@@ -1,6 +1,7 @@
 "use client";
 
 import { Box, Button, Stack, Typography } from "@mui/material";
+import branding from "@branding/branding.config";
 import { ctaButtonSx, headingSx, rootSx } from "./LoginLanding.styles";
 
 interface LoginLandingProps {
@@ -17,12 +18,12 @@ const LoginLanding = ({ visible, onSignIn }: LoginLandingProps) => (
     sx={rootSx(visible)}
   >
     <Typography component="h1" sx={headingSx}>
-      Cohort Discovery{" "}
+      {branding.loginTitle[0]}{" "}
       <Box
         component="span"
         sx={{ fontWeight: 400, color: "secondaryBlack.main" }}
       >
-        Service
+        {branding.loginTitle[1]}
       </Box>
     </Typography>
 

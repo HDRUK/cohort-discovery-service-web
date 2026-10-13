@@ -9,6 +9,7 @@ import { getLegalLinks } from "@/config/externalLinks";
 import { useApplicationMode } from "@/providers/ApplicationModeProvider";
 import { partitionAuthMethods } from "./authMethods";
 import LoginForm from "./LoginForm";
+import branding from "@branding/branding.config";
 import {
   methodsStackSx,
   providersGridSx,
@@ -57,7 +58,7 @@ const LoginOptions = ({
             Welcome back.
           </Typography>
           <Typography sx={secondaryTextSx}>
-            Sign in to your Cohort Discovery workspace.
+            Sign in to your {branding.productName} workspace.
           </Typography>
         </Box>
 
@@ -115,7 +116,7 @@ const LoginOptions = ({
           </Link>
         </Stack>
         <Typography variant="caption" sx={{ color: "text.secondary" }}>
-          © {copyrightYear} Cohort Discovery
+          © {copyrightYear} {branding.copyrightHolder}
         </Typography>
       </Stack>
     </Box>

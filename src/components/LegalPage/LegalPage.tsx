@@ -1,10 +1,11 @@
 import { Alert, Box, Container, Link, Typography } from "@mui/material";
 import { ReactNode } from "react";
+import branding from "@branding/branding.config";
 
 export interface LegalPageProps {
   title: string;
-  sourceLabel: string;
-  sourceHref: string;
+  sourceLabel?: string;
+  sourceHref?: string;
   lastUpdated: string;
   children: ReactNode;
 }
@@ -25,14 +26,17 @@ const LegalPage = ({
       Last updated {lastUpdated}
     </Typography>
 
-    <Alert severity="info" sx={{ mb: 4 }}>
-      This is the{" "}
-      <Link href={sourceHref} target="_blank" rel="noopener noreferrer">
-        {sourceLabel}
-      </Link>
-      , which covers Cohort Discovery. If your organisation runs its own Cohort
-      Discovery deployment, ask your administrator which policy applies to you.
-    </Alert>
+    {sourceLabel && sourceHref && (
+      <Alert severity="info" sx={{ mb: 4 }}>
+        This is the{" "}
+        <Link href={sourceHref} target="_blank" rel="noopener noreferrer">
+          {sourceLabel}
+        </Link>
+        , which covers {branding.productName}. If your organisation runs its own{" "}
+        {branding.productName} deployment, ask your administrator which policy
+        applies to you.
+      </Alert>
+    )}
 
     <Box
       sx={{

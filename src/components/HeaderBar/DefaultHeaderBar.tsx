@@ -2,16 +2,20 @@
 
 import { AppBar, Toolbar, Box, Typography } from "@mui/material";
 import Image from "next/image";
+import Link from "next/link";
 import userIcon from "@/assets/user_logo.svg";
+import logo from "@branding/assets/logo.svg";
+import branding from "@branding/branding.config";
 import PositionedMenu, { PositionedMenuItem } from "../PositionedMenu";
 import { useRouter } from "next/navigation";
 import useUserStore from "@/hooks/useUserStore";
 import { useApplicationMode } from "@/providers/ApplicationModeProvider";
 import { useSignOutStore } from "@/store/signOutStore";
 import { routes } from "@/config/routes";
+import { checkIsAdmin } from "@/utils/user";
+import { getOrganisationUrl } from "@/config/externalLinks";
 
-const NEXT_PUBLIC_LOGIN_URL =
-  process.env.NEXT_PUBLIC_LOGIN_URL ?? "https://healthdatagateway.org";
+const NEXT_PUBLIC_LOGIN_URL = getOrganisationUrl();
 
 const DefaultHeaderBar = () => {
   const router = useRouter();
@@ -19,8 +23,32 @@ const DefaultHeaderBar = () => {
   const setUser = useUserStore((s) => s.setUser);
   const { isStandalone } = useApplicationMode();
   const setSigningOut = useSignOutStore((s) => s.setSigningOut);
+  const logoHref = user ? routes.dashboardNewQuery() : routes.login;
 
   const links: PositionedMenuItem[] = [
+    ...(isStandalone
+      ? [
+          {
+            id: "profile",
+            label: "My Profile",
+            onClick: () => router.push(routes.profile),
+          },
+        ]
+      : []),
+    ...(checkIsAdmin(user)
+      ? [
+          {
+            id: "config",
+            label: "Configuration",
+            onClick: () => router.push(routes.config),
+          },
+          {
+            id: "regression",
+            label: "Regression Tests",
+            onClick: () => router.push(routes.adminRegression),
+          },
+        ]
+      : []),
     ...(isStandalone
       ? [
           {
@@ -55,9 +83,9 @@ const DefaultHeaderBar = () => {
     >
       <Toolbar sx={{ justifyContent: "space-between" }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Box sx={{ py: 0.5 }}>
-            <b> image</b>
-          </Box>
+          <Link href={logoHref} style={{ display: "flex", padding: "4px 0" }}>
+            <Image height={30} priority src={logo} alt={branding.logoAlt} />
+          </Link>
         </Box>
 
         {user && (

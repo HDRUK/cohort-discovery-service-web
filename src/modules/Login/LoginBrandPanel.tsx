@@ -3,6 +3,7 @@
 import { Box, Typography, useTheme } from "@mui/material";
 import Fingerprint from "@mui/icons-material/Fingerprint";
 import Circles from "@/components/Circles";
+import branding from "@branding/branding.config";
 import { AUTH_CIRCLE_DIAMETER, LANDING_CIRCLE_DIAMETER } from "./loginStyles";
 import {
   circlesPositionSx,
@@ -31,12 +32,13 @@ const LoginBrandPanel = ({ isAuth, showForm }: LoginBrandPanelProps) => {
       <Box aria-hidden sx={panelSx(isAuth)}>
         <Box sx={panelTextWrapperSx(showForm)}>
           <Typography component="p" sx={panelHeadingSx}>
-            The right cohort.
-            <br />A clearer discovery.
+            {branding.loginHeadline[0]}
+            <br />
+            {branding.loginHeadline[1]}
           </Typography>
 
           <Typography sx={panelSubheadingSx}>
-            Better questions. Meaningful connections.
+            {branding.loginSubheadline}
           </Typography>
         </Box>
       </Box>
@@ -49,7 +51,7 @@ const LoginBrandPanel = ({ isAuth, showForm }: LoginBrandPanelProps) => {
           diameter={diameter}
           opacities={isAuth ? AUTH_OPACITIES : LANDING_OPACITIES}
         >
-          <Box sx={fingerprintWrapperSx(diameter, showForm)}>
+          <Box sx={fingerprintWrapperSx(showForm)}>
             <Fingerprint sx={fingerprintIconSx} />
           </Box>
         </Circles>
