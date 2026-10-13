@@ -22,12 +22,15 @@ const prefersReducedMotion = () =>
   typeof window.matchMedia === "function" &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+type Direction = "auth" | "landing";
+
 const useLoginStage = (): LoginStage => {
   const [showLanding, setShowLanding] = useState(true);
   const [isAuth, setIsAuth] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [busy, setBusy] = useState(false);
 
+  const direction = useRef<Direction | null>(null);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const clearTimers = useCallback(() => {
@@ -42,38 +45,48 @@ const useLoginStage = (): LoginStage => {
   }, []);
 
   const toAuth = useCallback(() => {
-    if (busy) return;
+    if (busy && direction.current === "auth") return;
+
+    clearTimers();
 
     if (prefersReducedMotion()) {
+      direction.current = null;
       setShowLanding(false);
       setIsAuth(true);
       setShowForm(true);
+      setBusy(false);
       return;
     }
 
+    direction.current = "auth";
     setBusy(true);
     setShowLanding(false);
     schedule(TO_AUTH_GEOMETRY_MS, () => setIsAuth(true));
     schedule(TO_AUTH_CONTENT_MS, () => setShowForm(true));
     schedule(SETTLE_MS, () => setBusy(false));
-  }, [busy, schedule]);
+  }, [busy, clearTimers, schedule]);
 
   const toLanding = useCallback(() => {
-    if (busy) return;
+    if (busy && direction.current === "landing") return;
+
+    clearTimers();
 
     if (prefersReducedMotion()) {
+      direction.current = null;
       setShowForm(false);
       setIsAuth(false);
       setShowLanding(true);
+      setBusy(false);
       return;
     }
 
+    direction.current = "landing";
     setBusy(true);
     setShowForm(false);
     schedule(TO_LANDING_GEOMETRY_MS, () => setIsAuth(false));
     schedule(TO_LANDING_CONTENT_MS, () => setShowLanding(true));
     schedule(SETTLE_MS, () => setBusy(false));
-  }, [busy, schedule]);
+  }, [busy, clearTimers, schedule]);
 
   return { showLanding, isAuth, showForm, busy, toAuth, toLanding };
 };

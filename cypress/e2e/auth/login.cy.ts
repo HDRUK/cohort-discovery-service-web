@@ -34,9 +34,9 @@ describe("Login", () => {
     openAuthScreen();
 
     cy.get('input[type="password"]').type(password());
-    cy.contains("button", "Show password").click();
+    cy.get('button[aria-label="Show password"]').click();
     cy.get('input[name="password"]').should("have.attr", "type", "text");
-    cy.contains("button", "Hide password").click();
+    cy.get('button[aria-label="Hide password"]').click();
     cy.get('input[name="password"]').should("have.attr", "type", "password");
   });
 

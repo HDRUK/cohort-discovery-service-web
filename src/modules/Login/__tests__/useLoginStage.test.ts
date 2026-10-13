@@ -66,14 +66,34 @@ describe("useLoginStage", () => {
     expect(result.current.busy).toBe(false);
   });
 
-  it("ignores a second transition while one is still running", () => {
+  it("ignores a repeat call in the same direction while one is still running", () => {
     const { result } = renderHook(() => useLoginStage());
 
     act(() => result.current.toAuth());
     act(() => void jest.advanceTimersByTime(200));
-    act(() => result.current.toLanding());
+    act(() => result.current.toAuth());
 
-    expect(result.current.isAuth).toBe(true);
+    expect(result.current).toMatchObject({ isAuth: true, showForm: false });
+
+    act(() => void jest.advanceTimersByTime(700));
+    expect(result.current.showForm).toBe(true);
+  });
+
+  it("reverses direction even while the previous transition is still settling", () => {
+    const { result } = renderHook(() => useLoginStage());
+
+    act(() => result.current.toAuth());
+    act(() => void jest.advanceTimersByTime(900));
+    expect(result.current.showForm).toBe(true);
+
+    act(() => result.current.toLanding());
+    expect(result.current).toMatchObject({ showForm: false, isAuth: true });
+
+    act(() => void jest.advanceTimersByTime(280));
+    expect(result.current.isAuth).toBe(false);
+
+    act(() => void jest.advanceTimersByTime(720));
+    expect(result.current.showLanding).toBe(true);
   });
 
   it("snaps between screens when the user prefers reduced motion", () => {
