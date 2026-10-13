@@ -4,7 +4,7 @@ import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import { routes } from "@/config/routes";
 import { isStandalone } from "@/utils/modes";
 
-const API_BASE_URL = process.env.API_BASE_URL ?? "http://localhost:8100";
+const API_BASE_URL = process.env.API_BASE_URL;
 const GATEWAY_URL = process.env.NEXT_PUBLIC_LOGIN_URL;
 
 const ssoClaimsFrom = (
