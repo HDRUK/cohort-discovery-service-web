@@ -43,7 +43,11 @@
   "exclude": [
     "node_modules",
     "jest.config.ts",
-    "prs"
+    "prs",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/__tests__/**",
+    "**/__mocks__/**"
   ],
   "mdx": {
     "checkMdx": true
