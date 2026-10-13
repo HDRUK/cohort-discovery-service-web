@@ -1,0 +1,5 @@
+- Name: cohort-discovery
+  Scopes:
+    - openid
+    - profile
+    - email

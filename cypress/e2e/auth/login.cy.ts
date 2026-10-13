@@ -14,6 +14,7 @@ describe("Login", () => {
 
   it("shows the login form when Sign in is clicked", () => {
     cy.contains("button", "Sign in").click();
+    cy.contains("button", "Email and password").click();
     cy.contains("Login").should("be.visible");
     cy.get('input[type="email"]').should("be.visible");
     cy.get('input[type="password"]').should("be.visible");
@@ -21,6 +22,7 @@ describe("Login", () => {
 
   it("logs in with valid credentials and redirects to dashboard", () => {
     cy.contains("button", "Sign in").click();
+    cy.contains("button", "Email and password").click();
     cy.get('input[type="email"]').type(Cypress.env("CYPRESS_USER_EMAIL") || "test@example.com");
     cy.get('input[type="password"]').type(Cypress.env("CYPRESS_USER_PASSWORD") || "password123");
     cy.contains("button", "Login").click();
@@ -30,6 +32,7 @@ describe("Login", () => {
 
   it("shows error on invalid credentials", () => {
     cy.contains("button", "Sign in").click();
+    cy.contains("button", "Email and password").click();
     cy.get('input[type="email"]').type("wrong@example.com");
     cy.get('input[type="password"]').type("wrongpassword");
     cy.contains("button", "Login").click();
@@ -38,9 +41,10 @@ describe("Login", () => {
 
   it("Cancel button hides the login form", () => {
     cy.contains("button", "Sign in").click();
+    cy.contains("button", "Email and password").click();
     cy.contains("button", "Cancel").click();
     cy.get('input[type="email"]').should("not.exist");
-    cy.contains("button", "Sign in").should("be.visible");
+    cy.contains("button", "Email and password").should("be.visible");
   });
 
   it("redirects to dashboard if already authenticated", () => {

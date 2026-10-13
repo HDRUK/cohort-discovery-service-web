@@ -388,8 +388,8 @@ export interface TokenUser {
   is_admin: boolean;
   is_nhse_sde_approval: boolean;
   organisation: string;
-  provider: string;
-  workgroups: string[];
+  sso_provider?: string;
+  workgroups: Workgroup[];
   cohort_discovery_roles: RoleName[];
   cohort_admin_teams: ExternalCustodian[];
 }
@@ -566,5 +566,13 @@ export interface SignInPost {
   email: string;
   password: string;
 }
+
+export interface SignInResponse {
+  access_token: string;
+}
+
+export type AuthMethod =
+  | { type: "password"; label: string }
+  | { type: "oidc"; slug: string; label: string; redirect_url: string };
 
 export type GroupedCollection = { custodian: Custodian; items: Collection[] };
