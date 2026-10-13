@@ -1,3 +1,21 @@
+## [1.11.0](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.10.1...v1.11.0) (2026-10-08)
+
+### ✨ Features
+
+* **DP-1109:** add timed term directory tooltip  (#525) ([aa90e3c](https://github.com/HDRUK/cohort-discovery-service-web/commit/aa90e3c7434dc8ac6919865b080d9b03fb11b7bb)), closes [DP-1109](undefinedDP-1109)
+* **DP-1144:** improvements to Demographics filter (#522) ([772ed99](https://github.com/HDRUK/cohort-discovery-service-web/commit/772ed9966cfa4e87b1f1cda6b606b65507e53f83)), closes [DP-1144](undefinedDP-1144)
+* **DP-1147:** show "Unselected" status for datasets without location and death (#537) ([41bdf89](https://github.com/HDRUK/cohort-discovery-service-web/commit/41bdf89b10c5a17c836295bfcff2c2ade16dbbd3)), closes [DP-1147](undefinedDP-1147)
+* **DP-949:** clicking on hierarchy item scrolls to corresponding node (#526) ([5b8a0f7](https://github.com/HDRUK/cohort-discovery-service-web/commit/5b8a0f76dd979cdf2e9afcc2791ffd7c8cef96df)), closes [DP-949](undefinedDP-949)
+* **DP-995:** Rule block improvements (#524) ([6808dab](https://github.com/HDRUK/cohort-discovery-service-web/commit/6808dabba52cac6be388384ae03cb757284ab011)), closes [DP-995](undefinedDP-995)
+
+### 🐛 Bug Fixes
+
+* **DP-1006:** more rule block improvements (#530) ([47ee16a](https://github.com/HDRUK/cohort-discovery-service-web/commit/47ee16abcc1a93cc4a45a30631316dff04f491e3)), closes [DP-1006](undefinedDP-1006)
+* **DP-1141:** fix inconsistent bold highlighting of top menu tabs (#523) ([7237b92](https://github.com/HDRUK/cohort-discovery-service-web/commit/7237b9255982014a517acc0ee7ff8eadecc9505e))
+* **DP-1145:** fix clicked link color in query results (#521) ([fc805f1](https://github.com/HDRUK/cohort-discovery-service-web/commit/fc805f1fd8f5f89839a8afade3a2760fb89aee17))
+* **DP-948:** fix NLP rule block concept name truncation (#535) ([f9b0471](https://github.com/HDRUK/cohort-discovery-service-web/commit/f9b04714c00cbe835aa8f47213b8451e6dd34b33))
+* **GAT-8645:** Updated Base OS version with updating the node version (#527) ([fe1c27d](https://github.com/HDRUK/cohort-discovery-service-web/commit/fe1c27d368fb39b701cc599c1f3fe419edf13c82)), closes [GAT-8645](undefinedGAT-8645)
+
 ## [1.10.1](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.10.0...v1.10.1) (2026-09-16)
 
 ### 🐛 Bug Fixes

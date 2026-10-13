@@ -325,7 +325,6 @@ const RuleWrapper = ({
             {isRuleLeaf(node) &&
               type === DragType.Rule &&
               !isEmptyRule(node) &&
-              !renderFooter &&
               !["Gender", "Race"].includes(
                 getPrimaryConcept(node.rule.concept)?.category || "",
               ) &&
