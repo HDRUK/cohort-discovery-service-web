@@ -8,7 +8,13 @@ import { getProviderIcon } from "@/utils/ssoProviders";
 import { externalLinks } from "@/config/externalLinks";
 import { partitionAuthMethods } from "./authMethods";
 import LoginForm from "./LoginForm";
-import { BRAND_PANEL_WIDTH, FADE_MS } from "./loginStyles";
+import {
+  methodsStackSx,
+  providersGridSx,
+  rootSx,
+  secondaryTextSx,
+  welcomeHeadingSx,
+} from "./LoginOptions.styles";
 
 interface LoginOptionsProps {
   methods: AuthMethod[];
@@ -30,37 +36,8 @@ const LoginOptions = ({
   const hasNoMethods = !passwordMethod && providers.length === 0;
 
   return (
-    <Box
-      sx={{
-        position: "absolute",
-        left: { xs: 0, md: BRAND_PANEL_WIDTH },
-        right: 0,
-        top: 0,
-        bottom: 0,
-        zIndex: 9,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "space-between",
-        overflowY: "auto",
-        pt: 8,
-        pb: 4,
-        opacity: visible ? 1 : 0,
-        visibility: visible ? "visible" : "hidden",
-        transition: `opacity ${FADE_MS}ms ease-in-out, visibility ${FADE_MS}ms`,
-        "@media (prefers-reduced-motion: reduce)": { transition: "none" },
-      }}
-    >
-      <Stack
-        spacing={3}
-        sx={{
-          flex: 1,
-          justifyContent: "center",
-          width: "100%",
-          maxWidth: 472,
-          px: 8,
-        }}
-      >
+    <Box sx={rootSx(visible)}>
+      <Stack spacing={3} sx={methodsStackSx}>
         <Box>
           <Button
             onClick={onBack}
@@ -73,19 +50,16 @@ const LoginOptions = ({
             Back
           </Button>
 
-          <Typography
-            variant="h3"
-            sx={{ color: "text.primary", fontWeight: 600 }}
-          >
+          <Typography variant="h3" sx={welcomeHeadingSx}>
             Welcome back.
           </Typography>
-          <Typography sx={{ color: "text.secondary" }}>
+          <Typography sx={secondaryTextSx}>
             Sign in to your Cohort Discovery workspace.
           </Typography>
         </Box>
 
         {hasNoMethods && (
-          <Typography sx={{ color: "text.secondary" }}>
+          <Typography sx={secondaryTextSx}>
             We couldn&apos;t load the sign-in options. Refresh the page to try
             again, or contact your administrator if this keeps happening.
           </Typography>
@@ -98,13 +72,7 @@ const LoginOptions = ({
         )}
 
         {providers.length > 0 && (
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: providers.length > 1 ? "1fr 1fr" : "1fr",
-              gap: 1,
-            }}
-          >
+          <Box sx={providersGridSx(providers.length > 1)}>
             {providers.map((provider) => {
               const ProviderIcon = getProviderIcon(provider.slug);
 

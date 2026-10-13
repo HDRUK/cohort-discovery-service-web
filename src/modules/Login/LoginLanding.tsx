@@ -1,7 +1,7 @@
 "use client";
 
 import { Box, Button, Stack, Typography } from "@mui/material";
-import { FADE_MS } from "./loginStyles";
+import { ctaButtonSx, headingSx, rootSx } from "./LoginLanding.styles";
 
 interface LoginLandingProps {
   visible: boolean;
@@ -14,27 +14,9 @@ const LoginLanding = ({ visible, onSignIn }: LoginLandingProps) => (
     alignItems="center"
     justifyContent="center"
     spacing={{ xs: 4, md: 5 }}
-    sx={{
-      position: "absolute",
-      inset: 0,
-      zIndex: 8,
-      px: 3,
-      textAlign: { xs: "center", md: "left" },
-      opacity: visible ? 1 : 0,
-      visibility: visible ? "visible" : "hidden",
-      transition: `opacity ${FADE_MS}ms ease-in-out, visibility ${FADE_MS}ms`,
-      "@media (prefers-reduced-motion: reduce)": { transition: "none" },
-    }}
+    sx={rootSx(visible)}
   >
-    <Typography
-      component="h1"
-      sx={{
-        fontSize: "clamp(2rem, 3.7vw, 3.3rem)",
-        lineHeight: 1.2,
-        color: "text.primary",
-        fontWeight: 600,
-      }}
-    >
+    <Typography component="h1" sx={headingSx}>
       Cohort Discovery{" "}
       <Box
         component="span"
@@ -49,13 +31,7 @@ const LoginLanding = ({ visible, onSignIn }: LoginLandingProps) => (
         onClick={onSignIn}
         variant="contained"
         color="secondary"
-        sx={{
-          borderRadius: 9999,
-          px: 3,
-          py: 1,
-          fontSize: "clamp(1.25rem, 2vw, 2rem)",
-          lineHeight: 1.2,
-        }}
+        sx={ctaButtonSx}
       >
         Log in
       </Button>

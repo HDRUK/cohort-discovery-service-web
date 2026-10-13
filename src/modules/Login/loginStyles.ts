@@ -1,11 +1,3 @@
-import { SxProps, Theme } from "@mui/material";
-
-export const FIELD_SX: SxProps<Theme> = {
-  "& .MuiOutlinedInput-root, & .MuiOutlinedInput-notchedOutline": {
-    borderRadius: "4px",
-  },
-};
-
 export const PANEL_INSET = 2;
 export const BRAND_PANEL_WIDTH = "56%";
 export const LANDING_CIRCLE_DIAMETER = "36.6vw";

@@ -6,7 +6,7 @@ import { Controller, FormProvider, useForm } from "react-hook-form";
 import standaloneSignIn from "@/actions/standalone/standaloneSignIn";
 import FormTextField from "@/components/FormTextField";
 import FormPasswordField from "@/components/FormPasswordField";
-import { FIELD_SX } from "./loginStyles";
+import { FIELD_SX } from "./LoginForm.styles";
 
 interface LoginFormValues {
   email: string;
