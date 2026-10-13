@@ -1,5 +1,5 @@
 export const GATEWAY_URL =
-  process.env.NEXT_PUBLIC_LOGIN_URL ?? "https://www.hdruk.ac.uk/";
+  process.env.NEXT_PUBLIC_LOGIN_URL ?? "https://www.hdruk.ac.uk";
 
 export const externalLinks = {
   hdrukSite: GATEWAY_URL,
