@@ -35,6 +35,7 @@ export default function AddressSearch({
 
   useEffect(() => {
     skipNextFetch.current = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setInputValue(value);
   }, [value]);
 
@@ -48,6 +49,7 @@ export default function AddressSearch({
 
     const query = inputValue.trim();
     if (query.length < 3) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setOptions([]);
       return;
     }
