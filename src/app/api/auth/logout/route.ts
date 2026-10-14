@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import { routes } from "@/config/routes";
+import { redirectTo } from "@/lib/redirect";
 import { isStandalone } from "@/utils/modes";
 
 const API_BASE_URL = process.env.API_BASE_URL;
@@ -43,10 +44,7 @@ export async function GET(req: NextRequest) {
     location = new URL(routes.login, GATEWAY_URL).toString();
   }
 
-  const response = new NextResponse(null, {
-    status: 307,
-    headers: { Location: location },
-  });
+  const response = redirectTo(location);
   // Delete via multiple strategies to handle domain-scoped cookies set by
   // different origins (e.g., Cypress test runner sets domain: "localhost").
   response.cookies.delete(ACCESS_TOKEN_NAME);
