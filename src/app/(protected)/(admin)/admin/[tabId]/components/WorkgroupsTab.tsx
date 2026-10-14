@@ -14,8 +14,10 @@ export const WorkgroupsSkeleton = () => (
 
 const WorkgroupsTab = async ({
   searchParams,
+  collectionsPromise,
 }: {
   searchParams: CollectionsSearchParams;
+  collectionsPromise?: ReturnType<typeof getAdminCollections>;
 }) => {
   const { page = 1, per_page = DEFAULT_PER_PAGE, ...rest } = searchParams ?? {};
 
@@ -25,7 +27,8 @@ const WorkgroupsTab = async ({
     ...rest,
   });
 
-  const { data: collections } = await getAdminCollections({ params });
+  const { data: collections } = await (collectionsPromise ??
+    getAdminCollections({ params }));
 
   return <WorkgroupsAdmin collections={collections} />;
 };
