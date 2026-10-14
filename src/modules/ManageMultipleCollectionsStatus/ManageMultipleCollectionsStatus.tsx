@@ -60,6 +60,10 @@ const ManageMultipleCollectionsStatus = ({
     });
   }, [initialStatusId, selectedStatusId, setValue]);
 
+  useEffect(() => {
+    setSelectedStatusId(initialStatusId);
+  }, [initialStatusId]);
+
   const confirm = useConfirm();
 
   if (uniqueStates.length > 1) {
