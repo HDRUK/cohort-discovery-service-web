@@ -1,9 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import ssoExchange from "@/actions/standalone/ssoExchange";
 import { routes } from "@/config/routes";
-
-const redirectTo = (location: string) =>
-  new NextResponse(null, { status: 307, headers: { Location: location } });
+import { redirectTo } from "@/lib/redirect";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
