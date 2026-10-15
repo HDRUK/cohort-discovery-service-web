@@ -2,8 +2,8 @@ import useUserStore from "@/hooks/useUserStore";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import useStateManagement from "@/hooks/useStateManagement";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ApiError } from "@/lib/https";
 import { useNotify } from "@/providers/NotifyProvider";
+import { handleQueryRateLimitError } from "@/utils/queryErrors";
 
 import { routes } from "@/config/routes";
 import { useEffect } from "react";
@@ -35,30 +35,27 @@ const useSubmitQuery = () => {
 
   const { valid } = queryBuilderJson;
 
-  const submit = async () => {
+  const submit = async (): Promise<boolean> => {
     setIsLoading(true);
-    try {
-      const res = await fetchResults(queryName);
-      const newPid = res.data.query_pid;
-      const openQueries = searchParams.get("open_queries");
-      const arrayOpenQueries = (openQueries ?? "").split(",");
-      arrayOpenQueries.push(newPid);
-      router.push(
-        routes.dashboardQueryResult(
-          newPid,
-          arrayOpenQueries.filter((q) => q) ?? [],
-        ),
-      );
-    } catch (e) {
+    const res = await fetchResults(queryName);
+
+    if (res.error) {
       setIsLoading(false);
-      if (e instanceof ApiError && e.status === 429) {
-        notify.error(
-          "You've reached your monthly query limit. Try again next month.",
-        );
-        return;
-      }
-      throw e;
+      handleQueryRateLimitError(res.error, notify);
+      return false;
     }
+
+    const newPid = res.data.query_pid;
+    const openQueries = searchParams.get("open_queries");
+    const arrayOpenQueries = (openQueries ?? "").split(",");
+    arrayOpenQueries.push(newPid);
+    router.push(
+      routes.dashboardQueryResult(
+        newPid,
+        arrayOpenQueries.filter((q) => q) ?? [],
+      ),
+    );
+    return true;
   };
 
   const disabled = selectedDatasets.length === 0 || !valid || isLoading;

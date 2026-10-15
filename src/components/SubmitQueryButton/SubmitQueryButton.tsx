@@ -42,8 +42,8 @@ const SubmitQueryButton = ({ warning = false }: { warning: boolean }) => {
       onClick={async (event) => {
         event.stopPropagation();
         event.preventDefault();
-        await submit();
-        resetQueryBuilderJson(true);
+        const succeeded = await submit();
+        if (succeeded) resetQueryBuilderJson(true);
       }}
     >
       Run Query
