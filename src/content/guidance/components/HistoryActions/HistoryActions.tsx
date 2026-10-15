@@ -17,6 +17,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import getQuery from "@/actions/query/getQuery";
 import rerunQuery from "@/actions/query/rerunQuery";
+import { ApiError } from "@/lib/https";
 import DeleteMenuItem from "@/components/DeleteMenuItem";
 import DownloadButton, {
   AvailableFormats,
@@ -88,16 +89,26 @@ const HistoryActions = ({
         <ReRunButton
           label="Re-run query"
           onClick={async () => {
-            const { data } = await rerunQuery(selectedIds[0]);
-            const openQueries = (searchParams.get("open_queries") || "")
-              .split(",")
-              .filter((q) => q);
-            if (openQueries.indexOf(data.query_pid) === -1) {
-              openQueries.push(data.query_pid);
+            try {
+              const { data } = await rerunQuery(selectedIds[0]);
+              const openQueries = (searchParams.get("open_queries") || "")
+                .split(",")
+                .filter((q) => q);
+              if (openQueries.indexOf(data.query_pid) === -1) {
+                openQueries.push(data.query_pid);
+              }
+              router.push(
+                routes.dashboardQueryResult(data.query_pid, openQueries),
+              );
+            } catch (e) {
+              if (e instanceof ApiError && e.status === 429) {
+                notify.error(
+                  "You've reached your monthly query limit. Try again next month.",
+                );
+                return;
+              }
+              throw e;
             }
-            router.push(
-              routes.dashboardQueryResult(data.query_pid, openQueries),
-            );
           }}
           text="Re-run"
           size="medium"

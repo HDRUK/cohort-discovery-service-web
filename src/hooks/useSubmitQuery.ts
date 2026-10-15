@@ -2,6 +2,8 @@ import useUserStore from "@/hooks/useUserStore";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import useStateManagement from "@/hooks/useStateManagement";
 import { useRouter, useSearchParams } from "next/navigation";
+import { ApiError } from "@/lib/https";
+import { useNotify } from "@/providers/NotifyProvider";
 
 import { routes } from "@/config/routes";
 import { useEffect } from "react";
@@ -9,6 +11,7 @@ import { useEffect } from "react";
 const useSubmitQuery = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const notify = useNotify();
 
   const fetchResults = useUserStore((s) => s.fetchResults);
   const { isLoading, setIsLoading } = useStateManagement((s) => ({
@@ -48,6 +51,12 @@ const useSubmitQuery = () => {
       );
     } catch (e) {
       setIsLoading(false);
+      if (e instanceof ApiError && e.status === 429) {
+        notify.error(
+          "You've reached your monthly query limit. Try again next month.",
+        );
+        return;
+      }
       throw e;
     }
   };
