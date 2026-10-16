@@ -370,6 +370,13 @@ export interface UserIdentity extends WithTimestamps {
   last_login_at: string | null;
 }
 
+export interface QueryQuota {
+  limit: number;
+  used: number;
+  remaining: number | null;
+  unlimited: boolean;
+}
+
 export interface User extends WithTimestamps {
   id: number;
   email: string;
@@ -380,6 +387,7 @@ export interface User extends WithTimestamps {
   custodians: Custodian[];
   workgroups?: Workgroup[];
   identities?: UserIdentity[];
+  query_quota: QueryQuota;
 }
 
 export interface ExternalCustodian {
