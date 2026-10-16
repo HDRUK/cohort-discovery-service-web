@@ -37,6 +37,7 @@ export interface UserDataStoreState {
   setUser: (user: CombinedUser | null) => void;
   isOnlyInDefaultWorkgroup: boolean;
   isQueryLimitReached: boolean;
+  markQueryLimitReached: () => void;
 
   userCollections: Collection[];
   setUserCollections: (collections: Collection[]) => void;
@@ -107,6 +108,22 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
     })),
   isOnlyInDefaultWorkgroup: false,
   isQueryLimitReached: false,
+  markQueryLimitReached: () =>
+    set((state) => ({
+      ...state,
+      isQueryLimitReached: true,
+      user:
+        state.user && state.user.query_quota
+          ? {
+              ...state.user,
+              query_quota: {
+                ...state.user.query_quota,
+                used: state.user.query_quota.limit,
+                remaining: 0,
+              },
+            }
+          : state.user,
+    })),
   userCollections: [],
   setUserCollections: (userCollections) =>
     set((state) => ({
