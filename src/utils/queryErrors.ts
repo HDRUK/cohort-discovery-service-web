@@ -5,7 +5,7 @@ import { useUserDataStore } from "@/hooks/userDataStore";
 export const QUERY_LIMIT_REACHED_MESSAGE =
   "You've reached your monthly query limit. Try again next month.";
 
-const handleQueryRateLimitError = (
+const handleQuerySubmissionError = (
   error: { code: number; text: string },
   notify: NotifyFn,
 ): void => {
@@ -22,4 +22,4 @@ const handleQueryRateLimitError = (
   throw new ApiError(error.code, error.text);
 };
 
-export { handleQueryRateLimitError };
+export { handleQuerySubmissionError };

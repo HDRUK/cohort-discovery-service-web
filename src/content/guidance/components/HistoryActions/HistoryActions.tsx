@@ -19,7 +19,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import getQuery from "@/actions/query/getQuery";
 import rerunQuery from "@/actions/query/rerunQuery";
 import {
-  handleQueryRateLimitError,
+  handleQuerySubmissionError,
   QUERY_LIMIT_REACHED_MESSAGE,
 } from "@/utils/queryErrors";
 import DeleteMenuItem from "@/components/DeleteMenuItem";
@@ -101,7 +101,7 @@ const HistoryActions = ({
                 const { data, error } = await rerunQuery(selectedIds[0]);
 
                 if (error) {
-                  handleQueryRateLimitError(error, notify);
+                  handleQuerySubmissionError(error, notify);
                   return;
                 }
 

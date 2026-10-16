@@ -4,7 +4,7 @@ import useStateManagement from "@/hooks/useStateManagement";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useNotify } from "@/providers/NotifyProvider";
 import {
-  handleQueryRateLimitError,
+  handleQuerySubmissionError,
   QUERY_LIMIT_REACHED_MESSAGE,
 } from "@/utils/queryErrors";
 
@@ -45,7 +45,7 @@ const useSubmitQuery = () => {
 
     if (res.error) {
       setIsLoading(false);
-      handleQueryRateLimitError(res.error, notify);
+      handleQuerySubmissionError(res.error, notify);
       return false;
     }
 
