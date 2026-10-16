@@ -12,11 +12,16 @@ import {
   FormControlLabel,
   IconButton,
   Stack,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import getQuery from "@/actions/query/getQuery";
 import rerunQuery from "@/actions/query/rerunQuery";
+import {
+  handleQuerySubmissionError,
+  QUERY_LIMIT_REACHED_MESSAGE,
+} from "@/utils/queryErrors";
 import DeleteMenuItem from "@/components/DeleteMenuItem";
 import DownloadButton, {
   AvailableFormats,
@@ -28,6 +33,7 @@ import useSearchParams from "@/hooks/useSearchParams";
 import { useNotify } from "@/providers/NotifyProvider";
 import { useRouter } from "next/navigation";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
+import useUserStore from "@/hooks/useUserStore";
 import deleteQueries from "@/actions/query/deleteQueries";
 import RenameButton from "@/components/RenameButton";
 
@@ -47,6 +53,7 @@ const HistoryActions = ({
   const { searchParams } = useSearchParams();
   const router = useRouter();
   const notify = useNotify();
+  const isQueryLimitReached = useUserStore((s) => s.isQueryLimitReached);
   const { setQueryBuilderJson, setSelectedDatasets, setQueryName } =
     useQueryBuilder((qb) => ({
       setSelectedDatasets: qb.setSelectedDatasets,
@@ -85,23 +92,34 @@ const HistoryActions = ({
   return (
     <Stack>
       {!multiple && !resultsView && (
-        <ReRunButton
-          label="Re-run query"
-          onClick={async () => {
-            const { data } = await rerunQuery(selectedIds[0]);
-            const openQueries = (searchParams.get("open_queries") || "")
-              .split(",")
-              .filter((q) => q);
-            if (openQueries.indexOf(data.query_pid) === -1) {
-              openQueries.push(data.query_pid);
-            }
-            router.push(
-              routes.dashboardQueryResult(data.query_pid, openQueries),
-            );
-          }}
-          text="Re-run"
-          size="medium"
-        />
+        <Tooltip title={isQueryLimitReached ? QUERY_LIMIT_REACHED_MESSAGE : ""}>
+          <span>
+            <ReRunButton
+              label="Re-run query"
+              disabled={isQueryLimitReached}
+              onClick={async () => {
+                const { data, error } = await rerunQuery(selectedIds[0]);
+
+                if (error) {
+                  handleQuerySubmissionError(error, notify);
+                  return;
+                }
+
+                const openQueries = (searchParams.get("open_queries") || "")
+                  .split(",")
+                  .filter((q) => q);
+                if (openQueries.indexOf(data.query_pid) === -1) {
+                  openQueries.push(data.query_pid);
+                }
+                router.push(
+                  routes.dashboardQueryResult(data.query_pid, openQueries),
+                );
+              }}
+              text="Re-run"
+              size="medium"
+            />
+          </span>
+        </Tooltip>
       )}
       {!multiple && !resultsView && (
         <RenameButton

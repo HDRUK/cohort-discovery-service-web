@@ -57,6 +57,10 @@ export const getTagRegressionTest = (pid: string) => `regression-test-${pid}`;
 
 export const TAG_USERS = "users";
 export const TAG_ADMIN_USERS = "admin-users";
+export const TAG_USER_PROFILE = "user-profile";
+
+export const getTagUserProfile = (userId: string | number) =>
+  `${TAG_USER_PROFILE}-${userId}`;
 
 export const getTagTermDirectory = (userId: string | number) =>
   `term-directory-${userId}`;
