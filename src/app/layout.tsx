@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Source_Sans_3, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
+import "@material-symbols/font-400/rounded.css";
 import ThemeRegistry from "@/components/ThemeRegistry";
 import ServerDefaultProvider from "@/providers/ServerDefaultProvider";
 import ApplicationModeProvider from "@/providers/ApplicationModeProvider";
