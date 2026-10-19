@@ -18,8 +18,7 @@ import { Collection } from "@/types/api";
 import { getMockCollection } from "@/test/fixtures/collections";
 import DemographicsPanel from "./DemographicsPanel";
 import { HdrukUiProvider } from "@hdruk/ui";
-import { themeOptions } from "@/config/theme";
-import { ThemeOptions } from "@mui/material";
+import { siteTheme } from "@/config/theme";
 
 // The real picker pulls in leaflet (touches `window` at import) — replace it
 // with a light stub and make next/dynamic return it synchronously.
@@ -42,7 +41,7 @@ let sessionCollections: Collection[] = [];
 
 const renderPanel = (initialExpand?: boolean) =>
   render(
-    <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
+    <HdrukUiProvider theme={siteTheme}>
       <QueryClientProvider client={new QueryClient()}>
         <ApplicationModeProvider>
           <SessionDataProvider
