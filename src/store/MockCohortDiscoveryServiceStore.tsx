@@ -52,9 +52,8 @@ import { useAdminDataStore } from "@/store/adminDataStore";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import ConfirmProvider from "@/components/ConfirmProvider";
 import { DefaultProvider } from "@/providers/DefaultProvider";
-import { themeOptions } from "@/config/theme";
+import { appTheme } from "@/config/theme";
 import { HdrukUiProvider } from "@hdruk/ui";
-import { ThemeOptions } from "@mui/material";
 import { CohortBuilderProvider } from "@/providers/CohortBuilderProvider";
 import ApplicationModeProvider from "@/providers/ApplicationModeProvider";
 
@@ -259,7 +258,7 @@ const MockCohortDiscoveryServiceStore = ({
   return (
     <ApplicationModeProvider>
       <DefaultProvider>
-        <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
+        <HdrukUiProvider theme={appTheme}>
           <QueryClientProvider client={queryClient}>
             <CohortBuilderProvider>
               <LocalizationProvider dateAdapter={AdapterDayjs}>

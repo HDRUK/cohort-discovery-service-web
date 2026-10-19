@@ -2,6 +2,7 @@ import { createTheme, Theme, ThemeOptions } from "@mui/material/styles";
 import { tooltipClasses } from "@mui/material/Tooltip";
 import { deepmerge } from "@mui/utils";
 import brandingTheme from "@branding/theme";
+import { createHdrukTheme } from "@hdruk/ui/theme";
 
 const baseThemeOptions: ThemeOptions = {
   zIndex: {
@@ -263,10 +264,9 @@ const baseThemeOptions: ThemeOptions = {
   },
 };
 
-export const themeOptions: ThemeOptions = deepmerge(
-  baseThemeOptions,
-  brandingTheme,
-);
+const themeOptions: ThemeOptions = deepmerge(baseThemeOptions, brandingTheme);
+
+export const appTheme = createHdrukTheme(themeOptions);
 
 let theme = createTheme(themeOptions);
 
