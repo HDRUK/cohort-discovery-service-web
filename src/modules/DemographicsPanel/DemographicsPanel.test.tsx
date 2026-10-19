@@ -15,8 +15,7 @@ import { Collection } from "@/types/api";
 import { getMockCollection } from "@/actions/collection/__mocks__/getCollections";
 import DemographicsPanel from "./DemographicsPanel";
 import { HdrukUiProvider } from "@hdruk/ui";
-import { themeOptions } from "@/config/theme";
-import { ThemeOptions } from "@mui/material";
+import { appTheme } from "@/config/theme";
 
 // The real picker pulls in leaflet (touches `window` at import) — replace it
 // with a light stub and make next/dynamic return it synchronously.
@@ -37,7 +36,7 @@ const female = { concept_id: 8532, name: "Female", category: "Gender" };
 
 const renderPanel = (initialExpand?: boolean) =>
   render(
-    <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
+    <HdrukUiProvider theme={appTheme}>
       <QueryClientProvider client={new QueryClient()}>
         <ApplicationModeProvider>
           <DemographicsPanel initialExpand={initialExpand} />
