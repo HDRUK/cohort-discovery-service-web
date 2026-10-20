@@ -14,6 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import DetailRow from "@/components/DetailRow";
+import CollectionTelemetry from "./CollectionTelemetry";
 import { CollectionHealthRow, HealthCheck, HealthStage } from "./health";
 import ExpectedValue from "@/components/ExpectedValue";
 import { HealthIcon } from "./HealthIndicator";
@@ -26,6 +27,7 @@ const STAGE_LABELS: Record<HealthStage, string> = {
 
 interface HealthDetailPanelProps {
   row: CollectionHealthRow;
+  isExpanded: boolean;
   isRunning: boolean;
   onUpdateExpected: (testPid: string, expected: number | null) => void;
   onRunTest: (testPid: string) => void;
@@ -109,6 +111,7 @@ const CheckRow = ({
 
 const HealthDetailPanel = ({
   row,
+  isExpanded,
   isRunning,
   onUpdateExpected,
   onRunTest,
@@ -168,6 +171,10 @@ const HealthDetailPanel = ({
             </Tooltip>
           )}
         </Stack>
+      </Box>
+
+      <Box sx={{ flex: 1, minWidth: 420 }}>
+        {isExpanded && <CollectionTelemetry collectionPid={row.pid} />}
       </Box>
     </Box>
 
