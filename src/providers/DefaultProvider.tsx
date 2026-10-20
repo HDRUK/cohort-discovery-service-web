@@ -25,6 +25,11 @@ export type DefaultConfig = {
 
 const DefaultContext = createContext<DefaultConfig | null>(null);
 
+const definedOnly = (overrides: Partial<DefaultConfig> = {}) =>
+  Object.fromEntries(
+    Object.entries(overrides).filter(([, value]) => value !== undefined),
+  ) as Partial<DefaultConfig>;
+
 export const DefaultProvider = ({
   children,
   overrides,
@@ -44,7 +49,7 @@ export const DefaultProvider = ({
       serviceDeskSupportSuffix: "",
       serviceDeskReportBugSuffix: "",
       supportUrl: "",
-      ...overrides,
+      ...definedOnly(overrides),
     }),
     [overrides],
   );
