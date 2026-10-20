@@ -1,4 +1,5 @@
 import {
+  alpha,
   createTheme,
   responsiveFontSizes,
   Theme,
@@ -407,6 +408,11 @@ const baseThemeOptions: ThemeOptions = {
         root: ({ theme }) => ({
           borderRadius: (theme.shape.borderRadius as number) - 2,
           marginInline: 4,
+          "&:hover": undefined,
+          "&.Mui-selected, &.Mui-selected:is(:hover, :focus)": undefined,
+          "&.Mui-selected": {
+            backgroundColor: theme.palette.action.selected,
+          },
         }),
       },
     },
@@ -492,10 +498,62 @@ const baseThemeOptions: ThemeOptions = {
     MuiChip: {
       styleOverrides: {
         root: () => ({
+          height: undefined,
+          minHeight: undefined,
+          padding: undefined,
+          gap: undefined,
           borderRadius: 20,
+          fontSize: undefined,
           fontWeight: undefined,
+          lineHeight: undefined,
+          "&.Mui-focusVisible": undefined,
+          "&.Mui-disabled": undefined,
         }),
+        outlined: () => ({
+          padding: undefined,
+          backgroundColor: undefined,
+          "&.MuiChip-clickable:hover": undefined,
+          "&.Mui-focusVisible": undefined,
+        }),
+        label: { padding: undefined },
+        icon: () => ({ margin: undefined, fontSize: undefined }),
+        avatar: { margin: undefined },
+        deleteIcon: { margin: undefined },
       },
+      variants: [
+        {
+          props: { variant: "filled", color: "warning" },
+          style: ({ theme }) => ({
+            color: theme.palette.warning.contrastText,
+          }),
+        },
+        {
+          props: { variant: "outlined", color: "warning" },
+          style: ({ theme }) => ({
+            color: theme.palette.warning.main,
+          }),
+        },
+        {
+          props: { variant: "outlined", color: "default" },
+          style: ({ theme }) => ({
+            borderColor: theme.palette.grey[400],
+            "&.MuiChip-clickable:hover": {
+              backgroundColor: theme.palette.action.hover,
+            },
+          }),
+        },
+        ...(["primary", "success", "warning", "error"] as const).map(
+          color => ({
+            props: { variant: "outlined" as const, color },
+            style: ({ theme }: { theme: Theme }) => ({
+              borderColor: alpha(theme.palette[color].main, 0.7),
+              "&.MuiChip-clickable:hover": {
+                borderColor: alpha(theme.palette[color].main, 0.7),
+              },
+            }),
+          }),
+        ),
+      ],
     },
     MuiTooltip: {
       styleOverrides: {
