@@ -5,7 +5,7 @@ import "@mui/material/Button";
 
 declare module "@mui/material/styles" {
   interface Palette {
-    tertiary: Palette["primary"];
+    tertiary: Record<string, SimplePaletteColorOptions>;
     link: Palette["primary"];
     highlight: Palette["primary"];
     table?: Palette["primary"];
@@ -16,13 +16,13 @@ declare module "@mui/material/styles" {
     chart: { series: string[] };
   }
   interface PaletteOptions {
-    tertiary?: PaletteOptions["primary"];
+    tertiary?: Record<string, SimplePaletteColorOptions>;
     link?: PaletteOptions["primary"];
     highlight?: PaletteOptions["primary"];
     table?: PaletteOptions["primary"];
     tooltip?: PaletteOptions["primary"];
     yellowCustom?: PaletteOptions["primary"];
-    secondaryBlack: PaletteOptions["primary"];
+    secondaryBlack?: PaletteOptions["primary"];
     sage?: PaletteOptions["primary"];
     chart?: { series: string[] };
   }
