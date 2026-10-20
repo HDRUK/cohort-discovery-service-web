@@ -59,6 +59,8 @@ export const routes = {
   config: adminPath("configuration"),
   adminRegression: adminPath("regression"),
   adminCollectionHealth: adminPath("collection-health"),
+  adminCollectionHealthDetail: (pid: string) =>
+    adminPath(`collection-health/${pid}`),
   termDirectory: "/term-directory",
   termsAndConditions: "/terms-and-conditions",
   privacyPolicy: "/about/privacy-policy",
