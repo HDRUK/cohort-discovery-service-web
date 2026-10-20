@@ -11,6 +11,7 @@ import { getDatetime } from "@/utils/date";
 import DragRangeOverlay from "./DragRangeOverlay";
 import {
   CHART_HEIGHT,
+  STALE_TIME_TELEMETRY,
   useSeriesColours,
   X_AXIS_HEIGHT,
   Y_AXIS_WIDTH,
@@ -85,9 +86,11 @@ const PingHistoryChart = ({
     queryFn: () => getCollectionHealth(collectionPid, bin, range),
     enabled,
     refetchOnWindowFocus: false,
+    staleTime: STALE_TIME_TELEMETRY,
   });
 
   const health = data?.data;
+  const hasFailed = isError || !!data?.error;
 
   const labels = useMemo(
     () => health?.series.a.map((point) => formatBinLabel(point.bin, bin)) ?? [],
@@ -130,7 +133,7 @@ const PingHistoryChart = ({
         <Skeleton variant="rectangular" height={CHART_HEIGHT} sx={{ mb: 1 }} />
       )}
 
-      {enabled && isError && (
+      {enabled && hasFailed && (
         <Alert severity="error" sx={{ mb: 1 }}>
           Could not load ping history for this collection.
         </Alert>

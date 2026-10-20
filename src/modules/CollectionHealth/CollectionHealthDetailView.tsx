@@ -49,7 +49,7 @@ const CollectionHealthDetailView = ({
     invalidate,
     updateExpected,
     runTest,
-  } = useCollectionHealth({ initialCollections, fetchedAt });
+  } = useCollectionHealth({ initialCollections, fetchedAt, pid });
 
   const row = rows.find((candidate) => candidate.pid === pid);
 
@@ -144,7 +144,7 @@ const CollectionHealthDetailView = ({
       {row && (
         <CollectionHealthDetail
           row={row}
-          showTelemetry
+          isActive
           isRunning={!!runStates[row.pid]}
           onUpdateExpected={handleUpdateExpected}
           onRunTest={handleRunTest}

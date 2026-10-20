@@ -44,11 +44,18 @@ const AddHealthCheckDialog = ({
 
   const handleFormSubmit = useCallback(
     (values: FormValues) => {
+      if (!jsonText.trim()) {
+        setJsonError("Paste a query definition to save this check.");
+        return;
+      }
+
       let parsed: RuleGroupType;
       try {
         parsed = JSON.parse(jsonText) as RuleGroupType;
       } catch {
-        setJsonError("Invalid JSON");
+        setJsonError(
+          "That isn’t valid JSON — check for a missing bracket or comma.",
+        );
         return;
       }
 

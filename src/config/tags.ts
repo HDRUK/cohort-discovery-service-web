@@ -78,7 +78,10 @@ export const getTagsCollectionTaskHistory = (
   range: { from: string; to: string },
 ) => [TAG_COLLECTION_HEALTH, "task-history", pid, range.from, range.to];
 
-export const TAGS_COLLECTION_HEALTH_ROWS = [
+export const getTagsCollectionHealthRows = (pid?: string) => [
   TAG_COLLECTION_HEALTH,
   TAG_COLLECTIONS_ADMIN,
+  ...(pid ? [pid] : []),
 ];
+
+export const TAGS_REGRESSION_TESTS = [TAG_REGRESSION_TESTS];

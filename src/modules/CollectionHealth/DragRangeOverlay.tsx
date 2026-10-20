@@ -96,8 +96,19 @@ const DragRangeOverlay = ({ onSelect }: DragRangeOverlayProps) => {
 
     const handlePointerUpAndStop = (event: PointerEvent) => {
       handlePointerUp(event);
+      removeTracking();
+    };
+
+    const handlePointerCancelAndStop = () => {
+      startIndexRef.current = null;
+      setDrag(null);
+      removeTracking();
+    };
+
+    const removeTracking = () => {
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("pointerup", handlePointerUpAndStop);
+      window.removeEventListener("pointercancel", handlePointerCancelAndStop);
     };
 
     const handlePointerDownAndTrack = (event: PointerEvent) => {
@@ -106,14 +117,14 @@ const DragRangeOverlay = ({ onSelect }: DragRangeOverlayProps) => {
 
       window.addEventListener("pointermove", handlePointerMove);
       window.addEventListener("pointerup", handlePointerUpAndStop);
+      window.addEventListener("pointercancel", handlePointerCancelAndStop);
     };
 
     svg.addEventListener("pointerdown", handlePointerDownAndTrack);
 
     return () => {
       svg.removeEventListener("pointerdown", handlePointerDownAndTrack);
-      window.removeEventListener("pointermove", handlePointerMove);
-      window.removeEventListener("pointerup", handlePointerUpAndStop);
+      removeTracking();
     };
   }, [svgRef]);
 

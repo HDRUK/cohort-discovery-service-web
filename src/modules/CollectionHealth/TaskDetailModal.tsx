@@ -4,7 +4,6 @@ import { useState } from "react";
 import CodeIcon from "@mui/icons-material/Code";
 import NotesIcon from "@mui/icons-material/Notes";
 import {
-  Alert,
   Box,
   Chip,
   Divider,
@@ -12,31 +11,27 @@ import {
   List,
   ListItemButton,
   ListItemText,
-  Skeleton,
   Stack,
   Tooltip,
   Typography,
 } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
-import getQuery from "@/actions/query/getQuery";
-import { getTagsQuery } from "@/config/tags";
 import CodeBlock from "@/components/CodeBlock";
 import DetailRow from "@/components/DetailRow";
 import Modal from "@/components/Modal";
 import { TaskHistoryRun, TaskHistoryTask } from "@/types/api";
+import { RuleGroupType } from "@/types/rules";
 import { formatDuration, getDatetime } from "@/utils/date";
 import { queryToText } from "@/utils/queryBuilder";
 
-const QuerySummary = ({ task }: { task: TaskHistoryTask }) => {
+const QuerySummary = ({
+  task,
+  definition,
+}: {
+  task: TaskHistoryTask;
+  definition?: RuleGroupType;
+}) => {
   const queryPid = task.query?.pid ?? null;
   const [showJson, setShowJson] = useState(false);
-
-  const { data, isLoading, isError } = useQuery({
-    queryKey: getTagsQuery(queryPid as string),
-    queryFn: () => getQuery(queryPid as string),
-    enabled: queryPid !== null,
-    refetchOnWindowFocus: false,
-  });
 
   if (!queryPid) {
     return (
@@ -46,8 +41,6 @@ const QuerySummary = ({ task }: { task: TaskHistoryTask }) => {
       </Typography>
     );
   }
-
-  const definition = data?.data?.definition;
 
   return (
     <Stack spacing={0.5}>
@@ -79,20 +72,18 @@ const QuerySummary = ({ task }: { task: TaskHistoryTask }) => {
         </Tooltip>
       </Box>
 
-      {isLoading && <Skeleton variant="text" height={48} />}
-
-      {isError && (
-        <Alert severity="error">
-          Could not load the definition for this query.
-        </Alert>
-      )}
-
-      {definition &&
-        (showJson ? (
+      {definition ? (
+        showJson ? (
           <CodeBlock code={definition} />
         ) : (
           <Typography variant="body2">{queryToText(definition)}</Typography>
-        ))}
+        )
+      ) : (
+        <Typography variant="caption" color="text.secondary">
+          This query’s definition was not returned with the task history — it
+          may have been deleted since the task ran.
+        </Typography>
+      )}
 
       <DetailRow label="Query PID" value={queryPid} />
     </Stack>
@@ -130,9 +121,15 @@ const RunBlock = ({ run }: { run: TaskHistoryRun }) => (
   </Stack>
 );
 
-const TaskDetail = ({ task }: { task: TaskHistoryTask }) => (
+const TaskDetail = ({
+  task,
+  definition,
+}: {
+  task: TaskHistoryTask;
+  definition?: RuleGroupType;
+}) => (
   <Stack spacing={2}>
-    <QuerySummary task={task} />
+    <QuerySummary task={task} definition={definition} />
 
     <Divider />
 
@@ -183,17 +180,21 @@ const TaskDetail = ({ task }: { task: TaskHistoryTask }) => (
 interface TaskDetailModalProps {
   open: boolean;
   onClose: () => void;
-  binLabel: string;
-  typeLabel: string;
   tasks: TaskHistoryTask[];
+  definitionsByPid: Record<string, RuleGroupType>;
+  title?: string;
+  binLabel?: string;
+  typeLabel?: string;
 }
 
 const TaskDetailModal = ({
   open,
   onClose,
+  tasks,
+  definitionsByPid,
+  title,
   binLabel,
   typeLabel,
-  tasks,
 }: TaskDetailModalProps) => {
   const [selectedPid, setSelectedPid] = useState<string | null>(null);
 
@@ -204,13 +205,18 @@ const TaskDetailModal = ({
     <Modal
       open={open}
       onClose={onClose}
-      title={`${typeLabel} · ${binLabel}`}
+      title={title ?? [typeLabel, binLabel].filter(Boolean).join(" · ")}
       maxWidth="md"
       secondaryActionLabel={picked ? "Back to list" : undefined}
       onSecondaryAction={picked ? () => setSelectedPid(null) : undefined}
     >
       {selected ? (
-        <TaskDetail task={selected} />
+        <TaskDetail
+          task={selected}
+          definition={
+            selected.query ? definitionsByPid[selected.query.pid] : undefined
+          }
+        />
       ) : (
         <List disablePadding>
           {tasks.map((task) => (

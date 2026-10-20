@@ -8,9 +8,8 @@ import getRegressionTests from "@/actions/regressionTest/getRegressionTests";
 import runRegressionTest from "@/actions/regressionTest/runRegressionTest";
 import updateRegressionTest from "@/actions/regressionTest/updateRegressionTest";
 import {
-  TAG_COLLECTION_HEALTH,
-  TAG_COLLECTIONS_ADMIN,
-  TAG_REGRESSION_TESTS,
+  getTagsCollectionHealthRows,
+  TAGS_REGRESSION_TESTS,
 } from "@/config/tags";
 import useTaskPolling from "@/hooks/useTaskPolling";
 import { useDefaults } from "@/providers/DefaultProvider";
@@ -26,14 +25,6 @@ const REFRESH_OPTIONS = {
   refetchOnWindowFocus: false,
   refetchOnReconnect: false,
 } as const;
-
-const QUERY_KEY_REGRESSION = [TAG_COLLECTION_HEALTH, TAG_REGRESSION_TESTS];
-
-const collectionsQueryKey = (pid?: string) => [
-  TAG_COLLECTION_HEALTH,
-  TAG_COLLECTIONS_ADMIN,
-  ...(pid ? [pid] : []),
-];
 
 const collectionsParams = (pid?: string) =>
   new URLSearchParams(pid ? { pid } : { per_page: COLLECTIONS_PER_PAGE });
@@ -51,7 +42,10 @@ const useCollectionHealth = ({
   const notify = useNotify();
   const defaults = useDefaults();
 
-  const queryKeyCollections = useMemo(() => collectionsQueryKey(pid), [pid]);
+  const queryKeyCollections = useMemo(
+    () => getTagsCollectionHealthRows(pid),
+    [pid],
+  );
 
   const [runStates, setRunStates] = useState<Record<string, Set<string>>>({});
 
@@ -81,7 +75,7 @@ const useCollectionHealth = ({
     isError: isRegressionError,
     dataUpdatedAt: regressionUpdatedAt,
   } = useQuery({
-    queryKey: QUERY_KEY_REGRESSION,
+    queryKey: TAGS_REGRESSION_TESTS,
     queryFn: () => getRegressionTests(),
     ...REFRESH_OPTIONS,
   });
@@ -129,7 +123,7 @@ const useCollectionHealth = ({
 
   const invalidate = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: queryKeyCollections });
-    queryClient.invalidateQueries({ queryKey: QUERY_KEY_REGRESSION });
+    queryClient.invalidateQueries({ queryKey: TAGS_REGRESSION_TESTS });
   }, [queryClient, queryKeyCollections]);
 
   const handleTaskComplete = useCallback(
@@ -186,6 +180,7 @@ const useCollectionHealth = ({
         return;
       }
 
+      notify.success("Expected count saved");
       invalidate();
     },
     [invalidate, notify, tests],

@@ -71,7 +71,9 @@ const QueryDefinitionField = ({
                   onChange(JSON.stringify(JSON.parse(value), null, 2));
                   onError(null);
                 } catch {
-                  onError("Invalid JSON");
+                  onError(
+                    "That isn’t valid JSON — check for a missing bracket or comma.",
+                  );
                 }
               }}
             >
