@@ -6,6 +6,8 @@ import { isStandalone } from "@/utils/modes";
 
 const applicationMode = process.env.APPLICATION_MODE;
 
+export const instant = false;
+
 export default async function Home() {
   const token = (await cookies()).get(ACCESS_TOKEN_NAME);
 
