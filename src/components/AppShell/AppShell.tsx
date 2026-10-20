@@ -6,12 +6,15 @@ import Footer from "@/components/Footer";
 import SupportPopOut from "@/components/SupportPopOut/SupportPopOut";
 import { isStandalone } from "@/utils/modes";
 import { Suspense } from "react";
+import { getCopyrightText } from "@/utils/getCopyrightText";
 
 const hideNav = process.env.HIDE_NAV === "1";
 const applicationMode = process.env.APPLICATION_MODE;
 
-const AppShell = ({ children }: { children: React.ReactNode }) => {
+const AppShell = async ({ children }: { children: React.ReactNode }) => {
   const standalone = isStandalone(applicationMode);
+
+  const copyright = await getCopyrightText();
 
   return (
     <Box>
@@ -67,7 +70,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
           </Box>
         </Box>
       </Box>
-      <Footer />
+      <Footer copyright={copyright} />
     </Box>
   );
 };
