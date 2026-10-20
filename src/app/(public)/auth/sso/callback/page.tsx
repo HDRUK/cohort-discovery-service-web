@@ -5,6 +5,8 @@ interface SsoCallbackPageProps {
   searchParams: Promise<{ code?: string; error?: string }>;
 }
 
+export const instant = false;
+
 export default async function SsoCallbackPage({
   searchParams,
 }: SsoCallbackPageProps) {

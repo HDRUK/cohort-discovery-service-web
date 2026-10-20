@@ -10,6 +10,8 @@ interface LoginPageProps {
   searchParams: Promise<{ return_to?: string }>;
 }
 
+export const instant = false;
+
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   if ((await cookies()).get(ACCESS_TOKEN_NAME)) {
     redirect(routes.home);
