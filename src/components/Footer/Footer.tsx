@@ -18,7 +18,11 @@ interface FooterLink {
   label: string;
 }
 
-const Footer = () => {
+interface FooterProps {
+  copyright?: string;
+}
+
+const Footer = ({ copyright }: FooterProps) => {
   const showHdrukChrome = useHdrukChrome();
   const { isStandalone } = useApplicationMode();
   const legalLinks = getLegalLinks(isStandalone);
@@ -63,6 +67,7 @@ const Footer = () => {
           { title: "links1", items: primaryLinks },
           { title: "links2", items: secondaryLinks },
         ]}
+        copyrightText={copyright}
       />
     );
   }
@@ -97,7 +102,8 @@ const Footer = () => {
       </Box>
 
       <Typography variant="body2">
-        © {new Date().getFullYear()} {branding.copyrightHolder}
+        {/* © {new Date().getFullYear()} {branding.copyrightHolder} */}
+        {copyright}
       </Typography>
     </Box>
   );
