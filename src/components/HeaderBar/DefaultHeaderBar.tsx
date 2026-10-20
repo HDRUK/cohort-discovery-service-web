@@ -47,6 +47,11 @@ const DefaultHeaderBar = () => {
             label: "Regression Tests",
             onClick: () => router.push(routes.adminRegression),
           },
+          {
+            id: "health",
+                  label: "Collection Health",
+                  onClick: () => router.push(routes.adminCollectionHealth),
+                },
         ]
       : []),
     ...(isStandalone
