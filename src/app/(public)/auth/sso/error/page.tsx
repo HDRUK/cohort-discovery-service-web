@@ -23,6 +23,8 @@ interface SsoErrorPageProps {
   searchParams: Promise<{ error?: string }>;
 }
 
+export const instant = false;
+
 export default async function SsoErrorPage({
   searchParams,
 }: SsoErrorPageProps) {
