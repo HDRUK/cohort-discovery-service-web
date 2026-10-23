@@ -4,31 +4,6 @@ on:
   push:
 
 jobs:
-  storybook:
-    name: Build & Test Storybook
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: "${{ vars.NODE_VERSION }}"
-          cache: "npm"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build Storybook
-        run: npm run build-storybook
-
-      #- name: Upload Storybook artifacts
-      #  uses: actions/upload-artifact@v4
-      #  with:
-      #    name: storybook-static
-      #    path: storybook-static
 
   test:
     name: Run Tests
