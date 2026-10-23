@@ -2,6 +2,9 @@
   "name": "cohort-discovery-service-web",
   "version": "1.11.0",
   "private": true,
+  "engines": {
+    "node": ">=24.22.1"
+  },
   "scripts": {
     "dev": "next dev --turbopack",
     "dev-debug": "NODE_OPTIONS='--inspect' next dev --turbopack",
