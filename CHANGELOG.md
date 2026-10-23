@@ -1,3 +1,9 @@
+## [1.11.1](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.11.0...v1.11.1) (2026-10-23)
+
+### 🐛 Bug Fixes
+
+* **DP-9999:** CVE patches for node (#567) ([d281c9a](https://github.com/HDRUK/cohort-discovery-service-web/commit/d281c9ac94a4bc8c0906fe0ac9c6a18e35dbe5f6)), closes [DP-9999](undefinedDP-9999)
+
 ## [1.11.0](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.10.1...v1.11.0) (2026-10-08)
 
 ### ✨ Features
