@@ -151,6 +151,121 @@ export interface CollectionMetadata {
   threshold: string;
 }
 
+export type HealthBin = "minute" | "hour" | "day" | "week" | "month";
+
+export interface TimeRange {
+  from: string;
+  to: string;
+}
+
+export interface PingBin {
+  bin: string;
+  n: number;
+  minutes: number;
+  silent_minutes: number;
+  per_minute: number | null;
+}
+
+export interface PingSummary {
+  last_ping_at: string | null;
+  pings: number;
+  per_minute: number | null;
+  minutes: number;
+  silent_minutes: number;
+  bins: number;
+  empty_bins: number;
+  longest_gap_bins: number;
+}
+
+export interface CollectionHealthSeries {
+  collection_id: number;
+  bin: string;
+  from: string;
+  to: string;
+  summary: { a: PingSummary; b: PingSummary };
+  series: { a: PingBin[]; b: PingBin[] };
+}
+
+export interface DurationStats {
+  runs_measured: number;
+  min: number | null;
+  avg: number | null;
+  p50: number | null;
+  p95: number | null;
+  max: number | null;
+}
+
+export interface TaskHistoryBin {
+  bin: string;
+  minutes: number;
+  started: number;
+  finished: number;
+  succeeded: number;
+  failed: number;
+  concurrency_avg: number | null;
+  concurrency_max: number | null;
+  duration_ms: DurationStats;
+  queued_for_ms_avg: number | null;
+}
+
+export interface TaskHistorySummary {
+  tasks: number;
+  succeeded: number;
+  failed: number;
+  in_flight: number;
+  pending: number;
+  task_types: Record<string, number>;
+  attempts: { total: number; retried_tasks: number; max: number };
+  duration_ms: DurationStats;
+}
+
+export interface TaskHistoryRun {
+  attempt: number;
+  worker_id: string | null;
+  claimed_at: string | null;
+  started_at: string | null;
+  finished_at: string | null;
+  duration_ms: number | null;
+  result_status: string | null;
+  error_class: string | null;
+  error_message: string | null;
+}
+
+export type TaskHistoryStatus =
+  "succeeded" | "failed" | "in_flight" | "pending";
+
+export interface TaskHistoryTask {
+  pid: string;
+  task_type: string;
+  status: TaskHistoryStatus;
+  attempts: number;
+  created_at: string;
+  attempted_at: string | null;
+  completed_at: string | null;
+  failed_at: string | null;
+  queued_for_ms: number | null;
+  duration_ms: number | null;
+  total_duration_ms: number | null;
+  query: TaskHistoryQuery | null;
+  runs: TaskHistoryRun[];
+}
+
+export interface TaskHistoryQuery {
+  pid: string;
+  name: string;
+  query_type: string | null;
+  definition?: RuleGroupType;
+}
+
+export interface CollectionTaskHistory {
+  collection_id: number;
+  from: string;
+  to: string;
+  summary: TaskHistorySummary;
+  tasks: Paginated<TaskHistoryTask>;
+  definitionsByPid: Record<string, RuleGroupType>;
+}
+
 export interface Activity extends WithTimestamps {
   id: number;
   collection_id: number;
@@ -362,6 +477,21 @@ export enum TaskType {
   B = "b",
 }
 
+export interface UserIdentity extends WithTimestamps {
+  id: number;
+  provider: string;
+  provider_sub: string;
+  email_at_link: string | null;
+  last_login_at: string | null;
+}
+
+export interface QueryQuota {
+  limit: number;
+  used: number;
+  remaining: number | null;
+  unlimited: boolean;
+}
+
 export interface User extends WithTimestamps {
   id: number;
   email: string;
@@ -371,6 +501,8 @@ export interface User extends WithTimestamps {
   roles: Role[];
   custodians: Custodian[];
   workgroups?: Workgroup[];
+  identities?: UserIdentity[];
+  query_quota: QueryQuota;
 }
 
 export interface ExternalCustodian {
@@ -388,8 +520,8 @@ export interface TokenUser {
   is_admin: boolean;
   is_nhse_sde_approval: boolean;
   organisation: string;
-  provider: string;
-  workgroups: string[];
+  sso_provider?: string;
+  workgroups: Workgroup[];
   cohort_discovery_roles: RoleName[];
   cohort_admin_teams: ExternalCustodian[];
 }
@@ -566,5 +698,13 @@ export interface SignInPost {
   email: string;
   password: string;
 }
+
+export interface SignInResponse {
+  access_token: string;
+}
+
+export type AuthMethod =
+  | { type: "password"; label: string }
+  | { type: "oidc"; slug: string; label: string; redirect_url: string };
 
 export type GroupedCollection = { custodian: Custodian; items: Collection[] };

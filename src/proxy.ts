@@ -1,9 +1,13 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function proxy() {
+export async function proxy(request: NextRequest) {
   const res = NextResponse.next();
   //if we want to use the time later on
   res.headers.set("x-request-now", String(Math.floor(Date.now() / 1000)));
+  res.headers.set(
+    "x-pathname",
+    `${request.nextUrl.pathname}${request.nextUrl.search}`,
+  );
   return res;
 }
 

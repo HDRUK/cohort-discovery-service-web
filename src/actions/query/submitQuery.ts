@@ -1,7 +1,7 @@
 "use server";
 
 import { RuleGroupType } from "@/types/rules";
-import { apiPost } from "@/lib/apiClient";
+import { apiPost, ErrorMode } from "@/lib/apiClient";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { CreateQuery, CreateQueryPost, ApiResponse } from "@/types/api";
 import { capVarChar } from "@/utils/string";
@@ -21,7 +21,11 @@ const submitQuery = async (
       task_type: "a",
       ...(collection_filter && { collection_filter }),
     },
+    { errorMode: ErrorMode.RESULT },
   );
+
+  if (res.error) return res;
+
   await revalidateUserAction("queries");
   return res;
 };

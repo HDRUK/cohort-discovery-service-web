@@ -6,6 +6,7 @@ import { SupportButton, SupportList } from "./SupportPopOut.styles";
 import theme from "@/config/theme";
 import { useDefaults } from "@/providers/DefaultProvider";
 import useFeatures from "@/hooks/useFeatures";
+import { getOrganisationUrl } from "@/config/externalLinks";
 
 const SupportPopOut = () => {
   const { hdrukTheme: hdrukThemeEnabled } = useFeatures();
@@ -37,7 +38,7 @@ const SupportPopOut = () => {
   const links = [
     {
       label: "Visit Support Centre",
-      href: `${process.env.NEXT_PUBLIC_SUPPORT_URL ?? "https://healthdatagateway.org"}/support`,
+      href: `${process.env.NEXT_PUBLIC_SUPPORT_URL || getOrganisationUrl()}/support`,
       isExternal: false,
     },
     {

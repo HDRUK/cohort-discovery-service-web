@@ -12,6 +12,14 @@ const helpPath = (sectionId?: string, tutorialId?: string) =>
   `/help${sectionId ? `/${sectionId}${tutorialId ? `/${tutorialId}` : ""}` : ""}`;
 
 export const routes = {
+  home: "/",
+  login: "/login",
+  loginWithReturn: (returnTo: string) =>
+    `/login?return_to=${encodeURIComponent(returnTo)}`,
+  logout: "/api/auth/logout",
+  ssoCallback: "/api/auth/sso/callback",
+  ssoError: (error: string) =>
+    `/auth/sso/error?error=${encodeURIComponent(error)}`,
   dashboard: dashboardPath(),
   dashboardNewQuery: (openQueries?: string[], queryParams?: string) =>
     dashboardPath(
@@ -50,5 +58,10 @@ export const routes = {
   teamCollections: (pid: string) => teamPath(pid, "collections"),
   config: adminPath("configuration"),
   adminRegression: adminPath("regression"),
+  adminCollectionHealth: adminPath("collection-health"),
+  adminCollectionHealthDetail: (pid: string) =>
+    adminPath(`collection-health/${pid}`),
   termDirectory: "/term-directory",
+  termsAndConditions: "/terms-and-conditions",
+  privacyPolicy: "/about/privacy-policy",
 };

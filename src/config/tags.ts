@@ -57,6 +57,31 @@ export const getTagRegressionTest = (pid: string) => `regression-test-${pid}`;
 
 export const TAG_USERS = "users";
 export const TAG_ADMIN_USERS = "admin-users";
+export const TAG_USER_PROFILE = "user-profile";
+
+export const getTagUserProfile = (userId: string | number) =>
+  `${TAG_USER_PROFILE}-${userId}`;
 
 export const getTagTermDirectory = (userId: string | number) =>
   `term-directory-${userId}`;
+
+export const TAG_COLLECTION_HEALTH = "collection-health";
+
+export const getTagsCollectionHealth = (
+  pid: string,
+  bin: string,
+  range: { from: string; to: string },
+) => [TAG_COLLECTION_HEALTH, "series", pid, bin, range.from, range.to];
+
+export const getTagsCollectionTaskHistory = (
+  pid: string,
+  range: { from: string; to: string },
+) => [TAG_COLLECTION_HEALTH, "task-history", pid, range.from, range.to];
+
+export const getTagsCollectionHealthRows = (pid?: string) => [
+  TAG_COLLECTION_HEALTH,
+  TAG_COLLECTIONS_ADMIN,
+  ...(pid ? [pid] : []),
+];
+
+export const TAGS_REGRESSION_TESTS = [TAG_REGRESSION_TESTS];

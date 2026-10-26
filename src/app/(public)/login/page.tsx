@@ -1,34 +1,28 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import LoginClient from "./components/LoginClient";
-import { Box } from "@mui/material";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
-import TabsShell from "@/components/TabsShell";
-export default async function LoginPage() {
+import getAuthMethods from "@/actions/standalone/getAuthMethods";
+import { routes } from "@/config/routes";
+import { safeReturnTo } from "@/utils/returnTo";
+import Login from "@/modules/Login";
+
+interface LoginPageProps {
+  searchParams: Promise<{ return_to?: string }>;
+}
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
   if ((await cookies()).get(ACCESS_TOKEN_NAME)) {
-    redirect("/");
+    redirect(routes.home);
   }
 
-  const tabs = [
-    {
-      id: "profile",
-      label: "Profile",
-      page: (
-        <Box
-          sx={{
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            bgcolor: "",
-          }}
-        >
-          <LoginClient />
-        </Box>
-      ),
-    },
-  ];
+  const { return_to: returnToParam } = await searchParams;
+  const { data: methods } = await getAuthMethods();
 
-  return <TabsShell tabs={tabs} />;
+  return (
+    <Login
+      methods={methods}
+      returnTo={safeReturnTo(returnToParam)}
+      copyrightYear={new Date().getFullYear()}
+    />
+  );
 }
