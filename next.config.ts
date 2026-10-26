@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     authInterrupts: true,
+    useTypeScriptCli: false,
   },
   transpilePackages: ["@faker-js/faker"],
   outputFileTracingRoot: path.join(__dirname, "../"),
