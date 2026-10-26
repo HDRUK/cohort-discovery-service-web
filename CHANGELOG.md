@@ -1,3 +1,9 @@
+## [1.11.2](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.11.1...v1.11.2) (2026-10-26)
+
+### 🐛 Bug Fixes
+
+* **DP-9999:** Bump next to 16.4.1 and storybook to 10.6.3 for CVE patches (#570) ([36e5a01](https://github.com/HDRUK/cohort-discovery-service-web/commit/36e5a01ee8898d0d244b2b281009bb6d2051afb2)), closes [DP-9999](undefinedDP-9999)
+
 ## [1.11.1](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.11.0...v1.11.1) (2026-10-23)
 
 ### 🐛 Bug Fixes

@@ -1,6 +1,6 @@
 {
   "name": "cohort-discovery-service-web",
-  "version": "1.11.1",
+  "version": "1.11.2",
   "private": true,
   "engines": {
     "node": ">=24.22.1"
