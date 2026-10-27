@@ -25,7 +25,7 @@ const updateCollectionWithConfig = async (
     `${API_ROUTES.collectionConfig}/${data.config.id}`,
     payloadConfig,
   );
-  if (refreshCache) await revalidateCollections(data.custodian.pid);
+  if (refreshCache) await revalidateCollections(data.custodian.pid, false);
   return data;
 };
 
