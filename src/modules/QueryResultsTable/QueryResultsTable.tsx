@@ -11,6 +11,7 @@ import { addQueryParam } from "@/utils/string";
 import useTrackClick from "@/hooks/useTrackClick";
 import useSearchParams from "@/hooks/useSearchParams";
 import { DEFAULT_STATUS_LABELS } from "@/config/defaults";
+import { getTaskResultStatus } from "@/utils/tasks";
 import Table from "../../components/Table";
 import { TableProps } from "../../components/Table/Table";
 import getQuery from "@/actions/query/getQuery";
@@ -171,17 +172,9 @@ const QueryResultsTable = ({
       accessorKey: "status",
       accessorFn: (row) => row.result,
       header: "Status",
-      Cell: ({ cell, row: { original } }) => {
-        const result = cell.getValue<Result>();
-        if (original.failed_at) {
-          if (original.result?.status === "missing") {
-            return DEFAULT_STATUS_LABELS["unselected"];
-          }
-          return DEFAULT_STATUS_LABELS["error"];
-        }
-        const rawStatus = result?.status ?? "pending";
-        const displayStatus = DEFAULT_STATUS_LABELS[rawStatus] ?? rawStatus;
-        return displayStatus;
+      Cell: ({ row: { original } }) => {
+        const rawStatus = getTaskResultStatus(original);
+        return DEFAULT_STATUS_LABELS[rawStatus] ?? rawStatus;
       },
       size: 100,
       minSize: 100,
