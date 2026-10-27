@@ -27,9 +27,9 @@ const useSearchParams = (paramName: string = "searchTerm") => {
       });
 
       const queryString = params.toString();
-      router.replace(queryString ? `?${queryString}` : ".");
+      router.replace(queryString ? `?${queryString}` : pathname);
     },
-    [router, searchParams],
+    [router, searchParams, pathname],
   );
 
   const setSearchParam = useCallback(
