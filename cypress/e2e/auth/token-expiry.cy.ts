@@ -5,6 +5,8 @@
  */
 import { routes } from "@/config/routes";
 
+const STREAMED_REDIRECT_STATUS = 200;
+
 describe("Token expiry", () => {
   it("redirects to /login when no token is present", () => {
     cy.clearCookie("token");
@@ -30,6 +32,10 @@ describe("Token expiry", () => {
         followRedirect: false,
         failOnStatusCode: false,
       }).then((resp) => {
+        if (resp.status === STREAMED_REDIRECT_STATUS) {
+          expect(resp.body).to.match(/NEXT_REDIRECT;\w+;\/api\/auth\/logout;/);
+          return;
+        }
         expect(resp.status).to.be.oneOf([301, 302, 307, 308]);
         const location = resp.headers["location"] as string;
         expect(location).to.match(/logout|login/i);
