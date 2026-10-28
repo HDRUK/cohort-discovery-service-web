@@ -12,6 +12,7 @@ export interface TitleProps extends Omit<BoxProps, "title"> {
   titleOverflow?: "ellipsis" | "scroll" | "wrap" | "visible";
   centerTitleContent?: boolean;
   subTitleWrap?: boolean;
+  fadedTitle?: boolean;
 }
 
 const Title = ({
@@ -25,6 +26,7 @@ const Title = ({
   titleOverflow = "ellipsis",
   centerTitleContent = false,
   subTitleWrap = false,
+  fadedTitle = false,
   ...rest
 }: TitleProps) => {
   const titleVariant =
@@ -88,6 +90,7 @@ const Title = ({
             ...overflowStyles,
             display: "flex",
             ...(centerTitleContent && { alignItems: "center" }),
+            ...(fadedTitle && { fontWeight: 400, color: "faded.main" }),
             gap: 1,
           }}
         >
