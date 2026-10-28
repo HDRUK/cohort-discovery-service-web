@@ -32,6 +32,7 @@ const CohortBuilderClient = ({
   const router = useRouter();
   const { searchParams } = useSearchParams();
   const urlQueryPid = searchParams.get("query");
+  const previewText = useQueryBuilder((qb) => qb.queryAsText);
 
   const { setHelpTooltipOpen } = useQueryBuilder((qb) => ({
     setHelpTooltipOpen: qb.setHelpTooltipOpen,
@@ -88,7 +89,11 @@ const CohortBuilderClient = ({
             </Stack>
           </Stack>
 
-          <Title title="Query" subTitle="Preview" marginY={1}>
+          <Title
+            title={previewText ? "Preview /" : "Preview"}
+            subTitle=""
+            marginY={1}
+          >
             <CohortQueryPreview />
           </Title>
 
