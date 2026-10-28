@@ -3,17 +3,12 @@ import { DragType } from "@/types/dnd";
 import DomainChip from "@/components/DomainChip/DomainChip";
 import { Concept } from "@/types/api";
 import { useCallback } from "react";
-import ConceptChip from "@/components/ConceptChip";
 import { RuleLeafType, SingleSidedOperator } from "@/types/rules";
 import RuleSearch from "./RuleSearch";
+import RuleConcept from "./RuleConcept";
 
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import {
-  isEmptyRule,
-  updateById,
-  isSingleConcept,
-  isRuleLeaf,
-} from "@/utils/rules";
+import { isEmptyRule, updateById, isRuleLeaf } from "@/utils/rules";
 
 import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
@@ -36,26 +31,13 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     rule: { concept },
   } = rule;
 
-  const {
-    queryBuilderJson,
-    setQueryBuilderJson,
-    showDescendants,
-    setShowDescendants,
-    isSelected,
-    select,
-  } = useQueryBuilder((qb) => ({
-    queryBuilderJson: qb.queryBuilderJson,
-    setQueryBuilderJson: qb.setQueryBuilderJson,
-    showDescendants: qb.showDescendants[id],
-    setShowDescendants: qb.setShowDescendants,
-    isSelected: !!qb.selected[id],
-    select: qb.select,
-  }));
-
-  const toggleShowDescendants = useCallback(
-    () => setShowDescendants(id, !showDescendants),
-    [id, showDescendants, setShowDescendants],
-  );
+  const { queryBuilderJson, setQueryBuilderJson, isSelected, select } =
+    useQueryBuilder((qb) => ({
+      queryBuilderJson: qb.queryBuilderJson,
+      setQueryBuilderJson: qb.setQueryBuilderJson,
+      isSelected: !!qb.selected[id],
+      select: qb.select,
+    }));
 
   const setConcept = useCallback(
     (c: Concept | Concept[]) => {
@@ -94,20 +76,11 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     );
   }, [id, queryBuilderJson, setQueryBuilderJson]);
 
-  const removeChild = useCallback((parent: Concept, child: Concept) => {
-    const children = parent.children?.filter(
-      (c) => c.concept_id !== child.concept_id,
-    );
-    const newConcept = {
-      ...parent,
-      children,
-    };
-    return newConcept;
-  }, []);
-
   const { actions } = useNodeActions(rule);
 
   const selection = useRuleConceptSelection(setConcept);
+
+  const empty = isEmptyRule(rule);
 
   return (
     <RuleWrapper
@@ -115,10 +88,11 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       type={DragType.Rule}
       groupId={groupId}
       sortable={true}
-      subTitle={!isEmptyRule(rule) ? <DomainChip concept={concept} /> : null}
+      actions={actions}
+      subTitle={!empty && <DomainChip concept={concept} />}
       parameters={<RuleParameters rule={rule} />}
       invalidFooter={
-        isEmptyRule(rule) ? (
+        empty ? (
           <RuleFooter
             customInvalidRule={false}
             handleConfirm={selection.handleConfirm}
@@ -130,47 +104,17 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
           />
         ) : undefined
       }
-      actions={actions}
       {...rest}
     >
       <Box py={1}>
-        {isEmptyRule(rule) ? (
+        {empty ? (
           <RuleSearch onSelect={() => select(id)} selection={selection} />
         ) : (
-          <>
-            {isSingleConcept(concept) && (
-              <>
-                <ConceptChip
-                  indicateIfParent={showDescendants}
-                  concept={concept}
-                  onDelete={(e: React.MouseEvent) => {
-                    e.stopPropagation();
-                    clearConcept();
-                  }}
-                  onClick={
-                    (concept?.children?.length ?? 0) > 0
-                      ? (e: React.MouseEvent) => {
-                          e.stopPropagation();
-                          toggleShowDescendants();
-                        }
-                      : (e: React.MouseEvent) => {
-                          e.stopPropagation();
-                        }
-                  }
-                />
-                {showDescendants &&
-                  concept?.children?.map((childConcept) => (
-                    <ConceptChip
-                      key={childConcept.concept_id}
-                      concept={childConcept}
-                      onDelete={() => {
-                        setConcept(removeChild(concept, childConcept));
-                      }}
-                    />
-                  ))}
-              </>
-            )}
-          </>
+          <RuleConcept
+            rule={rule}
+            onChange={setConcept}
+            onClear={clearConcept}
+          />
         )}
       </Box>
     </RuleWrapper>
