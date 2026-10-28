@@ -15,7 +15,7 @@ import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import RuleParameters from "../RuleParameters";
 
 interface RuleMultiConceptProps
-  extends Omit<RuleWrapperProps, "node" | "type" | "render"> {
+  extends Omit<RuleWrapperProps, "node" | "type" | "children"> {
   rule: RuleLeafType;
   groupId?: string;
 }
@@ -81,35 +81,34 @@ const RuleMultiConcept = ({
       type={DragType.Rule}
       groupId={groupId}
       sortable={true}
-      headerExtra={<DomainChip concept={concept} />}
+      subTitle={<DomainChip concept={concept} />}
       parameters={<RuleParameters rule={rule} />}
-      render={() => (
-        <Stack spacing={1} py={1}>
-          {concepts.map((c) => (
-            <ConceptChip
-              key={c.concept_id}
-              concept={c}
-              indicateIfParent={showDescendants}
-              draggable={{
-                id: `concept-drag-${c.concept_id}-${id}`,
-                data: {
-                  type: DragType.Concept,
-                  concept: c,
-                  sourceRuleId: id,
-                  sourceGroupId: groupId,
-                },
-              }}
-              onDelete={(e) => {
-                e.stopPropagation();
-                handleDelete(c);
-              }}
-            />
-          ))}
-        </Stack>
-      )}
       actions={actions}
       {...rest}
-    />
+    >
+      <Stack spacing={1} py={1}>
+        {concepts.map((c) => (
+          <ConceptChip
+            key={c.concept_id}
+            concept={c}
+            indicateIfParent={showDescendants}
+            draggable={{
+              id: `concept-drag-${c.concept_id}-${id}`,
+              data: {
+                type: DragType.Concept,
+                concept: c,
+                sourceRuleId: id,
+                sourceGroupId: groupId,
+              },
+            }}
+            onDelete={(e) => {
+              e.stopPropagation();
+              handleDelete(c);
+            }}
+          />
+        ))}
+      </Stack>
+    </RuleWrapper>
   );
 };
 

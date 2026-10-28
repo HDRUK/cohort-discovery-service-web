@@ -13,7 +13,7 @@ import useHoverable from "@/hooks/useHoverable";
 
 export interface RuleOperatorProps extends Omit<
   RuleWrapperProps,
-  "node" | "type" | "render"
+  "node" | "type" | "children"
 > {
   operator: OperatorType;
   groupId?: string;
@@ -46,25 +46,24 @@ const RuleOperator = ({
       type={DragType.Operator}
       groupId={groupId}
       sortable={true}
-      render={() => (
-        <Box sx={rootSx(hidden)}>
-          <Divider orientation="vertical" flexItem sx={dividerSx(valid)} />
-
-          <Box />
-
-          <Box sx={{ maxWidth: 80, mx: "auto" }}>
-            <Chip
-              sx={chipSx}
-              label={combinator?.toUpperCase().replace("_", " ")}
-            />
-          </Box>
-
-          {valid ? <Box /> : <InvalidRule reasons={invalidReason ?? []} />}
-        </Box>
-      )}
       actions={actions}
       {...rest}
-    />
+    >
+      <Box sx={rootSx(hidden)}>
+        <Divider orientation="vertical" flexItem sx={dividerSx(valid)} />
+
+        <Box />
+
+        <Box sx={{ maxWidth: 80, mx: "auto" }}>
+          <Chip
+            sx={chipSx}
+            label={combinator?.toUpperCase().replace("_", " ")}
+          />
+        </Box>
+
+        {valid ? <Box /> : <InvalidRule reasons={invalidReason ?? []} />}
+      </Box>
+    </RuleWrapper>
   );
 };
 

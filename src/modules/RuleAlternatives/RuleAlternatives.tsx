@@ -25,7 +25,7 @@ import RuleParameters from "../RuleParameters";
 
 interface RuleAlternativesProps extends Omit<
   RuleWrapperProps,
-  "node" | "type" | "render"
+  "node" | "type" | "children"
 > {
   rule: RuleLeafType;
   groupId?: string;
@@ -160,9 +160,9 @@ const RuleAlternatives = ({
       type={DragType.Rule}
       groupId={groupId}
       sortable={true}
-      headerExtra={<DomainChip concept={concept} />}
+      subTitle={<DomainChip concept={concept} />}
       parameters={<RuleParameters rule={rule} />}
-      renderFooter={
+      invalidFooter={
         <RuleFooter
           customInvalidRule={true}
           handleConfirm={handleConfirm}
@@ -173,56 +173,55 @@ const RuleAlternatives = ({
           isNLP={true}
         />
       }
-      render={() => (
-        <Stack
-          component="form"
-          spacing="10px"
-          py="10px"
-          sx={{
-            maxHeight: DEFAULT_SEARCH_RESULTS_MAX_HEIGHT,
-            overflowY: "scroll",
-          }}
-        >
-          {conceptOptions.map((conceptOption) => (
-            <Stack
-              direction="row"
-              alignItems="center"
-              key={conceptOption.concept_id}
-              spacing={1}
-            >
-              <FormControlLabel
-                control={
-                  <SquareCheckbox
-                    checked={selectedConceptIds.includes(
-                      conceptOption.concept_id,
-                    )}
-                    onChange={() => toggleConcept(conceptOption.concept_id)}
-                    onClick={(e) => e.stopPropagation()}
-                    sx={{ p: 0 }}
-                  />
-                }
-                label=""
-                sx={{ m: 0 }}
-              />
-              <ConceptChip
-                indicateIfParent={showDescendants}
-                concept={conceptOption}
-                onDelete={(e) => {
-                  e.stopPropagation();
-                  handleDelete(conceptOption);
-                }}
-                onClick={(e: React.MouseEvent) => {
-                  e.stopPropagation();
-                  toggleConcept(conceptOption.concept_id);
-                }}
-              />
-            </Stack>
-          ))}
-        </Stack>
-      )}
       actions={actions}
       {...rest}
-    />
+    >
+      <Stack
+        component="form"
+        spacing="10px"
+        py="10px"
+        sx={{
+          maxHeight: DEFAULT_SEARCH_RESULTS_MAX_HEIGHT,
+          overflowY: "scroll",
+        }}
+      >
+        {conceptOptions.map((conceptOption) => (
+          <Stack
+            direction="row"
+            alignItems="center"
+            key={conceptOption.concept_id}
+            spacing={1}
+          >
+            <FormControlLabel
+              control={
+                <SquareCheckbox
+                  checked={selectedConceptIds.includes(
+                    conceptOption.concept_id,
+                  )}
+                  onChange={() => toggleConcept(conceptOption.concept_id)}
+                  onClick={(e) => e.stopPropagation()}
+                  sx={{ p: 0 }}
+                />
+              }
+              label=""
+              sx={{ m: 0 }}
+            />
+            <ConceptChip
+              indicateIfParent={showDescendants}
+              concept={conceptOption}
+              onDelete={(e) => {
+                e.stopPropagation();
+                handleDelete(conceptOption);
+              }}
+              onClick={(e: React.MouseEvent) => {
+                e.stopPropagation();
+                toggleConcept(conceptOption.concept_id);
+              }}
+            />
+          </Stack>
+        ))}
+      </Stack>
+    </RuleWrapper>
   );
 };
 

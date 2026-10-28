@@ -11,7 +11,7 @@ import DomainChip from "@/components/DomainChip/DomainChip";
 
 export interface RuleProps extends Omit<
   RuleWrapperProps,
-  "node" | "type" | "render"
+  "node" | "type" | "children"
 > {
   rule: AgeFilterType;
   groupId?: string;
@@ -29,20 +29,19 @@ const RuleAgeFilter = ({ rule, groupId, ...rest }: RuleProps) => {
       type={DragType.Rule}
       groupId={groupId}
       sortable={true}
-      headerExtra={<DomainChip label="Age" />}
-      render={() => (
-        <Box sx={{ width: "fit-content", my: 2 }}>
-          <RuleAgeSelectorReadOnly
-            from={from}
-            to={to}
-            minAge={MIN_AGE_FILTER}
-            maxAge={MAX_AGE_FILTER}
-          />
-        </Box>
-      )}
+      subTitle={<DomainChip label="Age" />}
       actions={actions}
       {...rest}
-    />
+    >
+      <Box sx={{ width: "fit-content", my: 2 }}>
+        <RuleAgeSelectorReadOnly
+          from={from}
+          to={to}
+          minAge={MIN_AGE_FILTER}
+          maxAge={MAX_AGE_FILTER}
+        />
+      </Box>
+    </RuleWrapper>
   );
 };
 

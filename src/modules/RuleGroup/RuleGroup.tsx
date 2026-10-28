@@ -8,7 +8,7 @@ import useNodeActions from "@/hooks/useNodeActions";
 
 export interface RuleGroupProps extends Omit<
   RuleWrapperProps,
-  "node" | "type" | "render"
+  "node" | "type" | "children"
 > {
   group: RuleGroupType;
   parentGroupId?: string;
@@ -24,10 +24,11 @@ const RuleGroup = ({ group, parentGroupId, ...rest }: RuleGroupProps) => {
       type={DragType.Group}
       groupId={parentGroupId}
       sortable={true}
-      render={() => <RuleBoard ruleGroup={group} />}
       actions={actions}
       {...rest}
-    />
+    >
+      <RuleBoard ruleGroup={group} />
+    </RuleWrapper>
   );
 };
 

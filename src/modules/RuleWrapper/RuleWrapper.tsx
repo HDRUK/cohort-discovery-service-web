@@ -12,7 +12,7 @@ import {
   Fade,
   Divider,
 } from "@mui/material";
-import { ReactNode, RefObject, useCallback, useMemo, useState } from "react";
+import { ReactNode, useCallback, useMemo, useState } from "react";
 import useSortable from "@/hooks/useSortable";
 import { useCohortBuilderContext } from "@/providers/CohortBuilderProvider";
 import useIsInDragOverlay from "@/hooks/useIsInDragOverlay";
@@ -50,43 +50,38 @@ interface Action {
   label: string;
 }
 
-export interface RuleWrapperProps extends BoxProps {
+export interface RuleWrapperProps {
   node: RuleNodeType;
   type: DragType.Rule | DragType.Group | DragType.Operator;
-  headerExtra?: ReactNode;
+  children: ReactNode;
+  subTitle?: ReactNode;
+  parameters?: ReactNode;
+  invalidFooter?: ReactNode;
   hideHeader?: boolean;
-  renderInHeader?: boolean;
   groupId?: string;
   sortable?: boolean;
   cardProps?: CardProps;
   containerProps?: BoxProps;
-  render: (
-    rule: RuleNodeType,
-    ref?: RefObject<HTMLDivElement | HTMLLIElement | null>,
-  ) => ReactNode;
   actions?: Action[];
   forceShowHandle?: boolean;
   useLeftDragPlaceHolder?: boolean;
-  renderFooter?: ReactNode;
-  parameters?: ReactNode;
 }
 
 const RuleWrapper = ({
   node,
   type,
   groupId,
-  headerExtra,
+  children,
+  subTitle,
+  parameters,
+  invalidFooter,
   hideHeader = false,
-  renderInHeader = false,
   sortable = true,
   cardProps: { sx: cardPropsSx, ...cardProps } = {},
   containerProps = undefined,
-  render,
   actions,
   forceShowHandle = false,
   useLeftDragPlaceHolder = false,
-  renderFooter,
-  parameters,
 }: RuleWrapperProps) => {
   const { id, valid = true, invalidReason } = node;
 
@@ -184,7 +179,7 @@ const RuleWrapper = ({
 
   const footer =
     (type === DragType.Rule || type === DragType.Group) && !valid
-      ? (renderFooter ??
+      ? (invalidFooter ??
         ((invalidReason ?? []).length > 0 && (
           <InvalidRule
             reasons={invalidReason ?? []}
@@ -281,37 +276,28 @@ const RuleWrapper = ({
                   },
                 }}
                 title={
-                  <>
-                    <Box
-                      width={"100%"}
-                      display={"flex"}
-                      justifyContent={"space-between"}
-                    >
-                      <Box display={"flex"}>
-                        {exclude !== undefined && (
-                          <Chip
-                            color={exclude == true ? "error" : "primary"}
-                            sx={chipSx}
-                            variant="outlined"
-                            label={exclude == true ? "Exclude" : "Include"}
-                          />
-                        )}
-                      </Box>
-                      <Title
-                        size={"small"}
-                        title={type}
-                        subTitle={headerExtra}
-                      />
+                  <Box
+                    width={"100%"}
+                    display={"flex"}
+                    justifyContent={"space-between"}
+                  >
+                    <Box display={"flex"}>
+                      {exclude !== undefined && (
+                        <Chip
+                          color={exclude == true ? "error" : "primary"}
+                          sx={chipSx}
+                          variant="outlined"
+                          label={exclude == true ? "Exclude" : "Include"}
+                        />
+                      )}
                     </Box>
-                    {renderInHeader && render(node)}
-                  </>
+                    <Title size={"small"} title={type} subTitle={subTitle} />
+                  </Box>
                 }
               />
             )}
 
-            {!renderInHeader && (
-              <CardContent>{render(node, anchorRef)}</CardContent>
-            )}
+            <CardContent>{children}</CardContent>
 
             {parameters}
 

@@ -24,7 +24,7 @@ import useRuleConceptSelection from "./useRuleConceptSelection";
 
 export interface RuleProps extends Omit<
   RuleWrapperProps,
-  "node" | "type" | "render"
+  "node" | "type" | "children"
 > {
   rule: RuleLeafType;
   groupId?: string;
@@ -115,9 +115,9 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       type={DragType.Rule}
       groupId={groupId}
       sortable={true}
-      headerExtra={!isEmptyRule(rule) ? <DomainChip concept={concept} /> : null}
+      subTitle={!isEmptyRule(rule) ? <DomainChip concept={concept} /> : null}
       parameters={<RuleParameters rule={rule} />}
-      renderFooter={
+      invalidFooter={
         isEmptyRule(rule) ? (
           <RuleFooter
             customInvalidRule={false}
@@ -130,51 +130,50 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
           />
         ) : undefined
       }
-      render={() => (
-        <Box py={1}>
-          {isEmptyRule(rule) ? (
-            <RuleSearch onSelect={() => select(id)} selection={selection} />
-          ) : (
-            <>
-              {isSingleConcept(concept) && (
-                <>
-                  <ConceptChip
-                    indicateIfParent={showDescendants}
-                    concept={concept}
-                    onDelete={(e: React.MouseEvent) => {
-                      e.stopPropagation();
-                      clearConcept();
-                    }}
-                    onClick={
-                      (concept?.children?.length ?? 0) > 0
-                        ? (e: React.MouseEvent) => {
-                            e.stopPropagation();
-                            toggleShowDescendants();
-                          }
-                        : (e: React.MouseEvent) => {
-                            e.stopPropagation();
-                          }
-                    }
-                  />
-                  {showDescendants &&
-                    concept?.children?.map((childConcept) => (
-                      <ConceptChip
-                        key={childConcept.concept_id}
-                        concept={childConcept}
-                        onDelete={() => {
-                          setConcept(removeChild(concept, childConcept));
-                        }}
-                      />
-                    ))}
-                </>
-              )}
-            </>
-          )}
-        </Box>
-      )}
       actions={actions}
       {...rest}
-    />
+    >
+      <Box py={1}>
+        {isEmptyRule(rule) ? (
+          <RuleSearch onSelect={() => select(id)} selection={selection} />
+        ) : (
+          <>
+            {isSingleConcept(concept) && (
+              <>
+                <ConceptChip
+                  indicateIfParent={showDescendants}
+                  concept={concept}
+                  onDelete={(e: React.MouseEvent) => {
+                    e.stopPropagation();
+                    clearConcept();
+                  }}
+                  onClick={
+                    (concept?.children?.length ?? 0) > 0
+                      ? (e: React.MouseEvent) => {
+                          e.stopPropagation();
+                          toggleShowDescendants();
+                        }
+                      : (e: React.MouseEvent) => {
+                          e.stopPropagation();
+                        }
+                  }
+                />
+                {showDescendants &&
+                  concept?.children?.map((childConcept) => (
+                    <ConceptChip
+                      key={childConcept.concept_id}
+                      concept={childConcept}
+                      onDelete={() => {
+                        setConcept(removeChild(concept, childConcept));
+                      }}
+                    />
+                  ))}
+              </>
+            )}
+          </>
+        )}
+      </Box>
+    </RuleWrapper>
   );
 };
 
