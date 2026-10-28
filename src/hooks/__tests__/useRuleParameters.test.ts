@@ -3,7 +3,7 @@ import useFeatures from "@/hooks/useFeatures";
 import { Concept } from "@/types/api";
 import { RuleLeafType } from "@/types/rules";
 import { createRule } from "@/utils/rules";
-import useParameters from "../useParameters";
+import useRuleParameters from "../useRuleParameters";
 
 jest.mock("@/hooks/useFeatures");
 
@@ -34,7 +34,7 @@ const setup = (
     constrainForBunnyV1,
     queryBuilderUseValueAsNumber,
   } as ReturnType<typeof useFeatures>);
-  return renderHook(() => useParameters(rule)).result.current;
+  return renderHook(() => useRuleParameters(rule)).result.current;
 };
 
 const PLAIN_RULE = makeRule();
@@ -48,7 +48,7 @@ const RULE_WITH_BOTH = makeRule({
   ageConstraint: [4, null],
 });
 
-describe("useParameters", () => {
+describe("useRuleParameters", () => {
   it("allows both timeframe and age when neither is set", () => {
     expect(setup(PLAIN_RULE)).toMatchObject({
       canAddTimeframe: true,

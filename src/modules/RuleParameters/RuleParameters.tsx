@@ -8,7 +8,7 @@ import RuleValueAsNumberSelector from "@/components/RuleValueAsNumberSelector";
 import AddTimeframeButton from "@/components/AddTimeFrameButton";
 import AddAgeButton from "@/components/AddAgeButton";
 import AddValueAsNumberButton from "@/components/AddValueAsNumberButton";
-import useParameters from "./useParameters";
+import useRuleParameters from "@/hooks/useRuleParameters";
 import { parametersRowSx } from "./RuleParameters.styles";
 
 interface RuleParametersProps {
@@ -19,7 +19,7 @@ const RuleParameters = ({ rule }: RuleParametersProps) => {
   const isSelected = useQueryBuilder((qb) => !!qb.selected[rule.id]);
   const { constrainForBunnyV1 } = useFeatures();
   const { hasParameters, hasValue, canAddTimeframe, canAddAge } =
-    useParameters(rule);
+    useRuleParameters(rule);
 
   if (
     !hasParameters ||

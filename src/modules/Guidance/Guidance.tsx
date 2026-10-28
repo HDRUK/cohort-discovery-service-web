@@ -41,7 +41,7 @@ import ShowDescendants from "@/content/guidance/components/ShowDescendants";
 import ToggleOperator from "@/content/guidance/components/ToggleOperator";
 import AddButton from "@/components/AddButton";
 import { AddButtonProps } from "@/components/AddButton/AddButton";
-import useParameters from "@/modules/RuleParameters/useParameters";
+import useRuleParameters from "@/hooks/useRuleParameters";
 import AddTimeFrameButton from "@/components/AddTimeFrameButton";
 import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
 import { CustomH1, CustomH2 } from "@/components/GuidanceHeaders";
@@ -205,8 +205,8 @@ const Guidance = () => {
       </CollapsibleGuidance>
     ),
     ShowDescendants: () => <ShowDescendants node={node} />,
-    AddTimeFrameButton: (props: AddButtonProps) => {
-      const { canAddTimeframe } = useParameters(node);
+    AddTimeFrameButton: (props: Omit<AddButtonProps, "onClick">) => {
+      const { canAddTimeframe } = useRuleParameters(node);
       return (
         !node.timeConstraint && (
           <AddTimeFrameButton
@@ -219,8 +219,8 @@ const Guidance = () => {
         )
       );
     },
-    AddAgeButton: (props: AddButtonProps) => {
-      const { canAddAge } = useParameters(node);
+    AddAgeButton: (props: Omit<AddButtonProps, "onClick">) => {
+      const { canAddAge } = useRuleParameters(node);
       return (
         !node.ageConstraint && (
           <AddAgeButton
@@ -252,8 +252,8 @@ const Guidance = () => {
     DeleteAgeButton: (props: DeleteMenuItemProps) => (
       <DeleteAgeButton rule={node} {...props} />
     ),
-    AddValueAsNumberButton: (props: AddButtonProps) => {
-      const { hasValue } = useParameters(node);
+    AddValueAsNumberButton: (props: Omit<AddButtonProps, "onClick">) => {
+      const { hasValue } = useRuleParameters(node);
       return (
         hasValue &&
         !node.valueAsNumber && (
