@@ -1,4 +1,5 @@
 import ErrorIcon from "@/components/ErrorIcon";
+import InvalidRule from "@/components/InvalidRule";
 import { Button, Stack, Typography } from "@mui/material";
 
 interface RuleSearchProps {
@@ -24,6 +25,15 @@ const RuleFooter = ({
 }: RuleSearchProps) => {
   const DEFAULT_CONFIRM_OR_CLEAR_MESSAGE =
     "Please confirm or clear your changes before continuing";
+  const ALTERNATIVES_MESSAGE =
+    "A rule has alternatives, please select one or more concepts";
+
+  const pendingMessage =
+    customInvalidRule && isSelected
+      ? ALTERNATIVES_MESSAGE
+      : selectedConceptsLength > 0
+        ? DEFAULT_CONFIRM_OR_CLEAR_MESSAGE
+        : null;
 
   return (
     <Stack
@@ -34,7 +44,7 @@ const RuleFooter = ({
       py={0.75}
       gap={1}
     >
-      {customInvalidRule ? (
+      {pendingMessage ? (
         <Stack
           direction="row"
           alignItems="center"
@@ -44,26 +54,11 @@ const RuleFooter = ({
         >
           <ErrorIcon />
           <Typography variant="body2" noWrap sx={{ fontSize: 16 }}>
-            {isSelected
-              ? "A rule has alternatives, please select one or more concepts"
-              : DEFAULT_CONFIRM_OR_CLEAR_MESSAGE}
+            {pendingMessage}
           </Typography>
         </Stack>
       ) : (
-        <Stack
-          direction="row"
-          alignItems="center"
-          gap={1}
-          flexShrink={1}
-          minWidth={0}
-        >
-          <ErrorIcon />
-          <Typography variant="body2" noWrap sx={{ fontSize: 16 }}>
-            {selectedConceptsLength > 0
-              ? DEFAULT_CONFIRM_OR_CLEAR_MESSAGE
-              : invalidReason}
-          </Typography>
-        </Stack>
+        <InvalidRule reasons={invalidReason ?? []} />
       )}
       {(hasOptions || isNLP) && (
         <Stack direction="row" justifyContent="flex-end" gap={1} pt={1}>

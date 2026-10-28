@@ -43,7 +43,6 @@ const RuleParameters = ({ rule }: RuleParametersProps) => {
       ) : isSelected ? (
         <AddTimeframeButton
           label="Add timeframe"
-          size="small"
           rule={rule}
           disabled={!canAddTimeframe}
           hoverKey={`rule-timeframe-${rule.id}`}
@@ -59,7 +58,6 @@ const RuleParameters = ({ rule }: RuleParametersProps) => {
       ) : isSelected ? (
         <AddAgeButton
           label="Add age"
-          size="small"
           rule={rule}
           disabled={!canAddAge}
           hoverKey={`rule-age-${rule.id}`}
@@ -71,7 +69,6 @@ const RuleParameters = ({ rule }: RuleParametersProps) => {
         ) : isSelected ? (
           <AddValueAsNumberButton
             label="Add value"
-            size="small"
             rule={rule}
             hoverKey={`rule-value-as-number-${rule.id}`}
           />
