@@ -11,13 +11,13 @@ import { AddButtonProps } from "@/components/AddButton/AddButton";
 import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
 import useHoverable from "@/hooks/useHoverable";
 
-type AddAgeChipProps = Omit<AddButtonProps, "onClick"> & {
+type AddAgeButtonProps = Omit<AddButtonProps, "onClick"> & {
   rule: RuleLeafType;
   hoverKey?: string;
   onClick?: () => void;
 };
 
-const AddAgeButton = ({ rule, hoverKey, ...props }: AddAgeChipProps) => {
+const AddAgeButton = ({ rule, hoverKey, ...props }: AddAgeButtonProps) => {
   const {
     queryBuilderJson,
     setQueryBuilderJson,

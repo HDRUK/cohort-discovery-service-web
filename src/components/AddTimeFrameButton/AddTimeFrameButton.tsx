@@ -9,7 +9,7 @@ import { AddButtonProps } from "@/components/AddButton/AddButton";
 import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
 import useHoverable from "@/hooks/useHoverable";
 
-type AddTimeframeChipProps = Omit<AddButtonProps, "onClick"> & {
+type AddTimeFrameButtonProps = Omit<AddButtonProps, "onClick"> & {
   rule: RuleLeafType;
   hoverKey?: string;
   onClick?: () => void;
@@ -19,7 +19,7 @@ const AddTimeFrameButton = ({
   rule,
   hoverKey,
   ...props
-}: AddTimeframeChipProps) => {
+}: AddTimeFrameButtonProps) => {
   const {
     queryBuilderJson,
     setQueryBuilderJson,
