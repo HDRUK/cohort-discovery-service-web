@@ -1,16 +1,20 @@
-import { Box } from "@mui/material";
+import { Box, Skeleton } from "@mui/material";
 import TopMenu from "@/components/TopMenu";
 import HeaderBar from "@/components/HeaderBar";
 import AccessBanner from "@/components/AccessBanner";
 import Footer from "@/components/Footer";
 import SupportPopOut from "@/components/SupportPopOut/SupportPopOut";
 import { isStandalone } from "@/utils/modes";
+import { Suspense } from "react";
+import { getCopyrightText } from "@/utils/getCopyrightText";
 
 const hideNav = process.env.HIDE_NAV === "1";
 const applicationMode = process.env.APPLICATION_MODE;
 
-const AppShell = ({ children }: { children: React.ReactNode }) => {
+const AppShell = async ({ children }: { children: React.ReactNode }) => {
   const standalone = isStandalone(applicationMode);
+
+  const copyright = await getCopyrightText();
 
   return (
     <Box>
@@ -38,7 +42,20 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
             minHeight: 0,
           }}
         >
-          {!hideNav && <TopMenu />}
+          {!hideNav && (
+            <Suspense
+              fallback={
+                <Box sx={{ display: "flex", px: 2, py: 1 }}>
+                  <Skeleton
+                    variant="rounded"
+                    sx={{ width: "100%", height: "40px" }}
+                  />
+                </Box>
+              }
+            >
+              <TopMenu />
+            </Suspense>
+          )}
 
           <Box
             component="main"
@@ -53,7 +70,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
           </Box>
         </Box>
       </Box>
-      <Footer />
+      <Footer copyright={copyright} />
     </Box>
   );
 };

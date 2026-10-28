@@ -17,6 +17,8 @@ import getUserCollections from "@/actions/collection/getUserCollections";
 
 const applicationMode = process.env.APPLICATION_MODE;
 
+export const instant = false;
+
 export default async function ProtectedLayout({
   children,
 }: {
