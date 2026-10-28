@@ -1,5 +1,4 @@
 import { Box } from "@mui/material";
-import { DragType } from "@/types/dnd";
 import DomainChip from "@/components/DomainChip/DomainChip";
 import { Concept } from "@/types/api";
 import { useCallback } from "react";
@@ -11,21 +10,16 @@ import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { isEmptyRule, updateById, isRuleLeaf, RuleErrors } from "@/utils/rules";
 
 import RuleWrapper from "../RuleWrapper";
-import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
-import useNodeActions from "@/hooks/useNodeActions";
 import RuleFooter from "../RuleFooter";
 import RuleParameters from "../RuleParameters";
 import useRuleConceptSelection from "./useRuleConceptSelection";
 
-export interface RuleProps extends Omit<
-  RuleWrapperProps,
-  "node" | "type" | "children"
-> {
+export interface RuleProps {
   rule: RuleLeafType;
   groupId?: string;
 }
 
-const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
+const Rule = ({ rule, groupId }: RuleProps) => {
   const {
     id,
     rule: { concept },
@@ -76,8 +70,6 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     );
   }, [id, queryBuilderJson, setQueryBuilderJson]);
 
-  const { actions } = useNodeActions(rule);
-
   const selection = useRuleConceptSelection(setConcept);
 
   const empty = isEmptyRule(rule);
@@ -86,10 +78,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
   return (
     <RuleWrapper
       node={rule}
-      type={DragType.Rule}
       groupId={groupId}
-      sortable={true}
-      actions={actions}
       subTitle={!empty && <DomainChip concept={concept} />}
       parameters={<RuleParameters rule={rule} />}
       invalidFooter={
@@ -107,7 +96,6 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
           />
         ) : undefined
       }
-      {...rest}
     >
       <Box py={1}>
         {empty ? (

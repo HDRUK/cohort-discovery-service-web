@@ -1,13 +1,11 @@
 import {
   Box,
-  BoxProps,
   IconButton,
   Skeleton,
   Card,
   CardHeader,
   Chip,
   CardContent,
-  CardProps,
   Collapse,
   Fade,
   Divider,
@@ -32,6 +30,7 @@ import {
   chipSx,
   selectedCaptionSx,
   headerRowSx,
+  operatorCardSx,
 } from "./RuleWrapper.styles";
 import { RuleNodeType } from "@/types/rules";
 import EditableText from "@/components/EditableText";
@@ -41,49 +40,40 @@ import Title from "@/components/Title";
 import useRightClickMenu from "@/hooks/useRightClickMenu";
 import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
 import { mergeSx } from "@/utils/helpers";
-import { isAgeFilter, removeById } from "@/utils/rules";
+import {
+  isAgeFilter,
+  isOperator,
+  isRuleGroup,
+  removeById,
+} from "@/utils/rules";
 import Close from "@mui/icons-material/Close";
 import useHoverable from "@/hooks/useHoverable";
-
-interface Action {
-  action: () => void;
-  label: string;
-}
+import useNodeActions from "@/hooks/useNodeActions";
 
 export interface RuleWrapperProps {
   node: RuleNodeType;
-  type: DragType.Rule | DragType.Group | DragType.Operator;
+  groupId?: string;
   children: ReactNode;
   subTitle?: ReactNode;
   parameters?: ReactNode;
   invalidFooter?: ReactNode;
-  hideHeader?: boolean;
-  groupId?: string;
-  sortable?: boolean;
-  cardProps?: CardProps;
-  containerProps?: BoxProps;
-  actions?: Action[];
-  forceShowHandle?: boolean;
-  useLeftDragPlaceHolder?: boolean;
 }
 
 const RuleWrapper = ({
   node,
-  type,
   groupId,
   children,
   subTitle,
   parameters,
   invalidFooter,
-  hideHeader = false,
-  sortable = true,
-  cardProps: { sx: cardPropsSx, ...cardProps } = {},
-  containerProps = undefined,
-  actions,
-  forceShowHandle = false,
-  useLeftDragPlaceHolder = false,
 }: RuleWrapperProps) => {
   const { id, valid = true, invalidReason } = node;
+  const isOperatorNode = isOperator(node);
+  const type = isRuleGroup(node)
+    ? DragType.Group
+    : isOperatorNode
+      ? DragType.Operator
+      : DragType.Rule;
 
   let exclude;
   if (!isAgeFilter(node)) {
@@ -169,6 +159,7 @@ const RuleWrapper = ({
   }, [showHandle, effectiveIsDragging, setShowHandle, setShowDelete]);
 
   const { handleContextMenu, ...rightClickMenuMethods } = useRightClickMenu();
+  const { actions } = useNodeActions(node);
 
   const handleDelete = useCallback(() => {
     const newQuery = removeById(queryBuilderJson, id);
@@ -178,7 +169,7 @@ const RuleWrapper = ({
   const nodeName = useMemo(() => getNodeName(node), [node, getNodeName]);
 
   const footer =
-    (type === DragType.Rule || type === DragType.Group) && !valid
+    !isOperatorNode && !valid
       ? (invalidFooter ??
         ((invalidReason ?? []).length > 0 && (
           <InvalidRule
@@ -206,9 +197,7 @@ const RuleWrapper = ({
     isDragging,
     attributes,
     listeners,
-    containerProps,
     cardHeaderSx,
-    cardProps,
     headerRowSx,
   });
 
@@ -217,27 +206,26 @@ const RuleWrapper = ({
       rule-id={id}
       data-testid="sortable-rule"
       ref={setNodeRef}
-      style={sortable ? style : {}}
-      {...containerProps}
+      style={style}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      sx={containerSx(isSelected && !effectiveIsDragging, containerProps?.sx)}
+      sx={containerSx(isSelected && !effectiveIsDragging)}
     >
       <Box sx={headerRowSx}>
         <Collapse
-          in={showHandle || forceShowHandle || effectiveIsDragging}
+          in={showHandle || isInDragOverlay || effectiveIsDragging}
           orientation="horizontal"
           collapsedSize={0}
           unmountOnExit
           sx={{ display: "flex", alignItems: "center" }}
         >
-          <Fade in={showHandle || forceShowHandle || effectiveIsDragging}>
+          <Fade in={showHandle || isInDragOverlay || effectiveIsDragging}>
             <IconButton
               aria-label="Drag"
               data-draggable="true"
               size="small"
-              {...(sortable ? attributes : {})}
-              {...(sortable ? listeners : {})}
+              {...attributes}
+              {...listeners}
               sx={dragButtonSx}
             >
               <DragIndicator
@@ -261,12 +249,16 @@ const RuleWrapper = ({
             data-draggable="true"
             component="div"
             data-testid="clickable-card"
-            sx={mergeSx(cardSx(isSelected, valid, isHighlighted), cardPropsSx)}
+            sx={mergeSx(
+              cardSx(isSelected, valid, isHighlighted),
+              isOperatorNode
+                ? operatorCardSx(isSelected, isHighlighted)
+                : undefined,
+            )}
             onContextMenu={handleContextMenu}
             onClick={handleOnSelect}
-            {...cardProps}
           >
-            {!hideHeader && (
+            {!isOperatorNode && (
               <CardHeader
                 sx={cardHeaderSx}
                 slotProps={{
@@ -311,9 +303,9 @@ const RuleWrapper = ({
           </Card>
         )}
 
-        {useLeftDragPlaceHolder && (
+        {isOperatorNode && (
           <Collapse
-            in={showHandle || forceShowHandle || effectiveIsDragging}
+            in={showHandle || isInDragOverlay || effectiveIsDragging}
             orientation="horizontal"
             collapsedSize={0}
             unmountOnExit
@@ -328,18 +320,18 @@ const RuleWrapper = ({
           </Collapse>
         )}
         <Collapse
-          in={showDelete || forceShowHandle}
+          in={showDelete || isInDragOverlay}
           orientation="horizontal"
           collapsedSize={0}
           unmountOnExit
           sx={{ display: "flex", alignItems: "center" }}
         >
-          <Fade in={showDelete || forceShowHandle}>
+          <Fade in={showDelete || isInDragOverlay}>
             <IconButton
               aria-label="Delete"
               size="small"
-              {...(sortable ? attributes : {})}
-              {...(sortable ? listeners : {})}
+              {...attributes}
+              {...listeners}
               sx={deleteButtonSx}
               onClick={handleDelete}
             >

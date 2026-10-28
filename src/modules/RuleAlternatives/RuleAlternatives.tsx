@@ -1,7 +1,6 @@
 "use client";
 
 import { Concept } from "@/types/api";
-import { DragType } from "@/types/dnd";
 import { RuleLeafType } from "@/types/rules";
 import ConceptChip from "@/components/ConceptChip";
 import SquareCheckbox from "@/components/SquareCheckbox";
@@ -9,7 +8,6 @@ import { FormControlLabel, Stack } from "@mui/material";
 import DomainChip from "@/components/DomainChip/DomainChip";
 import { useCallback, useMemo, useState } from "react";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import useNodeActions from "@/hooks/useNodeActions";
 import {
   findRulesWithAlternatives,
   hasAlternatives,
@@ -19,30 +17,20 @@ import {
 } from "@/utils/rules";
 import { useCohortBuilderContext } from "@/providers/CohortBuilderProvider";
 import RuleWrapper from "../RuleWrapper";
-import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import { DEFAULT_SEARCH_RESULTS_MAX_HEIGHT } from "@/config/defaults";
 import RuleFooter from "../RuleFooter";
 import RuleParameters from "../RuleParameters";
 
-interface RuleAlternativesProps extends Omit<
-  RuleWrapperProps,
-  "node" | "type" | "children"
-> {
+interface RuleAlternativesProps {
   rule: RuleLeafType;
   groupId?: string;
 }
 
-const RuleAlternatives = ({
-  rule,
-  groupId,
-  ...rest
-}: RuleAlternativesProps) => {
+const RuleAlternatives = ({ rule, groupId }: RuleAlternativesProps) => {
   const {
     id,
     rule: { concept },
   } = rule;
-
-  const { actions } = useNodeActions(rule);
 
   const {
     queryBuilderJson,
@@ -167,9 +155,7 @@ const RuleAlternatives = ({
   return (
     <RuleWrapper
       node={rule}
-      type={DragType.Rule}
       groupId={groupId}
-      sortable={true}
       subTitle={<DomainChip concept={concept} />}
       parameters={<RuleParameters rule={rule} />}
       invalidFooter={
@@ -181,8 +167,6 @@ const RuleAlternatives = ({
           onClear={clearAll}
         />
       }
-      actions={actions}
-      {...rest}
     >
       <Stack
         component="form"

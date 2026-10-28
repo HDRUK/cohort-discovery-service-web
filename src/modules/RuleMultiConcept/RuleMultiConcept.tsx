@@ -8,29 +8,20 @@ import { ConceptChip } from "@/components/ConceptChip/ConceptChip";
 import { DragType } from "@/types/dnd";
 import { useCallback, useMemo } from "react";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import useNodeActions from "@/hooks/useNodeActions";
 import { isMultipleConcept, isRuleLeaf, updateById } from "@/utils/rules";
 import RuleWrapper from "../RuleWrapper";
-import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import RuleParameters from "../RuleParameters";
 
-interface RuleMultiConceptProps
-  extends Omit<RuleWrapperProps, "node" | "type" | "children"> {
+interface RuleMultiConceptProps {
   rule: RuleLeafType;
   groupId?: string;
 }
 
-const RuleMultiConcept = ({
-  rule,
-  groupId,
-  ...rest
-}: RuleMultiConceptProps) => {
+const RuleMultiConcept = ({ rule, groupId }: RuleMultiConceptProps) => {
   const {
     id,
     rule: { concept },
   } = rule;
-
-  const { actions } = useNodeActions(rule);
 
   const { queryBuilderJson, setQueryBuilderJson, showDescendants } =
     useQueryBuilder((qb) => ({
@@ -78,13 +69,9 @@ const RuleMultiConcept = ({
   return (
     <RuleWrapper
       node={rule}
-      type={DragType.Rule}
       groupId={groupId}
-      sortable={true}
       subTitle={<DomainChip concept={concept} />}
       parameters={<RuleParameters rule={rule} />}
-      actions={actions}
-      {...rest}
     >
       <Stack spacing={1} py={1}>
         {concepts.map((c) => (
