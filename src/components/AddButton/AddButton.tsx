@@ -11,8 +11,9 @@ import { useState } from "react";
 
 export type AddButtonProps = Omit<ButtonProps, "action" | "onClick"> & {
   label: string;
-  onClick: () => void | Promise<void>;
+  onClick: (e: React.MouseEvent) => void | Promise<void>;
   buttonSx?: ButtonProps["sx"];
+  highlighted?: boolean;
 };
 
 const AddButton = ({
@@ -20,16 +21,17 @@ const AddButton = ({
   onClick,
   disabled,
   buttonSx,
+  highlighted = false,
   ...rest
 }: AddButtonProps) => {
   const { compact } = useActionMenuSection();
   const [loading, setLoading] = useState(false);
 
-  const handleClick = async () => {
+  const handleClick = async (e: React.MouseEvent) => {
     if (loading) return;
     try {
       setLoading(true);
-      await onClick();
+      await onClick(e);
     } finally {
       setLoading(false);
     }
@@ -57,6 +59,7 @@ const AddButton = ({
             justifyContent: "flex-start",
             textAlign: "left",
             color: "text.primary",
+            ...(highlighted && { backgroundColor: "highlight.main" }),
             "&.MuiButton-root:hover": {
               backgroundColor: "highlight.main",
             },

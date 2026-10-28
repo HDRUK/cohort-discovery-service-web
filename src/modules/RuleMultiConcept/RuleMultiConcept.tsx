@@ -12,6 +12,7 @@ import useNodeActions from "@/hooks/useNodeActions";
 import { isMultipleConcept, isRuleLeaf, updateById } from "@/utils/rules";
 import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
+import RuleParameters from "../RuleParameters";
 
 interface RuleMultiConceptProps
   extends Omit<RuleWrapperProps, "node" | "type" | "render"> {
@@ -81,6 +82,7 @@ const RuleMultiConcept = ({
       groupId={groupId}
       sortable={true}
       headerExtra={<DomainChip concept={concept} />}
+      parameters={<RuleParameters rule={rule} />}
       render={() => (
         <Stack spacing={1} py={1}>
           {concepts.map((c) => (

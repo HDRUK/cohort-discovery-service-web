@@ -59,7 +59,7 @@ const RuleFooter = ({
         >
           <ErrorIcon />
           <Typography variant="body2" noWrap sx={{ fontSize: 16 }}>
-            {!isSelected || selectedConceptsLength > 0
+            {selectedConceptsLength > 0
               ? DEFAULT_CONFIRM_OR_CLEAR_MESSAGE
               : invalidReason}
           </Typography>

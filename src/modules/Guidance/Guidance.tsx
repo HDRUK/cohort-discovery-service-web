@@ -41,7 +41,7 @@ import ShowDescendants from "@/content/guidance/components/ShowDescendants";
 import ToggleOperator from "@/content/guidance/components/ToggleOperator";
 import AddButton from "@/components/AddButton";
 import { AddButtonProps } from "@/components/AddButton/AddButton";
-import { AddChipProps } from "@/components/AddChip/AddChip";
+import useParameters from "@/modules/RuleParameters/useParameters";
 import AddTimeFrameButton from "@/components/AddTimeFrameButton";
 import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
 import { CustomH1, CustomH2 } from "@/components/GuidanceHeaders";
@@ -51,7 +51,6 @@ import {
   getDomainPastPhrase,
   getDomainPhrase,
   getUniqueDomains,
-  isValueAsNumberDomain,
 } from "@/utils/omop";
 import DeleteTimeFrameButton from "@/components/DeleteTimeFrameButton";
 import DeleteMenuItem, {
@@ -179,7 +178,7 @@ const Guidance = () => {
     [queryBuilderJson, setQueryBuilderJson],
   );
 
-  const { constrainForBunnyV1, queryBuilderAllowNestedGroups, queryBuilderUseValueAsNumber } = useFeatures();
+  const { constrainForBunnyV1, queryBuilderAllowNestedGroups } = useFeatures();
 
   const handleDelete = useCallback(() => {
     const newQuery = selectedIds.reduce(
@@ -206,26 +205,28 @@ const Guidance = () => {
       </CollapsibleGuidance>
     ),
     ShowDescendants: () => <ShowDescendants node={node} />,
-    AddTimeFrameButton: (props: AddChipProps) => {
+    AddTimeFrameButton: (props: AddButtonProps) => {
+      const { canAddTimeframe } = useParameters(node);
       return (
         !node.timeConstraint && (
           <AddTimeFrameButton
             key="RuleTimeframeSelector"
             rule={node}
             hoverKey={`rule-timeframe-${node.id}`}
-            disabled={!!node.ageConstraint}
+            disabled={!canAddTimeframe}
             {...props}
           />
         )
       );
     },
-    AddAgeButton: (props: AddChipProps) => {
+    AddAgeButton: (props: AddButtonProps) => {
+      const { canAddAge } = useParameters(node);
       return (
         !node.ageConstraint && (
           <AddAgeButton
             rule={node}
             hoverKey={`rule-age-${node.id}`}
-            disabled={!!node.timeConstraint}
+            disabled={!canAddAge}
             {...props}
           />
         )
@@ -251,10 +252,10 @@ const Guidance = () => {
     DeleteAgeButton: (props: DeleteMenuItemProps) => (
       <DeleteAgeButton rule={node} {...props} />
     ),
-    AddValueAsNumberButton: (props: AddChipProps) => {
+    AddValueAsNumberButton: (props: AddButtonProps) => {
+      const { hasValue } = useParameters(node);
       return (
-        queryBuilderUseValueAsNumber &&
-        isValueAsNumberDomain(node.rule.concept) &&
+        hasValue &&
         !node.valueAsNumber && (
           <AddValueAsNumberButton
             rule={node}

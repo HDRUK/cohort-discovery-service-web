@@ -9,7 +9,6 @@ import {
   CardContent,
   CardProps,
   Collapse,
-  CardActions,
   Fade,
   Divider,
 } from "@mui/material";
@@ -30,7 +29,6 @@ import {
   skeletonSx,
   cardSx,
   cardHeaderSx,
-  cardActionsSx,
   chipSx,
   selectedCaptionSx,
   headerRowSx,
@@ -38,28 +36,14 @@ import {
 import { RuleNodeType } from "@/types/rules";
 import EditableText from "@/components/EditableText";
 import { useLogDependencyChanges } from "@/utils/deps";
-import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
 import InvalidRule from "@/components/InvalidRule";
 import Title from "@/components/Title";
 import useRightClickMenu from "@/hooks/useRightClickMenu";
 import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
 import { mergeSx } from "@/utils/helpers";
-import RuleAgeSelector from "@/components/RuleAgeSelector";
-import {
-  getPrimaryConcept,
-  isAgeFilter,
-  isEmptyRule,
-  isRuleLeaf,
-  removeById,
-} from "@/utils/rules";
-import { isValueAsNumberDomain } from "@/utils/omop";
-import useFeatures from "@/hooks/useFeatures";
+import { isAgeFilter, removeById } from "@/utils/rules";
 import Close from "@mui/icons-material/Close";
 import useHoverable from "@/hooks/useHoverable";
-import AddTimeframeButton from "@/components/AddTimeFrameButton";
-import AddAgeButton from "@/components/AddAgeButton";
-import RuleValueAsNumberSelector from "@/components/RuleValueAsNumberSelector";
-import AddValueAsNumberButton from "@/components/AddValueAsNumberButton";
 
 interface Action {
   action: () => void;
@@ -84,6 +68,7 @@ export interface RuleWrapperProps extends BoxProps {
   forceShowHandle?: boolean;
   useLeftDragPlaceHolder?: boolean;
   renderFooter?: ReactNode;
+  parameters?: ReactNode;
 }
 
 const RuleWrapper = ({
@@ -101,6 +86,7 @@ const RuleWrapper = ({
   forceShowHandle = false,
   useLeftDragPlaceHolder = false,
   renderFooter,
+  parameters,
 }: RuleWrapperProps) => {
   const { id, valid = true, invalidReason } = node;
 
@@ -124,8 +110,6 @@ const RuleWrapper = ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
   }));
-
-  const { constrainForBunnyV1, queryBuilderUseValueAsNumber } = useFeatures();
 
   const {
     setNodeRef,
@@ -198,9 +182,16 @@ const RuleWrapper = ({
 
   const nodeName = useMemo(() => getNodeName(node), [node, getNodeName]);
 
-  const showFooter =
-    (type === DragType.Rule && isSelected && !isAgeFilter(node)) ||
-    (!valid && (invalidReason ?? []).length > 0);
+  const footer =
+    (type === DragType.Rule || type === DragType.Group) && !valid
+      ? (renderFooter ??
+        ((invalidReason ?? []).length > 0 && (
+          <InvalidRule
+            reasons={invalidReason ?? []}
+            stackProps={{ sx: { pt: 1, pb: 1 } }}
+          />
+        )))
+      : null;
 
   useLogDependencyChanges("wrapper " + node.id, {
     isSelected,
@@ -322,85 +313,13 @@ const RuleWrapper = ({
               <CardContent>{render(node, anchorRef)}</CardContent>
             )}
 
-            {isRuleLeaf(node) &&
-              type === DragType.Rule &&
-              !isEmptyRule(node) &&
-              !["Gender", "Race"].includes(
-                getPrimaryConcept(node.rule.concept)?.category || "",
-              ) &&
-              (node.timeConstraint ||
-                node.ageConstraint ||
-                (queryBuilderUseValueAsNumber && node.valueAsNumber) ||
-                isSelected) && (
-                <CardActions sx={cardActionsSx}>
-                  {node.timeConstraint ? (
-                    <RuleTimeframeSelector
-                      data-testid="rule-timeframe-selector"
-                      rule={node}
-                      readOnly={true}
-                      flex
-                    />
-                  ) : isSelected ? (
-                    <AddTimeframeButton
-                      label="Add timeframe"
-                      rule={node}
-                      key="RuleTimeframeSelector"
-                      hoverKey={`rule-timeframe-${node.id}`}
-                    />
-                  ) : null}
-                  {node.ageConstraint ? (
-                    <RuleAgeSelector
-                      rule={node}
-                      readOnly={true}
-                      uniDirectional={constrainForBunnyV1}
-                      flex
-                    />
-                  ) : isSelected ? (
-                    <AddAgeButton
-                      label="Add age"
-                      rule={node}
-                      key="RuleAgeSelector"
-                      hoverKey={`rule-age-${node.id}`}
-                    />
-                  ) : null}
-                  {queryBuilderUseValueAsNumber &&
-                    isValueAsNumberDomain(node.rule.concept) &&
-                    (node.valueAsNumber ? (
-                      <RuleValueAsNumberSelector
-                        rule={node}
-                        readOnly={true}
-                        flex
-                      />
-                    ) : isSelected ? (
-                      <AddValueAsNumberButton
-                        label="Add value"
-                        rule={node}
-                        key="RuleValueAsNumberSelector"
-                        hoverKey={`rule-value-as-number-${node.id}`}
-                      />
-                    ) : null)}
-                </CardActions>
-              )}
+            {parameters}
 
             <RightClickMenu {...rightClickMenuMethods} actions={actions} />
-            {(type === DragType.Rule || type === DragType.Group) && (
+            {footer && (
               <>
-                {showFooter && <Divider variant="fullWidth" />}
-                <Box
-                  minHeight={
-                    type === DragType.Rule && isSelected && !isAgeFilter(node)
-                      ? 40
-                      : 0
-                  }
-                >
-                  {!valid &&
-                    (renderFooter || (
-                      <InvalidRule
-                        reasons={invalidReason ?? []}
-                        stackProps={{ sx: { pt: 1, pb: 1 } }}
-                      />
-                    ))}
-                </Box>
+                <Divider variant="fullWidth" />
+                {footer}
               </>
             )}
           </Card>

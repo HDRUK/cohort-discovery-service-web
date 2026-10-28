@@ -21,6 +21,7 @@ import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import { DEFAULT_SEARCH_RESULTS_MAX_HEIGHT } from "@/config/defaults";
 import RuleFooter from "../RuleFooter";
+import RuleParameters from "../RuleParameters";
 
 interface RuleAlternativesProps extends Omit<
   RuleWrapperProps,
@@ -160,6 +161,7 @@ const RuleAlternatives = ({
       groupId={groupId}
       sortable={true}
       headerExtra={<DomainChip concept={concept} />}
+      parameters={<RuleParameters rule={rule} />}
       renderFooter={
         <RuleFooter
           customInvalidRule={true}

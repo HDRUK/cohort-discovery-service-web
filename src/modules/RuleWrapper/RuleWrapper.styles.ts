@@ -76,14 +76,6 @@ export const cardHeaderSx: SxProps<Theme> = {
   pb: 1,
 };
 
-export const cardActionsSx: SxProps<Theme> = {
-  borderTop: 1,
-  borderColor: "divider",
-  p: 0,
-  m: 0,
-  py: 1,
-};
-
 export const chipSx: SxProps<Theme> = {
   bgcolor: "white",
 };

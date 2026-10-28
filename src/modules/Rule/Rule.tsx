@@ -19,6 +19,7 @@ import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import useNodeActions from "@/hooks/useNodeActions";
 import RuleFooter from "../RuleFooter";
+import RuleParameters from "../RuleParameters";
 import useRuleConceptSelection from "./useRuleConceptSelection";
 
 export interface RuleProps extends Omit<
@@ -115,16 +116,19 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       groupId={groupId}
       sortable={true}
       headerExtra={!isEmptyRule(rule) ? <DomainChip concept={concept} /> : null}
+      parameters={<RuleParameters rule={rule} />}
       renderFooter={
-        <RuleFooter
-          customInvalidRule={false}
-          handleConfirm={selection.handleConfirm}
-          clearAll={selection.clearAll}
-          invalidReason={rule.invalidReason}
-          selectedConceptsLength={selection.selectedConcepts.length}
-          isSelected={isSelected}
-          hasOptions={selection.hasOptions}
-        />
+        isEmptyRule(rule) ? (
+          <RuleFooter
+            customInvalidRule={false}
+            handleConfirm={selection.handleConfirm}
+            clearAll={selection.clearAll}
+            invalidReason={rule.invalidReason}
+            selectedConceptsLength={selection.selectedConcepts.length}
+            isSelected={isSelected}
+            hasOptions={selection.hasOptions}
+          />
+        ) : undefined
       }
       render={() => (
         <Box py={1}>
