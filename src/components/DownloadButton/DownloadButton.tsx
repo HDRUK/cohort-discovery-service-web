@@ -1,51 +1,50 @@
-import { IconButtonProps } from "@mui/material";
-
 import DownloadIcon from "@mui/icons-material/Download";
 import PositionedMenu, { PositionedMenuItem } from "../PositionedMenu";
 import { useNotify } from "@/providers/NotifyProvider";
+
+const NOTIFY_DURATION = 3000;
 
 export enum AvailableFormats {
   JSON = "json",
   CSV = "csv",
 }
 
-export interface DownloadButtonProps extends Omit<
-  IconButtonProps<"a">,
-  "ref" | "href" | "component"
-> {
-  ids?: string[];
-  entity?: string;
-  formats?: AvailableFormats[];
+export interface DownloadButtonProps {
+  label: string;
+  formats: AvailableFormats[];
+  buildHref: (format: AvailableFormats) => string;
   isIcon?: boolean;
+  disabled?: boolean;
+  tooltip?: string;
 }
 
 const DownloadButton = ({
-  ids,
-  entity,
-  formats = [AvailableFormats.JSON],
-  disabled,
+  label,
+  formats,
+  buildHref,
   isIcon = true,
+  disabled,
+  tooltip,
 }: DownloadButtonProps) => {
   const notify = useNotify();
 
-  const download = async (format: AvailableFormats) => {
-    if (disabled || !ids || ids.length === 0 || !entity) return;
-    ids.map((id, idx) => {
-      const url = `/api/download/${encodeURIComponent(
-        id,
-      )}?entity=${encodeURIComponent(entity)}&format=${encodeURIComponent(
-        format,
-      )}`;
-      const a = document.createElement("a");
-      a.href = url;
-      a.target = "_self";
-      a.rel = "noopener noreferrer";
-      document.body.appendChild(a);
-      setTimeout(() => {
-        a.click();
-        notify.success(`Downloading ${entity} as ${format} has started`);
-      }, 100 * idx);
-    });
+  const download = (format: AvailableFormats) => {
+    if (disabled) return;
+
+    const a = document.createElement("a");
+    a.href = buildHref(format);
+    a.target = "_self";
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+
+    setTimeout(() => {
+      a.click();
+      a.remove();
+      notify.success(
+        `Downloading ${label} as ${format.toUpperCase()} has started. Please allow some time for it to complete.`,
+        NOTIFY_DURATION,
+      );
+    }, 100);
   };
 
   const items: PositionedMenuItem[] = formats.map((format) => ({
@@ -55,11 +54,17 @@ const DownloadButton = ({
   }));
 
   return isIcon ? (
-    <PositionedMenu data-testid="download-button" isIcon items={items}>
+    <PositionedMenu
+      title={tooltip}
+      data-testid="download-button"
+      isIcon
+      items={items}
+    >
       <DownloadIcon />
     </PositionedMenu>
   ) : (
     <PositionedMenu
+      title={tooltip}
       data-testid="download-button"
       items={items}
       startIcon={<DownloadIcon />}
