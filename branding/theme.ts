@@ -39,6 +39,9 @@ const brandingTheme: ThemeOptions = {
     secondaryBlack: {
       main: "#3C3C3B",
     },
+    faded: {
+      main: "#505A60",
+    },
     sage: {
       main: "#C6D9D4",
     },
