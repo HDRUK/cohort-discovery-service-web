@@ -70,32 +70,33 @@ const RuleMultiConcept = ({ rule, groupId }: RuleMultiConceptProps) => {
     <RuleWrapper
       node={rule}
       groupId={groupId}
-      subTitle={<DomainChip concept={concept} />}
-      parameters={<RuleParameters rule={rule} />}
-    >
-      <Stack spacing={1} py={1}>
-        {concepts.map((c) => (
-          <ConceptChip
-            key={c.concept_id}
-            concept={c}
-            indicateIfParent={showDescendants}
-            draggable={{
-              id: `concept-drag-${c.concept_id}-${id}`,
-              data: {
-                type: DragType.Concept,
-                concept: c,
-                sourceRuleId: id,
-                sourceGroupId: groupId,
-              },
-            }}
-            onDelete={(e) => {
-              e.stopPropagation();
-              handleDelete(c);
-            }}
-          />
-        ))}
-      </Stack>
-    </RuleWrapper>
+      renderSubTitle={<DomainChip concept={concept} />}
+      renderContent={
+        <Stack spacing={1} py={1}>
+          {concepts.map((c) => (
+            <ConceptChip
+              key={c.concept_id}
+              concept={c}
+              indicateIfParent={showDescendants}
+              draggable={{
+                id: `concept-drag-${c.concept_id}-${id}`,
+                data: {
+                  type: DragType.Concept,
+                  concept: c,
+                  sourceRuleId: id,
+                  sourceGroupId: groupId,
+                },
+              }}
+              onDelete={(e) => {
+                e.stopPropagation();
+                handleDelete(c);
+              }}
+            />
+          ))}
+        </Stack>
+      }
+      renderSubContent={<RuleParameters rule={rule} />}
+    />
   );
 };
 

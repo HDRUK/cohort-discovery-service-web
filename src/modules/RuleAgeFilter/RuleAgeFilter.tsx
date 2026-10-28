@@ -19,17 +19,18 @@ const RuleAgeFilter = ({ rule, groupId }: RuleProps) => {
     <RuleWrapper
       node={rule}
       groupId={groupId}
-      subTitle={<DomainChip label="Age" />}
-    >
-      <Box sx={{ width: "fit-content", my: 2 }}>
-        <RuleAgeSelectorReadOnly
-          from={from}
-          to={to}
-          minAge={MIN_AGE_FILTER}
-          maxAge={MAX_AGE_FILTER}
-        />
-      </Box>
-    </RuleWrapper>
+      renderSubTitle={<DomainChip label="Age" />}
+      renderContent={
+        <Box sx={{ width: "fit-content", my: 2 }}>
+          <RuleAgeSelectorReadOnly
+            from={from}
+            to={to}
+            minAge={MIN_AGE_FILTER}
+            maxAge={MAX_AGE_FILTER}
+          />
+        </Box>
+      }
+    />
   );
 };
 

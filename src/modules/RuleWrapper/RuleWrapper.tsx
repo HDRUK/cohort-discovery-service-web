@@ -49,23 +49,34 @@ import {
 import Close from "@mui/icons-material/Close";
 import useHoverable from "@/hooks/useHoverable";
 import useNodeActions from "@/hooks/useNodeActions";
+import { RenderProp, resolveRenderProp } from "./renderProp";
+
+export interface RuleCardState {
+  isSelected: boolean;
+  isHighlighted: boolean;
+  isDragging: boolean;
+  valid: boolean;
+  invalidReason: string[];
+}
 
 export interface RuleWrapperProps {
   node: RuleNodeType;
   groupId?: string;
-  children: ReactNode;
-  subTitle?: ReactNode;
-  parameters?: ReactNode;
-  invalidFooter?: ReactNode;
+  renderHeader?: RenderProp<[RuleCardState, ReactNode]>;
+  renderSubTitle?: RenderProp<[RuleCardState]>;
+  renderContent: RenderProp<[RuleCardState]>;
+  renderSubContent?: RenderProp<[RuleCardState]>;
+  renderFooter?: RenderProp<[RuleCardState, ReactNode]>;
 }
 
 const RuleWrapper = ({
   node,
   groupId,
-  children,
-  subTitle,
-  parameters,
-  invalidFooter,
+  renderHeader,
+  renderSubTitle,
+  renderContent,
+  renderSubContent,
+  renderFooter,
 }: RuleWrapperProps) => {
   const { id, valid = true, invalidReason } = node;
   const isOperatorNode = isOperator(node);
@@ -168,16 +179,62 @@ const RuleWrapper = ({
 
   const nodeName = useMemo(() => getNodeName(node), [node, getNodeName]);
 
-  const footer =
-    !isOperatorNode && !valid
-      ? (invalidFooter ??
-        ((invalidReason ?? []).length > 0 && (
-          <InvalidRule
-            reasons={invalidReason ?? []}
-            stackProps={{ sx: { pt: 1, pb: 1 } }}
+  const state: RuleCardState = {
+    isSelected,
+    isHighlighted,
+    isDragging: effectiveIsDragging,
+    valid,
+    invalidReason: invalidReason ?? [],
+  };
+
+  const defaultHeader = (
+    <CardHeader
+      sx={cardHeaderSx}
+      slotProps={{
+        title: {
+          component: "h2",
+          variant: "h5",
+        },
+      }}
+      title={
+        <Box width={"100%"} display={"flex"} justifyContent={"space-between"}>
+          <Box display={"flex"}>
+            {exclude !== undefined && (
+              <Chip
+                color={exclude == true ? "error" : "primary"}
+                sx={chipSx}
+                variant="outlined"
+                label={exclude == true ? "Exclude" : "Include"}
+              />
+            )}
+          </Box>
+          <Title
+            size={"small"}
+            title={type}
+            subTitle={resolveRenderProp(renderSubTitle, state)}
           />
-        )))
-      : null;
+        </Box>
+      }
+    />
+  );
+
+  const defaultFooter =
+    !isOperatorNode && !valid && state.invalidReason.length > 0 ? (
+      <InvalidRule
+        reasons={state.invalidReason}
+        stackProps={{ sx: { pt: 1, pb: 1 } }}
+      />
+    ) : null;
+
+  const header =
+    renderHeader === undefined
+      ? defaultHeader
+      : resolveRenderProp(renderHeader, state, defaultHeader);
+
+  const footer =
+    renderFooter === undefined
+      ? defaultFooter
+      : resolveRenderProp(renderFooter, state, defaultFooter);
 
   useLogDependencyChanges("wrapper " + node.id, {
     isSelected,
@@ -258,40 +315,11 @@ const RuleWrapper = ({
             onContextMenu={handleContextMenu}
             onClick={handleOnSelect}
           >
-            {!isOperatorNode && (
-              <CardHeader
-                sx={cardHeaderSx}
-                slotProps={{
-                  title: {
-                    component: "h2",
-                    variant: "h5",
-                  },
-                }}
-                title={
-                  <Box
-                    width={"100%"}
-                    display={"flex"}
-                    justifyContent={"space-between"}
-                  >
-                    <Box display={"flex"}>
-                      {exclude !== undefined && (
-                        <Chip
-                          color={exclude == true ? "error" : "primary"}
-                          sx={chipSx}
-                          variant="outlined"
-                          label={exclude == true ? "Exclude" : "Include"}
-                        />
-                      )}
-                    </Box>
-                    <Title size={"small"} title={type} subTitle={subTitle} />
-                  </Box>
-                }
-              />
-            )}
+            {header}
 
-            <CardContent>{children}</CardContent>
+            <CardContent>{resolveRenderProp(renderContent, state)}</CardContent>
 
-            {parameters}
+            {resolveRenderProp(renderSubContent, state)}
 
             <RightClickMenu {...rightClickMenuMethods} actions={actions} />
             {footer && (

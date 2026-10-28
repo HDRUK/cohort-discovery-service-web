@@ -10,9 +10,11 @@ export interface RuleGroupProps {
 
 const RuleGroup = ({ group, parentGroupId }: RuleGroupProps) => {
   return (
-    <RuleWrapper node={group} groupId={parentGroupId}>
-      <RuleBoard ruleGroup={group} />
-    </RuleWrapper>
+    <RuleWrapper
+      node={group}
+      groupId={parentGroupId}
+      renderContent={<RuleBoard ruleGroup={group} />}
+    />
   );
 };
 

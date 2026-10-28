@@ -36,14 +36,12 @@ const RuleAlternatives = ({ rule, groupId }: RuleAlternativesProps) => {
     queryBuilderJson,
     setQueryBuilderJson,
     showDescendants,
-    isSelected,
     select,
     deselect,
   } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
     showDescendants: qb.showDescendants[id],
-    isSelected: !!qb.selected[id],
     select: qb.select,
     deselect: qb.deselect,
   }));
@@ -143,77 +141,78 @@ const RuleAlternatives = ({ rule, groupId }: RuleAlternativesProps) => {
     [concept, setConcept],
   );
 
-  const footerMessages = [
-    isSelected
-      ? RuleErrors.CHOOSE_ALTERNATIVE
-      : RuleErrors.UNCONFIRMED_SELECTION,
-    ...(rule.invalidReason ?? []).filter(
-      (reason) => reason !== RuleErrors.HAS_ALTERNATIVES,
-    ),
-  ];
+  const otherReasons = (rule.invalidReason ?? []).filter(
+    (reason) => reason !== RuleErrors.HAS_ALTERNATIVES,
+  );
 
   return (
     <RuleWrapper
       node={rule}
       groupId={groupId}
-      subTitle={<DomainChip concept={concept} />}
-      parameters={<RuleParameters rule={rule} />}
-      invalidFooter={
+      renderSubTitle={<DomainChip concept={concept} />}
+      renderContent={
+        <Stack
+          component="form"
+          spacing="10px"
+          py="10px"
+          sx={{
+            maxHeight: DEFAULT_SEARCH_RESULTS_MAX_HEIGHT,
+            overflowY: "scroll",
+          }}
+        >
+          {conceptOptions.map((conceptOption) => (
+            <Stack
+              direction="row"
+              alignItems="center"
+              key={conceptOption.concept_id}
+              spacing={1}
+            >
+              <FormControlLabel
+                control={
+                  <SquareCheckbox
+                    checked={selectedConceptIds.includes(
+                      conceptOption.concept_id,
+                    )}
+                    onChange={() => toggleConcept(conceptOption.concept_id)}
+                    onClick={(e) => e.stopPropagation()}
+                    sx={{ p: 0 }}
+                  />
+                }
+                label=""
+                sx={{ m: 0 }}
+              />
+              <ConceptChip
+                indicateIfParent={showDescendants}
+                concept={conceptOption}
+                onDelete={(e) => {
+                  e.stopPropagation();
+                  handleDelete(conceptOption);
+                }}
+                onClick={(e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  toggleConcept(conceptOption.concept_id);
+                }}
+              />
+            </Stack>
+          ))}
+        </Stack>
+      }
+      renderSubContent={<RuleParameters rule={rule} />}
+      renderFooter={({ isSelected }) => (
         <RuleFooter
-          messages={footerMessages}
+          messages={[
+            isSelected
+              ? RuleErrors.CHOOSE_ALTERNATIVE
+              : RuleErrors.UNCONFIRMED_SELECTION,
+            ...otherReasons,
+          ]}
           showActions
           canConfirm={selectedConceptIds.length > 0}
           onConfirm={handleConfirm}
           onClear={clearAll}
         />
-      }
-    >
-      <Stack
-        component="form"
-        spacing="10px"
-        py="10px"
-        sx={{
-          maxHeight: DEFAULT_SEARCH_RESULTS_MAX_HEIGHT,
-          overflowY: "scroll",
-        }}
-      >
-        {conceptOptions.map((conceptOption) => (
-          <Stack
-            direction="row"
-            alignItems="center"
-            key={conceptOption.concept_id}
-            spacing={1}
-          >
-            <FormControlLabel
-              control={
-                <SquareCheckbox
-                  checked={selectedConceptIds.includes(
-                    conceptOption.concept_id,
-                  )}
-                  onChange={() => toggleConcept(conceptOption.concept_id)}
-                  onClick={(e) => e.stopPropagation()}
-                  sx={{ p: 0 }}
-                />
-              }
-              label=""
-              sx={{ m: 0 }}
-            />
-            <ConceptChip
-              indicateIfParent={showDescendants}
-              concept={conceptOption}
-              onDelete={(e) => {
-                e.stopPropagation();
-                handleDelete(conceptOption);
-              }}
-              onClick={(e: React.MouseEvent) => {
-                e.stopPropagation();
-                toggleConcept(conceptOption.concept_id);
-              }}
-            />
-          </Stack>
-        ))}
-      </Stack>
-    </RuleWrapper>
+      )}
+    />
   );
 };
 

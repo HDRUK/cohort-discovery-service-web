@@ -79,9 +79,22 @@ const Rule = ({ rule, groupId }: RuleProps) => {
     <RuleWrapper
       node={rule}
       groupId={groupId}
-      subTitle={!empty && <DomainChip concept={concept} />}
-      parameters={<RuleParameters rule={rule} />}
-      invalidFooter={
+      renderSubTitle={!empty && <DomainChip concept={concept} />}
+      renderContent={
+        <Box py={1}>
+          {empty ? (
+            <RuleSearch onSelect={() => select(id)} selection={selection} />
+          ) : (
+            <RuleConcept
+              rule={rule}
+              onChange={setConcept}
+              onClear={clearConcept}
+            />
+          )}
+        </Box>
+      }
+      renderSubContent={<RuleParameters rule={rule} />}
+      renderFooter={
         empty ? (
           <RuleFooter
             messages={
@@ -96,19 +109,7 @@ const Rule = ({ rule, groupId }: RuleProps) => {
           />
         ) : undefined
       }
-    >
-      <Box py={1}>
-        {empty ? (
-          <RuleSearch onSelect={() => select(id)} selection={selection} />
-        ) : (
-          <RuleConcept
-            rule={rule}
-            onChange={setConcept}
-            onClear={clearConcept}
-          />
-        )}
-      </Box>
-    </RuleWrapper>
+    />
   );
 };
 

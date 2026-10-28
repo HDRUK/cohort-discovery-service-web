@@ -20,22 +20,27 @@ const RuleOperator = ({
   const { combinator, valid = true, invalidReason } = operator;
 
   return (
-    <RuleWrapper node={operator} groupId={groupId}>
-      <Box sx={rootSx(hidden)}>
-        <Divider orientation="vertical" flexItem sx={dividerSx(valid)} />
+    <RuleWrapper
+      node={operator}
+      groupId={groupId}
+      renderHeader={null}
+      renderContent={
+        <Box sx={rootSx(hidden)}>
+          <Divider orientation="vertical" flexItem sx={dividerSx(valid)} />
 
-        <Box />
+          <Box />
 
-        <Box sx={{ maxWidth: 80, mx: "auto" }}>
-          <Chip
-            sx={chipSx}
-            label={combinator?.toUpperCase().replace("_", " ")}
-          />
+          <Box sx={{ maxWidth: 80, mx: "auto" }}>
+            <Chip
+              sx={chipSx}
+              label={combinator?.toUpperCase().replace("_", " ")}
+            />
+          </Box>
+
+          {valid ? <Box /> : <InvalidRule reasons={invalidReason ?? []} />}
         </Box>
-
-        {valid ? <Box /> : <InvalidRule reasons={invalidReason ?? []} />}
-      </Box>
-    </RuleWrapper>
+      }
+    />
   );
 };
 
