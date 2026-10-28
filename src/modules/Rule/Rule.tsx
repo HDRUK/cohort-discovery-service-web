@@ -8,7 +8,7 @@ import RuleSearch from "./RuleSearch";
 import RuleConcept from "./RuleConcept";
 
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import { isEmptyRule, updateById, isRuleLeaf } from "@/utils/rules";
+import { isEmptyRule, updateById, isRuleLeaf, RuleErrors } from "@/utils/rules";
 
 import RuleWrapper from "../RuleWrapper";
 import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
@@ -31,13 +31,13 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     rule: { concept },
   } = rule;
 
-  const { queryBuilderJson, setQueryBuilderJson, isSelected, select } =
-    useQueryBuilder((qb) => ({
+  const { queryBuilderJson, setQueryBuilderJson, select } = useQueryBuilder(
+    (qb) => ({
       queryBuilderJson: qb.queryBuilderJson,
       setQueryBuilderJson: qb.setQueryBuilderJson,
-      isSelected: !!qb.selected[id],
       select: qb.select,
-    }));
+    }),
+  );
 
   const setConcept = useCallback(
     (c: Concept | Concept[]) => {
@@ -81,6 +81,7 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
   const selection = useRuleConceptSelection(setConcept);
 
   const empty = isEmptyRule(rule);
+  const hasPendingSelection = selection.selectedConcepts.length > 0;
 
   return (
     <RuleWrapper
@@ -94,13 +95,15 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
       invalidFooter={
         empty ? (
           <RuleFooter
-            customInvalidRule={false}
-            handleConfirm={selection.handleConfirm}
-            clearAll={selection.clearAll}
-            invalidReason={rule.invalidReason}
-            selectedConceptsLength={selection.selectedConcepts.length}
-            isSelected={isSelected}
-            hasOptions={selection.hasOptions}
+            messages={
+              hasPendingSelection
+                ? [RuleErrors.UNCONFIRMED_SELECTION]
+                : (rule.invalidReason ?? [])
+            }
+            showActions={selection.hasOptions}
+            canConfirm={hasPendingSelection}
+            onConfirm={selection.handleConfirm}
+            onClear={selection.clearAll}
           />
         ) : undefined
       }

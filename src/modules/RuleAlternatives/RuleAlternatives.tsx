@@ -14,6 +14,7 @@ import {
   findRulesWithAlternatives,
   hasAlternatives,
   isRuleLeaf,
+  RuleErrors,
   updateById,
 } from "@/utils/rules";
 import { useCohortBuilderContext } from "@/providers/CohortBuilderProvider";
@@ -154,6 +155,15 @@ const RuleAlternatives = ({
     [concept, setConcept],
   );
 
+  const footerMessages = [
+    isSelected
+      ? RuleErrors.CHOOSE_ALTERNATIVE
+      : RuleErrors.UNCONFIRMED_SELECTION,
+    ...(rule.invalidReason ?? []).filter(
+      (reason) => reason !== RuleErrors.HAS_ALTERNATIVES,
+    ),
+  ];
+
   return (
     <RuleWrapper
       node={rule}
@@ -164,13 +174,11 @@ const RuleAlternatives = ({
       parameters={<RuleParameters rule={rule} />}
       invalidFooter={
         <RuleFooter
-          customInvalidRule={true}
-          handleConfirm={handleConfirm}
-          clearAll={clearAll}
-          invalidReason={rule.invalidReason}
-          selectedConceptsLength={selectedConceptIds.length}
-          isSelected={isSelected}
-          isNLP={true}
+          messages={footerMessages}
+          showActions
+          canConfirm={selectedConceptIds.length > 0}
+          onConfirm={handleConfirm}
+          onClear={clearAll}
         />
       }
       actions={actions}
