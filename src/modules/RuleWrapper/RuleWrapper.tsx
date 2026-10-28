@@ -62,6 +62,7 @@ export interface RuleCardState {
 export interface RuleWrapperProps {
   node: RuleNodeType;
   groupId?: string;
+  draggable?: boolean;
   renderHeader?: RenderProp<[RuleCardState, ReactNode]>;
   renderSubTitle?: RenderProp<[RuleCardState]>;
   renderContent: RenderProp<[RuleCardState]>;
@@ -72,6 +73,7 @@ export interface RuleWrapperProps {
 const RuleWrapper = ({
   node,
   groupId,
+  draggable = true,
   renderHeader,
   renderSubTitle,
   renderContent,
@@ -117,6 +119,7 @@ const RuleWrapper = ({
     listeners,
   } = useSortable({
     id,
+    disabled: { draggable: !draggable },
     data: {
       id,
       type,
@@ -270,13 +273,20 @@ const RuleWrapper = ({
     >
       <Box sx={headerRowSx}>
         <Collapse
-          in={showHandle || isInDragOverlay || effectiveIsDragging}
+          in={
+            draggable && (showHandle || isInDragOverlay || effectiveIsDragging)
+          }
           orientation="horizontal"
           collapsedSize={0}
           unmountOnExit
           sx={{ display: "flex", alignItems: "center" }}
         >
-          <Fade in={showHandle || isInDragOverlay || effectiveIsDragging}>
+          <Fade
+            in={
+              draggable &&
+              (showHandle || isInDragOverlay || effectiveIsDragging)
+            }
+          >
             <IconButton
               aria-label="Drag"
               data-draggable="true"

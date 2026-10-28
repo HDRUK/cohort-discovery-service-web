@@ -79,6 +79,7 @@ const Rule = ({ rule, groupId }: RuleProps) => {
     <RuleWrapper
       node={rule}
       groupId={groupId}
+      draggable={!hasPendingSelection}
       renderSubTitle={!empty && <DomainChip concept={concept} />}
       renderContent={
         <Box py={1}>

@@ -149,6 +149,7 @@ const RuleAlternatives = ({ rule, groupId }: RuleAlternativesProps) => {
     <RuleWrapper
       node={rule}
       groupId={groupId}
+      draggable={false}
       renderSubTitle={<DomainChip concept={concept} />}
       renderContent={
         <Stack
