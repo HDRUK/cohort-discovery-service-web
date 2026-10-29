@@ -8,9 +8,13 @@ import FilterDatasetsSkeleton from "./FilterDatasetsSkeleton";
 import useHasMounted from "@/hooks/useHasMounted";
 
 export const filterDatasetChipSx = {
+  border: 1,
+  borderColor: "grey.700",
   borderRadius: 10,
-  height: 30,
+  minHeight: 40,
   minWidth: 100,
+  px: 0.5,
+  py: 2.5,
 };
 
 const FilterDatasets = () => {
@@ -35,7 +39,7 @@ const FilterDatasets = () => {
       <Typography alignContent="center" sx={{ color: "error.main" }}>
         {noDatasets ? DatasetErrors.NO_DATASETS : undefined}
       </Typography>
-      <Title title="Filter" subTitle="Collections">
+      <Title centerTitleContent title="Filter /" sx={{ mr: 1.5 }}>
         <Tooltip
           title={noDatasets ? DatasetErrors.NO_DATASETS : undefined}
           variant="error"
@@ -50,7 +54,7 @@ const FilterDatasets = () => {
             }}
             sx={{
               bgcolor: open && !noDatasets ? "secondary.main" : "white",
-              color: open && !noDatasets ? "secondary.contrastText" : "inherit",
+              color: open && !noDatasets ? "white" : "secondaryBlack.main",
               ...filterDatasetChipSx,
             }}
             label={
@@ -65,10 +69,11 @@ const FilterDatasets = () => {
                 <Chip
                   label={selectedDatasets?.length ?? 0}
                   sx={{
-                    bgcolor: "background.default",
-                    color: "background.contrastText",
-                    borderRadius: 10,
-                    mr: 0.5,
+                    bgcolor: "tertiary.midnightBlue.main",
+                    color: "tertiary.midnightBlue.contrastText",
+                    borderRadius: 0.5,
+                    mr: 1,
+                    p: 0,
                   }}
                 />
                 <Typography variant="body1" color="inherit">
