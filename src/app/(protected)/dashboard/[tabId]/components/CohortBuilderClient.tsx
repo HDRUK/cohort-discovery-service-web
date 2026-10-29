@@ -89,12 +89,7 @@ const CohortBuilderClient = ({
             </Stack>
           </Stack>
 
-          <Title
-            fadedTitle
-            title={previewText ? "Preview /" : "Preview"}
-            subTitle=""
-            marginY={1}
-          >
+          <Title fadedTitle title={"Preview /"} subTitle="" marginY={1}>
             <CohortQueryPreview />
           </Title>
 
