@@ -42,6 +42,9 @@ const brandingTheme: ThemeOptions = {
     faded: {
       main: "#505A60",
     },
+    borderColor: {
+      main: "#868E96",
+    },
     sage: {
       main: "#C6D9D4",
     },

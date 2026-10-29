@@ -13,6 +13,7 @@ declare module "@mui/material/styles" {
     yellowCustom?: Palette["primary"];
     secondaryBlack: Palette["primary"];
     faded: Palette["primary"];
+    borderColor: Palette["primary"];
     sage: Palette["primary"];
     chart: { series: string[] };
   }
@@ -25,6 +26,7 @@ declare module "@mui/material/styles" {
     yellowCustom?: PaletteOptions["primary"];
     secondaryBlack: PaletteOptions["primary"];
     faded: PaletteOptions["primary"];
+    borderColor: PaletteOptions["primary"];
     sage?: PaletteOptions["primary"];
     chart?: { series: string[] };
   }
