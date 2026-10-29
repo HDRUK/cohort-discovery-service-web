@@ -1,15 +1,11 @@
 import { Theme } from "@mui/material/styles";
 import { SxProps } from "@mui/system";
 
-export const containerSx = (
-  isSelected: boolean,
-  rest?: SxProps<Theme>,
-): SxProps<Theme> => ({
+export const containerSx = (isSelected: boolean): SxProps<Theme> => ({
   border: 1,
   borderColor: isSelected ? "blue" : "transparent",
   p: 1,
   mx: 0.625,
-  ...rest,
 });
 
 export const headerRowSx: SxProps<Theme> = {
@@ -76,14 +72,6 @@ export const cardHeaderSx: SxProps<Theme> = {
   pb: 1,
 };
 
-export const cardActionsSx: SxProps<Theme> = {
-  borderTop: 1,
-  borderColor: "divider",
-  p: 0,
-  m: 0,
-  py: 1,
-};
-
 export const chipSx: SxProps<Theme> = {
   bgcolor: "white",
 };
@@ -106,3 +94,19 @@ export const selectedCaptionSx: SxProps<Theme> = {
   bgcolor: "blue",
   color: "white",
 };
+
+export const operatorCardSx = (
+  isSelected: boolean,
+  isHighlighted: boolean,
+): SxProps<Theme> => ({
+  border: 0,
+  bgcolor: isSelected
+    ? undefined
+    : isHighlighted
+      ? "highlight.main"
+      : "transparent",
+  "&:hover": {
+    bgcolor: isSelected ? undefined : "highlight.main",
+    cursor: "pointer",
+  },
+});

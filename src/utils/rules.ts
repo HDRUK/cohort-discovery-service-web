@@ -30,6 +30,8 @@ export enum RuleErrors {
   AGE_CONSTRAINT_IS_UNIDIRECTIONAL = "Age constraints needs to be unidirectional.",
   CANNOT_CONSTRAIN_AGE_AND_TIME = "A rule can only be constrained by either age OR time currently.",
   HAS_ALTERNATIVES = "The term has alternatives, please select the intended concept in the rule block(s) below.",
+  CHOOSE_ALTERNATIVE = "A rule has alternatives, please select one or more concepts",
+  UNCONFIRMED_SELECTION = "Please confirm or clear your changes before continuing",
   NO_QUERY_FOUND = "No valid query could be found for your search term.",
   DEMOGRAPHICS_BLOCK_IS_EMPTY = "Set at least one demographic filter, or add a rule, before running the query.",
 }

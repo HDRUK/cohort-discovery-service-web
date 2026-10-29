@@ -4,17 +4,22 @@ import useQueryBuilder from "@/hooks/useQueryBuilder";
 
 import { isRuleLeaf, updateById } from "@/utils/rules";
 import { RuleLeafType } from "@/types/rules";
-import AddChip from "@/components/AddChip";
-import { AddChipProps } from "@/components/AddChip/AddChip";
+import AddButton from "@/components/AddButton";
+import { AddButtonProps } from "@/components/AddButton/AddButton";
 import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
+import useHoverable from "@/hooks/useHoverable";
 
-type AddTimeframeChipProps = Omit<AddChipProps, "onClick"> & {
+type AddTimeFrameButtonProps = Omit<AddButtonProps, "onClick"> & {
   rule: RuleLeafType;
   hoverKey?: string;
   onClick?: () => void;
 };
 
-const AddTimeFrameButton = ({ rule, ...props }: AddTimeframeChipProps) => {
+const AddTimeFrameButton = ({
+  rule,
+  hoverKey,
+  ...props
+}: AddTimeFrameButtonProps) => {
   const {
     queryBuilderJson,
     setQueryBuilderJson,
@@ -27,7 +32,11 @@ const AddTimeFrameButton = ({ rule, ...props }: AddTimeframeChipProps) => {
     selected: qb.selected,
   }));
 
-  const onClick = () => {
+  const { setHoverRef, isHighlighted } =
+    useHoverable<HTMLButtonElement>(hoverKey);
+
+  const onClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setSelectedGuidance(
       collapsibleGuidanceKey("RuleTimeframeSelector", selected),
       true,
@@ -46,7 +55,14 @@ const AddTimeFrameButton = ({ rule, ...props }: AddTimeframeChipProps) => {
     );
   };
 
-  return <AddChip {...props} onClick={onClick} />;
+  return (
+    <AddButton
+      {...props}
+      ref={setHoverRef}
+      highlighted={isHighlighted}
+      onClick={onClick}
+    />
+  );
 };
 
 export default AddTimeFrameButton;

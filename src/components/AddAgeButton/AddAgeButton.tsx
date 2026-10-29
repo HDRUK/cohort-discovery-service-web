@@ -6,17 +6,18 @@ import { updateById } from "@/utils/rules";
 import { isRuleLeaf } from "@/utils/rules";
 
 import { RuleLeafType } from "@/types/rules";
-import AddChip from "@/components/AddChip";
-import { AddChipProps } from "@/components/AddChip/AddChip";
+import AddButton from "@/components/AddButton";
+import { AddButtonProps } from "@/components/AddButton/AddButton";
 import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
+import useHoverable from "@/hooks/useHoverable";
 
-type AddAgeChipProps = Omit<AddChipProps, "onClick"> & {
+type AddAgeButtonProps = Omit<AddButtonProps, "onClick"> & {
   rule: RuleLeafType;
   hoverKey?: string;
   onClick?: () => void;
 };
 
-const AddAgeButton = ({ rule, ...props }: AddAgeChipProps) => {
+const AddAgeButton = ({ rule, hoverKey, ...props }: AddAgeButtonProps) => {
   const {
     queryBuilderJson,
     setQueryBuilderJson,
@@ -29,7 +30,11 @@ const AddAgeButton = ({ rule, ...props }: AddAgeChipProps) => {
     selected: qb.selected,
   }));
 
-  const onClick = () => {
+  const { setHoverRef, isHighlighted } =
+    useHoverable<HTMLButtonElement>(hoverKey);
+
+  const onClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setSelectedGuidance(
       collapsibleGuidanceKey("RuleAgeSelector", selected),
       true,
@@ -48,7 +53,14 @@ const AddAgeButton = ({ rule, ...props }: AddAgeChipProps) => {
     );
   };
 
-  return <AddChip {...props} onClick={onClick} />;
+  return (
+    <AddButton
+      {...props}
+      ref={setHoverRef}
+      highlighted={isHighlighted}
+      onClick={onClick}
+    />
+  );
 };
 
 export default AddAgeButton;
