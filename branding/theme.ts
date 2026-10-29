@@ -39,12 +39,6 @@ const brandingTheme: ThemeOptions = {
     secondaryBlack: {
       main: "#3C3C3B",
     },
-    faded: {
-      main: "#505A60",
-    },
-    borderColor: {
-      main: "#868E96",
-    },
     sage: {
       main: "#C6D9D4",
     },

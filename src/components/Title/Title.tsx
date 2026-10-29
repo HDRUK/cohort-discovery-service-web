@@ -90,7 +90,7 @@ const Title = ({
             ...overflowStyles,
             display: "flex",
             ...(centerTitleContent && { alignItems: "center" }),
-            ...(fadedTitle && { fontWeight: 400, color: "faded.main" }),
+            ...(fadedTitle && { fontWeight: 400, color: "grey.600" }),
             gap: 1,
           }}
         >

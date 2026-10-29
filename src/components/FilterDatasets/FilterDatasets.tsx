@@ -9,7 +9,7 @@ import useHasMounted from "@/hooks/useHasMounted";
 
 export const filterDatasetChipSx = {
   border: 1,
-  borderColor: "borderColor.main",
+  borderColor: "grey.700",
   borderRadius: 10,
   minHeight: 40,
   minWidth: 100,
