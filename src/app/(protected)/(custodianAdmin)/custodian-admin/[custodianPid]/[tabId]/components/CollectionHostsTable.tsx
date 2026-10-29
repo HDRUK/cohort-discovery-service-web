@@ -13,6 +13,7 @@ interface CollectionHostsTableProps {
   rowSelection: MRT_RowSelectionState;
   setRowSelection: Dispatch<SetStateAction<MRT_RowSelectionState>>;
   onDelete: (ids: string[]) => void;
+  isDeletedView: boolean;
 }
 
 const CollectionHostsTable = ({
@@ -20,6 +21,7 @@ const CollectionHostsTable = ({
   rowSelection,
   setRowSelection,
   onDelete,
+  isDeletedView,
 }: CollectionHostsTableProps) => {
   const router = useRouter();
 
@@ -28,6 +30,12 @@ const CollectionHostsTable = ({
       {
         accessorKey: "name",
         header: "Name",
+        Cell: ({ row }) => (
+          <Box display="flex" alignItems="center" gap={1}>
+            {row.original.name}
+            {row.original.deleted_at && <Chip label="Deleted" color="error" />}
+          </Box>
+        ),
       },
       {
         accessorFn: (row) => row.collections,
@@ -72,7 +80,7 @@ const CollectionHostsTable = ({
         leftAction={{
           titleProps: {
             title: "Collection Hosts",
-            subTitle: "All",
+            subTitle: isDeletedView ? "Deleted" : "All",
             children: (
               <SortButton
                 fields={[
@@ -90,7 +98,7 @@ const CollectionHostsTable = ({
           },
         }}
         rightAction={{
-          deleteProps: { onClick: onDelete },
+          ...(!isDeletedView && { deleteProps: { onClick: onDelete } }),
         }}
       />
     </Box>

@@ -46,7 +46,7 @@ const ActionMenu: React.FC = () => {
         ))}
       </ActionMenuSection>
       <ActionMenuSection
-        title={"Hierarchy"}
+        title={"Query Structure"}
         defaultExpanded
         disabled={queryBuilderJson.rules.length === 0}
         underline
