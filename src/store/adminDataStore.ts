@@ -2,6 +2,7 @@ import { create } from "zustand";
 import createCollectionWithConfig from "@/actions/collection/createCollectionWithConfig";
 import updateCollectionWithConfig from "@/actions/collection/updateCollectionWithConfig";
 import deleteCollection from "@/actions/collection/deleteCollection";
+import restoreCollection from "@/actions/collection/restoreCollection";
 import createWorkgroup from "@/actions/workgroup/createWorkgroup";
 import addCollectionsToWorkgroup from "@/actions/workgroup/addCollectionsToWorkgroup";
 import removeCollectionsFromWorkgroup from "@/actions/workgroup/removeCollectionsFromWorkgroup";
@@ -70,6 +71,7 @@ export interface AdminDataStoreState {
     payloadConfig: Partial<CreateCollectionConfigPost>,
   ) => Promise<Collection>;
   deleteCollection: (id: number | string) => Promise<void>;
+  restoreCollection: (id: number | string) => Promise<void>;
 
   createWorkgroup: (payload: CreateWorkgroupPost) => Promise<Workgroup>;
 
@@ -160,6 +162,10 @@ export const useAdminDataStore = create<AdminDataStoreState>((set) => ({
 
   deleteCollection: async (id) => {
     await deleteCollection(id);
+  },
+
+  restoreCollection: async (id) => {
+    await restoreCollection(id);
   },
 
   createWorkgroup: async (payload) => {

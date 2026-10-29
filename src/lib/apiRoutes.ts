@@ -13,6 +13,8 @@ export const API_ROUTES = {
   parseQuery: `${API_URL}/parse-query`,
   collections: `${API_URL}/collections`,
   collection: (id: number | string) => `${API_URL}/collections/${id}`,
+  restoreCollection: (id: number | string) =>
+    `${API_URL}/collections/${id}/restore`,
   custodians: `${API_URL}/custodians`,
   custodian: (id: number | string) => `${API_URL}/custodians/${id}`,
   networks: `${API_URL}/custodian_networks`,
@@ -28,6 +30,8 @@ export const API_ROUTES = {
   queryResults: (queryPid: string) => `${API_URL}/query/${queryPid}/results`,
   collectionHosts: `${API_URL}/collection_hosts`,
   collectionHost: (id: number) => `${API_URL}/collection_hosts/${id}`,
+  restoreCollectionHost: (id: number) =>
+    `${API_URL}/collection_hosts/${id}/restore`,
   custodianCollectionHosts: (pid: string) =>
     `${API_URL}/custodians/${pid}/collection_hosts`,
   custodianCollections: (pid: string) =>

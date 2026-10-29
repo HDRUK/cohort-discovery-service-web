@@ -13,6 +13,7 @@ interface CollectionHostsTableProps {
   rowSelection: MRT_RowSelectionState;
   setRowSelection: Dispatch<SetStateAction<MRT_RowSelectionState>>;
   onDelete: (ids: string[]) => void;
+  onRestore: (ids: string[]) => void;
   isDeletedView: boolean;
 }
 
@@ -21,6 +22,7 @@ const CollectionHostsTable = ({
   rowSelection,
   setRowSelection,
   onDelete,
+  onRestore,
   isDeletedView,
 }: CollectionHostsTableProps) => {
   const router = useRouter();
@@ -98,7 +100,9 @@ const CollectionHostsTable = ({
           },
         }}
         rightAction={{
-          ...(!isDeletedView && { deleteProps: { onClick: onDelete } }),
+          ...(isDeletedView
+            ? { restoreProps: { onClick: onRestore } }
+            : { deleteProps: { onClick: onDelete } }),
         }}
       />
     </Box>
