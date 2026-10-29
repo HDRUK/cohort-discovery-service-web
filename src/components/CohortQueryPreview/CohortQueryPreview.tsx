@@ -21,6 +21,7 @@ const CohortQueryPreview = () => {
       justifyContent="space-between"
       alignItems="flex-start"
       width="100%"
+      color="secondaryBlack.main"
     >
       <Stack>
         <Typography>{previewText}</Typography>
