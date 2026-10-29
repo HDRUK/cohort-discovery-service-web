@@ -9,7 +9,22 @@ jest.mock("@/actions/collection/getCustodianCollections");
 jest.mock("@/actions/collection/getCollectionDetails");
 jest.mock("@/actions/custodian/getCustodian");
 
+let mockSearchParams = new URLSearchParams();
+
+jest.mock("next/navigation", () => ({
+  useSearchParams: () => mockSearchParams,
+  usePathname: () => "/admin/collections",
+  useRouter: () => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+  }),
+}));
+
 describe("CollectionsTable", () => {
+  beforeEach(() => {
+    mockSearchParams = new URLSearchParams();
+  });
+
   const renderCollectionsTableAdmin = (
     collections: Paginated<CollectionWithHosts>,
     props?: CollectionsTableProps,
@@ -81,5 +96,34 @@ describe("CollectionsTable", () => {
 
     expect(screen.getByText("Test Dataset #1")).toBeInTheDocument();
     expect(screen.getByText("Test Dataset #2")).toBeInTheDocument();
+  });
+
+  it("shows a deleted chip in place of the state for a deleted collection", async () => {
+    const collections = await getCustodianCollections("abc");
+    const [deleted, ...live] = collections.data.data;
+
+    renderCollectionsTableAdmin({
+      ...collections.data,
+      data: [{ ...deleted, deleted_at: "2026-10-01T00:00:00Z" }, ...live],
+    });
+
+    expect(screen.getAllByText("Deleted")).toHaveLength(1);
+  });
+
+  it("shows the delete button outside the deleted view", async () => {
+    const collections = await getCustodianCollections("abc");
+
+    renderCollectionsTableAdmin(collections.data);
+
+    expect(screen.getByTestId("DeleteIcon")).toBeInTheDocument();
+  });
+
+  it("hides the delete button on the deleted view", async () => {
+    mockSearchParams = new URLSearchParams("collection_filter=deleted");
+    const collections = await getCustodianCollections("abc");
+
+    renderCollectionsTableAdmin(collections.data);
+
+    expect(screen.queryByTestId("DeleteIcon")).not.toBeInTheDocument();
   });
 });

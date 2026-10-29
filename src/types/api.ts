@@ -25,6 +25,10 @@ export interface CollectionsSearchParams extends ApiSearchParams {
   collection_filter?: string; // collection status
 }
 
+export interface CollectionHostsSearchParams extends ApiSearchParams {
+  collection_host_filter?: string;
+}
+
 export interface QueryHistorySearchParams extends ApiSearchParams {
   query?: string;
   open_queries?: string[];
@@ -296,6 +300,7 @@ export interface Collection extends WithTimestamps {
   is_synthetic?: boolean;
   location_enabled?: boolean;
   death_enabled?: boolean;
+  deleted_at?: string | null;
 }
 
 export interface CollectionConfig {
@@ -564,6 +569,7 @@ export interface CollectionHost {
   client_secret: string;
   custodian: Custodian;
   collections: Collection[];
+  deleted_at?: string | null;
 }
 
 export type UrlString = `http${"s" | ""}://${string}`;
