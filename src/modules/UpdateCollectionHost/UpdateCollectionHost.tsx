@@ -2,7 +2,7 @@
 import { Stack } from "@mui/material";
 import { useRouter } from "next/navigation";
 import CopyableVariable from "@/components/CopyableVariable";
-import { CollectionHost } from "@/types/api";
+import { CollectionHostWithCredentials } from "@/types/api";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useCallback, useEffect, useMemo } from "react";
 import { useNotify } from "@/providers/NotifyProvider";
@@ -19,7 +19,7 @@ import { routes } from "@/config/routes";
 type CollectionHostFormValues = { hostName: string };
 
 export type UpdateCollectionHostProps = {
-  selectedCollectionHost: CollectionHost;
+  selectedCollectionHost: CollectionHostWithCredentials;
 };
 
 const UpdateCollectionHost = ({

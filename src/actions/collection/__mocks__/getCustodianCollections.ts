@@ -8,7 +8,7 @@ const getCustodianCollections = async (
 ): Promise<ApiResponse<Paginated<CollectionWithHosts>>> => {
   const collectionWithHost = getMockCollections().map((c) => ({
     ...c,
-    host: getCollectionHost(),
+    host: [getCollectionHost()],
   })) as CollectionWithHosts[];
 
   return {

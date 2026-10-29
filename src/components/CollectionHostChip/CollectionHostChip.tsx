@@ -1,5 +1,5 @@
 import { Chip } from "@mui/material";
-import { CollectionHost } from "@/types/api";
+import { CollectionHostWithCredentials } from "@/types/api";
 import ShowOnClick from "../ShowOnClick";
 import CodeBlock from "../CodeBlock";
 
@@ -8,7 +8,7 @@ const CollectionHostChip = ({
   disabled = false,
   ...rest
 }: {
-  ch?: CollectionHost;
+  ch?: CollectionHostWithCredentials;
   disabled?: boolean;
 }) => {
   if (!ch) return;
