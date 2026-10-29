@@ -27,11 +27,11 @@ function renderRule(item: RuleNodeType) {
       return <RuleAlternatives rule={item} />;
     if (isMultipleConcept(item.rule.concept))
       return <RuleMultiConcept rule={item} />;
-    return <Rule rule={item} forceShowHandle />;
+    return <Rule rule={item} />;
   } else if (isRuleGroup(item)) {
-    return <RuleGroup group={item} forceShowHandle />;
+    return <RuleGroup group={item} />;
   } else if (isOperator(item)) {
-    return <RuleOperator operator={item} forceShowHandle />;
+    return <RuleOperator operator={item} />;
   }
 }
 

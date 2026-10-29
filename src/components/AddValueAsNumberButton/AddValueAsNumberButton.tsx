@@ -3,11 +3,12 @@
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { updateById, isRuleLeaf } from "@/utils/rules";
 import { RuleLeafType } from "@/types/rules";
-import AddChip from "@/components/AddChip";
-import { AddChipProps } from "@/components/AddChip/AddChip";
+import AddButton from "@/components/AddButton";
+import { AddButtonProps } from "@/components/AddButton/AddButton";
 import { collapsibleGuidanceKey } from "@/utils/queryBuilder";
+import useHoverable from "@/hooks/useHoverable";
 
-type AddValueAsNumberButtonProps = Omit<AddChipProps, "onClick"> & {
+type AddValueAsNumberButtonProps = Omit<AddButtonProps, "onClick"> & {
   rule: RuleLeafType;
   hoverKey?: string;
   onClick?: () => void;
@@ -15,6 +16,7 @@ type AddValueAsNumberButtonProps = Omit<AddChipProps, "onClick"> & {
 
 const AddValueAsNumberButton = ({
   rule,
+  hoverKey,
   ...props
 }: AddValueAsNumberButtonProps) => {
   const {
@@ -29,7 +31,11 @@ const AddValueAsNumberButton = ({
     selected: qb.selected,
   }));
 
-  const onClick = () => {
+  const { setHoverRef, isHighlighted } =
+    useHoverable<HTMLButtonElement>(hoverKey);
+
+  const onClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setSelectedGuidance(
       collapsibleGuidanceKey("RuleValueAsNumberSelector", selected),
       true,
@@ -46,7 +52,14 @@ const AddValueAsNumberButton = ({
     );
   };
 
-  return <AddChip {...props} onClick={onClick} />;
+  return (
+    <AddButton
+      {...props}
+      ref={setHoverRef}
+      highlighted={isHighlighted}
+      onClick={onClick}
+    />
+  );
 };
 
 export default AddValueAsNumberButton;

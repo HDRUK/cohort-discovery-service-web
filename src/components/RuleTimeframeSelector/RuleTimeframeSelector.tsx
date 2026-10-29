@@ -97,7 +97,7 @@ const RuleTimeframeSelector = ({
   if (constrainForBunnyV1) {
     return (
       <HoverableDiv
-        stopPropagation={!readOnly}
+        stopPropagation
         hoverKey={`rule-timeframe-${rule.id}`}
         flex={flex}
       >
@@ -145,7 +145,7 @@ const RuleTimeframeSelector = ({
 
   return (
     <HoverableDiv
-      stopPropagation={!readOnly}
+      stopPropagation
       hoverKey={`rule-timeframe-${rule.id}`}
       flex={flex}
     >

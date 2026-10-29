@@ -1,19 +1,16 @@
 import {
   Box,
-  BoxProps,
   IconButton,
   Skeleton,
   Card,
   CardHeader,
   Chip,
   CardContent,
-  CardProps,
   Collapse,
-  CardActions,
   Fade,
   Divider,
 } from "@mui/material";
-import { ReactNode, RefObject, useCallback, useMemo, useState } from "react";
+import { ReactNode, useCallback, useMemo, useState } from "react";
 import useSortable from "@/hooks/useSortable";
 import { useCohortBuilderContext } from "@/providers/CohortBuilderProvider";
 import useIsInDragOverlay from "@/hooks/useIsInDragOverlay";
@@ -30,79 +27,66 @@ import {
   skeletonSx,
   cardSx,
   cardHeaderSx,
-  cardActionsSx,
   chipSx,
   selectedCaptionSx,
   headerRowSx,
+  operatorCardSx,
 } from "./RuleWrapper.styles";
 import { RuleNodeType } from "@/types/rules";
 import EditableText from "@/components/EditableText";
 import { useLogDependencyChanges } from "@/utils/deps";
-import RuleTimeframeSelector from "@/components/RuleTimeframeSelector";
 import InvalidRule from "@/components/InvalidRule";
 import Title from "@/components/Title";
 import useRightClickMenu from "@/hooks/useRightClickMenu";
 import RightClickMenu from "@/components/RightClickMenu/RightClickMenu";
 import { mergeSx } from "@/utils/helpers";
-import RuleAgeSelector from "@/components/RuleAgeSelector";
 import {
-  getPrimaryConcept,
   isAgeFilter,
-  isEmptyRule,
-  isRuleLeaf,
+  isOperator,
+  isRuleGroup,
   removeById,
 } from "@/utils/rules";
-import { isValueAsNumberDomain } from "@/utils/omop";
-import useFeatures from "@/hooks/useFeatures";
 import Close from "@mui/icons-material/Close";
 import useHoverable from "@/hooks/useHoverable";
-import AddTimeframeButton from "@/components/AddTimeFrameButton";
-import AddAgeButton from "@/components/AddAgeButton";
-import RuleValueAsNumberSelector from "@/components/RuleValueAsNumberSelector";
-import AddValueAsNumberButton from "@/components/AddValueAsNumberButton";
+import useNodeActions from "@/hooks/useNodeActions";
+import { RenderProp, resolveRenderProp } from "./renderProp";
 
-interface Action {
-  action: () => void;
-  label: string;
+export interface RuleCardState {
+  isSelected: boolean;
+  isHighlighted: boolean;
+  isDragging: boolean;
+  valid: boolean;
+  invalidReason: string[];
 }
 
-export interface RuleWrapperProps extends BoxProps {
+export interface RuleWrapperProps {
   node: RuleNodeType;
-  type: DragType.Rule | DragType.Group | DragType.Operator;
-  headerExtra?: ReactNode;
-  hideHeader?: boolean;
-  renderInHeader?: boolean;
   groupId?: string;
-  sortable?: boolean;
-  cardProps?: CardProps;
-  containerProps?: BoxProps;
-  render: (
-    rule: RuleNodeType,
-    ref?: RefObject<HTMLDivElement | HTMLLIElement | null>,
-  ) => ReactNode;
-  actions?: Action[];
-  forceShowHandle?: boolean;
-  useLeftDragPlaceHolder?: boolean;
-  renderFooter?: ReactNode;
+  draggable?: boolean;
+  renderHeader?: RenderProp<[RuleCardState, ReactNode]>;
+  renderSubTitle?: RenderProp<[RuleCardState]>;
+  renderContent: RenderProp<[RuleCardState]>;
+  renderSubContent?: RenderProp<[RuleCardState]>;
+  renderFooter?: RenderProp<[RuleCardState, ReactNode]>;
 }
 
 const RuleWrapper = ({
   node,
-  type,
   groupId,
-  headerExtra,
-  hideHeader = false,
-  renderInHeader = false,
-  sortable = true,
-  cardProps: { sx: cardPropsSx, ...cardProps } = {},
-  containerProps = undefined,
-  render,
-  actions,
-  forceShowHandle = false,
-  useLeftDragPlaceHolder = false,
+  draggable = true,
+  renderHeader,
+  renderSubTitle,
+  renderContent,
+  renderSubContent,
   renderFooter,
 }: RuleWrapperProps) => {
   const { id, valid = true, invalidReason } = node;
+  const isOperatorNode = isOperator(node);
+  const type = isRuleGroup(node)
+    ? DragType.Group
+    : isOperatorNode
+      ? DragType.Operator
+      : DragType.Rule;
 
   let exclude;
   if (!isAgeFilter(node)) {
@@ -125,8 +109,6 @@ const RuleWrapper = ({
     setQueryBuilderJson: qb.setQueryBuilderJson,
   }));
 
-  const { constrainForBunnyV1, queryBuilderUseValueAsNumber } = useFeatures();
-
   const {
     setNodeRef,
     style,
@@ -137,6 +119,7 @@ const RuleWrapper = ({
     listeners,
   } = useSortable({
     id,
+    disabled: { draggable: !draggable },
     data: {
       id,
       type,
@@ -190,6 +173,7 @@ const RuleWrapper = ({
   }, [showHandle, effectiveIsDragging, setShowHandle, setShowDelete]);
 
   const { handleContextMenu, ...rightClickMenuMethods } = useRightClickMenu();
+  const { actions } = useNodeActions(node);
 
   const handleDelete = useCallback(() => {
     const newQuery = removeById(queryBuilderJson, id);
@@ -198,9 +182,62 @@ const RuleWrapper = ({
 
   const nodeName = useMemo(() => getNodeName(node), [node, getNodeName]);
 
-  const showFooter =
-    (type === DragType.Rule && isSelected && !isAgeFilter(node)) ||
-    (!valid && (invalidReason ?? []).length > 0);
+  const state: RuleCardState = {
+    isSelected,
+    isHighlighted,
+    isDragging: effectiveIsDragging,
+    valid,
+    invalidReason: invalidReason ?? [],
+  };
+
+  const defaultHeader = (
+    <CardHeader
+      sx={cardHeaderSx}
+      slotProps={{
+        title: {
+          component: "h2",
+          variant: "h5",
+        },
+      }}
+      title={
+        <Box width={"100%"} display={"flex"} justifyContent={"space-between"}>
+          <Box display={"flex"}>
+            {exclude !== undefined && (
+              <Chip
+                color={exclude == true ? "error" : "primary"}
+                sx={chipSx}
+                variant="outlined"
+                label={exclude == true ? "Exclude" : "Include"}
+              />
+            )}
+          </Box>
+          <Title
+            size={"small"}
+            title={type}
+            subTitle={resolveRenderProp(renderSubTitle, state)}
+          />
+        </Box>
+      }
+    />
+  );
+
+  const defaultFooter =
+    !isOperatorNode && !valid && state.invalidReason.length > 0 ? (
+      <InvalidRule
+        reasons={state.invalidReason}
+        stackProps={{ sx: { pt: 1, pb: 1 } }}
+      />
+    ) : null;
+
+  const header =
+    renderHeader === undefined
+      ? defaultHeader
+      : resolveRenderProp(renderHeader, state, defaultHeader);
+
+  const footer =
+    renderFooter === undefined
+      ? defaultFooter
+      : resolveRenderProp(renderFooter, state, defaultFooter);
 
   useLogDependencyChanges("wrapper " + node.id, {
     isSelected,
@@ -220,9 +257,7 @@ const RuleWrapper = ({
     isDragging,
     attributes,
     listeners,
-    containerProps,
     cardHeaderSx,
-    cardProps,
     headerRowSx,
   });
 
@@ -231,27 +266,33 @@ const RuleWrapper = ({
       rule-id={id}
       data-testid="sortable-rule"
       ref={setNodeRef}
-      style={sortable ? style : {}}
-      {...containerProps}
+      style={style}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      sx={containerSx(isSelected && !effectiveIsDragging, containerProps?.sx)}
+      sx={containerSx(isSelected && !effectiveIsDragging)}
     >
       <Box sx={headerRowSx}>
         <Collapse
-          in={showHandle || forceShowHandle || effectiveIsDragging}
+          in={
+            draggable && (showHandle || isInDragOverlay || effectiveIsDragging)
+          }
           orientation="horizontal"
           collapsedSize={0}
           unmountOnExit
           sx={{ display: "flex", alignItems: "center" }}
         >
-          <Fade in={showHandle || forceShowHandle || effectiveIsDragging}>
+          <Fade
+            in={
+              draggable &&
+              (showHandle || isInDragOverlay || effectiveIsDragging)
+            }
+          >
             <IconButton
               aria-label="Drag"
               data-draggable="true"
               size="small"
-              {...(sortable ? attributes : {})}
-              {...(sortable ? listeners : {})}
+              {...attributes}
+              {...listeners}
               sx={dragButtonSx}
             >
               <DragIndicator
@@ -275,140 +316,34 @@ const RuleWrapper = ({
             data-draggable="true"
             component="div"
             data-testid="clickable-card"
-            sx={mergeSx(cardSx(isSelected, valid, isHighlighted), cardPropsSx)}
+            sx={mergeSx(
+              cardSx(isSelected, valid, isHighlighted),
+              isOperatorNode
+                ? operatorCardSx(isSelected, isHighlighted)
+                : undefined,
+            )}
             onContextMenu={handleContextMenu}
             onClick={handleOnSelect}
-            {...cardProps}
           >
-            {!hideHeader && (
-              <CardHeader
-                sx={cardHeaderSx}
-                slotProps={{
-                  title: {
-                    component: "h2",
-                    variant: "h5",
-                  },
-                }}
-                title={
-                  <>
-                    <Box
-                      width={"100%"}
-                      display={"flex"}
-                      justifyContent={"space-between"}
-                    >
-                      <Box display={"flex"}>
-                        {exclude !== undefined && (
-                          <Chip
-                            color={exclude == true ? "error" : "primary"}
-                            sx={chipSx}
-                            variant="outlined"
-                            label={exclude == true ? "Exclude" : "Include"}
-                          />
-                        )}
-                      </Box>
-                      <Title
-                        size={"small"}
-                        title={type}
-                        subTitle={headerExtra}
-                      />
-                    </Box>
-                    {renderInHeader && render(node)}
-                  </>
-                }
-              />
-            )}
+            {header}
 
-            {!renderInHeader && (
-              <CardContent>{render(node, anchorRef)}</CardContent>
-            )}
+            <CardContent>{resolveRenderProp(renderContent, state)}</CardContent>
 
-            {isRuleLeaf(node) &&
-              type === DragType.Rule &&
-              !isEmptyRule(node) &&
-              !["Gender", "Race"].includes(
-                getPrimaryConcept(node.rule.concept)?.category || "",
-              ) &&
-              (node.timeConstraint ||
-                node.ageConstraint ||
-                (queryBuilderUseValueAsNumber && node.valueAsNumber) ||
-                isSelected) && (
-                <CardActions sx={cardActionsSx}>
-                  {node.timeConstraint ? (
-                    <RuleTimeframeSelector
-                      data-testid="rule-timeframe-selector"
-                      rule={node}
-                      readOnly={true}
-                      flex
-                    />
-                  ) : isSelected ? (
-                    <AddTimeframeButton
-                      label="Add timeframe"
-                      rule={node}
-                      key="RuleTimeframeSelector"
-                      hoverKey={`rule-timeframe-${node.id}`}
-                    />
-                  ) : null}
-                  {node.ageConstraint ? (
-                    <RuleAgeSelector
-                      rule={node}
-                      readOnly={true}
-                      uniDirectional={constrainForBunnyV1}
-                      flex
-                    />
-                  ) : isSelected ? (
-                    <AddAgeButton
-                      label="Add age"
-                      rule={node}
-                      key="RuleAgeSelector"
-                      hoverKey={`rule-age-${node.id}`}
-                    />
-                  ) : null}
-                  {queryBuilderUseValueAsNumber &&
-                    isValueAsNumberDomain(node.rule.concept) &&
-                    (node.valueAsNumber ? (
-                      <RuleValueAsNumberSelector
-                        rule={node}
-                        readOnly={true}
-                        flex
-                      />
-                    ) : isSelected ? (
-                      <AddValueAsNumberButton
-                        label="Add value"
-                        rule={node}
-                        key="RuleValueAsNumberSelector"
-                        hoverKey={`rule-value-as-number-${node.id}`}
-                      />
-                    ) : null)}
-                </CardActions>
-              )}
+            {resolveRenderProp(renderSubContent, state)}
 
             <RightClickMenu {...rightClickMenuMethods} actions={actions} />
-            {(type === DragType.Rule || type === DragType.Group) && (
+            {footer && (
               <>
-                {showFooter && <Divider variant="fullWidth" />}
-                <Box
-                  minHeight={
-                    type === DragType.Rule && isSelected && !isAgeFilter(node)
-                      ? 40
-                      : 0
-                  }
-                >
-                  {!valid &&
-                    (renderFooter || (
-                      <InvalidRule
-                        reasons={invalidReason ?? []}
-                        stackProps={{ sx: { pt: 1, pb: 1 } }}
-                      />
-                    ))}
-                </Box>
+                <Divider variant="fullWidth" />
+                {footer}
               </>
             )}
           </Card>
         )}
 
-        {useLeftDragPlaceHolder && (
+        {isOperatorNode && (
           <Collapse
-            in={showHandle || forceShowHandle || effectiveIsDragging}
+            in={showHandle || isInDragOverlay || effectiveIsDragging}
             orientation="horizontal"
             collapsedSize={0}
             unmountOnExit
@@ -423,18 +358,18 @@ const RuleWrapper = ({
           </Collapse>
         )}
         <Collapse
-          in={showDelete || forceShowHandle}
+          in={showDelete || isInDragOverlay}
           orientation="horizontal"
           collapsedSize={0}
           unmountOnExit
           sx={{ display: "flex", alignItems: "center" }}
         >
-          <Fade in={showDelete || forceShowHandle}>
+          <Fade in={showDelete || isInDragOverlay}>
             <IconButton
               aria-label="Delete"
               size="small"
-              {...(sortable ? attributes : {})}
-              {...(sortable ? listeners : {})}
+              {...attributes}
+              {...listeners}
               sx={deleteButtonSx}
               onClick={handleDelete}
             >
