@@ -32,6 +32,7 @@ const CohortBuilderClient = ({
   const router = useRouter();
   const { searchParams } = useSearchParams();
   const urlQueryPid = searchParams.get("query");
+  const previewText = useQueryBuilder((qb) => qb.queryAsText);
 
   const { setHelpTooltipOpen } = useQueryBuilder((qb) => ({
     setHelpTooltipOpen: qb.setHelpTooltipOpen,

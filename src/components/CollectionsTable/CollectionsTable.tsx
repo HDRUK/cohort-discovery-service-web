@@ -6,7 +6,7 @@ import {
   type MRT_ColumnDef,
 } from "material-react-table";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Paper, Stack, Typography } from "@mui/material";
+import { Chip, Paper, Stack, Typography } from "@mui/material";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import Table from "@/components/Table";
 import CopyableVariable from "../CopyableVariable";
@@ -33,6 +33,7 @@ import usePrefetchCollectionDetails from "./usePrefetchCollectionDetails";
 import useFeatures from "@/hooks/useFeatures";
 import { useQueryClient } from "@tanstack/react-query";
 import { revalidateAction } from "@/actions/revalidate";
+import { CollectionFilterStatus } from "@/types/collections";
 
 export interface CollectionsTableProps extends TableProps {
   showPid?: boolean;
@@ -53,6 +54,7 @@ const CollectionsTable = ({
   const { adminMoreCollectionDetails } = useFeatures();
   const { searchParams, getSearchParam } = useSearchParams("collection_filter");
   const filter_name = getSearchParam() || "all";
+  const isDeletedView = filter_name === CollectionFilterStatus.DELETED;
 
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
 
@@ -195,7 +197,11 @@ const CollectionsTable = ({
           const status = cell.getValue<CollectionStatus>();
           return (
             <Stack gap={1} direction={"row"}>
-              <StatusChip state_id={status} />{" "}
+              {row.original.deleted_at ? (
+                <Chip label="Deleted" color="error" />
+              ) : (
+                <StatusChip state_id={status} />
+              )}{" "}
               <SyntheticChip isSynthetic={!!row.original?.is_synthetic} />
             </Stack>
           );
@@ -239,10 +245,17 @@ const CollectionsTable = ({
   });
 
   const handleDeleteClick = async () => {
+    const isPlural = selectedCollections.length > 1;
     const ok = await confirm({
       props: {
-        action: `delete the collection${selectedCollections.length > 1 ? "s" : ""} ${selectedCollections.map((c) => c.name).join(", ")}`,
+        action: `delete the collection${isPlural ? "s" : ""} ${selectedCollections.map((c) => c.name).join(", ")}`,
       },
+      title: deleteOverride
+        ? "Confirm"
+        : `Delete collection${isPlural ? "s" : ""}`,
+      ...(!deleteOverride && {
+        description: `${selectedCollections.map((c) => c.name).join(", ")} will be hidden from users and will stop receiving queries. ${isPlural ? "They" : "It"} can be restored from Deleted Collections.`,
+      }),
       confirmText: "Delete",
       confirmColor: "error",
     });
@@ -311,9 +324,11 @@ const CollectionsTable = ({
         },
       }}
       rightAction={{
-        deleteProps: {
-          onClick: handleDeleteClick,
-        },
+        ...(!isDeletedView && {
+          deleteProps: {
+            onClick: handleDeleteClick,
+          },
+        }),
         refreshProps: {
           tag:
             currentCustodian?.pid && !isAdmin
