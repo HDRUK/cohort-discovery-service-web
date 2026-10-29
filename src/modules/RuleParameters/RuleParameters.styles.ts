@@ -8,5 +8,5 @@ export const parametersRowSx: SxProps<Theme> = {
   flexWrap: "wrap",
   gap: 1,
   py: 1,
-  minHeight: 56,
+  minHeight: 76,
 };
