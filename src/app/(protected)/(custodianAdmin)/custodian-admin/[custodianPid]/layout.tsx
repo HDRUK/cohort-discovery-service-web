@@ -1,6 +1,7 @@
 import getCustodian from "@/actions/custodian/getCustodian";
 import getCustodianCollectionHosts from "@/actions/collectionHost/getCustodianCollectionHosts";
 import { CustodianSectionProvider } from "@/contexts/CustodianSectionContext";
+import { toCollectionHostSummary } from "@/utils/collectionHosts";
 
 type Params = Promise<{ custodianPid: string }>;
 
@@ -21,7 +22,7 @@ const ProtectedCustodianPageLayout = async ({
   return (
     <CustodianSectionProvider
       custodian={custodian}
-      collectionHosts={collectionHosts}
+      collectionHosts={collectionHosts?.map(toCollectionHostSummary)}
     >
       {children}
     </CustodianSectionProvider>

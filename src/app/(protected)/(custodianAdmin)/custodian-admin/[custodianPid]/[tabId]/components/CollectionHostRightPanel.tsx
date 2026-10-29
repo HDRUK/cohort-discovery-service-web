@@ -3,7 +3,7 @@ import UpdateCollectionHost, {
 } from "@/modules/UpdateCollectionHost";
 import { maskClientTest } from "@/lib/maskClientTest";
 import { CollectionHostGuidanceProps } from "./CollectionHostGuidance";
-import { CollectionHost } from "@/types/api";
+import { CollectionHostWithCredentials } from "@/types/api";
 import { useThreePane } from "@/providers/ThreePaneProvider";
 
 const CollectionHostGuidance = maskClientTest<CollectionHostGuidanceProps>(
@@ -14,7 +14,7 @@ interface CollectionHostRightPanelProps extends Omit<
   UpdateCollectionHostProps,
   "selectedCollectionHost"
 > {
-  selectedCollectionHost: CollectionHost | null;
+  selectedCollectionHost: CollectionHostWithCredentials | null;
 }
 
 const CollectionsRightPanel = ({

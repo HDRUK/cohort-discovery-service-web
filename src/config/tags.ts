@@ -8,6 +8,12 @@ export const TAG_QUERIES = "queries";
 export const getCollectionHostTag = (custodianPid: string) =>
   `collection-host-${custodianPid}`;
 
+export const getTagsCollectionHostCredentials = (hostId?: number) => [
+  TAG_COLLECTION_HOSTS,
+  "credentials",
+  hostId,
+];
+
 export const getTagsUserCollections = (userId: string | number) =>
   `${TAG_COLLECTIONS_USER}-${userId}`;
 

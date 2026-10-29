@@ -192,4 +192,51 @@ describe("UpdateCollection", () => {
       false,
     );
   });
+  describe("host credentials", () => {
+    const fetchMock = jest.fn();
+
+    beforeEach(() => {
+      fetchMock.mockReset();
+      global.fetch = fetchMock;
+    });
+
+    it("shows the credentials fetched for the collection's host", async () => {
+      fetchMock.mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          id: 11,
+          client_id: "client-id-11",
+          client_secret: "client-secret-11",
+        }),
+      });
+
+      renderComponent({ host: [getCollectionHost({ id: 11 })] });
+
+      expect(
+        await screen.findByDisplayValue("client-id-11"),
+      ).toBeInTheDocument();
+      expect(screen.getByDisplayValue("client-secret-11")).toBeInTheDocument();
+      expect(fetchMock).toHaveBeenCalledWith(
+        "/api/collection-hosts/11",
+        expect.objectContaining({ cache: "no-store" }),
+      );
+    });
+
+    it("explains when the credentials can't be loaded", async () => {
+      fetchMock.mockResolvedValue({ ok: false, status: 403 });
+
+      renderComponent({ host: [getCollectionHost({ id: 12 })] });
+
+      expect(
+        await screen.findByText(/couldn.t load this host.s credentials/i),
+      ).toBeInTheDocument();
+    });
+
+    it("explains when the collection has no host", () => {
+      renderComponent({ host: [] });
+
+      expect(screen.getByText(/has no host yet/i)).toBeInTheDocument();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+  });
 });
