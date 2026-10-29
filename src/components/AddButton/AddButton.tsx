@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   ButtonProps,
   CircularProgress,
@@ -39,36 +40,44 @@ const AddButton = ({
 
   const isDisabled = Boolean(disabled) || loading;
 
+  const stopPropagation = (e: React.MouseEvent) => e.stopPropagation();
+
   return (
     <>
       {compact ? (
         <Tooltip title={`Add ${label}`} disableHoverListener={!compact}>
-          <span>
+          <span onClick={stopPropagation}>
             <IconButton disabled={isDisabled} onClick={handleClick}>
               {loading ? <CircularProgress size={20} /> : <AddIcon />}
             </IconButton>
           </span>
         </Tooltip>
       ) : (
-        <Button
-          variant="text"
-          startIcon={loading ? <CircularProgress size={20} /> : <AddIcon />}
-          disabled={isDisabled}
-          onClick={handleClick}
-          sx={{
-            justifyContent: "flex-start",
-            textAlign: "left",
-            color: "text.primary",
-            ...(highlighted && { backgroundColor: "highlight.main" }),
-            "&.MuiButton-root:hover": {
-              backgroundColor: "highlight.main",
-            },
-            ...buttonSx,
-          }}
-          {...rest}
+        <Box
+          component="span"
+          onClick={stopPropagation}
+          sx={{ display: "inline-flex" }}
         >
-          {label}
-        </Button>
+          <Button
+            variant="text"
+            startIcon={loading ? <CircularProgress size={20} /> : <AddIcon />}
+            disabled={isDisabled}
+            onClick={handleClick}
+            sx={{
+              justifyContent: "flex-start",
+              textAlign: "left",
+              color: "text.primary",
+              ...(highlighted && { backgroundColor: "highlight.main" }),
+              "&.MuiButton-root:hover": {
+                backgroundColor: "highlight.main",
+              },
+              ...buttonSx,
+            }}
+            {...rest}
+          >
+            {label}
+          </Button>
+        </Box>
       )}
     </>
   );
