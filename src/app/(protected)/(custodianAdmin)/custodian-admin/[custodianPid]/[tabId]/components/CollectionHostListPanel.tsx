@@ -2,12 +2,12 @@
 import { Dispatch, SetStateAction } from "react";
 import { Box, Typography } from "@mui/material";
 import { MRT_RowSelectionState } from "material-react-table";
-import { CollectionHost } from "@/types/api";
+import { CollectionHostWithCredentials } from "@/types/api";
 import CollectionHostsTable from "./CollectionHostsTable";
 
 type CollectionHostListPanelProps = {
   noCollectionHosts: boolean;
-  collectionHosts: CollectionHost[];
+  collectionHosts: CollectionHostWithCredentials[];
   rowSelection: MRT_RowSelectionState;
   setRowSelection: Dispatch<SetStateAction<MRT_RowSelectionState>>;
   onDeleteHost: () => void;

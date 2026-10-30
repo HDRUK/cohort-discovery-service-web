@@ -2,7 +2,7 @@
 import { useState, useMemo } from "react";
 import { Box, Skeleton } from "@mui/material";
 import Title from "@/components/Title";
-import { CollectionHost } from "@/types/api";
+import { CollectionHostWithCredentials } from "@/types/api";
 import { MRT_RowSelectionState } from "material-react-table";
 import { trueKeys } from "@/utils/numbers";
 import { useNotify } from "@/providers/NotifyProvider";
@@ -23,7 +23,7 @@ const CollectionHostAdmin = ({
   collectionHosts,
 }: {
   pid: string;
-  collectionHosts: CollectionHost[];
+  collectionHosts: CollectionHostWithCredentials[];
 }) => {
   const notify = useNotify();
   const confirm = useConfirm();
@@ -42,7 +42,7 @@ const CollectionHostAdmin = ({
   const selectedCollectionHost = useMemo(
     () =>
       selectedHostIds.length > 0
-        ? collectionHosts.find((h) => h.client_id === selectedHostIds[0])
+        ? collectionHosts.find((h) => String(h.id) === selectedHostIds[0])
         : null,
     [collectionHosts, selectedHostIds],
   );
@@ -53,8 +53,8 @@ const CollectionHostAdmin = ({
   const handleDeleteHost = async () => {
     const isPlural = selectedHostIds.length > 1;
     const hostNames = selectedHostIds
-      .map((clientId) => collectionHosts.find((h) => h.client_id === clientId))
-      .filter((h): h is CollectionHost => !!h)
+      .map((hostId) => collectionHosts.find((h) => String(h.id) === hostId))
+      .filter((h): h is CollectionHostWithCredentials => !!h)
       .map((h) => h.name)
       .join(", ");
 
@@ -67,12 +67,12 @@ const CollectionHostAdmin = ({
     if (result !== "confirm") return;
 
     await Promise.all(
-      selectedHostIds.map((clientId) => {
-        const id = collectionHosts.find((h) => h.client_id === clientId)?.id;
+      selectedHostIds.map((hostId) => {
+        const id = collectionHosts.find((h) => String(h.id) === hostId)?.id;
         if (id) {
           return deleteCollectionHost(id);
         }
-        notify.warning(`Did not find host ${clientId} to delete`);
+        notify.warning(`Did not find host ${hostId} to delete`);
       }),
     );
 
@@ -84,12 +84,12 @@ const CollectionHostAdmin = ({
 
   const handleRestoreHost = async () => {
     await Promise.all(
-      selectedHostIds.map((clientId) => {
-        const id = collectionHosts.find((h) => h.client_id === clientId)?.id;
+      selectedHostIds.map((hostId) => {
+        const id = collectionHosts.find((h) => String(h.id) === hostId)?.id;
         if (id) {
           return restoreCollectionHost(id);
         }
-        notify.warning(`Did not find host ${clientId} to restore`);
+        notify.warning(`Did not find host ${hostId} to restore`);
       }),
     );
 
