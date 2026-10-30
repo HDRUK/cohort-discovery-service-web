@@ -83,18 +83,31 @@ const CollectionHostAdmin = ({
   };
 
   const handleRestoreHost = async () => {
-    await Promise.all(
-      selectedHostIds.map((clientId) => {
-        const id = collectionHosts.find((h) => h.client_id === clientId)?.id;
-        if (id) {
-          return restoreCollectionHost(id);
-        }
-        notify.warning(`Did not find host ${clientId} to restore`);
-      }),
+    const hosts = selectedHostIds
+      .map((clientId) => collectionHosts.find((h) => h.client_id === clientId))
+      .filter((h): h is CollectionHost => !!h);
+    const results = await Promise.all(
+      hosts.map(async (host) => ({
+        host,
+        result: await restoreCollectionHost(host.id),
+      })),
     );
+    const failed = results.filter(({ result }) => result.error);
+    const restoredCount = results.length - failed.length;
+    const isPlural = results.length > 1;
+
+    if (failed.length > 0) {
+      notify.error(
+        `Restored ${restoredCount} of ${results.length} host${isPlural ? "s" : ""}. Could not restore ${failed.map(({ host, result }) => `${host.name} (${result.error?.text})`).join(", ")} — check the details and try again`,
+      );
+      setRowSelection(
+        Object.fromEntries(failed.map(({ host }) => [host.client_id, true])),
+      );
+      return;
+    }
 
     notify.success(
-      `Restored ${selectedHostIds.length} host${selectedHostIds.length > 1 ? "s" : ""} — credentials work again`,
+      `Restored ${restoredCount} host${isPlural ? "s" : ""} — credentials work again`,
     );
     setRowSelection({});
   };

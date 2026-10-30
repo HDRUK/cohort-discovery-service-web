@@ -306,17 +306,31 @@ const CollectionsTable = ({
       return;
     }
 
-    await Promise.all(
-      selectedCollections.map((c) =>
-        currentCustodian
-          ? restoreCollection(c.id, currentCustodian.pid)
-          : restoreCollectionAdmin(c.id),
+    const results = await Promise.all(
+      selectedCollections.map(async (collection) => ({
+        collection,
+        result: await (currentCustodian
+          ? restoreCollection(collection.id, currentCustodian.pid)
+          : restoreCollectionAdmin(collection.id)),
+      })),
+    );
+    const failed = results.filter(({ result }) => result.error);
+    const restoredCount = results.length - failed.length;
+
+    if (failed.length > 0) {
+      notify.error(
+        `Restored ${restoredCount} of ${results.length} collection${isPlural ? "s" : ""}. Could not restore ${failed.map(({ collection, result }) => `${collection.name} (${result.error?.text})`).join(", ")} — check the details and try again`,
+      );
+    } else {
+      notify.success(
+        `${restoredCount} Collection${isPlural ? "s" : ""} restored`,
+      );
+    }
+    setRowSelection(
+      Object.fromEntries(
+        failed.map(({ collection }) => [String(collection.id), true]),
       ),
     );
-    notify.success(
-      `${selectedCollections.length} Collection${isPlural ? "s" : ""} restored`,
-    );
-    setRowSelection({});
   };
 
   useLogDependencyChanges("collectionsTable", {

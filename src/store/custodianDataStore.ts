@@ -8,6 +8,7 @@ import updateCollectionWithConfig from "@/actions/collection/updateCollectionWit
 import deleteCollection from "@/actions/collection/deleteCollection";
 import restoreCollection from "@/actions/collection/restoreCollection";
 import {
+  ApiResponse,
   Collection,
   Custodian,
   CreateCollectionPost,
@@ -41,7 +42,7 @@ export interface CustodianDataStoreState {
     payload: UpdateCollectionHostPayload,
   ) => Promise<void>;
   deleteCollectionHost: (id: number) => Promise<void>;
-  restoreCollectionHost: (id: number) => Promise<void>;
+  restoreCollectionHost: (id: number) => Promise<ApiResponse<CollectionHost>>;
 
   createCollection: (
     custodianPid: string,
@@ -61,7 +62,7 @@ export interface CustodianDataStoreState {
   restoreCollection: (
     id: number | string,
     custodianPid: string,
-  ) => Promise<void>;
+  ) => Promise<ApiResponse<Collection>>;
 
   requestCollectionMadeActive: (ids: number | number[]) => Promise<void>;
   toggleCollectionActive: (collection: CollectionWithHosts) => Promise<string>;
@@ -116,7 +117,7 @@ export const useCustodianDataStore = create<CustodianDataStoreState>(
 
     restoreCollectionHost: async (id) => {
       const currentCustodian = get().current.custodian;
-      await restoreCollectionHost(id, currentCustodian?.pid);
+      return await restoreCollectionHost(id, currentCustodian?.pid);
     },
 
     createCollection: async (custodianPid, payload, payloadConfig) => {
@@ -146,7 +147,7 @@ export const useCustodianDataStore = create<CustodianDataStoreState>(
     },
 
     restoreCollection: async (id, custodianPid) => {
-      await restoreCollection(id, custodianPid);
+      return await restoreCollection(id, custodianPid);
     },
 
     requestCollectionMadeActive: async (idOrIds: number | number[]) => {

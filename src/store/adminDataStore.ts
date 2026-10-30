@@ -10,6 +10,7 @@ import addCollectionToWorkgroups from "@/actions/workgroup/addCollectionToWorkgr
 import removeCollectionFromWorkgroups from "@/actions/workgroup/removeCollectionFromWorkgroups";
 import { revalidateWorkgroupAndCollections } from "@/actions/revalidate";
 import {
+  ApiResponse,
   Collection,
   CreateCollectionPost,
   CreateCollectionConfigPost,
@@ -71,7 +72,7 @@ export interface AdminDataStoreState {
     payloadConfig: Partial<CreateCollectionConfigPost>,
   ) => Promise<Collection>;
   deleteCollection: (id: number | string) => Promise<void>;
-  restoreCollection: (id: number | string) => Promise<void>;
+  restoreCollection: (id: number | string) => Promise<ApiResponse<Collection>>;
 
   createWorkgroup: (payload: CreateWorkgroupPost) => Promise<Workgroup>;
 
@@ -165,7 +166,7 @@ export const useAdminDataStore = create<AdminDataStoreState>((set) => ({
   },
 
   restoreCollection: async (id) => {
-    await restoreCollection(id);
+    return await restoreCollection(id);
   },
 
   createWorkgroup: async (payload) => {
