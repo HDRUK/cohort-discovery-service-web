@@ -2,7 +2,7 @@
 
 import { Box, Paper, Stack, useMediaQuery, useTheme } from "@mui/material";
 import { ReactNode, useMemo } from "react";
-import { SingleSidedOperator } from "@/types/rules";
+import { OperatorMode, SingleSidedOperator } from "@/types/rules";
 import OperatorToggle from "@/components/OperatorToggle";
 
 export type NullablePair<T> = [T | null, T | null];
@@ -154,7 +154,7 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
                 onChange={handleOperatorChange}
                 readOnly={readOnly}
                 onClick={onClick}
-                mode={isXl ? "instant" : "dropdown"}
+                mode={isXl ? OperatorMode.INSTANT : OperatorMode.DROPDOWN}
               />
             </Box>
 
