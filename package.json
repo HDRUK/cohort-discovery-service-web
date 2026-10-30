@@ -12,6 +12,7 @@
     "lint:workflows": "actionlint",
     "semi": "npx semantic-release",
     "test": "jest",
+    "test:coverage": "jest --coverage",
     "test:watch": "jest --watch --transformIgnorePatterns \"node_modules/(?!pretty-bytes)/\"  ",
     "mock-api:start": "node cypress/support/mock-server.js",
     "cy:open": "cypress open",

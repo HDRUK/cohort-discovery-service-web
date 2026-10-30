@@ -13,6 +13,7 @@ npm-debug.log
 *storybook.log
 storybook-static
 coverage
+.jest-cache
 .yalc
 yalc.lock
 

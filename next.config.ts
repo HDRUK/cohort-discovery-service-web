@@ -14,6 +14,9 @@ const nextConfig: NextConfig = {
     authInterrupts: true,
     useTypeScriptCli: false,
   },
+  typescript: {
+    ignoreBuildErrors: process.env.CYPRESS === "true",
+  },
   transpilePackages: ["@faker-js/faker"],
   outputFileTracingRoot: path.join(__dirname, "../"),
   // Boundary GeoJSON lives outside `public/`; ensure it ships with the

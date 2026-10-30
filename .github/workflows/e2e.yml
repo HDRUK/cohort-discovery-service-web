@@ -2,6 +2,7 @@ name: E2E Tests
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     branches:
       - dev
       - main
@@ -57,23 +58,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Record video when the commit asks for it
+        env:
+          GH_TOKEN: ${{ github.token }}
+          COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          message=$(gh api "repos/${{ github.repository }}/commits/$COMMIT_SHA" --jq .commit.message)
+          if [[ "$message" == *"[record-video]"* ]]; then
+            echo "CYPRESS_VIDEO=true" >> "$GITHUB_ENV"
+          fi
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "${{ vars.NODE_VERSION }}"
           cache: "npm"
-
-      - name: Cache Node modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            node_modules
-            ~/.npm
-          key: e2e-node-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-          restore-keys: e2e-node-${{ runner.os }}-
-
-      - name: Install dependencies
-        run: npm ci
 
       - name: Cache Cypress binary
         uses: actions/cache@v4
@@ -81,6 +80,16 @@ jobs:
           path: ~/.cache/Cypress
           key: e2e-cypress-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
           restore-keys: e2e-cypress-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.next/cache
+          key: e2e-nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ hashFiles('src/**') }}
+          restore-keys: e2e-nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
 
       - name: Build Next.js app
         env:
@@ -139,7 +148,7 @@ jobs:
 
       - name: Upload videos
         uses: actions/upload-artifact@v4
-        if: always()
+        if: always() && env.CYPRESS_VIDEO == 'true'
         with:
           name: cypress-videos-${{ matrix.app_mode }}
           path: cypress/videos

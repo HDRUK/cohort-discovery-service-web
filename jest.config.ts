@@ -14,12 +14,13 @@ const config: Config = {
 
   // The directory where Jest should store its cached dependency information
   // cacheDirectory: "/private/var/folders/gw/90mjly2s19q8zjdkv7k9cyy00000gp/T/jest_dy",
+  cacheDirectory: "<rootDir>/.jest-cache",
 
   // Automatically clear mock calls, instances, contexts and results before every test
   clearMocks: true,
 
   // Indicates whether the coverage information should be collected while executing the test
-  collectCoverage: true,
+  collectCoverage: false,
 
   // An array of glob patterns indicating a set of files for which coverage information should be collected
   // collectCoverageFrom: undefined,
