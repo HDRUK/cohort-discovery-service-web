@@ -4,7 +4,8 @@ import FormTextField from "@/components/FormTextField";
 import { capitaliseFirstLetter, getEnumLabel } from "@/utils/string";
 import { FrequencyMode, frequencyMap } from "@/types/api";
 import FormRadioGroup from "@/components/FormRadioGroup";
-import { useEffect, useMemo, useState } from "react";
+import { clampRunTimeFrequency } from "@/utils/frequency";
+import { useMemo, useState } from "react";
 import HourMinuteSelect from "../HourMinuteSelect";
 import FormLabel from "../FormLabel";
 import { UpdateCollectionFormValues } from "@/types/forms";
@@ -53,12 +54,6 @@ const CollectionConfig = ({
     return frequencyLabels.map((_, index) => index);
   }, [frequencyLabels]);
 
-  useEffect(() => {
-    if (runTime == null || !options.includes(runTime)) {
-      setValue("config.run_time_frequency", 0);
-    }
-  }, [options, runTime, setValue]);
-
   return (
     <>
       <Stack>
@@ -99,7 +94,15 @@ const CollectionConfig = ({
                 render={({ field, fieldState }) => (
                   <FormRadioGroup
                     {...field}
-                    onChange={(_event, value) => field.onChange(Number(value))}
+                    onChange={(_event, value) => {
+                      const mode = Number(value);
+                      field.onChange(mode);
+                      setValue(
+                        "config.run_time_frequency",
+                        clampRunTimeFrequency(mode, runTime),
+                        { shouldDirty: true },
+                      );
+                    }}
                     id={field.name}
                     label="Frequency"
                     error={!!fieldState.error}
@@ -121,11 +124,6 @@ const CollectionConfig = ({
                 render={({ field, fieldState: { error } }) => (
                   <FormTextField
                     {...field}
-                    value={
-                      field.value != null && options.includes(field.value)
-                        ? field.value
-                        : ""
-                    }
                     id={field.name}
                     error={error}
                     select
