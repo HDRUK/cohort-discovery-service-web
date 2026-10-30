@@ -182,7 +182,6 @@ const baseThemeOptions: ThemeOptions = {
           textDecorationColor: theme.palette.link.main,
           color: theme.palette.link.main,
           "&:hover": { color: theme.palette.link.dark },
-          "&:visited": { color: theme.palette.link.light },
         }),
       },
     },
