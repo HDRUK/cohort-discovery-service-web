@@ -32,6 +32,9 @@ const CollectionHostAdmin = ({
 
   const custodians = useUserStore((s) => s.custodians);
   const deleteCollectionHost = useCustodianStore((s) => s.deleteCollectionHost);
+  const restoreCollectionHost = useCustodianStore(
+    (s) => s.restoreCollectionHost,
+  );
 
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
   const selectedHostIds = useMemo(() => trueKeys(rowSelection), [rowSelection]);
@@ -79,6 +82,23 @@ const CollectionHostAdmin = ({
     setRowSelection({});
   };
 
+  const handleRestoreHost = async () => {
+    await Promise.all(
+      selectedHostIds.map((clientId) => {
+        const id = collectionHosts.find((h) => h.client_id === clientId)?.id;
+        if (id) {
+          return restoreCollectionHost(id);
+        }
+        notify.warning(`Did not find host ${clientId} to restore`);
+      }),
+    );
+
+    notify.success(
+      `Restored ${selectedHostIds.length} host${selectedHostIds.length > 1 ? "s" : ""} — credentials work again`,
+    );
+    setRowSelection({});
+  };
+
   if (!custodian) return <Skeleton height={"100%"} />;
 
   return (
@@ -102,6 +122,7 @@ const CollectionHostAdmin = ({
               rowSelection={rowSelection}
               setRowSelection={setRowSelection}
               onDeleteHost={handleDeleteHost}
+              onRestoreHost={handleRestoreHost}
               isDeletedView={isDeletedView}
             />
           }

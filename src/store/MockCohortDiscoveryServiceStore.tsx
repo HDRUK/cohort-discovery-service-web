@@ -192,6 +192,7 @@ const MockCohortDiscoveryServiceStore = ({
         _payload: UpdateCollectionHostPayload,
       ) => RESOLVE<void>(undefined),
       deleteCollectionHost: (_id: number) => RESOLVE<void>(undefined),
+      restoreCollectionHost: (_id: number) => RESOLVE<void>(undefined),
       createCollection: (
         _custodianPid: string,
         _payload: CreateCollectionPost,
@@ -203,6 +204,8 @@ const MockCohortDiscoveryServiceStore = ({
         _payloadConfig: Partial<CreateCollectionConfigPost>,
       ) => RESOLVE<Collection>(getMockCollection()),
       deleteCollection: (_id: number | string, _custodianPid: string) =>
+        RESOLVE<void>(undefined),
+      restoreCollection: (_id: number | string, _custodianPid: string) =>
         RESOLVE<void>(undefined),
       ...(overrides?.custodian ?? {}),
       current: {
@@ -226,6 +229,7 @@ const MockCohortDiscoveryServiceStore = ({
         _payload: Partial<CreateCollectionPost>,
       ) => RESOLVE<Collection>(getMockCollection()),
       deleteCollection: (_id: number | string) => RESOLVE<void>(undefined),
+      restoreCollection: (_id: number | string) => RESOLVE<void>(undefined),
       createWorkgroup: (_payload: {
         name: string;
         collections?: number[];

@@ -2,9 +2,11 @@ import { create } from "zustand";
 import createCollectionHost from "@/actions/collectionHost/createCollectionHost";
 import updateCollectionHost from "@/actions/collectionHost/updateCollectionHost";
 import deleteCollectionHost from "@/actions/collectionHost/deleteCollectionHost";
+import restoreCollectionHost from "@/actions/collectionHost/restoreCollectionHost";
 import createCustodianCollectionWithConfig from "@/actions/collection/createCustodianCollectionWithConfig";
 import updateCollectionWithConfig from "@/actions/collection/updateCollectionWithConfig";
 import deleteCollection from "@/actions/collection/deleteCollection";
+import restoreCollection from "@/actions/collection/restoreCollection";
 import {
   Collection,
   Custodian,
@@ -39,6 +41,7 @@ export interface CustodianDataStoreState {
     payload: UpdateCollectionHostPayload,
   ) => Promise<void>;
   deleteCollectionHost: (id: number) => Promise<void>;
+  restoreCollectionHost: (id: number) => Promise<void>;
 
   createCollection: (
     custodianPid: string,
@@ -52,6 +55,10 @@ export interface CustodianDataStoreState {
     refreshCache?: boolean,
   ) => Promise<Collection>;
   deleteCollection: (
+    id: number | string,
+    custodianPid: string,
+  ) => Promise<void>;
+  restoreCollection: (
     id: number | string,
     custodianPid: string,
   ) => Promise<void>;
@@ -107,6 +114,11 @@ export const useCustodianDataStore = create<CustodianDataStoreState>(
       await deleteCollectionHost(id, currentCustodian?.pid);
     },
 
+    restoreCollectionHost: async (id) => {
+      const currentCustodian = get().current.custodian;
+      await restoreCollectionHost(id, currentCustodian?.pid);
+    },
+
     createCollection: async (custodianPid, payload, payloadConfig) => {
       return await createCustodianCollectionWithConfig(
         custodianPid,
@@ -115,7 +127,12 @@ export const useCustodianDataStore = create<CustodianDataStoreState>(
       );
     },
 
-    updateCollection: async (id, payload, payloadConfig, refreshCache = true) => {
+    updateCollection: async (
+      id,
+      payload,
+      payloadConfig,
+      refreshCache = true,
+    ) => {
       return await updateCollectionWithConfig(
         id,
         payload,
@@ -126,6 +143,10 @@ export const useCustodianDataStore = create<CustodianDataStoreState>(
 
     deleteCollection: async (id, custodianPid) => {
       await deleteCollection(id, custodianPid);
+    },
+
+    restoreCollection: async (id, custodianPid) => {
+      await restoreCollection(id, custodianPid);
     },
 
     requestCollectionMadeActive: async (idOrIds: number | number[]) => {

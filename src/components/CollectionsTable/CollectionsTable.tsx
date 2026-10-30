@@ -62,6 +62,8 @@ const CollectionsTable = ({
   const isAdmin = useMemo(() => !currentCustodian, [currentCustodian]);
   const deleteCollectionAdmin = useAdminStore((s) => s.deleteCollection);
   const deleteCollection = useCustodianStore((s) => s.deleteCollection);
+  const restoreCollectionAdmin = useAdminStore((s) => s.restoreCollection);
+  const restoreCollection = useCustodianStore((s) => s.restoreCollection);
   const selectedCollections = useUserStore((s) => s.selectedCollections);
   const setSelectedCollections = useUserStore((s) => s.setSelectedCollections);
 
@@ -293,6 +295,30 @@ const CollectionsTable = ({
     ],
   );
 
+  const handleRestoreClick = async () => {
+    const isPlural = selectedCollections.length > 1;
+    const ok = await confirm({
+      title: `Restore collection${isPlural ? "s" : ""}`,
+      description: `${selectedCollections.map((c) => c.name).join(", ")} will come back as Draft and must be approved again before users can see ${isPlural ? "them" : "it"}.`,
+      confirmText: "Restore",
+    });
+    if (ok !== "confirm") {
+      return;
+    }
+
+    await Promise.all(
+      selectedCollections.map((c) =>
+        currentCustodian
+          ? restoreCollection(c.id, currentCustodian.pid)
+          : restoreCollectionAdmin(c.id),
+      ),
+    );
+    notify.success(
+      `${selectedCollections.length} Collection${isPlural ? "s" : ""} restored`,
+    );
+    setRowSelection({});
+  };
+
   useLogDependencyChanges("collectionsTable", {
     table,
     filter_name,
@@ -324,11 +350,9 @@ const CollectionsTable = ({
         },
       }}
       rightAction={{
-        ...(!isDeletedView && {
-          deleteProps: {
-            onClick: handleDeleteClick,
-          },
-        }),
+        ...(isDeletedView
+          ? { restoreProps: { onClick: handleRestoreClick } }
+          : { deleteProps: { onClick: handleDeleteClick } }),
         refreshProps: {
           tag:
             currentCustodian?.pid && !isAdmin

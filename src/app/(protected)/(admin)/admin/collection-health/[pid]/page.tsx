@@ -14,7 +14,12 @@ const loadCollection = async (pid: string) => {
   return { collections: result.data?.data ?? [], fetchedAt: Date.now() };
 };
 
-const CollectionHealthLoader = async ({ pid }: { pid: string }) => {
+const CollectionHealthLoader = async ({
+  params,
+}: {
+  params: Promise<{ pid: string }>;
+}) => {
+  const { pid } = await params;
   const { collections, fetchedAt } = await loadCollection(pid);
 
   return (
@@ -26,13 +31,11 @@ const CollectionHealthLoader = async ({ pid }: { pid: string }) => {
   );
 };
 
-const AdminCollectionHealthDetailPage = async ({
+const AdminCollectionHealthDetailPage = ({
   params,
 }: {
   params: Promise<{ pid: string }>;
 }) => {
-  const { pid } = await params;
-
   return (
     <Box
       sx={{
@@ -46,7 +49,7 @@ const AdminCollectionHealthDetailPage = async ({
       <Title title="Admin" subTitle="Collection Health" />
       <Divider sx={{ mb: 2 }} />
       <Suspense fallback={<SkeletonFull sx={{ minHeight: 400 }} />}>
-        <CollectionHealthLoader pid={pid} />
+        <CollectionHealthLoader params={params} />
       </Suspense>
     </Box>
   );

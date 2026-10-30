@@ -10,6 +10,7 @@ import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceS
 jest.mock("@/actions/collection/getCustodianCollections");
 
 const handleDeleteRows = jest.fn();
+const handleRestoreRows = jest.fn();
 
 interface Data {
   id: number;
@@ -52,6 +53,7 @@ const TableWithState = () => {
         table={table}
         rightAction={{
           deleteProps: { onClick: handleDeleteRows },
+          restoreProps: { onClick: handleRestoreRows },
           downloadProps: {
             ids: ["download-id"],
             entity: "test-entity",
@@ -117,6 +119,18 @@ describe("Table", () => {
     await userEvent.click(deleteButton);
 
     expect(handleDeleteRows).toHaveBeenLastCalledWith(["2"]);
+  });
+
+  it("restores the selected rows", async () => {
+    render(<TableWithState />);
+
+    const row = screen.getByRole("row", { name: /name2/i });
+    await userEvent.click(
+      within(row).getByRole("checkbox", { name: /toggle select row/i }),
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Restore" }));
+
+    expect(handleRestoreRows).toHaveBeenLastCalledWith(["2"]);
   });
 
   it("it can download on click", async () => {

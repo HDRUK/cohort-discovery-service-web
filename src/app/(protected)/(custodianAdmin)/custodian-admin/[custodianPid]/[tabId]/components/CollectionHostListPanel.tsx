@@ -11,6 +11,7 @@ type CollectionHostListPanelProps = {
   rowSelection: MRT_RowSelectionState;
   setRowSelection: Dispatch<SetStateAction<MRT_RowSelectionState>>;
   onDeleteHost: () => void;
+  onRestoreHost: () => void;
   isDeletedView: boolean;
 };
 
@@ -20,6 +21,7 @@ const CollectionHostListPanel = ({
   rowSelection,
   setRowSelection,
   onDeleteHost,
+  onRestoreHost,
   isDeletedView,
 }: CollectionHostListPanelProps) => {
   if (noCollectionHosts) {
@@ -41,6 +43,7 @@ const CollectionHostListPanel = ({
         rowSelection={rowSelection}
         setRowSelection={setRowSelection}
         onDelete={onDeleteHost}
+        onRestore={onRestoreHost}
         isDeletedView={isDeletedView}
       />
     </Box>
