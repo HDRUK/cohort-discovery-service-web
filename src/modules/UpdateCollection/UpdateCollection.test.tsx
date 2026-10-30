@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import UpdateCollection from ".";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 import { getMockCollection } from "@/actions/collection/__mocks__/getCollections";
@@ -69,7 +69,7 @@ describe("UpdateCollection", () => {
       >
         <ThreePaneProvider>
           <SwimLane> Another Area </SwimLane>
-          <SwimLane>
+          <SwimLane enableBlocker>
             <CloseGuardProvider>
               <UpdateCollection collection={collection} />
             </CloseGuardProvider>
@@ -191,5 +191,46 @@ describe("UpdateCollection", () => {
       }),
       false,
     );
+  });
+
+  it("lists a run time reset by a frequency change in the unsaved changes summary", async () => {
+    const user = userEvent.setup();
+    renderComponent({
+      config: {
+        id: 1,
+        enabled: true,
+        frequency_mode: 1,
+        run_time_frequency: 6,
+        run_time_hour: 1,
+        run_time_minute: 1,
+      },
+    });
+
+    await user.click(screen.getByTestId("edit-panel-toggle"));
+    await user.click(screen.getByLabelText("Biannually"));
+    await user.click(
+      document.querySelector(".MuiBackdrop-root") as HTMLElement,
+    );
+
+    const dialog = await screen.findByRole("dialog");
+    expect(within(dialog).getByText("Run time Frequency")).toBeInTheDocument();
+    expect(within(dialog).getByText("Sunday")).toBeInTheDocument();
+    expect(within(dialog).getByText("H1")).toBeInTheDocument();
+  });
+
+  it("resets a saved run time that the saved frequency does not offer", () => {
+    renderComponent({
+      config: {
+        id: 1,
+        enabled: true,
+        frequency_mode: 4,
+        run_time_frequency: 6,
+        run_time_hour: 1,
+        run_time_minute: 1,
+      },
+    });
+
+    expect(screen.getByText("Biannually")).toBeInTheDocument();
+    expect(screen.getByText("H1")).toBeInTheDocument();
   });
 });
