@@ -32,6 +32,9 @@ const CollectionHostAdmin = ({
 
   const custodians = useUserStore((s) => s.custodians);
   const deleteCollectionHost = useCustodianStore((s) => s.deleteCollectionHost);
+  const restoreCollectionHost = useCustodianStore(
+    (s) => s.restoreCollectionHost,
+  );
 
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
   const selectedHostIds = useMemo(() => trueKeys(rowSelection), [rowSelection]);
@@ -79,6 +82,36 @@ const CollectionHostAdmin = ({
     setRowSelection({});
   };
 
+  const handleRestoreHost = async () => {
+    const hosts = selectedHostIds
+      .map((clientId) => collectionHosts.find((h) => h.client_id === clientId))
+      .filter((h): h is CollectionHost => !!h);
+    const results = await Promise.all(
+      hosts.map(async (host) => ({
+        host,
+        result: await restoreCollectionHost(host.id),
+      })),
+    );
+    const failed = results.filter(({ result }) => result.error);
+    const restoredCount = results.length - failed.length;
+    const isPlural = results.length > 1;
+
+    if (failed.length > 0) {
+      notify.error(
+        `Restored ${restoredCount} of ${results.length} host${isPlural ? "s" : ""}. Could not restore ${failed.map(({ host, result }) => `${host.name} (${result.error?.text})`).join(", ")} — check the details and try again`,
+      );
+      setRowSelection(
+        Object.fromEntries(failed.map(({ host }) => [host.client_id, true])),
+      );
+      return;
+    }
+
+    notify.success(
+      `Restored ${restoredCount} host${isPlural ? "s" : ""} — credentials work again`,
+    );
+    setRowSelection({});
+  };
+
   if (!custodian) return <Skeleton height={"100%"} />;
 
   return (
@@ -102,6 +135,7 @@ const CollectionHostAdmin = ({
               rowSelection={rowSelection}
               setRowSelection={setRowSelection}
               onDeleteHost={handleDeleteHost}
+              onRestoreHost={handleRestoreHost}
               isDeletedView={isDeletedView}
             />
           }

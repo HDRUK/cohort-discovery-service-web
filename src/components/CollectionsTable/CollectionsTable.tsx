@@ -62,6 +62,8 @@ const CollectionsTable = ({
   const isAdmin = useMemo(() => !currentCustodian, [currentCustodian]);
   const deleteCollectionAdmin = useAdminStore((s) => s.deleteCollection);
   const deleteCollection = useCustodianStore((s) => s.deleteCollection);
+  const restoreCollectionAdmin = useAdminStore((s) => s.restoreCollection);
+  const restoreCollection = useCustodianStore((s) => s.restoreCollection);
   const selectedCollections = useUserStore((s) => s.selectedCollections);
   const setSelectedCollections = useUserStore((s) => s.setSelectedCollections);
 
@@ -293,6 +295,44 @@ const CollectionsTable = ({
     ],
   );
 
+  const handleRestoreClick = async () => {
+    const isPlural = selectedCollections.length > 1;
+    const ok = await confirm({
+      title: `Restore collection${isPlural ? "s" : ""}`,
+      description: `${selectedCollections.map((c) => c.name).join(", ")} will come back as Draft and must be approved again before users can see ${isPlural ? "them" : "it"}.`,
+      confirmText: "Restore",
+    });
+    if (ok !== "confirm") {
+      return;
+    }
+
+    const results = await Promise.all(
+      selectedCollections.map(async (collection) => ({
+        collection,
+        result: await (currentCustodian
+          ? restoreCollection(collection.id, currentCustodian.pid)
+          : restoreCollectionAdmin(collection.id)),
+      })),
+    );
+    const failed = results.filter(({ result }) => result.error);
+    const restoredCount = results.length - failed.length;
+
+    if (failed.length > 0) {
+      notify.error(
+        `Restored ${restoredCount} of ${results.length} collection${isPlural ? "s" : ""}. Could not restore ${failed.map(({ collection, result }) => `${collection.name} (${result.error?.text})`).join(", ")} — check the details and try again`,
+      );
+    } else {
+      notify.success(
+        `${restoredCount} Collection${isPlural ? "s" : ""} restored`,
+      );
+    }
+    setRowSelection(
+      Object.fromEntries(
+        failed.map(({ collection }) => [String(collection.id), true]),
+      ),
+    );
+  };
+
   useLogDependencyChanges("collectionsTable", {
     table,
     filter_name,
@@ -324,11 +364,9 @@ const CollectionsTable = ({
         },
       }}
       rightAction={{
-        ...(!isDeletedView && {
-          deleteProps: {
-            onClick: handleDeleteClick,
-          },
-        }),
+        ...(isDeletedView
+          ? { restoreProps: { onClick: handleRestoreClick } }
+          : { deleteProps: { onClick: handleDeleteClick } }),
         refreshProps: {
           tag:
             currentCustodian?.pid && !isAdmin

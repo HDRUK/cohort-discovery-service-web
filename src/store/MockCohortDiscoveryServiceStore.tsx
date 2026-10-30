@@ -3,6 +3,7 @@ import { PropsWithChildren, useState } from "react";
 import type {
   ApiResponse,
   Collection,
+  CollectionHost,
   CombinedUser,
   CreateQuery,
   Query,
@@ -189,6 +190,11 @@ const seedStores = (overrides?: SliceOverrides) => {
         _payload: UpdateCollectionHostPayload,
       ) => RESOLVE<void>(undefined),
       deleteCollectionHost: (_id: number) => RESOLVE<void>(undefined),
+      restoreCollectionHost: (_id: number) =>
+        RESOLVE<ApiResponse<CollectionHost>>({
+          message: "success",
+          data: {} as CollectionHost,
+        }),
       createCollection: (
         _custodianPid: string,
         _payload: CreateCollectionPost,
@@ -201,6 +207,11 @@ const seedStores = (overrides?: SliceOverrides) => {
       ) => RESOLVE<Collection>(getMockCollection()),
       deleteCollection: (_id: number | string, _custodianPid: string) =>
         RESOLVE<void>(undefined),
+      restoreCollection: (_id: number | string, _custodianPid: string) =>
+        RESOLVE<ApiResponse<Collection>>({
+          message: "success",
+          data: getMockCollection(),
+        }),
       ...(overrides?.custodian ?? {}),
       current: {
         custodian: null,
@@ -223,6 +234,11 @@ const seedStores = (overrides?: SliceOverrides) => {
         _payload: Partial<CreateCollectionPost>,
       ) => RESOLVE<Collection>(getMockCollection()),
       deleteCollection: (_id: number | string) => RESOLVE<void>(undefined),
+      restoreCollection: (_id: number | string) =>
+        RESOLVE<ApiResponse<Collection>>({
+          message: "success",
+          data: getMockCollection(),
+        }),
       createWorkgroup: (_payload: {
         name: string;
         collections?: number[];

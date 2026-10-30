@@ -118,12 +118,23 @@ describe("CollectionsTable", () => {
     expect(screen.getByTestId("DeleteIcon")).toBeInTheDocument();
   });
 
-  it("hides the delete button on the deleted view", async () => {
+  it("swaps delete for restore on the deleted view", async () => {
     mockSearchParams = new URLSearchParams("collection_filter=deleted");
     const collections = await getCustodianCollections("abc");
 
     renderCollectionsTableAdmin(collections.data);
 
     expect(screen.queryByTestId("DeleteIcon")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Restore" })).toBeInTheDocument();
+  });
+
+  it("shows no restore button outside the deleted view", async () => {
+    const collections = await getCustodianCollections("abc");
+
+    renderCollectionsTableAdmin(collections.data);
+
+    expect(
+      screen.queryByRole("button", { name: "Restore" }),
+    ).not.toBeInTheDocument();
   });
 });
