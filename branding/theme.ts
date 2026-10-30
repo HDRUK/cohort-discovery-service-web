@@ -24,7 +24,6 @@ const brandingTheme: ThemeOptions = {
     },
     link: {
       main: "#475da7",
-      dark: "#384b91",
     },
     action: {
       disabledBackground: "#F0F0F0",
