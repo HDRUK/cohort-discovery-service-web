@@ -2,7 +2,11 @@
 
 import * as React from "react";
 import { ClickAwayListener, Collapse, Stack, Tooltip } from "@mui/material";
-import { SingleSidedOperator, ValueAsNumberOperator } from "@/types/rules";
+import {
+  OperatorMode,
+  SingleSidedOperator,
+  ValueAsNumberOperator,
+} from "@/types/rules";
 import CircularIconButton from "@/components/CircularIconButton";
 
 type KnownOperator = ValueAsNumberOperator | SingleSidedOperator;
@@ -13,7 +17,7 @@ interface OperatorToggleProps<T extends KnownOperator> {
   onChange: (newOperator: T) => void;
   readOnly?: boolean;
   onClick?: () => void;
-  mode?: "dropdown" | "instant";
+  mode?: OperatorMode;
 }
 
 function OperatorToggle<T extends KnownOperator>({
@@ -22,7 +26,7 @@ function OperatorToggle<T extends KnownOperator>({
   onChange,
   readOnly,
   onClick,
-  mode = "dropdown",
+  mode = OperatorMode.DROPDOWN,
 }: OperatorToggleProps<T>) {
   const [open, setOpen] = React.useState(false);
 
@@ -38,7 +42,7 @@ function OperatorToggle<T extends KnownOperator>({
     onChange(alternatives[0]);
   };
 
-  if (mode === "instant") {
+  if (mode === OperatorMode.INSTANT) {
     return (
       <Stack direction="row" gap={1} onClick={onClick}>
         <Tooltip title="Change operator" disableInteractive>
