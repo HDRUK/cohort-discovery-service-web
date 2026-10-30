@@ -63,6 +63,7 @@ const RuleTimeframeSelector = ({
       sx: {
         backgroundColor: "white",
         borderRadius: 1,
+        ...(!constrainForBunnyV1 ? { width: readOnly ? 120 : 150 } : {}),
         ...(readOnly ? { pointerEvents: "none" as const } : {}),
       },
     },
