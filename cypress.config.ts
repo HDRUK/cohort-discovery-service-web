@@ -12,7 +12,7 @@ export default defineConfig({
     excludeSpecPattern: "cypress/e2e/**/*.idp.cy.ts",
     supportFile: "cypress/support/e2e.ts",
     fixturesFolder: "cypress/fixtures",
-    video: true,
+    video: false,
     screenshotOnRunFailure: true,
     viewportWidth: 1280,
     viewportHeight: 900,
