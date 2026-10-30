@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import AddButton from "../AddButton";
 
 const renderInsideClickableParent = (disabled: boolean) => {
@@ -22,10 +23,10 @@ describe("AddButton", () => {
     expect(onClick).not.toHaveBeenCalled();
   });
 
-  it("calls onClick when enabled", () => {
+  it("calls onClick when enabled", async () => {
     const { onClick } = renderInsideClickableParent(false);
 
-    fireEvent.click(screen.getByRole("button"));
+    await userEvent.click(screen.getByRole("button"));
 
     expect(onClick).toHaveBeenCalledTimes(1);
   });

@@ -121,6 +121,11 @@ const CollectionConfig = ({
                 render={({ field, fieldState: { error } }) => (
                   <FormTextField
                     {...field}
+                    value={
+                      field.value != null && options.includes(field.value)
+                        ? field.value
+                        : ""
+                    }
                     id={field.name}
                     error={error}
                     select

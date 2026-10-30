@@ -1,4 +1,4 @@
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useState } from "react";
 
 import type {
   ApiResponse,
@@ -82,10 +82,7 @@ const RESOLVE = <T,>(v: T) => Promise.resolve(v);
 const DEFAULT_QUERY: RuleGroupType =
   process.env.NEXT_PUBLIC_USE_EXAMPLE_QUERY === "true" ? EXAMPLE_1 : NO_QUERY;
 
-const MockCohortDiscoveryServiceStore = ({
-  overrides,
-  children,
-}: PropsWithChildren<{ overrides?: SliceOverrides }>) => {
+const seedStores = (overrides?: SliceOverrides) => {
   useStateManagementStore.setState(
     {
       ...useStateManagementStore.getState(),
@@ -255,6 +252,13 @@ const MockCohortDiscoveryServiceStore = ({
     } as FeatureFlagsStoreState,
     true,
   );
+};
+
+const MockCohortDiscoveryServiceStore = ({
+  overrides,
+  children,
+}: PropsWithChildren<{ overrides?: SliceOverrides }>) => {
+  useState(() => seedStores(overrides));
 
   return (
     <ApplicationModeProvider>

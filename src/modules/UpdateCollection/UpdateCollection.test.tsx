@@ -119,7 +119,7 @@ describe("UpdateCollection", () => {
 
     const nameInput = screen.getByDisplayValue("Mock Collection #1");
     await user.clear(nameInput);
-    await user.type(nameInput, "Updated Collection Name");
+    await user.paste("Updated Collection Name");
 
     await user.click(screen.getByTestId("save-panel-toggle"));
 
