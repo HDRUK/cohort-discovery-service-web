@@ -39,7 +39,7 @@ const FilterDatasets = () => {
       <Typography alignContent="center" sx={{ color: "error.main" }}>
         {noDatasets ? DatasetErrors.NO_DATASETS : undefined}
       </Typography>
-      <Title centerTitleContent title="Filter /" sx={{ mr: 1.5 }}>
+      <Title centerTitleContent title="Filter Collections /" sx={{ mr: 1.5 }}>
         <Tooltip
           title={noDatasets ? DatasetErrors.NO_DATASETS : undefined}
           variant="error"
