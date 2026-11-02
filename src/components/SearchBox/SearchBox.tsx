@@ -235,7 +235,6 @@ const SearchBox = ({
               htmlInput: {
                 sx: {
                   ...getHtmlInputSx(collapsible, expanded),
-
                   ...(readOnly
                     ? {
                         userSelect: "none",
@@ -243,6 +242,9 @@ const SearchBox = ({
                         caretColor: "transparent",
                       }
                     : {}),
+                  // removes default white "X" button from Chrome and Safari
+                  // to avoid duplicate clear icons
+                  "&::-webkit-search-cancel-button": { display: "none" },
                 },
                 id: STABLE_ID,
                 autoComplete: "off",
