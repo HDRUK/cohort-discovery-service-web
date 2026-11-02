@@ -22,6 +22,7 @@ import {
 } from "./SearchBox.styles";
 import useRotatingPlaceholder from "@/hooks/useRotatingPlaceholder";
 import { useDefaults } from "@/providers/DefaultProvider";
+import { DeleteIcon } from "@/icons/DeleteIcon";
 
 export type SearchBoxProps = Omit<TextFieldProps, "errors"> & {
   loading?: boolean;
@@ -34,6 +35,10 @@ export type SearchBoxProps = Omit<TextFieldProps, "errors"> & {
   inputBgColor?: string;
   actions?: React.ReactNode[];
   onClickEndAdornment?: () => void;
+  /**
+   * When provided, the end icon becomes a clear button while the input has text.
+   */
+  onClear?: () => void;
   endIcon?: React.ReactNode;
   startIcon?: React.ReactNode;
   showEndIcon?: boolean;
@@ -69,6 +74,7 @@ const SearchBox = ({
   actions,
   disabled = false,
   onClickEndAdornment,
+  onClear,
   endIcon,
   startIcon,
   showEndIcon = true,
@@ -79,6 +85,7 @@ const SearchBox = ({
   onKeyDown,
   onMouseDown,
   onClick,
+  defaultValue,
   ...rest
 }: SearchBoxProps) => {
   const defaults = useDefaults();
@@ -129,7 +136,7 @@ const SearchBox = ({
     defaults.searchSuggestionRotation,
   );
 
-  const [internalValue, setInternalValue] = useState(rest.defaultValue ?? "");
+  const [internalValue, setInternalValue] = useState(defaultValue ?? "");
 
   const inputValue = rest.value ?? internalValue;
 
@@ -150,6 +157,11 @@ const SearchBox = ({
     },
     [readOnly, onChange],
   );
+
+  const handleClearClick = () => {
+    setInternalValue("");
+    onClear?.();
+  };
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -203,6 +215,7 @@ const SearchBox = ({
         <Grid size="grow">
           <TextField
             {...rest}
+            value={inputValue}
             id={STABLE_ID}
             inputRef={inputRef}
             type="search"
@@ -263,6 +276,16 @@ const SearchBox = ({
                   <InputAdornment position="end" sx={inputAdornmentSx}>
                     {loading ? (
                       <CircularProgress size={24} color="inherit" />
+                    ) : showEndIcon && onClear && !isEmpty ? (
+                      <IconButton
+                        type="button"
+                        disabled={searchActionDisabled}
+                        onClick={handleClearClick}
+                        aria-label="Clear search"
+                        sx={iconButtonSx(searchActionDisabled)}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
                     ) : showEndIcon ? (
                       <IconButton
                         type="button"
