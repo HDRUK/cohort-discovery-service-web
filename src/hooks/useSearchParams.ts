@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useOptimistic } from "react";
 import {
   useRouter,
   useSearchParams as useNextSearchParams,
@@ -10,19 +10,21 @@ import { useSearchParamsTransition } from "@/contexts/SearchParamsTransitionCont
 
 const useSearchParams = (paramName: string = "searchTerm") => {
   const router = useRouter();
-  const searchParams = useNextSearchParams();
   const pathname = usePathname();
-  const startTransition = useSearchParamsTransition()?.startTransition;
+  const { startTransition } = useSearchParamsTransition();
+  const [searchParams, setOptimisticSearchParams] =
+    useOptimistic<URLSearchParams>(useNextSearchParams());
 
-  const replace = useCallback(
-    (url: string) => {
-      if (startTransition) {
-        startTransition(() => router.replace(url));
-      } else {
-        router.replace(url);
-      }
+  const navigate = useCallback(
+    (params: URLSearchParams) => {
+      const queryString = params.toString();
+
+      startTransition(() => {
+        setOptimisticSearchParams(params);
+        router.replace(queryString ? `?${queryString}` : pathname);
+      });
     },
-    [router, startTransition],
+    [startTransition, setOptimisticSearchParams, router, pathname],
   );
 
   const setSearchParams = useCallback(
@@ -39,10 +41,9 @@ const useSearchParams = (paramName: string = "searchTerm") => {
         }
       });
 
-      const queryString = params.toString();
-      replace(queryString ? `?${queryString}` : pathname);
+      navigate(params);
     },
-    [replace, searchParams, pathname],
+    [navigate, searchParams],
   );
 
   const setSearchParam = useCallback(
@@ -57,8 +58,8 @@ const useSearchParams = (paramName: string = "searchTerm") => {
   );
 
   const clearSearchParams = useCallback(() => {
-    replace(pathname);
-  }, [replace, pathname]);
+    navigate(new URLSearchParams());
+  }, [navigate]);
 
   return {
     searchParams,

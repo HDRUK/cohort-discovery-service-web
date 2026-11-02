@@ -1,13 +1,13 @@
 import "@testing-library/jest-dom";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Suspense, use, useEffect, useState } from "react";
 import TermDirectory from "./TermDirectory";
 import { SearchParamsTransitionProvider } from "@/contexts/SearchParamsTransitionContext";
 import { DefaultProvider } from "@/providers/DefaultProvider";
 import { NotifyProvider } from "@/providers/NotifyProvider";
 import { mockTermDirectoryEntries } from "@/actions/termDirectory/__mocks__/getTermDirectory";
 import { paginateData } from "@/utils/mock";
+import { createPendingNavigation } from "@/utils/pendingNavigation";
 import { TermDirectoryEntry, Paginated } from "@/types/api";
 
 const mockReplace = jest.fn();
@@ -28,33 +28,16 @@ const renderComponent = (entries: Paginated<TermDirectoryEntry>) =>
     </DefaultProvider>,
   );
 
-let startNavigation: () => void = () => {};
-let finishNavigation: () => void = () => {};
-
-const Router = () => {
-  const [navigation, setNavigation] = useState<Promise<void>>();
-  useEffect(() => {
-    startNavigation = () =>
-      setNavigation(
-        new Promise<void>((resolve) => {
-          finishNavigation = resolve;
-        }),
-      );
-  }, []);
-  if (navigation) use(navigation);
-  return null;
-};
+const navigation = createPendingNavigation();
 
 const renderWithRouter = (entries: Paginated<TermDirectoryEntry>) => {
-  mockReplace.mockImplementationOnce(() => startNavigation());
+  mockReplace.mockImplementationOnce(() => navigation.start());
   return render(
     <DefaultProvider>
       <NotifyProvider>
         <SearchParamsTransitionProvider>
           <TermDirectory entries={entries} />
-          <Suspense fallback={null}>
-            <Router />
-          </Suspense>
+          <navigation.PendingRouter />
         </SearchParamsTransitionProvider>
       </NotifyProvider>
     </DefaultProvider>,
@@ -128,6 +111,51 @@ describe("TermDirectory", () => {
     expect(skeletonCellCount(container)).toBeGreaterThan(0);
   });
 
+  it("marks the rows as busy while the terms load", () => {
+    const { container } = render(
+      <DefaultProvider>
+        <NotifyProvider>
+          <TermDirectory />
+        </NotifyProvider>
+      </DefaultProvider>,
+    );
+
+    expect(container.querySelector("tbody")).toHaveAttribute(
+      "aria-busy",
+      "true",
+    );
+  });
+
+  it("makes the search, sort and tabs non-interactive until the first terms arrive", () => {
+    render(
+      <DefaultProvider>
+        <NotifyProvider>
+          <TermDirectory />
+        </NotifyProvider>
+      </DefaultProvider>,
+    );
+
+    expect(
+      screen
+        .getByPlaceholderText("Search by term name or OMOP ID...")
+        .closest("[inert]"),
+    ).not.toBeNull();
+  });
+
+  it("keeps the search, sort and tabs interactive once the terms have loaded", () => {
+    renderComponent(paginateData({ data: mockTermDirectoryEntries }));
+
+    expect(
+      screen
+        .getByPlaceholderText("Search by term name or OMOP ID...")
+        .closest("[inert]"),
+    ).toBeNull();
+    expect(screen.getByRole("table").querySelector("tbody")).toHaveAttribute(
+      "aria-busy",
+      "false",
+    );
+  });
+
   it("does not show the loading overlay spinner on top of the skeleton rows", () => {
     render(
       <DefaultProvider>
@@ -160,7 +188,7 @@ describe("TermDirectory", () => {
     ).not.toBeInTheDocument();
     expect(skeletonCellCount(container)).toBeGreaterThan(0);
 
-    await act(async () => finishNavigation());
+    await act(async () => navigation.finish());
 
     expect(screen.getByText("Type 2 diabetes mellitus")).toBeInTheDocument();
     expect(skeletonCellCount(container)).toBe(0);
@@ -194,6 +222,7 @@ describe("TermDirectory", () => {
     );
 
     expect(mockReplace).toHaveBeenCalledWith("?page=2&per_page=5");
+    expect(screen.getByText("6-10 of 100")).toBeInTheDocument();
     expect(skeletonCellCount(container)).toBeGreaterThan(0);
   });
 

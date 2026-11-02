@@ -3,6 +3,7 @@
 import {
   createContext,
   ReactNode,
+  startTransition,
   TransitionStartFunction,
   useContext,
   useTransition,
@@ -13,24 +14,26 @@ interface SearchParamsTransition {
   startTransition: TransitionStartFunction;
 }
 
-const SearchParamsTransitionContext =
-  createContext<SearchParamsTransition | null>(null);
+const SearchParamsTransitionContext = createContext<SearchParamsTransition>({
+  isPending: false,
+  startTransition,
+});
 
 export const SearchParamsTransitionProvider = ({
   children,
 }: {
   children: ReactNode;
 }) => {
-  const [isPending, startTransition] = useTransition();
+  const [isPending, startPageTransition] = useTransition();
 
   return (
     <SearchParamsTransitionContext.Provider
-      value={{ isPending, startTransition }}
+      value={{ isPending, startTransition: startPageTransition }}
     >
       {children}
     </SearchParamsTransitionContext.Provider>
   );
 };
 
-export const useSearchParamsTransition = (): SearchParamsTransition | null =>
+export const useSearchParamsTransition = (): SearchParamsTransition =>
   useContext(SearchParamsTransitionContext);

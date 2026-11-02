@@ -1,6 +1,6 @@
 "use client";
 
-import { Stack } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import { type MRT_ColumnDef } from "material-react-table";
 import { useMemo } from "react";
 import { TermDirectoryEntry, Paginated } from "@/types/api";
@@ -20,8 +20,8 @@ interface TermDirectoryProps {
 }
 
 const TermDirectory = ({ entries }: TermDirectoryProps) => {
-  const isNavigating = useSearchParamsTransition()?.isPending ?? false;
-  const isLoading = !entries || isNavigating;
+  const { isPending } = useSearchParamsTransition();
+  const isLoading = !entries || isPending;
 
   const columns = useMemo<MRT_ColumnDef<TermDirectoryEntry>[]>(
     () => [
@@ -89,9 +89,10 @@ const TermDirectory = ({ entries }: TermDirectoryProps) => {
     enableSorting: false,
     enableRowSelection: false,
     state: { isLoading, showLoadingOverlay: false },
+    muiTableBodyProps: { "aria-busy": isLoading },
   });
 
-  return (
+  const directory = (
     <Table
       table={table}
       emptyMessage={isLoading ? undefined : "No terms found."}
@@ -122,6 +123,17 @@ const TermDirectory = ({ entries }: TermDirectoryProps) => {
         },
       }}
     />
+  );
+
+  if (entries) return directory;
+
+  return (
+    <Box
+      inert
+      sx={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}
+    >
+      {directory}
+    </Box>
   );
 };
 
