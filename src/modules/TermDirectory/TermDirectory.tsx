@@ -4,24 +4,21 @@ import { Stack } from "@mui/material";
 import { type MRT_ColumnDef } from "material-react-table";
 import { useMemo } from "react";
 import { TermDirectoryEntry, Paginated } from "@/types/api";
-import { useLatestPromise } from "@/hooks/useLatestPromise";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import CopyableTextButton from "@/components/CopyableTextButton";
 import Table from "@/components/Table";
 import { formatNumber } from "@/utils/numbers";
 import { DEFAULT_PER_PAGE } from "@/config/defaults";
-import DomainFilterTabs from "./DomainFilterTabs";
 import AssociatedCollectionsChip from "./AssociatedCollectionsChip";
 
 const NO_ENTRIES: TermDirectoryEntry[] = [];
 
 interface TermDirectoryProps {
-  entriesPromise: Promise<Paginated<TermDirectoryEntry>>;
+  entries?: Paginated<TermDirectoryEntry>;
 }
 
-const TermDirectory = ({ entriesPromise }: TermDirectoryProps) => {
-  const { value: entries, isPending: isLoading } =
-    useLatestPromise(entriesPromise);
+const TermDirectory = ({ entries }: TermDirectoryProps) => {
+  const isLoading = !entries;
 
   const columns = useMemo<MRT_ColumnDef<TermDirectoryEntry>[]>(
     () => [
@@ -95,30 +92,9 @@ const TermDirectory = ({ entriesPromise }: TermDirectoryProps) => {
     <Table
       table={table}
       emptyMessage={isLoading ? undefined : "No terms found."}
-      leftAction={{
-        searchProps: {
-          placeholder: "Search by term name or OMOP ID...",
-        },
-      }}
-      rightAction={{
-        sortProps: {
-          fields: [
-            { field: "concept_name", displayName: "Term Name", numeric: false },
-            { field: "count", displayName: "Count", numeric: true },
-          ],
-        },
-      }}
-      details={<DomainFilterTabs />}
       boxSxProps={{
-        "& > .MuiGrid-container": {
-          bgcolor: "table.main",
-          p: 1,
-        },
         "& .MuiPaper-root": {
           borderRadius: 0,
-        },
-        "& .MuiGrid-root": {
-          alignItems: "center",
         },
       }}
     />
