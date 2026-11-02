@@ -6,11 +6,24 @@ import {
   useSearchParams as useNextSearchParams,
   usePathname,
 } from "next/navigation";
+import { useSearchParamsTransition } from "@/contexts/SearchParamsTransitionContext";
 
 const useSearchParams = (paramName: string = "searchTerm") => {
   const router = useRouter();
   const searchParams = useNextSearchParams();
   const pathname = usePathname();
+  const startTransition = useSearchParamsTransition()?.startTransition;
+
+  const replace = useCallback(
+    (url: string) => {
+      if (startTransition) {
+        startTransition(() => router.replace(url));
+      } else {
+        router.replace(url);
+      }
+    },
+    [router, startTransition],
+  );
 
   const setSearchParams = useCallback(
     (updates: Record<string, string | null>) => {
@@ -27,9 +40,9 @@ const useSearchParams = (paramName: string = "searchTerm") => {
       });
 
       const queryString = params.toString();
-      router.replace(queryString ? `?${queryString}` : pathname);
+      replace(queryString ? `?${queryString}` : pathname);
     },
-    [router, searchParams, pathname],
+    [replace, searchParams, pathname],
   );
 
   const setSearchParam = useCallback(
@@ -44,8 +57,8 @@ const useSearchParams = (paramName: string = "searchTerm") => {
   );
 
   const clearSearchParams = useCallback(() => {
-    router.replace(pathname);
-  }, [router, pathname]);
+    replace(pathname);
+  }, [replace, pathname]);
 
   return {
     searchParams,

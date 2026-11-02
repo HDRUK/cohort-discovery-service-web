@@ -1,11 +1,10 @@
-import { Box, Paper, Stack } from "@mui/material";
+import { Paper, Stack } from "@mui/material";
 import { Suspense } from "react";
-import SearchParamsSuspense from "@/components/SearchParamsSuspense";
 import Title from "@/components/Title";
 import TermDirectory from "@/modules/TermDirectory";
 import CollectionFilter from "@/modules/TermDirectory/CollectionFilter";
-import TermDirectoryToolbar from "@/modules/TermDirectory/TermDirectoryToolbar";
 import getTermDirectory from "@/actions/termDirectory/getTermDirectory";
+import { SearchParamsTransitionProvider } from "@/contexts/SearchParamsTransitionContext";
 import { TermDirectorySearchParams } from "@/types/api";
 import { getDomainPhrase } from "@/utils/omop";
 import { capitaliseFirstLetter } from "@/utils/string";
@@ -43,36 +42,33 @@ const TermDirectoryEntries = async ({ searchParams }: PageProps) => {
 };
 
 const TermDirectoryPage = ({ searchParams }: PageProps) => (
-  <Paper
-    sx={{
-      p: 2,
-      gap: 2,
-      height: "100%",
-      display: "flex",
-      flexDirection: "column",
-      bgcolor: "background.default",
-    }}
-  >
-    <Stack
-      direction="row"
-      justifyContent="space-between"
-      alignItems="center"
-      gap={2}
+  <SearchParamsTransitionProvider>
+    <Paper
+      sx={{
+        p: 2,
+        gap: 2,
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        bgcolor: "background.default",
+      }}
     >
-      <Suspense fallback={<Title title="Term Directory" />}>
-        <TermDirectoryTitle searchParams={searchParams} />
-      </Suspense>
-      <CollectionFilter />
-    </Stack>
-    <Box
-      sx={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}
-    >
-      <TermDirectoryToolbar />
-      <SearchParamsSuspense fallback={<TermDirectory />}>
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        gap={2}
+      >
+        <Suspense fallback={<Title title="Term Directory" />}>
+          <TermDirectoryTitle searchParams={searchParams} />
+        </Suspense>
+        <CollectionFilter />
+      </Stack>
+      <Suspense fallback={<TermDirectory />}>
         <TermDirectoryEntries searchParams={searchParams} />
-      </SearchParamsSuspense>
-    </Box>
-  </Paper>
+      </Suspense>
+    </Paper>
+  </SearchParamsTransitionProvider>
 );
 
 export default TermDirectoryPage;

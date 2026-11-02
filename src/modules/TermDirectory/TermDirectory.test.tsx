@@ -1,7 +1,9 @@
 import "@testing-library/jest-dom";
-import { render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { Suspense, use, useEffect, useState } from "react";
 import TermDirectory from "./TermDirectory";
+import { SearchParamsTransitionProvider } from "@/contexts/SearchParamsTransitionContext";
 import { DefaultProvider } from "@/providers/DefaultProvider";
 import { NotifyProvider } from "@/providers/NotifyProvider";
 import { mockTermDirectoryEntries } from "@/actions/termDirectory/__mocks__/getTermDirectory";
@@ -25,6 +27,42 @@ const renderComponent = (entries: Paginated<TermDirectoryEntry>) =>
       </NotifyProvider>
     </DefaultProvider>,
   );
+
+let startNavigation: () => void = () => {};
+let finishNavigation: () => void = () => {};
+
+const Router = () => {
+  const [navigation, setNavigation] = useState<Promise<void>>();
+  useEffect(() => {
+    startNavigation = () =>
+      setNavigation(
+        new Promise<void>((resolve) => {
+          finishNavigation = resolve;
+        }),
+      );
+  }, []);
+  if (navigation) use(navigation);
+  return null;
+};
+
+const renderWithRouter = (entries: Paginated<TermDirectoryEntry>) => {
+  mockReplace.mockImplementationOnce(() => startNavigation());
+  return render(
+    <DefaultProvider>
+      <NotifyProvider>
+        <SearchParamsTransitionProvider>
+          <TermDirectory entries={entries} />
+          <Suspense fallback={null}>
+            <Router />
+          </Suspense>
+        </SearchParamsTransitionProvider>
+      </NotifyProvider>
+    </DefaultProvider>,
+  );
+};
+
+const skeletonCellCount = (container: HTMLElement) =>
+  container.querySelectorAll("tbody .MuiSkeleton-root").length;
 
 describe("TermDirectory", () => {
   beforeEach(() => {
@@ -87,9 +125,7 @@ describe("TermDirectory", () => {
     );
 
     expect(screen.queryByText("No terms found.")).not.toBeInTheDocument();
-    expect(
-      container.querySelectorAll("tbody .MuiSkeleton-root").length,
-    ).toBeGreaterThan(0);
+    expect(skeletonCellCount(container)).toBeGreaterThan(0);
   });
 
   it("does not show the loading overlay spinner on top of the skeleton rows", () => {
@@ -102,6 +138,71 @@ describe("TermDirectory", () => {
     );
 
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+  });
+
+  it("shows skeleton rows while a search loads, then the rows once it finishes", async () => {
+    const { container } = renderWithRouter(
+      paginateData({ data: mockTermDirectoryEntries }),
+    );
+    const searchBox = screen.getByPlaceholderText(
+      "Search by term name or OMOP ID...",
+    );
+
+    await act(async () => {
+      fireEvent.change(searchBox, { target: { value: "asthma" } });
+      fireEvent.keyDown(searchBox, { key: "Enter" });
+    });
+
+    expect(mockReplace).toHaveBeenCalledWith("?search_term=asthma");
+    expect(searchBox).toHaveValue("asthma");
+    expect(
+      screen.queryByText("Type 2 diabetes mellitus"),
+    ).not.toBeInTheDocument();
+    expect(skeletonCellCount(container)).toBeGreaterThan(0);
+
+    await act(async () => finishNavigation());
+
+    expect(screen.getByText("Type 2 diabetes mellitus")).toBeInTheDocument();
+    expect(skeletonCellCount(container)).toBe(0);
+  });
+
+  it("shows skeleton rows while a new sort order loads", async () => {
+    const user = userEvent.setup();
+    const { container } = renderWithRouter(
+      paginateData({ data: mockTermDirectoryEntries }),
+    );
+
+    await user.click(screen.getByLabelText("Sort"));
+    await act(async () =>
+      fireEvent.click(
+        screen.getByRole("menuitem", { name: "Sort by Count (High-Low)" }),
+      ),
+    );
+
+    expect(skeletonCellCount(container)).toBeGreaterThan(0);
+  });
+
+  it("shows skeleton rows while the next page of terms loads", async () => {
+    mockSearchParams = new URLSearchParams("page=1&per_page=5");
+    const { container } = renderWithRouter({
+      ...paginateData({ data: mockTermDirectoryEntries, perPage: 5 }),
+      total: 100,
+    });
+
+    await act(async () =>
+      fireEvent.click(screen.getByRole("button", { name: /next page/i })),
+    );
+
+    expect(mockReplace).toHaveBeenCalledWith("?page=2&per_page=5");
+    expect(skeletonCellCount(container)).toBeGreaterThan(0);
+  });
+
+  it("renders a search box so users can filter the directory", () => {
+    renderComponent(paginateData({ data: mockTermDirectoryEntries }));
+
+    expect(
+      screen.getByPlaceholderText("Search by term name or OMOP ID..."),
+    ).toBeInTheDocument();
   });
 
   it("shows a copy OMOP ID action on each row", () => {
@@ -164,5 +265,87 @@ describe("TermDirectory", () => {
     );
 
     expect(screen.getByText("1-5 of 100")).toBeInTheDocument();
+  });
+
+  it("renders a sort button with the correct fields", async () => {
+    const user = userEvent.setup();
+
+    renderComponent(paginateData({ data: mockTermDirectoryEntries }));
+
+    expect(screen.getByLabelText("Sort")).toBeInTheDocument();
+
+    await user.click(screen.getByLabelText("Sort"));
+
+    // The sort options menu and its items
+    expect(await screen.getByRole("tooltip")).toBeInTheDocument();
+
+    expect(
+      await screen.getByRole("menuitem", { name: "Clear sorting" }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.getByRole("menuitem", { name: "Sort by Term Name (A-Z)" }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.getByRole("menuitem", { name: "Sort by Term Name (Z-A)" }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.getByRole("menuitem", { name: "Sort by Count (Low-High)" }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.getByRole("menuitem", { name: "Sort by Count (High-Low)" }),
+    ).toBeInTheDocument();
+  });
+
+  it("updates the URL search params when sort options are clicked", async () => {
+    const user = userEvent.setup();
+
+    mockSearchParams = new URLSearchParams("page=1&per_page=5");
+
+    renderComponent(paginateData({ data: mockTermDirectoryEntries }));
+
+    await user.click(screen.getByLabelText("Sort"));
+    await user.click(
+      screen.getByRole("menuitem", { name: "Sort by Term Name (A-Z)" }),
+    );
+
+    expect(mockReplace).toHaveBeenCalledWith(
+      "?page=1&per_page=5&sort=concept_name%3Aasc",
+    );
+
+    mockReplace.mockClear();
+
+    await user.click(screen.getByLabelText("Sort"));
+    await user.click(
+      screen.getByRole("menuitem", { name: "Sort by Count (High-Low)" }),
+    );
+
+    expect(mockReplace).toHaveBeenCalledWith(
+      "?page=1&per_page=5&sort=count%3Adesc",
+    );
+  });
+
+  it("removes the sort parameter when clear sorting is clicked", async () => {
+    const user = userEvent.setup();
+
+    mockSearchParams = new URLSearchParams("page=1&per_page=5");
+
+    renderComponent(paginateData({ data: mockTermDirectoryEntries }));
+
+    await user.click(screen.getByLabelText("Sort"));
+    await user.click(
+      screen.getByRole("menuitem", { name: "Sort by Term Name (A-Z)" }),
+    );
+
+    expect(mockReplace).toHaveBeenCalledWith(
+      "?page=1&per_page=5&sort=concept_name%3Aasc",
+    );
+
+    mockReplace.mockClear();
+    mockSearchParams = new URLSearchParams();
+
+    await user.click(screen.getByLabelText("Sort"));
+    await user.click(screen.getByRole("menuitem", { name: "Clear sorting" }));
+
+    expect(mockReplace).toHaveBeenCalledWith("/term-directory");
   });
 });

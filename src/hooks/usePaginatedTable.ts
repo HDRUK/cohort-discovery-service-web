@@ -11,6 +11,7 @@ import {
   MRT_Updater,
 } from "material-react-table";
 import { useTable } from "./useTable";
+import { useSearchParamsTransition } from "@/contexts/SearchParamsTransitionContext";
 import { buildRowsPerPageOptions } from "@/utils/pagination";
 import { DEFAULT_PER_PAGE } from "@/config/defaults";
 
@@ -43,6 +44,7 @@ export function usePaginatedTable<TData extends MRT_RowData>({
 }: UsePaginatedTableOptions<TData>) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const startTransition = useSearchParamsTransition()?.startTransition;
 
   const page = parseInt(searchParams.get(pageParam) || "1");
   const resolvedPerPageDefault =
@@ -71,7 +73,13 @@ export function usePaginatedTable<TData extends MRT_RowData>({
     params.set(pageParam, String(nextPagination.pageIndex + 1));
     params.set(perPageParam, String(nextPagination.pageSize));
 
-    router.replace(`?${params.toString()}`);
+    const url = `?${params.toString()}`;
+
+    if (startTransition) {
+      startTransition(() => router.replace(url));
+    } else {
+      router.replace(url);
+    }
   };
 
   const [sorting, setSorting] = useState<MRT_SortingState>([]);
