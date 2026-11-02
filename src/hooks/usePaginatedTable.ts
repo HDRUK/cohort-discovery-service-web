@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import {
   MRT_ColumnDef,
   MRT_RowData,
@@ -11,6 +10,7 @@ import {
   MRT_Updater,
 } from "material-react-table";
 import { useTable } from "./useTable";
+import useSearchParams from "./useSearchParams";
 import { buildRowsPerPageOptions } from "@/utils/pagination";
 import { DEFAULT_PER_PAGE } from "@/config/defaults";
 
@@ -41,8 +41,7 @@ export function usePaginatedTable<TData extends MRT_RowData>({
   initialState,
   ...rest
 }: UsePaginatedTableOptions<TData>) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const { searchParams, setSearchParams } = useSearchParams();
 
   const page = parseInt(searchParams.get(pageParam) || "1");
   const resolvedPerPageDefault =
@@ -66,12 +65,10 @@ export function usePaginatedTable<TData extends MRT_RowData>({
         ? updaterOrValue(pagination)
         : updaterOrValue;
 
-    const params = new URLSearchParams(searchParams.toString());
-
-    params.set(pageParam, String(nextPagination.pageIndex + 1));
-    params.set(perPageParam, String(nextPagination.pageSize));
-
-    router.replace(`?${params.toString()}`);
+    setSearchParams({
+      [pageParam]: String(nextPagination.pageIndex + 1),
+      [perPageParam]: String(nextPagination.pageSize),
+    });
   };
 
   const [sorting, setSorting] = useState<MRT_SortingState>([]);

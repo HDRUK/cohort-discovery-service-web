@@ -1,9 +1,10 @@
-import { Paper, Skeleton, Stack } from "@mui/material";
+import { Paper, Stack } from "@mui/material";
 import { Suspense } from "react";
 import Title from "@/components/Title";
 import TermDirectory from "@/modules/TermDirectory";
 import CollectionFilter from "@/modules/TermDirectory/CollectionFilter";
 import getTermDirectory from "@/actions/termDirectory/getTermDirectory";
+import { SearchParamsTransitionProvider } from "@/contexts/SearchParamsTransitionContext";
 import { TermDirectorySearchParams } from "@/types/api";
 import { getDomainPhrase } from "@/utils/omop";
 import { capitaliseFirstLetter } from "@/utils/string";
@@ -12,7 +13,21 @@ interface PageProps {
   searchParams: Promise<TermDirectorySearchParams>;
 }
 
-const TermDirectoryPageContent = async ({ searchParams }: PageProps) => {
+const TermDirectoryTitle = async ({ searchParams }: PageProps) => {
+  const params = await searchParams;
+
+  return (
+    <Title
+      title="Term Directory"
+      subTitle={
+        params?.domain &&
+        capitaliseFirstLetter(getDomainPhrase(params.domain).noun)
+      }
+    />
+  );
+};
+
+const TermDirectoryEntries = async ({ searchParams }: PageProps) => {
   const params = await searchParams;
   const result = await getTermDirectory(
     params?.page,
@@ -23,7 +38,11 @@ const TermDirectoryPageContent = async ({ searchParams }: PageProps) => {
     params?.sort,
   );
 
-  return (
+  return <TermDirectory entries={result.data} />;
+};
+
+const TermDirectoryPage = ({ searchParams }: PageProps) => (
+  <SearchParamsTransitionProvider>
     <Paper
       sx={{
         p: 2,
@@ -40,24 +59,16 @@ const TermDirectoryPageContent = async ({ searchParams }: PageProps) => {
         alignItems="center"
         gap={2}
       >
-        <Title
-          title="Term Directory"
-          subTitle={
-            params?.domain &&
-            capitaliseFirstLetter(getDomainPhrase(params.domain).noun)
-          }
-        />
+        <Suspense fallback={<Title title="Term Directory" />}>
+          <TermDirectoryTitle searchParams={searchParams} />
+        </Suspense>
         <CollectionFilter />
       </Stack>
-      <TermDirectory entries={result.data} />
+      <Suspense fallback={<TermDirectory />}>
+        <TermDirectoryEntries searchParams={searchParams} />
+      </Suspense>
     </Paper>
-  );
-};
-
-const TermDirectoryPage = ({ searchParams }: PageProps) => (
-  <Suspense fallback={<Skeleton variant="rectangular" height={400} />}>
-    <TermDirectoryPageContent searchParams={searchParams} />
-  </Suspense>
+  </SearchParamsTransitionProvider>
 );
 
 export default TermDirectoryPage;

@@ -16,6 +16,7 @@ let mockSearchParams = new URLSearchParams();
 
 jest.mock("next/navigation", () => ({
   useSearchParams: () => mockSearchParams,
+  usePathname: () => "/table",
   useRouter: () => ({
     push: jest.fn(),
     replace: mockReplace,
@@ -102,7 +103,9 @@ describe("onPaginationChange", () => {
   it("writes a new pagination value to the url", () => {
     setup();
 
-    lastOptions().onPaginationChange?.({ pageIndex: 2, pageSize: 50 });
+    act(() =>
+      lastOptions().onPaginationChange?.({ pageIndex: 2, pageSize: 50 }),
+    );
 
     expect(mockReplace).toHaveBeenCalledWith("?page=3&per_page=50");
   });
@@ -110,10 +113,12 @@ describe("onPaginationChange", () => {
   it("passes the current pagination to an updater function", () => {
     setup("page=2&per_page=20");
 
-    lastOptions().onPaginationChange?.((current) => ({
-      ...current,
-      pageIndex: current.pageIndex + 1,
-    }));
+    act(() =>
+      lastOptions().onPaginationChange?.((current) => ({
+        ...current,
+        pageIndex: current.pageIndex + 1,
+      })),
+    );
 
     expect(mockReplace).toHaveBeenCalledWith("?page=3&per_page=20");
   });
@@ -121,7 +126,9 @@ describe("onPaginationChange", () => {
   it("keeps unrelated params", () => {
     setup("search_term=abc&page=1");
 
-    lastOptions().onPaginationChange?.({ pageIndex: 1, pageSize: 25 });
+    act(() =>
+      lastOptions().onPaginationChange?.({ pageIndex: 1, pageSize: 25 }),
+    );
 
     expect(mockReplace).toHaveBeenCalledWith(
       "?search_term=abc&page=2&per_page=25",
@@ -131,7 +138,9 @@ describe("onPaginationChange", () => {
   it("writes to custom param names", () => {
     setup("", { pageParam: "p", perPageParam: "size" });
 
-    lastOptions().onPaginationChange?.({ pageIndex: 1, pageSize: 25 });
+    act(() =>
+      lastOptions().onPaginationChange?.({ pageIndex: 1, pageSize: 25 }),
+    );
 
     expect(mockReplace).toHaveBeenCalledWith("?p=2&size=25");
   });
