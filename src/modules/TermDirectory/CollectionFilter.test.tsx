@@ -1,5 +1,11 @@
 import "@testing-library/jest-dom";
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import CollectionFilter from "./CollectionFilter";
 import { DefaultProvider } from "@/providers/DefaultProvider";
@@ -79,6 +85,32 @@ describe("CollectionFilter", () => {
     expect(
       screen.getByRole("checkbox", { name: "Test Dataset Beta" }),
     ).toBeChecked();
+  });
+
+  it("shows every collection again after reopening, so a stale search doesn't hide what's available", async () => {
+    renderComponent();
+
+    await openPopover();
+    await userEvent.type(screen.getByRole("searchbox"), "Alpha");
+    await waitFor(() =>
+      expect(
+        screen.queryByRole("checkbox", { name: "Test Dataset Beta" }),
+      ).not.toBeInTheDocument(),
+    );
+
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() =>
+      expect(screen.queryByRole("searchbox")).not.toBeInTheDocument(),
+    );
+    await openPopover();
+
+    expect(screen.getByRole("searchbox")).toHaveValue("");
+    expect(
+      screen.getByRole("checkbox", { name: "Test Dataset Alpha" }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByRole("checkbox", { name: "Test Dataset Beta" }),
+    ).toBeInTheDocument();
   });
 
   it("removes the param when the last collection is unchecked", async () => {
