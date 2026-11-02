@@ -2,7 +2,7 @@
 
 import { Controller, useForm, useWatch } from "react-hook-form";
 import type { FieldPath, DefaultValues } from "react-hook-form";
-import { TransitionStartFunction, useCallback, useRef } from "react";
+import { useCallback, useRef } from "react";
 
 import useSearchParams from "@/hooks/useSearchParams";
 import SearchBox from "@/components/SearchBox";
@@ -26,7 +26,6 @@ export interface ControlledSearchBoxProps<
   useErrors?: boolean;
   submitOnChange?: boolean;
   submitDelay?: number;
-  startTransition?: TransitionStartFunction;
 }
 
 const ControlledSearchBox = <
@@ -37,7 +36,6 @@ const ControlledSearchBox = <
   useErrors = false,
   submitOnChange = false,
   submitDelay = DEFAULT_SEARCH_WAIT_TIME,
-  startTransition,
   onKeyDown,
   ...searchBoxProps
 }: ControlledSearchBoxProps<TParams, K>) => {
@@ -62,14 +60,9 @@ const ControlledSearchBox = <
       if (nextValue === lastSubmittedValueRef.current) return;
 
       lastSubmittedValueRef.current = nextValue;
-
-      if (startTransition) {
-        startTransition(() => setSearchParam(nextValue));
-      } else {
-        setSearchParam(nextValue);
-      }
+      setSearchParam(nextValue);
     },
-    [setSearchParam, startTransition],
+    [setSearchParam],
   );
 
   const watchedValues = useWatch({ control });

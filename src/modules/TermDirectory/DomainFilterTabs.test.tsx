@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom";
-import { render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { startTransition } from "react";
+import { Suspense, use, useEffect, useState } from "react";
 import DomainFilterTabs from "./DomainFilterTabs";
 import { DOMAIN_TABS } from "@/config/domainFilters";
 import { getDomainPhrase } from "@/utils/omop";
@@ -19,6 +19,18 @@ jest.mock("next/navigation", () => ({
   }),
 }));
 
+const UNFINISHED_NAVIGATION = new Promise<never>(() => {});
+let startNavigation: () => void = () => {};
+
+const RouterStillFetching = () => {
+  const [isNavigating, setIsNavigating] = useState(false);
+  useEffect(() => {
+    startNavigation = () => setIsNavigating(true);
+  }, []);
+  if (isNavigating) use(UNFINISHED_NAVIGATION);
+  return null;
+};
+
 describe("DomainFilterTabs", () => {
   beforeEach(() => {
     mockReplace.mockClear();
@@ -26,7 +38,7 @@ describe("DomainFilterTabs", () => {
   });
 
   it("renders a tab for every domain filter", () => {
-    render(<DomainFilterTabs startTransition={startTransition} />);
+    render(<DomainFilterTabs />);
 
     for (const domain of DOMAIN_TABS) {
       const label = capitaliseFirstLetter(getDomainPhrase(domain).noun);
@@ -35,16 +47,37 @@ describe("DomainFilterTabs", () => {
   });
 
   it("writes the domain to the URL", async () => {
-    render(<DomainFilterTabs startTransition={startTransition} />);
+    render(<DomainFilterTabs />);
 
     await userEvent.click(screen.getByRole("tab", { name: "Observation" }));
 
     expect(mockReplace).toHaveBeenCalledWith("?domain=observation&page=1");
   });
 
+  it("selects the clicked tab straight away, before the router has finished navigating", async () => {
+    mockReplace.mockImplementationOnce(() => startNavigation());
+    render(
+      <>
+        <DomainFilterTabs />
+        <Suspense fallback={null}>
+          <RouterStillFetching />
+        </Suspense>
+      </>,
+    );
+
+    await act(async () =>
+      fireEvent.click(screen.getByRole("tab", { name: "Observation" })),
+    );
+
+    expect(screen.getByRole("tab", { name: "Observation" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+  });
+
   it("marks the tab from the URL as selected", () => {
     mockSearchParams = new URLSearchParams("domain=measurement");
-    render(<DomainFilterTabs startTransition={startTransition} />);
+    render(<DomainFilterTabs />);
 
     expect(screen.getByRole("tab", { name: "Measurement" })).toHaveAttribute(
       "aria-selected",
@@ -54,7 +87,7 @@ describe("DomainFilterTabs", () => {
 
   it("does nothing when clicking the already-selected domain tab", async () => {
     mockSearchParams = new URLSearchParams("domain=observation");
-    render(<DomainFilterTabs startTransition={startTransition} />);
+    render(<DomainFilterTabs />);
 
     await userEvent.click(screen.getByRole("tab", { name: "Observation" }));
 
@@ -63,7 +96,7 @@ describe("DomainFilterTabs", () => {
 
   it("clears the domain filter when clicking All while a domain is selected", async () => {
     mockSearchParams = new URLSearchParams("domain=observation");
-    render(<DomainFilterTabs startTransition={startTransition} />);
+    render(<DomainFilterTabs />);
 
     await userEvent.click(screen.getByRole("tab", { name: "All" }));
 

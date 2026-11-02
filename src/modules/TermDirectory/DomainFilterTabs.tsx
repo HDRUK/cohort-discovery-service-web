@@ -1,18 +1,15 @@
 "use client";
 
 import { Tab, Tabs } from "@mui/material";
-import { TransitionStartFunction, useOptimistic } from "react";
+import { useOptimistic, useTransition } from "react";
 import { DOMAIN_TABS } from "@/config/domainFilters";
 import useSearchParams from "@/hooks/useSearchParams";
 import { getDomainPhrase } from "@/utils/omop";
 import { capitaliseFirstLetter } from "@/utils/string";
 
-interface DomainFilterTabsProps {
-  startTransition: TransitionStartFunction;
-}
-
-const DomainFilterTabs = ({ startTransition }: DomainFilterTabsProps) => {
+const DomainFilterTabs = () => {
   const { getSearchParam, setSearchParams } = useSearchParams("domain");
+  const [, startTransition] = useTransition();
 
   const [selected, setOptimisticSelected] = useOptimistic(
     getSearchParam() ?? "all",

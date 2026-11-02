@@ -2,8 +2,9 @@
 
 import { Stack } from "@mui/material";
 import { type MRT_ColumnDef } from "material-react-table";
-import { useMemo, useTransition } from "react";
+import { useMemo } from "react";
 import { TermDirectoryEntry, Paginated } from "@/types/api";
+import { useLatestPromise } from "@/hooks/useLatestPromise";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import CopyableTextButton from "@/components/CopyableTextButton";
 import Table from "@/components/Table";
@@ -14,13 +15,13 @@ import AssociatedCollectionsChip from "./AssociatedCollectionsChip";
 
 const NO_ENTRIES: TermDirectoryEntry[] = [];
 
-const TermDirectory = ({
-  entries,
-}: {
-  entries?: Paginated<TermDirectoryEntry>;
-}) => {
-  const [isFiltering, startFilterTransition] = useTransition();
-  const isLoading = !entries || isFiltering;
+interface TermDirectoryProps {
+  entriesPromise: Promise<Paginated<TermDirectoryEntry>>;
+}
+
+const TermDirectory = ({ entriesPromise }: TermDirectoryProps) => {
+  const { value: entries, isPending: isLoading } =
+    useLatestPromise(entriesPromise);
 
   const columns = useMemo<MRT_ColumnDef<TermDirectoryEntry>[]>(
     () => [
@@ -87,7 +88,7 @@ const TermDirectory = ({
     enableStickyHeader: true,
     enableSorting: false,
     enableRowSelection: false,
-    state: { isLoading },
+    state: { isLoading, showLoadingOverlay: false },
   });
 
   return (
@@ -97,7 +98,6 @@ const TermDirectory = ({
       leftAction={{
         searchProps: {
           placeholder: "Search by term name or OMOP ID...",
-          startTransition: startFilterTransition,
         },
       }}
       rightAction={{
@@ -108,7 +108,7 @@ const TermDirectory = ({
           ],
         },
       }}
-      details={<DomainFilterTabs startTransition={startFilterTransition} />}
+      details={<DomainFilterTabs />}
       boxSxProps={{
         "& > .MuiGrid-container": {
           bgcolor: "table.main",

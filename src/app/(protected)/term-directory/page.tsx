@@ -26,46 +26,45 @@ const TermDirectoryTitle = async ({ searchParams }: PageProps) => {
   );
 };
 
-const TermDirectoryEntries = async ({ searchParams }: PageProps) => {
-  const params = await searchParams;
-  const result = await getTermDirectory(
-    params?.page,
-    params?.per_page,
-    params?.search_term,
-    params?.domain,
-    params?.collections?.split(","),
-    params?.sort,
-  );
+const TermDirectoryPage = ({ searchParams }: PageProps) => {
+  const entriesPromise = searchParams
+    .then((params) =>
+      getTermDirectory(
+        params?.page,
+        params?.per_page,
+        params?.search_term,
+        params?.domain,
+        params?.collections?.split(","),
+        params?.sort,
+      ),
+    )
+    .then((result) => result.data);
 
-  return <TermDirectory entries={result.data} />;
-};
-
-const TermDirectoryPage = ({ searchParams }: PageProps) => (
-  <Paper
-    sx={{
-      p: 2,
-      gap: 2,
-      height: "100%",
-      display: "flex",
-      flexDirection: "column",
-      bgcolor: "background.default",
-    }}
-  >
-    <Stack
-      direction="row"
-      justifyContent="space-between"
-      alignItems="center"
-      gap={2}
+  return (
+    <Paper
+      sx={{
+        p: 2,
+        gap: 2,
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        bgcolor: "background.default",
+      }}
     >
-      <Suspense fallback={<Title title="Term Directory" />}>
-        <TermDirectoryTitle searchParams={searchParams} />
-      </Suspense>
-      <CollectionFilter />
-    </Stack>
-    <Suspense fallback={<TermDirectory />}>
-      <TermDirectoryEntries searchParams={searchParams} />
-    </Suspense>
-  </Paper>
-);
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        gap={2}
+      >
+        <Suspense fallback={<Title title="Term Directory" />}>
+          <TermDirectoryTitle searchParams={searchParams} />
+        </Suspense>
+        <CollectionFilter />
+      </Stack>
+      <TermDirectory entriesPromise={entriesPromise} />
+    </Paper>
+  );
+};
 
 export default TermDirectoryPage;
