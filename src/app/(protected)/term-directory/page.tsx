@@ -1,4 +1,4 @@
-import { Paper, Skeleton, Stack } from "@mui/material";
+import { Paper, Stack } from "@mui/material";
 import { Suspense } from "react";
 import Title from "@/components/Title";
 import TermDirectory from "@/modules/TermDirectory";
@@ -12,7 +12,21 @@ interface PageProps {
   searchParams: Promise<TermDirectorySearchParams>;
 }
 
-const TermDirectoryPageContent = async ({ searchParams }: PageProps) => {
+const TermDirectoryTitle = async ({ searchParams }: PageProps) => {
+  const params = await searchParams;
+
+  return (
+    <Title
+      title="Term Directory"
+      subTitle={
+        params?.domain &&
+        capitaliseFirstLetter(getDomainPhrase(params.domain).noun)
+      }
+    />
+  );
+};
+
+const TermDirectoryEntries = async ({ searchParams }: PageProps) => {
   const params = await searchParams;
   const result = await getTermDirectory(
     params?.page,
@@ -23,41 +37,35 @@ const TermDirectoryPageContent = async ({ searchParams }: PageProps) => {
     params?.sort,
   );
 
-  return (
-    <Paper
-      sx={{
-        p: 2,
-        gap: 2,
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        bgcolor: "background.default",
-      }}
-    >
-      <Stack
-        direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-        gap={2}
-      >
-        <Title
-          title="Term Directory"
-          subTitle={
-            params?.domain &&
-            capitaliseFirstLetter(getDomainPhrase(params.domain).noun)
-          }
-        />
-        <CollectionFilter />
-      </Stack>
-      <TermDirectory entries={result.data} />
-    </Paper>
-  );
+  return <TermDirectory entries={result.data} />;
 };
 
 const TermDirectoryPage = ({ searchParams }: PageProps) => (
-  <Suspense fallback={<Skeleton variant="rectangular" height={400} />}>
-    <TermDirectoryPageContent searchParams={searchParams} />
-  </Suspense>
+  <Paper
+    sx={{
+      p: 2,
+      gap: 2,
+      height: "100%",
+      display: "flex",
+      flexDirection: "column",
+      bgcolor: "background.default",
+    }}
+  >
+    <Stack
+      direction="row"
+      justifyContent="space-between"
+      alignItems="center"
+      gap={2}
+    >
+      <Suspense fallback={<Title title="Term Directory" />}>
+        <TermDirectoryTitle searchParams={searchParams} />
+      </Suspense>
+      <CollectionFilter />
+    </Stack>
+    <Suspense fallback={<TermDirectory />}>
+      <TermDirectoryEntries searchParams={searchParams} />
+    </Suspense>
+  </Paper>
 );
 
 export default TermDirectoryPage;

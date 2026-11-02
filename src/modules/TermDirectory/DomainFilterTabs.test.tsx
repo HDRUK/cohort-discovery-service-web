@@ -1,6 +1,7 @@
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { startTransition } from "react";
 import DomainFilterTabs from "./DomainFilterTabs";
 import { DOMAIN_TABS } from "@/config/domainFilters";
 import { getDomainPhrase } from "@/utils/omop";
@@ -25,7 +26,7 @@ describe("DomainFilterTabs", () => {
   });
 
   it("renders a tab for every domain filter", () => {
-    render(<DomainFilterTabs />);
+    render(<DomainFilterTabs startTransition={startTransition} />);
 
     for (const domain of DOMAIN_TABS) {
       const label = capitaliseFirstLetter(getDomainPhrase(domain).noun);
@@ -34,7 +35,7 @@ describe("DomainFilterTabs", () => {
   });
 
   it("writes the domain to the URL", async () => {
-    render(<DomainFilterTabs />);
+    render(<DomainFilterTabs startTransition={startTransition} />);
 
     await userEvent.click(screen.getByRole("tab", { name: "Observation" }));
 
@@ -43,7 +44,7 @@ describe("DomainFilterTabs", () => {
 
   it("marks the tab from the URL as selected", () => {
     mockSearchParams = new URLSearchParams("domain=measurement");
-    render(<DomainFilterTabs />);
+    render(<DomainFilterTabs startTransition={startTransition} />);
 
     expect(screen.getByRole("tab", { name: "Measurement" })).toHaveAttribute(
       "aria-selected",
@@ -53,7 +54,7 @@ describe("DomainFilterTabs", () => {
 
   it("does nothing when clicking the already-selected domain tab", async () => {
     mockSearchParams = new URLSearchParams("domain=observation");
-    render(<DomainFilterTabs />);
+    render(<DomainFilterTabs startTransition={startTransition} />);
 
     await userEvent.click(screen.getByRole("tab", { name: "Observation" }));
 
@@ -62,7 +63,7 @@ describe("DomainFilterTabs", () => {
 
   it("clears the domain filter when clicking All while a domain is selected", async () => {
     mockSearchParams = new URLSearchParams("domain=observation");
-    render(<DomainFilterTabs />);
+    render(<DomainFilterTabs startTransition={startTransition} />);
 
     await userEvent.click(screen.getByRole("tab", { name: "All" }));
 
