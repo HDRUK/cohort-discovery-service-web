@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Stack } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { type MRT_ColumnDef } from "material-react-table";
 import { useMemo } from "react";
 import { TermDirectoryEntry, Paginated } from "@/types/api";
@@ -88,14 +88,22 @@ const TermDirectory = ({ entries }: TermDirectoryProps) => {
     enableStickyHeader: true,
     enableSorting: false,
     enableRowSelection: false,
+    layoutMode: "grid",
     state: { isLoading, showLoadingOverlay: false },
     muiTableBodyProps: { "aria-busy": isLoading },
+    renderEmptyRowsFallback: () => (
+      <Typography
+        variant="h5"
+        sx={{ py: 4, width: "100%", textAlign: "center" }}
+      >
+        No terms found.
+      </Typography>
+    ),
   });
 
   const directory = (
     <Table
       table={table}
-      emptyMessage={isLoading ? undefined : "No terms found."}
       leftAction={{
         searchProps: {
           placeholder: "Search by term name or OMOP ID...",

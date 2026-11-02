@@ -92,10 +92,13 @@ describe("TermDirectory", () => {
     expect(screen.getByText("1,234")).toBeInTheDocument();
   });
 
-  it("shows an empty message when no terms are returned", () => {
+  it("shows an empty message under the column headers when no terms are returned", () => {
     renderComponent(paginateData({ data: [] }));
 
     expect(screen.getByText("No terms found.")).toBeInTheDocument();
+    expect(
+      screen.getByRole("columnheader", { name: /Term Name/ }),
+    ).toBeInTheDocument();
   });
 
   it("shows skeleton rows instead of the empty message while the terms load", () => {

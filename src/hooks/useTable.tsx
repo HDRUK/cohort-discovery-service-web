@@ -184,6 +184,7 @@ export const useTable = <TData extends MRT_RowData>({
       sx: {
         flex: 1,
         overflow: "auto",
+        scrollbarGutter: "stable",
       },
     },
     ...rest,
