@@ -77,7 +77,7 @@ const CollectionFilter = () => {
   const open = Boolean(anchorEl);
 
   return (
-    <Title title="Filter" subTitle="Collections">
+    <Title centerTitleContent title="Filter Collections /" sx={{ mr: 1.5 }}>
       <Chip
         aria-label="Filter by collection"
         onClick={(event) => setAnchorEl(event.currentTarget)}
@@ -120,7 +120,13 @@ const CollectionFilter = () => {
         transformOrigin={{ vertical: "top", horizontal: "right" }}
       >
         <Stack
-          sx={{ p: 2, gap: 0.5, minWidth: 320, maxHeight: 400, overflow: "auto" }}
+          sx={{
+            p: 2,
+            gap: 0.5,
+            minWidth: 320,
+            maxHeight: 400,
+            overflow: "auto",
+          }}
         >
           <SearchBox
             placeholder="I'm looking for..."
