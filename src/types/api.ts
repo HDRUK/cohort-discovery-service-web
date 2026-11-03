@@ -310,6 +310,7 @@ export interface CollectionConfig {
   run_time_frequency: number;
   run_time_hour: number;
   run_time_minute: number;
+  type: DistributionJobType;
 }
 
 export interface CollectionWithHosts extends Collection {
@@ -477,9 +478,9 @@ export const frequencyMap: Record<FrequencyMode, string[]> = {
   [FrequencyMode.BIANNUALLY]: ["H1", "H2"],
 };
 
-export enum TaskType {
-  A = "a",
-  B = "b",
+export enum DistributionJobType {
+  GENERIC = "GENERIC",
+  DEMOGRAPHICS = "DEMOGRAPHICS",
 }
 
 export interface UserIdentity extends WithTimestamps {
@@ -605,7 +606,7 @@ export interface CreateCollectionConfigPost {
   frequency_mode: number;
   run_time_frequency: number;
   enabled: number;
-  type: string;
+  type: DistributionJobType;
 }
 
 export interface Workgroup {

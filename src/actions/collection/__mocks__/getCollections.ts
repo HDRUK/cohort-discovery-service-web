@@ -4,6 +4,7 @@ import {
   Collection,
   CollectionWithHosts,
   Distribution,
+  DistributionJobType,
   ModelState,
 } from "@/types/api";
 import { v4 as uuidv4 } from "uuid";
@@ -83,6 +84,7 @@ export const getMockCollection = (
     run_time_frequency: 1,
     run_time_hour: 0,
     run_time_minute: 0,
+    type: DistributionJobType.DEMOGRAPHICS,
   },
   ...rest,
 });

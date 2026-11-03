@@ -306,7 +306,7 @@ async function handle(req, res) {
 
   // Collection config
   if (method === "GET" && pathname === "/api/v1/collection_config") {
-    return ok(res, { id: 1, enabled: true, frequency_mode: 1, run_time_frequency: 1, run_time_hour: 0, run_time_minute: 0 });
+    return ok(res, { id: 1, enabled: true, frequency_mode: 1, run_time_frequency: 1, run_time_hour: 0, run_time_minute: 0, type: "DEMOGRAPHICS" });
   }
 
   if (method === "POST" && pathname === "/api/v1/collection_config") {
