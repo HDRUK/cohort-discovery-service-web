@@ -1,3 +1,42 @@
+## [1.12.0](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.11.2...v1.12.0) (2026-11-03)
+
+### ✨ Features
+
+* **DP-1006:** small rule block improvement/fix (#545) ([f8a3268](https://github.com/HDRUK/cohort-discovery-service-web/commit/f8a3268f557c09e497acb92d935f5d11dc0276ac))
+* **DP-1076:** enable Cache Components and fix any immediate issues (#565) ([f4b7594](https://github.com/HDRUK/cohort-discovery-service-web/commit/f4b759415db79a9b626f569b7a9bcfe0026c341f))
+* **DP-1100:** update "Hierarchy" to "Query Structure" (#576) ([6a0a174](https://github.com/HDRUK/cohort-discovery-service-web/commit/6a0a174c1c0b0fb1ff949b7a729ba5c1569ba575)), closes [DP-1100](undefinedDP-1100)
+* **DP-1120:** all tasks panel on the collection health detail (#514) ([80bd9f0](https://github.com/HDRUK/cohort-discovery-service-web/commit/80bd9f00bd13a3540b925580aec2f629b3f75a6d)), closes [DP-1120](undefinedDP-1120)
+* **DP-1120:** collection health panel (#509) ([9647335](https://github.com/HDRUK/cohort-discovery-service-web/commit/96473359ef1575614c85622a6208e7bbcf622350)), closes [DP-1120](undefinedDP-1120)
+* **DP-1120:** collection health telemetry plots (#510) ([c138d27](https://github.com/HDRUK/cohort-discovery-service-web/commit/c138d2794bfa8821267eeeca3c67ff44a5a8c969)), closes [DP-1120](undefinedDP-1120)
+* **DP-1120:** standalone collection health detail page (#513) ([08b9f45](https://github.com/HDRUK/cohort-discovery-service-web/commit/08b9f45425b27e5c801651098ed01aeeaa07f208)), closes [DP-1120](undefinedDP-1120)
+* **DP-1155:** Redesign the standalone login screen (#539) ([9284974](https://github.com/HDRUK/cohort-discovery-service-web/commit/928497424254fd831c8580a056566e8521fc6724)), closes [DP-1155](undefinedDP-1155)
+* **DP-1155:** Serve terms and privacy pages in standalone mode (#540) ([9b99c60](https://github.com/HDRUK/cohort-discovery-service-web/commit/9b99c603d16a503b5ef72eb7bfdfba9e7ae03ce7)), closes [DP-1155](undefinedDP-1155)
+* **DP-1156:** Make deployment branding configurable (#541) ([a0ef21e](https://github.com/HDRUK/cohort-discovery-service-web/commit/a0ef21ef6ca58a32110352b1ad7d13cf7eebd3d0)), closes [DP-1156](undefinedDP-1156)
+* **DP-1184:** restore soft-deleted collections and hosts (#588) ([2d9e13d](https://github.com/HDRUK/cohort-discovery-service-web/commit/2d9e13d100db8ed18d7c983845feda3ff4397a9c)), closes [DP-1184](undefinedDP-1184)
+* **DP-1184:** show soft-deleted collections and hosts (#587) ([97e701c](https://github.com/HDRUK/cohort-discovery-service-web/commit/97e701cd88221a5436b8c73797d6855357a22584)), closes [DP-1184](undefinedDP-1184)
+* **DP-1200:** match collection filter text to Figma (#597) ([ee9a351](https://github.com/HDRUK/cohort-discovery-service-web/commit/ee9a35102d3a2377af9f1711193384647ff9587c)), closes [DP-1200](undefinedDP-1200)
+* **DP-956:** update Collection filter styling and look (#591) ([2e8f5f9](https://github.com/HDRUK/cohort-discovery-service-web/commit/2e8f5f9bdeab08148e6804d0cfbb0e18e6003196)), closes [DP-956](undefinedDP-956)
+* **DP-958:** 'Preview' title styling update (#584) ([2562961](https://github.com/HDRUK/cohort-discovery-service-web/commit/2562961717830f46b7aafda352f3b3592acca5cf)), closes [DP-958](undefinedDP-958)
+* **DP-976:** Add a standalone admin Users view (#532) ([7d87163](https://github.com/HDRUK/cohort-discovery-service-web/commit/7d87163b85d7ac64c4851bcacdf2d0101d5b0e09)), closes [DP-976](undefinedDP-976)
+* **DP-976:** Add OIDC SSO support for standalone authentication (#528) ([a726938](https://github.com/HDRUK/cohort-discovery-service-web/commit/a7269387ab72ea36cba9be7bb04a9a7ffe68fcee)), closes [DP-976](undefinedDP-976)
+
+### 🐛 Bug Fixes
+
+* **DP-0000:** fix e2e test (#581) ([5b56b6a](https://github.com/HDRUK/cohort-discovery-service-web/commit/5b56b6a4ac91534ce6c3e48b12c94512503f7036))
+* **DP-1075:** keep the current page when a search is cleared (#580) ([99e9054](https://github.com/HDRUK/cohort-discovery-service-web/commit/99e9054455dd6cda4af7a7c3f88aea2c2899f721)), closes [DP-1075](undefinedDP-1075)
+* **DP-1077:** keep term directory column widths and headers steady (#598) ([824e8d7](https://github.com/HDRUK/cohort-discovery-service-web/commit/824e8d7b650332ac06a03d7645a353c9d9ef12fd)), closes [DP-1077](undefinedDP-1077)
+* **DP-1077:** show the term directory loading state on first load and after every filter change (#596) ([3046802](https://github.com/HDRUK/cohort-discovery-service-web/commit/3046802e4eba421861dae6fa32caf7f6ac82a47f)), closes [DP-1077](undefinedDP-1077)
+* **DP-1120:** give the health detail panel a surface hierarchy (#512) ([36c7425](https://github.com/HDRUK/cohort-discovery-service-web/commit/36c7425dfade9c790029ddba54a75384cbe00a5b)), closes [DP-1120](undefinedDP-1120)
+* **DP-1156:** Fix for standalone logout (#557) ([3bd5dc0](https://github.com/HDRUK/cohort-discovery-service-web/commit/3bd5dc0b64ba7a29e1c76e13c688d4f912b1a746))
+* **DP-1156:** standalone login redirects (#559) ([1bc6b36](https://github.com/HDRUK/cohort-discovery-service-web/commit/1bc6b369ffa2bfcd53a97efda2a01377418f2940)), closes [DP-1156](undefinedDP-1156)
+* **DP-1174:** query rate limit errors (#561) ([f4bb32c](https://github.com/HDRUK/cohort-discovery-service-web/commit/f4bb32c519826abe416af263474aa9d95f7867b2)), closes [DP-1174](undefinedDP-1174)
+* **DP-1182:** treat a delivered result as a finished task (#579) ([b3a70bb](https://github.com/HDRUK/cohort-discovery-service-web/commit/b3a70bb66897240b0ef08896e73422f63ac4b44a)), closes [DP-1182](undefinedDP-1182)
+* **DP-1185:** fix datepicker overflow in "Set Timeframe" (#595) ([c725be9](https://github.com/HDRUK/cohort-discovery-service-web/commit/c725be92f884283ad9c3180c1769be586b1e42ba))
+* **DP-1186:** Rule Refinements and Maintenance (#582) ([7d125c0](https://github.com/HDRUK/cohort-discovery-service-web/commit/7d125c011af949ad7938fb38314276e7e70f90f2)), closes [DP-1186](undefinedDP-1186)
+* **DP-1188:** speed up CI tests and remove console warnings (#593) ([283b01a](https://github.com/HDRUK/cohort-discovery-service-web/commit/283b01a00aa81b6af34aaa11d55c12da5b866e43)), closes [DP-1188](undefinedDP-1188)
+* **DP-1214:** fix filter collection styling in term directory (#600) ([6e24455](https://github.com/HDRUK/cohort-discovery-service-web/commit/6e24455e4966f690aa1c7195c0b5c252b3b78b7c))
+* **DP-920:** fix collection status out of sync (#560) ([bbf14a0](https://github.com/HDRUK/cohort-discovery-service-web/commit/bbf14a0b6a1a82daff0c3cce212550a173669ef9))
+
 ## [1.11.2](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.11.1...v1.11.2) (2026-10-26)
 
 ### 🐛 Bug Fixes
