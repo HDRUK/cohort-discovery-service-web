@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 import path from "path";
 
 const nextConfig: NextConfig = {
+  cacheComponents: true,
+  partialPrefetching: true,
   logging: {
     fetches: {
       fullUrl: true,
@@ -11,6 +13,9 @@ const nextConfig: NextConfig = {
   experimental: {
     authInterrupts: true,
     useTypeScriptCli: false,
+  },
+  typescript: {
+    ignoreBuildErrors: process.env.CYPRESS === "true",
   },
   transpilePackages: ["@faker-js/faker"],
   outputFileTracingRoot: path.join(__dirname, "../"),

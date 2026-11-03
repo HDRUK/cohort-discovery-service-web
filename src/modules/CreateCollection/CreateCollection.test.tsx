@@ -159,17 +159,20 @@ describe("CreateCollection", () => {
     });
 
     nameInput = screen.getByLabelText(/name/i) as HTMLInputElement;
-    await user.type(nameInput, "My Collection");
+    await user.click(nameInput);
+    await user.paste("My Collection");
     expect(nameInput).toHaveValue("My Collection");
 
     const descInput = screen.getByLabelText(/description/i) as HTMLInputElement;
-    await user.type(descInput, "A test collection");
+    await user.click(descInput);
+    await user.paste("A test collection");
     expect(descInput).toHaveValue("A test collection");
 
     const urlInput = screen.getByLabelText(
       /link to associated datasets/i,
     ) as HTMLInputElement;
-    await user.type(urlInput, "http://example.com");
+    await user.click(urlInput);
+    await user.paste("http://example.com");
     expect(urlInput).toHaveValue("http://example.com");
 
     const createButton = screen.getByRole("button", { name: /create/i });
@@ -229,12 +232,12 @@ describe("CreateCollection", () => {
       fireEvent.click(betaOption);
     });
 
-    await user.type(screen.getByLabelText(/name/i), "My Admin Collection");
-    await user.type(screen.getByLabelText(/description/i), "A test collection");
-    await user.type(
-      screen.getByLabelText(/link to associated datasets/i),
-      "http://example.com",
-    );
+    await user.click(screen.getByLabelText(/name/i));
+    await user.paste("My Admin Collection");
+    await user.click(screen.getByLabelText(/description/i));
+    await user.paste("A test collection");
+    await user.click(screen.getByLabelText(/link to associated datasets/i));
+    await user.paste("http://example.com");
 
     const createButton = screen.getByRole("button", { name: /create/i });
     expect(createButton).not.toBeDisabled();
@@ -271,9 +274,12 @@ describe("CreateCollection", () => {
       /link to associated datasets/i,
     ) as HTMLInputElement;
 
-    await user.type(nameInput, "Temp Name");
-    await user.type(descInput, "Temp Description");
-    await user.type(urlInput, "http://temp-url.com");
+    await user.click(nameInput);
+    await user.paste("Temp Name");
+    await user.click(descInput);
+    await user.paste("Temp Description");
+    await user.click(urlInput);
+    await user.paste("http://temp-url.com");
 
     const listbox = await screen.findByRole("listbox");
     const betaOption = within(listbox).getByText(/alpha host/i);

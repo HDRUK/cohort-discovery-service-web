@@ -11,6 +11,8 @@ type CollectionHostListPanelProps = {
   rowSelection: MRT_RowSelectionState;
   setRowSelection: Dispatch<SetStateAction<MRT_RowSelectionState>>;
   onDeleteHost: () => void;
+  onRestoreHost: () => void;
+  isDeletedView: boolean;
 };
 
 const CollectionHostListPanel = ({
@@ -19,12 +21,16 @@ const CollectionHostListPanel = ({
   rowSelection,
   setRowSelection,
   onDeleteHost,
+  onRestoreHost,
+  isDeletedView,
 }: CollectionHostListPanelProps) => {
   if (noCollectionHosts) {
     return (
       <Box sx={{ mx: "auto", my: "auto" }}>
         <Typography variant="h5">
-          Collection hosts will appear here when they are created
+          {isDeletedView
+            ? "No deleted hosts — hosts you delete appear here and can be restored"
+            : "Collection hosts will appear here when they are created"}
         </Typography>
       </Box>
     );
@@ -37,6 +43,8 @@ const CollectionHostListPanel = ({
         rowSelection={rowSelection}
         setRowSelection={setRowSelection}
         onDelete={onDeleteHost}
+        onRestore={onRestoreHost}
+        isDeletedView={isDeletedView}
       />
     </Box>
   );

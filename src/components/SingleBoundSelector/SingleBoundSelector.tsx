@@ -1,9 +1,8 @@
 "use client";
 
-import { Paper, Stack } from "@mui/material";
+import { Box, Paper, Stack, useMediaQuery, useTheme } from "@mui/material";
 import { ReactNode, useMemo } from "react";
-import { SingleSidedOperator } from "@/types/rules";
-
+import { OperatorMode, SingleSidedOperator } from "@/types/rules";
 import OperatorToggle from "@/components/OperatorToggle";
 
 export type NullablePair<T> = [T | null, T | null];
@@ -79,6 +78,9 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
   renderReadOnlyLabel,
   onClick,
 }: SingleBoundSelectorProps<TStored, TUi>) {
+  const theme = useTheme();
+  const isXl = useMediaQuery(theme.breakpoints.up("xl"));
+
   const parseFn = useMemo(
     () => parse ?? ((v: TStored | null) => v as unknown as TUi | null),
     [parse],
@@ -131,30 +133,42 @@ export default function SingleBoundSelector<TStored, TUi = TStored>({
             }
 
             const defaultText =
-              value == null
-                ? anyLabel
-                : `${operator} ${String(value)}`;
+              value == null ? anyLabel : `${operator} ${String(value)}`;
 
             return <Paper sx={{ border: 1, p: 1 }}>{defaultText}</Paper>;
           })()
         ) : (
-          <Stack direction={"row"} gap={1} alignItems={"center"}>
-            <OperatorToggle
-              operators={[SingleSidedOperator.GREATER_THAN, SingleSidedOperator.LESS_THAN]}
-              operator={operator}
-              onChange={handleOperatorChange}
-              readOnly={readOnly}
-              onClick={onClick}
-            />
+          <Stack
+            direction={{ lg: "column", xl: "row" }}
+            gap={1}
+            alignItems="stretch"
+            width="100%"
+          >
+            <Box sx={{ flexShrink: 0, alignSelf: "center" }}>
+              <OperatorToggle
+                operators={[
+                  SingleSidedOperator.GREATER_THAN,
+                  SingleSidedOperator.LESS_THAN,
+                ]}
+                operator={operator}
+                onChange={handleOperatorChange}
+                readOnly={readOnly}
+                onClick={onClick}
+                mode={isXl ? OperatorMode.INSTANT : OperatorMode.DROPDOWN}
+              />
+            </Box>
 
-            {renderPicker({
-              value,
-              onChange: handleValueChange,
-              readOnly,
-            })}
+            <Box sx={{ flex: 1, minWidth: 0, width: "100%" }}>
+              {renderPicker({
+                value,
+                onChange: handleValueChange,
+                readOnly,
+              })}
+            </Box>
           </Stack>
         )}
       </Stack>
+
       {children}
     </>
   );

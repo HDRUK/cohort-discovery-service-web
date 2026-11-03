@@ -14,6 +14,8 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PendingIcon from "@mui/icons-material/Pending";
 import { useTable } from "../../hooks/useTable";
 import { formatNumber } from "@/utils/numbers";
+import { getTaskStatus } from "@/utils/tasks";
+import { TaskStatus } from "@/types/tasks";
 import { RemoveCircle } from "@mui/icons-material";
 import dayjs from "dayjs";
 import Table from "../Table";
@@ -29,7 +31,7 @@ const TaskResults = ({ tasks }: TaskResultsProps) => {
         id: "status",
         header: "",
         Cell: ({ row }) => {
-          const { completed_at, failed_at, attempts } = row.original;
+          const { failed_at, attempts } = row.original;
           if (failed_at) {
             return (
               <Tooltip title={`Marked as failed after ${attempts} were made.`}>
@@ -37,10 +39,10 @@ const TaskResults = ({ tasks }: TaskResultsProps) => {
               </Tooltip>
             );
           }
-          return completed_at ? (
-            <CheckCircleIcon color="success" fontSize="small" />
-          ) : (
+          return getTaskStatus(row.original) === TaskStatus.PENDING ? (
             <PendingIcon color="warning" fontSize="small" />
+          ) : (
+            <CheckCircleIcon color="success" fontSize="small" />
           );
         },
         size: 20,

@@ -2,19 +2,11 @@
 
 import { Box, Chip, Divider } from "@mui/material";
 import { OperatorType } from "@/types/rules";
-import { DragType } from "@/types/dnd";
 import RuleWrapper from "../RuleWrapper";
-import useQueryBuilder from "@/hooks/useQueryBuilder";
-import { cardSx, rootSx, dividerSx, chipSx } from "./RuleOperator.styles";
+import { rootSx, dividerSx, chipSx } from "./RuleOperator.styles";
 import InvalidRule from "@/components/InvalidRule";
-import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
-import useNodeActions from "@/hooks/useNodeActions";
-import useHoverable from "@/hooks/useHoverable";
 
-export interface RuleOperatorProps extends Omit<
-  RuleWrapperProps,
-  "node" | "type" | "render"
-> {
+export interface RuleOperatorProps {
   operator: OperatorType;
   groupId?: string;
   hidden?: boolean;
@@ -24,29 +16,15 @@ const RuleOperator = ({
   operator,
   groupId,
   hidden = false,
-  ...rest
 }: RuleOperatorProps) => {
-  const { id, combinator, valid = true, invalidReason } = operator;
-
-  const { isSelected } = useQueryBuilder((qb) => ({
-    isSelected: !!qb.selected[id],
-  }));
-
-  const { actions } = useNodeActions(operator);
-  const { isHighlighted } = useHoverable<HTMLDivElement>(id);
+  const { combinator, valid = true, invalidReason } = operator;
 
   return (
     <RuleWrapper
-      useLeftDragPlaceHolder
-      hideHeader
-      cardProps={{
-        sx: cardSx(isSelected, isHighlighted),
-      }}
       node={operator}
-      type={DragType.Operator}
       groupId={groupId}
-      sortable={true}
-      render={() => (
+      renderHeader={null}
+      renderContent={
         <Box sx={rootSx(hidden)}>
           <Divider orientation="vertical" flexItem sx={dividerSx(valid)} />
 
@@ -61,9 +39,7 @@ const RuleOperator = ({
 
           {valid ? <Box /> : <InvalidRule reasons={invalidReason ?? []} />}
         </Box>
-      )}
-      actions={actions}
-      {...rest}
+      }
     />
   );
 };

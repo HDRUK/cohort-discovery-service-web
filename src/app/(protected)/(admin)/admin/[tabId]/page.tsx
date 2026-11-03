@@ -15,6 +15,8 @@ import NetworksTab from "./components/NetworksTab";
 
 type Params = Promise<{ tabId: string }>;
 
+export const instant = false;
+
 const applicationMode = process.env.APPLICATION_MODE;
 
 const CustodianAdminPage = async ({

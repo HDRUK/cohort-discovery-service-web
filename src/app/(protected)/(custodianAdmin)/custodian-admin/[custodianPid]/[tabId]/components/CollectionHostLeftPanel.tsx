@@ -6,6 +6,7 @@ import CreateCollectionHost from "@/modules/CreateCollectionHost";
 import { useThreePane } from "@/providers/ThreePaneProvider";
 import List from "@/components/List";
 import useSearchParams from "@/hooks/useSearchParams";
+import { CollectionHostFilter } from "@/types/collections";
 
 type CollectionHostLeftPanelProps = {
   custodianId: number;
@@ -16,9 +17,9 @@ const CollectionHostLeftPanel = ({
 }: CollectionHostLeftPanelProps) => {
   const { expandedLeft, toggleLeft } = useThreePane();
 
-  //does nothing yet
-  // - here for the future if a host filter is to be implemented
-  const { getSearchParam } = useSearchParams("collection_host_filter");
+  const { getSearchParam, setSearchParam } = useSearchParams(
+    "collection_host_filter",
+  );
   const searchParam = getSearchParam();
 
   return (
@@ -69,8 +70,14 @@ const CollectionHostLeftPanel = ({
           items={[
             {
               label: "All Hosts",
-              onClick: () => ({}),
-              selected: !searchParam,
+              onClick: () => setSearchParam(CollectionHostFilter.ALL),
+              selected:
+                searchParam === CollectionHostFilter.ALL || !searchParam,
+            },
+            {
+              label: "Deleted Hosts",
+              onClick: () => setSearchParam(CollectionHostFilter.DELETED),
+              selected: searchParam === CollectionHostFilter.DELETED,
             },
           ]}
         />

@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import CollectionFilter from "./CollectionFilter";
 import { DefaultProvider } from "@/providers/DefaultProvider";
@@ -8,6 +8,7 @@ import { useUserDataStore } from "@/hooks/userDataStore";
 import { HdrukUiProvider } from "@hdruk/ui";
 import { themeOptions } from "@/config/theme";
 import { ThemeOptions } from "@mui/material";
+import { createPendingNavigation } from "@/utils/pendingNavigation";
 
 const mockReplace = jest.fn();
 let mockSearchParams = new URLSearchParams();
@@ -54,6 +55,30 @@ describe("CollectionFilter", () => {
     );
 
     expect(mockReplace).toHaveBeenCalledWith("?collections=col-pid-2&page=1");
+  });
+
+  it("ticks the collection straight away, before the filtered terms have loaded", async () => {
+    const navigation = createPendingNavigation();
+    mockReplace.mockImplementationOnce(() => navigation.start());
+    render(
+      <DefaultProvider>
+        <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
+          <CollectionFilter />
+          <navigation.PendingRouter />
+        </HdrukUiProvider>
+      </DefaultProvider>,
+    );
+
+    await openPopover();
+    await act(async () =>
+      fireEvent.click(
+        screen.getByRole("checkbox", { name: "Test Dataset Beta" }),
+      ),
+    );
+
+    expect(
+      screen.getByRole("checkbox", { name: "Test Dataset Beta" }),
+    ).toBeChecked();
   });
 
   it("removes the param when the last collection is unchecked", async () => {

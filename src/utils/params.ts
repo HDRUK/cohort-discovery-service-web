@@ -1,11 +1,12 @@
 import {
-  ApiSearchParams,
+  CollectionHostsSearchParams,
   CollectionsSearchParams,
   ConceptSearchParams,
   QueryHistorySearchParams,
   SearchParams,
   SearchParamValue,
 } from "@/types/api";
+import { CollectionHostFilter } from "@/types/collections";
 
 export const buildSearchParams = <
   T extends Record<string, SearchParamValue> = SearchParams,
@@ -48,10 +49,17 @@ export const buildCollectionParams = (
   return buildSearchParams(params);
 };
 
-export const buildCollectionHostParams = (searchParams: ApiSearchParams) => {
-  const { sort } = searchParams ?? {};
+export const buildCollectionHostParams = (
+  searchParams: CollectionHostsSearchParams,
+) => {
+  const { sort, collection_host_filter } = searchParams ?? {};
 
-  return buildSearchParams({ sort });
+  return buildSearchParams({
+    sort,
+    ...(collection_host_filter === CollectionHostFilter.DELETED
+      ? { trashed: "only" }
+      : {}),
+  });
 };
 
 export const buildQueryHistoryParams = (

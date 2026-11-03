@@ -13,9 +13,10 @@ const ProtectedCustodianPageLayout = async ({
 }) => {
   const { custodianPid } = await params;
 
-  const { data: custodian } = await getCustodian(custodianPid);
-  const { data: collectionHosts } =
-    await getCustodianCollectionHosts(custodianPid);
+  const [{ data: custodian }, { data: collectionHosts }] = await Promise.all([
+    getCustodian(custodianPid),
+    getCustodianCollectionHosts(custodianPid),
+  ]);
 
   return (
     <CustodianSectionProvider

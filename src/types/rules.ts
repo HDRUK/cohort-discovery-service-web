@@ -19,6 +19,11 @@ export enum SingleSidedOperator {
   LESS_THAN = "<",
 }
 
+export enum OperatorMode {
+  INSTANT = "instant",
+  DROPDOWN = "dropdown",
+}
+
 export type ConceptOperator = {
   concept: Concept | Concept[] | null;
 };

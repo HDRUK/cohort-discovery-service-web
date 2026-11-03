@@ -1,11 +1,13 @@
 import "@testing-library/jest-dom";
-import { render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import TermDirectory from "./TermDirectory";
+import { SearchParamsTransitionProvider } from "@/contexts/SearchParamsTransitionContext";
 import { DefaultProvider } from "@/providers/DefaultProvider";
 import { NotifyProvider } from "@/providers/NotifyProvider";
 import { mockTermDirectoryEntries } from "@/actions/termDirectory/__mocks__/getTermDirectory";
 import { paginateData } from "@/utils/mock";
+import { createPendingNavigation } from "@/utils/pendingNavigation";
 import { TermDirectoryEntry, Paginated } from "@/types/api";
 
 const mockReplace = jest.fn();
@@ -25,6 +27,25 @@ const renderComponent = (entries: Paginated<TermDirectoryEntry>) =>
       </NotifyProvider>
     </DefaultProvider>,
   );
+
+const navigation = createPendingNavigation();
+
+const renderWithRouter = (entries: Paginated<TermDirectoryEntry>) => {
+  mockReplace.mockImplementationOnce(() => navigation.start());
+  return render(
+    <DefaultProvider>
+      <NotifyProvider>
+        <SearchParamsTransitionProvider>
+          <TermDirectory entries={entries} />
+          <navigation.PendingRouter />
+        </SearchParamsTransitionProvider>
+      </NotifyProvider>
+    </DefaultProvider>,
+  );
+};
+
+const skeletonCellCount = (container: HTMLElement) =>
+  container.querySelectorAll("tbody .MuiSkeleton-root").length;
 
 describe("TermDirectory", () => {
   beforeEach(() => {
@@ -71,10 +92,141 @@ describe("TermDirectory", () => {
     expect(screen.getByText("1,234")).toBeInTheDocument();
   });
 
-  it("shows an empty message when no terms are returned", () => {
+  it("shows an empty message under the column headers when no terms are returned", () => {
     renderComponent(paginateData({ data: [] }));
 
     expect(screen.getByText("No terms found.")).toBeInTheDocument();
+    expect(
+      screen.getByRole("columnheader", { name: /Term Name/ }),
+    ).toBeInTheDocument();
+  });
+
+  it("shows skeleton rows instead of the empty message while the terms load", () => {
+    const { container } = render(
+      <DefaultProvider>
+        <NotifyProvider>
+          <TermDirectory />
+        </NotifyProvider>
+      </DefaultProvider>,
+    );
+
+    expect(screen.queryByText("No terms found.")).not.toBeInTheDocument();
+    expect(skeletonCellCount(container)).toBeGreaterThan(0);
+  });
+
+  it("marks the rows as busy while the terms load", () => {
+    const { container } = render(
+      <DefaultProvider>
+        <NotifyProvider>
+          <TermDirectory />
+        </NotifyProvider>
+      </DefaultProvider>,
+    );
+
+    expect(container.querySelector("tbody")).toHaveAttribute(
+      "aria-busy",
+      "true",
+    );
+  });
+
+  it("makes the search, sort and tabs non-interactive until the first terms arrive", () => {
+    render(
+      <DefaultProvider>
+        <NotifyProvider>
+          <TermDirectory />
+        </NotifyProvider>
+      </DefaultProvider>,
+    );
+
+    expect(
+      screen
+        .getByPlaceholderText("Search by term name or OMOP ID...")
+        .closest("[inert]"),
+    ).not.toBeNull();
+  });
+
+  it("keeps the search, sort and tabs interactive once the terms have loaded", () => {
+    renderComponent(paginateData({ data: mockTermDirectoryEntries }));
+
+    expect(
+      screen
+        .getByPlaceholderText("Search by term name or OMOP ID...")
+        .closest("[inert]"),
+    ).toBeNull();
+    expect(screen.getByRole("table").querySelector("tbody")).toHaveAttribute(
+      "aria-busy",
+      "false",
+    );
+  });
+
+  it("does not show the loading overlay spinner on top of the skeleton rows", () => {
+    render(
+      <DefaultProvider>
+        <NotifyProvider>
+          <TermDirectory />
+        </NotifyProvider>
+      </DefaultProvider>,
+    );
+
+    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+  });
+
+  it("shows skeleton rows while a search loads, then the rows once it finishes", async () => {
+    const { container } = renderWithRouter(
+      paginateData({ data: mockTermDirectoryEntries }),
+    );
+    const searchBox = screen.getByPlaceholderText(
+      "Search by term name or OMOP ID...",
+    );
+
+    await act(async () => {
+      fireEvent.change(searchBox, { target: { value: "asthma" } });
+      fireEvent.keyDown(searchBox, { key: "Enter" });
+    });
+
+    expect(mockReplace).toHaveBeenCalledWith("?search_term=asthma");
+    expect(searchBox).toHaveValue("asthma");
+    expect(
+      screen.queryByText("Type 2 diabetes mellitus"),
+    ).not.toBeInTheDocument();
+    expect(skeletonCellCount(container)).toBeGreaterThan(0);
+
+    await act(async () => navigation.finish());
+
+    expect(screen.getByText("Type 2 diabetes mellitus")).toBeInTheDocument();
+    expect(skeletonCellCount(container)).toBe(0);
+  });
+
+  it("shows skeleton rows while a new sort order loads", async () => {
+    const user = userEvent.setup();
+    const { container } = renderWithRouter(
+      paginateData({ data: mockTermDirectoryEntries }),
+    );
+
+    await user.click(screen.getByLabelText("Sort"));
+    await act(async () =>
+      fireEvent.click(
+        screen.getByRole("menuitem", { name: "Sort by Count (High-Low)" }),
+      ),
+    );
+
+    expect(skeletonCellCount(container)).toBeGreaterThan(0);
+  });
+
+  it("shows skeleton rows while the next page of terms loads", async () => {
+    mockSearchParams = new URLSearchParams("page=1&per_page=5");
+    const { container } = renderWithRouter({
+      ...paginateData({ data: mockTermDirectoryEntries, perPage: 5 }),
+      total: 100,
+    });
+
+    await act(async () =>
+      fireEvent.click(screen.getByRole("button", { name: /next page/i })),
+    );
+
+    expect(mockReplace).toHaveBeenCalledWith("?page=2&per_page=5");
+    expect(screen.getByText("6-10 of 100")).toBeInTheDocument();
+    expect(skeletonCellCount(container)).toBeGreaterThan(0);
   });
 
   it("renders a search box so users can filter the directory", () => {

@@ -1,28 +1,21 @@
-import ErrorIcon from "@/components/ErrorIcon";
 import InvalidRule from "@/components/InvalidRule";
-import { Button, Stack, Typography } from "@mui/material";
+import { Button, Stack } from "@mui/material";
 
-interface RuleSearchProps {
-  customInvalidRule: boolean;
-  handleConfirm: () => void;
-  clearAll: () => void;
-  invalidReason: string[] | undefined;
-  selectedConceptsLength: number;
-  isSelected: boolean;
-  hasOptions?: boolean;
-  isNLP?: boolean;
+interface RuleFooterProps {
+  messages: string[];
+  showActions: boolean;
+  canConfirm: boolean;
+  onConfirm: () => void;
+  onClear: () => void;
 }
 
 const RuleFooter = ({
-  customInvalidRule,
-  handleConfirm,
-  clearAll,
-  invalidReason,
-  selectedConceptsLength = 0,
-  isSelected,
-  hasOptions,
-  isNLP,
-}: RuleSearchProps) => {
+  messages,
+  showActions,
+  canConfirm,
+  onConfirm,
+  onClear,
+}: RuleFooterProps) => {
   return (
     <Stack
       direction="row"
@@ -32,41 +25,8 @@ const RuleFooter = ({
       py={0.75}
       gap={1}
     >
-      {customInvalidRule ? (
-        <Stack
-          direction="row"
-          alignItems="center"
-          gap={1}
-          flexShrink={1}
-          minWidth={0}
-        >
-          <ErrorIcon />
-          <Typography variant="body2" noWrap sx={{ fontSize: 16 }}>
-            {isSelected
-              ? "A rule has alternatives, please select one or more concepts"
-              : "Please confirm or clear your changes before continuing"}
-          </Typography>
-        </Stack>
-      ) : !isSelected ? (
-        <Stack
-          direction="row"
-          alignItems="center"
-          gap={1}
-          flexShrink={1}
-          minWidth={0}
-        >
-          <ErrorIcon />
-          <Typography variant="body2" noWrap sx={{ fontSize: 16 }}>
-            Please confirm or clear your changes before continuing
-          </Typography>
-        </Stack>
-      ) : (
-        <InvalidRule
-          reasons={invalidReason ?? []}
-          stackProps={{ sx: { pt: 1, pb: 1, fontSize: 16 } }}
-        />
-      )}
-      {(hasOptions || isNLP) && (
+      <InvalidRule reasons={messages} />
+      {showActions && (
         <Stack direction="row" justifyContent="flex-end" gap={1} pt={1}>
           <Button
             variant="outlined"
@@ -74,7 +34,7 @@ const RuleFooter = ({
             size="small"
             onClick={(e) => {
               e.stopPropagation();
-              clearAll();
+              onClear();
             }}
           >
             Clear all
@@ -83,10 +43,10 @@ const RuleFooter = ({
             variant="contained"
             color="secondary"
             size="small"
-            disabled={selectedConceptsLength < 1}
+            disabled={!canConfirm}
             onClick={(e) => {
               e.stopPropagation();
-              handleConfirm();
+              onConfirm();
             }}
           >
             Confirm selection

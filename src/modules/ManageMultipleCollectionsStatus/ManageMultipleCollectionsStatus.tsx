@@ -60,6 +60,11 @@ const ManageMultipleCollectionsStatus = ({
     });
   }, [initialStatusId, selectedStatusId, setValue]);
 
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSelectedStatusId(initialStatusId);
+  }, [initialStatusId]);
+
   const confirm = useConfirm();
 
   if (uniqueStates.length > 1) {

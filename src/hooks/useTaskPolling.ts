@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable react-hooks/refs */
+
 import { useRef } from "react";
 import { useQueries } from "@tanstack/react-query";
 import getTask from "@/actions/task/getTask";

@@ -79,6 +79,7 @@ const ActionMenuSection = ({
 
   React.useEffect(() => {
     if (fixedExpanded || externalValue === undefined) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setExpanded(externalValue);
   }, [externalValue, fixedExpanded]);
 

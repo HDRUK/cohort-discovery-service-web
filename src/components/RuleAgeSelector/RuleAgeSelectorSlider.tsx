@@ -61,7 +61,7 @@ const RuleAgeSelectorSlider = ({
 
   return (
     <HoverableDiv
-      stopPropagation={!readOnly}
+      stopPropagation
       hoverKey={`rule-age-${rule.id}`}
       flex={flex}
     >

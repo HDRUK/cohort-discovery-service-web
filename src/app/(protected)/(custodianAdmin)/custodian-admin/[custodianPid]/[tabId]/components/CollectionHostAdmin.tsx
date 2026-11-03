@@ -14,6 +14,9 @@ import CollectionHostRightPanel from "./CollectionHostRightPanel";
 import useUserStore from "@/hooks/useUserStore";
 import useCustodianStore from "@/hooks/useCustodianStore";
 import { ThreePaneProvider } from "@/providers/ThreePaneProvider";
+import { useConfirm } from "@/hooks/useConfirm";
+import useSearchParams from "@/hooks/useSearchParams";
+import { CollectionHostFilter } from "@/types/collections";
 
 const CollectionHostAdmin = ({
   pid,
@@ -23,9 +26,15 @@ const CollectionHostAdmin = ({
   collectionHosts: CollectionHost[];
 }) => {
   const notify = useNotify();
+  const confirm = useConfirm();
+  const { getSearchParam } = useSearchParams("collection_host_filter");
+  const isDeletedView = getSearchParam() === CollectionHostFilter.DELETED;
 
   const custodians = useUserStore((s) => s.custodians);
   const deleteCollectionHost = useCustodianStore((s) => s.deleteCollectionHost);
+  const restoreCollectionHost = useCustodianStore(
+    (s) => s.restoreCollectionHost,
+  );
 
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
   const selectedHostIds = useMemo(() => trueKeys(rowSelection), [rowSelection]);
@@ -42,16 +51,64 @@ const CollectionHostAdmin = ({
   const noCollectionHosts = collectionHosts.length === 0;
 
   const handleDeleteHost = async () => {
-    selectedHostIds.forEach((clientId) => {
-      const id = collectionHosts.find((h) => h.client_id === clientId)?.id;
-      if (id) {
-        deleteCollectionHost(id);
-      } else {
-        notify.warning(`Did not find host ${clientId} to delete`);
-      }
-    });
+    const isPlural = selectedHostIds.length > 1;
+    const hostNames = selectedHostIds
+      .map((clientId) => collectionHosts.find((h) => h.client_id === clientId))
+      .filter((h): h is CollectionHost => !!h)
+      .map((h) => h.name)
+      .join(", ");
 
-    notify.success(`Deleted ${selectedHostIds.length} hosts`);
+    const result = await confirm({
+      title: `Delete host${isPlural ? "s" : ""}`,
+      description: `${hostNames} will be deleted. ${isPlural ? "Their" : "Its"} client ID and secret will stop working immediately, and linked collections will lose their host. ${isPlural ? "They" : "It"} can be restored from Deleted Hosts with the same credentials.`,
+      confirmText: "Delete",
+      confirmColor: "error",
+    });
+    if (result !== "confirm") return;
+
+    await Promise.all(
+      selectedHostIds.map((clientId) => {
+        const id = collectionHosts.find((h) => h.client_id === clientId)?.id;
+        if (id) {
+          return deleteCollectionHost(id);
+        }
+        notify.warning(`Did not find host ${clientId} to delete`);
+      }),
+    );
+
+    notify.success(
+      `Deleted ${selectedHostIds.length} host${isPlural ? "s" : ""} — credentials stop working until restored`,
+    );
+    setRowSelection({});
+  };
+
+  const handleRestoreHost = async () => {
+    const hosts = selectedHostIds
+      .map((clientId) => collectionHosts.find((h) => h.client_id === clientId))
+      .filter((h): h is CollectionHost => !!h);
+    const results = await Promise.all(
+      hosts.map(async (host) => ({
+        host,
+        result: await restoreCollectionHost(host.id),
+      })),
+    );
+    const failed = results.filter(({ result }) => result.error);
+    const restoredCount = results.length - failed.length;
+    const isPlural = results.length > 1;
+
+    if (failed.length > 0) {
+      notify.error(
+        `Restored ${restoredCount} of ${results.length} host${isPlural ? "s" : ""}. Could not restore ${failed.map(({ host, result }) => `${host.name} (${result.error?.text})`).join(", ")} — check the details and try again`,
+      );
+      setRowSelection(
+        Object.fromEntries(failed.map(({ host }) => [host.client_id, true])),
+      );
+      return;
+    }
+
+    notify.success(
+      `Restored ${restoredCount} host${isPlural ? "s" : ""} — credentials work again`,
+    );
     setRowSelection({});
   };
 
@@ -78,6 +135,8 @@ const CollectionHostAdmin = ({
               rowSelection={rowSelection}
               setRowSelection={setRowSelection}
               onDeleteHost={handleDeleteHost}
+              onRestoreHost={handleRestoreHost}
+              isDeletedView={isDeletedView}
             />
           }
           right={

@@ -41,7 +41,7 @@ import { useThreePane } from "@/providers/ThreePaneProvider";
 import { FieldConfigMap, useSaveChanges } from "@/hooks/useSaveChanges";
 import { useUserDataStore } from "@/hooks/userDataStore";
 import { useIsAdminSection } from "@/contexts/AdminSectionContext";
-import { getFrequencyModeKey } from "@/utils/frequency";
+import { clampRunTimeFrequency, getFrequencyModeKey } from "@/utils/frequency";
 
 export type UpdateCollectionProps = {
   collection: CollectionWithHosts;
@@ -97,7 +97,10 @@ const getDefaultValues = (collection: CollectionWithHosts | null) => {
     },
     config: {
       frequency_mode: config.frequency_mode,
-      run_time_frequency: config.run_time_frequency,
+      run_time_frequency: clampRunTimeFrequency(
+        config.frequency_mode,
+        config.run_time_frequency,
+      ),
       run_time_hour: config.run_time_hour ?? 0,
       run_time_minute: config.run_time_minute ?? 0,
     },

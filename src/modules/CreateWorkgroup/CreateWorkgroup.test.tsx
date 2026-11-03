@@ -54,7 +54,8 @@ describe("CreateWorkgroup", () => {
 
     renderCreateWorkgroup({ onCancel });
 
-    await user.type(screen.getByLabelText(/name/i), "My Workgroup");
+    await user.click(screen.getByLabelText(/name/i));
+    await user.paste("My Workgroup");
 
     const collectionSelect = screen.getByRole("combobox");
 
@@ -97,7 +98,8 @@ describe("CreateWorkgroup", () => {
 
     const nameInput = screen.getByLabelText(/name/i) as HTMLInputElement;
 
-    await user.type(nameInput, "Temp Name");
+    await user.click(nameInput);
+    await user.paste("Temp Name");
 
     const cancelButton = screen.getByRole("button", { name: /cancel/i });
     await user.click(cancelButton);

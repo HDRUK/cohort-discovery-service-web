@@ -1,59 +1,36 @@
 import { Box } from "@mui/material";
-import { DragType } from "@/types/dnd";
 import DomainChip from "@/components/DomainChip/DomainChip";
 import { Concept } from "@/types/api";
 import { useCallback } from "react";
-import ConceptChip from "@/components/ConceptChip";
 import { RuleLeafType, SingleSidedOperator } from "@/types/rules";
 import RuleSearch from "./RuleSearch";
+import RuleConcept from "./RuleConcept";
 
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import {
-  isEmptyRule,
-  updateById,
-  isSingleConcept,
-  isRuleLeaf,
-} from "@/utils/rules";
+import { isEmptyRule, updateById, isRuleLeaf, RuleErrors } from "@/utils/rules";
 
 import RuleWrapper from "../RuleWrapper";
-import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
-import useNodeActions from "@/hooks/useNodeActions";
 import RuleFooter from "../RuleFooter";
+import RuleParameters from "../RuleParameters";
 import useRuleConceptSelection from "./useRuleConceptSelection";
 
-export interface RuleProps extends Omit<
-  RuleWrapperProps,
-  "node" | "type" | "render"
-> {
+export interface RuleProps {
   rule: RuleLeafType;
   groupId?: string;
 }
 
-const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
+const Rule = ({ rule, groupId }: RuleProps) => {
   const {
     id,
     rule: { concept },
   } = rule;
 
-  const {
-    queryBuilderJson,
-    setQueryBuilderJson,
-    showDescendants,
-    setShowDescendants,
-    isSelected,
-    select,
-  } = useQueryBuilder((qb) => ({
-    queryBuilderJson: qb.queryBuilderJson,
-    setQueryBuilderJson: qb.setQueryBuilderJson,
-    showDescendants: qb.showDescendants[id],
-    setShowDescendants: qb.setShowDescendants,
-    isSelected: !!qb.selected[id],
-    select: qb.select,
-  }));
-
-  const toggleShowDescendants = useCallback(
-    () => setShowDescendants(id, !showDescendants),
-    [id, showDescendants, setShowDescendants],
+  const { queryBuilderJson, setQueryBuilderJson, select } = useQueryBuilder(
+    (qb) => ({
+      queryBuilderJson: qb.queryBuilderJson,
+      setQueryBuilderJson: qb.setQueryBuilderJson,
+      select: qb.select,
+    }),
   );
 
   const setConcept = useCallback(
@@ -93,83 +70,46 @@ const Rule = ({ rule, groupId, ...rest }: RuleProps) => {
     );
   }, [id, queryBuilderJson, setQueryBuilderJson]);
 
-  const removeChild = useCallback((parent: Concept, child: Concept) => {
-    const children = parent.children?.filter(
-      (c) => c.concept_id !== child.concept_id,
-    );
-    const newConcept = {
-      ...parent,
-      children,
-    };
-    return newConcept;
-  }, []);
-
-  const { actions } = useNodeActions(rule);
-
   const selection = useRuleConceptSelection(setConcept);
+
+  const empty = isEmptyRule(rule);
+  const hasPendingSelection = selection.selectedConcepts.length > 0;
 
   return (
     <RuleWrapper
       node={rule}
-      type={DragType.Rule}
       groupId={groupId}
-      sortable={true}
-      headerExtra={!isEmptyRule(rule) ? <DomainChip concept={concept} /> : null}
-      renderFooter={
-        <RuleFooter
-          customInvalidRule={false}
-          handleConfirm={selection.handleConfirm}
-          clearAll={selection.clearAll}
-          invalidReason={rule.invalidReason}
-          selectedConceptsLength={selection.selectedConcepts.length}
-          isSelected={isSelected}
-          hasOptions={selection.hasOptions}
-        />
-      }
-      render={() => (
+      draggable={!hasPendingSelection}
+      renderSubTitle={!empty && <DomainChip concept={concept} />}
+      renderContent={
         <Box py={1}>
-          {isEmptyRule(rule) ? (
+          {empty ? (
             <RuleSearch onSelect={() => select(id)} selection={selection} />
           ) : (
-            <>
-              {isSingleConcept(concept) && (
-                <>
-                  <ConceptChip
-                    indicateIfParent={showDescendants}
-                    concept={concept}
-                    onDelete={(e: React.MouseEvent) => {
-                      e.stopPropagation();
-                      clearConcept();
-                    }}
-                    onClick={
-                      (concept?.children?.length ?? 0) > 0
-                        ? (e: React.MouseEvent) => {
-                            e.stopPropagation();
-                            toggleShowDescendants();
-                          }
-                        : (e: React.MouseEvent) => {
-                            e.stopPropagation();
-                          }
-                    }
-                  />
-                  {showDescendants &&
-                    concept?.children?.map((childConcept) => (
-                      <ConceptChip
-                        key={childConcept.concept_id}
-                        concept={childConcept}
-                        onDelete={() => {
-                          setConcept(removeChild(concept, childConcept));
-                        }}
-                      />
-                    ))}
-                </>
-              )}
-            </>
+            <RuleConcept
+              rule={rule}
+              onChange={setConcept}
+              onClear={clearConcept}
+            />
           )}
         </Box>
-      )}
-      actions={actions}
-      {...rest}
+      }
+      renderSubContent={<RuleParameters rule={rule} />}
+      renderFooter={
+        empty ? (
+          <RuleFooter
+            messages={
+              hasPendingSelection
+                ? [RuleErrors.UNCONFIRMED_SELECTION]
+                : (rule.invalidReason ?? [])
+            }
+            showActions={selection.hasOptions}
+            canConfirm={hasPendingSelection}
+            onConfirm={selection.handleConfirm}
+            onClear={selection.clearAll}
+          />
+        ) : undefined
+      }
     />
   );
 };

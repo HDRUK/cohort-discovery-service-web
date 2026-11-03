@@ -5,4 +5,10 @@ export enum CollectionFilterStatus {
   PENDING = "pending",
   REJECTED = "rejected",
   SUSPENDED = "suspended",
+  DELETED = "deleted",
+}
+
+export enum CollectionHostFilter {
+  ALL = "all",
+  DELETED = "deleted",
 }

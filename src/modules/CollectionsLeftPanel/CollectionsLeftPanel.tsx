@@ -98,6 +98,12 @@ const CollectionsLeftPanel = () => {
                   onSelectCollectionsStatus(CollectionFilterStatus.REJECTED),
                 selected: searchParam === CollectionFilterStatus.REJECTED,
               },
+              {
+                label: "Deleted Collections",
+                onClick: () =>
+                  onSelectCollectionsStatus(CollectionFilterStatus.DELETED),
+                selected: searchParam === CollectionFilterStatus.DELETED,
+              },
             ]}
           />
         </ActionMenuSection>

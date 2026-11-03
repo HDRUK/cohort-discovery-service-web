@@ -54,6 +54,11 @@ const setAgeMin = async (value: string) => {
 };
 
 describe("DemographicsPanel", () => {
+  beforeEach(() => {
+    useFeatureFlagsStore.setState({ flags: null });
+    useUserDataStore.setState({ userCollections: [] });
+  });
+
   describe("first open (freshly added, nothing saved yet)", () => {
     beforeEach(() => {
       store().setQueryBuilderJson(DEFAULT_QUERY);
@@ -227,10 +232,6 @@ describe("DemographicsPanel", () => {
       store().setDemographics({ ...EMPTY_DEMOGRAPHICS, sex: [female] });
     });
 
-    afterEach(() => {
-      useFeatureFlagsStore.setState({ flags: null });
-    });
-
     it("shows the Race row by default", () => {
       renderPanel(true);
 
@@ -275,11 +276,6 @@ describe("DemographicsPanel", () => {
       useFeatureFlagsStore.setState({
         flags: { [FeatureName.QueryBuilderUseLocation]: true } as FeatureFlag,
       });
-    });
-
-    afterEach(() => {
-      useFeatureFlagsStore.setState({ flags: null });
-      useUserDataStore.setState({ userCollections: [] });
     });
 
     const openLocationRow = () =>
@@ -331,10 +327,6 @@ describe("DemographicsPanel", () => {
       store().setDemographics({ ...EMPTY_DEMOGRAPHICS, sex: [female] });
     });
 
-    afterEach(() => {
-      useFeatureFlagsStore.setState({ flags: null });
-    });
-
     it("hides the Death row by default", () => {
       renderPanel(true);
 
@@ -369,11 +361,6 @@ describe("DemographicsPanel", () => {
       useFeatureFlagsStore.setState({
         flags: { [FeatureName.QueryBuilderUseDeath]: true } as FeatureFlag,
       });
-    });
-
-    afterEach(() => {
-      useFeatureFlagsStore.setState({ flags: null });
-      useUserDataStore.setState({ userCollections: [] });
     });
 
     it("doesn't write to the store until Save is clicked for Death", async () => {

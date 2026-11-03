@@ -14,6 +14,8 @@ import { SearchParams } from "@/types/api";
 
 type Params = Promise<{ custodianPid: string; tabId: string }>;
 
+export const instant = false;
+
 const CustodianAdminPage = async ({
   params,
   searchParams,

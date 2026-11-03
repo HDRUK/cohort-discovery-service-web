@@ -1,8 +1,9 @@
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useState } from "react";
 
 import type {
   ApiResponse,
   Collection,
+  CollectionHost,
   CombinedUser,
   CreateQuery,
   Query,
@@ -82,10 +83,7 @@ const RESOLVE = <T,>(v: T) => Promise.resolve(v);
 const DEFAULT_QUERY: RuleGroupType =
   process.env.NEXT_PUBLIC_USE_EXAMPLE_QUERY === "true" ? EXAMPLE_1 : NO_QUERY;
 
-const MockCohortDiscoveryServiceStore = ({
-  overrides,
-  children,
-}: PropsWithChildren<{ overrides?: SliceOverrides }>) => {
+const seedStores = (overrides?: SliceOverrides) => {
   useStateManagementStore.setState(
     {
       ...useStateManagementStore.getState(),
@@ -192,6 +190,11 @@ const MockCohortDiscoveryServiceStore = ({
         _payload: UpdateCollectionHostPayload,
       ) => RESOLVE<void>(undefined),
       deleteCollectionHost: (_id: number) => RESOLVE<void>(undefined),
+      restoreCollectionHost: (_id: number) =>
+        RESOLVE<ApiResponse<CollectionHost>>({
+          message: "success",
+          data: {} as CollectionHost,
+        }),
       createCollection: (
         _custodianPid: string,
         _payload: CreateCollectionPost,
@@ -204,6 +207,11 @@ const MockCohortDiscoveryServiceStore = ({
       ) => RESOLVE<Collection>(getMockCollection()),
       deleteCollection: (_id: number | string, _custodianPid: string) =>
         RESOLVE<void>(undefined),
+      restoreCollection: (_id: number | string, _custodianPid: string) =>
+        RESOLVE<ApiResponse<Collection>>({
+          message: "success",
+          data: getMockCollection(),
+        }),
       ...(overrides?.custodian ?? {}),
       current: {
         custodian: null,
@@ -226,6 +234,11 @@ const MockCohortDiscoveryServiceStore = ({
         _payload: Partial<CreateCollectionPost>,
       ) => RESOLVE<Collection>(getMockCollection()),
       deleteCollection: (_id: number | string) => RESOLVE<void>(undefined),
+      restoreCollection: (_id: number | string) =>
+        RESOLVE<ApiResponse<Collection>>({
+          message: "success",
+          data: getMockCollection(),
+        }),
       createWorkgroup: (_payload: {
         name: string;
         collections?: number[];
@@ -255,6 +268,13 @@ const MockCohortDiscoveryServiceStore = ({
     } as FeatureFlagsStoreState,
     true,
   );
+};
+
+const MockCohortDiscoveryServiceStore = ({
+  overrides,
+  children,
+}: PropsWithChildren<{ overrides?: SliceOverrides }>) => {
+  useState(() => seedStores(overrides));
 
   return (
     <ApplicationModeProvider>

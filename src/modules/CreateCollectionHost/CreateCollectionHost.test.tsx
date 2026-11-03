@@ -56,7 +56,8 @@ describe("CreateCollectionHost", () => {
     renderCreateColllectionHost();
 
     const nameInput = screen.getByLabelText(/name/i);
-    await userEvent.type(nameInput, "My Host");
+    await userEvent.click(nameInput);
+    await userEvent.paste("My Host");
 
     createCollectionHost.mockImplementation(async () => {
       return { ok: true };

@@ -1,7 +1,6 @@
 "use client";
 
 import { Concept } from "@/types/api";
-import { DragType } from "@/types/dnd";
 import { RuleLeafType } from "@/types/rules";
 import ConceptChip from "@/components/ConceptChip";
 import SquareCheckbox from "@/components/SquareCheckbox";
@@ -9,51 +8,40 @@ import { FormControlLabel, Stack } from "@mui/material";
 import DomainChip from "@/components/DomainChip/DomainChip";
 import { useCallback, useMemo, useState } from "react";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import useNodeActions from "@/hooks/useNodeActions";
 import {
   findRulesWithAlternatives,
   hasAlternatives,
   isRuleLeaf,
+  RuleErrors,
   updateById,
 } from "@/utils/rules";
 import { useCohortBuilderContext } from "@/providers/CohortBuilderProvider";
 import RuleWrapper from "../RuleWrapper";
-import { RuleWrapperProps } from "../RuleWrapper/RuleWrapper";
 import { DEFAULT_SEARCH_RESULTS_MAX_HEIGHT } from "@/config/defaults";
 import RuleFooter from "../RuleFooter";
+import RuleParameters from "../RuleParameters";
 
-interface RuleAlternativesProps extends Omit<
-  RuleWrapperProps,
-  "node" | "type" | "render"
-> {
+interface RuleAlternativesProps {
   rule: RuleLeafType;
   groupId?: string;
 }
 
-const RuleAlternatives = ({
-  rule,
-  groupId,
-  ...rest
-}: RuleAlternativesProps) => {
+const RuleAlternatives = ({ rule, groupId }: RuleAlternativesProps) => {
   const {
     id,
     rule: { concept },
   } = rule;
 
-  const { actions } = useNodeActions(rule);
-
   const {
     queryBuilderJson,
     setQueryBuilderJson,
     showDescendants,
-    isSelected,
     select,
     deselect,
   } = useQueryBuilder((qb) => ({
     queryBuilderJson: qb.queryBuilderJson,
     setQueryBuilderJson: qb.setQueryBuilderJson,
     showDescendants: qb.showDescendants[id],
-    isSelected: !!qb.selected[id],
     select: qb.select,
     deselect: qb.deselect,
   }));
@@ -153,25 +141,17 @@ const RuleAlternatives = ({
     [concept, setConcept],
   );
 
+  const otherReasons = (rule.invalidReason ?? []).filter(
+    (reason) => reason !== RuleErrors.HAS_ALTERNATIVES,
+  );
+
   return (
     <RuleWrapper
       node={rule}
-      type={DragType.Rule}
       groupId={groupId}
-      sortable={true}
-      headerExtra={<DomainChip concept={concept} />}
-      renderFooter={
-        <RuleFooter
-          customInvalidRule={true}
-          handleConfirm={handleConfirm}
-          clearAll={clearAll}
-          invalidReason={rule.invalidReason}
-          selectedConceptsLength={selectedConceptIds.length}
-          isSelected={isSelected}
-          isNLP={true}
-        />
-      }
-      render={() => (
+      draggable={false}
+      renderSubTitle={<DomainChip concept={concept} />}
+      renderContent={
         <Stack
           component="form"
           spacing="10px"
@@ -217,9 +197,22 @@ const RuleAlternatives = ({
             </Stack>
           ))}
         </Stack>
+      }
+      renderSubContent={<RuleParameters rule={rule} />}
+      renderFooter={({ isSelected }) => (
+        <RuleFooter
+          messages={[
+            isSelected
+              ? RuleErrors.CHOOSE_ALTERNATIVE
+              : RuleErrors.UNCONFIRMED_SELECTION,
+            ...otherReasons,
+          ]}
+          showActions
+          canConfirm={selectedConceptIds.length > 0}
+          onConfirm={handleConfirm}
+          onClear={clearAll}
+        />
       )}
-      actions={actions}
-      {...rest}
     />
   );
 };

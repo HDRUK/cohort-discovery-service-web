@@ -4,6 +4,7 @@ import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import { TokenUser } from "@/types/api";
 import { redirect } from "next/navigation";
 import { isStandalone } from "@/utils/modes";
+import { routes } from "@/config/routes";
 
 const applicationMode = process.env.APPLICATION_MODE;
 
@@ -18,7 +19,7 @@ export async function getTokenUser(): Promise<{
   const user = decoded?.user as TokenUser;
   if (!user) {
     if (isStandalone(applicationMode)) {
-      redirect("/login");
+      redirect(routes.login);
     } else {
       redirect("/user-not-found");
     }

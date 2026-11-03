@@ -72,6 +72,7 @@ const useRuleConceptSelection = (
     }
     reset({ concepts: {} });
     setSelectedIds({});
+    setHasOptions(false);
   }, [selectedConcepts, onConfirm, reset]);
 
   useSaveChanges({

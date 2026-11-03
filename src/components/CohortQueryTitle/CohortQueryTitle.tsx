@@ -14,6 +14,7 @@ const CohortQueryTitle = () => {
 
   return (
     <Title
+      fadedTitle
       title={"Query Name"}
       subTitle={
         <EditableText
@@ -32,6 +33,8 @@ const CohortQueryTitle = () => {
           typographyProps={{
             component: "span",
             variant: "h5",
+            color: "secondaryBlack.main",
+            fontWeight: 500,
           }}
           textFieldProps={{
             placeholder: "Type query name here",

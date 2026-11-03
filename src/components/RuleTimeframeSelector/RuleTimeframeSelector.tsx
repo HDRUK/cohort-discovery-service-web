@@ -62,8 +62,8 @@ const RuleTimeframeSelector = ({
       size: "small",
       sx: {
         backgroundColor: "white",
-        width: readOnly ? 120 : 150,
         borderRadius: 1,
+        ...(!constrainForBunnyV1 ? { width: readOnly ? 120 : 150 } : {}),
         ...(readOnly ? { pointerEvents: "none" as const } : {}),
       },
     },
@@ -97,7 +97,7 @@ const RuleTimeframeSelector = ({
   if (constrainForBunnyV1) {
     return (
       <HoverableDiv
-        stopPropagation={!readOnly}
+        stopPropagation
         hoverKey={`rule-timeframe-${rule.id}`}
         flex={flex}
       >
@@ -126,6 +126,7 @@ const RuleTimeframeSelector = ({
               {...commonPickerProps}
               value={value}
               onChange={(v) => onChange(v)}
+              sx={{ width: "100%" }}
             />
           )}
           renderReadOnlyLabel={({ operator, value }) =>
@@ -145,7 +146,7 @@ const RuleTimeframeSelector = ({
 
   return (
     <HoverableDiv
-      stopPropagation={!readOnly}
+      stopPropagation
       hoverKey={`rule-timeframe-${rule.id}`}
       flex={flex}
     >

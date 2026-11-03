@@ -13,6 +13,8 @@ import { getQueryName } from "@/utils/query";
 
 type Params = Promise<{ tabId: string }>;
 
+export const instant = false;
+
 const DashboardTabPage = async (props: {
   params: Params;
   searchParams: Promise<SearchParams>;

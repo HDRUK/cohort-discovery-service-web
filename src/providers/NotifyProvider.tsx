@@ -7,15 +7,21 @@ import {
   useMemo,
   useState,
 } from "react";
-import { Snackbar, Alert, AlertColor } from "@mui/material";
+import { Snackbar, Alert, AlertColor, SnackbarOrigin } from "@mui/material";
+
+const DEFAULT_ANCHOR_ORIGIN: SnackbarOrigin = {
+  vertical: "bottom",
+  horizontal: "right",
+};
 
 type NotifyArgs = {
   message: string;
   severity?: AlertColor; // "success" | "info" | "warning" | "error"
-  autoHideDuration?: number; // ms
+  autoHideDuration?: number | null; // ms, null = stays until dismissed
+  anchorOrigin?: SnackbarOrigin;
 };
 
-type NotifyFn = {
+export type NotifyFn = {
   (args: NotifyArgs): void;
   success: (message: string, autoHideDuration?: number) => void;
   info: (message: string, autoHideDuration?: number) => void;
@@ -35,12 +41,18 @@ export function NotifyProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState<string>("");
   const [severity, setSeverity] = useState<AlertColor>("success");
-  const [autoHideDuration, setAutoHide] = useState<number | undefined>(3000);
+  const [autoHideDuration, setAutoHide] = useState<number | null>(3000);
+  const [anchorOrigin, setAnchorOrigin] = useState<SnackbarOrigin>(
+    DEFAULT_ANCHOR_ORIGIN,
+  );
 
   const notifyBase = useCallback((args: NotifyArgs) => {
     setMessage(args.message);
     setSeverity(args.severity ?? "success");
-    setAutoHide(args.autoHideDuration ?? 3000);
+    setAutoHide(
+      args.autoHideDuration === undefined ? 3000 : args.autoHideDuration,
+    );
+    setAnchorOrigin(args.anchorOrigin ?? DEFAULT_ANCHOR_ORIGIN);
     setOpen(true);
   }, []);
 
@@ -78,7 +90,7 @@ export function NotifyProvider({ children }: { children: React.ReactNode }) {
         open={open}
         onClose={() => setOpen(false)}
         autoHideDuration={autoHideDuration}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        anchorOrigin={anchorOrigin}
         sx={{ mb: 5 }}
       >
         <Alert

@@ -1,6 +1,7 @@
 import "@testing-library/jest-dom";
-import { render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { Suspense, use, useEffect, useState } from "react";
 import DomainFilterTabs from "./DomainFilterTabs";
 import { DOMAIN_TABS } from "@/config/domainFilters";
 import { getDomainPhrase } from "@/utils/omop";
@@ -17,6 +18,18 @@ jest.mock("next/navigation", () => ({
     replace: mockReplace,
   }),
 }));
+
+const UNFINISHED_NAVIGATION = new Promise<never>(() => {});
+let startNavigation: () => void = () => {};
+
+const RouterStillFetching = () => {
+  const [isNavigating, setIsNavigating] = useState(false);
+  useEffect(() => {
+    startNavigation = () => setIsNavigating(true);
+  }, []);
+  if (isNavigating) use(UNFINISHED_NAVIGATION);
+  return null;
+};
 
 describe("DomainFilterTabs", () => {
   beforeEach(() => {
@@ -39,6 +52,27 @@ describe("DomainFilterTabs", () => {
     await userEvent.click(screen.getByRole("tab", { name: "Observation" }));
 
     expect(mockReplace).toHaveBeenCalledWith("?domain=observation&page=1");
+  });
+
+  it("selects the clicked tab straight away, before the router has finished navigating", async () => {
+    mockReplace.mockImplementationOnce(() => startNavigation());
+    render(
+      <>
+        <DomainFilterTabs />
+        <Suspense fallback={null}>
+          <RouterStillFetching />
+        </Suspense>
+      </>,
+    );
+
+    await act(async () =>
+      fireEvent.click(screen.getByRole("tab", { name: "Observation" })),
+    );
+
+    expect(screen.getByRole("tab", { name: "Observation" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
   });
 
   it("marks the tab from the URL as selected", () => {

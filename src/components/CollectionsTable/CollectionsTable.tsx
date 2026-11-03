@@ -6,7 +6,7 @@ import {
   type MRT_ColumnDef,
 } from "material-react-table";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Paper, Stack, Typography } from "@mui/material";
+import { Chip, Paper, Stack, Typography } from "@mui/material";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import Table from "@/components/Table";
 import CopyableVariable from "../CopyableVariable";
@@ -33,6 +33,7 @@ import usePrefetchCollectionDetails from "./usePrefetchCollectionDetails";
 import useFeatures from "@/hooks/useFeatures";
 import { useQueryClient } from "@tanstack/react-query";
 import { revalidateAction } from "@/actions/revalidate";
+import { CollectionFilterStatus } from "@/types/collections";
 
 export interface CollectionsTableProps extends TableProps {
   showPid?: boolean;
@@ -53,6 +54,7 @@ const CollectionsTable = ({
   const { adminMoreCollectionDetails } = useFeatures();
   const { searchParams, getSearchParam } = useSearchParams("collection_filter");
   const filter_name = getSearchParam() || "all";
+  const isDeletedView = filter_name === CollectionFilterStatus.DELETED;
 
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
 
@@ -60,6 +62,8 @@ const CollectionsTable = ({
   const isAdmin = useMemo(() => !currentCustodian, [currentCustodian]);
   const deleteCollectionAdmin = useAdminStore((s) => s.deleteCollection);
   const deleteCollection = useCustodianStore((s) => s.deleteCollection);
+  const restoreCollectionAdmin = useAdminStore((s) => s.restoreCollection);
+  const restoreCollection = useCustodianStore((s) => s.restoreCollection);
   const selectedCollections = useUserStore((s) => s.selectedCollections);
   const setSelectedCollections = useUserStore((s) => s.setSelectedCollections);
 
@@ -195,7 +199,11 @@ const CollectionsTable = ({
           const status = cell.getValue<CollectionStatus>();
           return (
             <Stack gap={1} direction={"row"}>
-              <StatusChip state_id={status} />{" "}
+              {row.original.deleted_at ? (
+                <Chip label="Deleted" color="error" />
+              ) : (
+                <StatusChip state_id={status} />
+              )}{" "}
               <SyntheticChip isSynthetic={!!row.original?.is_synthetic} />
             </Stack>
           );
@@ -239,10 +247,17 @@ const CollectionsTable = ({
   });
 
   const handleDeleteClick = async () => {
+    const isPlural = selectedCollections.length > 1;
     const ok = await confirm({
       props: {
-        action: `delete the collection${selectedCollections.length > 1 ? "s" : ""} ${selectedCollections.map((c) => c.name).join(", ")}`,
+        action: `delete the collection${isPlural ? "s" : ""} ${selectedCollections.map((c) => c.name).join(", ")}`,
       },
+      title: deleteOverride
+        ? "Confirm"
+        : `Delete collection${isPlural ? "s" : ""}`,
+      ...(!deleteOverride && {
+        description: `${selectedCollections.map((c) => c.name).join(", ")} will be hidden from users and will stop receiving queries. ${isPlural ? "They" : "It"} can be restored from Deleted Collections.`,
+      }),
       confirmText: "Delete",
       confirmColor: "error",
     });
@@ -280,6 +295,44 @@ const CollectionsTable = ({
     ],
   );
 
+  const handleRestoreClick = async () => {
+    const isPlural = selectedCollections.length > 1;
+    const ok = await confirm({
+      title: `Restore collection${isPlural ? "s" : ""}`,
+      description: `${selectedCollections.map((c) => c.name).join(", ")} will come back as Draft and must be approved again before users can see ${isPlural ? "them" : "it"}.`,
+      confirmText: "Restore",
+    });
+    if (ok !== "confirm") {
+      return;
+    }
+
+    const results = await Promise.all(
+      selectedCollections.map(async (collection) => ({
+        collection,
+        result: await (currentCustodian
+          ? restoreCollection(collection.id, currentCustodian.pid)
+          : restoreCollectionAdmin(collection.id)),
+      })),
+    );
+    const failed = results.filter(({ result }) => result.error);
+    const restoredCount = results.length - failed.length;
+
+    if (failed.length > 0) {
+      notify.error(
+        `Restored ${restoredCount} of ${results.length} collection${isPlural ? "s" : ""}. Could not restore ${failed.map(({ collection, result }) => `${collection.name} (${result.error?.text})`).join(", ")} — check the details and try again`,
+      );
+    } else {
+      notify.success(
+        `${restoredCount} Collection${isPlural ? "s" : ""} restored`,
+      );
+    }
+    setRowSelection(
+      Object.fromEntries(
+        failed.map(({ collection }) => [String(collection.id), true]),
+      ),
+    );
+  };
+
   useLogDependencyChanges("collectionsTable", {
     table,
     filter_name,
@@ -311,9 +364,9 @@ const CollectionsTable = ({
         },
       }}
       rightAction={{
-        deleteProps: {
-          onClick: handleDeleteClick,
-        },
+        ...(isDeletedView
+          ? { restoreProps: { onClick: handleRestoreClick } }
+          : { deleteProps: { onClick: handleDeleteClick } }),
         refreshProps: {
           tag:
             currentCustodian?.pid && !isAdmin

@@ -148,7 +148,7 @@ const RuleValueAsNumberSelector = ({
 
   return (
     <HoverableDiv
-      stopPropagation={!readOnly}
+      stopPropagation
       hoverKey={`rule-value-as-number-${rule.id}`}
       flex={flex}
     >

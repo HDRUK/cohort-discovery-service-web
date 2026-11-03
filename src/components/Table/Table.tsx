@@ -14,6 +14,7 @@ import DownloadButton, {
 import SortButton, { SortButtonProps } from "@/components/SortButton";
 import EditButton, { EditButtonProps } from "@/components/EditButton";
 import DeleteButton, { DeleteButtonProps } from "@/components/DeleteButton";
+import RestoreButton, { RestoreButtonProps } from "@/components/RestoreButton";
 import Title, { TitleProps } from "@/components/Title";
 import ControlledSearchBox, {
   ControlledSearchBoxProps,
@@ -29,6 +30,9 @@ export interface TableProps {
     refreshProps?: RefreshButtonProps;
     reRunProps?: ReRunButtonProps;
     deleteProps?: Omit<DeleteButtonProps, "onClick"> & {
+      onClick?: (selectedRowIds: string[]) => void;
+    };
+    restoreProps?: Omit<RestoreButtonProps, "onClick"> & {
       onClick?: (selectedRowIds: string[]) => void;
     };
     downloadProps?: Omit<DownloadButtonProps, "onClick"> & {
@@ -66,10 +70,12 @@ const Table = <TData extends MRT_RowData>({
     refreshProps,
     reRunProps,
     deleteProps,
+    restoreProps,
     downloadProps,
   } = rightAction || {};
 
   const { onClick: onDeleteClick, ...restDeleteProps } = deleteProps ?? {};
+  const { onClick: onRestoreClick, ...restRestoreProps } = restoreProps ?? {};
   const { onClick: onDownloadClick, ...restDownloadProps } =
     downloadProps ?? {};
   const { onClick: onEditClick, ...restEditProps } = editProps ?? {};
@@ -122,6 +128,13 @@ const Table = <TData extends MRT_RowData>({
                   <DeleteButton
                     {...restDeleteProps}
                     onClick={() => onDeleteClick?.(selectedRows)}
+                  />
+                )}
+
+                {restoreProps && (
+                  <RestoreButton
+                    {...restRestoreProps}
+                    onClick={() => onRestoreClick?.(selectedRows)}
                   />
                 )}
 

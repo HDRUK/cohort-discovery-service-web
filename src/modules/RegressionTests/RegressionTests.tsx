@@ -26,6 +26,7 @@ import {
   RegressionTestCollectionInput,
 } from "@/types/api";
 import { useTable } from "@/hooks/useTable";
+import ExpectedValue from "@/components/ExpectedValue";
 import Table from "@/components/Table";
 import { getDatetime, getDurationSeconds } from "@/utils/date";
 import getRegressionTests from "@/actions/regressionTest/getRegressionTests";
@@ -34,9 +35,9 @@ import updateRegressionTest from "@/actions/regressionTest/updateRegressionTest"
 import deleteRegressionTest from "@/actions/regressionTest/deleteRegressionTest";
 import runRegressionTest from "@/actions/regressionTest/runRegressionTest";
 import PassFailChip from "./PassFailChip";
-import EditableExpected from "./EditableExpected";
 import AddRegressionTestDialog from "./AddRegressionTestDialog";
 import useTaskPolling from "@/hooks/useTaskPolling";
+import { TAGS_REGRESSION_TESTS } from "@/config/tags";
 import { useConfirmBool } from "@/hooks/useConfirm";
 
 type RunStates = Record<string, Set<string>>;
@@ -54,7 +55,7 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
   const confirmBool = useConfirmBool();
 
   const { data, isLoading } = useQuery({
-    queryKey: ["regression-tests"],
+    queryKey: TAGS_REGRESSION_TESTS,
     queryFn: () => getRegressionTests(),
     staleTime: 30_000,
   });
@@ -120,7 +121,7 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
         }
         return { ...prev, [key]: pending };
       });
-      queryClient.invalidateQueries({ queryKey: ["regression-tests"] });
+      queryClient.invalidateQueries({ queryKey: TAGS_REGRESSION_TESTS });
     },
     [queryClient],
   );
@@ -163,7 +164,7 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
     } else {
       await createRegressionTest(values);
     }
-    queryClient.invalidateQueries({ queryKey: ["regression-tests"] });
+    queryClient.invalidateQueries({ queryKey: TAGS_REGRESSION_TESTS });
   };
 
   const handleDeleteTest = useCallback(
@@ -178,7 +179,7 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
       });
       if (!ok) return;
       await deleteRegressionTest(test.pid);
-      queryClient.invalidateQueries({ queryKey: ["regression-tests"] });
+      queryClient.invalidateQueries({ queryKey: TAGS_REGRESSION_TESTS });
     },
     [confirmBool, queryClient],
   );
@@ -190,7 +191,7 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
           .filter((c) => c.pid !== colPid)
           .map((c) => ({ pid: c.pid, expected_result: c.expected_result })),
       });
-      queryClient.invalidateQueries({ queryKey: ["regression-tests"] });
+      queryClient.invalidateQueries({ queryKey: TAGS_REGRESSION_TESTS });
     },
     [queryClient],
   );
@@ -204,7 +205,7 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
             : { pid: c.pid, expected_result: c.expected_result },
         ),
       });
-      queryClient.invalidateQueries({ queryKey: ["regression-tests"] });
+      queryClient.invalidateQueries({ queryKey: TAGS_REGRESSION_TESTS });
     },
     [queryClient],
   );
@@ -243,8 +244,8 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
           if (row.original.kind !== "collection") return null;
           const { test, col } = row.original;
           return (
-            <EditableExpected
-              col={col}
+            <ExpectedValue
+              value={col.expected_result}
               onSave={(val) => handleUpdateExpected(test, col.pid, val)}
             />
           );

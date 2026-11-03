@@ -13,12 +13,16 @@ export const API_ROUTES = {
   parseQuery: `${API_URL}/parse-query`,
   collections: `${API_URL}/collections`,
   collection: (id: number | string) => `${API_URL}/collections/${id}`,
+  restoreCollection: (id: number | string) =>
+    `${API_URL}/collections/${id}/restore`,
   custodians: `${API_URL}/custodians`,
   custodian: (id: number | string) => `${API_URL}/custodians/${id}`,
   networks: `${API_URL}/custodian_networks`,
   network: (id: number | string) => `${API_URL}/custodian_networks/${id}`,
   getMe: `${API_URL}/user`,
   signIn: `${API_AUTH_URL}/login`,
+  authMethods: `${API_AUTH_URL}/methods`,
+  ssoExchange: `${API_AUTH_URL}/sso/exchange`,
   getQuery: (pid: string) => `${API_URL}/query/${pid}`,
   getCodes: (domain: string) => `${API_URL}/codes/${domain}`,
   getTaskStatus: (taskId: string) => `${API_URL}/task/${taskId}/status`,
@@ -26,10 +30,15 @@ export const API_ROUTES = {
   queryResults: (queryPid: string) => `${API_URL}/query/${queryPid}/results`,
   collectionHosts: `${API_URL}/collection_hosts`,
   collectionHost: (id: number) => `${API_URL}/collection_hosts/${id}`,
+  restoreCollectionHost: (id: number) =>
+    `${API_URL}/collection_hosts/${id}/restore`,
   custodianCollectionHosts: (pid: string) =>
     `${API_URL}/custodians/${pid}/collection_hosts`,
   custodianCollections: (pid: string) =>
     `${API_URL}/custodians/${pid}/collections`,
+  collectionHealth: (id: string) => `${API_URL}/collections/${id}/health`,
+  collectionTaskHistory: (id: string) =>
+    `${API_URL}/collections/${id}/task-history`,
   adminCollections: `${API_URL}/admin/collections`,
   userCollections: `${API_URL}/user/collections`,
   collectionConfig: `${API_URL}/collection_config`,

@@ -1,10 +1,11 @@
 "use client";
 
-import { Stack } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { type MRT_ColumnDef } from "material-react-table";
 import { useMemo } from "react";
 import { TermDirectoryEntry, Paginated } from "@/types/api";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
+import { useSearchParamsTransition } from "@/contexts/SearchParamsTransitionContext";
 import CopyableTextButton from "@/components/CopyableTextButton";
 import Table from "@/components/Table";
 import { formatNumber } from "@/utils/numbers";
@@ -12,11 +13,16 @@ import { DEFAULT_PER_PAGE } from "@/config/defaults";
 import DomainFilterTabs from "./DomainFilterTabs";
 import AssociatedCollectionsChip from "./AssociatedCollectionsChip";
 
-const TermDirectory = ({
-  entries,
-}: {
-  entries: Paginated<TermDirectoryEntry>;
-}) => {
+const NO_ENTRIES: TermDirectoryEntry[] = [];
+
+interface TermDirectoryProps {
+  entries?: Paginated<TermDirectoryEntry>;
+}
+
+const TermDirectory = ({ entries }: TermDirectoryProps) => {
+  const { isPending } = useSearchParamsTransition();
+  const isLoading = !entries || isPending;
+
   const columns = useMemo<MRT_ColumnDef<TermDirectoryEntry>[]>(
     () => [
       {
@@ -75,19 +81,29 @@ const TermDirectory = ({
 
   const table = usePaginatedTable<TermDirectoryEntry>({
     columns,
-    data: entries.data,
-    rowCount: entries.total,
+    data: entries?.data ?? NO_ENTRIES,
+    rowCount: entries?.total ?? 0,
     perPageDefault: DEFAULT_PER_PAGE,
-    getRowId: (row) => String(row?.concept_id),
+    getRowId: (row, index?: number) => String(row?.concept_id ?? index),
     enableStickyHeader: true,
     enableSorting: false,
     enableRowSelection: false,
+    layoutMode: "grid",
+    state: { isLoading, showLoadingOverlay: false },
+    muiTableBodyProps: { "aria-busy": isLoading },
+    renderEmptyRowsFallback: () => (
+      <Typography
+        variant="h5"
+        sx={{ py: 4, width: "100%", textAlign: "center" }}
+      >
+        No terms found.
+      </Typography>
+    ),
   });
 
-  return (
+  const directory = (
     <Table
       table={table}
-      emptyMessage="No terms found."
       leftAction={{
         searchProps: {
           placeholder: "Search by term name or OMOP ID...",
@@ -115,6 +131,17 @@ const TermDirectory = ({
         },
       }}
     />
+  );
+
+  if (entries) return directory;
+
+  return (
+    <Box
+      inert
+      sx={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}
+    >
+      {directory}
+    </Box>
   );
 };
 
