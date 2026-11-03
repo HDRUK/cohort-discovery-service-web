@@ -478,6 +478,11 @@ export const frequencyMap: Record<FrequencyMode, string[]> = {
   [FrequencyMode.BIANNUALLY]: ["H1", "H2"],
 };
 
+export enum TaskType {
+  A = "a",
+  B = "b",
+}
+
 export enum DistributionJobType {
   GENERIC = "GENERIC",
   DEMOGRAPHICS = "DEMOGRAPHICS",

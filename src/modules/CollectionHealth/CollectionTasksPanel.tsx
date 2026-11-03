@@ -21,7 +21,7 @@ import Table from "@/components/Table";
 import { getTagsCollectionTaskHistory } from "@/config/tags";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useTable } from "@/hooks/useTable";
-import { TaskHistoryTask, TimeRange } from "@/types/api";
+import { TaskHistoryTask, TaskType, TimeRange } from "@/types/api";
 import { formatDuration, getDatetime, getTimestamp } from "@/utils/date";
 import { queryToText } from "@/utils/queryBuilder";
 import TaskDetailModal from "./TaskDetailModal";
@@ -105,7 +105,7 @@ const CollectionTasksPanel = ({
         Cell: ({ row }) => (
           <Tooltip
             title={
-              row.original.task_type === "b"
+              row.original.task_type === TaskType.B
                 ? "B-type — a distribution job, which runs no cohort query"
                 : "A-type — a cohort query"
             }

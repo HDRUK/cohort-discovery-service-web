@@ -4,6 +4,7 @@ import {
   RegressionTest,
   ResultFile,
   Task,
+  TaskType,
 } from "@/types/api";
 import {
   buildCollectionHealth,
@@ -22,7 +23,7 @@ const isoAgo = (ms: number) => new Date(NOW - ms).toISOString();
 const activity = (ms: number) => ({
   id: 1,
   collection_id: 1,
-  task_type: "a",
+  task_type: TaskType.A,
   created_at: isoAgo(ms),
   updated_at: isoAgo(ms),
 });

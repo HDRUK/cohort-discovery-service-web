@@ -1,4 +1,4 @@
-import { TaskHistoryTask } from "@/types/api";
+import { TaskHistoryTask, TaskType } from "@/types/api";
 import { buildTaskSeries, groupByTaskType } from "../taskSeries";
 import { MAX_BINS } from "../timeRange";
 
@@ -8,7 +8,7 @@ const NOW = Date.parse("2026-09-02T14:00:00Z");
 
 const task = (overrides: Partial<TaskHistoryTask> = {}): TaskHistoryTask => ({
   pid: "task-1",
-  task_type: "a",
+  task_type: TaskType.A,
   status: "succeeded",
   attempts: 1,
   created_at: "2026-09-02T13:06:43Z",
@@ -295,9 +295,9 @@ describe("buildTaskSeries", () => {
 
 describe("groupByTaskType", () => {
   const mixed = [
-    task({ pid: "b-one", task_type: "b" }),
-    task({ pid: "a-one", task_type: "a" }),
-    task({ pid: "b-two", task_type: "b" }),
+    task({ pid: "b-one", task_type: TaskType.B }),
+    task({ pid: "a-one", task_type: TaskType.A }),
+    task({ pid: "b-two", task_type: TaskType.B }),
   ];
 
   it("splits by type, keys ascending so a type keeps its colour", () => {

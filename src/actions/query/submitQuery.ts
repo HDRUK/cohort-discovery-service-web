@@ -3,7 +3,12 @@
 import { RuleGroupType } from "@/types/rules";
 import { apiPost, ErrorMode } from "@/lib/apiClient";
 import { API_ROUTES } from "@/lib/apiRoutes";
-import { CreateQuery, CreateQueryPost, ApiResponse } from "@/types/api";
+import {
+  CreateQuery,
+  CreateQueryPost,
+  ApiResponse,
+  TaskType,
+} from "@/types/api";
 import { capVarChar } from "@/utils/string";
 import { revalidateUserAction } from "@/actions/revalidate";
 
@@ -18,7 +23,7 @@ const submitQuery = async (
     {
       name: safeName,
       definition: query,
-      task_type: "a",
+      task_type: TaskType.A,
       ...(collection_filter && { collection_filter }),
     },
     { errorMode: ErrorMode.RESULT },
