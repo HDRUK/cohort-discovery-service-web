@@ -3,7 +3,7 @@ import { useForm, Controller, FormProvider, useWatch } from "react-hook-form";
 import { CreateCollectionFormValues } from "@/types/forms";
 import { QueryContext } from "@/types/context";
 import FormTextField from "@/components/FormTextField";
-import { TaskType, FrequencyMode } from "@/types/api";
+import { DistributionJobType, FrequencyMode } from "@/types/api";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import { useNotify } from "@/providers/NotifyProvider";
 import CollectionConfig from "@/components/CollectionConfig";
@@ -51,7 +51,7 @@ const CreateCollection = ({ onCancel }: CreateCollectionProps) => {
         frequency_mode: Number(FrequencyMode.WEEKLY),
         run_time_frequency: 0,
         enabled: 1,
-        type: TaskType.B,
+        type: DistributionJobType.DEMOGRAPHICS,
       },
     },
   });
