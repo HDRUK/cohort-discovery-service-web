@@ -10,9 +10,6 @@ function getTokenKey(token: string) {
   return crypto.createHash("sha256").update(token).digest("hex");
 }
 
-const hashString = (value: string) =>
-  crypto.createHash("sha256").update(value).digest("hex");
-
 const getEnumLabel = <T extends Record<string, string | number>>(
   enumObj: T,
   value: string | number,
@@ -76,7 +73,6 @@ const addQueryParam = (url: string, key: string, value: string) => {
 export {
   capitaliseFirstLetter,
   getTokenKey,
-  hashString,
   capVarChar,
   getEnumLabel,
   paramsToString,
