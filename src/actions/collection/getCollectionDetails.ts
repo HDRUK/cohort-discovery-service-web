@@ -9,7 +9,7 @@ const fetchCollectionDetails = async (
   pid: string,
 ): Promise<CollectionDetails> => {
   const res = await apiGet<ApiResponse<CollectionDetails>>({
-    url: `${API_ROUTES.collection(pid)}/details`,
+    url: API_ROUTES.collectionDetails(pid),
     tags: [TAG_COLLECTIONS_ADMIN, getTagCollection(pid)],
     revalidate: false,
     includeUserTag: false,

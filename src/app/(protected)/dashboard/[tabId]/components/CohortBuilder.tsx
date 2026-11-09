@@ -1,5 +1,3 @@
-"use server";
-
 import getQuery from "@/actions/query/getQuery";
 import getQueries from "@/actions/query/getQueries";
 import { cookies } from "next/headers";

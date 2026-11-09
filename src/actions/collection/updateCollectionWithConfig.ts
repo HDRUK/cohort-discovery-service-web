@@ -22,7 +22,7 @@ const updateCollectionWithConfig = async (
     Partial<CreateCollectionPost>
   >(API_ROUTES.collection(id), payload);
   await apiPut<ApiResponse<Collection>, Partial<CreateCollectionConfigPost>>(
-    `${API_ROUTES.collectionConfig}/${data.config.id}`,
+    API_ROUTES.collectionConfigItem(data.config.id),
     payloadConfig,
   );
   if (refreshCache) await revalidateCollections(data.custodian.pid);

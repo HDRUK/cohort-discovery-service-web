@@ -14,7 +14,7 @@ const transitionCollections = async (
   await Promise.all(
     ids.map((id) =>
       apiPut<ApiResponse<Collection>, TransitionCollectionPut>(
-        `${API_ROUTES.collection(id)}/transition_to`,
+        API_ROUTES.transitionCollection(id),
         payload,
       ),
     ),

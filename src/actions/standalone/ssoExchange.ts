@@ -2,13 +2,13 @@
 
 import { ApiResponse, SignInResponse } from "@/types/api";
 import { API_ROUTES } from "@/lib/apiRoutes";
-import { apiPost } from "@/lib/apiClient";
+import { apiPostPublic } from "@/lib/apiClient";
 import { ApiError } from "@/lib/https";
 import { setAccessTokenCookie } from "@/lib/authCookie";
 
 const ssoExchange = async (code: string): Promise<boolean> => {
   try {
-    const response = await apiPost<
+    const response = await apiPostPublic<
       ApiResponse<SignInResponse>,
       { code: string }
     >(API_ROUTES.ssoExchange, { code });

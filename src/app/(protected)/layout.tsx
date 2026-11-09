@@ -49,7 +49,7 @@ export default async function ProtectedLayout({
 
   const user = decoded.user as TokenUser;
 
-  const { data: me, error } = await getMe({ errorMode: ErrorMode.RESULT });
+  const { data: me, error } = await getMe(ErrorMode.RESULT);
   const { code: errorCode } = error ?? {};
 
   if (errorCode === 404) {

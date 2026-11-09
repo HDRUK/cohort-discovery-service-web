@@ -12,7 +12,7 @@ const updateQuery = async (
   payload: Partial<CreateQueryPost>,
 ): Promise<ApiResponse<Query>> => {
   const result = await apiPut<ApiResponse<Query>, Partial<CreateQueryPost>>(
-    `${API_ROUTES.query}/${id}`,
+    API_ROUTES.updateQuery(id),
     payload,
   );
   await revalidateAction(TAG_QUERIES);

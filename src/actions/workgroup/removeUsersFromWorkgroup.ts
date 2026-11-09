@@ -11,7 +11,7 @@ const removeUserFromWorkgroup = async (
   await Promise.all(
     payload.ids.map(async (id) =>
       apiDelete<ApiResponse<number>>(
-        `${API_ROUTES.user(id)}/workgroup/${payload.workgroup_id}`,
+        API_ROUTES.userWorkgroup(id, payload.workgroup_id),
       ),
     ),
   );

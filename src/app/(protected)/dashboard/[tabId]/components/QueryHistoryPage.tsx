@@ -1,5 +1,3 @@
-"use server";
-
 import { Suspense } from "react";
 import getQueries from "@/actions/query/getQueries";
 import QueriesTable from "@/modules/QueriesTable";
