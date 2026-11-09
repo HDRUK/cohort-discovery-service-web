@@ -2,6 +2,7 @@ import {
   CollectionHost,
   CollectionHostCredentials,
   CollectionHostWithCredentials,
+  CollectionWithHosts,
   Custodian,
 } from "@/types/api";
 
@@ -56,9 +57,17 @@ const toCollectionHostCredentials = ({
   client_secret,
 });
 
+const toCollectionWithHostSummaries = (
+  collection: CollectionWithHosts,
+): CollectionWithHosts => ({
+  ...collection,
+  host: collection.host?.map(toCollectionHostSummary),
+});
+
 export {
   parseCollectionHostId,
   toCustodianSummary,
   toCollectionHostSummary,
   toCollectionHostCredentials,
+  toCollectionWithHostSummaries,
 };

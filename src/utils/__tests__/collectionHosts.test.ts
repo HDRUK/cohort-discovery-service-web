@@ -2,8 +2,10 @@ import {
   parseCollectionHostId,
   toCollectionHostCredentials,
   toCollectionHostSummary,
+  toCollectionWithHostSummaries,
   toCustodianSummary,
 } from "../collectionHosts";
+import { getMockCollection } from "@/actions/collection/__mocks__/getCollections";
 import getCollectionHost from "@/actions/collectionHost/__mocks__/getCollectionHost";
 import getCustodian from "@/actions/custodian/__mocks__/getCustodian";
 import { Custodian } from "@/types/api";
@@ -71,6 +73,30 @@ describe("toCollectionHostCredentials", () => {
       client_id: "client-id",
       client_secret: "client-secret",
     });
+  });
+});
+
+describe("toCollectionWithHostSummaries", () => {
+  it("drops the credentials from every host on the collection", () => {
+    const collection = getMockCollection({
+      host: [getCollectionHost({ id: 1 }), getCollectionHost({ id: 2 })],
+    });
+
+    const { host } = toCollectionWithHostSummaries(collection);
+
+    expect(host.map(({ id }) => id)).toEqual([1, 2]);
+    host.forEach((summary) => {
+      expect(summary).not.toHaveProperty("client_id");
+      expect(summary).not.toHaveProperty("client_secret");
+    });
+  });
+
+  it("keeps the rest of the collection", () => {
+    const collection = getMockCollection({ name: "Kept name" });
+
+    expect(toCollectionWithHostSummaries(collection)).toEqual(
+      expect.objectContaining({ id: collection.id, name: "Kept name" }),
+    );
   });
 });
 

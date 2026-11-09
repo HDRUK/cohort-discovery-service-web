@@ -4,6 +4,7 @@ import { buildCollectionParams } from "@/utils/params";
 import { Box, Skeleton } from "@mui/material";
 import getCustodianCollections from "@/actions/collection/getCustodianCollections";
 import CollectionsManagement from "../CollectionsManagement";
+import { toCollectionWithHostSummaries } from "@/utils/collectionHosts";
 
 export const CollectionsSkeleton = () => (
   <Box sx={{ height: "100%", p: 2 }}>
@@ -29,7 +30,15 @@ const CollectionsTab = async ({
       : getCustodianCollections(custodianPid, { params }),
   ]);
 
-  return <CollectionsManagement isAdmin={isAdmin} collections={collections} />;
+  return (
+    <CollectionsManagement
+      isAdmin={isAdmin}
+      collections={{
+        ...collections,
+        data: collections.data.map(toCollectionWithHostSummaries),
+      }}
+    />
+  );
 };
 
 export default CollectionsTab;

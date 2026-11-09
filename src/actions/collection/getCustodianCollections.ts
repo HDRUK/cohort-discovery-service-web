@@ -16,6 +16,7 @@ const getCustodianCollections = async (
     url,
     tags: [tag],
     ...args,
+    cacheOptions: { useCache: false },
   });
 };
 
