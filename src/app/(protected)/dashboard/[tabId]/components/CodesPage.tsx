@@ -3,7 +3,7 @@ import { Paper, Skeleton } from "@mui/material";
 import { Suspense } from "react";
 import RefreshButton from "@/components/RefreshButton";
 import Title from "@/components/Title";
-import getCodeStats from "@/actions/omop/getCodeStats";
+import { getCodeStats } from "@/server/data/omop";
 
 interface PageProps {
   searchParams: Promise<{
