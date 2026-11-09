@@ -3,7 +3,7 @@ import "server-only";
 import { cacheLife } from "next/cache";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { apiGet, ErrorMode } from "@/server/api";
-import { LIST_CACHE_LIFE, USER_DATA_CACHE_LIFE } from "@/server/cacheProfiles";
+import { USER_DATA_CACHE_LIFE } from "@/server/cacheProfiles";
 import { requireSession } from "@/server/session";
 import {
   ApiResponse,
@@ -18,7 +18,6 @@ import {
   TimeRange,
 } from "@/types/api";
 import { RuleGroupType } from "@/types/rules";
-import { canonicaliseQueryString } from "@/utils/string";
 
 const TASK_HISTORY_PER_PAGE = 100;
 
@@ -50,48 +49,17 @@ export const getAdminCollections = async (
   );
 };
 
-const fetchAdminCollectionList = async (
-  queryString: string,
-): Promise<ApiResponse<Paginated<CollectionWithHosts>>> => {
-  "use cache: private";
-  cacheLife(LIST_CACHE_LIFE);
-
-  const { token } = await requireSession();
-  return apiGet<ApiResponse<Paginated<CollectionWithHosts>>>(
-    token,
-    API_ROUTES.adminCollections,
-    { params: queryString },
-  );
-};
-
-export const getAdminCollectionList = (
-  args?: ReadArgs,
-): Promise<ApiResponse<Paginated<CollectionWithHosts>>> =>
-  fetchAdminCollectionList(canonicaliseQueryString(args?.params));
-
-const fetchCustodianCollections = async (
+export const getCustodianCollections = async (
   custodianPid: string,
-  queryString: string,
+  args?: ReadArgs,
 ): Promise<ApiResponse<Paginated<CollectionWithHosts>>> => {
-  "use cache: private";
-  cacheLife(LIST_CACHE_LIFE);
-
   const { token } = await requireSession();
   return apiGet<ApiResponse<Paginated<CollectionWithHosts>>>(
     token,
     API_ROUTES.custodianCollections(custodianPid),
-    { params: queryString },
+    { params: args?.params },
   );
 };
-
-export const getCustodianCollections = (
-  custodianPid: string,
-  args?: ReadArgs,
-): Promise<ApiResponse<Paginated<CollectionWithHosts>>> =>
-  fetchCustodianCollections(
-    custodianPid,
-    canonicaliseQueryString(args?.params),
-  );
 
 export const getCollectionDetails = async (
   pid: string,
