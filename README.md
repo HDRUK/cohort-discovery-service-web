@@ -39,13 +39,15 @@ Use `.env.example` as the base:
 | Variable | Required | Description |
 | --- | --- | --- |
 | `API_BASE_URL` | Yes | Backend API base URL used by server actions. |
-| `NEXT_PUBLIC_LOGIN_URL` | Yes | Login URL used when unauthenticated. Also the base for outbound organisation links; falls back to `links.organisation` in the branding config. |
+| `NEXT_PUBLIC_LOGIN_URL` | Yes | Login URL used when unauthenticated. In integrated mode this is the Gateway base URL (no path or query), and logout redirects to its sign-in page. Also the base for outbound organisation links; falls back to `links.organisation` in the branding config. |
 | `APPLICATION_MODE` | Yes | `integrated` or `standalone`. Controls auth/access behaviour. |
 | `NEXT_PUBLIC_TASK_URL` | Yes | API URL used for the task endpoints and the API docs footer link. |
 | `NEXT_PUBLIC_USE_EXAMPLE_QUERY` | No | Enables example query UX/debug helpers when `true`. |
 | `NEXT_PUBLIC_USE_DEBUG_LOGS` | No | Enables extra client-side debug logging when `true`. |
 | `NEXT_PUBLIC_SUPPORT_URL` | No | Base URL for the support centre link. Defaults to the organisation URL. |
 | `COOKIE_TOKEN_NAME` | No | Name of the session cookie. Defaults to `token`. |
+| `COOKIE_TOKEN_DOMAIN` | No | Integrated mode only. Domain Gateway sets the session cookie on (e.g. `.healthdatagateway.org`), so logout can clear it. Unset skips the domain-scoped delete. |
+| `CDS_PUBLIC_URL` | No | Integrated mode only. Public URL of this app, passed to Gateway on logout so users are sent back here after signing in. Unset sends users to Gateway without a return link. |
 | `HIDE_NAV` | No | Set to `1` to hide the header and top menu, for embedding the app in an iframe. |
 | `CONFIG_SUPPORT_URL` | No | Support site used by the support pop-out. |
 | `CONFIG_SERVICE_DESK_URL` | No | Service desk base URL. |
