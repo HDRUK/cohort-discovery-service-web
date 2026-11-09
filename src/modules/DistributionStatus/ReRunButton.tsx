@@ -18,9 +18,11 @@ interface ReRunButtonProps {
 export const ReRunButton = ({ onClick, onSuccess }: ReRunButtonProps) => {
   const defaults = useDefaults();
   const [submittedTaskPid, setSubmittedTaskPid] = useState<string | null>();
+  const hasCalledSuccessRef = useRef(false);
 
   const handleClick = useCallback(async () => {
     setSubmittedTaskPid(null);
+    hasCalledSuccessRef.current = false;
 
     const newQuery = await onClick();
     const newTask = newQuery.tasks?.[0] ?? null;
@@ -47,8 +49,6 @@ export const ReRunButton = ({ onClick, onSuccess }: ReRunButtonProps) => {
   const isSuccessful = taskStatus === TaskStatus.SUCCESSFUL;
   const hasFailed = taskStatus === TaskStatus.ERROR;
   const isLoading = isFetching || isPending;
-
-  const hasCalledSuccessRef = useRef(false);
 
   useEffect(() => {
     if (isSuccessful && !hasCalledSuccessRef.current) {

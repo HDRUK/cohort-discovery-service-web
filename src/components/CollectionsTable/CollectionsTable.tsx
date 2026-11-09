@@ -22,12 +22,7 @@ import useCustodianStore from "@/hooks/useCustodianStore";
 import useUserStore from "@/hooks/useUserStore";
 import { useConfirm } from "@/hooks/useConfirm";
 import { useNotify } from "@/providers/NotifyProvider";
-import {
-  getTagCollection,
-  getTagCustodianCollection,
-  QUERY_KEYS,
-  TAG_COLLECTIONS_ADMIN,
-} from "@/config/tags";
+import { QUERY_KEYS } from "@/config/tags";
 import StatusChip from "@/components/StatusChip";
 import { TableProps } from "../Table/Table";
 import SyntheticChip from "../SyntheticChip";
@@ -35,7 +30,6 @@ import CollectionDetails from "./CollectionDetails";
 import usePrefetchCollectionDetails from "./usePrefetchCollectionDetails";
 import useFeatures from "@/hooks/useFeatures";
 import { useQueryClient } from "@tanstack/react-query";
-import { revalidateAction } from "@/actions/revalidate";
 import { CollectionFilterStatus } from "@/types/collections";
 
 export interface CollectionsTableProps extends TableProps {
@@ -364,21 +358,12 @@ const CollectionsTable = ({
           ? { restoreProps: { onClick: handleRestoreClick } }
           : { deleteProps: { onClick: handleDeleteClick } }),
         refreshProps: {
-          tag:
-            currentCustodian?.pid && !isAdmin
-              ? getTagCustodianCollection(currentCustodian.pid)
-              : TAG_COLLECTIONS_ADMIN,
           label: "Refresh Collections",
           onRefreshed: async () => {
             if (!adminMoreCollectionDetails) return;
-            const tags = collections.data.map((c) => getTagCollection(c.pid));
-            tags.map((t) => revalidateAction(t));
             await queryClient.invalidateQueries({
               queryKey: QUERY_KEYS.collectionDetails(),
-            });
-            await queryClient.refetchQueries({
-              queryKey: QUERY_KEYS.collectionDetails(),
-              type: "all",
+              refetchType: "all",
             });
           },
         },
