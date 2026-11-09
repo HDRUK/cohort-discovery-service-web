@@ -1,5 +1,5 @@
 import {
-  getAdminCollections,
+  getAdminCollectionList,
   getCustodianCollections,
 } from "@/server/data/collections";
 import { CollectionsSearchParams } from "@/types/api";
@@ -27,7 +27,7 @@ const CollectionsTab = async ({
 
   const [{ data: collections }] = await Promise.all([
     isAdmin
-      ? getAdminCollections({ params })
+      ? getAdminCollectionList({ params })
       : getCustodianCollections(custodianPid, { params }),
   ]);
 
