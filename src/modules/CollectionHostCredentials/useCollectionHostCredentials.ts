@@ -15,6 +15,12 @@ const fetchCollectionHostCredentials = async (
   return response.json();
 };
 
+/**
+ * Fetches one host's credentials from the collection-hosts Route Handler. See
+ * src/app/api/collection-hosts/[id]/route.ts for why this isn't 'use cache'.
+ * staleTime and gcTime are 0 so the browser keeps nothing once the panel
+ * unmounts.
+ */
 const useCollectionHostCredentials = (
   hostId: number,
 ): UseQueryResult<CollectionHostCredentials> =>
