@@ -8,7 +8,6 @@ import { Query, CreateQueryPost, ApiResponse } from "@/types/api";
 
 const updateQuery = async (
   id: number,
-  pid: string,
   payload: Partial<CreateQueryPost>,
 ): Promise<ApiResponse<Query>> => {
   const { token } = await requireSession();

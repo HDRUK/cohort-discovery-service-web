@@ -20,8 +20,6 @@ import type {
   DistributionType,
   AddCollectionsToWorkgroupPost,
   RemoveCollectionsFromWorkgroupPost,
-  AddCollectionToWorkgroupsPost,
-  RemoveCollectionFromWorkgroupsPost,
 } from "@/types/api";
 
 import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
@@ -200,18 +198,6 @@ const seedStores = (overrides?: SliceOverrides) => {
         _payload: CreateCollectionPost,
         _payloadConfig: Omit<CreateCollectionConfigPost, "collection_id">,
       ) => RESOLVE<Collection>(getMockCollection()),
-      updateCollection: (
-        _id: number,
-        _payload: Partial<CreateCollectionPost>,
-        _payloadConfig: Partial<CreateCollectionConfigPost>,
-      ) => RESOLVE<Collection>(getMockCollection()),
-      deleteCollection: (_id: number | string, _custodianPid: string) =>
-        RESOLVE<void>(undefined),
-      restoreCollection: (_id: number | string, _custodianPid: string) =>
-        RESOLVE<ApiResponse<Collection>>({
-          message: "success",
-          data: getMockCollection(),
-        }),
       ...(overrides?.custodian ?? {}),
       current: {
         custodian: null,
@@ -229,16 +215,6 @@ const seedStores = (overrides?: SliceOverrides) => {
       selectedWorkgroup: null,
       createCollection: (_payload: CreateCollectionPost) =>
         RESOLVE<Collection>(getMockCollection()),
-      updateCollection: (
-        _id: number,
-        _payload: Partial<CreateCollectionPost>,
-      ) => RESOLVE<Collection>(getMockCollection()),
-      deleteCollection: (_id: number | string) => RESOLVE<void>(undefined),
-      restoreCollection: (_id: number | string) =>
-        RESOLVE<ApiResponse<Collection>>({
-          message: "success",
-          data: getMockCollection(),
-        }),
       createWorkgroup: (_payload: {
         name: string;
         collections?: number[];
@@ -248,11 +224,6 @@ const seedStores = (overrides?: SliceOverrides) => {
         RESOLVE<number[]>([1]),
       removeCollectionsFromWorkgroup: (
         _payload: RemoveCollectionsFromWorkgroupPost,
-      ) => RESOLVE<void>(undefined),
-      addCollectionToWorkgroups: (_payload: AddCollectionToWorkgroupsPost) =>
-        RESOLVE<number[]>([1]),
-      removeCollectionFromWorkgroups: (
-        _payload: RemoveCollectionFromWorkgroupsPost,
       ) => RESOLVE<void>(undefined),
       ...(overrides?.admin ?? {}),
     } as AdminStoreState,

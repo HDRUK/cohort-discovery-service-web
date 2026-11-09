@@ -1,11 +1,9 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import updateQuery from "@/actions/query/updateQuery";
 import EditableText from "@/components/EditableText";
-
-async function setQueryName(id: number, pid: string, name: string) {
-  await updateQuery(id, pid, { name });
-}
+import { QUERY_KEYS } from "@/config/tags";
 
 export default function EditableQuerySubtitle({
   defaultValue,
@@ -16,6 +14,16 @@ export default function EditableQuerySubtitle({
   queryId: number;
   queryPid: string;
 }) {
+  const queryClient = useQueryClient();
+
+  const renameQuery = async (name: string) => {
+    await updateQuery(queryId, { name });
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.queries() }),
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.query(queryPid) }),
+    ]);
+  };
+
   return (
     <EditableText
       showIcon
@@ -38,7 +46,7 @@ export default function EditableQuerySubtitle({
         },
       }}
       defaultValue={defaultValue}
-      onCommit={(value) => setQueryName(queryId, queryPid, value)}
+      onCommit={renameQuery}
     />
   );
 }

@@ -8,16 +8,24 @@ import getCustodian from "@/actions/custodian/__mocks__/getCustodian";
 import { CloseGuardProvider } from "@/providers/CloseGuardProvider";
 import userEvent from "@testing-library/user-event";
 import SwimLane from "@/components/SwimLane";
-import { revalidateCollections } from "@/actions/revalidate";
+import saveCollection from "@/actions/collection/saveCollection";
 import { CollectionWithHosts } from "@/types/api";
-jest.mock("@/actions/revalidate", () => ({
-  revalidateCollections: jest.fn(),
+
+jest.mock("@/actions/collection/saveCollection", () => ({
+  __esModule: true,
+  default: jest.fn().mockResolvedValue({
+    ok: true,
+    workgroupsAdded: 0,
+    workgroupsRemoved: 0,
+    statusChanged: false,
+  }),
 }));
 
-describe("UpdateCollection", () => {
-  const updateCollectionMock = jest.fn();
-  const updateCollectionStatusMock = jest.fn();
+const saveCollectionMock = saveCollection as jest.MockedFunction<
+  typeof saveCollection
+>;
 
+describe("UpdateCollection", () => {
   const renderComponent = (
     collectionOverride?: Partial<CollectionWithHosts>,
   ) => {
@@ -56,10 +64,8 @@ describe("UpdateCollection", () => {
               custodian,
               collectionHosts,
             },
-            updateCollection: updateCollectionMock,
           },
           admin: {
-            updateCollectionStatus: updateCollectionStatusMock,
             collectionHosts,
           },
           user: {
@@ -123,21 +129,20 @@ describe("UpdateCollection", () => {
 
     await user.click(screen.getByTestId("save-panel-toggle"));
 
-    expect(updateCollectionMock).toHaveBeenCalledWith(
+    expect(saveCollectionMock).toHaveBeenCalledWith(
       1,
       expect.objectContaining({
-        name: "Updated Collection Name",
+        collection: expect.objectContaining({
+          name: "Updated Collection Name",
+        }),
+        config: expect.objectContaining({
+          frequency_mode: 1,
+          run_time_frequency: 1,
+          run_time_hour: 1,
+          run_time_minute: 1,
+        }),
       }),
-      expect.objectContaining({
-        frequency_mode: 1,
-        run_time_frequency: 1,
-        run_time_hour: 1,
-        run_time_minute: 1,
-      }),
-      false,
     );
-
-    expect(revalidateCollections).toHaveBeenCalled();
   });
 
   it("can change frequency from Weekly to Monthly", async () => {
@@ -149,16 +154,17 @@ describe("UpdateCollection", () => {
     expect(screen.getByLabelText("Monthly")).toBeChecked();
 
     await user.click(screen.getByTestId("save-panel-toggle"));
-    expect(updateCollectionMock).toHaveBeenCalledWith(
+    expect(saveCollectionMock).toHaveBeenCalledWith(
       1,
-      expect.any(Object),
       expect.objectContaining({
-        frequency_mode: 2,
-        run_time_frequency: 1,
-        run_time_hour: 1,
-        run_time_minute: 1,
+        collection: expect.any(Object),
+        config: expect.objectContaining({
+          frequency_mode: 2,
+          run_time_frequency: 1,
+          run_time_hour: 1,
+          run_time_minute: 1,
+        }),
       }),
-      false,
     );
   });
 
@@ -180,16 +186,17 @@ describe("UpdateCollection", () => {
     expect(screen.getByLabelText("Biannually")).toBeChecked();
 
     await user.click(screen.getByTestId("save-panel-toggle"));
-    expect(updateCollectionMock).toHaveBeenCalledWith(
+    expect(saveCollectionMock).toHaveBeenCalledWith(
       1,
-      expect.any(Object),
       expect.objectContaining({
-        frequency_mode: 4,
-        run_time_frequency: 0, // gets reset as this mode has no value of 6
-        run_time_hour: 1,
-        run_time_minute: 1,
+        collection: expect.any(Object),
+        config: expect.objectContaining({
+          frequency_mode: 4,
+          run_time_frequency: 0, // gets reset as this mode has no value of 6
+          run_time_hour: 1,
+          run_time_minute: 1,
+        }),
       }),
-      false,
     );
   });
 
