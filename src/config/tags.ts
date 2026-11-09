@@ -1,37 +1,5 @@
 import type { QueryKey } from "@tanstack/react-query";
 
-export const TAG_COLLECTIONS_ADMIN = "collection-admin";
-export const TAG_CUSTODIAN_COLLECTION = "custodian-collection";
-export const TAG_COLLECTIONS = "collections";
-export const TAG_COLLECTIONS_USER = "collections-user";
-export const TAG_COLLECTION_HOSTS = "collection-hosts";
-export const TAG_QUERIES = "queries";
-
-export const getCollectionHostTag = (custodianPid: string) =>
-  `collection-host-${custodianPid}`;
-
-export const getTagCollection = (pid: string) => `${TAG_COLLECTIONS}-${pid}`;
-
-export const TAG_CUSTODIANS = "custodians";
-export const TAG_NETWORKS = "custodians-networks";
-
-export const getCustodianTag = (pid: string) => `custodian-${pid}`;
-
-export const TAG_WORKGROUP_ADMIN = "workgroups-admin";
-
-export const getTagCustodianCollection = (pid: string) =>
-  `${TAG_CUSTODIAN_COLLECTION}-${pid}`;
-
-export const getUserQueryTag = (id: string | number) => {
-  return `${TAG_QUERIES}-${id}`;
-};
-
-export const TAG_ADMIN_USERS = "admin-users";
-export const TAG_USER_PROFILE = "user-profile";
-
-export const getTagUserProfile = (userId: string | number) =>
-  `${TAG_USER_PROFILE}-${userId}`;
-
 type TimeRangeKey = { from: string; to: string };
 
 const queryKey = (...parts: unknown[]): QueryKey =>

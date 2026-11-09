@@ -147,7 +147,6 @@ const seedStores = (overrides?: SliceOverrides) => {
           data: { query_pid: "mock-pid" } as unknown as CreateQuery,
           message: "ok",
         }),
-      rerunTask: NOOP,
       setSelectedCollections: NOOP,
       runDistributions: (
         _collection: CollectionWithHosts,
@@ -171,7 +170,6 @@ const seedStores = (overrides?: SliceOverrides) => {
       removeConceptsFromSet: (_conceptSetId: number, _conceptIds: number[]) =>
         RESOLVE<void>(undefined),
       removeConceptSet: (_conceptSetId: number) => RESOLVE<void>(undefined),
-      deleteQueries: (_pids: string[]) => RESOLVE<void>(undefined),
       ...(overrides?.user ?? {}),
     } as UserStoreState,
     true,

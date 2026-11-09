@@ -1,13 +1,10 @@
 import { create } from "zustand";
 import submitQuery from "@/actions/query/submitQuery";
-import rerunTask from "@/actions/task/rerunTask";
 import rerunDistributions from "@/actions/rerunDistributions";
 import createConceptSet from "@/actions/conceptSet/createConceptSet";
 import attachConcepts from "@/actions/concept/attachConcepts";
 import detachConcepts from "@/actions/concept/detachConcepts";
 import deleteConceptSet from "@/actions/conceptSet/deleteConceptSet";
-import deleteQueries from "@/actions/query/deleteQueries";
-import { revalidateAction, revalidateCustodian } from "@/actions/revalidate";
 import {
   ApiResponse,
   CombinedUser,
@@ -23,9 +20,7 @@ import {
   Workgroup,
   Collection,
 } from "@/types/api";
-import { getUserQueryTag } from "@/config/tags";
 import { DEFAULT_QUERY, useQueryBuilderStore } from "@/store/queryBuilderStore";
-import { useCustodianDataStore } from "@/store/custodianDataStore";
 import searchConcepts from "@/actions/concept/searchConcepts";
 import { WorkgroupNames } from "@/config/workgroups";
 
@@ -49,8 +44,6 @@ export interface UserDataStoreState {
     queryName?: string,
     reset?: boolean,
   ) => Promise<ApiResponse<CreateQuery>>;
-
-  rerunTask: (id: string) => Promise<void>;
 
   selectedCollections: CollectionWithHosts[] | [];
   setSelectedCollections: (collections: CollectionWithHosts[] | []) => void;
@@ -82,8 +75,6 @@ export interface UserDataStoreState {
     conceptIds: number[],
   ) => Promise<void>;
   removeConceptSet: (conceptSetId: number) => Promise<void>;
-
-  deleteQueries: (pids: string[]) => Promise<void>;
 
   workgroups: Workgroup[];
   setWorkgroups: (workgroups: Workgroup[]) => void;
@@ -160,12 +151,6 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
     return res;
   },
 
-  rerunTask: async (id) => {
-    await rerunTask(id);
-    const custodian = useCustodianDataStore.getState().current.custodian;
-    if (custodian) await revalidateCustodian(custodian);
-  },
-
   selectedCollections: [],
   setSelectedCollections: (selectedCollections) =>
     set((state) => ({
@@ -214,12 +199,6 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
 
   removeConceptSet: async (conceptSetId) => {
     await deleteConceptSet(conceptSetId);
-  },
-
-  deleteQueries: async (pids) => {
-    await deleteQueries(pids);
-    const user = useUserDataStore.getState().user;
-    if (user) await revalidateAction(getUserQueryTag(user.id));
   },
 
   workgroups: [],
