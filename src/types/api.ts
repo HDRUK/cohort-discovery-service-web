@@ -48,6 +48,11 @@ export interface CacheOptions {
   useCache?: boolean;
 }
 
+export interface ReadArgs {
+  params?: URLSearchParams | string;
+  cacheOptions?: CacheOptions;
+}
+
 export interface ApiResponse<T> {
   message: string;
   data: T;

@@ -1,5 +1,3 @@
-"use server";
-
 import { Skeleton } from "@mui/material";
 import { Suspense } from "react";
 import CohortBuilder from "./CohortBuilder";

@@ -1,5 +1,3 @@
-"use server";
-
 import CodeStats from "@/components/CodeStats";
 import { Paper, Skeleton } from "@mui/material";
 import { Suspense } from "react";

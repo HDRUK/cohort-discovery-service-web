@@ -1,5 +1,3 @@
-"use server";
-
 import { Alert, Divider, Skeleton } from "@mui/material";
 import { Suspense } from "react";
 import QueryResultsTable from "@/modules/QueryResultsTable";

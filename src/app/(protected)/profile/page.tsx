@@ -1,5 +1,3 @@
-"use server";
-
 import { Paper } from "@mui/material";
 import Title from "@/components/Title";
 import UserProfile from "./components/UserProfile";

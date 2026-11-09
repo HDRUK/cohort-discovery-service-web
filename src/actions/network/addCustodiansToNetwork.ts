@@ -11,7 +11,7 @@ const addCustodiansToNetwork = async (
   const results = await Promise.all(
     payload.custodian_ids.map(async (custodian_id) =>
       apiPost<ApiResponse<number>, AddCustodiansToNetworkPost>(
-        `${API_ROUTES.custodian(custodian_id)}/networks/${payload.id}`,
+        API_ROUTES.custodianNetwork(custodian_id, payload.id),
         payload,
       ),
     ),

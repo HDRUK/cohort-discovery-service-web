@@ -1,17 +1,18 @@
 "use server";
 
 import { TAG_WORKGROUP_ADMIN } from "@/config/tags";
-import { apiGet, CachedGetArgs } from "@/lib/apiClient";
+import { apiGet } from "@/lib/apiClient";
 import { API_ROUTES } from "@/lib/apiRoutes";
-import { ApiResponse, Workgroup } from "@/types/api";
+import { ApiResponse, Workgroup, ReadArgs } from "@/types/api";
 
 const getWorkgroups = async (
-  args?: Omit<CachedGetArgs, "url">,
+  args?: ReadArgs,
 ): Promise<ApiResponse<Workgroup[]>> => {
   return await apiGet<ApiResponse<Workgroup[]>>({
     url: API_ROUTES.workgroups,
     tags: [TAG_WORKGROUP_ADMIN],
-    ...args,
+    params: args?.params,
+    cacheOptions: args?.cacheOptions,
   });
 };
 

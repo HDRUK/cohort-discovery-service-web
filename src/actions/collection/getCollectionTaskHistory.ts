@@ -1,11 +1,6 @@
 "use server";
 
-import {
-  apiGet,
-  CachedGetArgs,
-  ErrorMode,
-  RequestOptions,
-} from "@/lib/apiClient";
+import { apiGet, ErrorMode } from "@/lib/apiClient";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import {
   ApiResponse,
@@ -19,16 +14,7 @@ const PER_PAGE = 100;
 
 const MAX_PAGES = 10;
 
-type TaskHistoryArgs = Omit<CachedGetArgs, "url"> & {
-  options?: RequestOptions<undefined>;
-};
-
-const fetchPage = (
-  pid: string,
-  range: TimeRange,
-  page: number,
-  args?: TaskHistoryArgs,
-) =>
+const fetchPage = (pid: string, range: TimeRange, page: number) =>
   apiGet<ApiResponse<CollectionTaskHistory>>({
     url: API_ROUTES.collectionTaskHistory(pid),
     params: new URLSearchParams({
@@ -39,8 +25,7 @@ const fetchPage = (
       include: "definition",
     }),
     cacheOptions: { useCache: false },
-    ...args,
-    options: { errorMode: ErrorMode.RESULT, ...args?.options },
+    options: { errorMode: ErrorMode.RESULT },
   });
 
 const hoistDefinitions = (
@@ -73,9 +58,8 @@ const hoistDefinitions = (
 const getCollectionTaskHistory = async (
   pid: string,
   range: TimeRange,
-  args?: TaskHistoryArgs,
 ): Promise<ApiResponse<CollectionTaskHistory>> => {
-  const first = await fetchPage(pid, range, 1, args);
+  const first = await fetchPage(pid, range, 1);
   const paginator = first.data?.tasks;
   if (!paginator) return first;
 
@@ -86,7 +70,7 @@ const getCollectionTaskHistory = async (
       ? []
       : await Promise.all(
           Array.from({ length: pages - 1 }, (_, index) =>
-            fetchPage(pid, range, index + 2, args),
+            fetchPage(pid, range, index + 2),
           ),
         );
 

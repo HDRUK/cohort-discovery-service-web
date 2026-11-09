@@ -1,11 +1,11 @@
-"use server";
+import "server-only";
 
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import { cookies } from "next/headers";
 import { ApiError } from "./https";
 import { notFound, redirect } from "next/navigation";
 import { DEFAULT_REVALIDATE } from "@/config/defaults";
-import { getTokenUser } from "./auth";
+import { getTokenUser, requireSession } from "./auth";
 import { CacheOptions } from "@/types/api";
 import { hashString, canonicaliseQueryString } from "@/utils/string";
 
@@ -82,8 +82,11 @@ async function request<TResponse, TBody = undefined>(
   method: HttpMethod,
   url: string,
   options: RequestOptions<TBody> = {},
+  requiresSession = false,
 ): Promise<TResponse | never> {
-  const fullUrl = url.startsWith("http") ? url : `${baseURL}${url}`;
+  if (!url.startsWith("/"))
+    throw new Error(`API path must be relative: ${url}`);
+  const fullUrl = `${baseURL}${url}`;
   const {
     headers = {},
     body,
@@ -95,14 +98,15 @@ async function request<TResponse, TBody = undefined>(
 
   const cookieStore = await cookies();
   const token = cookieStore.get(ACCESS_TOKEN_NAME)?.value;
+  if (requiresSession) requireSession(token);
 
   try {
     const response = await fetch(fullUrl, {
       method,
       headers: {
         "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...headers,
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       body: body !== undefined ? JSON.stringify(body) : undefined,
       signal,
@@ -158,8 +162,8 @@ export async function apiGet<TResponse>(
 ) {
   const { finalUrl, init } = await buildCachedRequest(args);
   return request<TResponse>("GET", finalUrl, {
-    ...init,
     ...(args.options ?? {}),
+    ...init,
   });
 }
 
@@ -175,6 +179,14 @@ export async function apiPost<TResponse, TBody>(
   body?: TBody,
   options?: RequestOptions<TBody>,
 ) {
+  return request<TResponse, TBody>("POST", url, { ...options, body }, true);
+}
+
+export async function apiPostPublic<TResponse, TBody>(
+  url: string,
+  body?: TBody,
+  options?: RequestOptions<TBody>,
+) {
   return request<TResponse, TBody>("POST", url, { ...options, body });
 }
 
@@ -183,12 +195,12 @@ export async function apiPut<TResponse, TBody>(
   body: TBody,
   options?: RequestOptions<TBody>,
 ) {
-  return request<TResponse, TBody>("PUT", url, { ...options, body });
+  return request<TResponse, TBody>("PUT", url, { ...options, body }, true);
 }
 
 export async function apiDelete<TResponse>(
   url: string,
   options?: RequestOptions<undefined>,
 ) {
-  return request<TResponse>("DELETE", url, options);
+  return request<TResponse>("DELETE", url, options, true);
 }

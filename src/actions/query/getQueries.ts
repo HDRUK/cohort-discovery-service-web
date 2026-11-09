@@ -1,13 +1,19 @@
 "use server";
 
 import { getUserQueryTag, TAG_QUERIES } from "@/config/tags";
-import { apiGet, CachedGetArgs } from "@/lib/apiClient";
+import { apiGet } from "@/lib/apiClient";
 import { API_ROUTES } from "@/lib/apiRoutes";
-import { Query, ApiResponse, Paginated, WithIncomplete } from "@/types/api";
+import {
+  Query,
+  ApiResponse,
+  Paginated,
+  WithIncomplete,
+  ReadArgs,
+} from "@/types/api";
 import { getTokenUser } from "@/lib/auth";
 
 const getQueries = async (
-  args?: Omit<CachedGetArgs, "url">,
+  args?: ReadArgs,
 ): Promise<WithIncomplete<ApiResponse<Paginated<Query>>>> => {
   const {
     user: { id: userId },
@@ -16,7 +22,8 @@ const getQueries = async (
   const { data, message } = await apiGet<ApiResponse<Paginated<Query>>>({
     url: API_ROUTES.queries,
     tags: [TAG_QUERIES, getUserQueryTag(userId)],
-    ...args,
+    params: args?.params,
+    cacheOptions: args?.cacheOptions,
   });
 
   const incompleteQueries = data.data.filter((q) =>
