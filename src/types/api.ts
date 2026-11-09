@@ -314,7 +314,7 @@ export interface CollectionConfig {
 }
 
 export interface CollectionWithHosts extends Collection {
-  host: CollectionHost[];
+  host: CollectionHost | null;
   config: CollectionConfig;
   workgroups?: Workgroup[];
 }

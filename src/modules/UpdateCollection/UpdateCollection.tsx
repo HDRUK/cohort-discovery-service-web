@@ -43,7 +43,6 @@ import { useUserDataStore } from "@/hooks/userDataStore";
 import { useIsAdminSection } from "@/contexts/AdminSectionContext";
 import { clampRunTimeFrequency, getFrequencyModeKey } from "@/utils/frequency";
 import CollectionHostCredentials from "@/modules/CollectionHostCredentials";
-import { primaryHost } from "@/utils/collectionHosts";
 
 export type UpdateCollectionProps = {
   collection: CollectionWithHosts;
@@ -76,7 +75,7 @@ const getDefaultValues = (collection: CollectionWithHosts | null) => {
     name,
     description,
     url,
-    host: hosts,
+    host,
     config,
     model_state,
     workgroups,
@@ -84,13 +83,12 @@ const getDefaultValues = (collection: CollectionWithHosts | null) => {
     location_enabled,
     death_enabled,
   } = collection;
-  const [host] = hosts;
   return {
     collection: {
       name,
       description: description || "",
       url: url || ("" as UrlString),
-      host_id: host?.id ?? "",
+      host_id: host?.id ?? 0,
       model_state: model_state,
       workgroups: workgroups,
       is_synthetic: is_synthetic,
@@ -115,7 +113,7 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
 
   const currentCustodian = useCustodianStore((s) => s.current.custodian);
   const isAdmin = useIsAdminSection();
-  const hostId = primaryHost(collection)?.id;
+  const hostId = collection.host?.id;
 
   const currentCollectionHosts = useCustodianStore(
     (s) => s.current.collectionHosts,

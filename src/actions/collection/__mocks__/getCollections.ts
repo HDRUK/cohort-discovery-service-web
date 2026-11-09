@@ -76,7 +76,7 @@ export const getMockCollection = (
   demographics: getMockDemographics({ collection_id: 1, n: count }),
   custodian: getCustodian(),
   is_synthetic: false,
-  host: [],
+  host: null,
   config: {
     id: 1,
     enabled: true,

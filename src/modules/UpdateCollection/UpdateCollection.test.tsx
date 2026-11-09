@@ -30,7 +30,7 @@ describe("UpdateCollection", () => {
       name: "Mock Collection #1",
       description: "This is the description of the mock collection #1",
       url: "https://example.com/dataset",
-      host: [host1],
+      host: host1,
       config: {
         id: 1,
         enabled: true,
@@ -252,7 +252,7 @@ describe("UpdateCollection", () => {
         }),
       });
 
-      renderComponent({ host: [getCollectionHost({ id: 11 })] });
+      renderComponent({ host: getCollectionHost({ id: 11 }) });
 
       expect(
         await screen.findByDisplayValue("client-id-11"),
@@ -267,7 +267,7 @@ describe("UpdateCollection", () => {
     it("explains when the credentials can't be loaded", async () => {
       fetchMock.mockResolvedValue({ ok: false, status: 403 });
 
-      renderComponent({ host: [getCollectionHost({ id: 12 })] });
+      renderComponent({ host: getCollectionHost({ id: 12 }) });
 
       expect(
         await screen.findByText(/couldn.t load this host.s credentials/i),
@@ -275,7 +275,7 @@ describe("UpdateCollection", () => {
     });
 
     it("explains when the collection has no host", () => {
-      renderComponent({ host: [] });
+      renderComponent({ host: null });
 
       expect(screen.getByText(/has no host yet/i)).toBeInTheDocument();
       expect(fetchMock).not.toHaveBeenCalled();

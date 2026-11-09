@@ -3,12 +3,12 @@
 import { TAG_COLLECTION_HOSTS } from "@/config/tags";
 import { apiGet, CachedGetArgs } from "@/lib/apiClient";
 import { API_ROUTES } from "@/lib/apiRoutes";
-import { ApiResponse, CollectionHostWithCredentials } from "@/types/api";
+import { ApiResponse, CollectionHost } from "@/types/api";
 
 const getCollectionHosts = async (
   args?: Omit<CachedGetArgs, "url">,
-): Promise<ApiResponse<CollectionHostWithCredentials[]>> => {
-  return await apiGet<ApiResponse<CollectionHostWithCredentials[]>>({
+): Promise<ApiResponse<CollectionHost[]>> => {
+  return await apiGet<ApiResponse<CollectionHost[]>>({
     url: API_ROUTES.collectionHosts,
     tags: [TAG_COLLECTION_HOSTS],
     ...args,

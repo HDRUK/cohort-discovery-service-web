@@ -1,79 +1,22 @@
 import {
   parseCollectionHostId,
-  primaryHost,
   toCollectionHostCredentials,
-  toCollectionHostSummary,
-  toCollectionWithHostSummaries,
 } from "../collectionHosts";
-import { getMockCollection } from "@/actions/collection/__mocks__/getCollections";
 import getCollectionHost from "@/actions/collectionHost/__mocks__/getCollectionHost";
-
-describe("toCollectionHostSummary", () => {
-  it("drops the client id and secret", () => {
-    const summary = toCollectionHostSummary(getCollectionHost());
-
-    expect(summary).not.toHaveProperty("client_id");
-    expect(summary).not.toHaveProperty("client_secret");
-  });
-
-  it("keeps the id and name used to pick a host", () => {
-    const host = getCollectionHost({ id: 7, name: "Host seven" });
-
-    expect(toCollectionHostSummary(host)).toEqual(
-      expect.objectContaining({ id: 7, name: "Host seven" }),
-    );
-  });
-});
 
 describe("toCollectionHostCredentials", () => {
   it("returns only the id and credentials", () => {
-    const host = getCollectionHost({
-      id: 3,
+    const host = {
+      ...getCollectionHost({ id: 3 }),
       client_id: "client-id",
       client_secret: "client-secret",
-    });
+    };
 
     expect(toCollectionHostCredentials(host)).toEqual({
       id: 3,
       client_id: "client-id",
       client_secret: "client-secret",
     });
-  });
-});
-
-describe("toCollectionWithHostSummaries", () => {
-  it("drops the credentials from every host on the collection", () => {
-    const collection = getMockCollection({
-      host: [getCollectionHost({ id: 1 }), getCollectionHost({ id: 2 })],
-    });
-
-    const { host } = toCollectionWithHostSummaries(collection);
-
-    expect(host.map(({ id }) => id)).toEqual([1, 2]);
-    host.forEach((summary) => {
-      expect(summary).not.toHaveProperty("client_id");
-      expect(summary).not.toHaveProperty("client_secret");
-    });
-  });
-
-  it("keeps the rest of the collection", () => {
-    const collection = getMockCollection({ name: "Kept name" });
-
-    expect(toCollectionWithHostSummaries(collection)).toEqual(
-      expect.objectContaining({ id: collection.id, name: "Kept name" }),
-    );
-  });
-});
-
-describe("primaryHost", () => {
-  it("returns the first host", () => {
-    const host = getCollectionHost({ id: 4 });
-
-    expect(primaryHost(getMockCollection({ host: [host] }))).toBe(host);
-  });
-
-  it("returns null when there is no host", () => {
-    expect(primaryHost(getMockCollection({ host: [] }))).toBeNull();
   });
 });
 
