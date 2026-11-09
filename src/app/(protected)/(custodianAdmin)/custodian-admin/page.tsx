@@ -1,7 +1,7 @@
 import { routes } from "@/config/routes";
 import { SearchParams } from "@/types/api";
 import { notFound, redirect } from "next/navigation";
-import getCustodians from "@/actions/custodian/getCustodians";
+import { getCustodians } from "@/server/data/custodians";
 
 export default async function CustodianAdmin({
   searchParams,
