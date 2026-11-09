@@ -8,18 +8,16 @@ import {
   useForm,
 } from "react-hook-form";
 import { useCallback, useEffect, useState } from "react";
-import { revalidateCollections } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
 import useCustodianStore from "@/hooks/useCustodianStore";
 import { useLogDependencyChanges } from "@/utils/deps";
 import SquareCheckbox from "@/components/SquareCheckbox";
-import removeCollectionFromWorkgroups from "@/actions/workgroup/removeCollectionFromWorkgroups";
-import addCollectionToWorkgroups from "@/actions/workgroup/addCollectionToWorkgroups";
+import updateCollections from "@/actions/collection/updateCollections";
+import { describeCollectionSave } from "@/utils/collectionSave";
 import FormLabel from "@/components/FormLabel";
 import ManageMultipleCollectionsStatus from "@/modules/ManageMultipleCollectionsStatus";
 import UpdateMultipleCollectionsGuidance from "./UpdateMultipleCollectionsGuidance";
 import { UpdateCollectionFormValues } from "@/types/forms";
-import { useAdminDataStore } from "@/store/adminDataStore";
 import UpdatePanel from "@/components/UpdatePanel";
 import { useUserDataStore } from "@/hooks/userDataStore";
 import { useThreePane } from "@/providers/ThreePaneProvider";
@@ -55,9 +53,6 @@ const UpdateMultipleCollections = ({
   const currentCustodian = useCustodianStore((s) => s.current.custodian);
 
   const workgroups = useUserDataStore((s) => s.workgroups);
-  const updateCollectionStatus = useAdminDataStore(
-    (s) => s.updateCollectionStatus,
-  );
 
   const notify = useNotify();
 
@@ -104,79 +99,48 @@ const UpdateMultipleCollections = ({
   const submitForm = useCallback(
     async (data: FieldValues, closeAfter = false) => {
       if (isDirty) {
-        // for each collection, compare to what's selected, and run the add/removes required
-        for (const c of collections) {
+        const changes = collections.map((c) => {
           const cwNames = new Set((c.workgroups ?? []).map((w) => w.name));
-          const newWorkgroups = workgroups.filter(
-            (wg) => workgroupValues.get(wg.name) && !cwNames.has(wg.name),
-          );
+          return {
+            id: c.id,
+            addWorkgroupIds: workgroups
+              .filter(
+                (wg) => workgroupValues.get(wg.name) && !cwNames.has(wg.name),
+              )
+              .map((wg) => wg.id),
+            removeWorkgroupIds: workgroups
+              .filter(
+                (wg) => !workgroupValues.get(wg.name) && cwNames.has(wg.name),
+              )
+              .map((wg) => wg.id),
+          };
+        });
 
-          if (newWorkgroups.length > 0) {
-            await addCollectionToWorkgroups({
-              id: c.id,
-              workgroup_ids: newWorkgroups.map((wg) => wg.id),
-            });
-            notify.success(
-              `Add collection ${c.id} to workgroup${
-                newWorkgroups.length > 1 ? "s" : ""
-              } ${newWorkgroups.map((wg) => wg.name).join(", ")}`,
-            );
-          }
+        const nextStateId = data.collection.model_state?.state.id;
+        const status =
+          nextStateId && collections[0].model_state?.state_id !== nextStateId
+            ? (nextStateId as CollectionStatus)
+            : undefined;
 
-          const workgroupsToRemove = workgroups.filter(
-            (wg) => !workgroupValues.get(wg.name) && cwNames.has(wg.name),
-          );
+        const result = await updateCollections(changes, status);
 
-          if (workgroupsToRemove.length > 0) {
-            await removeCollectionFromWorkgroups({
-              id: c.id,
-              workgroup_ids: workgroupsToRemove.map((wg) => wg.id),
-            });
-            notify.success(
-              `Removed collection ${c.id} from workgroup${
-                workgroupsToRemove.length > 1 ? "s" : ""
-              } ${workgroupsToRemove.map((wg) => wg.name).join(", ")}`,
-            );
-          }
+        const { ok, message } = describeCollectionSave(
+          `${collections.length} collection${collections.length === 1 ? "" : "s"}`,
+          result,
+          status !== undefined ? CollectionStatus[status] : undefined,
+        );
+        if (ok) {
+          notify.success(message);
+        } else {
+          notify.error(message);
         }
-
-        if (
-          data.collection.model_state?.state.id &&
-          collections[0].model_state?.state_id !==
-            data.collection.model_state?.state.id
-        ) {
-          await updateCollectionStatus(
-            collections.map((c) => c.id),
-            data.collection.model_state.state.id,
-          );
-          notify.success(
-            `Transitioned collections (${collections
-              .map((c) => c.name)
-              .join(", ")}) to status ${
-              CollectionStatus[
-                data.collection.model_state.state.id as CollectionStatus
-              ]
-            }`,
-          );
-        }
-
-        revalidateCollections(currentCustodian?.pid ?? undefined);
       }
 
       if (closeAfter) {
         onClose?.();
       }
     },
-    [
-      collections,
-      currentCustodian,
-      isDirty,
-      notify,
-      onClose,
-      workgroups,
-      workgroupValues,
-      updateCollectionStatus,
-    ],
+    [collections, isDirty, notify, onClose, workgroups, workgroupValues],
   );
 
   const handleLockClick = useCallback(

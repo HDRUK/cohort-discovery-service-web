@@ -173,10 +173,6 @@ const QueriesTable = ({
     return routes.dashboardQueryResult(queryId, openQueries);
   }
 
-  async function setQueryName(id: number, pid: string, name: string) {
-    await updateQuery(id, pid, { name });
-  }
-
   const handleRenameQuery = async (newName: string) => {
     setRenamingQueryId(null);
     const initialDataQuery = queries.data.find(
@@ -188,8 +184,13 @@ const QueriesTable = ({
       newName &&
       newName !== getQueryName(initialDataQuery)
     ) {
-      await setQueryName(initialDataQuery.id, initialDataQuery.pid, newName);
-      await qc.invalidateQueries({ queryKey: QUERY_KEYS.queries() });
+      await updateQuery(initialDataQuery.id, { name: newName });
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: QUERY_KEYS.queries() }),
+        qc.invalidateQueries({
+          queryKey: QUERY_KEYS.query(initialDataQuery.pid),
+        }),
+      ]);
       notify.success("Query renamed successfully");
     }
   };

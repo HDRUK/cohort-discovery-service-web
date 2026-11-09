@@ -1,33 +1,21 @@
 import { create } from "zustand";
 import createCollectionWithConfig from "@/actions/collection/createCollectionWithConfig";
-import updateCollectionWithConfig from "@/actions/collection/updateCollectionWithConfig";
-import deleteCollection from "@/actions/collection/deleteCollection";
-import restoreCollection from "@/actions/collection/restoreCollection";
 import createWorkgroup from "@/actions/workgroup/createWorkgroup";
 import addCollectionsToWorkgroup from "@/actions/workgroup/addCollectionsToWorkgroup";
 import removeCollectionsFromWorkgroup from "@/actions/workgroup/removeCollectionsFromWorkgroup";
-import addCollectionToWorkgroups from "@/actions/workgroup/addCollectionToWorkgroups";
-import removeCollectionFromWorkgroups from "@/actions/workgroup/removeCollectionFromWorkgroups";
-import { revalidateWorkgroupAndCollections } from "@/actions/revalidate";
 import {
-  ApiResponse,
   Collection,
   CreateCollectionPost,
   CreateCollectionConfigPost,
-  UpdateCollectionPayload,
   Workgroup,
   CreateWorkgroupPost,
   AddCollectionsToWorkgroupPost,
   RemoveCollectionsFromWorkgroupPost,
-  AddCollectionToWorkgroupsPost,
-  RemoveCollectionFromWorkgroupsPost,
   CollectionHost,
   Paginated,
   CollectionWithHosts,
   User,
-  AddUsersToWorkgroupPost,
   RemoveUsersFromWorkgroupPost,
-  CollectionStatus,
   Network,
   AddCustodiansToNetworkPost,
   CreateNetworkPost,
@@ -35,9 +23,7 @@ import {
   UpdateNetworkPost,
 } from "@/types/api";
 import { emptyPaginated } from "@/utils/pagination";
-import addUsersToWorkgroup from "@/actions/workgroup/addUsersToWorkgroup";
 import removeUserFromWorkgroup from "@/actions/workgroup/removeUsersFromWorkgroup";
-import transitionCollections from "@/actions/collection/transitionCollections";
 import createNetwork from "@/actions/network/createNetwork";
 import addCustodiansToNetwork from "@/actions/network/addCustodiansToNetwork";
 import deleteNetwork from "@/actions/network/deleteNetwork";
@@ -66,13 +52,6 @@ export interface AdminDataStoreState {
     payload: CreateCollectionPost,
     payloadConfig: Omit<CreateCollectionConfigPost, "collection_id">,
   ) => Promise<Collection>;
-  updateCollection: (
-    id: number,
-    payload: UpdateCollectionPayload,
-    payloadConfig: Partial<CreateCollectionConfigPost>,
-  ) => Promise<Collection>;
-  deleteCollection: (id: number | string) => Promise<void>;
-  restoreCollection: (id: number | string) => Promise<ApiResponse<Collection>>;
 
   createWorkgroup: (payload: CreateWorkgroupPost) => Promise<Workgroup>;
 
@@ -83,22 +62,8 @@ export interface AdminDataStoreState {
     payload: RemoveCollectionsFromWorkgroupPost,
   ) => Promise<void>;
 
-  addUsersToWorkgroup: (payload: AddUsersToWorkgroupPost) => Promise<number[]>;
   removeUsersFromWorkgroup: (
     payload: RemoveUsersFromWorkgroupPost,
-  ) => Promise<void>;
-
-  addCollectionToWorkgroups: (
-    payload: AddCollectionToWorkgroupsPost,
-  ) => Promise<number[]>;
-  removeCollectionFromWorkgroups: (
-    payload: RemoveCollectionFromWorkgroupsPost,
-  ) => Promise<void>;
-
-  updateCollectionStatus: (
-    idOrIds: number | number[],
-    status: CollectionStatus,
-    refreshCache?: boolean,
   ) => Promise<void>;
 
   createNetwork: (payload: CreateNetworkPost) => Promise<Network>;
@@ -157,18 +122,6 @@ export const useAdminDataStore = create<AdminDataStoreState>((set) => ({
     return await createCollectionWithConfig(payload, payloadConfig);
   },
 
-  updateCollection: async (id, payload, payloadConfig) => {
-    return await updateCollectionWithConfig(id, payload, payloadConfig);
-  },
-
-  deleteCollection: async (id) => {
-    await deleteCollection(id);
-  },
-
-  restoreCollection: async (id) => {
-    return await restoreCollection(id);
-  },
-
   createWorkgroup: async (payload) => {
     return await createWorkgroup(payload);
   },
@@ -181,29 +134,8 @@ export const useAdminDataStore = create<AdminDataStoreState>((set) => ({
     await removeCollectionsFromWorkgroup(payload);
   },
 
-  addUsersToWorkgroup: async (payload) => {
-    return await addUsersToWorkgroup(payload);
-  },
-
   removeUsersFromWorkgroup: async (payload) => {
     await removeUserFromWorkgroup(payload);
-  },
-
-  addCollectionToWorkgroups: async (payload) => {
-    const data = await addCollectionToWorkgroups(payload);
-    await revalidateWorkgroupAndCollections();
-    return data.map((d) => d.data);
-  },
-
-  removeCollectionFromWorkgroups: async (payload) => {
-    await removeCollectionFromWorkgroups(payload);
-    await revalidateWorkgroupAndCollections();
-  },
-
-  updateCollectionStatus: async (idOrIds, status, refreshCache = true) => {
-    const state = CollectionStatus[status].toLowerCase();
-    const ids = Array.isArray(idOrIds) ? idOrIds : [idOrIds];
-    await transitionCollections(ids, { state }, refreshCache);
   },
 
   createNetwork: async (payload: CreateNetworkPost) => {
