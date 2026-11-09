@@ -1,8 +1,5 @@
-import { cookies } from "next/headers";
-import { ACCESS_TOKEN_NAME } from "@/config/internals";
-import { apiGetUncached, ErrorMode } from "@/lib/apiClient";
-import { API_ROUTES } from "@/lib/apiRoutes";
-import { ApiResponse, CollectionHostWithCredentials } from "@/types/api";
+import { getCollectionHostWithCredentials } from "@/server/data/collectionHosts";
+import { getSession } from "@/server/session";
 import {
   parseCollectionHostId,
   toCollectionHostCredentials,
@@ -32,8 +29,8 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const cookieStore = await cookies();
-  if (!cookieStore.get(ACCESS_TOKEN_NAME)?.value) {
+  const session = await getSession();
+  if (!session) {
     return new Response("Not signed in", { status: 401 });
   }
 
@@ -42,9 +39,7 @@ export async function GET(
     return new Response("Invalid collection host id", { status: 400 });
   }
 
-  const result = await apiGetUncached<
-    ApiResponse<CollectionHostWithCredentials | null>
-  >(API_ROUTES.collectionHost(hostId), { errorMode: ErrorMode.RESULT });
+  const result = await getCollectionHostWithCredentials(session.token, hostId);
 
   if (!result.data) {
     return new Response(result.error?.text ?? "Collection host not found", {

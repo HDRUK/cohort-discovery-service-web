@@ -1,33 +1,16 @@
 "use server";
 
-import { apiGet } from "@/lib/apiClient";
-import { API_ROUTES } from "@/lib/apiRoutes";
-import { ApiResponse, CollectionDetails } from "@/types/api";
-import { getTagCollection, TAG_COLLECTIONS_ADMIN } from "@/config/tags";
+import { getCollectionDetails as readCollectionDetails } from "@/server/data/collections";
+import { CollectionDetails } from "@/types/api";
 
-const fetchCollectionDetails = async (
-  pid: string,
-): Promise<CollectionDetails> => {
-  const res = await apiGet<ApiResponse<CollectionDetails>>({
-    url: API_ROUTES.collectionDetails(pid),
-    tags: [TAG_COLLECTIONS_ADMIN, getTagCollection(pid)],
-    revalidate: false,
-    includeUserTag: false,
-  });
-  return res.data;
-};
-
-const getCollectionDetails = async (
-  pid: string,
-): Promise<CollectionDetails> => {
-  return await fetchCollectionDetails(pid);
-};
+const getCollectionDetails = async (pid: string): Promise<CollectionDetails> =>
+  readCollectionDetails(pid);
 
 export const getCollectionDetailsBulk = async (
   pids: string[],
 ): Promise<Record<string, CollectionDetails>> => {
   const entries = await Promise.all(
-    pids.map(async (pid) => [pid, await fetchCollectionDetails(pid)] as const),
+    pids.map(async (pid) => [pid, await readCollectionDetails(pid)] as const),
   );
 
   return Object.fromEntries(entries);

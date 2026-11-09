@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { Box, Divider } from "@mui/material";
-import getAdminCollections from "@/actions/collection/getAdminCollections";
+import { getAdminCollections } from "@/server/data/collections";
 import SkeletonFull from "@/components/SkeletonFull";
 import Title from "@/components/Title";
 import CollectionHealthDetailView from "@/modules/CollectionHealth/CollectionHealthDetailView";
@@ -8,7 +8,6 @@ import CollectionHealthDetailView from "@/modules/CollectionHealth/CollectionHea
 const loadCollection = async (pid: string) => {
   const result = await getAdminCollections({
     params: new URLSearchParams({ pid }),
-    cacheOptions: { useCache: false },
   });
 
   return { collections: result.data?.data ?? [], fetchedAt: Date.now() };

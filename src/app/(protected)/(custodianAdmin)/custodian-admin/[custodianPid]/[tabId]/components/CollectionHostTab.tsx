@@ -1,6 +1,6 @@
 import { Box, Skeleton } from "@mui/material";
 import CollectionHostAdmin from "./CollectionHostAdmin";
-import getCustodianCollectionHosts from "@/actions/collectionHost/getCustodianCollectionHosts";
+import { getCustodianCollectionHosts } from "@/server/data/collectionHosts";
 import { ApiSearchParams } from "@/types/api";
 import { buildCollectionHostParams } from "@/utils/params";
 
@@ -19,8 +19,10 @@ const CollectionHostsTab = async ({
   searchParams: ApiSearchParams;
 }) => {
   const params = buildCollectionHostParams(searchParams);
-  const { data: collectionHosts } =
-    await getCustodianCollectionHosts(custodianPid, { params });
+  const { data: collectionHosts } = await getCustodianCollectionHosts(
+    custodianPid,
+    { params },
+  );
 
   return (
     <CollectionHostAdmin pid={custodianPid} collectionHosts={collectionHosts} />

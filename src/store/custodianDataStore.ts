@@ -69,7 +69,7 @@ export interface CustodianDataStoreState {
 }
 
 export const useCustodianDataStore = create<CustodianDataStoreState>(
-  (set, get) => ({
+  (set) => ({
     current: {
       custodian: null,
       setCustodian: (custodian) =>
@@ -99,25 +99,19 @@ export const useCustodianDataStore = create<CustodianDataStoreState>(
         })),
     },
     createCollectionHost: async (custodianId, payload) => {
-      const currentCustodian = get().current.custodian;
-      const pid =
-        currentCustodian?.id === custodianId ? currentCustodian.pid : undefined;
-      await createCollectionHost(custodianId, payload, pid);
+      await createCollectionHost(custodianId, payload);
     },
 
     updateCollectionHost: async (id, payload) => {
-      const currentCustodian = get().current.custodian;
-      await updateCollectionHost(id, payload, currentCustodian?.pid);
+      await updateCollectionHost(id, payload);
     },
 
     deleteCollectionHost: async (id) => {
-      const currentCustodian = get().current.custodian;
-      await deleteCollectionHost(id, currentCustodian?.pid);
+      await deleteCollectionHost(id);
     },
 
     restoreCollectionHost: async (id) => {
-      const currentCustodian = get().current.custodian;
-      return await restoreCollectionHost(id, currentCustodian?.pid);
+      return await restoreCollectionHost(id);
     },
 
     createCollection: async (custodianPid, payload, payloadConfig) => {
@@ -142,24 +136,21 @@ export const useCustodianDataStore = create<CustodianDataStoreState>(
       );
     },
 
-    deleteCollection: async (id, custodianPid) => {
-      await deleteCollection(id, custodianPid);
+    deleteCollection: async (id) => {
+      await deleteCollection(id);
     },
 
-    restoreCollection: async (id, custodianPid) => {
-      return await restoreCollection(id, custodianPid);
+    restoreCollection: async (id) => {
+      return await restoreCollection(id);
     },
 
     requestCollectionMadeActive: async (idOrIds: number | number[]) => {
-      const currentCustodian = get().current.custodian;
       const ids = Array.isArray(idOrIds) ? idOrIds : [idOrIds];
       const state = CollectionStatus[CollectionStatus.PENDING].toLowerCase();
-      await transitionCollections(ids, { state }, currentCustodian?.pid);
+      await transitionCollections(ids, { state });
     },
 
     toggleCollectionActive: async (collection: CollectionWithHosts) => {
-      const currentCustodian = get().current.custodian;
-
       const stateId = collection.model_state.state_id;
 
       let nextState: string;
@@ -178,11 +169,7 @@ export const useCustodianDataStore = create<CustodianDataStoreState>(
           break;
       }
 
-      await transitionCollections(
-        [collection.id],
-        { state: nextState },
-        currentCustodian?.pid,
-      );
+      await transitionCollections([collection.id], { state: nextState });
 
       return nextState;
     },
