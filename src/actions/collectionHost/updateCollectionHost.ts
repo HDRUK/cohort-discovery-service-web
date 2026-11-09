@@ -1,24 +1,26 @@
 "use server";
 
-import { apiPut } from "@/lib/apiClient";
+import { refresh } from "next/cache";
+import { apiPut } from "@/server/api";
+import { requireSession } from "@/server/session";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import {
   CollectionHost,
   UpdateCollectionHostPayload,
   ApiResponse,
 } from "@/types/api";
-import { revalidateCollections } from "@/actions/revalidate";
 
 const updateCollectionHost = async (
   hostId: number,
   payload: UpdateCollectionHostPayload,
-  custodianPid?: string,
 ): Promise<void> => {
+  const { token } = await requireSession();
   await apiPut<ApiResponse<CollectionHost>, UpdateCollectionHostPayload>(
+    token,
     API_ROUTES.collectionHost(hostId),
     payload,
   );
-  await revalidateCollections(custodianPid);
+  refresh();
 };
 
 export default updateCollectionHost;

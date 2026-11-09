@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { Box, Divider } from "@mui/material";
 import Title from "@/components/Title";
 import TableSkeleton from "@/components/TableSkeleton";
-import getAdminCollections from "@/actions/collection/getAdminCollections";
+import { getAdminCollections } from "@/server/data/collections";
 import RegressionTests from "@/modules/RegressionTests/RegressionTests";
 
 const RegressionContent = async () => {

@@ -1,20 +1,13 @@
 "use server";
 
-import { apiGet, ErrorMode } from "@/lib/apiClient";
-import { API_ROUTES } from "@/lib/apiRoutes";
+import { getCollectionHealth as readCollectionHealth } from "@/server/data/collections";
 import { ApiResponse, CollectionHealthSeries, TimeRange } from "@/types/api";
 
 const getCollectionHealth = async (
   pid: string,
   bin: string,
   range: TimeRange,
-): Promise<ApiResponse<CollectionHealthSeries>> => {
-  return await apiGet<ApiResponse<CollectionHealthSeries>>({
-    url: API_ROUTES.collectionHealth(pid),
-    params: new URLSearchParams({ bin, from: range.from, to: range.to }),
-    cacheOptions: { useCache: false },
-    options: { errorMode: ErrorMode.RESULT },
-  });
-};
+): Promise<ApiResponse<CollectionHealthSeries>> =>
+  readCollectionHealth(pid, bin, range);
 
 export default getCollectionHealth;

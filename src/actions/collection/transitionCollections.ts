@@ -1,24 +1,26 @@
 "use server";
 
-import { apiPut } from "@/lib/apiClient";
+import { refresh } from "next/cache";
+import { apiPut } from "@/server/api";
+import { requireSession } from "@/server/session";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { Collection, TransitionCollectionPut, ApiResponse } from "@/types/api";
-import { revalidateCollections } from "@/actions/revalidate";
 
 const transitionCollections = async (
   ids: number[],
   payload: TransitionCollectionPut,
-  custodianPid?: string,
   refreshCache = true,
 ): Promise<void> => {
+  const { token } = await requireSession();
   await Promise.all(
     ids.map((id) =>
       apiPut<ApiResponse<Collection>, TransitionCollectionPut>(
+        token,
         API_ROUTES.transitionCollection(id),
         payload,
       ),
     ),
   );
-  if (refreshCache) await revalidateCollections(custodianPid);
+  if (refreshCache) refresh();
 };
 export default transitionCollections;

@@ -15,7 +15,6 @@ import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceS
 import { getMockCollection } from "@/actions/collection/__mocks__/getCollections";
 import getCollectionHost from "@/actions/collectionHost/__mocks__/getCollectionHost";
 import { useCustodianDataStore } from "@/store/custodianDataStore";
-jest.mock("@/actions/custodian/getCustodian");
 
 const createCollection = jest.fn();
 const mockCustodian = getCustodian();

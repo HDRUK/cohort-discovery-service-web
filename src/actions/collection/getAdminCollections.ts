@@ -1,24 +1,16 @@
 "use server";
 
-import { apiGet } from "@/lib/apiClient";
-import { API_ROUTES } from "@/lib/apiRoutes";
+import { getAdminCollections as readAdminCollections } from "@/server/data/collections";
 import {
   ApiResponse,
-  Paginated,
   CollectionWithHosts,
+  Paginated,
   ReadArgs,
 } from "@/types/api";
-import { TAG_COLLECTIONS_ADMIN } from "@/config/tags";
 
 const getAdminCollections = async (
   args?: ReadArgs,
-): Promise<ApiResponse<Paginated<CollectionWithHosts>>> => {
-  return await apiGet<ApiResponse<Paginated<CollectionWithHosts>>>({
-    url: API_ROUTES.adminCollections,
-    tags: [TAG_COLLECTIONS_ADMIN],
-    params: args?.params,
-    cacheOptions: args?.cacheOptions,
-  });
-};
+): Promise<ApiResponse<Paginated<CollectionWithHosts>>> =>
+  readAdminCollections({ params: args?.params });
 
 export default getAdminCollections;

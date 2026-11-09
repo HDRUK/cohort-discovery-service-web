@@ -1,13 +1,11 @@
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import CollectionsTable, { CollectionsTableProps } from "./CollectionsTable";
-import getCustodianCollections from "@/actions/collection/getCustodianCollections";
-import getCustodian from "@/actions/custodian/getCustodian";
+import getCustodianCollections from "@/actions/collection/__mocks__/getCustodianCollections";
+import getCustodian from "@/actions/custodian/__mocks__/getCustodian";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 import { CollectionWithHosts, Paginated } from "@/types/api";
-jest.mock("@/actions/collection/getCustodianCollections");
 jest.mock("@/actions/collection/getCollectionDetails");
-jest.mock("@/actions/custodian/getCustodian");
 
 let mockSearchParams = new URLSearchParams();
 

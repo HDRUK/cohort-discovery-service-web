@@ -14,3 +14,13 @@ export const getCustodians = async (): Promise<ApiResponse<Custodian[]>> => {
   const { token } = await requireSession();
   return apiGet<ApiResponse<Custodian[]>>(token, API_ROUTES.custodians);
 };
+
+export const getCustodian = async (
+  pid: string,
+): Promise<ApiResponse<Custodian>> => {
+  "use cache: private";
+  cacheLife(USER_DATA_CACHE_LIFE);
+
+  const { token } = await requireSession();
+  return apiGet<ApiResponse<Custodian>>(token, API_ROUTES.custodian(pid));
+};
