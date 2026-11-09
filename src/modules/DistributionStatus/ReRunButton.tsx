@@ -8,6 +8,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { Button, CircularProgress } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { QUERY_KEYS } from "@/config/tags";
 
 interface ReRunButtonProps {
   onClick: () => Promise<Query>;
@@ -28,7 +29,7 @@ export const ReRunButton = ({ onClick, onSuccess }: ReRunButtonProps) => {
   }, [onClick]);
 
   const { data: taskResponse, isFetching } = useQuery({
-    queryKey: ["task", submittedTaskPid],
+    queryKey: QUERY_KEYS.task(submittedTaskPid!),
     queryFn: () => getTask(submittedTaskPid!),
     enabled: !!submittedTaskPid,
     refetchInterval: (query) => {

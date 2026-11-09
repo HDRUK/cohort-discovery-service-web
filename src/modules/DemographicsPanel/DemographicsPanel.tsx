@@ -33,6 +33,7 @@ import { OmopTableName } from "@/types/omop";
 import { useUserDataStore } from "@/hooks/userDataStore";
 import useFeatures from "@/hooks/useFeatures";
 import { hasDemographicsContent } from "@/utils/rules";
+import { QUERY_KEYS } from "@/config/tags";
 
 const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
   const { demographics, remove, selectedDatasets } = useQueryBuilder((qb) => ({
@@ -71,7 +72,7 @@ const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
 
   //this will be different for different users and what collectionPids are selected
   const { data: personConcepts } = useQuery({
-    queryKey: [`demographics-${user?.id}`, collectionPids],
+    queryKey: QUERY_KEYS.demographics(user?.id, collectionPids),
     queryFn: async () =>
       await getTermDirectory(1, 100, "", OmopTableName.Person, collectionPids),
     enabled: !!user?.id,

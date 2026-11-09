@@ -5,7 +5,7 @@ import { Alert, Box, Skeleton, Stack, Typography } from "@mui/material";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { useQuery } from "@tanstack/react-query";
 import getCollectionHealth from "@/actions/collection/getCollectionHealth";
-import { getTagsCollectionHealth } from "@/config/tags";
+import { QUERY_KEYS } from "@/config/tags";
 import { PingBin, PingSummary } from "@/types/api";
 import { getDatetime } from "@/utils/date";
 import DragRangeOverlay from "./DragRangeOverlay";
@@ -82,7 +82,7 @@ const PingHistoryChart = ({
   const [seriesAColour, seriesBColour] = useSeriesColours();
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: getTagsCollectionHealth(collectionPid, bin, range),
+    queryKey: QUERY_KEYS.collectionHealthSeries(collectionPid, bin, range),
     queryFn: () => getCollectionHealth(collectionPid, bin, range),
     enabled,
     refetchOnWindowFocus: false,

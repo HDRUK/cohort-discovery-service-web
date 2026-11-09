@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getCollectionDetailsBulk } from "@/actions/collection/getCollectionDetails";
+import { QUERY_KEYS } from "@/config/tags";
 
 type Props = {
   pids: string[];
@@ -16,7 +17,7 @@ const usePrefetchCollectionDetails = ({ pids }: Props) => {
 
     const prefetch = async () => {
       const missingPids = pids.filter(
-        (pid) => !queryClient.getQueryData(["collectionDetails", pid]),
+        (pid) => !queryClient.getQueryData(QUERY_KEYS.collectionDetails(pid)),
       );
 
       if (!missingPids.length) return;
@@ -24,7 +25,7 @@ const usePrefetchCollectionDetails = ({ pids }: Props) => {
       if (cancelled) return;
 
       for (const [pid, details] of Object.entries(detailsMap)) {
-        queryClient.setQueryData(["collectionDetails", pid], details);
+        queryClient.setQueryData(QUERY_KEYS.collectionDetails(pid), details);
       }
     };
 
