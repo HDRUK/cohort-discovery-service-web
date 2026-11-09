@@ -18,7 +18,7 @@ const useTaskPolling = (
     queries: Object.entries(runStates).flatMap(([key, taskPids]) =>
       Array.from(taskPids).map((taskPid) => ({
         queryKey: [TAG_REGRESSION_TASK, taskPid],
-        queryFn: () => getTask(taskPid, { cacheOptions: { useCache: false } }),
+        queryFn: () => getTask(taskPid),
         refetchOnMount: false,
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
