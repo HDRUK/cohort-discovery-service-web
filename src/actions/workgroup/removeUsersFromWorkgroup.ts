@@ -1,21 +1,24 @@
 "use server";
 
-import { apiDelete } from "@/lib/apiClient";
+import { refresh } from "next/cache";
+import { apiDelete } from "@/server/api";
+import { requireSession } from "@/server/session";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { ApiResponse, RemoveUsersFromWorkgroupPost } from "@/types/api";
-import { revalidateWorkgroupAndCollections } from "@/actions/revalidate";
 
 const removeUserFromWorkgroup = async (
   payload: RemoveUsersFromWorkgroupPost,
 ): Promise<void> => {
+  const { token } = await requireSession();
   await Promise.all(
     payload.ids.map(async (id) =>
       apiDelete<ApiResponse<number>>(
+        token,
         API_ROUTES.userWorkgroup(id, payload.workgroup_id),
       ),
     ),
   );
-  await revalidateWorkgroupAndCollections(true);
+  refresh();
 };
 
 export default removeUserFromWorkgroup;
