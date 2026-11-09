@@ -9,11 +9,13 @@ import { themeOptions } from "../../config/theme";
 import { NotifyProvider } from "../../providers/NotifyProvider";
 import { HdrukUiProvider } from "@hdruk/ui";
 import { ThemeOptions } from "@mui/material";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import ConfirmProvider from "../ConfirmProvider";
-const queryClient = new QueryClient();
+import { getQueryClient } from "@/lib/queryClient";
 
 export default function ThemeRegistry({ children }: { children: ReactNode }) {
+  const queryClient = getQueryClient();
+
   return (
     <AppRouterCacheProvider>
       <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
