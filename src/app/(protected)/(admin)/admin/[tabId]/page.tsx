@@ -36,11 +36,14 @@ const CustodianAdminPage = async ({
             id: "users",
             label: "Users",
             href: routes.adminUsers,
-            page: (
-              <Suspense fallback={<UsersSkeleton />}>
-                <UsersTab applicationMode={applicationMode} />
-              </Suspense>
-            ),
+            page:
+              tabId === "users" ? (
+                <Suspense fallback={<UsersSkeleton />}>
+                  <UsersTab applicationMode={applicationMode} />
+                </Suspense>
+              ) : (
+                <UsersSkeleton />
+              ),
           },
         ]
       : []),
@@ -48,31 +51,40 @@ const CustodianAdminPage = async ({
       id: "workgroups",
       label: "Workgroups",
       href: routes.adminWorkgroups,
-      page: (
-        <Suspense fallback={<WorkgroupsSkeleton />}>
-          <WorkgroupsTab searchParams={apiSearchParams} />
-        </Suspense>
-      ),
+      page:
+        tabId === "workgroups" ? (
+          <Suspense fallback={<WorkgroupsSkeleton />}>
+            <WorkgroupsTab searchParams={apiSearchParams} />
+          </Suspense>
+        ) : (
+          <WorkgroupsSkeleton />
+        ),
     },
     {
       id: "collections",
       label: "Collections",
       href: routes.adminCollections,
-      page: (
-        <Suspense fallback={<CollectionsSkeleton />}>
-          <CollectionsTab searchParams={apiSearchParams} />
-        </Suspense>
-      ),
+      page:
+        tabId === "collections" ? (
+          <Suspense fallback={<CollectionsSkeleton />}>
+            <CollectionsTab searchParams={apiSearchParams} />
+          </Suspense>
+        ) : (
+          <CollectionsSkeleton />
+        ),
     },
     {
       id: "networks",
       label: "Networks",
       href: routes.adminNetworks,
-      page: (
-        <Suspense fallback={<CollectionsSkeleton />}>
-          <NetworksTab searchParams={apiSearchParams} />
-        </Suspense>
-      ),
+      page:
+        tabId === "networks" ? (
+          <Suspense fallback={<CollectionsSkeleton />}>
+            <NetworksTab searchParams={apiSearchParams} />
+          </Suspense>
+        ) : (
+          <CollectionsSkeleton />
+        ),
     },
   ];
 

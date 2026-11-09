@@ -31,27 +31,33 @@ const CustodianAdminPage = async ({
       id: "hosts",
       label: "Hosts",
       href: routes.teamHosts(custodianPid),
-      page: (
-        <Suspense fallback={<CollectionHostsSkeleton />}>
-          <CollectionHostsTab
-            custodianPid={custodianPid}
-            searchParams={apiSearchParams}
-          />
-        </Suspense>
-      ),
+      page:
+        tabId === "hosts" ? (
+          <Suspense fallback={<CollectionHostsSkeleton />}>
+            <CollectionHostsTab
+              custodianPid={custodianPid}
+              searchParams={apiSearchParams}
+            />
+          </Suspense>
+        ) : (
+          <CollectionHostsSkeleton />
+        ),
     },
     {
       id: "collections",
       label: "Collections",
       href: routes.teamCollections(custodianPid),
-      page: (
-        <Suspense fallback={<CollectionsSkeleton />}>
-          <CollectionsTab
-            custodianPid={custodianPid}
-            searchParams={apiSearchParams}
-          />
-        </Suspense>
-      ),
+      page:
+        tabId === "collections" ? (
+          <Suspense fallback={<CollectionsSkeleton />}>
+            <CollectionsTab
+              custodianPid={custodianPid}
+              searchParams={apiSearchParams}
+            />
+          </Suspense>
+        ) : (
+          <CollectionsSkeleton />
+        ),
     },
   ];
 

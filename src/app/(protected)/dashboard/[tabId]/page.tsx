@@ -1,3 +1,4 @@
+import { Skeleton } from "@mui/material";
 import { notFound } from "next/navigation";
 import NewQueryPage from "./components/NewQueryPage";
 import QueryResultsPage from "./components/QueryResultsPage";
@@ -9,6 +10,7 @@ import { getQuery } from "@/server/data/queries";
 import { capVarChar } from "@/utils/string";
 import { SearchParams } from "@/types/api";
 import QueryHistoryPage from "./components/QueryHistoryPage";
+import { QueriesTableSkeleton } from "@/modules/QueriesTable";
 import { getQueryName } from "@/utils/query";
 
 type Params = Promise<{ tabId: string }>;
@@ -26,24 +28,27 @@ const DashboardTabPage = async (props: {
 
   const resultsTabs = openQueries
     ? await Promise.all(
-        arrayOpenQueries.map(async (tabId) => {
-          const { data: openQueryData } = await getQuery(tabId as string);
+        arrayOpenQueries.map(async (queryPid) => {
+          const { data: openQueryData } = await getQuery(queryPid);
+          const resultTabId = `query-result-${queryPid}`;
 
           return {
-            id: `query-result-${tabId}`,
+            id: resultTabId,
             label: `Result: ${
               openQueryData
                 ? capVarChar(getQueryName(openQueryData), 30, true)
-                : tabId
+                : queryPid
             }`,
-            href: routes.dashboardQueryResult(
-              tabId as string,
-              arrayOpenQueries ?? [],
-            ),
+            href: routes.dashboardQueryResult(queryPid, arrayOpenQueries ?? []),
             onCloseHref: routes.dashboardNewQuery(
-              arrayOpenQueries.filter((val) => val !== tabId) ?? [],
+              arrayOpenQueries.filter((val) => val !== queryPid) ?? [],
             ),
-            page: <QueryResultsPage {...props} />,
+            page:
+              tabId === resultTabId ? (
+                <QueryResultsPage {...props} />
+              ) : (
+                <Skeleton height={600} />
+              ),
           };
         }),
       )
@@ -54,18 +59,26 @@ const DashboardTabPage = async (props: {
       id: "new-query",
       label: "New Query",
       href: routes.dashboardNewQuery(arrayOpenQueries),
-      page: (
-        <NewQueryPage
-          query={query as string}
-          open_queries={(openQueries ?? "").toString()}
-        />
-      ),
+      page:
+        tabId === "new-query" ? (
+          <NewQueryPage
+            query={query as string}
+            open_queries={(openQueries ?? "").toString()}
+          />
+        ) : (
+          <Skeleton height={600} />
+        ),
     },
     {
       id: "query-history",
       label: "Query History",
       href: routes.dashboardHistory(arrayOpenQueries),
-      page: <QueryHistoryPage {...props} />,
+      page:
+        tabId === "query-history" ? (
+          <QueryHistoryPage {...props} />
+        ) : (
+          <QueriesTableSkeleton />
+        ),
     },
   ].concat(resultsTabs);
 
