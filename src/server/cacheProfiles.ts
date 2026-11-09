@@ -5,9 +5,3 @@ export const USER_DATA_CACHE_LIFE = {
   revalidate: 300,
   expire: 3600,
 };
-
-export const LIST_CACHE_LIFE = {
-  stale: 60,
-  revalidate: 60,
-  expire: 300,
-};
