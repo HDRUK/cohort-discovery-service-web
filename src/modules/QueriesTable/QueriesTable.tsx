@@ -76,7 +76,6 @@ const QueriesTable = ({
 
       const res = await getQueries({
         params: searchParamsObject.toString(),
-        cacheOptions: { useCache: false },
       });
       return res.data;
     },

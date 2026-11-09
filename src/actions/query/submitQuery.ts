@@ -1,7 +1,9 @@
 "use server";
 
+import { refresh } from "next/cache";
 import { RuleGroupType } from "@/types/rules";
-import { apiPost, ErrorMode } from "@/lib/apiClient";
+import { apiPost, ErrorMode } from "@/server/api";
+import { requireSession } from "@/server/session";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import {
   CreateQuery,
@@ -10,15 +12,16 @@ import {
   TaskType,
 } from "@/types/api";
 import { capVarChar } from "@/utils/string";
-import { revalidateUserAction } from "@/actions/revalidate";
 
 const submitQuery = async (
   query: RuleGroupType,
   queryName: string | null,
   collection_filter?: string[],
 ): Promise<ApiResponse<CreateQuery>> => {
+  const { token } = await requireSession();
   const safeName = queryName ? capVarChar(queryName) : null;
   const res = await apiPost<ApiResponse<CreateQuery>, CreateQueryPost>(
+    token,
     API_ROUTES.queries,
     {
       name: safeName,
@@ -31,7 +34,7 @@ const submitQuery = async (
 
   if (res.error) return res;
 
-  await revalidateUserAction("queries");
+  refresh();
   return res;
 };
 

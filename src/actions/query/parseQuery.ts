@@ -1,6 +1,7 @@
 "use server";
 
-import { apiPost } from "@/lib/apiClient";
+import { apiPost } from "@/server/api";
+import { requireSession } from "@/server/session";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { ApiResponse } from "@/types/api";
 
@@ -19,12 +20,17 @@ const parseQuery = async (
     collections?: string[];
   },
 ): Promise<ApiResponse<string>> => {
-  return await apiPost<ApiResponse<string>, Payload>(API_ROUTES.parseQuery, {
-    query,
-    ignore_synthetic: options?.ignoreSynthetic,
-    prefer_non_synthetic: options?.preferNonSynthetic,
-    collections: options?.collections,
-  });
+  const { token } = await requireSession();
+  return await apiPost<ApiResponse<string>, Payload>(
+    token,
+    API_ROUTES.parseQuery,
+    {
+      query,
+      ignore_synthetic: options?.ignoreSynthetic,
+      prefer_non_synthetic: options?.preferNonSynthetic,
+      collections: options?.collections,
+    },
+  );
 };
 
 export default parseQuery;

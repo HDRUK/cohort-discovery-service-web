@@ -29,8 +29,7 @@ export const ReRunButton = ({ onClick, onSuccess }: ReRunButtonProps) => {
 
   const { data: taskResponse, isFetching } = useQuery({
     queryKey: ["task", submittedTaskPid],
-    queryFn: () =>
-      getTask(submittedTaskPid!, { cacheOptions: { useCache: false } }),
+    queryFn: () => getTask(submittedTaskPid!),
     enabled: !!submittedTaskPid,
     refetchInterval: (query) => {
       const task = query.state.data?.data;

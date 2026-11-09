@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import getQueries from "@/actions/query/getQueries";
+import { getQueries } from "@/server/data/queries";
 import QueriesTable from "@/modules/QueriesTable";
 import { QueriesTableSkeleton } from "@/modules/QueriesTable";
 import { Box } from "@mui/material";

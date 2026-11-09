@@ -1,30 +1,26 @@
-import { apiGet } from "@/lib/apiClient";
-import { API_ROUTES } from "@/lib/apiRoutes";
-import { ReadArgs } from "@/types/api";
+import { getTask as readTask } from "@/server/data/tasks";
 import getTask from "../getTask";
 
-jest.mock("@/lib/apiClient", () => ({
-  apiGet: jest.fn(),
+jest.mock("@/server/data/tasks", () => ({
+  getTask: jest.fn(),
 }));
 
-const mockedApiGet = apiGet as jest.MockedFunction<typeof apiGet>;
+const mockedReadTask = readTask as jest.MockedFunction<typeof readTask>;
 
-beforeEach(() => mockedApiGet.mockReset());
+beforeEach(() => mockedReadTask.mockReset());
 
 describe("getTask", () => {
-  it("ignores a url passed in args", async () => {
+  it("passes only the pid to the data layer", async () => {
     const hostileArgs = {
       url: "https://attacker.example.com",
       options: { headers: { Authorization: "Bearer stolen" } },
-      cacheOptions: { useCache: false },
-    } as ReadArgs;
+    };
 
-    await getTask("task-pid", hostileArgs);
+    await (getTask as (pid: string, args: unknown) => Promise<unknown>)(
+      "task-pid",
+      hostileArgs,
+    );
 
-    expect(mockedApiGet).toHaveBeenCalledWith({
-      url: API_ROUTES.getTask("task-pid"),
-      params: undefined,
-      cacheOptions: { useCache: false },
-    });
+    expect(mockedReadTask).toHaveBeenCalledWith("task-pid");
   });
 });
