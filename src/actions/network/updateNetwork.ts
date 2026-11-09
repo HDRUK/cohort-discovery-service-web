@@ -1,19 +1,22 @@
 "use server";
 
-import { apiPut } from "@/lib/apiClient";
+import { refresh } from "next/cache";
+import { apiPut } from "@/server/api";
+import { requireSession } from "@/server/session";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { Network, ApiResponse, UpdateNetworkPost } from "@/types/api";
-import { revalidateNetworks } from "@/actions/revalidate";
 
 const updateNetwork = async (
   id: number,
   payload: UpdateNetworkPost,
 ): Promise<void> => {
+  const { token } = await requireSession();
   await apiPut<ApiResponse<Network>, UpdateNetworkPost>(
+    token,
     API_ROUTES.network(id),
     payload,
   );
-  await revalidateNetworks();
+  refresh();
 };
 
 export default updateNetwork;

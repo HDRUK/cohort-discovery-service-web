@@ -1,6 +1,6 @@
 import { getCollectionHosts } from "@/server/data/collectionHosts";
 import { getCollections } from "@/server/data/collections";
-import getUsersList from "@/actions/admin/getUsersList";
+import { getUsersList } from "@/server/data/users";
 import { AdminSectionProvider } from "@/contexts/AdminSectionContext";
 
 const ProtectedAdminPageLayout = async ({

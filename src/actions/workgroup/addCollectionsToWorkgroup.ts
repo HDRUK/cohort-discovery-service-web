@@ -1,22 +1,25 @@
 "use server";
 
-import { apiPost } from "@/lib/apiClient";
+import { refresh } from "next/cache";
+import { apiPost } from "@/server/api";
+import { requireSession } from "@/server/session";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { AddCollectionsToWorkgroupPost, ApiResponse } from "@/types/api";
-import { revalidateWorkgroupAndCollections } from "@/actions/revalidate";
 
 const addCollectionsToWorkgroup = async (
   payload: AddCollectionsToWorkgroupPost,
 ): Promise<number[]> => {
+  const { token } = await requireSession();
   const results = await Promise.all(
     payload.ids.map(async (id) =>
       apiPost<ApiResponse<number>, AddCollectionsToWorkgroupPost>(
+        token,
         API_ROUTES.collectionWorkgroups(id),
         payload,
       ),
     ),
   );
-  await revalidateWorkgroupAndCollections();
+  refresh();
   return results.map((r) => r.data);
 };
 

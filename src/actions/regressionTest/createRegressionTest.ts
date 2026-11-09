@@ -1,11 +1,15 @@
 "use server";
 
-import { apiPost } from "@/lib/apiClient";
+import { refresh } from "next/cache";
+import { apiPost } from "@/server/api";
+import { requireSession } from "@/server/session";
 import { API_ROUTES } from "@/lib/apiRoutes";
-import { ApiResponse, RegressionTest, RegressionTestCollectionInput } from "@/types/api";
+import {
+  ApiResponse,
+  RegressionTest,
+  RegressionTestCollectionInput,
+} from "@/types/api";
 import { RuleGroupType } from "@/types/rules";
-import { revalidateUserAction } from "@/actions/revalidate";
-import { TAG_REGRESSION_TESTS } from "@/config/tags";
 
 interface CreateRegressionTestBody {
   name: string;
@@ -16,11 +20,12 @@ interface CreateRegressionTestBody {
 const createRegressionTest = async (
   body: CreateRegressionTestBody,
 ): Promise<ApiResponse<RegressionTest>> => {
-  const res = await apiPost<ApiResponse<RegressionTest>, CreateRegressionTestBody>(
-    API_ROUTES.regressionTests,
-    body,
-  );
-  await revalidateUserAction(TAG_REGRESSION_TESTS);
+  const { token } = await requireSession();
+  const res = await apiPost<
+    ApiResponse<RegressionTest>,
+    CreateRegressionTestBody
+  >(token, API_ROUTES.regressionTests, body);
+  refresh();
   return res;
 };
 
