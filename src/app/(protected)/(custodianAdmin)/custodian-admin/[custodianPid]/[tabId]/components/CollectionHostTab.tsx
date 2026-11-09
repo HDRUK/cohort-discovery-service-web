@@ -3,6 +3,7 @@ import CollectionHostAdmin from "./CollectionHostAdmin";
 import getCustodianCollectionHosts from "@/actions/collectionHost/getCustodianCollectionHosts";
 import { ApiSearchParams } from "@/types/api";
 import { buildCollectionHostParams } from "@/utils/params";
+import { toCollectionHostSummary } from "@/utils/collectionHosts";
 
 export const CollectionHostsSkeleton = () => (
   <Box sx={{ height: "100%", p: 2 }}>
@@ -19,11 +20,16 @@ const CollectionHostsTab = async ({
   searchParams: ApiSearchParams;
 }) => {
   const params = buildCollectionHostParams(searchParams);
-  const { data: collectionHosts } =
-    await getCustodianCollectionHosts(custodianPid, { params });
+  const { data: collectionHosts } = await getCustodianCollectionHosts(
+    custodianPid,
+    { params },
+  );
 
   return (
-    <CollectionHostAdmin pid={custodianPid} collectionHosts={collectionHosts} />
+    <CollectionHostAdmin
+      pid={custodianPid}
+      collectionHosts={collectionHosts.map(toCollectionHostSummary)}
+    />
   );
 };
 

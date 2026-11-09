@@ -9,7 +9,6 @@ import AppShell from "@/components/AppShell";
 import { routes } from "@/config/routes";
 import getMe from "@/actions/getMe";
 import getCustodians from "@/actions/custodian/getCustodians";
-import { toCustodianSummary } from "@/utils/collectionHosts";
 import getFeatureFlags from "@/actions/getFeatureFlags";
 import { isStandalone } from "@/utils/modes";
 import { ErrorMode } from "@/lib/apiClient";
@@ -89,7 +88,7 @@ export default async function ProtectedLayout({
       <ProtectedPage
         user={combinedUser}
         collections={collections}
-        custodians={custodians?.map(toCustodianSummary)}
+        custodians={custodians}
         workgroups={workgroups}
         featureFlags={flags}
       >

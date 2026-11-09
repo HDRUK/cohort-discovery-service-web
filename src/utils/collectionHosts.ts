@@ -3,33 +3,12 @@ import {
   CollectionHostCredentials,
   CollectionHostWithCredentials,
   CollectionWithHosts,
-  Custodian,
 } from "@/types/api";
 
 const parseCollectionHostId = (value: string): number | null => {
   const hostId = Number(value);
   return Number.isInteger(hostId) && hostId > 0 ? hostId : null;
 };
-
-const toCustodianSummary = ({
-  id,
-  pid,
-  name,
-  external_custodian_id,
-  external_custodian_name,
-  network,
-  created_at,
-  updated_at,
-}: Custodian): Custodian => ({
-  id,
-  pid,
-  name,
-  external_custodian_id,
-  external_custodian_name,
-  network,
-  created_at,
-  updated_at,
-});
 
 const toCollectionHostSummary = ({
   id,
@@ -42,7 +21,7 @@ const toCollectionHostSummary = ({
   id,
   name,
   query_context_type,
-  custodian: custodian && toCustodianSummary(custodian),
+  custodian,
   collections,
   deleted_at,
 });
@@ -64,9 +43,12 @@ const toCollectionWithHostSummaries = (
   host: collection.host?.map(toCollectionHostSummary),
 });
 
+const primaryHost = (collection: CollectionWithHosts): CollectionHost | null =>
+  collection.host?.[0] ?? null;
+
 export {
   parseCollectionHostId,
-  toCustodianSummary,
+  primaryHost,
   toCollectionHostSummary,
   toCollectionHostCredentials,
   toCollectionWithHostSummaries,

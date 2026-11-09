@@ -1,4 +1,4 @@
-import { skipToken, useQuery, UseQueryResult } from "@tanstack/react-query";
+import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { routes } from "@/config/routes";
 import { getTagsCollectionHostCredentials } from "@/config/tags";
 import { CollectionHostCredentials } from "@/types/api";
@@ -16,11 +16,11 @@ const fetchCollectionHostCredentials = async (
 };
 
 const useCollectionHostCredentials = (
-  hostId: number | undefined,
+  hostId: number,
 ): UseQueryResult<CollectionHostCredentials> =>
   useQuery({
     queryKey: getTagsCollectionHostCredentials(hostId),
-    queryFn: hostId ? () => fetchCollectionHostCredentials(hostId) : skipToken,
+    queryFn: () => fetchCollectionHostCredentials(hostId),
     staleTime: 0,
     gcTime: 0,
     retry: false,

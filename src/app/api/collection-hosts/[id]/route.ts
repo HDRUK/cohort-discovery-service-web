@@ -24,10 +24,7 @@ export async function GET(
 
   const result = await apiGetUncached<
     ApiResponse<CollectionHostWithCredentials | null>
-  >(API_ROUTES.collectionHost(hostId), {
-    cache: "no-store",
-    errorMode: ErrorMode.RESULT,
-  });
+  >(API_ROUTES.collectionHost(hostId), { errorMode: ErrorMode.RESULT });
 
   if (!result.data) {
     return new Response(result.error?.text ?? "Collection host not found", {

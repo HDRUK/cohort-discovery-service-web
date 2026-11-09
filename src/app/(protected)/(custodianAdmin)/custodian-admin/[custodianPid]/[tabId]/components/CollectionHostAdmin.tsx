@@ -2,7 +2,7 @@
 import { useState, useMemo } from "react";
 import { Box, Skeleton } from "@mui/material";
 import Title from "@/components/Title";
-import { CollectionHostWithCredentials } from "@/types/api";
+import { CollectionHost } from "@/types/api";
 import { MRT_RowSelectionState } from "material-react-table";
 import { trueKeys } from "@/utils/numbers";
 import { useNotify } from "@/providers/NotifyProvider";
@@ -23,7 +23,7 @@ const CollectionHostAdmin = ({
   collectionHosts,
 }: {
   pid: string;
-  collectionHosts: CollectionHostWithCredentials[];
+  collectionHosts: CollectionHost[];
 }) => {
   const notify = useNotify();
   const confirm = useConfirm();
@@ -54,7 +54,7 @@ const CollectionHostAdmin = ({
     const isPlural = selectedHostIds.length > 1;
     const hostNames = selectedHostIds
       .map((hostId) => collectionHosts.find((h) => String(h.id) === hostId))
-      .filter((h): h is CollectionHostWithCredentials => !!h)
+      .filter((h): h is CollectionHost => !!h)
       .map((h) => h.name)
       .join(", ");
 
@@ -85,7 +85,7 @@ const CollectionHostAdmin = ({
   const handleRestoreHost = async () => {
     const hosts = selectedHostIds
       .map((hostId) => collectionHosts.find((h) => String(h.id) === hostId))
-      .filter((h): h is CollectionHostWithCredentials => !!h);
+      .filter((h): h is CollectionHost => !!h);
     const results = await Promise.all(
       hosts.map(async (host) => ({
         host,

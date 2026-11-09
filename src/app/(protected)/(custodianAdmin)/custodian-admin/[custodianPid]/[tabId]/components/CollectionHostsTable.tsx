@@ -1,4 +1,4 @@
-import { CollectionHostWithCredentials } from "@/types/api";
+import { CollectionHost } from "@/types/api";
 import { useRouter } from "next/navigation";
 import { useTable } from "@/hooks/useTable";
 import { MRT_ColumnDef, MRT_RowSelectionState } from "material-react-table";
@@ -9,7 +9,7 @@ import { routes } from "@/config/routes";
 import SortButton from "@/components/SortButton";
 
 interface CollectionHostsTableProps {
-  collectionHosts: CollectionHostWithCredentials[];
+  collectionHosts: CollectionHost[];
   rowSelection: MRT_RowSelectionState;
   setRowSelection: Dispatch<SetStateAction<MRT_RowSelectionState>>;
   onDelete: (ids: string[]) => void;
@@ -27,7 +27,7 @@ const CollectionHostsTable = ({
 }: CollectionHostsTableProps) => {
   const router = useRouter();
 
-  const columns = useMemo<MRT_ColumnDef<CollectionHostWithCredentials>[]>(
+  const columns = useMemo<MRT_ColumnDef<CollectionHost>[]>(
     () => [
       {
         accessorKey: "name",
@@ -67,7 +67,7 @@ const CollectionHostsTable = ({
     [router],
   );
 
-  const table = useTable<CollectionHostWithCredentials>({
+  const table = useTable<CollectionHost>({
     columns,
     data: collectionHosts,
     getRowId: (row) => String(row.id),

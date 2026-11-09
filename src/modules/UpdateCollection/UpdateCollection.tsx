@@ -7,7 +7,6 @@ import {
   FormGroup,
   FormControlLabel,
   Typography,
-  Skeleton,
 } from "@mui/material";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import {
@@ -43,7 +42,8 @@ import { FieldConfigMap, useSaveChanges } from "@/hooks/useSaveChanges";
 import { useUserDataStore } from "@/hooks/userDataStore";
 import { useIsAdminSection } from "@/contexts/AdminSectionContext";
 import { clampRunTimeFrequency, getFrequencyModeKey } from "@/utils/frequency";
-import useCollectionHostCredentials from "./useCollectionHostCredentials";
+import CollectionHostCredentials from "@/modules/CollectionHostCredentials";
+import { primaryHost } from "@/utils/collectionHosts";
 
 export type UpdateCollectionProps = {
   collection: CollectionWithHosts;
@@ -115,10 +115,7 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
 
   const currentCustodian = useCustodianStore((s) => s.current.custodian);
   const isAdmin = useIsAdminSection();
-  const hostId = collection.host?.[0]?.id;
-  const hostCredentials = useCollectionHostCredentials(
-    isAdmin ? undefined : hostId,
-  );
+  const hostId = primaryHost(collection)?.id;
 
   const currentCollectionHosts = useCustodianStore(
     (s) => s.current.collectionHosts,
@@ -460,31 +457,7 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
                     to copy. Choose one under Collection Connection.
                   </Typography>
                 )}
-                {hostId && hostCredentials.isPending && (
-                  <Skeleton variant="rounded" height={120} sx={{ mb: 2 }} />
-                )}
-                {hostId && hostCredentials.isError && (
-                  <Typography color="error" sx={{ mb: 2 }}>
-                    We couldn&apos;t load this host&apos;s credentials. Open the
-                    host on the Hosts tab, or ask an admin if you no longer have
-                    access to it.
-                  </Typography>
-                )}
-                {hostCredentials.data && (
-                  <>
-                    Client ID
-                    <CopyableVariable
-                      value={hostCredentials.data.client_id}
-                      sx={{ mb: 2 }}
-                    />
-                    Client Secret
-                    <CopyableVariable
-                      hidden
-                      value={hostCredentials.data.client_secret}
-                      sx={{ mb: 2 }}
-                    />
-                  </>
-                )}
+                {hostId && <CollectionHostCredentials hostId={hostId} />}
               </Stack>
             )}
           </Box>
