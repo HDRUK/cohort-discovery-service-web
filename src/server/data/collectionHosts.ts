@@ -1,7 +1,9 @@
 import "server-only";
 
+import { cacheLife } from "next/cache";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { apiGet, ErrorMode } from "@/server/api";
+import { LIST_CACHE_LIFE } from "@/server/cacheProfiles";
 import { requireSession } from "@/server/session";
 import {
   ApiResponse,
@@ -9,6 +11,7 @@ import {
   CollectionHostWithCredentials,
   ReadArgs,
 } from "@/types/api";
+import { canonicaliseQueryString } from "@/utils/string";
 
 export const getCollectionHosts = async (): Promise<
   ApiResponse<CollectionHost[]>
@@ -20,17 +23,29 @@ export const getCollectionHosts = async (): Promise<
   );
 };
 
-export const getCustodianCollectionHosts = async (
+const fetchCustodianCollectionHosts = async (
   custodianPid: string,
-  args?: ReadArgs,
+  queryString: string,
 ): Promise<ApiResponse<CollectionHost[]>> => {
+  "use cache: private";
+  cacheLife(LIST_CACHE_LIFE);
+
   const { token } = await requireSession();
   return apiGet<ApiResponse<CollectionHost[]>>(
     token,
     API_ROUTES.custodianCollectionHosts(custodianPid),
-    { params: args?.params },
+    { params: queryString },
   );
 };
+
+export const getCustodianCollectionHosts = (
+  custodianPid: string,
+  args?: ReadArgs,
+): Promise<ApiResponse<CollectionHost[]>> =>
+  fetchCustodianCollectionHosts(
+    custodianPid,
+    canonicaliseQueryString(args?.params),
+  );
 
 export const getCollectionHostWithCredentials = (
   token: string,
