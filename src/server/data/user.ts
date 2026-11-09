@@ -1,6 +1,7 @@
 import "server-only";
 
 import { cacheLife } from "next/cache";
+import { unstable_rethrow } from "next/navigation";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { apiGet, ErrorMode } from "@/server/api";
 import { USER_DATA_CACHE_LIFE } from "@/server/cacheProfiles";
@@ -22,16 +23,28 @@ export const toCurrentUser = (me: User): User => ({
   updated_at: me.updated_at,
 });
 
-export const getCurrentUser = async (): Promise<ApiResponse<User>> => {
+const fetchMe = async (): Promise<ApiResponse<User>> => {
+  const { token } = await requireSession();
+  return apiGet<ApiResponse<User>>(token, API_ROUTES.getMe, {
+    errorMode: ErrorMode.RESULT,
+  });
+};
+
+const fetchCachedCurrentUser = async (): Promise<ApiResponse<User>> => {
   "use cache: private";
   cacheLife(USER_DATA_CACHE_LIFE);
 
-  const { token } = await requireSession();
-  const response = await apiGet<ApiResponse<User>>(token, API_ROUTES.getMe, {
-    errorMode: ErrorMode.RESULT,
-  });
+  const response = await fetchMe();
+  if (response.error) throw new Error(response.error.text);
 
-  return response.data
-    ? { ...response, data: toCurrentUser(response.data) }
-    : response;
+  return { ...response, data: toCurrentUser(response.data) };
+};
+
+export const getCurrentUser = async (): Promise<ApiResponse<User>> => {
+  try {
+    return await fetchCachedCurrentUser();
+  } catch (error) {
+    unstable_rethrow(error);
+    return fetchMe();
+  }
 };
