@@ -52,6 +52,12 @@ export default async function ProtectedLayout({
   const { data: me, error } = await getMe({ errorMode: ErrorMode.RESULT });
   const { code: errorCode } = error ?? {};
 
+  // The API rejected the token (e.g. expired before the exp check above
+  // caught it, or revoked), so clear it rather than crash on a null `me`.
+  if (errorCode === 401) {
+    redirect(routes.logout);
+  }
+
   if (errorCode === 404) {
     if (isStandalone(applicationMode)) {
       notFound();
