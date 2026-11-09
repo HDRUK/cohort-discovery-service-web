@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { ApiError } from "./https";
 import { notFound, redirect } from "next/navigation";
 import { DEFAULT_REVALIDATE } from "@/config/defaults";
-import { getTokenUser, requireSession } from "./auth";
+import { getTokenUser } from "./auth";
 import { CacheOptions } from "@/types/api";
 import { hashString, canonicaliseQueryString } from "@/utils/string";
 
@@ -82,7 +82,6 @@ async function request<TResponse, TBody = undefined>(
   method: HttpMethod,
   url: string,
   options: RequestOptions<TBody> = {},
-  requiresSession = false,
 ): Promise<TResponse | never> {
   if (!url.startsWith("/"))
     throw new Error(`API path must be relative: ${url}`);
@@ -98,7 +97,6 @@ async function request<TResponse, TBody = undefined>(
 
   const cookieStore = await cookies();
   const token = cookieStore.get(ACCESS_TOKEN_NAME)?.value;
-  if (requiresSession) requireSession(token);
 
   try {
     const response = await fetch(fullUrl, {
@@ -179,14 +177,6 @@ export async function apiPost<TResponse, TBody>(
   body?: TBody,
   options?: RequestOptions<TBody>,
 ) {
-  return request<TResponse, TBody>("POST", url, { ...options, body }, true);
-}
-
-export async function apiPostPublic<TResponse, TBody>(
-  url: string,
-  body?: TBody,
-  options?: RequestOptions<TBody>,
-) {
   return request<TResponse, TBody>("POST", url, { ...options, body });
 }
 
@@ -195,12 +185,12 @@ export async function apiPut<TResponse, TBody>(
   body: TBody,
   options?: RequestOptions<TBody>,
 ) {
-  return request<TResponse, TBody>("PUT", url, { ...options, body }, true);
+  return request<TResponse, TBody>("PUT", url, { ...options, body });
 }
 
 export async function apiDelete<TResponse>(
   url: string,
   options?: RequestOptions<undefined>,
 ) {
-  return request<TResponse>("DELETE", url, options, true);
+  return request<TResponse>("DELETE", url, options);
 }

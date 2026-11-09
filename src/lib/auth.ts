@@ -8,16 +8,6 @@ import { routes } from "@/config/routes";
 
 const applicationMode = process.env.APPLICATION_MODE;
 
-function redirectToSignIn(): never {
-  redirect(isStandalone(applicationMode) ? routes.login : "/user-not-found");
-}
-
-export function requireSession(
-  token: string | undefined,
-): asserts token is string {
-  if (!token) redirectToSignIn();
-}
-
 export async function getTokenUser(): Promise<{
   user: TokenUser;
 }> {
@@ -27,7 +17,13 @@ export async function getTokenUser(): Promise<{
   const decoded = token ? (jwt.decode(token) as JwtPayload) : undefined;
 
   const user = decoded?.user as TokenUser;
-  if (!user) redirectToSignIn();
+  if (!user) {
+    if (isStandalone(applicationMode)) {
+      redirect(routes.login);
+    } else {
+      redirect("/user-not-found");
+    }
+  }
 
   return { user };
 }
