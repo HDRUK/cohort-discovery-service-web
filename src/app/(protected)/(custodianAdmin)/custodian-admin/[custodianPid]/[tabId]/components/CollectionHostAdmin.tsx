@@ -42,7 +42,7 @@ const CollectionHostAdmin = ({
   const selectedCollectionHost = useMemo(
     () =>
       selectedHostIds.length > 0
-        ? collectionHosts.find((h) => h.client_id === selectedHostIds[0])
+        ? collectionHosts.find((h) => String(h.id) === selectedHostIds[0])
         : null,
     [collectionHosts, selectedHostIds],
   );
@@ -53,7 +53,7 @@ const CollectionHostAdmin = ({
   const handleDeleteHost = async () => {
     const isPlural = selectedHostIds.length > 1;
     const hostNames = selectedHostIds
-      .map((clientId) => collectionHosts.find((h) => h.client_id === clientId))
+      .map((hostId) => collectionHosts.find((h) => String(h.id) === hostId))
       .filter((h): h is CollectionHost => !!h)
       .map((h) => h.name)
       .join(", ");
@@ -67,12 +67,12 @@ const CollectionHostAdmin = ({
     if (result !== "confirm") return;
 
     await Promise.all(
-      selectedHostIds.map((clientId) => {
-        const id = collectionHosts.find((h) => h.client_id === clientId)?.id;
+      selectedHostIds.map((hostId) => {
+        const id = collectionHosts.find((h) => String(h.id) === hostId)?.id;
         if (id) {
           return deleteCollectionHost(id);
         }
-        notify.warning(`Did not find host ${clientId} to delete`);
+        notify.warning(`Did not find host ${hostId} to delete`);
       }),
     );
 
@@ -84,7 +84,7 @@ const CollectionHostAdmin = ({
 
   const handleRestoreHost = async () => {
     const hosts = selectedHostIds
-      .map((clientId) => collectionHosts.find((h) => h.client_id === clientId))
+      .map((hostId) => collectionHosts.find((h) => String(h.id) === hostId))
       .filter((h): h is CollectionHost => !!h);
     const results = await Promise.all(
       hosts.map(async (host) => ({
@@ -101,7 +101,7 @@ const CollectionHostAdmin = ({
         `Restored ${restoredCount} of ${results.length} host${isPlural ? "s" : ""}. Could not restore ${failed.map(({ host, result }) => `${host.name} (${result.error?.text})`).join(", ")} — check the details and try again`,
       );
       setRowSelection(
-        Object.fromEntries(failed.map(({ host }) => [host.client_id, true])),
+        Object.fromEntries(failed.map(({ host }) => [String(host.id), true])),
       );
       return;
     }

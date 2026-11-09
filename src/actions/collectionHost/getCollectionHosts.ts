@@ -12,6 +12,7 @@ const getCollectionHosts = async (
     url: API_ROUTES.collectionHosts,
     tags: [TAG_COLLECTION_HOSTS],
     ...args,
+    cacheOptions: { useCache: false },
   });
 };
 

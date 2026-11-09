@@ -314,7 +314,7 @@ export interface CollectionConfig {
 }
 
 export interface CollectionWithHosts extends Collection {
-  host: CollectionHost[];
+  host: CollectionHost | null;
   config: CollectionConfig;
   workgroups?: Workgroup[];
 }
@@ -571,12 +571,20 @@ export interface CollectionHost {
   id: number;
   name: string;
   query_context_type: string;
-  client_id: string;
-  client_secret: string;
   custodian: Custodian;
   collections: Collection[];
   deleted_at?: string | null;
 }
+
+export interface CollectionHostWithCredentials extends CollectionHost {
+  client_id: string;
+  client_secret: string;
+}
+
+export type CollectionHostCredentials = Pick<
+  CollectionHostWithCredentials,
+  "id" | "client_id" | "client_secret"
+>;
 
 export type UrlString = `http${"s" | ""}://${string}`;
 

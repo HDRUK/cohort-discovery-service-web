@@ -1,7 +1,6 @@
 "use client";
 import { Stack } from "@mui/material";
 import { useRouter } from "next/navigation";
-import CopyableVariable from "@/components/CopyableVariable";
 import { CollectionHost } from "@/types/api";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useCallback, useEffect, useMemo } from "react";
@@ -15,6 +14,7 @@ import UpdatePanel from "@/components/UpdatePanel";
 import { useThreePane } from "@/providers/ThreePaneProvider";
 import { useSaveChanges } from "@/hooks/useSaveChanges";
 import { routes } from "@/config/routes";
+import CollectionHostCredentials from "@/modules/CollectionHostCredentials";
 
 type CollectionHostFormValues = { hostName: string };
 
@@ -135,13 +135,7 @@ const UpdateCollectionHost = ({
 
         <Stack sx={{ mt: 1 }}>
           <FormLabel underlined>Host Credentials</FormLabel>
-          Client ID
-          <CopyableVariable value={selectedCollectionHost.client_id} />
-          Client Secret
-          <CopyableVariable
-            hidden
-            value={selectedCollectionHost.client_secret}
-          />
+          <CollectionHostCredentials hostId={selectedCollectionHost.id} />
         </Stack>
       </UpdatePanel>
     </FormProvider>

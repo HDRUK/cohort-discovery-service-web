@@ -70,7 +70,7 @@ const CollectionHostsTable = ({
   const table = useTable<CollectionHost>({
     columns,
     data: collectionHosts,
-    getRowId: (row) => row.client_id,
+    getRowId: (row) => String(row.id),
     onRowSelectionChange: setRowSelection,
     state: { rowSelection },
   });

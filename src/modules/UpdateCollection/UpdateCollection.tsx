@@ -42,6 +42,7 @@ import { FieldConfigMap, useSaveChanges } from "@/hooks/useSaveChanges";
 import { useUserDataStore } from "@/hooks/userDataStore";
 import { useIsAdminSection } from "@/contexts/AdminSectionContext";
 import { clampRunTimeFrequency, getFrequencyModeKey } from "@/utils/frequency";
+import CollectionHostCredentials from "@/modules/CollectionHostCredentials";
 
 export type UpdateCollectionProps = {
   collection: CollectionWithHosts;
@@ -74,7 +75,7 @@ const getDefaultValues = (collection: CollectionWithHosts | null) => {
     name,
     description,
     url,
-    host: hosts,
+    host,
     config,
     model_state,
     workgroups,
@@ -82,13 +83,12 @@ const getDefaultValues = (collection: CollectionWithHosts | null) => {
     location_enabled,
     death_enabled,
   } = collection;
-  const [host] = hosts;
   return {
     collection: {
       name,
       description: description || "",
       url: url || ("" as UrlString),
-      host_id: host?.id ?? "",
+      host_id: host?.id ?? 0,
       model_state: model_state,
       workgroups: workgroups,
       is_synthetic: is_synthetic,
@@ -113,6 +113,7 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
 
   const currentCustodian = useCustodianStore((s) => s.current.custodian);
   const isAdmin = useIsAdminSection();
+  const hostId = collection.host?.id;
 
   const currentCollectionHosts = useCustodianStore(
     (s) => s.current.collectionHosts,
@@ -448,17 +449,13 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
             {!isAdmin && (
               <Stack>
                 <FormLabel underlined>Host Credentials</FormLabel>
-                Client ID
-                <CopyableVariable
-                  value={collection.host?.[0]?.client_id}
-                  sx={{ mb: 2 }}
-                />
-                Client Secret
-                <CopyableVariable
-                  hidden
-                  value={collection.host?.[0]?.client_secret}
-                  sx={{ mb: 2 }}
-                />
+                {!hostId && (
+                  <Typography sx={{ mb: 2 }}>
+                    This collection has no host yet, so there are no credentials
+                    to copy. Choose one under Collection Connection.
+                  </Typography>
+                )}
+                {hostId && <CollectionHostCredentials hostId={hostId} />}
               </Stack>
             )}
           </Box>

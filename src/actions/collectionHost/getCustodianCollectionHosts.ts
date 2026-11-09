@@ -13,6 +13,7 @@ const getCustodianCollectionHosts = async (
     url: API_ROUTES.custodianCollectionHosts(custodianPid),
     tags: [TAG_COLLECTION_HOSTS, getCollectionHostTag(custodianPid)],
     ...args,
+    cacheOptions: { useCache: false },
   });
 };
 
