@@ -12,10 +12,11 @@ import Table from "../Table";
 import { formatNumber } from "@/utils/numbers";
 import { getDatetime } from "@/utils/date";
 import { useTransposedTable } from "@/hooks/useTransposedTable";
+import { QUERY_KEYS } from "@/config/tags";
 
 const CollectionDetails = ({ pid }: { pid: string }) => {
   const { data: details, isLoading } = useQuery<CollectionDetailsType>({
-    queryKey: ["collectionDetails", pid],
+    queryKey: QUERY_KEYS.collectionDetails(pid),
     queryFn: async () => getCollectionDetails(pid),
     enabled: !!pid,
     refetchOnMount: true,

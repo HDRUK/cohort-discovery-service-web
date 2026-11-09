@@ -23,6 +23,7 @@ import { useNotify } from "@/providers/NotifyProvider";
 import {
   getTagCollection,
   getTagCustodianCollection,
+  QUERY_KEYS,
   TAG_COLLECTIONS_ADMIN,
 } from "@/config/tags";
 import StatusChip from "@/components/StatusChip";
@@ -378,10 +379,10 @@ const CollectionsTable = ({
             const tags = collections.data.map((c) => getTagCollection(c.pid));
             tags.map((t) => revalidateAction(t));
             await queryClient.invalidateQueries({
-              queryKey: ["collectionDetails"],
+              queryKey: QUERY_KEYS.collectionDetails(),
             });
             await queryClient.refetchQueries({
-              queryKey: ["collectionDetails"],
+              queryKey: QUERY_KEYS.collectionDetails(),
               type: "all",
             });
           },

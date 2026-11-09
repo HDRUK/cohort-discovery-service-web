@@ -34,6 +34,7 @@ import QueriesTableSkeleton from "./QueriesTableSkeleton";
 import EditableText from "@/components/EditableText";
 import updateQuery from "@/actions/query/updateQuery";
 import { useNotify } from "@/providers/NotifyProvider";
+import { QUERY_KEYS } from "@/config/tags";
 
 interface QueriesTableProps {
   initialData: Paginated<Query>;
@@ -52,7 +53,7 @@ const QueriesTable = ({
 
   const qc = useQueryClient();
   const queryKey = useMemo(
-    () => [`queries-${searchParams.toString()}`],
+    () => QUERY_KEYS.queries(searchParams.toString()),
     [searchParams],
   );
 
@@ -188,7 +189,7 @@ const QueriesTable = ({
       newName !== getQueryName(initialDataQuery)
     ) {
       await setQueryName(initialDataQuery.id, initialDataQuery.pid, newName);
-      qc.refetchQueries({ queryKey: [`queries`], type: "active" });
+      await qc.invalidateQueries({ queryKey: QUERY_KEYS.queries() });
       notify.success("Query renamed successfully");
     }
   };

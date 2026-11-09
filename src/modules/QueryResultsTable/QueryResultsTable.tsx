@@ -20,6 +20,7 @@ import QueryHistoryGuidance from "../QueryHistory";
 import { useDefaults } from "@/providers/DefaultProvider";
 import TwoPaneSwimLaneLayout from "@/modules/TwoPaneSwimLaneLayout";
 import QueryResultsLocation from "./QueryResultsLocation";
+import { QUERY_KEYS } from "@/config/tags";
 
 interface QueryResultsTableProps {
   initialData: Query;
@@ -40,11 +41,7 @@ const QueryResultsTable = ({
   const track = useTrackClick();
 
   const queryKey = useMemo(
-    () => [
-      "query",
-      initialData.pid,
-      `${initialData.pid}-${initialSearchParams.toString()}`,
-    ],
+    () => QUERY_KEYS.query(initialData.pid, initialSearchParams.toString()),
     [initialSearchParams, initialData.pid],
   );
   const qc = useQueryClient();
