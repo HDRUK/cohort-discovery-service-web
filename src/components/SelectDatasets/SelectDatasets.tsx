@@ -17,7 +17,6 @@ import SelectNetworkDatasets, {
   NetworkGroupedCollections,
 } from "../SelectNetworkDatasets";
 import RefreshButton from "../RefreshButton";
-import { TAG_COLLECTIONS } from "@/config/tags";
 import { useUserDataStore } from "@/hooks/userDataStore";
 import SquareCheckbox from "../SquareCheckbox";
 import CollectionTypeFilters from "../CollectionTypeFilters";
@@ -172,7 +171,7 @@ const SelectDatasets = () => {
                 width: "100%",
               }}
             >
-              <RefreshButton component="div" tag={TAG_COLLECTIONS} />
+              <RefreshButton component="div" label="Refresh datasets" />
             </Title>
           </AccordionSummary>
           <AccordionDetails
