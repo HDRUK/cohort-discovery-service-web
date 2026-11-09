@@ -4,7 +4,6 @@ import {
   getCollectionHostTag,
   getCustodianTag,
   getTagCustodianCollection,
-  isAllowedTag,
   TAG_ADMIN_USERS,
   TAG_COLLECTION_HOSTS,
   TAG_COLLECTIONS,
@@ -18,21 +17,15 @@ import { getTokenUser } from "@/lib/auth";
 import { Custodian } from "@/types/api";
 import { updateTag } from "next/cache";
 
-const assertAllowedTag = (tagName: string) => {
-  if (!isAllowedTag(tagName))
-    throw new Error(`Cannot revalidate tag "${tagName}"`);
-};
-
 export const revalidateAction = async (tagName: string) => {
   await getTokenUser();
-  assertAllowedTag(tagName);
   updateTag(tagName);
 };
 
 export const revalidateUserAction = async (tagName: string) => {
   const { user } = await getTokenUser();
-  assertAllowedTag(tagName);
-  updateTag(`${tagName}-${user.id}`);
+  const userId = user.id;
+  await revalidateAction(`${tagName}-${userId}`);
 };
 
 export const revalidateCustodianByPid = async (custodianPid: string) => {
@@ -64,7 +57,9 @@ export const revalidateCollections = async (
       : []),
   ]);
 
-export const revalidateWorkgroupAndCollections = async (includeUsers = false) =>
+export const revalidateWorkgroupAndCollections = async (
+  includeUsers = false,
+) =>
   Promise.all([
     revalidateAction(TAG_WORKGROUP_ADMIN),
     revalidateCollections(),
