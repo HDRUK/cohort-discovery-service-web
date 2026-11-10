@@ -3,10 +3,18 @@ import { routes } from "@/config/routes";
 
 const stripTrailingSlashes = (url: string) => url.replace(/\/+$/, "");
 
+const originOf = (url: string | undefined): string | null => {
+  if (!url) return null;
+  try {
+    return new URL(url).origin;
+  } catch {
+    return null;
+  }
+};
+
 export const getOrganisationUrl = (): string =>
-  stripTrailingSlashes(
-    process.env.NEXT_PUBLIC_LOGIN_URL || branding.links.organisation,
-  );
+  originOf(process.env.NEXT_PUBLIC_LOGIN_URL) ??
+  stripTrailingSlashes(branding.links.organisation);
 
 const organisationUrl = getOrganisationUrl();
 

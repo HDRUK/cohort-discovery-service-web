@@ -39,7 +39,7 @@ Use `.env.example` as the base:
 | Variable | Required | Description |
 | --- | --- | --- |
 | `API_BASE_URL` | Yes | Backend API base URL used by server actions. |
-| `NEXT_PUBLIC_LOGIN_URL` | Yes | Login URL used when unauthenticated. Also the base for outbound organisation links; falls back to `links.organisation` in the branding config. |
+| `NEXT_PUBLIC_LOGIN_URL` | Yes | Integrated mode: the full Gateway sign-in URL, used as is by the sign-in button and by logout, including the return param, e.g. `https://gateway.example.org?redirect_cohort_discovery_upon_signin=https://cds.example.org`. Its origin is the base for outbound organisation links; falls back to `links.organisation` in the branding config. |
 | `APPLICATION_MODE` | Yes | `integrated` or `standalone`. Controls auth/access behaviour. |
 | `NEXT_PUBLIC_TASK_URL` | Yes | API URL used for the task endpoints and the API docs footer link. |
 | `NEXT_PUBLIC_USE_EXAMPLE_QUERY` | No | Enables example query UX/debug helpers when `true`. |
