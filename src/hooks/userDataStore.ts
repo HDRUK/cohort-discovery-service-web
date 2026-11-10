@@ -12,7 +12,6 @@ import {
   Concept,
   Paginated,
   CreateConceptSetPost,
-  ConceptSet,
   DistributionType,
   CollectionWithHosts,
   SearchConceptsBody,
@@ -25,8 +24,6 @@ export interface UserDataStoreState {
   isQueryLimitReached: boolean;
   markQueryLimitReached: () => void;
 
-  queries: Query[];
-  setQueries: (queries: Query[]) => void;
 
   fetchResults: (
     queryName?: string,
@@ -41,8 +38,6 @@ export interface UserDataStoreState {
     query_type: DistributionType,
   ) => Promise<Query>;
 
-  conceptSets: ConceptSet[];
-  setConceptSets: (conceptSets: ConceptSet[]) => void;
 
   createConceptSet: (payload: CreateConceptSetPost) => Promise<void>;
 
@@ -71,13 +66,6 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
     set((state) => ({
       ...state,
       isQueryLimitReached: true,
-    })),
-
-  queries: [],
-  setQueries: (queries) =>
-    set((state) => ({
-      ...state,
-      queries,
     })),
 
   fetchResults: async (name, reset = false) => {
@@ -109,13 +97,6 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
     const res = await rerunDistributions(collection.pid, { query_type });
     return res.data;
   },
-
-  conceptSets: [],
-  setConceptSets: (conceptSets) =>
-    set((state) => ({
-      ...state,
-      conceptSets,
-    })),
 
   createConceptSet: async (payload) => {
     await createConceptSet(payload);

@@ -18,7 +18,6 @@ import type {
   CreateQuery,
   Query,
   CreateCollectionPost,
-  ConceptSet,
   Concept,
   Workgroup,
   Paginated,
@@ -152,9 +151,7 @@ const seedStores = (overrides?: SliceOverrides) => {
 
   useUserDataStore.setState(
     {
-      queries: [] as Query[],
       selectedCollections: [] as CollectionWithHosts[],
-      conceptSets: [] as ConceptSet[],
       fetchResults: (_queryName?: string, _reset?: boolean) =>
         RESOLVE<ApiResponse<CreateQuery>>({
           data: { query_pid: "mock-pid" } as unknown as CreateQuery,
