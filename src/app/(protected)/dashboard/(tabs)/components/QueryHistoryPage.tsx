@@ -6,6 +6,7 @@ import { Box, Skeleton } from "@mui/material";
 import Title from "@/components/Title";
 import { ApiSearchParams } from "@/types/api";
 import { buildQueryHistoryParams } from "@/utils/params";
+import { requestTime } from "@/server/requestTime";
 
 interface PageProps {
   searchParams: Promise<ApiSearchParams>;
@@ -16,7 +17,7 @@ const loadQueries = async (params: ApiSearchParams) => {
     params: buildQueryHistoryParams(params),
   });
 
-  return { queries, fetchedAt: Date.now() };
+  return { queries, fetchedAt: await requestTime() };
 };
 
 const QueryHistoryLayout = ({

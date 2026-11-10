@@ -8,6 +8,7 @@ import { buildQueryHistoryParams } from "@/utils/params";
 import { QueryHistorySearchParams } from "@/types/api";
 import { getQueryName } from "@/utils/query";
 import EditableQuerySubtitle from "@/components/EditableQuerySubtitle";
+import { requestTime } from "@/server/requestTime";
 
 type PageSearchParams = Promise<QueryHistorySearchParams>;
 
@@ -18,7 +19,7 @@ interface PageProps {
 const loadQuery = async (pid: string, params: URLSearchParams) => {
   const queryData = await getQuery(pid, { params });
 
-  return { queryData, fetchedAt: Date.now() };
+  return { queryData, fetchedAt: await requestTime() };
 };
 
 const QueryResultsPageContent = async ({

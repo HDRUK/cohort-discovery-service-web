@@ -4,13 +4,17 @@ import { getAdminCollections } from "@/server/data/collections";
 import SkeletonFull from "@/components/SkeletonFull";
 import Title from "@/components/Title";
 import CollectionHealth from "@/modules/CollectionHealth/CollectionHealth";
+import { requestTime } from "@/server/requestTime";
 
 const loadCollections = async () => {
   const result = await getAdminCollections({
     params: new URLSearchParams({ per_page: "500" }),
   });
 
-  return { collections: result.data?.data ?? [], fetchedAt: Date.now() };
+  return {
+    collections: result.data?.data ?? [],
+    fetchedAt: await requestTime(),
+  };
 };
 
 const CollectionHealthLoader = async () => {
