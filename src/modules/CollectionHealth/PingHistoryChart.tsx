@@ -4,8 +4,8 @@ import { useCallback, useMemo } from "react";
 import { Alert, Box, Skeleton, Stack, Typography } from "@mui/material";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { useQuery } from "@tanstack/react-query";
-import getCollectionHealth from "@/actions/collection/getCollectionHealth";
 import { QUERY_KEYS } from "@/config/tags";
+import { fetchCollectionHealth } from "./healthQueries";
 import { PingBin, PingSummary } from "@/types/api";
 import { getDatetime } from "@/utils/date";
 import DragRangeOverlay from "./DragRangeOverlay";
@@ -83,7 +83,7 @@ const PingHistoryChart = ({
 
   const { data, isLoading, isError } = useQuery({
     queryKey: QUERY_KEYS.collectionHealthSeries(collectionPid, bin, range),
-    queryFn: () => getCollectionHealth(collectionPid, bin, range),
+    queryFn: () => fetchCollectionHealth(collectionPid, bin, range),
     enabled,
     refetchOnWindowFocus: false,
     staleTime: STALE_TIME_TELEMETRY,

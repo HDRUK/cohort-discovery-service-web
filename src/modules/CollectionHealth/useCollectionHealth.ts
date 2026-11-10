@@ -2,9 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import getAdminCollections from "@/actions/collection/getAdminCollections";
 import createRegressionTest from "@/actions/regressionTest/createRegressionTest";
-import getRegressionTests from "@/actions/regressionTest/getRegressionTests";
 import runRegressionTest from "@/actions/regressionTest/runRegressionTest";
 import updateRegressionTest from "@/actions/regressionTest/updateRegressionTest";
 import { QUERY_KEYS } from "@/config/tags";
@@ -13,8 +11,8 @@ import { useDefaults } from "@/providers/DefaultProvider";
 import { useNotify } from "@/providers/NotifyProvider";
 import { CollectionWithHosts, Paginated, RegressionTest } from "@/types/api";
 import { buildHealthRows, HealthThresholds } from "./health";
+import { fetchHealthCollections, fetchRegressionTests } from "./healthQueries";
 
-export const COLLECTIONS_PER_PAGE = "500";
 export const REFRESH_INTERVAL = 10_000;
 
 const REFRESH_OPTIONS = {
@@ -22,9 +20,6 @@ const REFRESH_OPTIONS = {
   refetchOnWindowFocus: false,
   refetchOnReconnect: false,
 } as const;
-
-const collectionsParams = (pid?: string) =>
-  new URLSearchParams(pid ? { pid } : { per_page: COLLECTIONS_PER_PAGE });
 
 const useCollectionHealth = ({
   initialCollections,
@@ -53,10 +48,7 @@ const useCollectionHealth = ({
     dataUpdatedAt: collectionsUpdatedAt,
   } = useQuery({
     queryKey: queryKeyCollections,
-    queryFn: () =>
-      getAdminCollections({
-        params: collectionsParams(pid),
-      }),
+    queryFn: () => fetchHealthCollections(pid),
     initialData: {
       message: "",
       data: { data: initialCollections } as Paginated<CollectionWithHosts>,
@@ -72,7 +64,7 @@ const useCollectionHealth = ({
     dataUpdatedAt: regressionUpdatedAt,
   } = useQuery({
     queryKey: QUERY_KEYS.regressionTests(),
-    queryFn: () => getRegressionTests(),
+    queryFn: () => fetchRegressionTests(),
     ...REFRESH_OPTIONS,
   });
 
