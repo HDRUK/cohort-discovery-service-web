@@ -110,4 +110,10 @@ describe("GET /api/auth/logout", () => {
     expect(setCookie).toContain("Max-Age=0");
     expect(setCookie).toContain("HttpOnly");
   });
+
+  it("tells the browser to clear the previous user's local and session storage", async () => {
+    const response = await logoutWith({ mode: "integrated", gatewayUrl: GATEWAY });
+
+    expect(response.headers.get("Clear-Site-Data")).toBe('"storage"');
+  });
 });

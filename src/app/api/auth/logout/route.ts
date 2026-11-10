@@ -8,6 +8,7 @@ import { isStandalone } from "@/utils/modes";
 const API_BASE_URL = process.env.API_BASE_URL;
 const GATEWAY_URL = process.env.NEXT_PUBLIC_LOGIN_URL;
 const applicationMode = process.env.APPLICATION_MODE;
+const CLEAR_BROWSER_STORAGE = '"storage"';
 
 const ssoClaimsFrom = (
   token: string | undefined,
@@ -55,5 +56,6 @@ export async function GET(req: NextRequest) {
     httpOnly: true,
     sameSite: "lax",
   });
+  response.headers.set("Clear-Site-Data", CLEAR_BROWSER_STORAGE);
   return response;
 }
