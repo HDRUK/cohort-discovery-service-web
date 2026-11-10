@@ -199,7 +199,6 @@ const seedStores = (overrides?: SliceOverrides) => {
       ...(overrides?.custodian ?? {}),
       current: {
         custodian: null,
-        collections: [] as Collection[],
         workgroups: [] as Workgroup[],
         ...(overrides?.custodian?.current ?? {}),
       },
@@ -209,7 +208,6 @@ const seedStores = (overrides?: SliceOverrides) => {
 
   useAdminDataStore.setState(
     {
-      collections: [] as Collection[],
       selectedWorkgroup: null,
       createCollection: (_payload: CreateCollectionPost) =>
         RESOLVE<Collection>(getMockCollection()),

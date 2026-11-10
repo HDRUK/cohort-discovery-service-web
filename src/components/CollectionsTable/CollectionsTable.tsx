@@ -1,6 +1,12 @@
 "use client";
 
-import { Collection, CollectionStatus } from "@/types/api";
+import {
+  Collection,
+  CollectionStatus,
+  CollectionWithHosts,
+  Paginated,
+} from "@/types/api";
+import { DEFAULT_PER_PAGE } from "@/config/defaults";
 import {
   MRT_RowSelectionState,
   type MRT_ColumnDef,
@@ -15,7 +21,6 @@ import { capitaliseFirstLetter } from "@/utils/string";
 import { getDatetime } from "@/utils/date";
 import { trueKeys } from "@/utils/numbers";
 import { useLogDependencyChanges } from "@/utils/deps";
-import useAdminStore from "@/hooks/useAdminStore";
 import deleteCollections from "@/actions/collection/deleteCollections";
 import restoreCollection from "@/actions/collection/restoreCollection";
 import useCustodianStore from "@/hooks/useCustodianStore";
@@ -33,6 +38,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { CollectionFilterStatus } from "@/types/collections";
 
 export interface CollectionsTableProps extends TableProps {
+  collections?: Paginated<CollectionWithHosts>;
   showPid?: boolean;
   tableTitle?: string;
   tableSubTitle?: string;
@@ -41,6 +47,7 @@ export interface CollectionsTableProps extends TableProps {
 }
 
 const CollectionsTable = ({
+  collections,
   showPid = false,
   tableTitle,
   tableSubTitle,
@@ -60,11 +67,7 @@ const CollectionsTable = ({
   const selectedCollections = useUserStore((s) => s.selectedCollections);
   const setSelectedCollections = useUserStore((s) => s.setSelectedCollections);
 
-  const adminCollections = useAdminStore((s) => s.collections);
-  const custodianCollections = useCustodianStore((s) => s.current.collections);
-
-  //rely on server side data only
-  const collections = isAdmin ? adminCollections : custodianCollections;
+  const rows = collections?.data;
 
   const notify = useNotify();
 
@@ -77,12 +80,12 @@ const CollectionsTable = ({
 
   useEffect(() => {
     const newSelectedCollections = selectedCollectionIds
-      .map((id) => collections.data.find((c) => String(c.id) === id) || null)
+      .map((id) => rows?.find((c) => String(c.id) === id) || null)
       .filter((c) => c !== null);
 
     setSelectedCollections(newSelectedCollections);
   }, [
-    collections.data,
+    rows,
     selectedCollections,
     selectedCollectionIds,
     setSelectedCollections,
@@ -210,14 +213,14 @@ const CollectionsTable = ({
   );
 
   usePrefetchCollectionDetails({
-    pids: adminMoreCollectionDetails ? collections.data.map((c) => c.pid) : [],
+    pids: adminMoreCollectionDetails && rows ? rows.map((c) => c.pid) : [],
   });
 
   const table = usePaginatedTable<Collection>({
     columns,
-    data: collections.data,
-    rowCount: collections.total,
-    perPageDefault: collections.per_page,
+    data: rows,
+    rowCount: collections?.total ?? 0,
+    perPageDefault: collections?.per_page ?? DEFAULT_PER_PAGE,
     enableSorting: false,
     ...(setRowSelection && { onRowSelectionChange: setRowSelection }),
     ...(rowSelection && { state: { rowSelection } }),

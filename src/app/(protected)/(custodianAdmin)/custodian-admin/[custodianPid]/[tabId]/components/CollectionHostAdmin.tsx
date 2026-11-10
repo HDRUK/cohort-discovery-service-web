@@ -18,13 +18,16 @@ import { useConfirm } from "@/hooks/useConfirm";
 import useSearchParams from "@/hooks/useSearchParams";
 import { CollectionHostFilter } from "@/types/collections";
 
+const NO_HOSTS: CollectionHost[] = [];
+
 const CollectionHostAdmin = ({
   pid,
   collectionHosts,
 }: {
   pid: string;
-  collectionHosts: CollectionHost[];
+  collectionHosts?: CollectionHost[];
 }) => {
+  const loadedHosts = collectionHosts ?? NO_HOSTS;
   const notify = useNotify();
   const confirm = useConfirm();
   const { getSearchParam } = useSearchParams("collection_host_filter");
@@ -42,18 +45,18 @@ const CollectionHostAdmin = ({
   const selectedCollectionHost = useMemo(
     () =>
       selectedHostIds.length > 0
-        ? collectionHosts.find((h) => String(h.id) === selectedHostIds[0])
+        ? loadedHosts.find((h) => String(h.id) === selectedHostIds[0])
         : null,
-    [collectionHosts, selectedHostIds],
+    [loadedHosts, selectedHostIds],
   );
 
   const custodian = custodians.find((c) => c.pid === pid);
-  const noCollectionHosts = collectionHosts.length === 0;
+  const noCollectionHosts = collectionHosts?.length === 0;
 
   const handleDeleteHost = async () => {
     const isPlural = selectedHostIds.length > 1;
     const hostNames = selectedHostIds
-      .map((hostId) => collectionHosts.find((h) => String(h.id) === hostId))
+      .map((hostId) => loadedHosts.find((h) => String(h.id) === hostId))
       .filter((h): h is CollectionHost => !!h)
       .map((h) => h.name)
       .join(", ");
@@ -68,7 +71,7 @@ const CollectionHostAdmin = ({
 
     await Promise.all(
       selectedHostIds.map((hostId) => {
-        const id = collectionHosts.find((h) => String(h.id) === hostId)?.id;
+        const id = loadedHosts.find((h) => String(h.id) === hostId)?.id;
         if (id) {
           return deleteCollectionHost(id);
         }
@@ -84,7 +87,7 @@ const CollectionHostAdmin = ({
 
   const handleRestoreHost = async () => {
     const hosts = selectedHostIds
-      .map((hostId) => collectionHosts.find((h) => String(h.id) === hostId))
+      .map((hostId) => loadedHosts.find((h) => String(h.id) === hostId))
       .filter((h): h is CollectionHost => !!h);
     const results = await Promise.all(
       hosts.map(async (host) => ({
