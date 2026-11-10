@@ -14,8 +14,11 @@ interface LoginPageProps {
 const LoginContent = async ({ searchParams }: LoginPageProps) => {
   if (await hasLiveSession()) redirect(routes.home);
 
-  const [{ return_to: returnToParam }, { data: methods }, copyrightYear] =
-    await Promise.all([searchParams, getAuthMethods(), getCopyrightYear()]);
+  const { return_to: returnToParam } = await searchParams;
+  const [{ data: methods }, copyrightYear] = await Promise.all([
+    getAuthMethods(),
+    getCopyrightYear(),
+  ]);
 
   return (
     <Login
