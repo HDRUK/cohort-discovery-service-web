@@ -224,11 +224,12 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
           result,
           status !== undefined ? CollectionStatus[status] : undefined,
         );
-        if (ok) {
-          notify.success(message);
-        } else {
+        if (!ok) {
+          lastCollectionIdRef.current = id;
           notify.error(message);
+          return;
         }
+        notify.success(message);
       }
 
       if (closeAfter) onClose?.();
