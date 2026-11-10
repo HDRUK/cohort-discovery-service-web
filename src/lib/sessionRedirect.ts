@@ -1,6 +1,6 @@
 import { routes } from "@/config/routes";
 
-const NO_TOKEN_FORBIDDEN_PATH = "/403?reason=no-token";
+const NO_TOKEN_FORBIDDEN_PATH = `${routes.forbidden}?reason=no-token`;
 
 export const signedOutRedirect = (
   standalone: boolean,
