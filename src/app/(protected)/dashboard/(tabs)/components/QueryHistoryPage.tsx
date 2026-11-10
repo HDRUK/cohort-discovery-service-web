@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { getQueries } from "@/server/data/queries";
 import QueriesTable from "@/modules/QueriesTable";
-import { QueriesTableSkeleton } from "@/modules/QueriesTable";
+import { SearchParamsTransitionProvider } from "@/contexts/SearchParamsTransitionContext";
 import { Box } from "@mui/material";
 import Title from "@/components/Title";
 import { ApiSearchParams } from "@/types/api";
@@ -34,11 +34,11 @@ const QueryHistoryPageContent = async ({ searchParams }: PageProps) => {
 
 const QueryHistoryPage = async ({ searchParams }: PageProps) => {
   return (
-    <>
-      <Suspense fallback={<QueriesTableSkeleton />}>
+    <SearchParamsTransitionProvider>
+      <Suspense fallback={<QueriesTable />}>
         <QueryHistoryPageContent searchParams={searchParams} />
       </Suspense>
-    </>
+    </SearchParamsTransitionProvider>
   );
 };
 

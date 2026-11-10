@@ -30,15 +30,15 @@ import useSearchParams from "@/hooks/useSearchParams";
 import { buildQueryHistoryParams } from "@/utils/params";
 import { useDefaults } from "@/providers/DefaultProvider";
 import TwoPaneSwimLaneLayout from "../TwoPaneSwimLaneLayout";
-import QueriesTableSkeleton from "./QueriesTableSkeleton";
 import EditableText from "@/components/EditableText";
 import updateQuery from "@/actions/query/updateQuery";
 import { useNotify } from "@/providers/NotifyProvider";
 import { QUERY_KEYS } from "@/config/tags";
 import { receivedAt, setQueryDataIfNewer } from "@/utils/queryCache";
+import { DEFAULT_QUERIES_PER_PAGE } from "@/config/defaults";
 
 interface QueriesTableProps {
-  initialData: Paginated<Query>;
+  initialData?: Paginated<Query>;
   columnVisibility?: Record<string, boolean>;
 }
 
@@ -70,8 +70,8 @@ const QueriesTable = ({
     queryKey,
     queryFn: async () => {
       const searchParamsObject = buildQueryHistoryParams({
-        page: Number(searchParams.get("page")) ?? initialData.current_page,
-        per_page: Number(searchParams.get("per_page")) ?? initialData.per_page,
+        page: Number(searchParams.get("page")) ?? initialData?.current_page,
+        per_page: Number(searchParams.get("per_page")) ?? initialData?.per_page,
         sort: searchParams.get("sort") ?? undefined,
         search_term: searchParams.get("search_term") ?? undefined,
       });
@@ -82,7 +82,8 @@ const QueriesTable = ({
       return res.data;
     },
     initialData,
-    initialDataUpdatedAt: receivedAt(initialData),
+    initialDataUpdatedAt: initialData && receivedAt(initialData),
+    enabled: initialData !== undefined,
     staleTime: 2 * defaults.tableRefresh,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
@@ -96,7 +97,7 @@ const QueriesTable = ({
     },
   });
   useEffect(() => {
-    setQueryDataIfNewer(qc, queryKey, initialData);
+    if (initialData) setQueryDataIfNewer(qc, queryKey, initialData);
   }, [qc, queryKey, initialData]);
 
   const columns: MRT_ColumnDef<Query>[] = [
@@ -177,7 +178,7 @@ const QueriesTable = ({
 
   const handleRenameQuery = async (newName: string) => {
     setRenamingQueryId(null);
-    const initialDataQuery = queries.data.find(
+    const initialDataQuery = queries?.data.find(
       (q) => q.pid === renamingQueryId,
     );
 
@@ -199,10 +200,10 @@ const QueriesTable = ({
 
   const table = usePaginatedTable<Query>({
     columns,
-    data: queries.data,
+    data: isLoading || showSkeletonRefresh ? undefined : queries?.data,
     enableSorting: false,
-    rowCount: queries.total,
-    perPageDefault: queries.per_page,
+    rowCount: queries?.total ?? 0,
+    perPageDefault: queries?.per_page ?? DEFAULT_QUERIES_PER_PAGE,
     expandFirstRow: false,
     initialState: { columnVisibility },
     enableRowSelection: true,
@@ -313,8 +314,6 @@ const QueriesTable = ({
     await qc.refetchQueries({ queryKey, type: "active" });
     setShowSkeletonRefresh(false);
   }, [setShowSkeletonRefresh, setRowSelection, setExpanded, qc, queryKey]);
-
-  if (isLoading || showSkeletonRefresh) return <QueriesTableSkeleton />;
 
   return (
     <TwoPaneSwimLaneLayout
