@@ -1,5 +1,5 @@
 import { routes } from "@/config/routes";
-import { routeGet } from "@/lib/routeGet";
+import { routeGet } from "@/lib/routeFetch";
 import {
   ApiResponse,
   CollectionHealthSeries,
