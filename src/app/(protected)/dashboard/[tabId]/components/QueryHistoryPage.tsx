@@ -11,12 +11,16 @@ interface PageProps {
   searchParams: Promise<ApiSearchParams>;
 }
 
+const loadQueries = async (params: ApiSearchParams) => {
+  const queries = await getQueries({
+    params: buildQueryHistoryParams(params),
+  });
+
+  return { queries, fetchedAt: Date.now() };
+};
+
 const QueryHistoryPageContent = async ({ searchParams }: PageProps) => {
-  const params = await searchParams;
-
-  const searchParamsObject = buildQueryHistoryParams(params);
-
-  const queries = await getQueries({ params: searchParamsObject });
+  const { queries, fetchedAt } = await loadQueries(await searchParams);
 
   return (
     <Box
@@ -29,7 +33,7 @@ const QueryHistoryPageContent = async ({ searchParams }: PageProps) => {
       }}
     >
       <Title title={"History"} subTitle={`${queries.data.total}`} />
-      <QueriesTable initialData={queries.data} />
+      <QueriesTable initialData={queries.data} fetchedAt={fetchedAt} />
     </Box>
   );
 };

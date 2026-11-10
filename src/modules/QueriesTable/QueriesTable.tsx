@@ -3,7 +3,7 @@
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Query, Paginated } from "@/types/api";
+import { ApiResponse, Query, Paginated } from "@/types/api";
 import {
   MRT_ExpandedState,
   MRT_RowSelectionState,
@@ -24,7 +24,7 @@ import QueryResultsTable from "@/modules/QueryResultsTable";
 import QueryHistoryGuidance from "@/modules/QueryHistory/QueryHistoryGuidance";
 import { queryToText } from "@/utils/queryBuilder";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import getQueries from "@/actions/query/getQueries";
+import { routeGet } from "@/lib/routeGet";
 import { getQueryName, getQueryStatus } from "@/utils/query";
 import useSearchParams from "@/hooks/useSearchParams";
 import { buildQueryHistoryParams } from "@/utils/params";
@@ -35,14 +35,17 @@ import EditableText from "@/components/EditableText";
 import updateQuery from "@/actions/query/updateQuery";
 import { useNotify } from "@/providers/NotifyProvider";
 import { QUERY_KEYS } from "@/config/tags";
+import { setQueryDataIfNewer } from "@/utils/queryCache";
 
 interface QueriesTableProps {
   initialData: Paginated<Query>;
+  fetchedAt: number;
   columnVisibility?: Record<string, boolean>;
 }
 
 const QueriesTable = ({
   initialData,
+  fetchedAt,
   columnVisibility = { pid: false, "mrt-row-expand": false },
 }: QueriesTableProps) => {
   const defaults = useDefaults();
@@ -65,7 +68,11 @@ const QueriesTable = ({
   // - the SSR/CSR mix here has made this a little complex
   const [showSkeletonRefresh, setShowSkeletonRefresh] = useState(false);
 
-  const { data: queries, isLoading } = useQuery<Paginated<Query>>({
+  const {
+    data: queries,
+    isLoading,
+    dataUpdatedAt,
+  } = useQuery<Paginated<Query>>({
     queryKey,
     queryFn: async () => {
       const searchParamsObject = buildQueryHistoryParams({
@@ -75,12 +82,13 @@ const QueriesTable = ({
         search_term: searchParams.get("search_term") ?? undefined,
       });
 
-      const res = await getQueries({
-        params: searchParamsObject.toString(),
-      });
+      const res = await routeGet<ApiResponse<Paginated<Query>>>(
+        routes.api.queries(searchParamsObject),
+      );
       return res.data;
     },
     initialData,
+    initialDataUpdatedAt: fetchedAt,
     staleTime: 2 * defaults.tableRefresh,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
@@ -94,8 +102,8 @@ const QueriesTable = ({
     },
   });
   useEffect(() => {
-    qc.setQueryData(queryKey, initialData);
-  }, [qc, queryKey, initialData]);
+    setQueryDataIfNewer(qc, queryKey, initialData, fetchedAt);
+  }, [qc, queryKey, initialData, fetchedAt]);
 
   const columns: MRT_ColumnDef<Query>[] = [
     {
@@ -236,6 +244,7 @@ const QueriesTable = ({
       >
         <QueryResultsTable
           initialData={row.original}
+          fetchedAt={dataUpdatedAt}
           useTableProps={{ enableRowSelection: false }}
           tableProps={{
             leftAction: {

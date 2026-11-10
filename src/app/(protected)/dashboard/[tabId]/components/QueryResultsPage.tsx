@@ -15,6 +15,12 @@ interface PageProps {
   searchParams: PageSearchParams;
 }
 
+const loadQuery = async (pid: string, params: URLSearchParams) => {
+  const queryData = await getQuery(pid, { params });
+
+  return { queryData, fetchedAt: Date.now() };
+};
+
 const QueryResultsPageContent = async ({
   searchParams,
 }: {
@@ -24,9 +30,10 @@ const QueryResultsPageContent = async ({
 
   const searchParamsObject = buildQueryHistoryParams(rest);
 
-  const queryData = await getQuery(query as string, {
-    params: searchParamsObject,
-  });
+  const { queryData, fetchedAt } = await loadQuery(
+    query as string,
+    searchParamsObject,
+  );
 
   return (
     <>
@@ -44,6 +51,7 @@ const QueryResultsPageContent = async ({
       <Divider />
       <QueryResultsTable
         initialData={queryData.data}
+        fetchedAt={fetchedAt}
         initialSearchParams={searchParamsObject}
         useTableProps={{ enableRowSelection: false }}
         tableProps={{
