@@ -9,6 +9,7 @@ import { useNotify } from "@/providers/NotifyProvider";
 import FormMultiSelect from "@/components/FormMultiSelect";
 import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
 import useAdminStore from "@/hooks/useAdminStore";
+import { useAdminSection } from "@/contexts/AdminSectionContext";
 
 interface CreateCollectionProps {
   onCancel?: () => void;
@@ -16,7 +17,7 @@ interface CreateCollectionProps {
 
 const CreateWorkgroup = ({ onCancel }: CreateCollectionProps) => {
   const createWorkgroup = useAdminStore((s) => s.createWorkgroup);
-  const collections = useAdminStore((s) => s.allAprovedCollections);
+  const collections = useAdminSection()?.collections ?? [];
   const addCollectionsToWorkgroup = useAdminStore(
     (s) => s.addCollectionsToWorkgroup,
   );

@@ -1,4 +1,6 @@
 "use client";
+
+import { CollectionHost } from "@/types/api";
 import {
   Chip,
   Box,
@@ -25,7 +27,6 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useNotify } from "@/providers/NotifyProvider";
 import FormDropdown from "@/components/FormDropdown";
 import DistributionStatus from "../DistributionStatus";
-import useCustodianStore from "@/hooks/useCustodianStore";
 import FormLabel from "@/components/FormLabel";
 import saveCollection from "@/actions/collection/saveCollection";
 import { describeCollectionSave } from "@/utils/collectionSave";
@@ -33,7 +34,6 @@ import SquareCheckbox from "@/components/SquareCheckbox";
 import ManageCollectionStatus from "@/modules/ManageCollectionStatus";
 import CopyableVariable from "@/components/CopyableVariable";
 import ErrorHeader from "@/components/ErrorHeader";
-import { useAdminDataStore } from "@/store/adminDataStore";
 import UpdatePanel from "@/components/UpdatePanel";
 import { useThreePane } from "@/providers/ThreePaneProvider";
 import { FieldConfigMap, useSaveChanges } from "@/hooks/useSaveChanges";
@@ -41,6 +41,10 @@ import { useIsAdminSection } from "@/contexts/AdminSectionContext";
 import { clampRunTimeFrequency, getFrequencyModeKey } from "@/utils/frequency";
 import CollectionHostCredentials from "@/modules/CollectionHostCredentials";
 import { useSessionData } from "@/contexts/SessionDataContext";
+import { useCustodianSectionHosts } from "@/contexts/CustodianSectionContext";
+import { useAdminSection } from "@/contexts/AdminSectionContext";
+
+const NO_HOSTS: CollectionHost[] = [];
 
 export type UpdateCollectionProps = {
   collection: CollectionWithHosts;
@@ -112,10 +116,8 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
   const isAdmin = useIsAdminSection();
   const hostId = collection.host?.id;
 
-  const currentCollectionHosts = useCustodianStore(
-    (s) => s.current.collectionHosts,
-  );
-  const collectionHosts = useAdminDataStore((s) => s.collectionHosts);
+  const currentCollectionHosts = useCustodianSectionHosts() ?? NO_HOSTS;
+  const collectionHosts = useAdminSection()?.collectionHosts ?? NO_HOSTS;
   const workgroups = useSessionData().workgroups;
 
   const notify = useNotify();

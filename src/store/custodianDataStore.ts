@@ -7,7 +7,6 @@ import createCustodianCollectionWithConfig from "@/actions/collection/createCust
 import {
   ApiResponse,
   Collection,
-  Custodian,
   CreateCollectionPost,
   CreateCollectionConfigPost,
   UpdateCollectionHostPayload,
@@ -18,13 +17,6 @@ import {
 import transitionCollections from "@/actions/collection/transitionCollections";
 
 export interface CustodianDataStoreState {
-  current: {
-    custodian: Custodian | null;
-    setCustodian: (custodian: Custodian | null) => void;
-
-    collectionHosts: CollectionHost[];
-    setCollectionHosts: (collectionHosts: CollectionHost[]) => void;
-  };
   createCollectionHost: (
     custodianId: number,
     payload: { name: string; context: string },
@@ -46,25 +38,7 @@ export interface CustodianDataStoreState {
   toggleCollectionActive: (collection: CollectionWithHosts) => Promise<string>;
 }
 
-export const useCustodianDataStore = create<CustodianDataStoreState>((set) => ({
-  current: {
-    custodian: null,
-    setCustodian: (custodian) =>
-      set((state) => ({
-        ...state,
-        current: { ...state.current, custodian },
-      })),
-
-    collectionHosts: [],
-    setCollectionHosts: (collectionHosts) =>
-      set((state) => ({
-        ...state,
-        current: {
-          ...state.current,
-          collectionHosts,
-        },
-      })),
-  },
+export const useCustodianDataStore = create<CustodianDataStoreState>(() => ({
   createCollectionHost: async (custodianId, payload) => {
     await createCollectionHost(custodianId, payload);
   },

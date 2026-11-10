@@ -10,6 +10,7 @@ import { Box, Chip } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { useConfirm } from "@/hooks/useConfirm";
+import { useCustodianSection } from "@/contexts/CustodianSectionContext";
 
 interface ManageMultipleCollectionsStatusProps {
   collections: Collection[];
@@ -22,7 +23,7 @@ const ManageMultipleCollectionsStatus = ({
 }: ManageMultipleCollectionsStatusProps) => {
   const { control, setValue } = useFormContext<UpdateCollectionFormValues>();
 
-  const currentCustodian = useCustodianStore((s) => s.current.custodian);
+  const currentCustodian = useCustodianSection();
   const requestCollectionMadeActive = useCustodianStore(
     (s) => s.requestCollectionMadeActive,
   );

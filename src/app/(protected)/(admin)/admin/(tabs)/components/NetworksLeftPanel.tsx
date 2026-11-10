@@ -9,13 +9,14 @@ import useAdminStore from "@/hooks/useAdminStore";
 import CreateNetwork from "@/modules/CreateNetwork";
 import { useConfirm } from "@/hooks/useConfirm";
 import { useThreePane } from "@/providers/ThreePaneProvider";
+import { useNetworks } from "@/contexts/NetworksContext";
 
 const NetworksLeftPanel = () => {
   const { expandedLeft, toggleLeft } = useThreePane();
 
   const selectedNetwork = useAdminStore((s) => s.selectedNetwork);
   const setSelectedNetwork = useAdminStore((s) => s.setSelectedNetwork);
-  const networks = useAdminStore((s) => s.networks);
+  const networks = useNetworks();
   const deleteNetwork = useAdminStore((s) => s.deleteNetwork);
 
   const { getSearchParam, setSearchParam } = useSearchParams("network_filter");

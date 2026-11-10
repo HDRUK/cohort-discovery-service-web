@@ -23,7 +23,6 @@ import { trueKeys } from "@/utils/numbers";
 import { useLogDependencyChanges } from "@/utils/deps";
 import deleteCollections from "@/actions/collection/deleteCollections";
 import restoreCollection from "@/actions/collection/restoreCollection";
-import useCustodianStore from "@/hooks/useCustodianStore";
 import useUserStore from "@/hooks/useUserStore";
 import { useConfirm } from "@/hooks/useConfirm";
 import { useNotify } from "@/providers/NotifyProvider";
@@ -35,6 +34,7 @@ import CollectionDetails from "./CollectionDetails";
 import useFeatures from "@/hooks/useFeatures";
 import { useQueryClient } from "@tanstack/react-query";
 import { CollectionFilterStatus } from "@/types/collections";
+import { useCustodianSection } from "@/contexts/CustodianSectionContext";
 
 export interface CollectionsTableProps extends TableProps {
   collections?: Paginated<CollectionWithHosts>;
@@ -61,7 +61,7 @@ const CollectionsTable = ({
 
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
 
-  const currentCustodian = useCustodianStore((s) => s.current.custodian);
+  const currentCustodian = useCustodianSection();
   const isAdmin = useMemo(() => !currentCustodian, [currentCustodian]);
   const selectedCollections = useUserStore((s) => s.selectedCollections);
   const setSelectedCollections = useUserStore((s) => s.setSelectedCollections);

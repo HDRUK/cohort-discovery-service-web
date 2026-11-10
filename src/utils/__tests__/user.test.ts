@@ -1,6 +1,7 @@
 import { Collection, CombinedUser } from "@/types/api";
 import {
   hasSyntheticSelection,
+  isCustodianMember,
   isOnlyInDefaultWorkgroup,
   isQuotaExhausted,
 } from "../user";
@@ -72,5 +73,23 @@ describe("hasSyntheticSelection", () => {
 
   it("is false when only real collections are selected", () => {
     expect(hasSyntheticSelection(["real"], collections)).toBe(false);
+  });
+});
+
+describe("isCustodianMember", () => {
+  const member = userWith({
+    custodians: [{ pid: "custodian-a" }],
+  } as Partial<CombinedUser>);
+
+  it("is true for a custodian the user belongs to", () => {
+    expect(isCustodianMember(member, "custodian-a")).toBe(true);
+  });
+
+  it("is false for any other custodian", () => {
+    expect(isCustodianMember(member, "custodian-b")).toBe(false);
+  });
+
+  it("is false without a user", () => {
+    expect(isCustodianMember(null, "custodian-a")).toBe(false);
   });
 });

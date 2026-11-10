@@ -59,13 +59,8 @@ describe("UpdateCollection", () => {
     return render(
       <MockCohortDiscoveryServiceStore
         overrides={{
-          custodian: {
-            current: {
-              custodian,
-              collectionHosts,
-            },
-          },
-          admin: {
+          custodianSection: {
+            custodian,
             collectionHosts,
           },
           session: {

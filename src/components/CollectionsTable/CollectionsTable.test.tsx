@@ -39,10 +39,8 @@ describe("CollectionsTable", () => {
     render(
       <MockCohortDiscoveryServiceStore
         overrides={{
-          custodian: {
-            current: {
-              custodian: getCustodian(),
-            },
+          custodianSection: {
+            custodian: getCustodian(),
           },
         }}
       >

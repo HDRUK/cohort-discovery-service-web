@@ -1,21 +1,35 @@
 "use client";
 
-import { createContext, use, useContext, useEffect, useMemo } from "react";
-import { redirect } from "next/navigation";
-import { Paper } from "@mui/material";
+import { createContext, ReactNode, use, useContext, useMemo } from "react";
 
-import SkeletonFull from "@/components/SkeletonFull";
-import useCustodianStore from "@/hooks/useCustodianStore";
 import type { ApiResponse, CollectionHost, Custodian } from "@/types/api";
-import { useSessionData } from "@/contexts/SessionDataContext";
+
+export interface CustodianSectionData {
+  custodian: Custodian;
+  collectionHosts: CollectionHost[];
+}
 
 type Props = {
   custodian: Promise<ApiResponse<Custodian>>;
   collectionHosts: Promise<ApiResponse<CollectionHost[]>>;
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
-const CustodianSectionContext = createContext<Custodian | null>(null);
+const CustodianSectionContext = createContext<CustodianSectionData | null>(
+  null,
+);
+
+export const CustodianSectionDataProvider = ({
+  value,
+  children,
+}: {
+  value: CustodianSectionData;
+  children: ReactNode;
+}) => (
+  <CustodianSectionContext.Provider value={value}>
+    {children}
+  </CustodianSectionContext.Provider>
+);
 
 export function CustodianSectionProvider({
   custodian: custodianPromise,
@@ -24,43 +38,16 @@ export function CustodianSectionProvider({
 }: Props) {
   const { data: custodian } = use(custodianPromise);
   const { data: collectionHosts } = use(collectionHostsPromise);
-  const user = useSessionData().user;
 
-  const setCurrentCustodian = useCustodianStore((s) => s.current.setCustodian);
-  const setCurrentCollectionHosts = useCustodianStore(
-    (s) => s.current.setCollectionHosts,
+  const value = useMemo<CustodianSectionData>(
+    () => ({ custodian, collectionHosts }),
+    [custodian, collectionHosts],
   );
 
-  useEffect(() => {
-    setCurrentCustodian(custodian);
-  }, [custodian, setCurrentCustodian]);
-
-  useEffect(() => {
-    setCurrentCollectionHosts(collectionHosts);
-  }, [collectionHosts, setCurrentCollectionHosts]);
-
-  const allowed = useMemo(() => {
-    if (!user) return false; // unknown/loading
-    const pids = user.custodians?.map((c) => c.pid) ?? [];
-    return pids.includes(custodian.pid);
-  }, [user, custodian.pid]);
-
-  if (user && !allowed) {
-    redirect("/403?reason=no-access-custodian");
-  }
-
-  if (!user) {
-    return (
-      <Paper sx={{ display: "flex", height: "100%" }}>
-        <SkeletonFull />
-      </Paper>
-    );
-  }
-
   return (
-    <CustodianSectionContext.Provider value={custodian}>
+    <CustodianSectionDataProvider value={value}>
       {children}
-    </CustodianSectionContext.Provider>
+    </CustodianSectionDataProvider>
   );
 }
 
@@ -68,8 +55,12 @@ export function CustodianSectionProvider({
  * Returns section info if you're in the custodian layout, otherwise null.
  * (This makes it safe for components reused elsewhere.)
  */
-export function useCustodianSection() {
-  return useContext(CustodianSectionContext);
+export function useCustodianSection(): Custodian | null {
+  return useContext(CustodianSectionContext)?.custodian ?? null;
+}
+
+export function useCustodianSectionHosts(): CollectionHost[] | null {
+  return useContext(CustodianSectionContext)?.collectionHosts ?? null;
 }
 
 /** Convenience boolean hook */
