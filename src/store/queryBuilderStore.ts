@@ -145,6 +145,9 @@ export interface QueryBuilderStoreState {
 
   hasSelectedSyntheticDatasets: boolean;
 
+  ownerId: number | null;
+  resetSelectedDatasetsFor: (ownerId: number) => void;
+
   initialiseSelectedDatasets: (
     collections: Collection[],
     includeSynthetic: boolean,
@@ -499,6 +502,15 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     }));
   },
 
+  ownerId: null,
+  resetSelectedDatasetsFor: (ownerId) =>
+    set((state) => ({
+      ...state,
+      ownerId,
+      selectedDatasets: [],
+      hasSelectedSyntheticDatasets: false,
+    })),
+
   hasSelectedSyntheticDatasets: false,
   selectedDatasets: [],
   setSelectedDatasets: (pids) => {
@@ -618,6 +630,7 @@ export const useQueryBuilderStore = create<QueryBuilderStoreState>()(
     partialize: (state) => ({
       selectedDatasets: state.selectedDatasets,
       hasSelectedSyntheticDatasets: state.hasSelectedSyntheticDatasets,
+      ownerId: state.ownerId,
     }),
   }),
 );
