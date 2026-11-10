@@ -7,8 +7,13 @@ import useAdminStore from "@/hooks/useAdminStore";
 import { useNotify } from "@/providers/NotifyProvider";
 import UserTable from "@/components/UserTable";
 import useFeatures from "@/hooks/useFeatures";
+import { CollectionWithHosts, Paginated } from "@/types/api";
 
-const WorkgroupsMiddlePanel = () => {
+const WorkgroupsMiddlePanel = ({
+  collections,
+}: {
+  collections?: Paginated<CollectionWithHosts>;
+}) => {
   const { manageWorkgroupsInternal } = useFeatures();
 
   const selectedWorkgroup = useAdminStore((s) => s.selectedWorkgroup);
@@ -35,6 +40,7 @@ const WorkgroupsMiddlePanel = () => {
         <Stack gap={2}>
           <Box>
             <CollectionsTable
+              collections={collections}
               tableTitle={`${formatWorkgroupName(selectedWorkgroup?.name)} Workgroup`}
               tableSubTitle="Collections"
               deleteOverride={async (ids: string[]) => {

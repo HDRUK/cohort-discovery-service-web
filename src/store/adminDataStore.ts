@@ -12,8 +12,6 @@ import {
   AddCollectionsToWorkgroupPost,
   RemoveCollectionsFromWorkgroupPost,
   CollectionHost,
-  Paginated,
-  CollectionWithHosts,
   User,
   RemoveUsersFromWorkgroupPost,
   Network,
@@ -22,7 +20,6 @@ import {
   RemoveCustodiansFromNetworkPost,
   UpdateNetworkPost,
 } from "@/types/api";
-import { emptyPaginated } from "@/utils/pagination";
 import removeUserFromWorkgroup from "@/actions/workgroup/removeUsersFromWorkgroup";
 import createNetwork from "@/actions/network/createNetwork";
 import addCustodiansToNetwork from "@/actions/network/addCustodiansToNetwork";
@@ -33,10 +30,6 @@ import updateNetwork from "@/actions/network/updateNetwork";
 export interface AdminDataStoreState {
   users: User[];
   setUsers: (users: User[]) => void;
-
-  // for collections the admin searches on in the tables
-  collections: Paginated<CollectionWithHosts>;
-  setCollections: (collections: Paginated<CollectionWithHosts>) => void;
 
   // for all collections needed when assigning workgroups
   allAprovedCollections: Collection[];
@@ -95,13 +88,6 @@ export const useAdminDataStore = create<AdminDataStoreState>((set) => ({
     set((state) => ({
       ...state,
       allAprovedCollections,
-    })),
-
-  collections: emptyPaginated<CollectionWithHosts>([]),
-  setCollections: (collections) =>
-    set((state) => ({
-      ...state,
-      collections,
     })),
 
   collectionHosts: [],

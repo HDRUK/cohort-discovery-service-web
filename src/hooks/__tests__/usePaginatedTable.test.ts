@@ -25,6 +25,15 @@ jest.mock("next/navigation", () => ({
 
 jest.mock("../useTable");
 
+let mockIsPending = false;
+
+jest.mock("@/contexts/SearchParamsTransitionContext", () => ({
+  useSearchParamsTransition: () => ({
+    isPending: mockIsPending,
+    startTransition: (callback: () => void) => callback(),
+  }),
+}));
+
 const mockUseTable = useTable as jest.MockedFunction<typeof useTable>;
 
 const COLUMNS: MRT_ColumnDef<Row>[] = [{ accessorKey: "name", header: "Name" }];
@@ -41,6 +50,7 @@ const lastOptions = (): MRT_TableOptions<Row> =>
 
 const setup = (query = "", options: SetupOptions = {}) => {
   mockSearchParams = new URLSearchParams(query);
+  mockIsPending = false;
   mockUseTable.mockReturnValue({} as ReturnType<typeof useTable<Row>>);
   return renderHook(() =>
     usePaginatedTable<Row>({
@@ -176,6 +186,7 @@ describe("options passed to useTable", () => {
       pagination: { pageIndex: 1, pageSize: PER_PAGE_DEFAULT },
       sorting: [{ id: "name", desc: true }],
       isLoading: true,
+      showLoadingOverlay: false,
     });
   });
 
@@ -255,6 +266,57 @@ describe("expandFirstRow", () => {
     expect(lastOptions().initialState).toEqual({
       columnVisibility: { name: false },
       expanded: { abc: true },
+    });
+  });
+});
+
+describe("pending display", () => {
+  const setupPending = (options: SetupOptions = {}) => {
+    const result = setup("", options);
+    mockIsPending = true;
+    result.rerender();
+    return result;
+  };
+
+  it("shows skeleton rows when there is no data yet", () => {
+    setup("", { data: undefined });
+
+    expect(lastOptions().state?.isLoading).toBe(true);
+    expect(lastOptions().data).toEqual([]);
+  });
+
+  it("shows skeleton rows while params change by default", () => {
+    setupPending();
+
+    expect(lastOptions().state?.isLoading).toBe(true);
+    expect(lastOptions().muiTableBodyProps).toMatchObject({
+      "aria-busy": true,
+    });
+  });
+
+  it("keeps the previous rows while params change when asked to", () => {
+    setupPending({ showSkeletonWhilePending: false });
+
+    expect(lastOptions().state?.isLoading).toBe(false);
+    expect(lastOptions().data).toEqual(ROWS);
+    expect(lastOptions().muiTableBodyProps).toMatchObject({
+      "aria-busy": true,
+      sx: { opacity: 0.5 },
+    });
+  });
+
+  it("still shows skeleton rows with no data when keeping previous rows", () => {
+    setup("", { data: undefined, showSkeletonWhilePending: false });
+
+    expect(lastOptions().state?.isLoading).toBe(true);
+  });
+
+  it("isn't busy once the data has loaded", () => {
+    setup();
+
+    expect(lastOptions().state?.isLoading).toBe(false);
+    expect(lastOptions().muiTableBodyProps).toMatchObject({
+      "aria-busy": false,
     });
   });
 });

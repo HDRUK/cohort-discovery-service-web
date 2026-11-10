@@ -28,14 +28,8 @@ describe("CollectionsTable", () => {
     props?: CollectionsTableProps,
   ) =>
     render(
-      <MockCohortDiscoveryServiceStore
-        overrides={{
-          admin: {
-            collections,
-          },
-        }}
-      >
-        <CollectionsTable {...props} />
+      <MockCohortDiscoveryServiceStore>
+        <CollectionsTable collections={collections} {...props} />
       </MockCohortDiscoveryServiceStore>,
     );
 
@@ -49,12 +43,11 @@ describe("CollectionsTable", () => {
           custodian: {
             current: {
               custodian: getCustodian(),
-              collections,
             },
           },
         }}
       >
-        <CollectionsTable {...props} />
+        <CollectionsTable collections={collections} {...props} />
       </MockCohortDiscoveryServiceStore>,
     );
 
@@ -76,6 +69,17 @@ describe("CollectionsTable", () => {
         screen.getByRole("columnheader", { name: column }),
       ).toBeInTheDocument();
     }
+  });
+
+  it("marks the table busy until the collections have loaded", () => {
+    render(
+      <MockCohortDiscoveryServiceStore>
+        <CollectionsTable />
+      </MockCohortDiscoveryServiceStore>,
+    );
+
+    expect(document.querySelector('tbody[aria-busy="true"]')).not.toBeNull();
+    expect(screen.queryByText("Test Dataset #1")).not.toBeInTheDocument();
   });
 
   it("displays data when collections exist for admin", async () => {
