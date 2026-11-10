@@ -106,8 +106,6 @@ export interface CreateQuery {
   task_count: number;
   task_pids: string[];
 }
-export type Tasks = string[];
-
 export interface Distribution extends WithTimestamps {
   id: number;
   collection_id: number;
