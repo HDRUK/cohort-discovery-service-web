@@ -1,28 +1,19 @@
-import getCollectionDetails from "@/actions/collection/getCollectionDetails";
 import { useTable } from "@/hooks/useTable";
 import {
   CollectionDetails as CollectionDetailsType,
   ResultFile,
 } from "@/types/api";
 import { Skeleton, Stack } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
 import { MRT_ColumnDef } from "material-react-table";
 import { useMemo } from "react";
 import Table from "../Table";
 import { formatNumber } from "@/utils/numbers";
 import { getDatetime } from "@/utils/date";
 import { useTransposedTable } from "@/hooks/useTransposedTable";
-import { QUERY_KEYS } from "@/config/tags";
+import useCollectionDetails from "./useCollectionDetails";
 
 const CollectionDetails = ({ pid }: { pid: string }) => {
-  const { data: details, isLoading } = useQuery<CollectionDetailsType>({
-    queryKey: QUERY_KEYS.collectionDetails(pid),
-    queryFn: async () => getCollectionDetails(pid),
-    enabled: !!pid,
-    refetchOnMount: true,
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-  });
+  const { data: details, isLoading } = useCollectionDetails(pid);
 
   const detailsTable = useTransposedTable<CollectionDetailsType>({
     data: details,

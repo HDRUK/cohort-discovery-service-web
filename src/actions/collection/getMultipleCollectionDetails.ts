@@ -12,7 +12,7 @@ const getMultipleCollectionDetails = async (
 
   const results = await Promise.all(
     uniquePids.map(
-      async (pid) => [pid, await getCollectionDetails(pid)] as const,
+      async (pid) => [pid, (await getCollectionDetails(pid)).data] as const,
     ),
   );
 

@@ -32,7 +32,6 @@ import StatusChip from "@/components/StatusChip";
 import { TableProps } from "../Table/Table";
 import SyntheticChip from "../SyntheticChip";
 import CollectionDetails from "./CollectionDetails";
-import usePrefetchCollectionDetails from "./usePrefetchCollectionDetails";
 import useFeatures from "@/hooks/useFeatures";
 import { useQueryClient } from "@tanstack/react-query";
 import { CollectionFilterStatus } from "@/types/collections";
@@ -211,10 +210,6 @@ const CollectionsTable = ({
     ],
     [showPid],
   );
-
-  usePrefetchCollectionDetails({
-    pids: adminMoreCollectionDetails && rows ? rows.map((c) => c.pid) : [],
-  });
 
   const table = usePaginatedTable<Collection>({
     columns,
