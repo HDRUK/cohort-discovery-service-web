@@ -1,71 +1,51 @@
-/**
- * @jest-environment node
- */
-import jwt from "jsonwebtoken";
-import { SessionRedirectArgs, sessionRedirect } from "../sessionRedirect";
+import { isSessionExpired, signedOutRedirect } from "../sessionRedirect";
 
-const NOW = 1_700_000_000;
-
-const tokenExpiringAt = (exp: number) =>
-  jwt.sign({ user: { id: 1 }, exp }, "test-secret");
-
-const redirectFor = (args: Partial<SessionRedirectArgs>) =>
-  sessionRedirect({
-    token: undefined,
-    nowSeconds: NOW,
-    pathname: "/admin/collections",
-    search: "",
-    standalone: true,
-    ...args,
-  });
-
-describe("sessionRedirect", () => {
-  it("sends a logged-out standalone user to login with a return path", () => {
-    expect(redirectFor({ search: "?page=2" })).toBe(
+describe("signedOutRedirect", () => {
+  it("sends a standalone user to login with the page they asked for", () => {
+    expect(signedOutRedirect(true, "/admin/collections?page=2")).toBe(
       "/login?return_to=%2Fadmin%2Fcollections%3Fpage%3D2",
     );
   });
 
-  it("sends a logged-out standalone user at the root to plain login", () => {
-    expect(redirectFor({ pathname: "/" })).toBe("/login");
+  it.each([
+    ["the root", "/"],
+    ["no known path", null],
+  ])("sends a standalone user at %s to plain login", (_, requestedPath) => {
+    expect(signedOutRedirect(true, requestedPath)).toBe("/login");
   });
 
-  it("sends a logged-out integrated user to the no-token 403", () => {
-    expect(redirectFor({ standalone: false })).toBe("/403?reason=no-token");
-  });
-
-  it("treats a token that does not decode as missing", () => {
-    expect(redirectFor({ token: "not-a-jwt", standalone: false })).toBe(
+  it("sends an integrated user to the no-token 403", () => {
+    expect(signedOutRedirect(false, "/admin/collections")).toBe(
       "/403?reason=no-token",
     );
   });
 
-  it("sends an expired token to logout", () => {
-    expect(redirectFor({ token: tokenExpiringAt(NOW) })).toBe(
-      "/api/auth/logout",
-    );
-  });
-
-  it("lets a valid token through", () => {
-    expect(redirectFor({ token: tokenExpiringAt(NOW + 60) })).toBeNull();
-  });
-
-  it.each(["/login", "/auth/sso/callback", "/about/privacy-policy", "/403"])(
-    "ignores the public path %s",
-    (pathname) => {
-      expect(redirectFor({ pathname })).toBeNull();
-    },
-  );
-
-  it("does not treat a path that only shares a prefix as public", () => {
-    expect(redirectFor({ pathname: "/login-history" })).not.toBeNull();
-  });
-
   it("returns relative paths only", () => {
     [
-      redirectFor({}),
-      redirectFor({ standalone: false }),
-      redirectFor({ token: tokenExpiringAt(NOW) }),
+      signedOutRedirect(true, "/term-directory"),
+      signedOutRedirect(true, null),
+      signedOutRedirect(false, "/term-directory"),
     ].forEach((path) => expect(path).toMatch(/^\/[^/]/));
+  });
+});
+
+describe("isSessionExpired", () => {
+  const NOW = 1_700_000_000;
+
+  it("treats a token at or past its expiry as expired", () => {
+    expect(isSessionExpired(NOW, NOW)).toBe(true);
+    expect(isSessionExpired(NOW - 1, NOW)).toBe(true);
+  });
+
+  it("keeps a token before its expiry", () => {
+    expect(isSessionExpired(NOW + 60, NOW)).toBe(false);
+  });
+
+  it("keeps a token without an expiry", () => {
+    expect(isSessionExpired(undefined, NOW)).toBe(false);
+  });
+
+  it("can't decide without the request time", () => {
+    expect(isSessionExpired(NOW - 60, 0)).toBe(false);
   });
 });
