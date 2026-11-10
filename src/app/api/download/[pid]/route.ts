@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { parseDownloadParams } from "@/utils/download";
+import { isPid } from "@/utils/routeParams";
 const baseURL = process.env.API_BASE_URL!;
 
 export async function GET(
@@ -9,6 +10,9 @@ export async function GET(
   { params }: { params: Promise<{ pid: string }> },
 ) {
   const { pid } = await params;
+  if (!isPid(pid)) {
+    return new Response("Invalid pid", { status: 400 });
+  }
   const downloadParams = parseDownloadParams(new URL(req.url).searchParams);
   if (!downloadParams) {
     return new Response("Unsupported download", { status: 400 });
