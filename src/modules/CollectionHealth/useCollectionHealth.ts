@@ -9,7 +9,7 @@ import { routes } from "@/config/routes";
 import { QUERY_KEYS } from "@/config/tags";
 import useTaskPolling from "@/hooks/useTaskPolling";
 import { useDefaults } from "@/providers/DefaultProvider";
-import { routeGet } from "@/lib/routeGet";
+import { routeGet } from "@/lib/routeFetch";
 import { useNotify } from "@/providers/NotifyProvider";
 import {
   ApiResponse,

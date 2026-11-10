@@ -16,7 +16,7 @@ import {
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { routeGet } from "@/lib/routeGet";
+import { routeGet } from "@/lib/routeFetch";
 import { ApiResponse, Query } from "@/types/api";
 import rerunQuery from "@/actions/query/rerunQuery";
 import {

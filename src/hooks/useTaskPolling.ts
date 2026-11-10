@@ -7,7 +7,7 @@ import { useQueries } from "@tanstack/react-query";
 import { routes } from "@/config/routes";
 import { QUERY_KEYS } from "@/config/tags";
 import { DEFAULT_REFRESH_TABLE } from "@/config/defaults";
-import { routeGet } from "@/lib/routeGet";
+import { routeGet } from "@/lib/routeFetch";
 import { ApiResponse, Task } from "@/types/api";
 
 const useTaskPolling = (

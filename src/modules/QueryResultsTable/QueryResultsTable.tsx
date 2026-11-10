@@ -14,7 +14,7 @@ import { DEFAULT_STATUS_LABELS } from "@/config/defaults";
 import { getTaskResultStatus } from "@/utils/tasks";
 import Table from "../../components/Table";
 import { TableProps } from "../../components/Table/Table";
-import { routeGet } from "@/lib/routeGet";
+import { routeGet } from "@/lib/routeFetch";
 import { routes } from "@/config/routes";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import QueryHistoryGuidance from "../QueryHistory";
