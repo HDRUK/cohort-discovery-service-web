@@ -1,4 +1,4 @@
-"use server";
+import "server-only";
 
 import { ApiResponse, SignInResponse } from "@/types/api";
 import { API_ROUTES } from "@/lib/apiRoutes";
