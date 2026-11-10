@@ -8,7 +8,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useState } from "react";
 import { filterDatasetChipSx } from "@/components/FilterDatasets/FilterDatasets";
 import SearchBox from "@/components/SearchBox";
 import SquareCheckbox from "@/components/SquareCheckbox";
@@ -25,6 +25,8 @@ const CollectionFilter = () => {
   const userCollections = useSessionData().userCollections;
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+
+  useLayoutEffect(() => () => setAnchorEl(null), []);
   const [searchTerm, setSearchTerm] = useState<string>();
   const { debounced: debouncedSearchTerm } = useDebounce(searchTerm, {});
 
