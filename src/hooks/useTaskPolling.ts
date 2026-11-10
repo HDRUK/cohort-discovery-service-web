@@ -4,9 +4,11 @@
 
 import { useRef } from "react";
 import { useQueries } from "@tanstack/react-query";
-import getTask from "@/actions/task/getTask";
+import { routes } from "@/config/routes";
 import { QUERY_KEYS } from "@/config/tags";
 import { DEFAULT_REFRESH_TABLE } from "@/config/defaults";
+import { routeGet } from "@/lib/routeGet";
+import { ApiResponse, Task } from "@/types/api";
 
 const useTaskPolling = (
   runStates: Record<string, Set<string>>,
@@ -18,13 +20,11 @@ const useTaskPolling = (
     queries: Object.entries(runStates).flatMap(([key, taskPids]) =>
       Array.from(taskPids).map((taskPid) => ({
         queryKey: QUERY_KEYS.task(taskPid),
-        queryFn: () => getTask(taskPid),
+        queryFn: () => routeGet<ApiResponse<Task>>(routes.api.task(taskPid)),
         refetchOnMount: false,
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
-        refetchInterval: (query: {
-          state: { data?: Awaited<ReturnType<typeof getTask>> };
-        }) => {
+        refetchInterval: (query: { state: { data?: ApiResponse<Task> } }) => {
           const task = query.state.data?.data;
           if (!task?.completed_at && !task?.failed_at)
             return DEFAULT_REFRESH_TABLE;

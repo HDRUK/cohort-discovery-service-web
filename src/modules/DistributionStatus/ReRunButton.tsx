@@ -1,6 +1,5 @@
-import getTask from "@/actions/task/getTask";
 import { useDefaults } from "@/providers/DefaultProvider";
-import { Query } from "@/types/api";
+import { ApiResponse, Query, Task } from "@/types/api";
 import { TaskStatus } from "@/types/tasks";
 import { getTaskStatus } from "@/utils/tasks";
 import CheckIcon from "@mui/icons-material/Check";
@@ -9,6 +8,8 @@ import { Button, CircularProgress } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { QUERY_KEYS } from "@/config/tags";
+import { routes } from "@/config/routes";
+import { routeGet } from "@/lib/routeGet";
 
 interface ReRunButtonProps {
   onClick: () => Promise<Query>;
@@ -32,7 +33,8 @@ export const ReRunButton = ({ onClick, onSuccess }: ReRunButtonProps) => {
 
   const { data: taskResponse, isFetching } = useQuery({
     queryKey: QUERY_KEYS.task(submittedTaskPid!),
-    queryFn: () => getTask(submittedTaskPid!),
+    queryFn: () =>
+      routeGet<ApiResponse<Task>>(routes.api.task(submittedTaskPid!)),
     enabled: !!submittedTaskPid,
     refetchInterval: (query) => {
       const task = query.state.data?.data;
