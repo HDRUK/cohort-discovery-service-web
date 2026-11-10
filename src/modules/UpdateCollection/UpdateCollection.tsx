@@ -42,7 +42,7 @@ import { clampRunTimeFrequency, getFrequencyModeKey } from "@/utils/frequency";
 import CollectionHostCredentials from "@/modules/CollectionHostCredentials";
 import { useSessionData } from "@/contexts/SessionDataContext";
 import { useCustodianSectionHosts } from "@/contexts/CustodianSectionContext";
-import { useAdminSection } from "@/contexts/AdminSectionContext";
+import { useAdminCollectionHosts } from "@/contexts/AdminSectionContext";
 
 const NO_HOSTS: CollectionHost[] = [];
 
@@ -117,7 +117,7 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
   const hostId = collection.host?.id;
 
   const currentCollectionHosts = useCustodianSectionHosts() ?? NO_HOSTS;
-  const collectionHosts = useAdminSection()?.collectionHosts ?? NO_HOSTS;
+  const collectionHosts = useAdminCollectionHosts() ?? NO_HOSTS;
   const workgroups = useSessionData().workgroups;
 
   const notify = useNotify();

@@ -26,9 +26,7 @@ import { getLastName } from "@/utils/user";
 import { formatWorkgroupName } from "@/utils/workgroups";
 import { filterUsers } from "./userFilters";
 import { useSessionData } from "@/contexts/SessionDataContext";
-import { useAdminSection } from "@/contexts/AdminSectionContext";
-
-const NO_USERS: User[] = [];
+import { useAdminUsers } from "@/contexts/AdminSectionContext";
 
 const PAGE_PARAM = "users_page";
 const PER_PAGE_PARAM = "users_per_page";
@@ -60,7 +58,7 @@ const UserTable = ({
 
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
 
-  const users = useAdminSection()?.users ?? NO_USERS;
+  const users = useAdminUsers();
   const setSelectedUser = useAdminStore((s) => s.setSelectedUser);
   const [sorting, setSorting] = useState<MRT_SortingState>([]);
 
