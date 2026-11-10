@@ -18,7 +18,7 @@ import {
   useCustodianSection,
   useCustodianSectionHosts,
 } from "@/contexts/CustodianSectionContext";
-import { useAdminSection } from "@/contexts/AdminSectionContext";
+import { useAdminCollectionHosts } from "@/contexts/AdminSectionContext";
 
 const NO_HOSTS: CollectionHost[] = [];
 
@@ -30,7 +30,7 @@ const CreateCollection = ({ onCancel }: CreateCollectionProps) => {
   const createCollection = useCustodianStore((s) => s.createCollection);
   const currentCustodian = useCustodianSection();
   const currentCollectionHosts = useCustodianSectionHosts() ?? NO_HOSTS;
-  const collectionHosts = useAdminSection()?.collectionHosts ?? NO_HOSTS;
+  const collectionHosts = useAdminCollectionHosts() ?? NO_HOSTS;
   const custodians = useSessionData().custodians;
 
   const isAdmin = !currentCustodian;

@@ -1,10 +1,10 @@
 "use client";
-import { Box } from "@mui/material";
+import { Box, Skeleton } from "@mui/material";
 import List from "@/components/List";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import AddButton from "@/components/AddButton";
 import CreateWorkgroup from "@/modules/CreateWorkgroup";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, Suspense } from "react";
 import useSearchParams from "@/hooks/useSearchParams";
 import useAdminStore from "@/hooks/useAdminStore";
 import { useThreePane } from "@/providers/ThreePaneProvider";
@@ -58,7 +58,11 @@ const WorkgroupsLeftPanel = () => {
           disabled={expandedLeft}
         />
 
-        {expandedLeft && <CreateWorkgroup onCancel={toggleLeft} />}
+        {expandedLeft && (
+          <Suspense fallback={<Skeleton variant="rectangular" height={300} />}>
+            <CreateWorkgroup onCancel={toggleLeft} />
+          </Suspense>
+        )}
       </ActionMenuSection>
 
       <ActionMenuSection

@@ -11,13 +11,16 @@ import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
 import useAdminStore from "@/hooks/useAdminStore";
 import { useThreePane } from "@/providers/ThreePaneProvider";
 import { useSaveChanges } from "@/hooks/useSaveChanges";
-import { useAdminSection } from "@/contexts/AdminSectionContext";
+import {
+  useAdminCollections,
+  useAdminUsers,
+} from "@/contexts/AdminSectionContext";
 
 const UpdateWorkgroup = () => {
   const { expandedRight, toggleRight: onClose } = useThreePane();
 
-  const collections = useAdminSection()?.collections ?? [];
-  const users = useAdminSection()?.users ?? [];
+  const collections = useAdminCollections();
+  const users = useAdminUsers();
 
   const selectedWorkgroup = useAdminStore((s) => s.selectedWorkgroup);
 
