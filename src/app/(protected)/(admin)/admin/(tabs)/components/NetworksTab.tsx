@@ -29,7 +29,7 @@ const NetworksTab = async ({
     ...rest,
   });
 
-  const { data: networks } = await getNetworks(params.toString());
+  const { data: networks } = await getNetworks(params);
 
   return <NetworksAdmin networks={networks} />;
 };

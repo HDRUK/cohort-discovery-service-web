@@ -2,7 +2,7 @@ import WorkgroupsAdmin from "./WorkgroupsAdmin";
 import { CollectionsSearchParams } from "@/types/api";
 import { buildCollectionParams } from "@/utils/params";
 import { Box, Skeleton } from "@mui/material";
-import { getAdminCollections } from "@/server/data/collections";
+import { getAdminCollectionList } from "@/server/data/collections";
 import { DEFAULT_PER_PAGE } from "@/config/defaults";
 
 export const WorkgroupsSkeleton = () => (
@@ -29,7 +29,7 @@ const WorkgroupsTab = async ({
     ...rest,
   });
 
-  const { data: collections } = await getAdminCollections({ params });
+  const { data: collections } = await getAdminCollectionList({ params });
 
   return <WorkgroupsAdmin collections={collections} />;
 };
