@@ -9,17 +9,16 @@ const CohortBuilder = async (props: { query?: string }) => {
   const cookieStore = await cookies();
   const cookie = cookieStore?.get(QUERY_BUILDER_GUIDANCE_COOKIE);
 
-  const query = props.query ? await getQuery(props.query) : null;
-
   const searchParamsObject = buildQueryHistoryParams({
     page: 1,
     per_page: DEFAULT_QUERIES_DROPDOWN_PER_PAGE,
     sort: "created_at:desc",
   });
 
-  const { data: userQueries } = await getQueries({
-    params: searchParamsObject,
-  });
+  const [query, { data: userQueries }] = await Promise.all([
+    props.query ? getQuery(props.query) : null,
+    getQueries({ params: searchParamsObject }),
+  ]);
 
   return (
     <CohortBuilderClient
