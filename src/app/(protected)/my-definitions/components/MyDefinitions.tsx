@@ -2,7 +2,7 @@
 import { ConceptSet } from "@/types/api";
 import { useTable } from "@/hooks/useTable";
 import { type MRT_ColumnDef } from "material-react-table";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { Box, Grid } from "@mui/material";
 import dayjs from "dayjs";
 import ConceptTable from "./ConceptTable";
@@ -15,11 +15,6 @@ import useUserStore from "@/hooks/useUserStore";
 const MyDefinitions = ({ conceptSets }: { conceptSets: ConceptSet[] }) => {
   const removeConceptsFromSet = useUserStore((s) => s.removeConceptsFromSet);
   const removeConceptSet = useUserStore((s) => s.removeConceptSet);
-  const setConceptSets = useUserStore((s) => s.setConceptSets);
-
-  useEffect(() => {
-    setConceptSets(conceptSets);
-  }, [conceptSets, setConceptSets]);
 
   const onDelete = useCallback(
     async (id: number) => removeConceptSet(id),
