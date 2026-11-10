@@ -96,6 +96,25 @@ describe("request", () => {
     expect(redirect).not.toHaveBeenCalled();
   });
 
+  it("rethrows an aborted fetch unchanged instead of reporting a 500", async () => {
+    const aborted = new DOMException(
+      "This operation was aborted",
+      "AbortError",
+    );
+    global.fetch = jest.fn().mockRejectedValue(aborted);
+
+    await expect(apiGet("a-token", "/api/v1/queries")).rejects.toBe(aborted);
+  });
+
+  it("reports any other failure as a 500", async () => {
+    global.fetch = jest.fn().mockRejectedValue(new Error("socket hang up"));
+
+    await expect(apiGet("a-token", "/api/v1/queries")).rejects.toMatchObject({
+      status: 500,
+      message: "socket hang up",
+    });
+  });
+
   it("returns the error as a result in RESULT mode", async () => {
     global.fetch = respondWith(401, { message: "Unauthenticated" });
 
