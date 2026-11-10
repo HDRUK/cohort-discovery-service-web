@@ -61,7 +61,7 @@ const CollectionsTable = ({
 
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
 
-  const currentCustodian = useCustodianSection();
+  const currentCustodian = useCustodianSection()?.custodian;
   const isAdmin = useMemo(() => !currentCustodian, [currentCustodian]);
   const selectedCollections = useUserStore((s) => s.selectedCollections);
   const setSelectedCollections = useUserStore((s) => s.setSelectedCollections);

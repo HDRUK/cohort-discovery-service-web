@@ -21,7 +21,7 @@ type Props = {
 };
 
 const CollectionsManagement = ({ isAdmin, collections }: Props) => {
-  const custodian = useCustodianSection();
+  const custodian = useCustodianSection()?.custodian;
 
   if (!isAdmin && !custodian) return <Skeleton height={"100%"} />;
 

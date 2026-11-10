@@ -51,16 +51,8 @@ export function CustodianSectionProvider({
   );
 }
 
-/**
- * Returns section info if you're in the custodian layout, otherwise null.
- * (This makes it safe for components reused elsewhere.)
- */
-export function useCustodianSection(): Custodian | null {
-  return useContext(CustodianSectionContext)?.custodian ?? null;
-}
-
-export function useCustodianSectionHosts(): CollectionHost[] | null {
-  return useContext(CustodianSectionContext)?.collectionHosts ?? null;
+export function useCustodianSection(): CustodianSectionData | null {
+  return useContext(CustodianSectionContext);
 }
 
 /** Convenience boolean hook */
