@@ -1,6 +1,6 @@
 "use client";
 
-import { Query, Task, Result } from "../../types/api";
+import { ApiResponse, Query, Task, Result } from "../../types/api";
 import { MRT_TableOptions, type MRT_ColumnDef } from "material-react-table";
 import { CircularProgress, Link, Stack } from "@mui/material";
 import LaunchIcon from "@mui/icons-material/Launch";
@@ -14,16 +14,19 @@ import { DEFAULT_STATUS_LABELS } from "@/config/defaults";
 import { getTaskResultStatus } from "@/utils/tasks";
 import Table from "../../components/Table";
 import { TableProps } from "../../components/Table/Table";
-import getQuery from "@/actions/query/getQuery";
+import { routeGet } from "@/lib/routeGet";
+import { routes } from "@/config/routes";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import QueryHistoryGuidance from "../QueryHistory";
 import { useDefaults } from "@/providers/DefaultProvider";
 import TwoPaneSwimLaneLayout from "@/modules/TwoPaneSwimLaneLayout";
 import QueryResultsLocation from "./QueryResultsLocation";
 import { QUERY_KEYS } from "@/config/tags";
+import { setQueryDataIfNewer } from "@/utils/queryCache";
 
 interface QueryResultsTableProps {
   initialData: Query;
+  fetchedAt: number;
   initialSearchParams?: URLSearchParams;
   tableProps?: TableProps;
   useTableProps?: Omit<MRT_TableOptions<Task>, "data" | "columns">;
@@ -32,6 +35,7 @@ interface QueryResultsTableProps {
 
 const QueryResultsTable = ({
   initialData,
+  fetchedAt,
   initialSearchParams = new URLSearchParams(),
   tableProps,
   useTableProps,
@@ -48,12 +52,13 @@ const QueryResultsTable = ({
   const { data: query } = useQuery<Query>({
     queryKey,
     queryFn: async () => {
-      const res = await getQuery(initialData.pid, {
-        params: initialSearchParams.toString(),
-      });
+      const res = await routeGet<ApiResponse<Query>>(
+        routes.api.query(initialData.pid, initialSearchParams),
+      );
       return res.data;
     },
     initialData,
+    initialDataUpdatedAt: fetchedAt,
     staleTime: 2 * defaults.tableRefresh,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
@@ -65,8 +70,8 @@ const QueryResultsTable = ({
     },
   });
   useEffect(() => {
-    qc.setQueryData(queryKey, initialData);
-  }, [qc, queryKey, initialData]);
+    setQueryDataIfNewer(qc, queryKey, initialData, fetchedAt);
+  }, [qc, queryKey, initialData, fetchedAt]);
 
   const { tasks, definition } = query;
   const location = definition.demographics?.location ?? null;
