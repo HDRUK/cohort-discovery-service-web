@@ -1,7 +1,7 @@
 "use client";
 
 import { Skeleton } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
+import { skipToken, useQuery } from "@tanstack/react-query";
 import Title from "@/components/Title";
 import { QUERY_KEYS } from "@/config/tags";
 import useSearchParams from "@/hooks/useSearchParams";
@@ -11,7 +11,7 @@ const QueryHistoryTitle = ({ total }: { total?: number }) => {
   const { searchParams } = useSearchParams();
   const { data } = useQuery<Paginated<Query>>({
     queryKey: QUERY_KEYS.queries(searchParams.toString()),
-    enabled: false,
+    queryFn: skipToken,
   });
 
   const count = data?.total ?? total;
