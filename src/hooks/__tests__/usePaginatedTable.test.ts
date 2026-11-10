@@ -31,6 +31,8 @@ jest.mock("@/contexts/SearchParamsTransitionContext", () => ({
   useSearchParamsTransition: () => ({
     isPending: mockIsPending,
     startTransition: (callback: () => void) => callback(),
+    pendingSearchParams: null,
+    setPendingSearchParams: () => {},
   }),
 }));
 
