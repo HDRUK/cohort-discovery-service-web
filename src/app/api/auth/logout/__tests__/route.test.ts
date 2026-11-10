@@ -6,7 +6,8 @@ import jwt from "jsonwebtoken";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
 
 const LOGOUT_URL = "https://localhost:3000/api/auth/logout";
-const GATEWAY = "https://web.dev.hdruk.cloud";
+const GATEWAY =
+  "https://web.dev.hdruk.cloud?redirect_cohort_discovery_upon_signin=https://web.cohort-discovery.dev.hdruk.cloud";
 const API = "https://api.cohort-discovery.dev.hdruk.cloud";
 
 const signSsoToken = (provider: string, logoutTicket?: string) =>
@@ -61,10 +62,10 @@ describe("GET /api/auth/logout", () => {
     expect(response.headers.get("location")).toBe("/login");
   });
 
-  it("redirects to the gateway login page in integrated mode", async () => {
+  it("redirects to the gateway sign-in url unchanged in integrated mode", async () => {
     const response = await logoutWith({ mode: "integrated", gatewayUrl: GATEWAY });
 
-    expect(response.headers.get("location")).toBe(`${GATEWAY}/login`);
+    expect(response.headers.get("location")).toBe(GATEWAY);
   });
 
   it("falls back to a relative path when the gateway url is unset", async () => {

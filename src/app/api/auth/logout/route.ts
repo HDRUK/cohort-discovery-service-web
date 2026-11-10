@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
   } else if (isStandalone(applicationMode) || !GATEWAY_URL) {
     location = routes.login;
   } else {
-    location = new URL(routes.login, GATEWAY_URL).toString();
+    location = GATEWAY_URL;
   }
 
   const response = redirectTo(location);
