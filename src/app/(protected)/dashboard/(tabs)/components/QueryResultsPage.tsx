@@ -1,4 +1,5 @@
 import { Alert, Divider, Skeleton } from "@mui/material";
+import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import QueryResultsTable from "@/modules/QueryResultsTable";
 import { getQuery } from "@/server/data/queries";
@@ -8,6 +9,7 @@ import { buildQueryHistoryParams } from "@/utils/params";
 import { QueryHistorySearchParams } from "@/types/api";
 import { getQueryName } from "@/utils/query";
 import EditableQuerySubtitle from "@/components/EditableQuerySubtitle";
+import { isPathSegment } from "@/lib/apiRoutes";
 
 type PageSearchParams = Promise<QueryHistorySearchParams>;
 
@@ -21,6 +23,7 @@ const QueryResultsPageContent = async ({
   searchParams: PageSearchParams;
 }) => {
   const { query, ...rest } = await searchParams;
+  if (!isPathSegment(query as string)) notFound();
 
   const searchParamsObject = buildQueryHistoryParams(rest);
 
