@@ -11,12 +11,12 @@ import CollectionHostLeftPanel from "./CollectionHostLeftPanel";
 import CollectionHostListPanel from "./CollectionHostListPanel";
 import CollectionHostRightPanel from "./CollectionHostRightPanel";
 
-import useUserStore from "@/hooks/useUserStore";
 import useCustodianStore from "@/hooks/useCustodianStore";
 import { ThreePaneProvider } from "@/providers/ThreePaneProvider";
 import { useConfirm } from "@/hooks/useConfirm";
 import useSearchParams from "@/hooks/useSearchParams";
 import { CollectionHostFilter } from "@/types/collections";
+import { useSessionData } from "@/contexts/SessionDataContext";
 
 const NO_HOSTS: CollectionHost[] = [];
 
@@ -33,7 +33,7 @@ const CollectionHostAdmin = ({
   const { getSearchParam } = useSearchParams("collection_host_filter");
   const isDeletedView = getSearchParam() === CollectionHostFilter.DELETED;
 
-  const custodians = useUserStore((s) => s.custodians);
+  const custodians = useSessionData().custodians;
   const deleteCollectionHost = useCustodianStore((s) => s.deleteCollectionHost);
   const restoreCollectionHost = useCustodianStore(
     (s) => s.restoreCollectionHost,

@@ -66,7 +66,7 @@ const renderCreateCollection = (
           createCollection: createCollectionAdmin,
           collectionHosts: collectionHosts,
         },
-        user: {
+        session: {
           custodians,
         },
       }}

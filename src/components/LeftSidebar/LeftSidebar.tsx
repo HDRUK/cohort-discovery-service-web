@@ -4,8 +4,8 @@ import { useMemo } from "react";
 import { Box, List } from "@mui/material";
 
 import { routes } from "../../config/routes";
-import useUserStore from "@/hooks/useUserStore";
 import LeftSidebarMenuItem from "./LeftSidebarMenuItem";
+import { useSessionData } from "@/contexts/SessionDataContext";
 
 const drawerWidth = 240;
 
@@ -18,8 +18,8 @@ type MenuItem = {
 };
 
 export default function LeftSidebar() {
-  const user = useUserStore((s) => s.user);
-  const custodians = useUserStore((s) => s.custodians);
+  const user = useSessionData().user;
+  const custodians = useSessionData().custodians;
 
   const teamIds = useMemo(
     () => user?.token_user?.cohort_admin_teams?.map((t) => String(t.id)) ?? [],

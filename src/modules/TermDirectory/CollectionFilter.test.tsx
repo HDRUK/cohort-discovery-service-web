@@ -4,7 +4,10 @@ import userEvent from "@testing-library/user-event";
 import CollectionFilter from "./CollectionFilter";
 import { DefaultProvider } from "@/providers/DefaultProvider";
 import { getMockCollection } from "@/actions/collection/__mocks__/getCollections";
-import { useUserDataStore } from "@/hooks/userDataStore";
+import {
+  SessionData,
+  SessionDataProvider,
+} from "@/contexts/SessionDataContext";
 import { HdrukUiProvider } from "@hdruk/ui";
 import { themeOptions } from "@/config/theme";
 import { ThemeOptions } from "@mui/material";
@@ -31,7 +34,11 @@ const renderComponent = () =>
   render(
     <DefaultProvider>
       <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
-        <CollectionFilter />
+        <SessionDataProvider
+          value={{ userCollections: collections } as unknown as SessionData}
+        >
+          <CollectionFilter />
+        </SessionDataProvider>
       </HdrukUiProvider>
     </DefaultProvider>,
   );
@@ -43,7 +50,6 @@ describe("CollectionFilter", () => {
   beforeEach(() => {
     mockReplace.mockClear();
     mockSearchParams = new URLSearchParams();
-    useUserDataStore.setState({ userCollections: collections });
   });
 
   it("writes a checked collection to the URL and restarts at page 1", async () => {
@@ -63,7 +69,11 @@ describe("CollectionFilter", () => {
     render(
       <DefaultProvider>
         <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
-          <CollectionFilter />
+          <SessionDataProvider
+            value={{ userCollections: collections } as unknown as SessionData}
+          >
+            <CollectionFilter />
+          </SessionDataProvider>
           <navigation.PendingRouter />
         </HdrukUiProvider>
       </DefaultProvider>,

@@ -4,10 +4,10 @@ import { createContext, use, useContext, useEffect, useMemo } from "react";
 import { redirect } from "next/navigation";
 
 import useCustodianStore from "@/hooks/useCustodianStore";
-import useUserStore from "@/hooks/useUserStore";
 import { useAdminDataStore } from "@/store/adminDataStore";
 import { checkIsAdmin } from "@/utils/user";
 import { ApiResponse, Collection, CollectionHost, User } from "@/types/api";
+import { useSessionData } from "@/contexts/SessionDataContext";
 
 type Props = {
   collections: Promise<ApiResponse<Collection[]>>;
@@ -31,7 +31,7 @@ export const AdminSectionProvider = ({
   const { data: collections } = use(collectionsPromise);
   const { data: collectionHosts } = use(collectionHostsPromise);
   const { data: users } = use(usersPromise);
-  const user = useUserStore((s) => s.user);
+  const user = useSessionData().user;
 
   const setCurrentCustodian = useCustodianStore((s) => s.current.setCustodian);
   const setCollectionHosts = useAdminDataStore((s) => s.setCollectionHosts);

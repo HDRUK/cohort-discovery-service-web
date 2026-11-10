@@ -37,10 +37,10 @@ import { useAdminDataStore } from "@/store/adminDataStore";
 import UpdatePanel from "@/components/UpdatePanel";
 import { useThreePane } from "@/providers/ThreePaneProvider";
 import { FieldConfigMap, useSaveChanges } from "@/hooks/useSaveChanges";
-import { useUserDataStore } from "@/hooks/userDataStore";
 import { useIsAdminSection } from "@/contexts/AdminSectionContext";
 import { clampRunTimeFrequency, getFrequencyModeKey } from "@/utils/frequency";
 import CollectionHostCredentials from "@/modules/CollectionHostCredentials";
+import { useSessionData } from "@/contexts/SessionDataContext";
 
 export type UpdateCollectionProps = {
   collection: CollectionWithHosts;
@@ -116,7 +116,7 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
     (s) => s.current.collectionHosts,
   );
   const collectionHosts = useAdminDataStore((s) => s.collectionHosts);
-  const workgroups = useUserDataStore((s) => s.workgroups);
+  const workgroups = useSessionData().workgroups;
 
   const notify = useNotify();
 

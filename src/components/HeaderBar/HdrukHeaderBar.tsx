@@ -4,13 +4,13 @@ import Link, { type LinkProps } from "next/link";
 import logo from "@branding/assets/logo.svg";
 import branding from "@branding/branding.config";
 import { Header } from "@hdruk/ui";
-import useUserStore from "@/hooks/useUserStore";
 import { type AnchorHTMLAttributes } from "react";
 import { checkIsAdmin } from "@/utils/user";
 import { routes } from "@/config/routes";
 import { useApplicationMode } from "@/providers/ApplicationModeProvider";
 import { useSignOutStore } from "@/store/signOutStore";
 import { getOrganisationUrl } from "@/config/externalLinks";
+import { useSessionUser } from "@/contexts/SessionDataContext";
 
 const NEXT_PUBLIC_LOGIN_URL = getOrganisationUrl();
 const GATEWAY_PROFILE_HREF = `${NEXT_PUBLIC_LOGIN_URL}/account/profile`;
@@ -49,7 +49,7 @@ const HeaderLink = ({ href, rel, onClick, ...props }: HeaderLinkProps) => {
 };
 
 const HdrukHeader = () => {
-  const user = useUserStore((s) => s.user);
+  const user = useSessionUser();
   const { isStandalone } = useApplicationMode();
   const [first, last] = (user?.name ?? "").trim().split(/\s+/, 2);
 

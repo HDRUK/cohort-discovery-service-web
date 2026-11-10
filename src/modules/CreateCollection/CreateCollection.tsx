@@ -12,8 +12,8 @@ import FormDropdown from "@/components/FormDropdown";
 import useCustodianStore from "@/hooks/useCustodianStore";
 import { useEffect, useMemo } from "react";
 import ErrorHeader from "@/components/ErrorHeader";
-import { useUserDataStore } from "@/hooks/userDataStore";
 import { useAdminDataStore } from "@/store/adminDataStore";
+import { useSessionData } from "@/contexts/SessionDataContext";
 
 interface CreateCollectionProps {
   onCancel?: () => void;
@@ -26,7 +26,7 @@ const CreateCollection = ({ onCancel }: CreateCollectionProps) => {
     (s) => s.current.collectionHosts,
   );
   const collectionHosts = useAdminDataStore((s) => s.collectionHosts);
-  const custodians = useUserDataStore((s) => s.custodians);
+  const custodians = useSessionData().custodians;
 
   const isAdmin = !currentCustodian;
 

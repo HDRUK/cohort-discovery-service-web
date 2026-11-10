@@ -7,37 +7,23 @@ import detachConcepts from "@/actions/concept/detachConcepts";
 import deleteConceptSet from "@/actions/conceptSet/deleteConceptSet";
 import {
   ApiResponse,
-  CombinedUser,
   CreateQuery,
   Query,
-  Custodian,
   Concept,
   Paginated,
   CreateConceptSetPost,
   ConceptSet,
   DistributionType,
   CollectionWithHosts,
-  Workgroup,
-  Collection,
   SearchConceptsBody,
 } from "@/types/api";
 import { DEFAULT_QUERY, useQueryBuilderStore } from "@/store/queryBuilderStore";
 import { routes } from "@/config/routes";
 import { routePost } from "@/lib/routeFetch";
-import { WorkgroupNames } from "@/config/workgroups";
 
 export interface UserDataStoreState {
-  user: CombinedUser | undefined | null;
-  setUser: (user: CombinedUser | null) => void;
-  isOnlyInDefaultWorkgroup: boolean;
   isQueryLimitReached: boolean;
   markQueryLimitReached: () => void;
-
-  userCollections: Collection[];
-  setUserCollections: (collections: Collection[]) => void;
-
-  custodians: Custodian[];
-  setCustodians: (custodians: Custodian[]) => void;
 
   queries: Query[];
   setQueries: (queries: Query[]) => void;
@@ -77,55 +63,14 @@ export interface UserDataStoreState {
     conceptIds: number[],
   ) => Promise<void>;
   removeConceptSet: (conceptSetId: number) => Promise<void>;
-
-  workgroups: Workgroup[];
-  setWorkgroups: (workgroups: Workgroup[]) => void;
 }
 
 export const useUserDataStore = create<UserDataStoreState>((set) => ({
-  user: null,
-  setUser: (user) =>
-    set((state) => ({
-      ...state,
-      user,
-      isOnlyInDefaultWorkgroup:
-        (user?.workgroups?.length ?? 0) === 1 &&
-        user?.workgroups?.[0]?.name === WorkgroupNames.DEFAULT,
-      isQueryLimitReached:
-        !!user?.query_quota &&
-        !user.query_quota.unlimited &&
-        (user.query_quota.remaining ?? 0) <= 0,
-    })),
-  isOnlyInDefaultWorkgroup: false,
   isQueryLimitReached: false,
   markQueryLimitReached: () =>
     set((state) => ({
       ...state,
       isQueryLimitReached: true,
-      user:
-        state.user && state.user.query_quota
-          ? {
-              ...state.user,
-              query_quota: {
-                ...state.user.query_quota,
-                used: state.user.query_quota.limit,
-                remaining: 0,
-              },
-            }
-          : state.user,
-    })),
-  userCollections: [],
-  setUserCollections: (userCollections) =>
-    set((state) => ({
-      ...state,
-      userCollections,
-    })),
-
-  custodians: [],
-  setCustodians: (custodians) =>
-    set((state) => ({
-      ...state,
-      custodians,
     })),
 
   queries: [],
@@ -205,11 +150,4 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
   removeConceptSet: async (conceptSetId) => {
     await deleteConceptSet(conceptSetId);
   },
-
-  workgroups: [],
-  setWorkgroups: (workgroups) =>
-    set((state) => ({
-      ...state,
-      workgroups,
-    })),
 }));

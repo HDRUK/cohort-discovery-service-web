@@ -10,6 +10,7 @@ import {
 
 import { routes } from "@/config/routes";
 import { useEffect } from "react";
+import useIsQueryLimitReached from "@/hooks/useIsQueryLimitReached";
 
 const useSubmitQuery = () => {
   const router = useRouter();
@@ -17,7 +18,7 @@ const useSubmitQuery = () => {
   const notify = useNotify();
 
   const fetchResults = useUserStore((s) => s.fetchResults);
-  const isQueryLimitReached = useUserStore((s) => s.isQueryLimitReached);
+  const isQueryLimitReached = useIsQueryLimitReached();
   const { isLoading, setIsLoading } = useStateManagement((s) => ({
     isLoading: s.isLoading,
     setIsLoading: s.setIsLoading,

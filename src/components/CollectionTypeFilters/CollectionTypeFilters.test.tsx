@@ -39,7 +39,7 @@ describe("CollectionTypeFilters", () => {
             selectedDatasets: [],
             setSelectedDatasets,
           },
-          user: {
+          session: {
             userCollections: mockCollections,
           },
         }}
@@ -75,7 +75,7 @@ describe("CollectionTypeFilters", () => {
             selectedDatasets: syntheticPids,
             setSelectedDatasets,
           },
-          user: {
+          session: {
             userCollections: mockCollections,
           },
         }}
@@ -96,7 +96,7 @@ describe("CollectionTypeFilters", () => {
     render(
       <MockCohortDiscoveryServiceStore
         overrides={{
-          user: {
+          session: {
             userCollections: getMixedCollections(),
           },
         }}
@@ -130,7 +130,7 @@ describe("CollectionTypeFilters", () => {
             selectedDatasets: [],
             setSelectedDatasets,
           },
-          user: {
+          session: {
             userCollections: mockCollections,
           },
           featureFlags: {
@@ -168,7 +168,7 @@ describe("CollectionTypeFilters", () => {
           queryBuilder: {
             selectedDatasets: syntheticPids.slice(0, 2),
           },
-          user: {
+          session: {
             userCollections: mockCollections,
           },
         }}
@@ -186,7 +186,7 @@ describe("CollectionTypeFilters", () => {
     render(
       <MockCohortDiscoveryServiceStore
         overrides={{
-          user: {
+          session: {
             userCollections: getMockCollections(5, false),
           },
         }}
@@ -210,7 +210,7 @@ describe("CollectionTypeFilters", () => {
             selectedDatasets: [],
             setSelectedDatasets,
           },
-          user: {
+          session: {
             userCollections: getMockCollections(10, [1, 2, 3, 4]),
           },
         }}

@@ -5,9 +5,9 @@ import { redirect } from "next/navigation";
 import { Paper } from "@mui/material";
 
 import SkeletonFull from "@/components/SkeletonFull";
-import useUserStore from "@/hooks/useUserStore";
 import useCustodianStore from "@/hooks/useCustodianStore";
 import type { ApiResponse, CollectionHost, Custodian } from "@/types/api";
+import { useSessionData } from "@/contexts/SessionDataContext";
 
 type Props = {
   custodian: Promise<ApiResponse<Custodian>>;
@@ -24,7 +24,7 @@ export function CustodianSectionProvider({
 }: Props) {
   const { data: custodian } = use(custodianPromise);
   const { data: collectionHosts } = use(collectionHostsPromise);
-  const user = useUserStore((s) => s.user);
+  const user = useSessionData().user;
 
   const setCurrentCustodian = useCustodianStore((s) => s.current.setCustodian);
   const setCurrentCollectionHosts = useCustodianStore(
