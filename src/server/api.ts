@@ -27,6 +27,9 @@ export interface RequestOptions<B = undefined> {
 
 export const isSessionEnded = (status: number): boolean => status === 401;
 
+const isAborted = (error: unknown): boolean =>
+  error instanceof Error && error.name === "AbortError";
+
 const buildUrl = (path: string, params?: URLSearchParams | string) => {
   if (!path.startsWith("/"))
     throw new Error(`API path must be relative: ${path}`);
@@ -72,6 +75,7 @@ export async function request<TResponse, TBody = undefined>(
       if (error.status === 403) redirect(routes.forbidden);
       throw error;
     }
+    if (isAborted(error)) throw error;
     throw await handleApiError(error);
   }
 }
