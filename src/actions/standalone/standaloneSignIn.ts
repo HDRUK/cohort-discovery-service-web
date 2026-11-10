@@ -5,13 +5,16 @@ import { API_ROUTES } from "@/lib/apiRoutes";
 import { apiPost } from "@/server/api";
 import { ApiError } from "@/lib/https";
 import { setAccessTokenCookie } from "@/lib/authCookie";
+import { pick } from "@/utils/pick";
+
+const SIGN_IN_FIELDS = ["email", "password"] as const;
 
 const standaloneSignIn = async (payload: SignInPost): Promise<boolean> => {
   try {
     const response = await apiPost<ApiResponse<SignInResponse>, SignInPost>(
       null,
       API_ROUTES.signIn,
-      payload,
+      pick(payload, SIGN_IN_FIELDS),
     );
 
     const token = response.data?.access_token;

@@ -10,15 +10,18 @@ const removeUserFromWorkgroup = async (
   payload: RemoveUsersFromWorkgroupPost,
 ): Promise<void> => {
   const { token } = await requireSession();
-  await Promise.all(
-    payload.ids.map(async (id) =>
-      apiDelete<ApiResponse<number>>(
-        token,
-        API_ROUTES.userWorkgroup(id, payload.workgroup_id),
+  try {
+    await Promise.all(
+      payload.ids.map(async (id) =>
+        apiDelete<ApiResponse<number>>(
+          token,
+          API_ROUTES.userWorkgroup(id, payload.workgroup_id),
+        ),
       ),
-    ),
-  );
-  refresh();
+    );
+  } finally {
+    refresh();
+  }
 };
 
 export default removeUserFromWorkgroup;

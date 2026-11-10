@@ -11,6 +11,33 @@ import {
   CreateCollectionPost,
   TransitionCollectionPut,
 } from "@/types/api";
+import { pick } from "@/utils/pick";
+
+export const COLLECTION_FIELDS = [
+  "name",
+  "description",
+  "type",
+  "host_id",
+  "url",
+  "custodian_id",
+  "status",
+  "pid",
+  "model_state",
+  "is_synthetic",
+  "location_enabled",
+  "death_enabled",
+] as const;
+
+export const COLLECTION_CONFIG_FIELDS = [
+  "run_time_hour",
+  "run_time_minute",
+  "frequency_mode",
+  "run_time_frequency",
+  "enabled",
+  "type",
+] as const;
+
+const TRANSITION_FIELDS = ["state"] as const;
 
 export const updateCollectionDetails = async (
   token: string,
@@ -21,11 +48,11 @@ export const updateCollectionDetails = async (
   const { data } = await apiPut<
     ApiResponse<CollectionWithHosts>,
     Partial<CreateCollectionPost>
-  >(token, API_ROUTES.collection(id), payload);
+  >(token, API_ROUTES.collection(id), pick(payload, COLLECTION_FIELDS));
   await apiPut<ApiResponse<Collection>, Partial<CreateCollectionConfigPost>>(
     token,
     API_ROUTES.collectionConfigItem(data.config.id),
-    payloadConfig,
+    pick(payloadConfig, COLLECTION_CONFIG_FIELDS),
   );
   return data;
 };
@@ -70,7 +97,7 @@ export const transitionCollectionIds = async (
       apiPut<ApiResponse<Collection>, TransitionCollectionPut>(
         token,
         API_ROUTES.transitionCollection(id),
-        payload,
+        pick(payload, TRANSITION_FIELDS),
       ),
     ),
   );
