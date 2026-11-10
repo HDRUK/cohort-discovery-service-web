@@ -89,3 +89,35 @@ describe("request", () => {
     });
   });
 });
+
+describe("the API call log", () => {
+  let info: jest.SpyInstance;
+
+  beforeEach(() => {
+    info = jest.spyOn(console, "info").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    delete process.env.API_CALL_LOG;
+  });
+
+  it("logs nothing unless API_CALL_LOG is 1", async () => {
+    await apiGet("a-token", "/api/v1/users");
+
+    expect(info).not.toHaveBeenCalled();
+  });
+
+  it("logs the method, path and status without the query or token", async () => {
+    process.env.API_CALL_LOG = "1";
+
+    await apiGet("a-token", "/api/v1/users", {
+      params: "name[]=Jane Doe",
+    });
+
+    expect(info).toHaveBeenCalledTimes(1);
+    const line = info.mock.calls[0][0] as string;
+    expect(line).toMatch(/^\[api\] GET \/api\/v1\/users 200 \d+ms$/);
+    expect(line).not.toContain("Jane");
+    expect(line).not.toContain("a-token");
+  });
+});

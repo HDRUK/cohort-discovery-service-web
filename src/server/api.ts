@@ -31,6 +31,17 @@ const buildUrl = (path: string, params?: URLSearchParams | string) => {
   return `${baseURL}${path}${queryString ? `?${queryString}` : ""}`;
 };
 
+const logApiCall = (
+  method: HttpMethod,
+  path: string,
+  outcome: number | string,
+  startedAt: number,
+) => {
+  if (process.env.API_CALL_LOG !== "1") return;
+  const elapsed = Math.round(performance.now() - startedAt);
+  console.info(`[api] ${method} ${path} ${outcome} ${elapsed}ms`);
+};
+
 export async function request<TResponse, TBody = undefined>(
   token: string | null,
   method: HttpMethod,
@@ -38,6 +49,7 @@ export async function request<TResponse, TBody = undefined>(
   { params, body, errorMode = ErrorMode.THROW }: RequestOptions<TBody> = {},
 ): Promise<TResponse> {
   const url = buildUrl(path, params);
+  const startedAt = process.env.API_CALL_LOG === "1" ? performance.now() : 0;
 
   try {
     const response = await fetch(url, {
@@ -49,6 +61,7 @@ export async function request<TResponse, TBody = undefined>(
       body: body !== undefined ? JSON.stringify(body) : undefined,
       cache: "no-store",
     });
+    logApiCall(method, path, response.status, startedAt);
 
     if (!response.ok) {
       const errorText = await extractErrorMessage(response);
