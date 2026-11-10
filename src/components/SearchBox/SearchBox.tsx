@@ -161,6 +161,7 @@ const SearchBox = ({
   const handleClearClick = () => {
     setInternalValue("");
     onClear?.();
+    inputRef.current?.focus();
   };
 
   const handleKeyDown = useCallback(
@@ -243,8 +244,10 @@ const SearchBox = ({
                       }
                     : {}),
                   // removes default white "X" button from Chrome and Safari
-                  // to avoid duplicate clear icons
-                  "&::-webkit-search-cancel-button": { display: "none" },
+                  // to avoid duplicate clear icons, only when our own clear button is used
+                  ...(onClear
+                    ? { "&::-webkit-search-cancel-button": { display: "none" } }
+                    : {}),
                 },
                 id: STABLE_ID,
                 autoComplete: "off",

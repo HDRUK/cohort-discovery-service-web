@@ -41,6 +41,16 @@ describe("SearchBox clear button", () => {
     expect(submitButton()).toBeInTheDocument();
   });
 
+  it("moves focus back to the input after clearing, so keyboard users don't lose their place", async () => {
+    renderComponent({ onClear: jest.fn() });
+    const input = screen.getByRole("searchbox");
+
+    await userEvent.type(input, "asthma");
+    await userEvent.click(clearButton()!);
+
+    expect(input).toHaveFocus();
+  });
+
   it("keeps the submit button for callers that don't opt in, so they can still submit with text entered", async () => {
     const onClickEndAdornment = jest.fn();
     renderComponent({ onClickEndAdornment });
