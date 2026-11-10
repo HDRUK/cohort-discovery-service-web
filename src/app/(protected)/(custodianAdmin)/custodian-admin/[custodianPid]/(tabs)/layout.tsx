@@ -1,5 +1,6 @@
 import { ReactNode, Suspense } from "react";
 import { CollectionsSkeleton } from "@/modules/CollectionsTab/CollectionsTab";
+import CustodianSection from "../components/CustodianSection";
 import CustodianTabs from "./components/CustodianTabs";
 
 const CustodianTabsLayout = ({
@@ -10,7 +11,11 @@ const CustodianTabsLayout = ({
   params: Promise<{ custodianPid: string }>;
 }) => (
   <Suspense fallback={<CollectionsSkeleton />}>
-    <CustodianTabs params={params}>{children}</CustodianTabs>
+    <CustodianTabs>
+      <Suspense fallback={<CollectionsSkeleton />}>
+        <CustodianSection params={params}>{children}</CustodianSection>
+      </Suspense>
+    </CustodianTabs>
   </Suspense>
 );
 

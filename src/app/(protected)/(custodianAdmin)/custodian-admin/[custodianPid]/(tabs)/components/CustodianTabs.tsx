@@ -1,15 +1,12 @@
+"use client";
+
 import { ReactNode } from "react";
+import { useParams } from "next/navigation";
 import SegmentTabsShell from "@/components/SegmentTabsShell";
 import { routes } from "@/config/routes";
 
-const CustodianTabs = async ({
-  params,
-  children,
-}: {
-  params: Promise<{ custodianPid: string }>;
-  children: ReactNode;
-}) => {
-  const { custodianPid } = await params;
+const CustodianTabs = ({ children }: { children: ReactNode }) => {
+  const { custodianPid } = useParams<{ custodianPid: string }>();
 
   return (
     <SegmentTabsShell
