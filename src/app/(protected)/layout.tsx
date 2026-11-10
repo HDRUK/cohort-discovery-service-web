@@ -43,7 +43,7 @@ export default async function ProtectedLayout({
   const requestNow = h?.get("x-request-now");
   const now = requestNow !== null ? Math.floor(Number(requestNow)) : 0;
   if (decoded.exp && now >= Math.floor(decoded.exp)) {
-    redirect("/api/auth/logout");
+    redirect(routes.logout);
   }
 
   const user = decoded.user as TokenUser;
@@ -51,11 +51,19 @@ export default async function ProtectedLayout({
   const { data: me, error } = await getCurrentUser();
   const { code: errorCode } = error ?? {};
 
+  if (errorCode === 401) {
+    redirect(routes.logout);
+  }
+
   if (errorCode === 404) {
     if (isStandalone(applicationMode)) {
       notFound();
     }
     redirect("/user-not-found");
+  }
+
+  if (error) {
+    throw new Error(error.text);
   }
 
   const roles = me.roles.map((r) => r.name) ?? [];
