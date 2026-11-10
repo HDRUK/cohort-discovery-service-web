@@ -23,7 +23,6 @@ import { trueKeys } from "@/utils/numbers";
 import { useLogDependencyChanges } from "@/utils/deps";
 import deleteCollections from "@/actions/collection/deleteCollections";
 import restoreCollection from "@/actions/collection/restoreCollection";
-import useUserStore from "@/hooks/useUserStore";
 import { useConfirm } from "@/hooks/useConfirm";
 import { useNotify } from "@/providers/NotifyProvider";
 import { QUERY_KEYS } from "@/config/tags";
@@ -35,6 +34,8 @@ import useFeatures from "@/hooks/useFeatures";
 import { useQueryClient } from "@tanstack/react-query";
 import { CollectionFilterStatus } from "@/types/collections";
 import { useCustodianSection } from "@/contexts/CustodianSectionContext";
+import { useSelectionStore } from "@/store/selectionStore";
+import { selectAllById } from "@/utils/selection";
 
 export interface CollectionsTableProps extends TableProps {
   collections?: Paginated<CollectionWithHosts>;
@@ -63,8 +64,9 @@ const CollectionsTable = ({
 
   const currentCustodian = useCustodianSection()?.custodian;
   const isAdmin = useMemo(() => !currentCustodian, [currentCustodian]);
-  const selectedCollections = useUserStore((s) => s.selectedCollections);
-  const setSelectedCollections = useUserStore((s) => s.setSelectedCollections);
+  const setSelectedCollectionIds = useSelectionStore(
+    (s) => s.setSelectedCollectionIds,
+  );
 
   const rows = collections?.data;
 
@@ -75,20 +77,21 @@ const CollectionsTable = ({
     [rowSelection],
   );
 
+  const selectedCollections = useMemo(
+    () => selectAllById(rows ?? [], selectedCollectionIds),
+    [rows, selectedCollectionIds],
+  );
+
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    const newSelectedCollections = selectedCollectionIds
-      .map((id) => rows?.find((c) => String(c.id) === id) || null)
-      .filter((c) => c !== null);
+    setSelectedCollectionIds(selectedCollectionIds);
+  }, [selectedCollectionIds, setSelectedCollectionIds]);
 
-    setSelectedCollections(newSelectedCollections);
-  }, [
-    rows,
-    selectedCollections,
-    selectedCollectionIds,
-    setSelectedCollections,
-  ]);
+  useEffect(
+    () => () => setSelectedCollectionIds([]),
+    [setSelectedCollectionIds],
+  );
 
   const columns = useMemo<MRT_ColumnDef<Collection>[]>(
     () => [
@@ -332,7 +335,7 @@ const CollectionsTable = ({
     getSearchParam,
     rowSelection,
     setRowSelection,
-    setSelectedCollections,
+    setSelectedCollectionIds,
   });
 
   const confirm = useConfirm();

@@ -1,10 +1,10 @@
 import { useSessionData } from "@/contexts/SessionDataContext";
-import useUserStore from "@/hooks/useUserStore";
+import { useQueryLimitStore } from "@/store/queryLimitStore";
 import { isQuotaExhausted } from "@/utils/user";
 
 const useIsQueryLimitReached = (): boolean => {
   const { user } = useSessionData();
-  const isLimitReached = useUserStore((s) => s.isQueryLimitReached);
+  const isLimitReached = useQueryLimitStore((s) => s.isQueryLimitReached);
   return isLimitReached || isQuotaExhausted(user);
 };
 

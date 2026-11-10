@@ -11,10 +11,10 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import { useForm, Controller } from "react-hook-form";
 import { useState } from "react";
-import useUserStore from "@/hooks/useUserStore";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { OmopTableName } from "@/types/omop";
+import createConceptSet from "@/actions/conceptSet/createConceptSet";
 
 interface CreateConceptSetFormProps {
   onCancel?: () => void;
@@ -35,7 +35,6 @@ const schema = yup.object({
 type ConceptSetFormValues = yup.InferType<typeof schema>;
 
 const CreateConceptSetForm = ({ onCancel }: CreateConceptSetFormProps) => {
-  const createConceptSet = useUserStore((s) => s.createConceptSet);
 
   const [submitting, setSubmitting] = useState(false);
 

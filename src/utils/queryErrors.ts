@@ -1,6 +1,6 @@
 import { ApiError } from "@/lib/https";
 import { NotifyFn } from "@/providers/NotifyProvider";
-import { useUserDataStore } from "@/hooks/userDataStore";
+import { useQueryLimitStore } from "@/store/queryLimitStore";
 import { useSessionStore } from "@/store/sessionStore";
 
 export const QUERY_LIMIT_REACHED_MESSAGE =
@@ -18,7 +18,7 @@ const handleQuerySubmissionError = (
     return;
   }
   if (error.code === 429) {
-    useUserDataStore.getState().markQueryLimitReached();
+    useQueryLimitStore.getState().markQueryLimitReached();
     notify({
       message: QUERY_LIMIT_REACHED_MESSAGE,
       severity: "error",

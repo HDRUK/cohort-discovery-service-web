@@ -3,11 +3,11 @@ import { Box, Stack, Typography } from "@mui/material";
 import FormLabel from "@/components/FormLabel";
 import { ReRunButton } from "./ReRunButton";
 import { useLogDependencyChanges } from "@/utils/deps";
-import useUserStore from "@/hooks/useUserStore";
 import { useCallback } from "react";
 import LastDistributionChip from "./LastDistributionChip";
 import { useRouter } from "next/navigation";
 import MetadataPanel from "@/components/MetadataPanel";
+import rerunDistributions from "@/actions/rerunDistributions";
 
 const DistributionStatus = ({
   collection,
@@ -20,15 +20,19 @@ const DistributionStatus = ({
     collection.latest_successful_demographic_result_file;
   const latestConceptFile = collection.latest_successful_concept_result_file;
 
-  const runDistributions = useUserStore((s) => s.runDistributions);
-
   const handleRunDemographicsNow = useCallback(async () => {
-    return await runDistributions(collection, DistributionType.DEMOGRAPHICS);
-  }, [runDistributions, collection]);
+    const { data } = await rerunDistributions(collection.pid, {
+      query_type: DistributionType.DEMOGRAPHICS,
+    });
+    return data;
+  }, [collection]);
 
   const handleRunConceptsNow = useCallback(async () => {
-    return await runDistributions(collection, DistributionType.GENERIC);
-  }, [runDistributions, collection]);
+    const { data } = await rerunDistributions(collection.pid, {
+      query_type: DistributionType.GENERIC,
+    });
+    return data;
+  }, [collection]);
 
   const router = useRouter();
   const handleRefresh = () => router.refresh();

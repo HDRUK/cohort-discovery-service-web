@@ -2,7 +2,6 @@ import AddButton from "@/components/AddButton";
 import FormRadioGroup from "@/components/FormRadioGroup";
 import StatusChip from "@/components/StatusChip";
 import { useNotify } from "@/providers/NotifyProvider";
-import useCustodianStore from "@/hooks/useCustodianStore";
 import { Collection, CollectionStatus } from "@/types/api";
 import { UpdateCollectionFormValues } from "@/types/forms";
 import { getCollectionStatus } from "@/utils/colours";
@@ -11,6 +10,7 @@ import { useEffect, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { useConfirm } from "@/hooks/useConfirm";
 import { useCustodianSection } from "@/contexts/CustodianSectionContext";
+import requestCollectionsActive from "@/actions/collection/requestCollectionsActive";
 
 interface ManageMultipleCollectionsStatusProps {
   collections: Collection[];
@@ -24,9 +24,6 @@ const ManageMultipleCollectionsStatus = ({
   const { control, setValue } = useFormContext<UpdateCollectionFormValues>();
 
   const currentCustodian = useCustodianSection()?.custodian;
-  const requestCollectionMadeActive = useCustodianStore(
-    (s) => s.requestCollectionMadeActive,
-  );
   const notify = useNotify();
 
   const uniqueStates = [
@@ -77,7 +74,7 @@ const ManageMultipleCollectionsStatus = ({
   }
 
   const handleAction = async () => {
-    await requestCollectionMadeActive(collections.map((c) => c.id));
+    await requestCollectionsActive(collections.map((c) => c.id));
     setSelectedStatusId(CollectionStatus.PENDING);
     notify.success(
       `Requested for collections (${collections

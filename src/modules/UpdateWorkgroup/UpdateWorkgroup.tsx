@@ -8,13 +8,13 @@ import updateWorkgroupMembers from "@/actions/workgroup/updateWorkgroupMembers";
 import { useNotify } from "@/providers/NotifyProvider";
 import FormMultiSelect from "@/components/FormMultiSelect";
 import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
-import useAdminStore from "@/hooks/useAdminStore";
 import { useThreePane } from "@/providers/ThreePaneProvider";
 import { useSaveChanges } from "@/hooks/useSaveChanges";
 import {
   useAdminCollections,
   useAdminUsers,
 } from "@/contexts/AdminSectionContext";
+import useSelectedWorkgroup from "@/hooks/useSelectedWorkgroup";
 import { Collection, User } from "@/types/api";
 
 const NO_COLLECTIONS: Collection[] = [];
@@ -26,7 +26,7 @@ const UpdateWorkgroup = () => {
   const collections = useAdminCollections() ?? NO_COLLECTIONS;
   const users = useAdminUsers() ?? NO_USERS;
 
-  const selectedWorkgroup = useAdminStore((s) => s.selectedWorkgroup);
+  const selectedWorkgroup = useSelectedWorkgroup();
 
   const notify = useNotify();
 

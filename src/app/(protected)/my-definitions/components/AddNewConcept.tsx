@@ -8,13 +8,12 @@ import { ConceptSet } from "@/types/api";
 import { useMemo, useState } from "react";
 import { useNotify } from "@/providers/NotifyProvider";
 import { falseKeys, trueKeys } from "@/utils/numbers";
-import useUserStore from "@/hooks/useUserStore";
+import attachConcepts from "@/actions/concept/attachConcepts";
+import detachConcepts from "@/actions/concept/detachConcepts";
 
 const AddNewConcept = ({ conceptSet }: { conceptSet: ConceptSet }) => {
   const notify = useNotify();
 
-  const addConceptsToSet = useUserStore((s) => s.addConceptsToSet);
-  const removeConceptsFromSet = useUserStore((s) => s.removeConceptsFromSet);
 
   const { domain, concepts } = conceptSet;
 
@@ -39,10 +38,10 @@ const AddNewConcept = ({ conceptSet }: { conceptSet: ConceptSet }) => {
 
   const onSave = async () => {
     if (idsToBeRemoved.length > 0) {
-      await removeConceptsFromSet(conceptSet.id, idsToBeRemoved);
+      await detachConcepts(conceptSet.id, idsToBeRemoved);
     }
     if (idsToAdd.length > 0) {
-      await addConceptsToSet(conceptSet.id, idsToAdd);
+      await attachConcepts(conceptSet.id, idsToAdd);
     }
 
     notify.success(
