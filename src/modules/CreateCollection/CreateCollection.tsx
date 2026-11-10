@@ -1,3 +1,4 @@
+import { CollectionHost } from "@/types/api";
 import { Box, Stack, Button, MenuItem } from "@mui/material";
 import { useForm, Controller, FormProvider, useWatch } from "react-hook-form";
 import { CreateCollectionFormValues } from "@/types/forms";
@@ -12,8 +13,14 @@ import FormDropdown from "@/components/FormDropdown";
 import useCustodianStore from "@/hooks/useCustodianStore";
 import { useEffect, useMemo } from "react";
 import ErrorHeader from "@/components/ErrorHeader";
-import { useAdminDataStore } from "@/store/adminDataStore";
 import { useSessionData } from "@/contexts/SessionDataContext";
+import {
+  useCustodianSection,
+  useCustodianSectionHosts,
+} from "@/contexts/CustodianSectionContext";
+import { useAdminSection } from "@/contexts/AdminSectionContext";
+
+const NO_HOSTS: CollectionHost[] = [];
 
 interface CreateCollectionProps {
   onCancel?: () => void;
@@ -21,11 +28,9 @@ interface CreateCollectionProps {
 
 const CreateCollection = ({ onCancel }: CreateCollectionProps) => {
   const createCollection = useCustodianStore((s) => s.createCollection);
-  const currentCustodian = useCustodianStore((s) => s.current.custodian);
-  const currentCollectionHosts = useCustodianStore(
-    (s) => s.current.collectionHosts,
-  );
-  const collectionHosts = useAdminDataStore((s) => s.collectionHosts);
+  const currentCustodian = useCustodianSection();
+  const currentCollectionHosts = useCustodianSectionHosts() ?? NO_HOSTS;
+  const collectionHosts = useAdminSection()?.collectionHosts ?? NO_HOSTS;
   const custodians = useSessionData().custodians;
 
   const isAdmin = !currentCustodian;

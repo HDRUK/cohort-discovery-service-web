@@ -26,7 +26,9 @@ const renderCreateWorkgroup = (
         admin: {
           createWorkgroup,
           addCollectionsToWorkgroup,
-          allAprovedCollections: collections,
+        },
+        adminSection: {
+          collections,
         },
       }}
     >

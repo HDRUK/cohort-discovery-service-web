@@ -1,8 +1,8 @@
-import { Collection, CombinedUser } from "@/types/api";
+import { Collection, CombinedUser, User } from "@/types/api";
 import { RoleName } from "@/types/roles";
 import { WorkgroupNames } from "@/config/workgroups";
 
-const checkIsAdmin = (user?: CombinedUser | null) =>
+const checkIsAdmin = (user?: Pick<User, "roles"> | null) =>
   !!user?.roles.find((r) => r.name === RoleName.ADMIN);
 
 const checkHasNhsSdeAccess = (user?: CombinedUser | null) =>
@@ -29,6 +29,12 @@ const hasSyntheticSelection = (
   );
 };
 
+const isCustodianMember = (
+  user: Pick<User, "custodians"> | null | undefined,
+  custodianPid: string,
+): boolean =>
+  !!user?.custodians?.some((custodian) => custodian.pid === custodianPid);
+
 const getLastName = (name?: string) => {
   if (!name) return "";
   const parts = name.trim().split(" ");
@@ -40,6 +46,7 @@ export {
   checkIsAdmin,
   getLastName,
   hasSyntheticSelection,
+  isCustodianMember,
   isOnlyInDefaultWorkgroup,
   isQuotaExhausted,
 };

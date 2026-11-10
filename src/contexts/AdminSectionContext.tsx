@@ -1,26 +1,35 @@
 "use client";
 
-import { createContext, use, useContext, useEffect, useMemo } from "react";
-import { redirect } from "next/navigation";
+import { createContext, ReactNode, use, useContext, useMemo } from "react";
 
-import useCustodianStore from "@/hooks/useCustodianStore";
-import { useAdminDataStore } from "@/store/adminDataStore";
-import { checkIsAdmin } from "@/utils/user";
 import { ApiResponse, Collection, CollectionHost, User } from "@/types/api";
-import { useSessionData } from "@/contexts/SessionDataContext";
+
+export interface AdminSectionData {
+  users: User[];
+  collections: Collection[];
+  collectionHosts: CollectionHost[];
+}
 
 type Props = {
   collections: Promise<ApiResponse<Collection[]>>;
   collectionHosts: Promise<ApiResponse<CollectionHost[]>>;
   users: Promise<ApiResponse<User[]>>;
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
-type AdminSectionValue = {
-  isAdminSection: true;
-};
+const AdminSectionContext = createContext<AdminSectionData | null>(null);
 
-const AdminSectionContext = createContext<AdminSectionValue | null>(null);
+export const AdminSectionDataProvider = ({
+  value,
+  children,
+}: {
+  value: AdminSectionData;
+  children: ReactNode;
+}) => (
+  <AdminSectionContext.Provider value={value}>
+    {children}
+  </AdminSectionContext.Provider>
+);
 
 export const AdminSectionProvider = ({
   collections: collectionsPromise,
@@ -31,45 +40,21 @@ export const AdminSectionProvider = ({
   const { data: collections } = use(collectionsPromise);
   const { data: collectionHosts } = use(collectionHostsPromise);
   const { data: users } = use(usersPromise);
-  const user = useSessionData().user;
 
-  const setCurrentCustodian = useCustodianStore((s) => s.current.setCustodian);
-  const setCollectionHosts = useAdminDataStore((s) => s.setCollectionHosts);
-  const setCollections = useAdminDataStore((s) => s.setAllAprovedCollections);
-  const setUsers = useAdminDataStore((s) => s.setUsers);
-
-  const isAdmin = checkIsAdmin(user);
-  if (user && !isAdmin) {
-    redirect("/403?reason=no-admin-access");
-  }
-
-  useEffect(() => {
-    setCurrentCustodian(null);
-  }, [setCurrentCustodian]);
-
-  useEffect(() => {
-    setCollectionHosts(collectionHosts);
-  }, [collectionHosts, setCollectionHosts]);
-
-  useEffect(() => {
-    setCollections(collections);
-  }, [collections, setCollections]);
-
-  useEffect(() => {
-    setUsers(users);
-  }, [users, setUsers]);
-
-  const value = useMemo<AdminSectionValue>(
-    () => ({ isAdminSection: true }),
-    [],
+  const value = useMemo<AdminSectionData>(
+    () => ({ users, collections, collectionHosts }),
+    [users, collections, collectionHosts],
   );
 
   return (
-    <AdminSectionContext.Provider value={value}>
+    <AdminSectionDataProvider value={value}>
       {children}
-    </AdminSectionContext.Provider>
+    </AdminSectionDataProvider>
   );
 };
+
+export const useAdminSection = (): AdminSectionData | null =>
+  useContext(AdminSectionContext);
 
 export const useIsAdminSection = () => {
   return useContext(AdminSectionContext) !== null;

@@ -3,12 +3,18 @@ import {
   SessionData,
   SessionDataProvider,
 } from "@/contexts/SessionDataContext";
+import {
+  AdminSectionData,
+  AdminSectionDataProvider,
+} from "@/contexts/AdminSectionContext";
+import { CustodianSectionDataProvider } from "@/contexts/CustodianSectionContext";
 
 import type {
   ApiResponse,
   Collection,
   CollectionHost,
   CombinedUser,
+  Custodian,
   CreateQuery,
   Query,
   CreateCollectionPost,
@@ -74,6 +80,11 @@ type SliceOverrides = {
   queryBuilder?: Partial<QueryBuilderState>;
   user?: Partial<UserStoreState>;
   session?: Partial<SessionData>;
+  adminSection?: Partial<AdminSectionData>;
+  custodianSection?: {
+    custodian?: Custodian | null;
+    collectionHosts?: CollectionHost[];
+  };
   custodian?: Partial<CustodianStoreState>;
   admin?: Partial<AdminStoreState>;
   featureFlags?: Partial<FeatureFlagsStoreState>;
@@ -199,11 +210,6 @@ const seedStores = (overrides?: SliceOverrides) => {
         _payloadConfig: Omit<CreateCollectionConfigPost, "collection_id">,
       ) => RESOLVE<Collection>(getMockCollection()),
       ...(overrides?.custodian ?? {}),
-      current: {
-        custodian: null,
-        workgroups: [] as Workgroup[],
-        ...(overrides?.custodian?.current ?? {}),
-      },
     } as CustodianStoreState,
     true,
   );
@@ -239,6 +245,42 @@ const seedStores = (overrides?: SliceOverrides) => {
   );
 };
 
+const MockSections = ({
+  overrides,
+  children,
+}: PropsWithChildren<{ overrides?: SliceOverrides }>) => {
+  const { adminSection, custodianSection } = overrides ?? {};
+  const custodian = custodianSection?.custodian;
+
+  const withCustodian = custodian ? (
+    <CustodianSectionDataProvider
+      value={{
+        custodian,
+        collectionHosts: custodianSection?.collectionHosts ?? [],
+      }}
+    >
+      {children}
+    </CustodianSectionDataProvider>
+  ) : (
+    children
+  );
+
+  return adminSection ? (
+    <AdminSectionDataProvider
+      value={{
+        users: [],
+        collections: [],
+        collectionHosts: [],
+        ...adminSection,
+      }}
+    >
+      {withCustodian}
+    </AdminSectionDataProvider>
+  ) : (
+    withCustodian
+  );
+};
+
 const MockCohortDiscoveryServiceStore = ({
   overrides,
   children,
@@ -267,7 +309,9 @@ const MockCohortDiscoveryServiceStore = ({
                 <ConfirmProvider>
                   <NotifyProvider>
                     <SessionDataProvider value={sessionData}>
-                      {children}
+                      <MockSections overrides={overrides}>
+                        {children}
+                      </MockSections>
                     </SessionDataProvider>
                   </NotifyProvider>
                 </ConfirmProvider>
