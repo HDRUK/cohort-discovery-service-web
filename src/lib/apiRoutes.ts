@@ -13,7 +13,6 @@ const segment = (value: string | number): string => {
 export const API_ROUTES = {
   task: `${API_URL}/task`,
   rerunTask: (id: string) => `${API_URL}/task/re-run/${segment(id)}`,
-  tasks: `${API_URL}/tasks`,
   getTask: (pid: string) => `${API_URL}/task/${segment(pid)}`,
   queries: `${API_URL}/queries`,
   query: `${API_URL}/query`,
@@ -79,8 +78,6 @@ export const API_ROUTES = {
     `${API_URL}/collection/${segment(pid)}/distributions/run-manually`,
   conceptSets: `${API_URL}/concept_sets`,
   getConceptSet: (id: number) => `${API_URL}/concept_sets/${segment(id)}`,
-  clearConceptSet: (conceptSetId: number) =>
-    `${API_URL}/concept_sets/${segment(conceptSetId)}/clear`,
   attachConcept: (conceptSetId: number, conceptId: number) =>
     `${API_URL}/concept_sets/${segment(conceptSetId)}/attach/${segment(conceptId)}`,
   detachConcept: (conceptSetId: number, conceptId: number) =>
