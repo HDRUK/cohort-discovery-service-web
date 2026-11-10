@@ -4,21 +4,13 @@ import { createContext, ReactNode, use, useContext, useMemo } from "react";
 
 import { ApiResponse, Collection, CollectionHost, User } from "@/types/api";
 
-type Source<T> = Promise<ApiResponse<T>> | T;
-
 export interface AdminSectionData {
   users: User[];
   collections: Collection[];
   collectionHosts: CollectionHost[];
 }
 
-interface AdminSectionSources {
-  users: Source<User[]>;
-  collections: Source<Collection[]>;
-  collectionHosts: Source<CollectionHost[]>;
-}
-
-const AdminSectionContext = createContext<AdminSectionSources | null>(null);
+const AdminSectionContext = createContext<AdminSectionData | null>(null);
 
 export const AdminSectionDataProvider = ({
   value,
@@ -33,9 +25,9 @@ export const AdminSectionDataProvider = ({
 );
 
 export const AdminSectionProvider = ({
-  users,
-  collections,
-  collectionHosts,
+  users: usersPromise,
+  collections: collectionsPromise,
+  collectionHosts: collectionHostsPromise,
   children,
 }: {
   users: Promise<ApiResponse<User[]>>;
@@ -43,39 +35,24 @@ export const AdminSectionProvider = ({
   collectionHosts: Promise<ApiResponse<CollectionHost[]>>;
   children: ReactNode;
 }) => {
-  const value = useMemo<AdminSectionSources>(
+  const { data: users } = use(usersPromise);
+  const { data: collections } = use(collectionsPromise);
+  const { data: collectionHosts } = use(collectionHostsPromise);
+
+  const value = useMemo<AdminSectionData>(
     () => ({ users, collections, collectionHosts }),
     [users, collections, collectionHosts],
   );
 
   return (
-    <AdminSectionContext.Provider value={value}>
+    <AdminSectionDataProvider value={value}>
       {children}
-    </AdminSectionContext.Provider>
+    </AdminSectionDataProvider>
   );
 };
 
-const useSourceValue = <T,>(source: Source<T>): T =>
-  source instanceof Promise ? use(source).data : source;
-
-const useAdminSectionSources = (): AdminSectionSources => {
-  const sources = useContext(AdminSectionContext);
-  if (!sources)
-    throw new Error("Admin section data must be used within the admin section");
-  return sources;
-};
-
-export const useAdminUsers = (): User[] =>
-  useSourceValue(useAdminSectionSources().users);
-
-export const useAdminCollections = (): Collection[] =>
-  useSourceValue(useAdminSectionSources().collections);
-
-export const useAdminCollectionHosts = (): CollectionHost[] | null => {
-  const hosts = useContext(AdminSectionContext)?.collectionHosts;
-  if (hosts === undefined) return null;
-  return hosts instanceof Promise ? use(hosts).data : hosts;
-};
+export const useAdminSection = (): AdminSectionData | null =>
+  useContext(AdminSectionContext);
 
 export const useIsAdminSection = () => {
   return useContext(AdminSectionContext) !== null;

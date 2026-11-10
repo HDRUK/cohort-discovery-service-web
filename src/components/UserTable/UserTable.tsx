@@ -18,7 +18,10 @@ import useAdminStore from "@/hooks/useAdminStore";
 import dayjs from "dayjs";
 import { TableProps } from "../Table/Table";
 import { trueKeys } from "@/utils/numbers";
-import { useIsAdminSection } from "@/contexts/AdminSectionContext";
+import {
+  useAdminSection,
+  useIsAdminSection,
+} from "@/contexts/AdminSectionContext";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import { DEFAULT_PER_PAGE, DEFAULT_USERS_PER_PAGE } from "@/config/defaults";
 import { getTimestamp } from "@/utils/date";
@@ -26,7 +29,8 @@ import { getLastName } from "@/utils/user";
 import { formatWorkgroupName } from "@/utils/workgroups";
 import { filterUsers } from "./userFilters";
 import { useSessionData } from "@/contexts/SessionDataContext";
-import { useAdminUsers } from "@/contexts/AdminSectionContext";
+
+const NO_USERS: User[] = [];
 
 const PAGE_PARAM = "users_page";
 const PER_PAGE_PARAM = "users_per_page";
@@ -58,7 +62,7 @@ const UserTable = ({
 
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
 
-  const users = useAdminUsers();
+  const users = useAdminSection()?.users ?? NO_USERS;
   const setSelectedUser = useAdminStore((s) => s.setSelectedUser);
   const [sorting, setSorting] = useState<MRT_SortingState>([]);
 

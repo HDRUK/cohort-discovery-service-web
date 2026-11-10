@@ -37,12 +37,14 @@ import ErrorHeader from "@/components/ErrorHeader";
 import UpdatePanel from "@/components/UpdatePanel";
 import { useThreePane } from "@/providers/ThreePaneProvider";
 import { FieldConfigMap, useSaveChanges } from "@/hooks/useSaveChanges";
-import { useIsAdminSection } from "@/contexts/AdminSectionContext";
+import {
+  useAdminSection,
+  useIsAdminSection,
+} from "@/contexts/AdminSectionContext";
 import { clampRunTimeFrequency, getFrequencyModeKey } from "@/utils/frequency";
 import CollectionHostCredentials from "@/modules/CollectionHostCredentials";
 import { useSessionData } from "@/contexts/SessionDataContext";
-import { useCustodianSectionHosts } from "@/contexts/CustodianSectionContext";
-import { useAdminCollectionHosts } from "@/contexts/AdminSectionContext";
+import { useCustodianSection } from "@/contexts/CustodianSectionContext";
 
 const NO_HOSTS: CollectionHost[] = [];
 
@@ -116,8 +118,9 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
   const isAdmin = useIsAdminSection();
   const hostId = collection.host?.id;
 
-  const currentCollectionHosts = useCustodianSectionHosts() ?? NO_HOSTS;
-  const collectionHosts = useAdminCollectionHosts() ?? NO_HOSTS;
+  const currentCollectionHosts =
+    useCustodianSection()?.collectionHosts ?? NO_HOSTS;
+  const collectionHosts = useAdminSection()?.collectionHosts ?? NO_HOSTS;
   const workgroups = useSessionData().workgroups;
 
   const notify = useNotify();

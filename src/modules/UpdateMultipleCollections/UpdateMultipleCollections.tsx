@@ -50,7 +50,7 @@ const UpdateMultipleCollections = ({
   collections,
 }: UpdateMultipleCollectionProps) => {
   const { expandedRight, toggleRight: onClose } = useThreePane();
-  const currentCustodian = useCustodianSection();
+  const currentCustodian = useCustodianSection()?.custodian;
 
   const workgroups = useSessionData().workgroups;
 

@@ -23,7 +23,7 @@ const ManageMultipleCollectionsStatus = ({
 }: ManageMultipleCollectionsStatusProps) => {
   const { control, setValue } = useFormContext<UpdateCollectionFormValues>();
 
-  const currentCustodian = useCustodianSection();
+  const currentCustodian = useCustodianSection()?.custodian;
   const requestCollectionMadeActive = useCustodianStore(
     (s) => s.requestCollectionMadeActive,
   );
