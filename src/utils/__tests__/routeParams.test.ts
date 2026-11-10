@@ -1,4 +1,12 @@
-import { isPid, parseQueryListParams, parseTimeRange } from "../routeParams";
+import {
+  isPid,
+  parseParseQueryBody,
+  parseQueryListParams,
+  parseSearchConceptsBody,
+  parseTermDirectoryParams,
+  parseTimeRange,
+  toTermDirectoryParams,
+} from "../routeParams";
 
 const RANGE = {
   from: "2026-09-07T00:00:00.000Z",
@@ -68,5 +76,109 @@ describe("parseQueryListParams", () => {
 
     expect(params.get("page")).toBeNull();
     expect(params.get("per_page")).toBe("200");
+  });
+});
+
+describe("toTermDirectoryParams", () => {
+  it("round-trips through parseTermDirectoryParams", () => {
+    const params = {
+      page: 2,
+      perPage: 50,
+      search: "asthma",
+      domain: "person" as const,
+      collections: ["col_a", "col_b"],
+      sort: "name:asc",
+    };
+
+    expect(parseTermDirectoryParams(toTermDirectoryParams(params))).toEqual(
+      params,
+    );
+  });
+});
+
+describe("parseTermDirectoryParams", () => {
+  it("defaults the page and page size", () => {
+    expect(parseTermDirectoryParams(new URLSearchParams())).toEqual({
+      page: 1,
+      perPage: 25,
+      search: undefined,
+      domain: undefined,
+      collections: [],
+      sort: undefined,
+    });
+  });
+
+  it("clamps per_page", () => {
+    expect(
+      parseTermDirectoryParams(new URLSearchParams("per_page=100000"))?.perPage,
+    ).toBe(200);
+  });
+
+  it.each([
+    ["an unknown domain", "domain=everything"],
+    ["an invalid collection pid", "collections[]=../admin"],
+    ["an overlong search", `search=${"a".repeat(256)}`],
+  ])("returns null for %s", (_label, query) => {
+    expect(parseTermDirectoryParams(new URLSearchParams(query))).toBeNull();
+  });
+});
+
+describe("parseSearchConceptsBody", () => {
+  it("keeps the known fields and clamps per_page", () => {
+    expect(
+      parseSearchConceptsBody({
+        concept_name: ["asthma"],
+        concept_id: ["asthma"],
+        domain: "Condition",
+        collections: ["col_a"],
+        page: 1,
+        per_page: 5000,
+        url: "https://example.com",
+      }),
+    ).toEqual({
+      concept_name: ["asthma"],
+      concept_id: ["asthma"],
+      domain: "Condition",
+      collections: ["col_a"],
+      page: 1,
+      per_page: 200,
+      include_ancestors: undefined,
+    });
+  });
+
+  it.each([
+    ["a non-object", "asthma"],
+    ["a non-array search", { concept_name: "asthma" }],
+    ["an invalid collection pid", { collections: ["a/b"] }],
+    ["a fractional page", { page: 1.5 }],
+  ])("returns null for %s", (_label, body) => {
+    expect(parseSearchConceptsBody(body)).toBeNull();
+  });
+});
+
+describe("parseParseQueryBody", () => {
+  it("keeps the known fields", () => {
+    expect(
+      parseParseQueryBody({
+        query: "adults with asthma",
+        ignore_synthetic: true,
+        collections: ["col_a"],
+        extra: 1,
+      }),
+    ).toEqual({
+      query: "adults with asthma",
+      ignore_synthetic: true,
+      prefer_non_synthetic: undefined,
+      collections: ["col_a"],
+    });
+  });
+
+  it.each([
+    ["a missing query", {}],
+    ["a blank query", { query: "  " }],
+    ["an overlong query", { query: "a".repeat(10_001) }],
+    ["a non-boolean flag", { query: "asthma", ignore_synthetic: "yes" }],
+  ])("returns null for %s", (_label, body) => {
+    expect(parseParseQueryBody(body)).toBeNull();
   });
 });

@@ -48,6 +48,23 @@ export interface ReadArgs {
   params?: URLSearchParams | string;
 }
 
+export interface SearchConceptsBody {
+  concept_name?: string[];
+  concept_id?: string[];
+  domain?: string;
+  collections?: string[];
+  page?: number;
+  per_page?: number;
+  include_ancestors?: boolean;
+}
+
+export interface ParseQueryBody {
+  query: string;
+  ignore_synthetic?: boolean;
+  prefer_non_synthetic?: boolean;
+  collections?: string[];
+}
+
 export interface ApiResponse<T> {
   message: string;
   data: T;
