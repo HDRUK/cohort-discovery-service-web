@@ -29,7 +29,7 @@ import { useTable } from "@/hooks/useTable";
 import ExpectedValue from "@/components/ExpectedValue";
 import Table from "@/components/Table";
 import { getDatetime, getDurationSeconds } from "@/utils/date";
-import getRegressionTests from "@/actions/regressionTest/getRegressionTests";
+import { fetchRegressionTests } from "@/modules/CollectionHealth/healthQueries";
 import createRegressionTest from "@/actions/regressionTest/createRegressionTest";
 import updateRegressionTest from "@/actions/regressionTest/updateRegressionTest";
 import deleteRegressionTest from "@/actions/regressionTest/deleteRegressionTest";
@@ -56,7 +56,7 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
 
   const { data, isLoading } = useQuery({
     queryKey: QUERY_KEYS.regressionTests(),
-    queryFn: () => getRegressionTests(),
+    queryFn: () => fetchRegressionTests(),
     staleTime: 30_000,
   });
 

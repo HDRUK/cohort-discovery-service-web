@@ -14,7 +14,7 @@ import {
 import { SxProps, Theme } from "@mui/material/styles";
 import { useQuery } from "@tanstack/react-query";
 import { MRT_ColumnDef } from "material-react-table";
-import getCollectionTaskHistory from "@/actions/collection/getCollectionTaskHistory";
+import { fetchCollectionTaskHistory } from "./healthQueries";
 import SearchBox from "@/components/SearchBox";
 import SectionCard from "@/components/SectionCard";
 import Table from "@/components/Table";
@@ -55,7 +55,7 @@ const CollectionTasksPanel = ({
 
   const { data, isLoading, isError } = useQuery({
     queryKey: QUERY_KEYS.collectionTaskHistory(collectionPid, range),
-    queryFn: () => getCollectionTaskHistory(collectionPid, range),
+    queryFn: () => fetchCollectionTaskHistory(collectionPid, range),
     enabled: isActive,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
