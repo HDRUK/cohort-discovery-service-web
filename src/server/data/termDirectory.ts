@@ -1,7 +1,7 @@
 import "server-only";
 
 import { API_ROUTES } from "@/lib/apiRoutes";
-import { apiGet } from "@/server/api";
+import { apiGet, ErrorMode } from "@/server/api";
 import { requireSession } from "@/server/session";
 import { TermDirectoryEntry, ApiResponse, Paginated } from "@/types/api";
 import { DEFAULT_PER_PAGE } from "@/config/defaults";
@@ -14,6 +14,7 @@ export const getTermDirectory = async (
   domain?: DomainTab,
   collections?: string[],
   sort?: string,
+  errorMode?: ErrorMode,
 ): Promise<ApiResponse<Paginated<TermDirectoryEntry>>> => {
   const { token } = await requireSession();
 
@@ -46,6 +47,6 @@ export const getTermDirectory = async (
   return apiGet<ApiResponse<Paginated<TermDirectoryEntry>>>(
     token,
     API_ROUTES.termDirectory,
-    { params },
+    { params, errorMode },
   );
 };

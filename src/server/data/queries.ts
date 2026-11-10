@@ -1,9 +1,15 @@
 import "server-only";
 
 import { API_ROUTES } from "@/lib/apiRoutes";
-import { apiGet, ReadOptions } from "@/server/api";
+import { apiGet, apiPost, ErrorMode, ReadOptions } from "@/server/api";
 import { requireSession } from "@/server/session";
-import { ApiResponse, Paginated, Query, WithIncomplete } from "@/types/api";
+import {
+  ApiResponse,
+  Paginated,
+  ParseQueryBody,
+  Query,
+  WithIncomplete,
+} from "@/types/api";
 
 export const getQueries = async (
   args?: ReadOptions,
@@ -36,4 +42,16 @@ export const getQuery = async (
     params: args?.params,
     errorMode: args?.errorMode,
   });
+};
+
+export const parseQuery = async (
+  body: ParseQueryBody,
+): Promise<ApiResponse<string>> => {
+  const { token } = await requireSession();
+  return apiPost<ApiResponse<string>, ParseQueryBody>(
+    token,
+    API_ROUTES.parseQuery,
+    body,
+    { errorMode: ErrorMode.RESULT },
+  );
 };
