@@ -1,5 +1,6 @@
 import { getCollectionHostWithCredentials } from "@/server/data/collectionHosts";
 import { getSession } from "@/server/session";
+import { toResponse } from "@/server/routeHandler";
 import {
   parseCollectionHostId,
   toCollectionHostCredentials,
@@ -42,9 +43,9 @@ export async function GET(
   const result = await getCollectionHostWithCredentials(session.token, hostId);
 
   if (!result.data) {
-    return new Response(result.error?.text ?? "Collection host not found", {
-      status: result.error?.code ?? 404,
-    });
+    return result.error
+      ? toResponse(result)
+      : new Response("Collection host not found", { status: 404 });
   }
 
   return Response.json(toCollectionHostCredentials(result.data), {
