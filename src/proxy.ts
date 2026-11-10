@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function proxy(request: NextRequest) {
-  const res = NextResponse.next();
+  const headers = new Headers(request.headers);
   //if we want to use the time later on
-  res.headers.set("x-request-now", String(Math.floor(Date.now() / 1000)));
-  res.headers.set(
+  headers.set("x-request-now", String(Math.floor(Date.now() / 1000)));
+  headers.set(
     "x-pathname",
     `${request.nextUrl.pathname}${request.nextUrl.search}`,
   );
-  return res;
+  return NextResponse.next({ request: { headers } });
 }
 
 export const config = {
