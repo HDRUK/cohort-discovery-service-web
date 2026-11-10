@@ -8,7 +8,14 @@ import { NotifyProvider } from "@/providers/NotifyProvider";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 
 // --- Mock CohortDiscoveryService store ---
-const createCollectionHost = jest.fn();
+const mockCreateCollectionHost = jest.fn();
+
+jest.mock("@/actions/collectionHost/createCollectionHost", () => ({
+  __esModule: true,
+  default: (...args: unknown[]) => mockCreateCollectionHost(...args),
+}));
+
+const createCollectionHost = mockCreateCollectionHost;
 const onCancel = jest.fn();
 
 let custodian: Custodian;
@@ -18,13 +25,7 @@ const renderCreateColllectionHost = (
 ) =>
   render(
     <NotifyProvider>
-      <MockCohortDiscoveryServiceStore
-        overrides={{
-          custodian: {
-            createCollectionHost,
-          },
-        }}
-      >
+      <MockCohortDiscoveryServiceStore>
         <CreateCollectionHost
           custodianId={custodian.id}
           onCancel={onCancel}

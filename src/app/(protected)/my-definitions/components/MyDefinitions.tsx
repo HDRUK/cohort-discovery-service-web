@@ -10,15 +10,14 @@ import AddNewConcept from "./AddNewConcept";
 import ActionDeleteButton from "@/components/ActionDeleteButton";
 import CreateConceptSet from "@/modules/CreateConceptSet";
 import Table from "@/components/Table";
-import useUserStore from "@/hooks/useUserStore";
+import detachConcepts from "@/actions/concept/detachConcepts";
+import deleteConceptSet from "@/actions/conceptSet/deleteConceptSet";
 
 const MyDefinitions = ({ conceptSets }: { conceptSets: ConceptSet[] }) => {
-  const removeConceptsFromSet = useUserStore((s) => s.removeConceptsFromSet);
-  const removeConceptSet = useUserStore((s) => s.removeConceptSet);
 
   const onDelete = useCallback(
-    async (id: number) => removeConceptSet(id),
-    [removeConceptSet],
+    async (id: number) => deleteConceptSet(id),
+    [],
   );
 
   const columns = useMemo<MRT_ColumnDef<ConceptSet>[]>(
@@ -93,7 +92,7 @@ const MyDefinitions = ({ conceptSets }: { conceptSets: ConceptSet[] }) => {
         <Grid size={7}>
           <ConceptTable
             concepts={row.original.concepts}
-            onDelete={(id) => removeConceptsFromSet(row.original.id, [id])}
+            onDelete={(id) => detachConcepts(row.original.id, [id])}
           />
         </Grid>
         <Grid size={5}>

@@ -15,7 +15,14 @@ import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceS
 import { getMockCollection } from "@/actions/collection/__mocks__/getCollections";
 import getCollectionHost from "@/actions/collectionHost/__mocks__/getCollectionHost";
 
-const createCollection = jest.fn();
+const mockCreateCollection = jest.fn();
+
+jest.mock("@/actions/collection/createCustodianCollectionWithConfig", () => ({
+  __esModule: true,
+  default: (...args: unknown[]) => mockCreateCollection(...args),
+}));
+
+const createCollection = mockCreateCollection;
 const mockCustodian = getCustodian();
 const mockCollectionHosts = [
   getCollectionHost({
@@ -29,7 +36,6 @@ const mockCollectionHosts = [
     custodian: mockCustodian,
   }),
 ];
-const createCollectionAdmin = jest.fn();
 
 let custodians: Custodian[];
 let collectionHosts: CollectionHost[];
@@ -43,16 +49,10 @@ const renderCreateCollection = (
   render(
     <MockCohortDiscoveryServiceStore
       overrides={{
-        custodian: {
-          createCollection,
-        },
         custodianSection: {
           custodian: custodians[0],
           collectionHosts,
           ...sectionOverrides,
-        },
-        admin: {
-          createCollection: createCollectionAdmin,
         },
         adminSection: {
           collectionHosts,

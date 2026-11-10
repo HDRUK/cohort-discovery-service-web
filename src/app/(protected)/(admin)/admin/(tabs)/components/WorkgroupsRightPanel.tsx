@@ -3,14 +3,14 @@ import { Suspense } from "react";
 import UpdateWorkgroup from "@/modules/UpdateWorkgroup";
 import { maskClientTest } from "@/lib/maskClientTest";
 import { WorkgroupGuidanceProps } from "./WorkgroupsGuidance";
-import useAdminStore from "@/hooks/useAdminStore";
+import useSelectedWorkgroup from "@/hooks/useSelectedWorkgroup";
 
 const WorkgroupGuidance = maskClientTest<WorkgroupGuidanceProps>(
   () => import("./WorkgroupsGuidance"),
 );
 
 const WorkgroupsRightPanel = () => {
-  const selectedWorkgroup = useAdminStore((s) => s.selectedWorkgroup);
+  const selectedWorkgroup = useSelectedWorkgroup();
 
   if (selectedWorkgroup) {
     return (
