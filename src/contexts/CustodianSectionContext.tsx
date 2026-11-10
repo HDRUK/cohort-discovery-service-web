@@ -1,27 +1,29 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo } from "react";
+import { createContext, use, useContext, useEffect, useMemo } from "react";
 import { redirect } from "next/navigation";
 import { Paper } from "@mui/material";
 
 import SkeletonFull from "@/components/SkeletonFull";
 import useUserStore from "@/hooks/useUserStore";
 import useCustodianStore from "@/hooks/useCustodianStore";
-import type { CollectionHost, Custodian } from "@/types/api";
+import type { ApiResponse, CollectionHost, Custodian } from "@/types/api";
 
 type Props = {
-  custodian: Custodian;
-  collectionHosts: CollectionHost[];
+  custodian: Promise<ApiResponse<Custodian>>;
+  collectionHosts: Promise<ApiResponse<CollectionHost[]>>;
   children: React.ReactNode;
 };
 
 const CustodianSectionContext = createContext<Custodian | null>(null);
 
 export function CustodianSectionProvider({
-  custodian,
-  collectionHosts,
+  custodian: custodianPromise,
+  collectionHosts: collectionHostsPromise,
   children,
 }: Props) {
+  const { data: custodian } = use(custodianPromise);
+  const { data: collectionHosts } = use(collectionHostsPromise);
   const user = useUserStore((s) => s.user);
 
   const setCurrentCustodian = useCustodianStore((s) => s.current.setCustodian);
