@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, ReactNode, useContext } from "react";
+import { createContext, ReactNode, use, useContext } from "react";
 import { Collection, CombinedUser, Custodian, Workgroup } from "@/types/api";
 
 export interface SessionData {
@@ -10,13 +10,17 @@ export interface SessionData {
   workgroups: Workgroup[];
 }
 
-const SessionDataContext = createContext<SessionData | null>(null);
+type SessionDataSource = SessionData | Promise<SessionData | null> | null;
+
+const SessionDataContext = createContext<SessionDataSource | undefined>(
+  undefined,
+);
 
 export const SessionDataProvider = ({
   value,
   children,
 }: {
-  value: SessionData;
+  value: SessionDataSource;
   children: ReactNode;
 }) => (
   <SessionDataContext.Provider value={value}>
@@ -24,14 +28,19 @@ export const SessionDataProvider = ({
   </SessionDataContext.Provider>
 );
 
+const useResolvedSessionData = (
+  source: SessionDataSource | undefined,
+): SessionData | null =>
+  source instanceof Promise ? use(source) : (source ?? null);
+
 export const useSessionData = (): SessionData => {
-  const sessionData = useContext(SessionDataContext);
+  const sessionData = useResolvedSessionData(useContext(SessionDataContext));
   if (!sessionData)
     throw new Error(
-      "useSessionData must be used within <SessionDataProvider />",
+      "useSessionData must be used within <SessionDataProvider /> with a signed-in session",
     );
   return sessionData;
 };
 
 export const useSessionUser = (): CombinedUser | null =>
-  useContext(SessionDataContext)?.user ?? null;
+  useResolvedSessionData(useContext(SessionDataContext))?.user ?? null;
