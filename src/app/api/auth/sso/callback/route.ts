@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import ssoExchange from "@/actions/standalone/ssoExchange";
+import ssoExchange from "@/server/ssoExchange";
 import { routes } from "@/config/routes";
 import { redirectTo } from "@/lib/redirect";
 
