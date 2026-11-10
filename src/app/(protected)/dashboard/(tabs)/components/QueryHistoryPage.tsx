@@ -1,9 +1,8 @@
 import { ReactNode, Suspense } from "react";
 import { getQueries } from "@/server/data/queries";
-import QueriesTable from "@/modules/QueriesTable";
+import QueriesTable, { QueryHistoryTitle } from "@/modules/QueriesTable";
 import { SearchParamsTransitionProvider } from "@/contexts/SearchParamsTransitionContext";
-import { Box, Skeleton } from "@mui/material";
-import Title from "@/components/Title";
+import { Box } from "@mui/material";
 import { ApiSearchParams } from "@/types/api";
 import { buildQueryHistoryParams } from "@/utils/params";
 import { requestTime } from "@/server/requestTime";
@@ -36,20 +35,7 @@ const QueryHistoryLayout = ({
       gap: 1,
     }}
   >
-    <Title
-      title={"History"}
-      subTitle={
-        total === undefined ? (
-          <Skeleton
-            variant="text"
-            width={40}
-            sx={{ display: "inline-block" }}
-          />
-        ) : (
-          `${total}`
-        )
-      }
-    />
+    <QueryHistoryTitle total={total} />
     {children}
   </Box>
 );
