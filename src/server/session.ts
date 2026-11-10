@@ -50,3 +50,14 @@ export const requireSession = async (): Promise<Session> => {
   }
   return session;
 };
+
+export const hasLiveSession = async (): Promise<boolean> => {
+  const [session, requestHeaders] = await Promise.all([
+    getSession(),
+    headers(),
+  ]);
+  return (
+    !!session &&
+    !isSessionExpired(session.exp, Number(requestHeaders.get("x-request-now")))
+  );
+};
