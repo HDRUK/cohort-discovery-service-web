@@ -7,6 +7,8 @@ import { ReactNode, useEffect, useRef } from "react";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import useUserStore from "@/hooks/useUserStore";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
+import { useQueryBuilderStore } from "@/store/queryBuilderStore";
+import { shouldResetPreferences } from "@/store/queryBuilderPreferences";
 
 interface ProtectedPageProps {
   user: CombinedUser;
@@ -41,6 +43,9 @@ const ProtectedPage = ({
   const checkSelectedDatasets = useQueryBuilder(
     (qb) => qb.checkSelectedDatasets,
   );
+  const resetSelectedDatasetsFor = useQueryBuilder(
+    (qb) => qb.resetSelectedDatasetsFor,
+  );
 
   const hasRendered = useRef(false);
 
@@ -66,10 +71,20 @@ const ProtectedPage = ({
 
   useEffect(() => {
     if (!hasRendered.current) {
+      const { ownerId } = useQueryBuilderStore.getState();
+      if (shouldResetPreferences(ownerId, user.id)) {
+        resetSelectedDatasetsFor(user.id);
+      }
       initialiseSelectedDatasets(collections, isOnlyInDefaultWorkgroup);
     }
     hasRendered.current = true;
-  }, [collections, initialiseSelectedDatasets, isOnlyInDefaultWorkgroup]);
+  }, [
+    collections,
+    initialiseSelectedDatasets,
+    isOnlyInDefaultWorkgroup,
+    resetSelectedDatasetsFor,
+    user.id,
+  ]);
 
   useEffect(() => {
     if (!currentUser) return;
