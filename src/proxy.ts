@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
-import { redirectTo } from "@/lib/redirect";
 import { sessionRedirect } from "@/lib/sessionRedirect";
 import { isStandalone } from "@/utils/modes";
 
@@ -13,7 +12,9 @@ export async function proxy(request: NextRequest) {
     search: request.nextUrl.search,
     standalone: isStandalone(process.env.APPLICATION_MODE),
   });
-  if (redirectPath) return redirectTo(redirectPath);
+  if (redirectPath) {
+    return NextResponse.redirect(new URL(redirectPath, request.nextUrl));
+  }
 
   const headers = new Headers(request.headers);
   //if we want to use the time later on
