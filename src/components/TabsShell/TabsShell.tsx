@@ -20,7 +20,7 @@ import { useRouter } from "next/navigation";
 import { mergeSx } from "@/utils/helpers";
 
 export type TabType = {
-  page: React.ReactNode;
+  page?: React.ReactNode;
   id?: string;
   label: string;
   icon?: React.ReactElement | string;
@@ -42,6 +42,7 @@ type TabsShellProps = {
   tabListSx?: BoxProps["sx"];
   tabContentSx?: BoxProps["sx"];
   forceValue?: boolean;
+  children?: React.ReactNode;
 };
 
 export default function TabsShell({
@@ -53,6 +54,7 @@ export default function TabsShell({
   tabListSx,
   tabContentSx,
   forceValue = false,
+  children,
 }: TabsShellProps) {
   const router = useRouter();
   const [internalValue, setInternalValue] = React.useState(
@@ -155,6 +157,10 @@ export default function TabsShell({
             )}
           </TabList>
         </Box>
+
+        {children && (
+          <Box sx={mergeSx(defaultTabContentSx, tabContentSx)}>{children}</Box>
+        )}
 
         {kids.length > 0 && (
           <Box sx={mergeSx(defaultTabContentSx, tabContentSx)}>
