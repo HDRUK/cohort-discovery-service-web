@@ -52,14 +52,14 @@ describe("proxy", () => {
     );
   });
 
-  it("redirects a logged-out request with a relative location", async () => {
+  it("redirects a logged-out request to login on the request's own host", async () => {
     const response = await proxy(
       requestFor("https://localhost/admin/collections"),
     );
 
     expect(response.status).toBe(307);
     expect(response.headers.get("location")).toBe(
-      "/login?return_to=%2Fadmin%2Fcollections",
+      "https://localhost/login?return_to=%2Fadmin%2Fcollections",
     );
   });
 });
