@@ -35,7 +35,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useQueryBuilderStore } from "./queryBuilderStore";
 import { useStateManagementStore } from "@/store/stateManagementStore";
 import { useSelectionStore } from "@/store/selectionStore";
-import { useQueryLimitStore } from "@/store/queryLimitStore";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import ConfirmProvider from "@/components/ConfirmProvider";
 import { DefaultProvider } from "@/providers/DefaultProvider";
@@ -127,8 +126,6 @@ const seedStores = (overrides?: SliceOverrides) => {
     selectedUserId: null,
     selectedCollectionIds: [],
   });
-
-  useQueryLimitStore.setState({ isQueryLimitReached: false });
 
   useFeatureFlagsStore.setState(
     {

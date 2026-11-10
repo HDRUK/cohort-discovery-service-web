@@ -12,6 +12,7 @@ import {
   TaskType,
 } from "@/types/api";
 import { capVarChar } from "@/utils/string";
+import { changesQueryQuota } from "@/utils/queryLimit";
 
 const submitQuery = async (
   query: RuleGroupType,
@@ -32,9 +33,7 @@ const submitQuery = async (
     { errorMode: ErrorMode.RESULT },
   );
 
-  if (res.error) return res;
-
-  refresh();
+  if (changesQueryQuota(res)) refresh();
   return res;
 };
 
