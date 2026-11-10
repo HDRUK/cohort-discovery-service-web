@@ -130,11 +130,11 @@ const UpdateMultipleCollections = ({
           result,
           status !== undefined ? CollectionStatus[status] : undefined,
         );
-        if (ok) {
-          notify.success(message);
-        } else {
+        if (!ok) {
           notify.error(message);
+          return;
         }
+        notify.success(message);
       }
 
       if (closeAfter) {
