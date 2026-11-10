@@ -3,7 +3,8 @@ import "server-only";
 import { cacheLife } from "next/cache";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { apiGet, ErrorMode } from "@/server/api";
-import { USER_DATA_CACHE_LIFE } from "@/server/cacheProfiles";
+import { LIST_CACHE_LIFE, USER_DATA_CACHE_LIFE } from "@/server/cacheProfiles";
+import { isSearchQuery, toListQuery } from "@/server/listQuery";
 import { requireSession } from "@/server/session";
 import {
   ApiResponse,
@@ -34,6 +35,9 @@ export const getUserCollections = async (): Promise<
 };
 
 export const getCollections = async (): Promise<ApiResponse<Collection[]>> => {
+  "use cache: private";
+  cacheLife(LIST_CACHE_LIFE);
+
   const { token } = await requireSession();
   return apiGet<ApiResponse<Collection[]>>(token, API_ROUTES.collections);
 };
@@ -49,16 +53,65 @@ export const getAdminCollections = async (
   );
 };
 
-export const getCustodianCollections = async (
-  custodianPid: string,
+const fetchAdminCollectionList = async (
+  queryString: string,
+): Promise<ApiResponse<Paginated<CollectionWithHosts>>> => {
+  const { token } = await requireSession();
+  return apiGet<ApiResponse<Paginated<CollectionWithHosts>>>(
+    token,
+    API_ROUTES.adminCollections,
+    { params: queryString },
+  );
+};
+
+const fetchCachedAdminCollectionList = async (
+  queryString: string,
+): Promise<ApiResponse<Paginated<CollectionWithHosts>>> => {
+  "use cache: private";
+  cacheLife(LIST_CACHE_LIFE);
+
+  return fetchAdminCollectionList(queryString);
+};
+
+export const getAdminCollectionList = (
   args?: ReadArgs,
+): Promise<ApiResponse<Paginated<CollectionWithHosts>>> => {
+  const queryString = toListQuery(args?.params);
+  return isSearchQuery(queryString)
+    ? fetchAdminCollectionList(queryString)
+    : fetchCachedAdminCollectionList(queryString);
+};
+
+const fetchCustodianCollections = async (
+  custodianPid: string,
+  queryString: string,
 ): Promise<ApiResponse<Paginated<CollectionWithHosts>>> => {
   const { token } = await requireSession();
   return apiGet<ApiResponse<Paginated<CollectionWithHosts>>>(
     token,
     API_ROUTES.custodianCollections(custodianPid),
-    { params: args?.params },
+    { params: queryString },
   );
+};
+
+const fetchCachedCustodianCollections = async (
+  custodianPid: string,
+  queryString: string,
+): Promise<ApiResponse<Paginated<CollectionWithHosts>>> => {
+  "use cache: private";
+  cacheLife(LIST_CACHE_LIFE);
+
+  return fetchCustodianCollections(custodianPid, queryString);
+};
+
+export const getCustodianCollections = (
+  custodianPid: string,
+  args?: ReadArgs,
+): Promise<ApiResponse<Paginated<CollectionWithHosts>>> => {
+  const queryString = toListQuery(args?.params);
+  return isSearchQuery(queryString)
+    ? fetchCustodianCollections(custodianPid, queryString)
+    : fetchCachedCustodianCollections(custodianPid, queryString);
 };
 
 export const getCollectionDetails = async (
