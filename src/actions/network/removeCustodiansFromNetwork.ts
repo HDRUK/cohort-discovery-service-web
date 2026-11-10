@@ -10,16 +10,19 @@ const removeCustodiansFromNetwork = async (
   payload: RemoveCustodiansFromNetworkPost,
 ): Promise<number[]> => {
   const { token } = await requireSession();
-  const results = await Promise.all(
-    payload.custodian_ids.map(async (custodian_id) =>
-      apiDelete<ApiResponse<number>>(
-        token,
-        API_ROUTES.custodianNetwork(custodian_id, payload.id),
+  try {
+    const results = await Promise.all(
+      payload.custodian_ids.map(async (custodian_id) =>
+        apiDelete<ApiResponse<number>>(
+          token,
+          API_ROUTES.custodianNetwork(custodian_id, payload.id),
+        ),
       ),
-    ),
-  );
-  refresh();
-  return results.map((r) => r.data);
+    );
+    return results.map((r) => r.data);
+  } finally {
+    refresh();
+  }
 };
 
 export default removeCustodiansFromNetwork;
