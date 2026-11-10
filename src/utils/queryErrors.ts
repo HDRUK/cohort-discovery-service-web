@@ -1,7 +1,7 @@
 import { ApiError } from "@/lib/https";
 import { NotifyFn } from "@/providers/NotifyProvider";
-import { useQueryLimitStore } from "@/store/queryLimitStore";
 import { useSessionStore } from "@/store/sessionStore";
+import { QUERY_LIMIT_STATUS } from "@/utils/queryLimit";
 
 export const QUERY_LIMIT_REACHED_MESSAGE =
   "You've reached your monthly query limit. Try again next month.";
@@ -17,8 +17,7 @@ const handleQuerySubmissionError = (
     useSessionStore.getState().endSession();
     return;
   }
-  if (error.code === 429) {
-    useQueryLimitStore.getState().markQueryLimitReached();
+  if (error.code === QUERY_LIMIT_STATUS) {
     notify({
       message: QUERY_LIMIT_REACHED_MESSAGE,
       severity: "error",

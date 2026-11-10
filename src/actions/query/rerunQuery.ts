@@ -5,6 +5,7 @@ import { API_ROUTES } from "@/lib/apiRoutes";
 import { apiGet, ErrorMode } from "@/server/api";
 import { requireSession } from "@/server/session";
 import { CreateQuery, ApiResponse } from "@/types/api";
+import { changesQueryQuota } from "@/utils/queryLimit";
 
 const rerunQuery = async (pid: string): Promise<ApiResponse<CreateQuery>> => {
   const { token } = await requireSession();
@@ -13,7 +14,7 @@ const rerunQuery = async (pid: string): Promise<ApiResponse<CreateQuery>> => {
     API_ROUTES.rerunQuery(pid),
     { errorMode: ErrorMode.RESULT },
   );
-  if (!res.error) refresh();
+  if (changesQueryQuota(res)) refresh();
   return res;
 };
 
