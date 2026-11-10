@@ -12,6 +12,7 @@ import { ThemeOptions } from "@mui/material";
 import { QueryClientProvider } from "@tanstack/react-query";
 import ConfirmProvider from "../ConfirmProvider";
 import { getQueryClient } from "@/lib/queryClient";
+import SessionEndedHandler from "@/components/SessionEndedHandler";
 
 export default function ThemeRegistry({ children }: { children: ReactNode }) {
   const queryClient = getQueryClient();
@@ -34,7 +35,10 @@ export default function ThemeRegistry({ children }: { children: ReactNode }) {
                   },
                 }}
               />
-              <NotifyProvider>{children}</NotifyProvider>
+              <NotifyProvider>
+                <SessionEndedHandler />
+                {children}
+              </NotifyProvider>
             </LocalizationProvider>
           </QueryClientProvider>
         </ConfirmProvider>
