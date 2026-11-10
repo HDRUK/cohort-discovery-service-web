@@ -1,6 +1,7 @@
 import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
 import path from "path";
+import { routes } from "./src/config/routes";
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
@@ -23,6 +24,15 @@ const nextConfig: NextConfig = {
   // standalone build so the route handler can stream it at runtime.
   outputFileTracingIncludes: {
     "/api/location/boundaries/[region]": ["./boundaries/**"],
+  },
+  async redirects() {
+    return [
+      {
+        source: routes.dashboard,
+        destination: routes.dashboardNewQuery(),
+        permanent: false,
+      },
+    ];
   },
   async headers() {
     if (process.env.NODE_ENV === "production") {
