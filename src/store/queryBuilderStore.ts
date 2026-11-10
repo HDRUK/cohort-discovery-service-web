@@ -36,7 +36,6 @@ import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import { intersection } from "lodash";
 import { getAllowedDatasetIds } from "@/utils/collections";
 import { getDomain } from "@/utils/omop";
-import { useUserDataStore } from "@/hooks/userDataStore";
 
 export enum NodeKind {
   RULE = "RULE",
@@ -142,8 +141,6 @@ export interface QueryBuilderStoreState {
 
   selectedDatasets: string[];
   setSelectedDatasets: (pids: string[]) => void;
-
-  hasSelectedSyntheticDatasets: boolean;
 
   ownerId: number | null;
   resetSelectedDatasetsFor: (ownerId: number) => void;
@@ -508,28 +505,13 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
       ...state,
       ownerId,
       selectedDatasets: [],
-      hasSelectedSyntheticDatasets: false,
     })),
 
-  hasSelectedSyntheticDatasets: false,
   selectedDatasets: [],
   setSelectedDatasets: (pids) => {
-    const { userCollections } = useUserDataStore.getState();
-
-    const syntheticPids = userCollections
-      .filter((collection) => collection.is_synthetic)
-      .map((collection) => collection.pid);
-
-    const selectedSet = new Set(pids);
-
-    const hasSelectedSyntheticDatasets = syntheticPids.some((pid) =>
-      selectedSet.has(pid),
-    );
-
     set((state) => ({
       ...state,
       selectedDatasets: pids,
-      hasSelectedSyntheticDatasets,
     }));
 
     get().setErrors(get().queryBuilderJson, pids);
@@ -629,7 +611,6 @@ export const useQueryBuilderStore = create<QueryBuilderStoreState>()(
     storage: createJSONStorage(() => localStorage),
     partialize: (state) => ({
       selectedDatasets: state.selectedDatasets,
-      hasSelectedSyntheticDatasets: state.hasSelectedSyntheticDatasets,
       ownerId: state.ownerId,
     }),
   }),

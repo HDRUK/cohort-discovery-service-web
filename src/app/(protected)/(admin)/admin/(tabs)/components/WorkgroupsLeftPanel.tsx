@@ -8,15 +8,15 @@ import { useCallback, useEffect } from "react";
 import useSearchParams from "@/hooks/useSearchParams";
 import useAdminStore from "@/hooks/useAdminStore";
 import { useThreePane } from "@/providers/ThreePaneProvider";
-import { useUserDataStore } from "@/hooks/userDataStore";
 import { formatWorkgroupName } from "@/utils/workgroups";
+import { useSessionData } from "@/contexts/SessionDataContext";
 
 const WorkgroupsLeftPanel = () => {
   const { expandedLeft, toggleLeft } = useThreePane();
 
   const selectedWorkgroup = useAdminStore((s) => s.selectedWorkgroup);
   const setSelectedWorkgroup = useAdminStore((s) => s.setSelectedWorkgroup);
-  const workgroups = useUserDataStore((s) => s.workgroups);
+  const workgroups = useSessionData().workgroups;
 
   const { getSearchParam, setSearchParam } =
     useSearchParams("workgroup_filter");

@@ -8,7 +8,7 @@ import logo from "@branding/assets/logo.svg";
 import branding from "@branding/branding.config";
 import PositionedMenu, { PositionedMenuItem } from "../PositionedMenu";
 import { useRouter } from "next/navigation";
-import useUserStore from "@/hooks/useUserStore";
+import { useSessionUser } from "@/contexts/SessionDataContext";
 import { useApplicationMode } from "@/providers/ApplicationModeProvider";
 import { useSignOutStore } from "@/store/signOutStore";
 import { routes } from "@/config/routes";
@@ -19,8 +19,7 @@ const NEXT_PUBLIC_LOGIN_URL = getOrganisationUrl();
 
 const DefaultHeaderBar = () => {
   const router = useRouter();
-  const user = useUserStore((s) => s.user);
-  const setUser = useUserStore((s) => s.setUser);
+  const user = useSessionUser();
   const { isStandalone } = useApplicationMode();
   const setSigningOut = useSignOutStore((s) => s.setSigningOut);
   const logoHref = user ? routes.dashboardNewQuery() : routes.login;
@@ -61,7 +60,6 @@ const DefaultHeaderBar = () => {
             label: "Logout",
             onClick: () => {
               setSigningOut(true);
-              setUser(null);
               window.location.href = routes.logout;
             },
           },

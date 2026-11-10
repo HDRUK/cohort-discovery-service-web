@@ -14,7 +14,7 @@ import { useTable } from "@/hooks/useTable";
 import dayjs from "dayjs";
 import { TableProps } from "../Table/Table";
 import { trueKeys } from "@/utils/numbers";
-import { useUserDataStore } from "@/hooks/userDataStore";
+import { useSessionData } from "@/contexts/SessionDataContext";
 
 export interface CustodianTableProps extends TableProps {
   showPid?: boolean;
@@ -37,7 +37,7 @@ const CustodianTable = ({
 
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
 
-  const custodians = useUserDataStore((s) => s.custodians);
+  const custodians = useSessionData().custodians;
 
   const selectedCustodianIds = useMemo(
     () => trueKeys(rowSelection ?? {}),

@@ -4,6 +4,10 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import SearchConcepts from "./SearchConcepts";
 import ApplicationModeProvider from "@/providers/ApplicationModeProvider";
+import {
+  SessionData,
+  SessionDataProvider,
+} from "@/contexts/SessionDataContext";
 
 jest.mock("@/lib/routeFetch", () => {
   const mockSearchConcepts = jest.requireActual(
@@ -20,11 +24,15 @@ function Wrapper(props: React.ComponentProps<typeof SearchConcepts>) {
   const [selected, setSelected] = useState<Record<number, boolean>>({});
   return (
     <ApplicationModeProvider>
-      <SearchConcepts
-        {...props}
-        selected={selected}
-        setSelected={setSelected}
-      />
+      <SessionDataProvider
+        value={{ userCollections: [] } as unknown as SessionData}
+      >
+        <SearchConcepts
+          {...props}
+          selected={selected}
+          setSelected={setSelected}
+        />
+      </SessionDataProvider>
     </ApplicationModeProvider>
   );
 }

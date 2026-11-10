@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { forbidden, notFound } from "next/navigation";
 import { CombinedUser } from "@/types/api";
+import AppShell from "@/components/AppShell";
 import UserNotFound from "@/components/UserNotFound";
 import { getCurrentUser } from "@/server/data/user";
 import { getCustodians } from "@/server/data/custodians";
@@ -26,7 +27,11 @@ const SessionGate = async ({ children }: { children: ReactNode }) => {
       return <SessionEnded />;
     case SessionAccess.UserNotFound:
       if (isStandalone(applicationMode)) notFound();
-      return <UserNotFound />;
+      return (
+        <AppShell>
+          <UserNotFound />
+        </AppShell>
+      );
     case SessionAccess.Forbidden:
       forbidden();
     case SessionAccess.Failed:

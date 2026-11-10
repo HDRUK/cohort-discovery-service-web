@@ -2,13 +2,13 @@
 
 import { Collection, CombinedUser, Custodian, Workgroup } from "@/types/api";
 import { FeatureFlag } from "@/types/features";
-import { redirect } from "next/navigation";
-import { ReactNode, useEffect, useRef } from "react";
+import { ReactNode, useEffect, useMemo, useRef } from "react";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
-import useUserStore from "@/hooks/useUserStore";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { useQueryBuilderStore } from "@/store/queryBuilderStore";
 import { shouldResetPreferences } from "@/store/queryBuilderPreferences";
+import { SessionDataProvider } from "@/contexts/SessionDataContext";
+import { isOnlyInDefaultWorkgroup } from "@/utils/user";
 
 interface ProtectedPageProps {
   user: CombinedUser;
@@ -27,14 +27,6 @@ const ProtectedPage = ({
   workgroups,
   children,
 }: ProtectedPageProps) => {
-  const currentUser = useUserStore((s) => s.user);
-  const setUser = useUserStore((s) => s.setUser);
-  const isOnlyInDefaultWorkgroup = useUserStore(
-    (s) => s.isOnlyInDefaultWorkgroup,
-  );
-  const setCollections = useUserStore((s) => s.setUserCollections);
-  const setCustodians = useUserStore((s) => s.setCustodians);
-  const setWorkgroups = useUserStore((s) => s.setWorkgroups);
   const setFlags = useFeatureFlagsStore((s) => s.setFlags);
 
   const initialiseSelectedDatasets = useQueryBuilder(
@@ -49,21 +41,10 @@ const ProtectedPage = ({
 
   const hasRendered = useRef(false);
 
-  useEffect(() => {
-    setUser(user);
-  }, [user, setUser]);
-
-  useEffect(() => {
-    setCollections(collections);
-  }, [collections, setCollections]);
-
-  useEffect(() => {
-    setCustodians(custodians);
-  }, [custodians, setCustodians]);
-
-  useEffect(() => {
-    setWorkgroups(workgroups);
-  }, [workgroups, setWorkgroups]);
+  const sessionData = useMemo(
+    () => ({ user, userCollections: collections, custodians, workgroups }),
+    [user, collections, custodians, workgroups],
+  );
 
   useEffect(() => {
     setFlags(featureFlags);
@@ -75,25 +56,18 @@ const ProtectedPage = ({
       if (shouldResetPreferences(ownerId, user.id)) {
         resetSelectedDatasetsFor(user.id);
       }
-      initialiseSelectedDatasets(collections, isOnlyInDefaultWorkgroup);
+      initialiseSelectedDatasets(collections, isOnlyInDefaultWorkgroup(user));
     }
     hasRendered.current = true;
-  }, [
-    collections,
-    initialiseSelectedDatasets,
-    isOnlyInDefaultWorkgroup,
-    resetSelectedDatasetsFor,
-    user.id,
-  ]);
+  }, [collections, initialiseSelectedDatasets, resetSelectedDatasetsFor, user]);
 
   useEffect(() => {
-    if (!currentUser) return;
     checkSelectedDatasets(collections);
-  }, [collections, currentUser, checkSelectedDatasets]);
+  }, [collections, checkSelectedDatasets]);
 
-  if (!user) redirect("/403?reason=no-token");
-
-  return <>{children}</>;
+  return (
+    <SessionDataProvider value={sessionData}>{children}</SessionDataProvider>
+  );
 };
 
 export default ProtectedPage;

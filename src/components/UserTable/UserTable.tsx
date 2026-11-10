@@ -18,7 +18,6 @@ import useAdminStore from "@/hooks/useAdminStore";
 import dayjs from "dayjs";
 import { TableProps } from "../Table/Table";
 import { trueKeys } from "@/utils/numbers";
-import { useUserDataStore } from "@/hooks/userDataStore";
 import { useIsAdminSection } from "@/contexts/AdminSectionContext";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import { DEFAULT_PER_PAGE, DEFAULT_USERS_PER_PAGE } from "@/config/defaults";
@@ -26,6 +25,7 @@ import { getTimestamp } from "@/utils/date";
 import { getLastName } from "@/utils/user";
 import { formatWorkgroupName } from "@/utils/workgroups";
 import { filterUsers } from "./userFilters";
+import { useSessionData } from "@/contexts/SessionDataContext";
 
 const PAGE_PARAM = "users_page";
 const PER_PAGE_PARAM = "users_per_page";
@@ -75,7 +75,7 @@ const UserTable = ({
     return () => setSelectedUser(null);
   }, [selectedUserIds, users, setSelectedUser]);
 
-  const workgroups = useUserDataStore((s) => s.workgroups);
+  const workgroups = useSessionData().workgroups;
   const activeWorkgroup = workgroups.find((wg) => String(wg.id) === wgFilter);
 
   const hydratedUsers = useMemo(() => {

@@ -9,10 +9,10 @@ export default function ProtectedLayout({
   children: React.ReactNode;
 }) {
   return (
-    <AppShell>
-      <Suspense fallback={<SkeletonFull />}>
-        <SessionGate>{children}</SessionGate>
-      </Suspense>
-    </AppShell>
+    <Suspense fallback={<SkeletonFull sx={{ minHeight: "100dvh" }} />}>
+      <SessionGate>
+        <AppShell>{children}</AppShell>
+      </SessionGate>
+    </Suspense>
   );
 }

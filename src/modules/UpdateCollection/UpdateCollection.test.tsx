@@ -68,7 +68,7 @@ describe("UpdateCollection", () => {
           admin: {
             collectionHosts,
           },
-          user: {
+          session: {
             workgroups,
           },
         }}

@@ -19,8 +19,8 @@ import ManageMultipleCollectionsStatus from "@/modules/ManageMultipleCollections
 import UpdateMultipleCollectionsGuidance from "./UpdateMultipleCollectionsGuidance";
 import { UpdateCollectionFormValues } from "@/types/forms";
 import UpdatePanel from "@/components/UpdatePanel";
-import { useUserDataStore } from "@/hooks/userDataStore";
 import { useThreePane } from "@/providers/ThreePaneProvider";
+import { useSessionData } from "@/contexts/SessionDataContext";
 
 export type UpdateMultipleCollectionProps = {
   collections: CollectionWithHosts[];
@@ -52,7 +52,7 @@ const UpdateMultipleCollections = ({
   const { expandedRight, toggleRight: onClose } = useThreePane();
   const currentCustodian = useCustodianStore((s) => s.current.custodian);
 
-  const workgroups = useUserDataStore((s) => s.workgroups);
+  const workgroups = useSessionData().workgroups;
 
   const notify = useNotify();
 

@@ -33,10 +33,10 @@ import { routeGet } from "@/lib/routeFetch";
 import { toTermDirectoryParams } from "@/utils/routeParams";
 import { OmopTableName } from "@/types/omop";
 import { ApiResponse, Paginated, TermDirectoryEntry } from "@/types/api";
-import { useUserDataStore } from "@/hooks/userDataStore";
 import useFeatures from "@/hooks/useFeatures";
 import { hasDemographicsContent } from "@/utils/rules";
 import { QUERY_KEYS } from "@/config/tags";
+import { useSessionData } from "@/contexts/SessionDataContext";
 
 const PERSON_CONCEPTS_PER_PAGE = 100;
 
@@ -46,8 +46,8 @@ const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
     remove: qb.removeDemographics,
     selectedDatasets: qb.selectedDatasets,
   }));
-  const user = useUserDataStore((s) => s.user);
-  const userCollections = useUserDataStore((s) => s.userCollections);
+  const user = useSessionData().user;
+  const userCollections = useSessionData().userCollections;
   const { queryBuilderUseLocation, queryBuilderUseRace, queryBuilderUseDeath } =
     useFeatures();
 

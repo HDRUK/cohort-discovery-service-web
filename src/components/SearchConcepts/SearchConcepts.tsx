@@ -22,13 +22,13 @@ import {
 import SquareCheckbox from "@/components/SquareCheckbox";
 import { ConceptItem, ConceptItemProps } from "./ConceptItem";
 import useUserStore from "@/hooks/useUserStore";
-import useQueryBuilder from "@/hooks/useQueryBuilder";
 import {
   DEFAULT_CODES_PER_PAGE,
   DEFAULT_SEARCH_RESULTS_MAX_HEIGHT,
 } from "@/config/defaults";
 import useFeatures from "@/hooks/useFeatures";
 import { mergeSx } from "@/utils/helpers";
+import useHasSelectedSyntheticDatasets from "@/hooks/useHasSelectedSyntheticDatasets";
 
 interface SlotProps {
   conceptItem: ConceptItemProps;
@@ -74,9 +74,7 @@ const SearchConcepts = ({
 }: SearchConceptsProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const searchForConcepts = useUserStore((s) => s.searchForConcepts);
-  const includeSynthetic = useQueryBuilder(
-    (qb) => qb.hasSelectedSyntheticDatasets,
-  );
+  const includeSynthetic = useHasSelectedSyntheticDatasets();
 
   const [activeResult, setActiveResult] = useState<Paginated<
     Partial<Concept>

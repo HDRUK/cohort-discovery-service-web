@@ -3,11 +3,11 @@
 import { Button, Stack, Typography } from "@mui/material";
 import InfoBanner from "@/components/InfoBanner";
 import useFeatures from "@/hooks/useFeatures";
-import useUserStore from "@/hooks/useUserStore";
 import { useUiPreferences } from "@/store/uiPreferencesStore";
 import { DEFAULT_ACCESS_BANNER_AUTO_HIDE } from "@/config/defaults";
 import { checkHasNhsSdeAccess } from "@/utils/user";
 import { getOrganisationUrl } from "@/config/externalLinks";
+import { useSessionUser } from "@/contexts/SessionDataContext";
 
 const BANNER_LABEL = "New!";
 const BANNER_HEADING = "Optional NHS Research SDE Cohort";
@@ -18,7 +18,7 @@ const BANNER_CTA_URL = `${getOrganisationUrl()}/account/profile/cohort-discovery
 
 const AccessBanner = () => {
   const { accessBanner: accessBannerEnabled } = useFeatures();
-  const user = useUserStore((s) => s.user);
+  const user = useSessionUser();
   const dismissed = useUiPreferences((s) => s.dismissed.accessBanner);
   const dismiss = useUiPreferences((s) => s.dismiss);
   const dismissBanner = () => dismiss("accessBanner");

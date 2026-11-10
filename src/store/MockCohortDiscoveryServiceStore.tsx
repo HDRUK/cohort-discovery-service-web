@@ -1,4 +1,8 @@
 import { PropsWithChildren, useState } from "react";
+import {
+  SessionData,
+  SessionDataProvider,
+} from "@/contexts/SessionDataContext";
 
 import type {
   ApiResponse,
@@ -7,7 +11,6 @@ import type {
   CombinedUser,
   CreateQuery,
   Query,
-  Custodian,
   CreateCollectionPost,
   ConceptSet,
   Concept,
@@ -70,6 +73,7 @@ type SliceOverrides = {
   stateManagement?: Partial<StateManagementState>;
   queryBuilder?: Partial<QueryBuilderState>;
   user?: Partial<UserStoreState>;
+  session?: Partial<SessionData>;
   custodian?: Partial<CustodianStoreState>;
   admin?: Partial<AdminStoreState>;
   featureFlags?: Partial<FeatureFlagsStoreState>;
@@ -137,9 +141,7 @@ const seedStores = (overrides?: SliceOverrides) => {
 
   useUserDataStore.setState(
     {
-      user: null as CombinedUser | undefined | null,
       queries: [] as Query[],
-      custodians: [] as Custodian[],
       selectedCollections: [] as CollectionWithHosts[],
       conceptSets: [] as ConceptSet[],
       fetchResults: (_queryName?: string, _reset?: boolean) =>
@@ -242,6 +244,18 @@ const MockCohortDiscoveryServiceStore = ({
   children,
 }: PropsWithChildren<{ overrides?: SliceOverrides }>) => {
   useState(() => seedStores(overrides));
+  const [sessionData] = useState<SessionData>(() => ({
+    user: {
+      id: 1,
+      roles: [],
+      custodians: [],
+      workgroups: [],
+    } as unknown as CombinedUser,
+    userCollections: [],
+    custodians: [],
+    workgroups: [],
+    ...overrides?.session,
+  }));
 
   return (
     <ApplicationModeProvider>
@@ -251,7 +265,11 @@ const MockCohortDiscoveryServiceStore = ({
             <CohortBuilderProvider>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <ConfirmProvider>
-                  <NotifyProvider>{children}</NotifyProvider>
+                  <NotifyProvider>
+                    <SessionDataProvider value={sessionData}>
+                      {children}
+                    </SessionDataProvider>
+                  </NotifyProvider>
                 </ConfirmProvider>
               </LocalizationProvider>
             </CohortBuilderProvider>
