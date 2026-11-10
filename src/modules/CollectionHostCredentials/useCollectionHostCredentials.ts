@@ -1,19 +1,8 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { routes } from "@/config/routes";
 import { QUERY_KEYS } from "@/config/tags";
+import { routeGet } from "@/lib/routeGet";
 import { CollectionHostCredentials } from "@/types/api";
-
-const fetchCollectionHostCredentials = async (
-  hostId: number,
-): Promise<CollectionHostCredentials> => {
-  const response = await fetch(routes.collectionHostCredentials(hostId), {
-    cache: "no-store",
-  });
-  if (!response.ok) {
-    throw new Error(`Collection host credentials returned ${response.status}`);
-  }
-  return response.json();
-};
 
 /**
  * Fetches one host's credentials from the collection-hosts Route Handler. See
@@ -26,7 +15,10 @@ const useCollectionHostCredentials = (
 ): UseQueryResult<CollectionHostCredentials> =>
   useQuery({
     queryKey: QUERY_KEYS.collectionHostCredentials(hostId),
-    queryFn: () => fetchCollectionHostCredentials(hostId),
+    queryFn: () =>
+      routeGet<CollectionHostCredentials>(
+        routes.api.collectionHostCredentials(hostId),
+      ),
     staleTime: 0,
     gcTime: 0,
     retry: false,
