@@ -16,12 +16,13 @@ export const CollectionsSkeleton = () => (
 
 const CollectionsTab = async ({
   searchParams,
-  custodianPid,
+  custodianPid: custodianPidPromise,
 }: {
-  searchParams: CollectionsSearchParams;
-  custodianPid?: string;
+  searchParams: Promise<CollectionsSearchParams>;
+  custodianPid?: Promise<string>;
 }) => {
-  const params = buildCollectionParams(searchParams);
+  const params = buildCollectionParams(await searchParams);
+  const custodianPid = await custodianPidPromise;
 
   const isAdmin = !custodianPid;
 
