@@ -26,7 +26,7 @@ describe("toResponse", () => {
     expect(await response.json()).toEqual(ok);
   });
 
-  it.each([403, 404, 500])("passes an API %i through", async (code) => {
+  it.each([403, 404, 422])("passes an API %i through", async (code) => {
     const response = toResponse({
       message: "",
       data: null,
@@ -36,6 +36,24 @@ describe("toResponse", () => {
     expect(response.status).toBe(code);
     expect(await response.text()).toBe("Nope");
   });
+});
+
+describe("toResponse with a server error", () => {
+  it.each([500, 503])(
+    "replaces the API's text with a generic message for a %i",
+    async (code) => {
+      const response = toResponse({
+        message: "",
+        data: null,
+        error: { text: "SQLSTATE[42S22]: Column not found", code },
+      });
+
+      expect(response.status).toBe(code);
+      expect(await response.text()).toBe(
+        "Something went wrong. Try again later.",
+      );
+    },
+  );
 });
 
 describe("badRequest", () => {
