@@ -11,18 +11,15 @@ const detachConcepts = async (
   conceptIds: number[],
 ): Promise<void> => {
   const { token } = await requireSession();
-  try {
-    await Promise.all(
-      conceptIds.map((conceptId) =>
-        apiDelete<ApiResponse<Concept>>(
-          token,
-          API_ROUTES.detachConcept(conceptSetId, conceptId),
-        ),
+  await Promise.all(
+    conceptIds.map((conceptId) =>
+      apiDelete<ApiResponse<Concept>>(
+        token,
+        API_ROUTES.detachConcept(conceptSetId, conceptId),
       ),
-    );
-  } finally {
-    refresh();
-  }
+    ),
+  );
+  refresh();
 };
 
 export default detachConcepts;

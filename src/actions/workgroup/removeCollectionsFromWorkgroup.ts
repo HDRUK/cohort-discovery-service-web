@@ -10,18 +10,15 @@ const removeCollectionsFromWorkgroup = async (
   payload: RemoveCollectionsFromWorkgroupPost,
 ): Promise<void> => {
   const { token } = await requireSession();
-  try {
-    await Promise.all(
-      payload.ids.map(async (id) =>
-        apiDelete<ApiResponse<number>>(
-          token,
-          API_ROUTES.collectionWorkgroup(id, payload.workgroup_id),
-        ),
+  await Promise.all(
+    payload.ids.map(async (id) =>
+      apiDelete<ApiResponse<number>>(
+        token,
+        API_ROUTES.collectionWorkgroup(id, payload.workgroup_id),
       ),
-    );
-  } finally {
-    refresh();
-  }
+    ),
+  );
+  refresh();
 };
 
 export default removeCollectionsFromWorkgroup;

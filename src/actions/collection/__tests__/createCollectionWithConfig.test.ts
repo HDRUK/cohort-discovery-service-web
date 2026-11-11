@@ -42,7 +42,15 @@ const CONFIG: Omit<CreateCollectionConfigPost, "collection_id"> = {
 beforeEach(() => jest.clearAllMocks());
 
 describe("createCollectionWithConfig", () => {
-  it("refreshes when the config step fails after the collection is created", async () => {
+  it("refreshes once both writes succeed", async () => {
+    mockedApiPost.mockResolvedValue({ data: { id: 42 } });
+
+    await createCollectionWithConfig(collection(), CONFIG);
+
+    expect(refresh).toHaveBeenCalledTimes(1);
+  });
+
+  it("skips the refresh when the config step fails", async () => {
     mockedApiPost
       .mockResolvedValueOnce({ data: { id: 42 } })
       .mockRejectedValueOnce(new ApiError(422, "Invalid config"));
@@ -51,6 +59,6 @@ describe("createCollectionWithConfig", () => {
       createCollectionWithConfig(collection(), CONFIG),
     ).rejects.toThrow("Invalid config");
 
-    expect(refresh).toHaveBeenCalledTimes(1);
+    expect(refresh).not.toHaveBeenCalled();
   });
 });

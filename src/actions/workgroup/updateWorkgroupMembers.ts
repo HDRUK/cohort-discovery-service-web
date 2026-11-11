@@ -20,25 +20,24 @@ const updateWorkgroupMembers = async (
   { userIds, collectionIds }: WorkgroupMembers,
 ): Promise<void> => {
   const { token } = await requireSession();
-  try {
-    for (const userId of userIds) {
-      await apiPost<ApiResponse<number>, AddUsersToWorkgroupPost>(
-        token,
-        API_ROUTES.userWorkgroups(userId),
-        { ids: userIds, workgroup_id: workgroupId },
-      );
-    }
 
-    for (const collectionId of collectionIds) {
-      await apiPost<ApiResponse<number>, AddCollectionsToWorkgroupPost>(
-        token,
-        API_ROUTES.collectionWorkgroups(collectionId),
-        { ids: collectionIds, workgroup_id: workgroupId },
-      );
-    }
-  } finally {
-    refresh();
+  for (const userId of userIds) {
+    await apiPost<ApiResponse<number>, AddUsersToWorkgroupPost>(
+      token,
+      API_ROUTES.userWorkgroups(userId),
+      { ids: userIds, workgroup_id: workgroupId },
+    );
   }
+
+  for (const collectionId of collectionIds) {
+    await apiPost<ApiResponse<number>, AddCollectionsToWorkgroupPost>(
+      token,
+      API_ROUTES.collectionWorkgroups(collectionId),
+      { ids: collectionIds, workgroup_id: workgroupId },
+    );
+  }
+
+  refresh();
 };
 
 export default updateWorkgroupMembers;

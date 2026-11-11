@@ -10,20 +10,17 @@ const addCollectionsToWorkgroup = async (
   payload: AddCollectionsToWorkgroupPost,
 ): Promise<number[]> => {
   const { token } = await requireSession();
-  try {
-    const results = await Promise.all(
-      payload.ids.map(async (id) =>
-        apiPost<ApiResponse<number>, AddCollectionsToWorkgroupPost>(
-          token,
-          API_ROUTES.collectionWorkgroups(id),
-          payload,
-        ),
+  const results = await Promise.all(
+    payload.ids.map(async (id) =>
+      apiPost<ApiResponse<number>, AddCollectionsToWorkgroupPost>(
+        token,
+        API_ROUTES.collectionWorkgroups(id),
+        payload,
       ),
-    );
-    return results.map((r) => r.data);
-  } finally {
-    refresh();
-  }
+    ),
+  );
+  refresh();
+  return results.map((r) => r.data);
 };
 
 export default addCollectionsToWorkgroup;

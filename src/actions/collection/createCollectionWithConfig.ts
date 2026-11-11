@@ -16,20 +16,18 @@ const createCollectionWithConfig = async (
   payloadConfig: Omit<CreateCollectionConfigPost, "collection_id">,
 ): Promise<Collection> => {
   const { token } = await requireSession();
-  try {
-    const { data } = await apiPost<
-      ApiResponse<Collection>,
-      CreateCollectionPost
-    >(token, API_ROUTES.collections, payload);
-    await apiPost<ApiResponse<Collection>, CreateCollectionConfigPost>(
-      token,
-      API_ROUTES.collectionConfig,
-      { ...payloadConfig, collection_id: data.id },
-    );
-    return data;
-  } finally {
-    refresh();
-  }
+  const { data } = await apiPost<ApiResponse<Collection>, CreateCollectionPost>(
+    token,
+    API_ROUTES.collections,
+    payload,
+  );
+  await apiPost<ApiResponse<Collection>, CreateCollectionConfigPost>(
+    token,
+    API_ROUTES.collectionConfig,
+    { ...payloadConfig, collection_id: data.id },
+  );
+  refresh();
+  return data;
 };
 
 export default createCollectionWithConfig;

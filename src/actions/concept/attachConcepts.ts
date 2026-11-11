@@ -11,19 +11,16 @@ const attachConcepts = async (
   conceptIds: number[],
 ): Promise<void> => {
   const { token } = await requireSession();
-  try {
-    await Promise.all(
-      conceptIds.map((conceptId) =>
-        apiPost<ApiResponse<Concept>, Record<string, never>>(
-          token,
-          API_ROUTES.attachConcept(conceptSetId, conceptId),
-          {},
-        ),
+  await Promise.all(
+    conceptIds.map((conceptId) =>
+      apiPost<ApiResponse<Concept>, Record<string, never>>(
+        token,
+        API_ROUTES.attachConcept(conceptSetId, conceptId),
+        {},
       ),
-    );
-  } finally {
-    refresh();
-  }
+    ),
+  );
+  refresh();
 };
 
 export default attachConcepts;

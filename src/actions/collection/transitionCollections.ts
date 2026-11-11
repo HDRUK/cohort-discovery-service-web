@@ -10,11 +10,8 @@ const transitionCollections = async (
   payload: TransitionCollectionPut,
 ): Promise<void> => {
   const { token } = await requireSession();
-  try {
-    await transitionCollectionIds(token, ids, payload);
-  } finally {
-    refresh();
-  }
+  await transitionCollectionIds(token, ids, payload);
+  refresh();
 };
 
 export default transitionCollections;
