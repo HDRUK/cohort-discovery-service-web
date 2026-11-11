@@ -43,4 +43,29 @@ describe("describeCollectionSave", () => {
     expect(message).toContain("Workgroup not found");
     expect(message).toContain("Anything before that step was saved");
   });
+
+  it("names the collection whose workgroup changes failed", () => {
+    const { ok, message } = describeCollectionSave("3 collections", {
+      ok: false,
+      failedStep: "workgroups",
+      failedCollection: { id: 7, name: "Cohort B" },
+      message: "Workgroup not found",
+    });
+
+    expect(ok).toBe(false);
+    expect(message).toBe(
+      "Couldn't save the workgroup changes for \"Cohort B\": Workgroup not found. Collections before it in the list were updated and the ones after it weren't, so check them and save again.",
+    );
+  });
+
+  it("falls back to the collection id when the failed collection has no name", () => {
+    const { message } = describeCollectionSave("3 collections", {
+      ok: false,
+      failedStep: "workgroups",
+      failedCollection: { id: 7 },
+      message: "Workgroup not found",
+    });
+
+    expect(message).toContain("the workgroup changes for collection 7");
+  });
 });

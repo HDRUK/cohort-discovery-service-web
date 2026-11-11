@@ -103,6 +103,7 @@ const UpdateMultipleCollections = ({
           const cwNames = new Set((c.workgroups ?? []).map((w) => w.name));
           return {
             id: c.id,
+            name: c.name,
             addWorkgroupIds: workgroups
               .filter(
                 (wg) => workgroupValues.get(wg.name) && !cwNames.has(wg.name),

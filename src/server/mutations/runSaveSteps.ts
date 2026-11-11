@@ -2,12 +2,22 @@ import "server-only";
 
 import { unstable_rethrow } from "next/navigation";
 import { ApiError } from "@/lib/https";
-import { CollectionSaveResult, CollectionSaveStep } from "@/types/api";
+import {
+  CollectionSaveResult,
+  CollectionSaveStep,
+  SaveStepCollection,
+} from "@/types/api";
+
+export type SaveStep = [
+  CollectionSaveStep,
+  () => Promise<void>,
+  SaveStepCollection?,
+];
 
 export const runSaveSteps = async (
-  steps: [CollectionSaveStep, () => Promise<void>][],
+  steps: SaveStep[],
 ): Promise<Extract<CollectionSaveResult, { ok: false }> | null> => {
-  for (const [step, run] of steps) {
+  for (const [step, run, collection] of steps) {
     try {
       await run();
     } catch (error) {
@@ -15,6 +25,7 @@ export const runSaveSteps = async (
       return {
         ok: false,
         failedStep: step,
+        ...(collection && { failedCollection: collection }),
         message: error instanceof ApiError ? error.message : "Unexpected error",
       };
     }

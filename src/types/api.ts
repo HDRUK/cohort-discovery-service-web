@@ -621,10 +621,21 @@ export type CollectionSaveResult =
       workgroupsRemoved: number;
       statusChanged: boolean;
     }
-  | { ok: false; failedStep: CollectionSaveStep; message: string };
+  | {
+      ok: false;
+      failedStep: CollectionSaveStep;
+      failedCollection?: SaveStepCollection;
+      message: string;
+    };
+
+export interface SaveStepCollection {
+  id: number;
+  name?: string;
+}
 
 export interface CollectionWorkgroupChanges {
   id: number;
+  name: string;
   addWorkgroupIds: number[];
   removeWorkgroupIds: number[];
 }

@@ -7,7 +7,7 @@ import {
   toTransitionState,
   transitionCollectionIds,
 } from "@/server/mutations/collections";
-import { runSaveSteps } from "@/server/mutations/runSaveSteps";
+import { runSaveSteps, SaveStep } from "@/server/mutations/runSaveSteps";
 import { requireSession } from "@/server/session";
 import {
   CollectionSaveResult,
@@ -22,15 +22,16 @@ const updateCollections = async (
   const { token } = await requireSession();
 
   const failure = await runSaveSteps([
-    [
-      "workgroups",
-      async () => {
-        for (const { id, addWorkgroupIds, removeWorkgroupIds } of changes) {
+    ...changes.map(
+      ({ id, name, addWorkgroupIds, removeWorkgroupIds }): SaveStep => [
+        "workgroups",
+        async () => {
           await addCollectionToWorkgroupIds(token, id, addWorkgroupIds);
           await removeCollectionFromWorkgroupIds(token, id, removeWorkgroupIds);
-        }
-      },
-    ],
+        },
+        { id, name },
+      ],
+    ),
     [
       "status",
       async () => {
