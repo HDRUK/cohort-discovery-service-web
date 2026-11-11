@@ -5,13 +5,19 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import createRegressionTest from "@/actions/regressionTest/createRegressionTest";
 import runRegressionTest from "@/actions/regressionTest/runRegressionTest";
 import updateRegressionTest from "@/actions/regressionTest/updateRegressionTest";
+import { routes } from "@/config/routes";
 import { QUERY_KEYS } from "@/config/tags";
 import useTaskPolling from "@/hooks/useTaskPolling";
 import { useDefaults } from "@/providers/DefaultProvider";
+import { routeGet } from "@/lib/routeGet";
 import { useNotify } from "@/providers/NotifyProvider";
-import { CollectionWithHosts, Paginated, RegressionTest } from "@/types/api";
+import {
+  ApiResponse,
+  CollectionWithHosts,
+  Paginated,
+  RegressionTest,
+} from "@/types/api";
 import { buildHealthRows, HealthThresholds } from "./health";
-import { fetchHealthCollections, fetchRegressionTests } from "./healthQueries";
 
 export const REFRESH_INTERVAL = 10_000;
 
@@ -48,7 +54,10 @@ const useCollectionHealth = ({
     dataUpdatedAt: collectionsUpdatedAt,
   } = useQuery({
     queryKey: queryKeyCollections,
-    queryFn: () => fetchHealthCollections(pid),
+    queryFn: () =>
+      routeGet<ApiResponse<Paginated<CollectionWithHosts>>>(
+        routes.api.adminCollectionHealth(pid),
+      ),
     initialData: {
       message: "",
       data: { data: initialCollections } as Paginated<CollectionWithHosts>,
@@ -64,7 +73,8 @@ const useCollectionHealth = ({
     dataUpdatedAt: regressionUpdatedAt,
   } = useQuery({
     queryKey: QUERY_KEYS.regressionTests(),
-    queryFn: () => fetchRegressionTests(),
+    queryFn: () =>
+      routeGet<ApiResponse<RegressionTest[]>>(routes.api.regressionTests),
     ...REFRESH_OPTIONS,
   });
 
