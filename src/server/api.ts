@@ -60,6 +60,9 @@ export async function request<TResponse, TBody = undefined>(
       },
       body: body !== undefined ? JSON.stringify(body) : undefined,
       cache: "no-store",
+    }).catch((error: unknown) => {
+      logApiCall(method, path, "failed", startedAt);
+      throw error;
     });
     logApiCall(method, path, response.status, startedAt);
 
