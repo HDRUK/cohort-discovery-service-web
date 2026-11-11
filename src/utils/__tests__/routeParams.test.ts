@@ -116,6 +116,7 @@ describe("parseTermDirectoryParams", () => {
 
   it.each([
     ["an unknown domain", "domain=everything"],
+    ["an inherited property as the domain", "domain=constructor"],
     ["an invalid collection pid", "collections[]=../admin"],
     ["an overlong search", `search=${"a".repeat(256)}`],
   ])("returns null for %s", (_label, query) => {

@@ -96,7 +96,8 @@ export const parseTermDirectoryParams = (
   searchParams: URLSearchParams,
 ): TermDirectoryParams | null => {
   const domain = searchParams.get("domain") ?? undefined;
-  if (domain !== undefined && !(domain in DOMAIN_TAB_FILTERS)) return null;
+  if (domain !== undefined && !Object.hasOwn(DOMAIN_TAB_FILTERS, domain))
+    return null;
 
   const collections = searchParams.getAll("collections[]");
   if (!isPids(collections)) return null;
