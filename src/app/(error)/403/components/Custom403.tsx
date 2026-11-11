@@ -43,16 +43,6 @@ export default function Custom403() {
           redirectUrl: loginRedirect,
         };
 
-      case "expired-token":
-        return {
-          messages: [
-            "Your session has expired.",
-            "For security reasons you’ve been signed out.",
-            "Please sign in again to continue.",
-          ],
-          redirectUrl: loginRedirect,
-        };
-
       case "no-access-custodian":
         return {
           messages: [
