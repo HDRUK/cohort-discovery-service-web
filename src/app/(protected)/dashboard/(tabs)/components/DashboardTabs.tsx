@@ -22,6 +22,7 @@ const DashboardTabs = () => {
     queries: openQueries.map((pid) => ({
       queryKey: QUERY_KEYS.query(pid),
       queryFn: () => routeGet<ApiResponse<Query>>(routes.api.query(pid)),
+      staleTime: Infinity,
     })),
   });
 
