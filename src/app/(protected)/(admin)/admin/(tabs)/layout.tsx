@@ -1,3 +1,6 @@
+// Admin routes with the tab bar. The bar sits outside Suspense so it is in
+// the static shell; the admin gate and the users, collections and hosts
+// reads sit inside it.
 import { ReactNode, Suspense } from "react";
 import SegmentTabsShell from "@/components/SegmentTabsShell";
 import { routes } from "@/config/routes";

@@ -1,3 +1,6 @@
+// Admin pages without a tab bar (configuration, regression, collection
+// health). They only need the admin gate, so they don't wait for the tab
+// lists' reads.
 import { ReactNode, Suspense } from "react";
 import { Paper } from "@mui/material";
 import SkeletonFull from "@/components/SkeletonFull";

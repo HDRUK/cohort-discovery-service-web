@@ -1,3 +1,6 @@
+// Every dashboard route shows the tab bar (/dashboard itself redirects in
+// next.config.ts). The bar reads open_queries, so it streams in its own
+// Suspense and the tab content doesn't wait for it.
 import { ReactNode, Suspense } from "react";
 import { Box } from "@mui/material";
 import {
