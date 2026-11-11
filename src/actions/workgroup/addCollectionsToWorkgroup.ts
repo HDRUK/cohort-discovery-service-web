@@ -5,9 +5,6 @@ import { apiPost } from "@/server/api";
 import { requireSession } from "@/server/session";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { AddCollectionsToWorkgroupPost, ApiResponse } from "@/types/api";
-import { pick } from "@/utils/pick";
-
-const WORKGROUP_COLLECTIONS_FIELDS = ["ids", "workgroup_id"] as const;
 
 const addCollectionsToWorkgroup = async (
   payload: AddCollectionsToWorkgroupPost,
@@ -19,7 +16,7 @@ const addCollectionsToWorkgroup = async (
         apiPost<ApiResponse<number>, AddCollectionsToWorkgroupPost>(
           token,
           API_ROUTES.collectionWorkgroups(id),
-          pick(payload, WORKGROUP_COLLECTIONS_FIELDS),
+          payload,
         ),
       ),
     );

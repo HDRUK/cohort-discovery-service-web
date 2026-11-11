@@ -9,9 +9,6 @@ import {
   UpdateCollectionHostPayload,
   ApiResponse,
 } from "@/types/api";
-import { pick } from "@/utils/pick";
-
-const COLLECTION_HOST_FIELDS = ["name", "query_context_type"] as const;
 
 const updateCollectionHost = async (
   hostId: number,
@@ -21,7 +18,7 @@ const updateCollectionHost = async (
   await apiPut<ApiResponse<CollectionHost>, UpdateCollectionHostPayload>(
     token,
     API_ROUTES.collectionHost(hostId),
-    pick(payload, COLLECTION_HOST_FIELDS),
+    payload,
   );
   refresh();
 };

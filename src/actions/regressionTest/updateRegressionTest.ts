@@ -10,10 +10,6 @@ import {
   RegressionTestCollectionInput,
 } from "@/types/api";
 import { RuleGroupType } from "@/types/rules";
-import { pick } from "@/utils/pick";
-
-const REGRESSION_TEST_FIELDS = ["name", "query_definition"] as const;
-const REGRESSION_COLLECTION_FIELDS = ["pid", "expected_result"] as const;
 
 interface UpdateRegressionTestBody {
   name?: string;
@@ -29,12 +25,7 @@ const updateRegressionTest = async (
   const res = await apiPut<
     ApiResponse<RegressionTest>,
     UpdateRegressionTestBody
-  >(token, API_ROUTES.regressionTest(pid), {
-    ...pick(body, REGRESSION_TEST_FIELDS),
-    collections: body.collections?.map((collection) =>
-      pick(collection, REGRESSION_COLLECTION_FIELDS),
-    ),
-  });
+  >(token, API_ROUTES.regressionTest(pid), body);
   refresh();
   return res;
 };

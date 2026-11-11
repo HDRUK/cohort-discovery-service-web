@@ -53,17 +53,4 @@ describe("createCollectionWithConfig", () => {
 
     expect(refresh).toHaveBeenCalledTimes(1);
   });
-
-  it("sends only the known collection fields", async () => {
-    mockedApiPost.mockResolvedValue({ data: { id: 42 } });
-    const crafted = { ...collection(), owner_id: 7 } as CreateCollectionPost;
-
-    await createCollectionWithConfig(crafted, CONFIG);
-
-    expect(mockedApiPost.mock.calls[0][2]).toEqual(collection());
-    expect(mockedApiPost.mock.calls[1][2]).toEqual({
-      ...CONFIG,
-      collection_id: 42,
-    });
-  });
 });

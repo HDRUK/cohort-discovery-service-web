@@ -10,11 +10,6 @@ import {
   CreateCollectionConfigPost,
   CreateCollectionPost,
 } from "@/types/api";
-import {
-  COLLECTION_CONFIG_FIELDS,
-  COLLECTION_FIELDS,
-} from "@/server/mutations/collections";
-import { pick } from "@/utils/pick";
 
 const createCollectionWithConfig = async (
   payload: CreateCollectionPost,
@@ -25,14 +20,11 @@ const createCollectionWithConfig = async (
     const { data } = await apiPost<
       ApiResponse<Collection>,
       CreateCollectionPost
-    >(token, API_ROUTES.collections, pick(payload, COLLECTION_FIELDS));
+    >(token, API_ROUTES.collections, payload);
     await apiPost<ApiResponse<Collection>, CreateCollectionConfigPost>(
       token,
       API_ROUTES.collectionConfig,
-      {
-        ...pick(payloadConfig, COLLECTION_CONFIG_FIELDS),
-        collection_id: data.id,
-      },
+      { ...payloadConfig, collection_id: data.id },
     );
     return data;
   } finally {

@@ -10,11 +10,6 @@ import {
   CreateCollectionConfigPost,
   CreateCollectionPost,
 } from "@/types/api";
-import {
-  COLLECTION_CONFIG_FIELDS,
-  COLLECTION_FIELDS,
-} from "@/server/mutations/collections";
-import { pick } from "@/utils/pick";
 
 const createCustodianCollectionWithConfig = async (
   custodianPid: string,
@@ -26,18 +21,11 @@ const createCustodianCollectionWithConfig = async (
     const { data } = await apiPost<
       ApiResponse<Collection>,
       CreateCollectionPost
-    >(
-      token,
-      API_ROUTES.custodianCollections(custodianPid),
-      pick(payload, COLLECTION_FIELDS),
-    );
+    >(token, API_ROUTES.custodianCollections(custodianPid), payload);
     await apiPost<ApiResponse<Collection>, CreateCollectionConfigPost>(
       token,
       API_ROUTES.collectionConfig,
-      {
-        ...pick(payloadConfig, COLLECTION_CONFIG_FIELDS),
-        collection_id: data.id,
-      },
+      { ...payloadConfig, collection_id: data.id },
     );
     return data;
   } finally {

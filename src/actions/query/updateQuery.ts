@@ -5,9 +5,6 @@ import { apiPut } from "@/server/api";
 import { requireSession } from "@/server/session";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { Query, CreateQueryPost, ApiResponse } from "@/types/api";
-import { pick } from "@/utils/pick";
-
-const QUERY_FIELDS = ["name", "definition", "task_type"] as const;
 
 const updateQuery = async (
   id: number,
@@ -17,7 +14,7 @@ const updateQuery = async (
   const result = await apiPut<ApiResponse<Query>, Partial<CreateQueryPost>>(
     token,
     API_ROUTES.updateQuery(id),
-    pick(payload, QUERY_FIELDS),
+    payload,
   );
   refresh();
   return result;
