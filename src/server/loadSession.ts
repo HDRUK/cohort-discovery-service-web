@@ -10,7 +10,7 @@ import { getCustodians } from "@/server/data/custodians";
 import { getFeatureFlags } from "@/server/data/features";
 import { getCurrentUser } from "@/server/data/user";
 import { getWorkgroups } from "@/server/data/workgroups";
-import { getSession } from "@/server/session";
+import { getSession, hasLiveSession } from "@/server/session";
 import { CombinedUser } from "@/types/api";
 import { FeatureFlag } from "@/types/features";
 
@@ -64,3 +64,11 @@ export const loadSession = async (): Promise<LoadedSession> => {
     },
   };
 };
+
+const signedOut = (): null => null;
+
+export const loadSessionDataOrSignedOut =
+  async (): Promise<SessionData | null> => {
+    if (!(await hasLiveSession())) return null;
+    return loadSession().then(({ data }) => data, signedOut);
+  };

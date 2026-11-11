@@ -7,10 +7,13 @@ import { getCustodians } from "@/server/data/custodians";
 import { getFeatureFlags } from "@/server/data/features";
 import { getCurrentUser } from "@/server/data/user";
 import { getWorkgroups } from "@/server/data/workgroups";
-import { getSession } from "@/server/session";
-import { loadSession } from "../loadSession";
+import { getSession, hasLiveSession } from "@/server/session";
+import { loadSession, loadSessionDataOrSignedOut } from "../loadSession";
 
-jest.mock("@/server/session", () => ({ getSession: jest.fn() }));
+jest.mock("@/server/session", () => ({
+  getSession: jest.fn(),
+  hasLiveSession: jest.fn(),
+}));
 jest.mock("@/server/data/user", () => ({ getCurrentUser: jest.fn() }));
 jest.mock("@/server/data/features", () => ({ getFeatureFlags: jest.fn() }));
 jest.mock("@/server/data/custodians", () => ({ getCustodians: jest.fn() }));
@@ -99,5 +102,48 @@ describe("loadSession", () => {
       data: null,
     });
     expect(unhandled).not.toHaveBeenCalled();
+  });
+});
+
+describe("loadSessionDataOrSignedOut", () => {
+  beforeEach(() => {
+    mocked(getSession).mockResolvedValue({ token: "t", user: TOKEN_USER });
+    mocked(hasLiveSession).mockResolvedValue(true);
+  });
+
+  it("returns the session data for a signed-in user", async () => {
+    mocked(getCurrentUser).mockResolvedValue(ok(USER));
+    resolveSessionReads();
+
+    await expect(loadSessionDataOrSignedOut()).resolves.toMatchObject({
+      user: { ...USER, token_user: TOKEN_USER },
+    });
+  });
+
+  it("returns null without calling the API when there is no live session", async () => {
+    mocked(hasLiveSession).mockResolvedValue(false);
+    mocked(getCurrentUser).mockClear();
+
+    await expect(loadSessionDataOrSignedOut()).resolves.toBeNull();
+    expect(getCurrentUser).not.toHaveBeenCalled();
+  });
+
+  it("returns null when the API says the session has ended", async () => {
+    mocked(getCurrentUser).mockResolvedValue({
+      message: "",
+      data: null,
+      error: { text: "Unauthenticated", code: 401 },
+    });
+    resolveSessionReads();
+
+    await expect(loadSessionDataOrSignedOut()).resolves.toBeNull();
+  });
+
+  it("returns null instead of rejecting when a session read redirects", async () => {
+    mocked(getCurrentUser).mockResolvedValue(ok(USER));
+    resolveSessionReads();
+    mocked(getCustodians).mockRejectedValue(new Error("NEXT_REDIRECT"));
+
+    await expect(loadSessionDataOrSignedOut()).resolves.toBeNull();
   });
 });
