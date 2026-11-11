@@ -115,7 +115,10 @@ const CollectionFilter = () => {
       <Popover
         open={open}
         anchorEl={anchorEl}
-        onClose={() => setAnchorEl(null)}
+        onClose={() => {
+          setAnchorEl(null);
+          setSearchTerm("");
+        }}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "right" }}
       >
@@ -133,6 +136,7 @@ const CollectionFilter = () => {
             collapsible={false}
             inputBgColor="background.default"
             onChange={(event) => setSearchTerm(event.target.value)}
+            onClear={() => setSearchTerm("")}
           />
           {custodianGroups.map(({ custodian, items }) => (
             <Stack key={custodian.id} sx={{ gap: 0.5, mt: 1 }}>
