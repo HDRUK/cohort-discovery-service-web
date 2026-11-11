@@ -27,6 +27,14 @@ export async function GET(
 - The reader is called with `ErrorMode.RESULT`, so the API's status passes through instead of turning into a redirect.
 - GET by default; POST only when the API takes a body (`concepts/search`, `parse-query`).
 
+### Why concept search and parse-query are POST Route Handlers, not server actions
+
+Both are reads: nothing is stored. They are POST only because the Laravel endpoints they wrap take a JSON body.
+
+- **Not server actions.** Next runs server actions one at a time per client, and they exist for mutations. A typeahead search or a parse would queue behind any save in flight, and results would arrive in order rather than as soon as they are ready. Route Handlers run in parallel, and TanStack can cache, dedupe and cancel them like any other read.
+- **Not GET.** `parse-query` takes up to 10,000 characters of free text, which is too long for a URL and would put the user's query text into access and proxy logs. `concepts/search` could be a GET, but it stays POST so the two body-taking reads work the same way.
+- Like every handler here they check the session (`withSession`) and parse the body field by field (`parseSearchConceptsBody`, `parseParseQueryBody` in `src/utils/routeParams.ts`) before calling the reader.
+
 The browser calls these with `routeGet` / `routePost` (`src/lib/routeFetch.ts`), usually from a TanStack `queryFn` keyed by `QUERY_KEYS` (`src/config/tags.ts`). Handler URLs live under `routes.api` in `src/config/routes.ts`.
 
 ## What doesn't
