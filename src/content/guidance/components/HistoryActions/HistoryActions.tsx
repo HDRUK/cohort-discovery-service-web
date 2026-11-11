@@ -143,9 +143,17 @@ const HistoryActions = ({
         <EditButton
           label="Edit"
           onClick={async () => {
-            const result = await routeGet<ApiResponse<Query>>(
-              routes.api.query(selectedIds[0]),
-            );
+            let result: ApiResponse<Query>;
+            try {
+              result = await routeGet<ApiResponse<Query>>(
+                routes.api.query(selectedIds[0]),
+              );
+            } catch {
+              notify.error(
+                "We couldn't open that query for editing. Try again.",
+              );
+              return;
+            }
             const ranCollectionPids = result.data.tasks.map(
               (t) => t.collection.pid,
             );
