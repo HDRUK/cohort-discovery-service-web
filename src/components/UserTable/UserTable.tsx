@@ -7,7 +7,7 @@ import {
   type MRT_ColumnDef,
   type MRT_Row,
 } from "material-react-table";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import ChipList from "@/components/ChipList";
 import Table from "@/components/Table";
 import useSearchParams from "@/hooks/useSearchParams";
@@ -19,7 +19,7 @@ import dayjs from "dayjs";
 import { TableProps } from "../Table/Table";
 import { trueKeys } from "@/utils/numbers";
 import {
-  useAdminSection,
+  useAdminUsers,
   useIsAdminSection,
 } from "@/contexts/AdminSectionContext";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
@@ -45,14 +45,19 @@ export interface CollectionsTableProps extends TableProps {
   showCheckboxes?: boolean;
 }
 
-const UserTable = ({
+interface UserTableViewProps extends CollectionsTableProps {
+  users?: User[];
+}
+
+const UserTableView = ({
+  users,
   tableTitle,
   tableSubTitle,
   handleDelete,
   showRolesAndWorkgroupColumns = false,
   showCheckboxes = true,
   ...rest
-}: CollectionsTableProps) => {
+}: UserTableViewProps) => {
   const { getSearchParam, searchParams } = useSearchParams("workgroup_filter");
   const wgFilter = getSearchParam();
   const searchTerm = (searchParams.get("search_term") || "")
@@ -62,7 +67,7 @@ const UserTable = ({
 
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
 
-  const users = useAdminSection()?.users ?? NO_USERS;
+  const loadedUsers = users ?? NO_USERS;
   const setSelectedUser = useAdminStore((s) => s.setSelectedUser);
   const [sorting, setSorting] = useState<MRT_SortingState>([]);
 
@@ -74,17 +79,19 @@ const UserTable = ({
   useEffect(() => {
     const [firstId] = selectedUserIds;
     setSelectedUser(
-      firstId ? (users.find((u) => String(u.id) === firstId) ?? null) : null,
+      firstId
+        ? (loadedUsers.find((u) => String(u.id) === firstId) ?? null)
+        : null,
     );
 
     return () => setSelectedUser(null);
-  }, [selectedUserIds, users, setSelectedUser]);
+  }, [selectedUserIds, loadedUsers, setSelectedUser]);
 
   const workgroups = useSessionData().workgroups;
   const activeWorkgroup = workgroups.find((wg) => String(wg.id) === wgFilter);
 
   const hydratedUsers = useMemo(() => {
-    const filtered = filterUsers(users, {
+    const filtered = filterUsers(loadedUsers, {
       workgroupId: wgFilter,
       searchTerm,
     });
@@ -128,7 +135,7 @@ const UserTable = ({
           return 0;
       }
     });
-  }, [users, wgFilter, sorting, searchTerm]);
+  }, [loadedUsers, wgFilter, sorting, searchTerm]);
 
   const page = Math.max(1, parseInt(searchParams.get(PAGE_PARAM) || "1", 10));
 
@@ -224,7 +231,7 @@ const UserTable = ({
 
   const table = usePaginatedTable<User>({
     columns,
-    data: paginatedHydratedUsers,
+    data: users && paginatedHydratedUsers,
     showSkeletonWhilePending: false,
     rowCount: hydratedUsers.length,
     perPageDefault: DEFAULT_USERS_PER_PAGE,
@@ -267,5 +274,16 @@ const UserTable = ({
     />
   );
 };
+
+const AdminUsersTable = (props: CollectionsTableProps) => {
+  const users = useAdminUsers() ?? NO_USERS;
+  return <UserTableView {...props} users={users} />;
+};
+
+const UserTable = (props: CollectionsTableProps) => (
+  <Suspense fallback={<UserTableView {...props} />}>
+    <AdminUsersTable {...props} />
+  </Suspense>
+);
 
 export default UserTable;

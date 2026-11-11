@@ -38,7 +38,7 @@ import UpdatePanel from "@/components/UpdatePanel";
 import { useThreePane } from "@/providers/ThreePaneProvider";
 import { FieldConfigMap, useSaveChanges } from "@/hooks/useSaveChanges";
 import {
-  useAdminSection,
+  useAdminCollectionHosts,
   useIsAdminSection,
 } from "@/contexts/AdminSectionContext";
 import { clampRunTimeFrequency, getFrequencyModeKey } from "@/utils/frequency";
@@ -120,7 +120,7 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
 
   const currentCollectionHosts =
     useCustodianSection()?.collectionHosts ?? NO_HOSTS;
-  const collectionHosts = useAdminSection()?.collectionHosts ?? NO_HOSTS;
+  const collectionHosts = useAdminCollectionHosts() ?? NO_HOSTS;
   const workgroups = useSessionData().workgroups;
 
   const notify = useNotify();

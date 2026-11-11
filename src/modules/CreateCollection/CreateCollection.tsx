@@ -15,7 +15,7 @@ import { useEffect, useMemo } from "react";
 import ErrorHeader from "@/components/ErrorHeader";
 import { useSessionData } from "@/contexts/SessionDataContext";
 import { useCustodianSection } from "@/contexts/CustodianSectionContext";
-import { useAdminSection } from "@/contexts/AdminSectionContext";
+import { useAdminCollectionHosts } from "@/contexts/AdminSectionContext";
 
 const NO_HOSTS: CollectionHost[] = [];
 
@@ -28,7 +28,7 @@ const CreateCollection = ({ onCancel }: CreateCollectionProps) => {
   const custodianSection = useCustodianSection();
   const currentCustodian = custodianSection?.custodian;
   const currentCollectionHosts = custodianSection?.collectionHosts ?? NO_HOSTS;
-  const collectionHosts = useAdminSection()?.collectionHosts ?? NO_HOSTS;
+  const collectionHosts = useAdminCollectionHosts() ?? NO_HOSTS;
   const custodians = useSessionData().custodians;
 
   const isAdmin = !currentCustodian;
