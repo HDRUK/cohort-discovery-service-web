@@ -14,7 +14,7 @@ interface ProtectedPageProps {
   user: CombinedUser;
   collections: Collection[];
   featureFlags: FeatureFlag;
-  expiresAt?: number;
+  sessionMsRemaining: number | null;
   children: ReactNode;
 }
 
@@ -22,10 +22,10 @@ const ProtectedPage = ({
   user,
   collections,
   featureFlags,
-  expiresAt,
+  sessionMsRemaining,
   children,
 }: ProtectedPageProps) => {
-  useSessionExpiry(expiresAt);
+  useSessionExpiry(sessionMsRemaining);
 
   const setFlags = useFeatureFlagsStore((s) => s.setFlags);
 

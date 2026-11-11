@@ -1,7 +1,7 @@
 import { cookies, headers } from "next/headers";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
-import { SESSION_CLOCK_SKEW_SECONDS } from "@/lib/sessionRedirect";
+import { SESSION_CLOCK_SKEW_SECONDS } from "@/server/sessionExpiry";
 
 const FALLBACK_MAX_AGE_SECONDS = 60 * 60;
 

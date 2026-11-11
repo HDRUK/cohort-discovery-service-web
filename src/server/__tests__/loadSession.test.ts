@@ -1,6 +1,7 @@
 /**
  * @jest-environment node
  */
+import { headers } from "next/headers";
 import { SessionAccess } from "@/app/(protected)/components/sessionAccess";
 import { getUserCollections } from "@/server/data/collections";
 import { getCustodians } from "@/server/data/custodians";
@@ -10,6 +11,7 @@ import { getWorkgroups } from "@/server/data/workgroups";
 import { getSession, hasLiveSession } from "@/server/session";
 import { loadSession, loadSessionDataOrSignedOut } from "../loadSession";
 
+jest.mock("next/headers", () => ({ headers: jest.fn() }));
 jest.mock("@/server/session", () => ({
   getSession: jest.fn(),
   hasLiveSession: jest.fn(),
@@ -29,6 +31,7 @@ const ok = <T>(data: T) => ({ message: "", data });
 
 const USER = { id: 1, roles: [{ name: "user" }], custodians: [] };
 const TOKEN_USER = { id: 1, name: "Jane Doe" };
+const REQUEST_NOW = 1_700_000_000;
 
 const resolveSessionReads = () => {
   mocked(getFeatureFlags).mockResolvedValue(ok({ flag: true }));
@@ -40,6 +43,9 @@ const resolveSessionReads = () => {
 describe("loadSession", () => {
   beforeEach(() => {
     mocked(getSession).mockResolvedValue({ token: "t", user: TOKEN_USER });
+    mocked(headers).mockResolvedValue(
+      new Headers({ "x-request-now": String(REQUEST_NOW) }),
+    );
   });
 
   it("starts the session reads before the user has loaded", async () => {
@@ -71,6 +77,7 @@ describe("loadSession", () => {
     expect(loaded).toEqual({
       access: SessionAccess.Ok,
       flags: { flag: true },
+      sessionMsRemaining: null,
       data: {
         user: { ...USER, token_user: TOKEN_USER },
         userCollections: [{ pid: "c1" }],
@@ -78,6 +85,20 @@ describe("loadSession", () => {
         workgroups: [],
       },
     });
+  });
+
+  it("measures the time left on the token from the request time", async () => {
+    mocked(getSession).mockResolvedValue({
+      token: "t",
+      user: TOKEN_USER,
+      exp: REQUEST_NOW + 90,
+    });
+    mocked(getCurrentUser).mockResolvedValue(ok(USER));
+    resolveSessionReads();
+
+    const loaded = await loadSession();
+
+    expect(loaded).toMatchObject({ sessionMsRemaining: 60_000 });
   });
 
   it("reports an ended session without waiting for or leaking the session reads", async () => {

@@ -1,5 +1,6 @@
 import "server-only";
 
+import { headers } from "next/headers";
 import {
   decideAccess,
   SessionAccess,
@@ -11,6 +12,7 @@ import { getFeatureFlags } from "@/server/data/features";
 import { getCurrentUser } from "@/server/data/user";
 import { getWorkgroups } from "@/server/data/workgroups";
 import { getSession, hasLiveSession } from "@/server/session";
+import { msUntilSessionEnds } from "@/server/sessionExpiry";
 import { CombinedUser } from "@/types/api";
 import { FeatureFlag } from "@/types/features";
 
@@ -19,7 +21,7 @@ export type LoadedSession =
       access: SessionAccess.Ok;
       data: SessionData;
       flags: FeatureFlag;
-      expiresAt?: number;
+      sessionMsRemaining: number | null;
     }
   | {
       access: Exclude<SessionAccess, SessionAccess.Ok>;
@@ -38,9 +40,10 @@ export const loadSession = async (): Promise<LoadedSession> => {
   ]);
   sessionReads.catch(ignoreRejection);
 
-  const [session, currentUser] = await Promise.all([
+  const [session, currentUser, requestHeaders] = await Promise.all([
     getSession(),
     getCurrentUser(),
+    headers(),
   ]);
 
   const access = decideAccess(currentUser);
@@ -58,7 +61,10 @@ export const loadSession = async (): Promise<LoadedSession> => {
   return {
     access,
     flags,
-    expiresAt: session?.exp,
+    sessionMsRemaining: msUntilSessionEnds(
+      session?.exp,
+      Number(requestHeaders.get("x-request-now")),
+    ),
     data: {
       user: {
         ...currentUser.data,

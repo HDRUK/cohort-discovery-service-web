@@ -1,8 +1,4 @@
-import {
-  isSessionExpired,
-  msUntilSessionEnds,
-  signedOutRedirect,
-} from "../sessionRedirect";
+import { isSessionExpired, signedOutRedirect } from "../sessionRedirect";
 
 describe("signedOutRedirect", () => {
   it("sends a standalone user to login with the page they asked for", () => {
@@ -51,26 +47,5 @@ describe("isSessionExpired", () => {
 
   it("can't decide without the request time", () => {
     expect(isSessionExpired(NOW - 60, 0)).toBe(false);
-  });
-});
-
-describe("msUntilSessionEnds", () => {
-  const NOW_MS = 1_700_000_000_000;
-  const NOW_SECONDS = NOW_MS / 1000;
-
-  it("ends the session 30 seconds before the token expires", () => {
-    expect(msUntilSessionEnds(NOW_SECONDS + 90, NOW_MS)).toBe(60_000);
-  });
-
-  it("ends the session straight away once inside the skew", () => {
-    expect(msUntilSessionEnds(NOW_SECONDS + 10, NOW_MS)).toBe(0);
-  });
-
-  it("ends the session straight away when the token has expired", () => {
-    expect(msUntilSessionEnds(NOW_SECONDS - 100, NOW_MS)).toBe(0);
-  });
-
-  it("returns null when the token has no expiry", () => {
-    expect(msUntilSessionEnds(undefined, NOW_MS)).toBeNull();
   });
 });

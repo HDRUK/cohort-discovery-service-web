@@ -1,26 +1,24 @@
 "use client";
 
 import { useEffect } from "react";
-import { msUntilSessionEnds } from "@/lib/sessionRedirect";
 import { useSessionStore } from "@/store/sessionStore";
 
 const MAX_TIMEOUT_MS = 2 ** 31 - 1;
 
-const useSessionExpiry = (exp: number | undefined): void => {
+const useSessionExpiry = (msRemaining: number | null): void => {
   const endSession = useSessionStore((s) => s.endSession);
 
   useEffect(() => {
-    const delay = msUntilSessionEnds(exp, Date.now());
-    if (delay === null) return;
+    if (msRemaining === null) return;
 
+    const deadline = Date.now() + msRemaining;
     const timer =
-      delay <= MAX_TIMEOUT_MS ? setTimeout(endSession, delay) : undefined;
+      msRemaining <= MAX_TIMEOUT_MS
+        ? setTimeout(endSession, msRemaining)
+        : undefined;
 
     const endIfExpired = () => {
-      if (
-        document.visibilityState === "visible" &&
-        msUntilSessionEnds(exp, Date.now()) === 0
-      ) {
+      if (document.visibilityState === "visible" && Date.now() >= deadline) {
         endSession();
       }
     };
@@ -30,7 +28,7 @@ const useSessionExpiry = (exp: number | undefined): void => {
       clearTimeout(timer);
       document.removeEventListener("visibilitychange", endIfExpired);
     };
-  }, [exp, endSession]);
+  }, [msRemaining, endSession]);
 };
 
 export default useSessionExpiry;
