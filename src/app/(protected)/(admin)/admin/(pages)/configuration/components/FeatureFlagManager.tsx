@@ -4,17 +4,23 @@ import { useState } from "react";
 import Table from "@/components/Table";
 import { useTransposedTable } from "@/hooks/useTransposedTable";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
+import { useNotify } from "@/providers/NotifyProvider";
 import { Box, CircularProgress, Switch } from "@mui/material";
 
 export const FeatureFlagManager = () => {
   const flags = useFeatureFlagsStore((s) => s.flags);
   const updateFlag = useFeatureFlagsStore((s) => s.updateFlag);
   const [savingKeys, setSavingKeys] = useState<string[]>([]);
+  const notify = useNotify();
 
   const handleToggleFeature = async (key: string, newValue: boolean) => {
     setSavingKeys((keys) => [...keys, key]);
     try {
       await updateFlag(key, newValue);
+    } catch {
+      notify.error(
+        `Could not save the "${key}" flag, so it has been switched back. Try again, or refresh the page if it keeps failing.`,
+      );
     } finally {
       setSavingKeys((keys) => keys.filter((k) => k !== key));
     }
