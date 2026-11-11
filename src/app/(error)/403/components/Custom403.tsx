@@ -6,19 +6,20 @@ import { isStandalone } from "@/utils/modes";
 import { Button, Paper, Stack, Typography } from "@mui/material";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { routes } from "@/config/routes";
 import { getOrganisationUrl } from "@/config/externalLinks";
+import { signInUrl } from "./signInUrl";
 
-const NEXT_PUBLIC_LOGIN_URL = getOrganisationUrl();
+const ORGANISATION_URL = getOrganisationUrl();
 const applicationMode = process.env.APPLICATION_MODE;
 
 export default function Custom403() {
   const params = useSearchParams();
   const reason = params.get("reason");
 
-  const loginRedirect = isStandalone(applicationMode)
-    ? routes.login
-    : NEXT_PUBLIC_LOGIN_URL;
+  const loginRedirect = signInUrl(
+    isStandalone(applicationMode),
+    process.env.NEXT_PUBLIC_LOGIN_URL,
+  );
 
   const getContent = (): { messages: string[]; redirectUrl: string } => {
     switch (reason) {
@@ -76,7 +77,7 @@ export default function Custom403() {
           ],
           redirectUrl: isStandalone(applicationMode)
             ? "/"
-            : NEXT_PUBLIC_LOGIN_URL,
+            : ORGANISATION_URL,
         };
     }
   };
