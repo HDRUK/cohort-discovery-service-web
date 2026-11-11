@@ -35,11 +35,7 @@ const renderTable = (
 ) =>
   render(
     <MockCohortDiscoveryServiceStore>
-      <QueryResultsTable
-        initialData={getMockQuery()}
-        fetchedAt={Date.now()}
-        {...props}
-      />
+      <QueryResultsTable initialData={getMockQuery()} {...props} />
     </MockCohortDiscoveryServiceStore>,
   );
 

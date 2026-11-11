@@ -10,15 +10,13 @@ const loadCollections = async () => {
     params: new URLSearchParams({ per_page: "500" }),
   });
 
-  return { collections: result.data?.data ?? [], fetchedAt: Date.now() };
+  return result.data?.data ?? [];
 };
 
 const CollectionHealthLoader = async () => {
-  const { collections, fetchedAt } = await loadCollections();
+  const collections = await loadCollections();
 
-  return (
-    <CollectionHealth initialCollections={collections} fetchedAt={fetchedAt} />
-  );
+  return <CollectionHealth initialCollections={collections} />;
 };
 
 const AdminCollectionHealthPage = () => (

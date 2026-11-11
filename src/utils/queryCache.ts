@@ -1,13 +1,24 @@
 import { QueryClient, QueryKey } from "@tanstack/react-query";
 
-export const setQueryDataIfNewer = <T>(
+const firstSeenAt = new WeakMap<object, number>();
+
+export const receivedAt = (payload: object): number => {
+  const seenAt = firstSeenAt.get(payload);
+  if (seenAt !== undefined) return seenAt;
+
+  const now = Date.now();
+  firstSeenAt.set(payload, now);
+  return now;
+};
+
+export const setQueryDataIfNewer = <T extends object>(
   queryClient: QueryClient,
   queryKey: QueryKey,
   data: T,
-  fetchedAt: number,
 ): void => {
+  const stamp = receivedAt(data);
   const cachedAt = queryClient.getQueryState(queryKey)?.dataUpdatedAt ?? 0;
-  if (fetchedAt <= cachedAt) return;
+  if (stamp <= cachedAt) return;
 
-  queryClient.setQueryData(queryKey, data, { updatedAt: fetchedAt });
+  queryClient.setQueryData(queryKey, data, { updatedAt: stamp });
 };

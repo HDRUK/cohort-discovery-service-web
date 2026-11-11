@@ -62,10 +62,8 @@ const OVERALL_COLOURS: Record<HealthLevel, "success" | "warning" | "error"> = {
 
 const CollectionHealth = ({
   initialCollections,
-  fetchedAt,
 }: {
   initialCollections: CollectionWithHosts[];
-  fetchedAt: number;
 }) => {
   const hasMounted = useHasMounted();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -84,7 +82,7 @@ const CollectionHealth = ({
     addHealthCheck,
     updateExpected,
     runTest,
-  } = useCollectionHealth({ initialCollections, fetchedAt });
+  } = useCollectionHealth({ initialCollections });
 
   const handleUpdateExpected = updateExpected;
   const handleRunTest = runTest;

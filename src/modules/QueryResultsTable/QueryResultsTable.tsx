@@ -22,11 +22,10 @@ import { useDefaults } from "@/providers/DefaultProvider";
 import TwoPaneSwimLaneLayout from "@/modules/TwoPaneSwimLaneLayout";
 import QueryResultsLocation from "./QueryResultsLocation";
 import { QUERY_KEYS } from "@/config/tags";
-import { setQueryDataIfNewer } from "@/utils/queryCache";
+import { receivedAt, setQueryDataIfNewer } from "@/utils/queryCache";
 
 interface QueryResultsTableProps {
   initialData: Query;
-  fetchedAt: number;
   initialSearchParams?: URLSearchParams;
   tableProps?: TableProps;
   useTableProps?: Omit<MRT_TableOptions<Task>, "data" | "columns">;
@@ -35,7 +34,6 @@ interface QueryResultsTableProps {
 
 const QueryResultsTable = ({
   initialData,
-  fetchedAt,
   initialSearchParams = new URLSearchParams(),
   tableProps,
   useTableProps,
@@ -58,7 +56,7 @@ const QueryResultsTable = ({
       return res.data;
     },
     initialData,
-    initialDataUpdatedAt: fetchedAt,
+    initialDataUpdatedAt: receivedAt(initialData),
     staleTime: 2 * defaults.tableRefresh,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
@@ -70,8 +68,8 @@ const QueryResultsTable = ({
     },
   });
   useEffect(() => {
-    setQueryDataIfNewer(qc, queryKey, initialData, fetchedAt);
-  }, [qc, queryKey, initialData, fetchedAt]);
+    setQueryDataIfNewer(qc, queryKey, initialData);
+  }, [qc, queryKey, initialData]);
 
   const { tasks, definition } = query;
   const location = definition.demographics?.location ?? null;

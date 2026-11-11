@@ -10,7 +10,7 @@ const loadCollection = async (pid: string) => {
     params: new URLSearchParams({ pid }),
   });
 
-  return { collections: result.data?.data ?? [], fetchedAt: Date.now() };
+  return result.data?.data ?? [];
 };
 
 const CollectionHealthLoader = async ({
@@ -19,14 +19,10 @@ const CollectionHealthLoader = async ({
   params: Promise<{ pid: string }>;
 }) => {
   const { pid } = await params;
-  const { collections, fetchedAt } = await loadCollection(pid);
+  const collections = await loadCollection(pid);
 
   return (
-    <CollectionHealthDetailView
-      pid={pid}
-      initialCollections={collections}
-      fetchedAt={fetchedAt}
-    />
+    <CollectionHealthDetailView pid={pid} initialCollections={collections} />
   );
 };
 

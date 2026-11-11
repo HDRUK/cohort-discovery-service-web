@@ -17,6 +17,7 @@ import {
   Paginated,
   RegressionTest,
 } from "@/types/api";
+import { receivedAt } from "@/utils/queryCache";
 import { buildHealthRows, HealthThresholds } from "./health";
 
 export const REFRESH_INTERVAL = 10_000;
@@ -29,11 +30,9 @@ const REFRESH_OPTIONS = {
 
 const useCollectionHealth = ({
   initialCollections,
-  fetchedAt,
   pid,
 }: {
   initialCollections: CollectionWithHosts[];
-  fetchedAt: number;
   pid?: string;
 }) => {
   const queryClient = useQueryClient();
@@ -62,7 +61,7 @@ const useCollectionHealth = ({
       message: "",
       data: { data: initialCollections } as Paginated<CollectionWithHosts>,
     },
-    initialDataUpdatedAt: fetchedAt,
+    initialDataUpdatedAt: receivedAt(initialCollections),
     ...REFRESH_OPTIONS,
   });
 
@@ -81,8 +80,8 @@ const useCollectionHealth = ({
   const now = useMemo(
     () =>
       Math.max(collectionsUpdatedAt || 0, regressionUpdatedAt || 0) ||
-      fetchedAt,
-    [collectionsUpdatedAt, regressionUpdatedAt, fetchedAt],
+      receivedAt(initialCollections),
+    [collectionsUpdatedAt, regressionUpdatedAt, initialCollections],
   );
 
   const collections = useMemo(

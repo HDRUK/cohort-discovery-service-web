@@ -35,10 +35,7 @@ describe("QueriesTable", () => {
     const mockQueries = [getMockQuery()];
     render(
       <MockCohortDiscoveryServiceStore>
-        <QueriesTable
-          initialData={paginateData({ data: mockQueries })}
-          fetchedAt={Date.now()}
-        />
+        <QueriesTable initialData={paginateData({ data: mockQueries })} />
       </MockCohortDiscoveryServiceStore>,
     );
 

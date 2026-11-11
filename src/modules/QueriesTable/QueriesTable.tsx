@@ -35,17 +35,15 @@ import EditableText from "@/components/EditableText";
 import updateQuery from "@/actions/query/updateQuery";
 import { useNotify } from "@/providers/NotifyProvider";
 import { QUERY_KEYS } from "@/config/tags";
-import { setQueryDataIfNewer } from "@/utils/queryCache";
+import { receivedAt, setQueryDataIfNewer } from "@/utils/queryCache";
 
 interface QueriesTableProps {
   initialData: Paginated<Query>;
-  fetchedAt: number;
   columnVisibility?: Record<string, boolean>;
 }
 
 const QueriesTable = ({
   initialData,
-  fetchedAt,
   columnVisibility = { pid: false, "mrt-row-expand": false },
 }: QueriesTableProps) => {
   const defaults = useDefaults();
@@ -68,11 +66,7 @@ const QueriesTable = ({
   // - the SSR/CSR mix here has made this a little complex
   const [showSkeletonRefresh, setShowSkeletonRefresh] = useState(false);
 
-  const {
-    data: queries,
-    isLoading,
-    dataUpdatedAt,
-  } = useQuery<Paginated<Query>>({
+  const { data: queries, isLoading } = useQuery<Paginated<Query>>({
     queryKey,
     queryFn: async () => {
       const searchParamsObject = buildQueryHistoryParams({
@@ -88,7 +82,7 @@ const QueriesTable = ({
       return res.data;
     },
     initialData,
-    initialDataUpdatedAt: fetchedAt,
+    initialDataUpdatedAt: receivedAt(initialData),
     staleTime: 2 * defaults.tableRefresh,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
@@ -102,8 +96,8 @@ const QueriesTable = ({
     },
   });
   useEffect(() => {
-    setQueryDataIfNewer(qc, queryKey, initialData, fetchedAt);
-  }, [qc, queryKey, initialData, fetchedAt]);
+    setQueryDataIfNewer(qc, queryKey, initialData);
+  }, [qc, queryKey, initialData]);
 
   const columns: MRT_ColumnDef<Query>[] = [
     {
@@ -244,7 +238,6 @@ const QueriesTable = ({
       >
         <QueryResultsTable
           initialData={row.original}
-          fetchedAt={dataUpdatedAt}
           useTableProps={{ enableRowSelection: false }}
           tableProps={{
             leftAction: {
