@@ -15,7 +15,12 @@ import { CombinedUser } from "@/types/api";
 import { FeatureFlag } from "@/types/features";
 
 export type LoadedSession =
-  | { access: SessionAccess.Ok; data: SessionData; flags: FeatureFlag }
+  | {
+      access: SessionAccess.Ok;
+      data: SessionData;
+      flags: FeatureFlag;
+      expiresAt?: number;
+    }
   | {
       access: Exclude<SessionAccess, SessionAccess.Ok>;
       errorText?: string;
@@ -53,6 +58,7 @@ export const loadSession = async (): Promise<LoadedSession> => {
   return {
     access,
     flags,
+    expiresAt: session?.exp,
     data: {
       user: {
         ...currentUser.data,

@@ -35,6 +35,7 @@ const SessionGate = async ({
       user={loaded.data.user}
       collections={loaded.data.userCollections}
       featureFlags={loaded.flags}
+      expiresAt={loaded.expiresAt}
     >
       {children}
     </ProtectedPage>

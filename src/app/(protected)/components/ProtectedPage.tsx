@@ -8,11 +8,13 @@ import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { useQueryBuilderStore } from "@/store/queryBuilderStore";
 import { shouldResetPreferences } from "@/store/queryBuilderPreferences";
 import { isOnlyInDefaultWorkgroup } from "@/utils/user";
+import useSessionExpiry from "@/hooks/useSessionExpiry";
 
 interface ProtectedPageProps {
   user: CombinedUser;
   collections: Collection[];
   featureFlags: FeatureFlag;
+  expiresAt?: number;
   children: ReactNode;
 }
 
@@ -20,8 +22,11 @@ const ProtectedPage = ({
   user,
   collections,
   featureFlags,
+  expiresAt,
   children,
 }: ProtectedPageProps) => {
+  useSessionExpiry(expiresAt);
+
   const setFlags = useFeatureFlagsStore((s) => s.setFlags);
 
   const initialiseSelectedDatasets = useQueryBuilder(
