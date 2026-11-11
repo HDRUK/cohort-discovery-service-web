@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
-import { API_ROUTES } from "@/lib/apiRoutes";
+import { API_ROUTES, isPathSegment } from "@/lib/apiRoutes";
 import { parseDownloadParams } from "@/utils/download";
 const baseURL = process.env.API_BASE_URL!;
 
@@ -10,7 +10,7 @@ export async function GET(
 ) {
   const { pid } = await params;
   const downloadParams = parseDownloadParams(new URL(req.url).searchParams);
-  if (!downloadParams) {
+  if (!downloadParams || !isPathSegment(pid)) {
     return new Response("Unsupported download", { status: 400 });
   }
   const { entity, format } = downloadParams;

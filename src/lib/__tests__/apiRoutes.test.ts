@@ -1,4 +1,4 @@
-import { API_ROUTES } from "../apiRoutes";
+import { API_ROUTES, isPathSegment } from "../apiRoutes";
 
 describe("API_ROUTES", () => {
   it("builds the same paths for valid ids, pids and flag names", () => {
@@ -29,5 +29,18 @@ describe("API_ROUTES", () => {
     expect(() =>
       API_ROUTES.user("5/../../features" as unknown as number),
     ).toThrow("Invalid API path segment");
+  });
+});
+
+describe("isPathSegment", () => {
+  it.each(["9b2f6c1e-4a3d-4c1b-9f0e-2d7a8b6c5e41", "abc_123", 12])(
+    "accepts %p",
+    (value) => {
+      expect(isPathSegment(value)).toBe(true);
+    },
+  );
+
+  it.each(["..", "../users?x=", "a/b", "a?b", ""])("rejects %p", (value) => {
+    expect(isPathSegment(value)).toBe(false);
   });
 });

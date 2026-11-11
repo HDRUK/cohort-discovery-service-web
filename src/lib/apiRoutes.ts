@@ -4,10 +4,12 @@ const API_URL = "/api/v1";
 const API_AUTH_URL = "/api/auth";
 const SEGMENT_PATTERN = /^[A-Za-z0-9_-]+$/;
 
+export const isPathSegment = (value: string | number): boolean =>
+  SEGMENT_PATTERN.test(String(value));
+
 const segment = (value: string | number): string => {
-  const text = String(value);
-  if (!SEGMENT_PATTERN.test(text)) throw new Error("Invalid API path segment");
-  return text;
+  if (!isPathSegment(value)) throw new Error("Invalid API path segment");
+  return String(value);
 };
 
 export const API_ROUTES = {
