@@ -7,6 +7,7 @@
     "dev-debug": "NODE_OPTIONS='--inspect' next dev --turbopack",
     "build": "next build",
     "start": "next start",
+    "preview": "next build && API_CALL_LOG=1 next start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "lint:workflows": "actionlint",
