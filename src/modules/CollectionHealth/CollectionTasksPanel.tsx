@@ -21,7 +21,7 @@ import { routes } from "@/config/routes";
 import { QUERY_KEYS } from "@/config/tags";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useTable } from "@/hooks/useTable";
-import { routeGet } from "@/lib/routeGet";
+import { routeGet } from "@/lib/routeFetch";
 import {
   ApiResponse,
   CollectionTaskHistory,

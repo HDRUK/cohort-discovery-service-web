@@ -41,6 +41,10 @@ export const routes = {
       withQuery(`/api/queries/${pid}`, params),
     task: (pid: string) => `/api/tasks/${pid}`,
     regressionTests: "/api/regression-tests",
+    termDirectory: (params: URLSearchParams) =>
+      withQuery("/api/term-directory", params),
+    conceptSearch: "/api/concepts/search",
+    parseQuery: "/api/parse-query",
   },
   ssoError: (error: string) =>
     `/auth/sso/error?error=${encodeURIComponent(error)}`,

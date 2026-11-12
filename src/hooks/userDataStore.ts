@@ -19,9 +19,11 @@ import {
   CollectionWithHosts,
   Workgroup,
   Collection,
+  SearchConceptsBody,
 } from "@/types/api";
 import { DEFAULT_QUERY, useQueryBuilderStore } from "@/store/queryBuilderStore";
-import searchConcepts from "@/actions/concept/searchConcepts";
+import { routes } from "@/config/routes";
+import { routePost } from "@/lib/routeFetch";
 import { WorkgroupNames } from "@/config/workgroups";
 
 export interface UserDataStoreState {
@@ -177,7 +179,10 @@ export const useUserDataStore = create<UserDataStoreState>((set) => ({
   searchForConcepts: async ({ searchTerm, perPage, page = 1, domain }) => {
     const { selectedDatasets } = useQueryBuilderStore.getState();
 
-    const { data } = await searchConcepts({
+    const { data } = await routePost<
+      ApiResponse<Paginated<Partial<Concept>>>,
+      SearchConceptsBody
+    >(routes.api.conceptSearch, {
       concept_name: [searchTerm],
       concept_id: [searchTerm],
       per_page: perPage,

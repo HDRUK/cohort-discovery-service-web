@@ -28,12 +28,17 @@ import {
   formatDeathSummary,
 } from "./summary";
 import { useQuery } from "@tanstack/react-query";
-import getTermDirectory from "@/actions/termDirectory/getTermDirectory";
+import { routes } from "@/config/routes";
+import { routeGet } from "@/lib/routeFetch";
+import { toTermDirectoryParams } from "@/utils/routeParams";
 import { OmopTableName } from "@/types/omop";
+import { ApiResponse, Paginated, TermDirectoryEntry } from "@/types/api";
 import { useUserDataStore } from "@/hooks/userDataStore";
 import useFeatures from "@/hooks/useFeatures";
 import { hasDemographicsContent } from "@/utils/rules";
 import { QUERY_KEYS } from "@/config/tags";
+
+const PERSON_CONCEPTS_PER_PAGE = 100;
 
 const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
   const { demographics, remove, selectedDatasets } = useQueryBuilder((qb) => ({
@@ -73,8 +78,17 @@ const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
   //this will be different for different users and what collectionPids are selected
   const { data: personConcepts } = useQuery({
     queryKey: QUERY_KEYS.demographics(user?.id, collectionPids),
-    queryFn: async () =>
-      await getTermDirectory(1, 100, "", OmopTableName.Person, collectionPids),
+    queryFn: () =>
+      routeGet<ApiResponse<Paginated<TermDirectoryEntry>>>(
+        routes.api.termDirectory(
+          toTermDirectoryParams({
+            page: 1,
+            perPage: PERSON_CONCEPTS_PER_PAGE,
+            domain: OmopTableName.Person,
+            collections: collectionPids,
+          }),
+        ),
+      ),
     enabled: !!user?.id,
     staleTime: 10 * 60_000,
   });

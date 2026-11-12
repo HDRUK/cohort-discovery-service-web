@@ -1,5 +1,5 @@
 import { ApiError } from "@/lib/https";
-import { routeGet } from "../routeGet";
+import { routeGet, routePost } from "../routeFetch";
 
 const mockFetch = jest.fn();
 
@@ -32,5 +32,30 @@ describe("routeGet", () => {
     expect(error).toBeInstanceOf(ApiError);
     expect(error.status).toBe(403);
     expect(error.message).toBe("Forbidden");
+  });
+});
+
+describe("routePost", () => {
+  it("posts the body as JSON and returns the parsed response", async () => {
+    mockFetch.mockResolvedValueOnce(responseWith(true, 200, { data: "q" }));
+
+    await expect(
+      routePost("/api/parse-query", { query: "diabetes" }),
+    ).resolves.toEqual({ data: "q" });
+    expect(mockFetch).toHaveBeenCalledWith("/api/parse-query", {
+      method: "POST",
+      cache: "no-store",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: "diabetes" }),
+    });
+  });
+
+  it("throws an ApiError with the status on a failed response", async () => {
+    mockFetch.mockResolvedValueOnce(responseWith(false, 400, "Invalid"));
+
+    const error = await routePost("/api/parse-query", {}).catch((e) => e);
+
+    expect(error).toBeInstanceOf(ApiError);
+    expect(error.status).toBe(400);
   });
 });

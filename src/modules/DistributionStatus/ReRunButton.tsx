@@ -9,7 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { QUERY_KEYS } from "@/config/tags";
 import { routes } from "@/config/routes";
-import { routeGet } from "@/lib/routeGet";
+import { routeGet } from "@/lib/routeFetch";
 
 interface ReRunButtonProps {
   onClick: () => Promise<Query>;

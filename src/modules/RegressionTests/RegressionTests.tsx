@@ -39,7 +39,7 @@ import AddRegressionTestDialog from "./AddRegressionTestDialog";
 import useTaskPolling from "@/hooks/useTaskPolling";
 import { routes } from "@/config/routes";
 import { QUERY_KEYS } from "@/config/tags";
-import { routeGet } from "@/lib/routeGet";
+import { routeGet } from "@/lib/routeFetch";
 import { useConfirmBool } from "@/hooks/useConfirm";
 
 type RunStates = Record<string, Set<string>>;

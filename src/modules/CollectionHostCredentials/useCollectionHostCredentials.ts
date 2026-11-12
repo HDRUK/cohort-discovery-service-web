@@ -1,7 +1,7 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { routes } from "@/config/routes";
 import { QUERY_KEYS } from "@/config/tags";
-import { routeGet } from "@/lib/routeGet";
+import { routeGet } from "@/lib/routeFetch";
 import { CollectionHostCredentials } from "@/types/api";
 
 /**
