@@ -10,18 +10,19 @@ import PositionedMenu, { PositionedMenuItem } from "../PositionedMenu";
 import { useRouter } from "next/navigation";
 import { useSessionUser } from "@/contexts/SessionDataContext";
 import { useApplicationMode } from "@/providers/ApplicationModeProvider";
-import { useSignOutStore } from "@/store/signOutStore";
 import { routes } from "@/config/routes";
 import { checkIsAdmin } from "@/utils/user";
 import { getOrganisationUrl } from "@/config/externalLinks";
+import useSignOut from "@/hooks/useSignOut";
+import SignOutOverlay from "@/components/SignOutOverlay";
 
-const NEXT_PUBLIC_LOGIN_URL = getOrganisationUrl();
+const ORGANISATION_URL = getOrganisationUrl();
 
 const DefaultHeaderBar = () => {
   const router = useRouter();
   const user = useSessionUser();
   const { isStandalone } = useApplicationMode();
-  const setSigningOut = useSignOutStore((s) => s.setSigningOut);
+  const { signOut, isSigningOut } = useSignOut();
   const logoHref = user ? routes.dashboardNewQuery() : routes.login;
 
   const links: PositionedMenuItem[] = [
@@ -58,10 +59,7 @@ const DefaultHeaderBar = () => {
           {
             id: "logout",
             label: "Logout",
-            onClick: () => {
-              setSigningOut(true);
-              window.location.href = routes.logout;
-            },
+            onClick: signOut,
           },
         ]
       : [
@@ -69,13 +67,14 @@ const DefaultHeaderBar = () => {
             id: "back",
             label: "Back",
             onClick: () => {
-              router.push(NEXT_PUBLIC_LOGIN_URL);
+              router.push(ORGANISATION_URL);
             },
           },
         ]),
   ];
 
   return (
+    <>
     <AppBar
       position="static"
       sx={(theme) => ({
@@ -101,6 +100,8 @@ const DefaultHeaderBar = () => {
         )}
       </Toolbar>
     </AppBar>
+    <SignOutOverlay open={isSigningOut} />
+    </>
   );
 };
 
