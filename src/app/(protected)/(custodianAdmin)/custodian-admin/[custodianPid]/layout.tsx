@@ -1,5 +1,5 @@
-import getCustodian from "@/actions/custodian/getCustodian";
-import getCustodianCollectionHosts from "@/actions/collectionHost/getCustodianCollectionHosts";
+import { getCustodian } from "@/server/data/custodians";
+import { getCustodianCollectionHosts } from "@/server/data/collectionHosts";
 import { CustodianSectionProvider } from "@/contexts/CustodianSectionContext";
 
 type Params = Promise<{ custodianPid: string }>;

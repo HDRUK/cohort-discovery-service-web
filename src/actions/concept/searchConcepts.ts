@@ -1,6 +1,7 @@
 "use server";
 
-import { apiPost } from "@/lib/apiClient";
+import { apiPost } from "@/server/api";
+import { requireSession } from "@/server/session";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { Concept, ApiResponse, Paginated } from "@/types/api";
 
@@ -17,10 +18,11 @@ interface SearchConceptsBody {
 const searchConcepts = async (
   body: SearchConceptsBody,
 ): Promise<ApiResponse<Paginated<Partial<Concept>>>> => {
+  const { token } = await requireSession();
   const { data, message } = await apiPost<
     ApiResponse<Paginated<Partial<Concept>>>,
     SearchConceptsBody
-  >(API_ROUTES.searchConcepts, body);
+  >(token, API_ROUTES.searchConcepts, body);
 
   return { data, message };
 };

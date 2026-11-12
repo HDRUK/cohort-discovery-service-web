@@ -203,7 +203,7 @@ export const useAdminDataStore = create<AdminDataStoreState>((set) => ({
   updateCollectionStatus: async (idOrIds, status, refreshCache = true) => {
     const state = CollectionStatus[status].toLowerCase();
     const ids = Array.isArray(idOrIds) ? idOrIds : [idOrIds];
-    await transitionCollections(ids, { state }, undefined, refreshCache);
+    await transitionCollections(ids, { state }, refreshCache);
   },
 
   createNetwork: async (payload: CreateNetworkPost) => {

@@ -1,12 +1,12 @@
 "use server";
 
-import { TAG_USERS } from "@/config/tags";
-import { apiGet } from "@/lib/apiClient";
 import { API_ROUTES } from "@/lib/apiRoutes";
-import { ApiResponse } from "@/types/api";
-import { User } from "@/types/api";
+import { apiGet } from "@/server/api";
+import { requireSession } from "@/server/session";
+import { ApiResponse, User } from "@/types/api";
 
 const getSearchUsers = async (term?: string): Promise<ApiResponse<User[]>> => {
+  const { token } = await requireSession();
   const params = new URLSearchParams(
     term
       ? {
@@ -16,11 +16,7 @@ const getSearchUsers = async (term?: string): Promise<ApiResponse<User[]>> => {
       : {},
   );
 
-  return await apiGet<ApiResponse<User[]>>({
-    url: API_ROUTES.users,
-    params,
-    tags: [TAG_USERS],
-  });
+  return apiGet<ApiResponse<User[]>>(token, API_ROUTES.users, { params });
 };
 
 export default getSearchUsers;

@@ -1,15 +1,13 @@
 "use server";
 
-import { TAG_LATEST_QUERY } from "@/config/tags";
-import { apiGet } from "@/lib/apiClient";
 import { API_ROUTES } from "@/lib/apiRoutes";
+import { apiGet } from "@/server/api";
+import { requireSession } from "@/server/session";
 import { Query, ApiResponse } from "@/types/api";
 
 const getLatestQuery = async (): Promise<ApiResponse<Query>> => {
-  return await apiGet<ApiResponse<Query>>({
-    url: `${API_ROUTES.queries}/latest`,
-    tags: [TAG_LATEST_QUERY],
-  });
+  const { token } = await requireSession();
+  return apiGet<ApiResponse<Query>>(token, `${API_ROUTES.queries}/latest`);
 };
 
 export default getLatestQuery;

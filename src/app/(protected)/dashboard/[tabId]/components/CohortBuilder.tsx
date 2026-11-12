@@ -1,5 +1,4 @@
-import getQuery from "@/actions/query/getQuery";
-import getQueries from "@/actions/query/getQueries";
+import { getQueries, getQuery } from "@/server/data/queries";
 import { cookies } from "next/headers";
 import { QUERY_BUILDER_GUIDANCE_COOKIE } from "@/config/internals";
 import { buildQueryHistoryParams } from "@/utils/params";

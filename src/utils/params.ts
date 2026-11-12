@@ -7,6 +7,7 @@ import {
   SearchParamValue,
 } from "@/types/api";
 import { CollectionHostFilter } from "@/types/collections";
+import { MAX_PER_PAGE } from "@/config/defaults";
 
 export const buildSearchParams = <
   T extends Record<string, SearchParamValue> = SearchParams,
@@ -32,6 +33,12 @@ export const buildSearchParams = <
   return searchParams;
 };
 
+export const clampPerPage = (perPage?: number | string): number | undefined => {
+  const value = Math.floor(Number(perPage));
+  if (!Number.isFinite(value) || value < 1) return undefined;
+  return Math.min(value, MAX_PER_PAGE);
+};
+
 export const buildCollectionParams = (
   searchParams: CollectionsSearchParams,
 ) => {
@@ -40,7 +47,7 @@ export const buildCollectionParams = (
 
   const params = {
     page,
-    per_page,
+    per_page: clampPerPage(per_page),
     ...(workgroup_filter ? { workgroup_id: workgroup_filter } : {}),
     ...(collection_filter ? { state: collection_filter } : {}),
     ...(search_term ? { ["name[]"]: search_term } : {}),
@@ -65,13 +72,14 @@ export const buildCollectionHostParams = (
 export const buildQueryHistoryParams = (
   searchParams: QueryHistorySearchParams,
 ) => {
-  const { search_term, ...rest } = searchParams;
-  const params = {
-    ...rest,
-    ...(search_term ? { ["name[]"]: search_term } : {}),
-  };
+  const { page, per_page, sort, search_term } = searchParams;
 
-  return buildSearchParams(params);
+  return buildSearchParams({
+    page,
+    per_page: clampPerPage(per_page),
+    sort,
+    ...(search_term ? { ["name[]"]: search_term } : {}),
+  });
 };
 
 export const buildConceptSearchParams = (searchParams: ConceptSearchParams) => {

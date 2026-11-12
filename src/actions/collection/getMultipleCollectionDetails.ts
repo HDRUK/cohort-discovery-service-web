@@ -1,29 +1,19 @@
 "use server";
 
-import { apiGet } from "@/lib/apiClient";
-import { API_ROUTES } from "@/lib/apiRoutes";
-import { ApiResponse, CollectionDetails, ReadArgs } from "@/types/api";
-import { getTagCollection } from "@/config/tags";
+import { getCollectionDetails } from "@/server/data/collections";
+import { ApiResponse, CollectionDetails } from "@/types/api";
 
 export type CollectionDetailsMap = Record<string, CollectionDetails>;
 
 const getMultipleCollectionDetails = async (
   pids: string[],
-  args?: ReadArgs,
 ): Promise<ApiResponse<CollectionDetailsMap>> => {
   const uniquePids = [...new Set(pids)].filter(Boolean);
 
   const results = await Promise.all(
-    uniquePids.map(async (pid) => {
-      const res = await apiGet<ApiResponse<CollectionDetails>>({
-        url: API_ROUTES.collectionDetails(pid),
-        tags: [getTagCollection(pid)],
-        params: args?.params,
-        cacheOptions: args?.cacheOptions,
-      });
-
-      return [pid, res.data] as const;
-    }),
+    uniquePids.map(
+      async (pid) => [pid, await getCollectionDetails(pid)] as const,
+    ),
   );
 
   return {

@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { Box, Divider } from "@mui/material";
-import getAdminCollections from "@/actions/collection/getAdminCollections";
+import { getAdminCollections } from "@/server/data/collections";
 import SkeletonFull from "@/components/SkeletonFull";
 import Title from "@/components/Title";
 import CollectionHealth from "@/modules/CollectionHealth/CollectionHealth";

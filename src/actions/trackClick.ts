@@ -1,6 +1,7 @@
 "use server";
 
-import { apiPost } from "@/lib/apiClient";
+import { apiPost } from "@/server/api";
+import { requireSession } from "@/server/session";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { ApiResponse } from "@/types/api";
 
@@ -26,13 +27,15 @@ const trackClick = async ({
   action,
   description,
   properties,
-}: TrackClickInput): Promise<ApiResponse<null>> =>
-  await apiPost<ApiResponse<null>, TrackClickBody>(API_ROUTES.clicks, {
+}: TrackClickInput): Promise<ApiResponse<null>> => {
+  const { token } = await requireSession();
+  return apiPost<ApiResponse<null>, TrackClickBody>(token, API_ROUTES.clicks, {
     subject_type: subjectType,
     subject_id: subjectId,
     action,
     description,
     properties,
   });
+};
 
 export default trackClick;

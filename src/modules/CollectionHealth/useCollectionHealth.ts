@@ -59,7 +59,6 @@ const useCollectionHealth = ({
     queryFn: () =>
       getAdminCollections({
         params: collectionsParams(pid),
-        cacheOptions: { useCache: false },
       }),
     initialData: {
       message: "",

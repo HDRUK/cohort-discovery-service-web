@@ -13,17 +13,17 @@ import {
   TAG_NETWORKS,
   TAG_WORKGROUP_ADMIN,
 } from "@/config/tags";
-import { getTokenUser } from "@/lib/auth";
+import { requireSession } from "@/server/session";
 import { Custodian } from "@/types/api";
 import { updateTag } from "next/cache";
 
 export const revalidateAction = async (tagName: string) => {
-  await getTokenUser();
+  await requireSession();
   updateTag(tagName);
 };
 
 export const revalidateUserAction = async (tagName: string) => {
-  const { user } = await getTokenUser();
+  const { user } = await requireSession();
   const userId = user.id;
   await revalidateAction(`${tagName}-${userId}`);
 };
@@ -57,9 +57,7 @@ export const revalidateCollections = async (
       : []),
   ]);
 
-export const revalidateWorkgroupAndCollections = async (
-  includeUsers = false,
-) =>
+export const revalidateWorkgroupAndCollections = async (includeUsers = false) =>
   Promise.all([
     revalidateAction(TAG_WORKGROUP_ADMIN),
     revalidateCollections(),

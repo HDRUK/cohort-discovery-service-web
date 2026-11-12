@@ -1,11 +1,9 @@
 import "@testing-library/jest-dom";
 import { render, screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import getCollections from "@/actions/collection/getCollections";
+import getCollections from "@/actions/collection/__mocks__/getCollections";
 import SelectDatasets from "./SelectDatasets";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
-
-jest.mock("@/actions/collection/getCollections");
 
 const setSelectedDatasets = jest.fn();
 const setPreviouslySelectedDatasets = jest.fn();

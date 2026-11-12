@@ -1,92 +1,12 @@
 "use server";
 
-import { apiGet, ErrorMode } from "@/lib/apiClient";
-import { API_ROUTES } from "@/lib/apiRoutes";
-import {
-  ApiResponse,
-  CollectionTaskHistory,
-  TaskHistoryTask,
-  TimeRange,
-} from "@/types/api";
-import { RuleGroupType } from "@/types/rules";
-
-const PER_PAGE = 100;
-
-const MAX_PAGES = 10;
-
-const fetchPage = (pid: string, range: TimeRange, page: number) =>
-  apiGet<ApiResponse<CollectionTaskHistory>>({
-    url: API_ROUTES.collectionTaskHistory(pid),
-    params: new URLSearchParams({
-      from: range.from,
-      to: range.to,
-      per_page: String(PER_PAGE),
-      page: String(page),
-      include: "definition",
-    }),
-    cacheOptions: { useCache: false },
-    options: { errorMode: ErrorMode.RESULT },
-  });
-
-const hoistDefinitions = (
-  tasks: TaskHistoryTask[],
-): {
-  tasks: TaskHistoryTask[];
-  definitionsByPid: Record<string, RuleGroupType>;
-} => {
-  const definitionsByPid: Record<string, RuleGroupType> = {};
-
-  const stripped = tasks.map((task) => {
-    const { query } = task;
-    if (!query?.definition) return task;
-
-    definitionsByPid[query.pid] ??= query.definition;
-
-    return {
-      ...task,
-      query: {
-        pid: query.pid,
-        name: query.name,
-        query_type: query.query_type,
-      },
-    };
-  });
-
-  return { tasks: stripped, definitionsByPid };
-};
+import { getCollectionTaskHistory as readCollectionTaskHistory } from "@/server/data/collections";
+import { ApiResponse, CollectionTaskHistory, TimeRange } from "@/types/api";
 
 const getCollectionTaskHistory = async (
   pid: string,
   range: TimeRange,
-): Promise<ApiResponse<CollectionTaskHistory>> => {
-  const first = await fetchPage(pid, range, 1);
-  const paginator = first.data?.tasks;
-  if (!paginator) return first;
-
-  const pages = Math.min(paginator.last_page, MAX_PAGES);
-
-  const rest =
-    pages <= 1
-      ? []
-      : await Promise.all(
-          Array.from({ length: pages - 1 }, (_, index) =>
-            fetchPage(pid, range, index + 2),
-          ),
-        );
-
-  const { tasks, definitionsByPid } = hoistDefinitions([
-    ...paginator.data,
-    ...rest.flatMap((response) => response.data?.tasks?.data ?? []),
-  ]);
-
-  return {
-    ...first,
-    data: {
-      ...first.data,
-      tasks: { ...paginator, data: tasks },
-      definitionsByPid,
-    },
-  };
-};
+): Promise<ApiResponse<CollectionTaskHistory>> =>
+  readCollectionTaskHistory(pid, range);
 
 export default getCollectionTaskHistory;

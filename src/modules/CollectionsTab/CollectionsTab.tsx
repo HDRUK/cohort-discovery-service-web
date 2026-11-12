@@ -1,8 +1,10 @@
-import getAdminCollections from "@/actions/collection/getAdminCollections";
+import {
+  getAdminCollections,
+  getCustodianCollections,
+} from "@/server/data/collections";
 import { CollectionsSearchParams } from "@/types/api";
 import { buildCollectionParams } from "@/utils/params";
 import { Box, Skeleton } from "@mui/material";
-import getCustodianCollections from "@/actions/collection/getCustodianCollections";
 import CollectionsManagement from "../CollectionsManagement";
 
 export const CollectionsSkeleton = () => (

@@ -1,6 +1,6 @@
-import getCollectionHosts from "@/actions/collectionHost/getCollectionHosts";
-import getCollections from "@/actions/collection/getCollections";
-import getUsersList from "@/actions/admin/getUsersList";
+import { getCollectionHosts } from "@/server/data/collectionHosts";
+import { getCollections } from "@/server/data/collections";
+import { getUsersList } from "@/server/data/users";
 import { AdminSectionProvider } from "@/contexts/AdminSectionContext";
 
 const ProtectedAdminPageLayout = async ({
@@ -9,11 +9,7 @@ const ProtectedAdminPageLayout = async ({
   children: React.ReactNode;
 }) => {
   const [{ data: collectionHosts }, { data: collections }, { data: users }] =
-    await Promise.all([
-      getCollectionHosts(),
-      getCollections(),
-      getUsersList(),
-    ]);
+    await Promise.all([getCollectionHosts(), getCollections(), getUsersList()]);
 
   return (
     <AdminSectionProvider

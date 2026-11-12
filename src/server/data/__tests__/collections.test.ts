@@ -1,9 +1,13 @@
-import { apiGet } from "@/lib/apiClient";
-import getCollectionTaskHistory from "../getCollectionTaskHistory";
+import { apiGet } from "@/server/api";
+import { getCollectionTaskHistory } from "../collections";
 
-jest.mock("@/lib/apiClient", () => ({
+jest.mock("@/server/api", () => ({
   apiGet: jest.fn(),
   ErrorMode: { THROW: "throw", RESULT: "result" },
+}));
+
+jest.mock("@/server/session", () => ({
+  requireSession: jest.fn().mockResolvedValue({ token: "a-token" }),
 }));
 
 const mockedApiGet = apiGet as jest.MockedFunction<typeof apiGet>;
@@ -69,12 +73,11 @@ describe("getCollectionTaskHistory", () => {
   });
 
   it("stops at the page ceiling and leaves total intact so the caller can say it truncated", async () => {
-    mockedApiGet.mockImplementation((({
-      params,
-    }: {
-      params: URLSearchParams;
-    }) =>
-      Promise.resolve(page(Number(params.get("page")), 50, 5000))) as never);
+    mockedApiGet.mockImplementation(((
+      _token: string,
+      _path: string,
+      { params }: { params: URLSearchParams },
+    ) => Promise.resolve(page(Number(params.get("page")), 50, 5000))) as never);
 
     const result = await getCollectionTaskHistory("abc", RANGE);
 
@@ -98,7 +101,7 @@ describe("getCollectionTaskHistory", () => {
 
     await getCollectionTaskHistory("abc", RANGE);
 
-    const { params } = mockedApiGet.mock.calls[0][0] as {
+    const { params } = mockedApiGet.mock.calls[0][2] as {
       params: URLSearchParams;
     };
 
@@ -111,9 +114,9 @@ describe("getCollectionTaskHistory", () => {
     await getCollectionTaskHistory("abc", RANGE);
 
     expect(mockedApiGet).toHaveBeenCalledWith(
-      expect.objectContaining({
-        options: expect.objectContaining({ errorMode: "result" }),
-      }),
+      "a-token",
+      expect.any(String),
+      expect.objectContaining({ errorMode: "result" }),
     );
   });
 
@@ -156,13 +159,15 @@ describe("getCollectionTaskHistory", () => {
     expect(result.data?.definitionsByPid).toEqual({});
   });
 
-  it("never caches, since task history changes constantly", async () => {
+  it("calls the task history endpoint with the session token", async () => {
     mockedApiGet.mockResolvedValueOnce(page(1, 1, 1) as never);
 
     await getCollectionTaskHistory("abc", RANGE);
 
     expect(mockedApiGet).toHaveBeenCalledWith(
-      expect.objectContaining({ cacheOptions: { useCache: false } }),
+      "a-token",
+      "/api/v1/collections/abc/task-history",
+      expect.anything(),
     );
   });
 });

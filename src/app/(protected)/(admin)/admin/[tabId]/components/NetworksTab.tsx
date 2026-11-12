@@ -3,7 +3,7 @@ import { buildCollectionParams } from "@/utils/params";
 import { Box, Skeleton } from "@mui/material";
 import { DEFAULT_PER_PAGE } from "@/config/defaults";
 import NetworksAdmin from "./NetworksAdmin";
-import getNetworks from "@/actions/network/getNetworks";
+import { getNetworks } from "@/server/data/networks";
 
 export const WorkgroupsSkeleton = () => (
   <Box sx={{ height: "100%", p: 2 }}>
@@ -25,7 +25,7 @@ const NetworksTab = async ({
     ...rest,
   });
 
-  const { data: networks } = await getNetworks({ params });
+  const { data: networks } = await getNetworks(params.toString());
 
   return <NetworksAdmin networks={networks} />;
 };

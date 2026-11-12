@@ -44,13 +44,8 @@ export interface TermDirectorySearchParams extends ApiSearchParams {
   collections?: string;
 }
 
-export interface CacheOptions {
-  useCache?: boolean;
-}
-
 export interface ReadArgs {
   params?: URLSearchParams | string;
-  cacheOptions?: CacheOptions;
 }
 
 export interface ApiResponse<T> {

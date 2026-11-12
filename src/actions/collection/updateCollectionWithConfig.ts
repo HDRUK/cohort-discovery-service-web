@@ -1,6 +1,8 @@
 "use server";
 
-import { apiPut } from "@/lib/apiClient";
+import { refresh } from "next/cache";
+import { apiPut } from "@/server/api";
+import { requireSession } from "@/server/session";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import {
   ApiResponse,
@@ -9,7 +11,6 @@ import {
   CreateCollectionConfigPost,
   CreateCollectionPost,
 } from "@/types/api";
-import { revalidateCollections } from "@/actions/revalidate";
 
 const updateCollectionWithConfig = async (
   id: number,
@@ -17,15 +18,17 @@ const updateCollectionWithConfig = async (
   payloadConfig: Partial<CreateCollectionConfigPost>,
   refreshCache = true,
 ): Promise<CollectionWithHosts> => {
+  const { token } = await requireSession();
   const { data } = await apiPut<
     ApiResponse<CollectionWithHosts>,
     Partial<CreateCollectionPost>
-  >(API_ROUTES.collection(id), payload);
+  >(token, API_ROUTES.collection(id), payload);
   await apiPut<ApiResponse<Collection>, Partial<CreateCollectionConfigPost>>(
+    token,
     API_ROUTES.collectionConfigItem(data.config.id),
     payloadConfig,
   );
-  if (refreshCache) await revalidateCollections(data.custodian.pid);
+  if (refreshCache) refresh();
   return data;
 };
 

@@ -7,13 +7,12 @@ import { RoleName } from "@/types/roles";
 import ProtectedPage from "./components/ProtectedPage";
 import AppShell from "@/components/AppShell";
 import { routes } from "@/config/routes";
-import getMe from "@/actions/getMe";
-import getCustodians from "@/actions/custodian/getCustodians";
-import getFeatureFlags from "@/actions/getFeatureFlags";
+import { getCurrentUser } from "@/server/data/user";
+import { getCustodians } from "@/server/data/custodians";
+import { getFeatureFlags } from "@/server/data/features";
 import { isStandalone } from "@/utils/modes";
-import { ErrorMode } from "@/lib/apiClient";
-import getWorkgroups from "@/actions/workgroup/getWorkgroups";
-import getUserCollections from "@/actions/collection/getUserCollections";
+import { getWorkgroups } from "@/server/data/workgroups";
+import { getUserCollections } from "@/server/data/collections";
 
 const applicationMode = process.env.APPLICATION_MODE;
 
@@ -49,7 +48,7 @@ export default async function ProtectedLayout({
 
   const user = decoded.user as TokenUser;
 
-  const { data: me, error } = await getMe(ErrorMode.RESULT);
+  const { data: me, error } = await getCurrentUser();
   const { code: errorCode } = error ?? {};
 
   if (errorCode === 404) {

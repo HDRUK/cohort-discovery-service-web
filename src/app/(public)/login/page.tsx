@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
-import getAuthMethods from "@/actions/standalone/getAuthMethods";
+import { getAuthMethods } from "@/server/data/auth";
 import { routes } from "@/config/routes";
 import { safeReturnTo } from "@/utils/returnTo";
 import Login from "@/modules/Login";

@@ -1,6 +1,8 @@
 "use server";
 
-import { apiPost } from "@/lib/apiClient";
+import { refresh } from "next/cache";
+import { apiPost } from "@/server/api";
+import { requireSession } from "@/server/session";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import {
   ApiResponse,
@@ -8,22 +10,24 @@ import {
   CreateCollectionConfigPost,
   CreateCollectionPost,
 } from "@/types/api";
-import { revalidateCollections } from "@/actions/revalidate";
 
 const createCustodianCollectionWithConfig = async (
   custodianPid: string,
   payload: CreateCollectionPost,
   payloadConfig: Omit<CreateCollectionConfigPost, "collection_id">,
 ): Promise<Collection> => {
+  const { token } = await requireSession();
   const { data } = await apiPost<ApiResponse<Collection>, CreateCollectionPost>(
+    token,
     API_ROUTES.custodianCollections(custodianPid),
     payload,
   );
   await apiPost<ApiResponse<Collection>, CreateCollectionConfigPost>(
+    token,
     API_ROUTES.collectionConfig,
     { ...payloadConfig, collection_id: data.id },
   );
-  await revalidateCollections(custodianPid);
+  refresh();
   return data;
 };
 
