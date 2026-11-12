@@ -6,7 +6,7 @@ import { LineChart } from "@mui/x-charts/LineChart";
 import { LineItemIdentifier } from "@mui/x-charts/models";
 import { useQuery } from "@tanstack/react-query";
 import getCollectionTaskHistory from "@/actions/collection/getCollectionTaskHistory";
-import { getTagsCollectionTaskHistory } from "@/config/tags";
+import { QUERY_KEYS } from "@/config/tags";
 import { TaskHistoryTask, TaskHistorySummary } from "@/types/api";
 import { formatDuration, MS_PER_SECOND } from "@/utils/date";
 import {
@@ -94,7 +94,7 @@ const TaskHistoryChart = ({
   const seriesColours = useSeriesColours();
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: getTagsCollectionTaskHistory(collectionPid, range),
+    queryKey: QUERY_KEYS.collectionTaskHistory(collectionPid, range),
     queryFn: () => getCollectionTaskHistory(collectionPid, range),
     enabled,
     refetchOnWindowFocus: false,

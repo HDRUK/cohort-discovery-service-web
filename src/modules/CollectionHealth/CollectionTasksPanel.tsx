@@ -18,7 +18,7 @@ import getCollectionTaskHistory from "@/actions/collection/getCollectionTaskHist
 import SearchBox from "@/components/SearchBox";
 import SectionCard from "@/components/SectionCard";
 import Table from "@/components/Table";
-import { getTagsCollectionTaskHistory } from "@/config/tags";
+import { QUERY_KEYS } from "@/config/tags";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useTable } from "@/hooks/useTable";
 import { TaskHistoryTask, TaskType, TimeRange } from "@/types/api";
@@ -54,7 +54,7 @@ const CollectionTasksPanel = ({
   const isActive = enabled;
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: getTagsCollectionTaskHistory(collectionPid, range),
+    queryKey: QUERY_KEYS.collectionTaskHistory(collectionPid, range),
     queryFn: () => getCollectionTaskHistory(collectionPid, range),
     enabled: isActive,
     refetchOnWindowFocus: false,

@@ -6,8 +6,7 @@ import { useLogDependencyChanges } from "@/utils/deps";
 import useUserStore from "@/hooks/useUserStore";
 import { useCallback } from "react";
 import LastDistributionChip from "./LastDistributionChip";
-import { revalidateAction, revalidateCustodian } from "@/actions/revalidate";
-import { TAG_COLLECTIONS_ADMIN } from "@/config/tags";
+import { useRouter } from "next/navigation";
 import MetadataPanel from "@/components/MetadataPanel";
 
 const DistributionStatus = ({
@@ -31,10 +30,8 @@ const DistributionStatus = ({
     return await runDistributions(collection, DistributionType.GENERIC);
   }, [runDistributions, collection]);
 
-  const handleRefresh = () => {
-    revalidateCustodian(collection.custodian);
-    revalidateAction(TAG_COLLECTIONS_ADMIN);
-  };
+  const router = useRouter();
+  const handleRefresh = () => router.refresh();
 
   useLogDependencyChanges("DistributionStatus", {
     collection,

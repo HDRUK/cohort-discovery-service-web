@@ -8,6 +8,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { Button, CircularProgress } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { QUERY_KEYS } from "@/config/tags";
 
 interface ReRunButtonProps {
   onClick: () => Promise<Query>;
@@ -17,9 +18,11 @@ interface ReRunButtonProps {
 export const ReRunButton = ({ onClick, onSuccess }: ReRunButtonProps) => {
   const defaults = useDefaults();
   const [submittedTaskPid, setSubmittedTaskPid] = useState<string | null>();
+  const hasCalledSuccessRef = useRef(false);
 
   const handleClick = useCallback(async () => {
     setSubmittedTaskPid(null);
+    hasCalledSuccessRef.current = false;
 
     const newQuery = await onClick();
     const newTask = newQuery.tasks?.[0] ?? null;
@@ -28,7 +31,7 @@ export const ReRunButton = ({ onClick, onSuccess }: ReRunButtonProps) => {
   }, [onClick]);
 
   const { data: taskResponse, isFetching } = useQuery({
-    queryKey: ["task", submittedTaskPid],
+    queryKey: QUERY_KEYS.task(submittedTaskPid!),
     queryFn: () => getTask(submittedTaskPid!),
     enabled: !!submittedTaskPid,
     refetchInterval: (query) => {
@@ -46,8 +49,6 @@ export const ReRunButton = ({ onClick, onSuccess }: ReRunButtonProps) => {
   const isSuccessful = taskStatus === TaskStatus.SUCCESSFUL;
   const hasFailed = taskStatus === TaskStatus.ERROR;
   const isLoading = isFetching || isPending;
-
-  const hasCalledSuccessRef = useRef(false);
 
   useEffect(() => {
     if (isSuccessful && !hasCalledSuccessRef.current) {

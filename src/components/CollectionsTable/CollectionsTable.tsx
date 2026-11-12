@@ -16,15 +16,13 @@ import { getDatetime } from "@/utils/date";
 import { trueKeys } from "@/utils/numbers";
 import { useLogDependencyChanges } from "@/utils/deps";
 import useAdminStore from "@/hooks/useAdminStore";
+import deleteCollections from "@/actions/collection/deleteCollections";
+import restoreCollection from "@/actions/collection/restoreCollection";
 import useCustodianStore from "@/hooks/useCustodianStore";
 import useUserStore from "@/hooks/useUserStore";
 import { useConfirm } from "@/hooks/useConfirm";
 import { useNotify } from "@/providers/NotifyProvider";
-import {
-  getTagCollection,
-  getTagCustodianCollection,
-  TAG_COLLECTIONS_ADMIN,
-} from "@/config/tags";
+import { QUERY_KEYS } from "@/config/tags";
 import StatusChip from "@/components/StatusChip";
 import { TableProps } from "../Table/Table";
 import SyntheticChip from "../SyntheticChip";
@@ -32,7 +30,6 @@ import CollectionDetails from "./CollectionDetails";
 import usePrefetchCollectionDetails from "./usePrefetchCollectionDetails";
 import useFeatures from "@/hooks/useFeatures";
 import { useQueryClient } from "@tanstack/react-query";
-import { revalidateAction } from "@/actions/revalidate";
 import { CollectionFilterStatus } from "@/types/collections";
 
 export interface CollectionsTableProps extends TableProps {
@@ -60,10 +57,6 @@ const CollectionsTable = ({
 
   const currentCustodian = useCustodianStore((s) => s.current.custodian);
   const isAdmin = useMemo(() => !currentCustodian, [currentCustodian]);
-  const deleteCollectionAdmin = useAdminStore((s) => s.deleteCollection);
-  const deleteCollection = useCustodianStore((s) => s.deleteCollection);
-  const restoreCollectionAdmin = useAdminStore((s) => s.restoreCollection);
-  const restoreCollection = useCustodianStore((s) => s.restoreCollection);
   const selectedCollections = useUserStore((s) => s.selectedCollections);
   const setSelectedCollections = useUserStore((s) => s.setSelectedCollections);
 
@@ -272,27 +265,28 @@ const CollectionsTable = ({
       if (deleteOverride) {
         await deleteOverride(ids);
       } else {
-        await Promise.all(
-          ids.map((id) => {
-            if (currentCustodian) {
-              deleteCollection(id, currentCustodian.pid);
-            } else {
-              deleteCollectionAdmin(id);
-            }
-          }),
-        );
-        notify.success(
-          `${ids.length} Collection${ids.length > 1 ? "s" : ""} deleted`,
+        const { deleted, failed } = await deleteCollections(ids.map(Number));
+        const isPlural = ids.length > 1;
+
+        if (failed.length > 0) {
+          const failedNames = selectedCollections
+            .filter((c) => failed.includes(c.id))
+            .map((c) => c.name)
+            .join(", ");
+          notify.error(
+            `Deleted ${deleted.length} of ${ids.length} collection${isPlural ? "s" : ""}. Could not delete ${failedNames} — check the details and try again`,
+          );
+        } else {
+          notify.success(
+            `${deleted.length} Collection${isPlural ? "s" : ""} deleted`,
+          );
+        }
+        setRowSelection(
+          Object.fromEntries(failed.map((id) => [String(id), true])),
         );
       }
     },
-    [
-      currentCustodian,
-      deleteCollection,
-      deleteCollectionAdmin,
-      deleteOverride,
-      notify,
-    ],
+    [deleteOverride, notify, selectedCollections],
   );
 
   const handleRestoreClick = async () => {
@@ -309,9 +303,7 @@ const CollectionsTable = ({
     const results = await Promise.all(
       selectedCollections.map(async (collection) => ({
         collection,
-        result: await (currentCustodian
-          ? restoreCollection(collection.id, currentCustodian.pid)
-          : restoreCollectionAdmin(collection.id)),
+        result: await restoreCollection(collection.id),
       })),
     );
     const failed = results.filter(({ result }) => result.error);
@@ -343,8 +335,6 @@ const CollectionsTable = ({
     rowSelection,
     setRowSelection,
     setSelectedCollections,
-    deleteCollection,
-    deleteCollectionAdmin,
   });
 
   const confirm = useConfirm();
@@ -368,21 +358,12 @@ const CollectionsTable = ({
           ? { restoreProps: { onClick: handleRestoreClick } }
           : { deleteProps: { onClick: handleDeleteClick } }),
         refreshProps: {
-          tag:
-            currentCustodian?.pid && !isAdmin
-              ? getTagCustodianCollection(currentCustodian.pid)
-              : TAG_COLLECTIONS_ADMIN,
           label: "Refresh Collections",
           onRefreshed: async () => {
             if (!adminMoreCollectionDetails) return;
-            const tags = collections.data.map((c) => getTagCollection(c.pid));
-            tags.map((t) => revalidateAction(t));
             await queryClient.invalidateQueries({
-              queryKey: ["collectionDetails"],
-            });
-            await queryClient.refetchQueries({
-              queryKey: ["collectionDetails"],
-              type: "all",
+              queryKey: QUERY_KEYS.collectionDetails(),
+              refetchType: "all",
             });
           },
         },

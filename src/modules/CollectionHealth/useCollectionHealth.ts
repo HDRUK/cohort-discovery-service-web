@@ -7,10 +7,7 @@ import createRegressionTest from "@/actions/regressionTest/createRegressionTest"
 import getRegressionTests from "@/actions/regressionTest/getRegressionTests";
 import runRegressionTest from "@/actions/regressionTest/runRegressionTest";
 import updateRegressionTest from "@/actions/regressionTest/updateRegressionTest";
-import {
-  getTagsCollectionHealthRows,
-  TAGS_REGRESSION_TESTS,
-} from "@/config/tags";
+import { QUERY_KEYS } from "@/config/tags";
 import useTaskPolling from "@/hooks/useTaskPolling";
 import { useDefaults } from "@/providers/DefaultProvider";
 import { useNotify } from "@/providers/NotifyProvider";
@@ -43,7 +40,7 @@ const useCollectionHealth = ({
   const defaults = useDefaults();
 
   const queryKeyCollections = useMemo(
-    () => getTagsCollectionHealthRows(pid),
+    () => QUERY_KEYS.collectionHealthRows(pid),
     [pid],
   );
 
@@ -74,7 +71,7 @@ const useCollectionHealth = ({
     isError: isRegressionError,
     dataUpdatedAt: regressionUpdatedAt,
   } = useQuery({
-    queryKey: TAGS_REGRESSION_TESTS,
+    queryKey: QUERY_KEYS.regressionTests(),
     queryFn: () => getRegressionTests(),
     ...REFRESH_OPTIONS,
   });
@@ -122,7 +119,7 @@ const useCollectionHealth = ({
 
   const invalidate = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: queryKeyCollections });
-    queryClient.invalidateQueries({ queryKey: TAGS_REGRESSION_TESTS });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.regressionTests() });
   }, [queryClient, queryKeyCollections]);
 
   const handleTaskComplete = useCallback(

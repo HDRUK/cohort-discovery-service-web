@@ -37,7 +37,7 @@ import runRegressionTest from "@/actions/regressionTest/runRegressionTest";
 import PassFailChip from "./PassFailChip";
 import AddRegressionTestDialog from "./AddRegressionTestDialog";
 import useTaskPolling from "@/hooks/useTaskPolling";
-import { TAGS_REGRESSION_TESTS } from "@/config/tags";
+import { QUERY_KEYS } from "@/config/tags";
 import { useConfirmBool } from "@/hooks/useConfirm";
 
 type RunStates = Record<string, Set<string>>;
@@ -55,7 +55,7 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
   const confirmBool = useConfirmBool();
 
   const { data, isLoading } = useQuery({
-    queryKey: TAGS_REGRESSION_TESTS,
+    queryKey: QUERY_KEYS.regressionTests(),
     queryFn: () => getRegressionTests(),
     staleTime: 30_000,
   });
@@ -80,9 +80,11 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
     (): TableRow[] =>
       tests.flatMap((test): TableRow[] => [
         { kind: "test", test },
-        ...test.collections.map(
-          (col): TableRow => ({ kind: "collection", test, col }),
-        ),
+        ...test.collections.map((col): TableRow => ({
+          kind: "collection",
+          test,
+          col,
+        })),
       ]),
     [tests],
   );
@@ -121,7 +123,7 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
         }
         return { ...prev, [key]: pending };
       });
-      queryClient.invalidateQueries({ queryKey: TAGS_REGRESSION_TESTS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.regressionTests() });
     },
     [queryClient],
   );
@@ -164,7 +166,7 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
     } else {
       await createRegressionTest(values);
     }
-    queryClient.invalidateQueries({ queryKey: TAGS_REGRESSION_TESTS });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.regressionTests() });
   };
 
   const handleDeleteTest = useCallback(
@@ -179,7 +181,7 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
       });
       if (!ok) return;
       await deleteRegressionTest(test.pid);
-      queryClient.invalidateQueries({ queryKey: TAGS_REGRESSION_TESTS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.regressionTests() });
     },
     [confirmBool, queryClient],
   );
@@ -191,7 +193,7 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
           .filter((c) => c.pid !== colPid)
           .map((c) => ({ pid: c.pid, expected_result: c.expected_result })),
       });
-      queryClient.invalidateQueries({ queryKey: TAGS_REGRESSION_TESTS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.regressionTests() });
     },
     [queryClient],
   );
@@ -205,7 +207,7 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
             : { pid: c.pid, expected_result: c.expected_result },
         ),
       });
-      queryClient.invalidateQueries({ queryKey: TAGS_REGRESSION_TESTS });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.regressionTests() });
     },
     [queryClient],
   );

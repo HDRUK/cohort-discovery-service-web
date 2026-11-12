@@ -5,7 +5,7 @@
 import { useRef } from "react";
 import { useQueries } from "@tanstack/react-query";
 import getTask from "@/actions/task/getTask";
-import { TAG_REGRESSION_TASK } from "@/config/tags";
+import { QUERY_KEYS } from "@/config/tags";
 import { DEFAULT_REFRESH_TABLE } from "@/config/defaults";
 
 const useTaskPolling = (
@@ -17,7 +17,7 @@ const useTaskPolling = (
   useQueries({
     queries: Object.entries(runStates).flatMap(([key, taskPids]) =>
       Array.from(taskPids).map((taskPid) => ({
-        queryKey: [TAG_REGRESSION_TASK, taskPid],
+        queryKey: QUERY_KEYS.task(taskPid),
         queryFn: () => getTask(taskPid),
         refetchOnMount: false,
         refetchOnWindowFocus: false,

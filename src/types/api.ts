@@ -612,6 +612,39 @@ export interface TransitionCollectionPut {
   state: string;
 }
 
+export type CollectionSaveStep = "details" | "workgroups" | "status";
+
+export type CollectionSaveResult =
+  | {
+      ok: true;
+      workgroupsAdded: number;
+      workgroupsRemoved: number;
+      statusChanged: boolean;
+    }
+  | {
+      ok: false;
+      failedStep: CollectionSaveStep;
+      failedCollection?: SaveStepCollection;
+      message: string;
+    };
+
+export interface SaveStepCollection {
+  id: number;
+  name?: string;
+}
+
+export interface CollectionWorkgroupChanges {
+  id: number;
+  name: string;
+  addWorkgroupIds: number[];
+  removeWorkgroupIds: number[];
+}
+
+export interface DeleteCollectionsResult {
+  deleted: number[];
+  failed: number[];
+}
+
 export interface CreateCollectionConfigPost {
   collection_id: number;
   run_time_hour: number;
@@ -645,11 +678,6 @@ export interface AddUsersToWorkgroupPost {
   workgroup_id: number;
 }
 
-export interface AddCollectionToWorkgroupsPost {
-  id: number;
-  workgroup_ids: number[];
-}
-
 export interface RemoveCollectionsFromWorkgroupPost {
   ids: number[];
   workgroup_id: number;
@@ -658,11 +686,6 @@ export interface RemoveCollectionsFromWorkgroupPost {
 export interface RemoveUsersFromWorkgroupPost {
   ids: number[];
   workgroup_id: number;
-}
-
-export interface RemoveCollectionFromWorkgroupsPost {
-  id: number;
-  workgroup_ids: number[];
 }
 
 export interface CreateNetworkPost {

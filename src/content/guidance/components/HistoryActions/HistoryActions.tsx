@@ -32,6 +32,8 @@ import { routes } from "@/config/routes";
 import useSearchParams from "@/hooks/useSearchParams";
 import { useNotify } from "@/providers/NotifyProvider";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+import { QUERY_KEYS } from "@/config/tags";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import useUserStore from "@/hooks/useUserStore";
 import deleteQueries from "@/actions/query/deleteQueries";
@@ -53,6 +55,7 @@ const HistoryActions = ({
   const { searchParams } = useSearchParams();
   const router = useRouter();
   const notify = useNotify();
+  const queryClient = useQueryClient();
   const isQueryLimitReached = useUserStore((s) => s.isQueryLimitReached);
   const { setQueryBuilderJson, setSelectedDatasets, setQueryName } =
     useQueryBuilder((qb) => ({
@@ -104,6 +107,10 @@ const HistoryActions = ({
                   handleQuerySubmissionError(error, notify);
                   return;
                 }
+
+                await queryClient.invalidateQueries({
+                  queryKey: QUERY_KEYS.queries(),
+                });
 
                 const openQueries = (searchParams.get("open_queries") || "")
                   .split(",")

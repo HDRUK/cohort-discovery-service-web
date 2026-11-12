@@ -23,7 +23,7 @@ const CodesPageContent = async ({ searchParams }: PageProps) => {
   return (
     <Paper sx={{ p: 2, gap: 2, display: "flex", flexDirection: "column" }}>
       <Title title={"Available Codes"} subTitle={stats.data.total}>
-        <RefreshButton tag="omop" />
+        <RefreshButton label="Refresh codes" />
       </Title>
       <CodeStats codes={stats.data} />
     </Paper>

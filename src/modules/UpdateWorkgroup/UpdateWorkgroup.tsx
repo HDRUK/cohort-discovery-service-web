@@ -4,23 +4,16 @@ import ActionMenuSection from "@/components/ActionMenuSection";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { UpdateWorkgroupFormValues } from "@/types/forms";
 import { useCallback, useEffect } from "react";
-import { revalidateAction } from "@/actions/revalidate";
+import updateWorkgroupMembers from "@/actions/workgroup/updateWorkgroupMembers";
 import { useNotify } from "@/providers/NotifyProvider";
 import FormMultiSelect from "@/components/FormMultiSelect";
 import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
 import useAdminStore from "@/hooks/useAdminStore";
-import { TAG_CUSTODIAN_COLLECTION, TAG_WORKGROUP_ADMIN } from "@/config/tags";
 import { useThreePane } from "@/providers/ThreePaneProvider";
 import { useSaveChanges } from "@/hooks/useSaveChanges";
 
 const UpdateWorkgroup = () => {
   const { expandedRight, toggleRight: onClose } = useThreePane();
-
-  const addCollectionsToWorkgroup = useAdminStore(
-    (s) => s.addCollectionsToWorkgroup,
-  );
-
-  const addUsersToWorkgroup = useAdminStore((s) => s.addUsersToWorkgroup);
 
   const collections = useAdminStore((s) => s.allAprovedCollections);
   const users = useAdminStore((s) => s.users);
@@ -63,28 +56,12 @@ const UpdateWorkgroup = () => {
 
       const { id } = selectedWorkgroup;
 
-      if (data.users.length > 0) {
-        await addUsersToWorkgroup({
-          ids: data.users.map((c) => +c.value),
-          workgroup_id: id,
-        });
-        notify.success(`Updated workgroup users ${selectedWorkgroup?.name}`);
+      const userIds = data.users.map((c) => +c.value);
+      const collectionIds = data.collections.map((c) => +c.value);
 
-        revalidateAction(TAG_CUSTODIAN_COLLECTION);
-        revalidateAction(TAG_WORKGROUP_ADMIN);
-      }
-
-      if (data.collections.length > 0) {
-        await addCollectionsToWorkgroup({
-          ids: data.collections.map((c) => +c.value),
-          workgroup_id: id,
-        });
-        notify.success(
-          `Updated workgroup collections ${selectedWorkgroup?.name}`,
-        );
-
-        revalidateAction(TAG_CUSTODIAN_COLLECTION);
-        revalidateAction(TAG_WORKGROUP_ADMIN);
+      if (userIds.length > 0 || collectionIds.length > 0) {
+        await updateWorkgroupMembers(id, { userIds, collectionIds });
+        notify.success(`Updated workgroup ${selectedWorkgroup.name}`);
       }
 
       reset();
@@ -92,14 +69,7 @@ const UpdateWorkgroup = () => {
         onClose?.();
       }
     },
-    [
-      notify,
-      selectedWorkgroup,
-      addCollectionsToWorkgroup,
-      addUsersToWorkgroup,
-      onClose,
-      reset,
-    ],
+    [notify, selectedWorkgroup, onClose, reset],
   );
 
   const onSave = (closeAfter = false) =>

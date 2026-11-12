@@ -34,6 +34,7 @@ import QueriesTableSkeleton from "./QueriesTableSkeleton";
 import EditableText from "@/components/EditableText";
 import updateQuery from "@/actions/query/updateQuery";
 import { useNotify } from "@/providers/NotifyProvider";
+import { QUERY_KEYS } from "@/config/tags";
 
 interface QueriesTableProps {
   initialData: Paginated<Query>;
@@ -52,7 +53,7 @@ const QueriesTable = ({
 
   const qc = useQueryClient();
   const queryKey = useMemo(
-    () => [`queries-${searchParams.toString()}`],
+    () => QUERY_KEYS.queries(searchParams.toString()),
     [searchParams],
   );
 
@@ -172,10 +173,6 @@ const QueriesTable = ({
     return routes.dashboardQueryResult(queryId, openQueries);
   }
 
-  async function setQueryName(id: number, pid: string, name: string) {
-    await updateQuery(id, pid, { name });
-  }
-
   const handleRenameQuery = async (newName: string) => {
     setRenamingQueryId(null);
     const initialDataQuery = queries.data.find(
@@ -187,8 +184,13 @@ const QueriesTable = ({
       newName &&
       newName !== getQueryName(initialDataQuery)
     ) {
-      await setQueryName(initialDataQuery.id, initialDataQuery.pid, newName);
-      qc.refetchQueries({ queryKey: [`queries`], type: "active" });
+      await updateQuery(initialDataQuery.id, { name: newName });
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: QUERY_KEYS.queries() }),
+        qc.invalidateQueries({
+          queryKey: QUERY_KEYS.query(initialDataQuery.pid),
+        }),
+      ]);
       notify.success("Query renamed successfully");
     }
   };

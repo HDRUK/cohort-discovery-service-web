@@ -22,7 +22,6 @@ import { useUserDataStore } from "@/hooks/userDataStore";
 import { useIsAdminSection } from "@/contexts/AdminSectionContext";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import { DEFAULT_PER_PAGE, DEFAULT_USERS_PER_PAGE } from "@/config/defaults";
-import { TAG_ADMIN_USERS } from "@/config/tags";
 import { getTimestamp } from "@/utils/date";
 import { getLastName } from "@/utils/user";
 import { formatWorkgroupName } from "@/utils/workgroups";
@@ -255,7 +254,6 @@ const UserTable = ({
           },
         }),
         refreshProps: {
-          tag: TAG_ADMIN_USERS,
           label: "Refresh Users",
         },
       }}
