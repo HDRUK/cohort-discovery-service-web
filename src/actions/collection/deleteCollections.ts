@@ -1,6 +1,7 @@
 "use server";
 
-import { refresh } from "next/cache";
+import { updateTag } from "next/cache";
+import { CACHE_TAGS } from "@/config/tags";
 import { unstable_rethrow } from "next/navigation";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { apiDelete } from "@/server/api";
@@ -26,7 +27,8 @@ const deleteCollections = async (
     }
   }
 
-  refresh();
+  updateTag(CACHE_TAGS.collections);
+  updateTag(CACHE_TAGS.collectionHosts);
   return result;
 };
 

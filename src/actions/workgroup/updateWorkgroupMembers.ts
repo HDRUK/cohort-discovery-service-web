@@ -1,6 +1,7 @@
 "use server";
 
-import { refresh } from "next/cache";
+import { updateTag } from "next/cache";
+import { CACHE_TAGS } from "@/config/tags";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { apiPost } from "@/server/api";
 import { requireSession } from "@/server/session";
@@ -37,7 +38,10 @@ const updateWorkgroupMembers = async (
     );
   }
 
-  refresh();
+  updateTag(CACHE_TAGS.workgroups);
+  updateTag(CACHE_TAGS.users);
+  updateTag(CACHE_TAGS.currentUser);
+  updateTag(CACHE_TAGS.collections);
 };
 
 export default updateWorkgroupMembers;

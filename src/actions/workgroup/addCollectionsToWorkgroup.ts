@@ -1,6 +1,7 @@
 "use server";
 
-import { refresh } from "next/cache";
+import { updateTag } from "next/cache";
+import { CACHE_TAGS } from "@/config/tags";
 import { apiPost } from "@/server/api";
 import { requireSession } from "@/server/session";
 import { API_ROUTES } from "@/lib/apiRoutes";
@@ -19,7 +20,8 @@ const addCollectionsToWorkgroup = async (
       ),
     ),
   );
-  refresh();
+  updateTag(CACHE_TAGS.workgroups);
+  updateTag(CACHE_TAGS.collections);
   return results.map((r) => r.data);
 };
 

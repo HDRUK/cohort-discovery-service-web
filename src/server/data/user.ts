@@ -1,6 +1,7 @@
 import "server-only";
 
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
+import { CACHE_TAGS } from "@/config/tags";
 import { unstable_rethrow } from "next/navigation";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { apiGet, ErrorMode } from "@/server/api";
@@ -33,6 +34,7 @@ const fetchMe = async (): Promise<ApiResponse<User>> => {
 const fetchCachedCurrentUser = async (): Promise<ApiResponse<User>> => {
   "use cache: private";
   cacheLife(USER_DATA_CACHE_LIFE);
+  cacheTag(CACHE_TAGS.currentUser);
 
   const response = await fetchMe();
   if (response.error) throw new Error(response.error.text);

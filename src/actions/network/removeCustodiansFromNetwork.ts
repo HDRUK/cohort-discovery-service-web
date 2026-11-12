@@ -1,6 +1,7 @@
 "use server";
 
-import { refresh } from "next/cache";
+import { updateTag } from "next/cache";
+import { CACHE_TAGS } from "@/config/tags";
 import { apiDelete } from "@/server/api";
 import { requireSession } from "@/server/session";
 import { API_ROUTES } from "@/lib/apiRoutes";
@@ -18,7 +19,8 @@ const removeCustodiansFromNetwork = async (
       ),
     ),
   );
-  refresh();
+  updateTag(CACHE_TAGS.custodians);
+  updateTag(CACHE_TAGS.collections);
   return results.map((r) => r.data);
 };
 

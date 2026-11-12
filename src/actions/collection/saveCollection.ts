@@ -1,6 +1,7 @@
 "use server";
 
-import { refresh } from "next/cache";
+import { updateTag } from "next/cache";
+import { CACHE_TAGS } from "@/config/tags";
 import {
   addCollectionToWorkgroupIds,
   removeCollectionFromWorkgroupIds,
@@ -62,7 +63,9 @@ const saveCollection = async (
     ],
   ]);
 
-  refresh();
+  updateTag(CACHE_TAGS.collections);
+  updateTag(CACHE_TAGS.collectionHosts);
+  updateTag(CACHE_TAGS.workgroups);
 
   return (
     failure ?? {

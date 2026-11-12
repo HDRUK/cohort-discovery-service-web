@@ -1,6 +1,7 @@
 import "server-only";
 
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
+import { CACHE_TAGS } from "@/config/tags";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { apiGet, ErrorMode } from "@/server/api";
 import { LIST_CACHE_LIFE } from "@/server/cacheProfiles";
@@ -18,6 +19,7 @@ export const getCollectionHosts = async (): Promise<
 > => {
   "use cache: private";
   cacheLife(LIST_CACHE_LIFE);
+  cacheTag(CACHE_TAGS.collectionHosts);
 
   const { token } = await requireSession();
   return apiGet<ApiResponse<CollectionHost[]>>(
@@ -32,6 +34,7 @@ const fetchCustodianCollectionHosts = async (
 ): Promise<ApiResponse<CollectionHost[]>> => {
   "use cache: private";
   cacheLife(LIST_CACHE_LIFE);
+  cacheTag(CACHE_TAGS.collectionHosts);
 
   const { token } = await requireSession();
   return apiGet<ApiResponse<CollectionHost[]>>(

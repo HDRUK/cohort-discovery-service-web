@@ -1,6 +1,7 @@
 "use server";
 
-import { refresh } from "next/cache";
+import { updateTag } from "next/cache";
+import { CACHE_TAGS } from "@/config/tags";
 import { transitionCollectionIds } from "@/server/mutations/collections";
 import { requireSession } from "@/server/session";
 import { CollectionStatus } from "@/types/api";
@@ -12,7 +13,8 @@ const requestCollectionsActive = async (ids: number[]): Promise<void> => {
   try {
     await transitionCollectionIds(token, ids, { state: PENDING_STATE });
   } finally {
-    refresh();
+    updateTag(CACHE_TAGS.collections);
+    updateTag(CACHE_TAGS.collectionHosts);
   }
 };
 
