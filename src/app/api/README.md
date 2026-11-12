@@ -37,6 +37,16 @@ Both are reads: nothing is stored. They are POST only because the Laravel endpoi
 
 The browser calls these with `routeGet` / `routePost` (`src/lib/routeFetch.ts`), usually from a TanStack `queryFn` keyed by `QUERY_KEYS` (`src/config/tags.ts`). Handler URLs live under `routes.api` in `src/config/routes.ts`.
 
+### Handlers that don't use `withSession`
+
+| Handler | Why |
+| --- | --- |
+| `auth/logout` | Must work without a session; clears the cookie and redirects. |
+| `auth/sso/callback` | Runs before there is a session; it creates one. |
+| `collection-hosts/[id]` | Returns credentials, so it checks `getSession()` itself and answers `no-store`. |
+| `download/[pid]` | Streams a file. It reads the cookie and calls Laravel directly; moving it onto `src/server/api.ts` is a follow-up. |
+| `location/boundaries/[region]` | Serves static GeoJSON from the repo; no API call and no user data. |
+
 ## What doesn't
 
 - **Data a page needs to render.** A Server Component imports the reader from `src/server/data/` directly; it doesn't fetch its own Route Handler.

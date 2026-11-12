@@ -137,6 +137,17 @@ Why they are separate:
 - **Server actions run one at a time per client and can't be cached**, so they are for mutations only. Reads the browser makes go through Route Handlers, which run in parallel and answer 401 instead of redirecting.
 - **A reader is needed by both pages and Route Handlers**, so it lives in `src/server/data/` rather than inside either.
 
+### Getting server data to client components
+
+| Data | How it reaches the component |
+| --- | --- |
+| Read by the page for one part of it (a paginated, URL-driven admin table) | Props from the Server Component that read it |
+| Shared by many components (the user, the collections they can query, their custodians and workgroups) | `useSessionData()` / `useSessionUser()` |
+| Shared across a section (admin users, collections, hosts; the custodian's section) | The section's context, which `use()`s a promise its layout passes in |
+| Client state (query builder, UI state, selected ids) | Zustand. Store an id, never a server object |
+
+Signing out is a full page load to `/api/auth/logout` (`useSignOut`), not a client navigation, so every store is dropped and the response's `Clear-Site-Data` applies.
+
 ## Available Scripts
 
 - `npm run dev`: Start Next.js dev server (Turbopack) on port 3000.
