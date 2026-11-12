@@ -1,8 +1,9 @@
 import WorkgroupsAdmin from "./WorkgroupsAdmin";
 import { CollectionsSearchParams } from "@/types/api";
-import { buildCollectionParams } from "@/utils/params";
+import { buildWorkgroupCollectionParams } from "@/utils/params";
 import { Box, Skeleton } from "@mui/material";
 import { getAdminCollectionList } from "@/server/data/collections";
+import { getWorkgroups } from "@/server/data/workgroups";
 import { DEFAULT_PER_PAGE } from "@/config/defaults";
 
 export const WorkgroupsSkeleton = () => (
@@ -17,17 +18,16 @@ const WorkgroupsTab = async ({
 }: {
   searchParams: Promise<CollectionsSearchParams>;
 }) => {
-  const {
-    page = 1,
-    per_page = DEFAULT_PER_PAGE,
-    ...rest
-  } = (await searchParams) ?? {};
+  const [
+    { page = 1, per_page = DEFAULT_PER_PAGE, ...rest } = {},
+    { data: workgroups },
+  ] = await Promise.all([searchParams, getWorkgroups()]);
 
-  const params = buildCollectionParams({
-    page,
-    per_page,
-    ...rest,
-  });
+  const params = buildWorkgroupCollectionParams(
+    { page, per_page, ...rest },
+    workgroups ?? [],
+  );
+  if (!params) return <WorkgroupsAdmin />;
 
   const { data: collections } = await getAdminCollectionList({ params });
 
