@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 import { headers } from "next/headers";
-import { SessionAccess } from "@/lib/sessionAccess";
+import { SessionAccess } from "@/types/session";
 import { getUserCollections } from "@/server/data/collections";
 import { getCustodians } from "@/server/data/custodians";
 import { getFeatureFlags } from "@/server/data/features";

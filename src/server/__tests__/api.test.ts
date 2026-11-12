@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { apiGet, apiPost, ErrorMode, isSessionEnded } from "../api";
+import { apiGet, apiPost, ErrorMode } from "../api";
 
 jest.mock("next/navigation", () => ({
   notFound: jest.fn(() => {
@@ -124,15 +124,5 @@ describe("request", () => {
       data: null,
       error: { text: "Unauthenticated", code: 401 },
     });
-  });
-});
-
-describe("isSessionEnded", () => {
-  it("treats 401 as ended", () => {
-    expect(isSessionEnded(401)).toBe(true);
-  });
-
-  it.each([403, 404])("treats %i as not ended", (status) => {
-    expect(isSessionEnded(status)).toBe(false);
   });
 });

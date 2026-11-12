@@ -1,6 +1,7 @@
 import { ApiResponse, User } from "@/types/api";
 import { RoleName } from "@/types/roles";
-import { decideAccess, SessionAccess } from "@/lib/sessionAccess";
+import { decideAccess, isSessionEnded } from "@/lib/sessionAccess";
+import { SessionAccess } from "@/types/session";
 
 const userWith = ({
   roles = [],
@@ -53,5 +54,15 @@ describe("decideAccess", () => {
 
   it("reports any other error as failed", () => {
     expect(decideAccess(errorWith(500))).toBe(SessionAccess.Failed);
+  });
+});
+
+describe("isSessionEnded", () => {
+  it("treats 401 as ended", () => {
+    expect(isSessionEnded(401)).toBe(true);
+  });
+
+  it.each([403, 404])("treats %i as not ended", (status) => {
+    expect(isSessionEnded(status)).toBe(false);
   });
 });

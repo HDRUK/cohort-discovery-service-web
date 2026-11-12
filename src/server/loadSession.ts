@@ -1,10 +1,8 @@
 import "server-only";
 
 import { headers } from "next/headers";
-import {
-  decideAccess,
-  SessionAccess,
-} from "@/lib/sessionAccess";
+import { decideAccess } from "@/lib/sessionAccess";
+import { SessionAccess } from "@/types/session";
 import type { SessionData } from "@/contexts/SessionDataContext";
 import { getUserCollections } from "@/server/data/collections";
 import { getCustodians } from "@/server/data/custodians";

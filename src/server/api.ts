@@ -3,6 +3,7 @@ import "server-only";
 import { notFound, redirect } from "next/navigation";
 import { routes } from "@/config/routes";
 import { ApiError } from "@/lib/https";
+import { isSessionEnded } from "@/lib/sessionAccess";
 import { ReadArgs } from "@/types/api";
 import { canonicaliseQueryString } from "@/utils/string";
 
@@ -24,8 +25,6 @@ export interface RequestOptions<B = undefined> {
   body?: B;
   errorMode?: ErrorMode;
 }
-
-export const isSessionEnded = (status: number): boolean => status === 401;
 
 const isAborted = (error: unknown): boolean =>
   error instanceof Error && error.name === "AbortError";

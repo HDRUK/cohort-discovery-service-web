@@ -1,5 +1,6 @@
 import { ApiError } from "@/lib/https";
 import { NotifyFn } from "@/providers/NotifyProvider";
+import { isSessionEnded } from "@/lib/sessionAccess";
 import { useSessionStore } from "@/store/sessionStore";
 import { QUERY_LIMIT_STATUS } from "@/utils/queryLimit";
 
@@ -13,7 +14,7 @@ const handleQuerySubmissionError = (
   error: { code: number; text: string },
   notify: NotifyFn,
 ): void => {
-  if (error.code === 401) {
+  if (isSessionEnded(error.code)) {
     useSessionStore.getState().endSession();
     return;
   }
