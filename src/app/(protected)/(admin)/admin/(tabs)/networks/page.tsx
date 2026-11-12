@@ -1,11 +1,10 @@
 import { Suspense } from "react";
 import { SearchParamsTransitionProvider } from "@/contexts/SearchParamsTransitionContext";
-import { CollectionsSkeleton } from "@/modules/CollectionsTab/CollectionsTab";
-import NetworksTab from "../components/NetworksTab";
+import NetworksTab, { NetworksSkeleton } from "../components/NetworksTab";
 
 const AdminNetworksPage = () => (
   <SearchParamsTransitionProvider>
-    <Suspense fallback={<CollectionsSkeleton />}>
+    <Suspense fallback={<NetworksSkeleton />}>
       <NetworksTab />
     </Suspense>
   </SearchParamsTransitionProvider>
