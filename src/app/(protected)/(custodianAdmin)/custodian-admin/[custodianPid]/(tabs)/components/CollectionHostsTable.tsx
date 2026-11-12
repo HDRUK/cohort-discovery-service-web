@@ -4,12 +4,15 @@ import { useTable } from "@/hooks/useTable";
 import { MRT_ColumnDef, MRT_RowSelectionState } from "material-react-table";
 import { Box, Chip } from "@mui/material";
 import { Dispatch, SetStateAction, useMemo } from "react";
+import { useSearchParamsTransition } from "@/contexts/SearchParamsTransitionContext";
 import Table from "@/components/Table";
 import { routes } from "@/config/routes";
 import SortButton from "@/components/SortButton";
 
+const NO_HOSTS: CollectionHost[] = [];
+
 interface CollectionHostsTableProps {
-  collectionHosts: CollectionHost[];
+  collectionHosts?: CollectionHost[];
   rowSelection: MRT_RowSelectionState;
   setRowSelection: Dispatch<SetStateAction<MRT_RowSelectionState>>;
   onDelete: (ids: string[]) => void;
@@ -26,6 +29,8 @@ const CollectionHostsTable = ({
   isDeletedView,
 }: CollectionHostsTableProps) => {
   const router = useRouter();
+  const { isPending } = useSearchParamsTransition();
+  const isLoading = !collectionHosts || isPending;
 
   const columns = useMemo<MRT_ColumnDef<CollectionHost>[]>(
     () => [
@@ -69,10 +74,11 @@ const CollectionHostsTable = ({
 
   const table = useTable<CollectionHost>({
     columns,
-    data: collectionHosts,
+    data: collectionHosts ?? NO_HOSTS,
     getRowId: (row) => String(row.id),
     onRowSelectionChange: setRowSelection,
-    state: { rowSelection },
+    state: { rowSelection, isLoading, showLoadingOverlay: false },
+    muiTableBodyProps: { "aria-busy": isLoading },
   });
 
   return (

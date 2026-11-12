@@ -1,9 +1,9 @@
-import WorkgroupsAdmin from "./WorkgroupsAdmin";
 import { CollectionsSearchParams } from "@/types/api";
 import { buildCollectionParams } from "@/utils/params";
 import { Box, Skeleton } from "@mui/material";
-import { getAdminCollections } from "@/server/data/collections";
 import { DEFAULT_PER_PAGE } from "@/config/defaults";
+import NetworksAdmin from "./NetworksAdmin";
+import { getNetworks } from "@/server/data/networks";
 
 export const WorkgroupsSkeleton = () => (
   <Box sx={{ height: "100%", p: 2 }}>
@@ -12,12 +12,16 @@ export const WorkgroupsSkeleton = () => (
   </Box>
 );
 
-const WorkgroupsTab = async ({
+const NetworksTab = async ({
   searchParams,
 }: {
-  searchParams: CollectionsSearchParams;
+  searchParams: Promise<CollectionsSearchParams>;
 }) => {
-  const { page = 1, per_page = DEFAULT_PER_PAGE, ...rest } = searchParams ?? {};
+  const {
+    page = 1,
+    per_page = DEFAULT_PER_PAGE,
+    ...rest
+  } = (await searchParams) ?? {};
 
   const params = buildCollectionParams({
     page,
@@ -25,9 +29,9 @@ const WorkgroupsTab = async ({
     ...rest,
   });
 
-  const { data: collections } = await getAdminCollections({ params });
+  const { data: networks } = await getNetworks(params);
 
-  return <WorkgroupsAdmin collections={collections} />;
+  return <NetworksAdmin networks={networks} />;
 };
 
-export default WorkgroupsTab;
+export default NetworksTab;

@@ -220,6 +220,7 @@ const UserTable = ({
   const table = usePaginatedTable<User>({
     columns,
     data: paginatedHydratedUsers,
+    showSkeletonWhilePending: false,
     rowCount: hydratedUsers.length,
     perPageDefault: DEFAULT_USERS_PER_PAGE,
     pageParam: PAGE_PARAM,

@@ -14,7 +14,7 @@ export const UsersSkeleton = ({ children }: { children?: React.ReactNode }) => (
   </Box>
 );
 
-const UsersTab = async ({ applicationMode }: { applicationMode: string }) => {
+const UsersTab = async ({ applicationMode }: { applicationMode?: string }) => {
   if (!isStandalone(applicationMode)) notFound();
 
   return <UsersAdmin />;

@@ -13,12 +13,18 @@ import { useTable } from "./useTable";
 import useSearchParams from "./useSearchParams";
 import { buildRowsPerPageOptions } from "@/utils/pagination";
 import { DEFAULT_PER_PAGE } from "@/config/defaults";
+import { useSearchParamsTransition } from "@/contexts/SearchParamsTransitionContext";
+
+const NO_ROWS: never[] = [];
+
+const PREVIOUS_ROWS_OPACITY = 0.5;
 
 interface UsePaginatedTableOptions<TData extends MRT_RowData> extends Partial<
   MRT_TableOptions<TData>
 > {
   columns: MRT_ColumnDef<TData>[];
-  data: TData[];
+  data?: TData[];
+  showSkeletonWhilePending?: boolean;
   rowCount: number;
   perPageDefault: number;
   expandFirstRow?: boolean;
@@ -31,6 +37,7 @@ interface UsePaginatedTableOptions<TData extends MRT_RowData> extends Partial<
 export function usePaginatedTable<TData extends MRT_RowData>({
   columns,
   data,
+  showSkeletonWhilePending = true,
   rowCount,
   perPageDefault,
   expandFirstRow = false,
@@ -42,6 +49,12 @@ export function usePaginatedTable<TData extends MRT_RowData>({
   ...rest
 }: UsePaginatedTableOptions<TData>) {
   const { searchParams, setSearchParams } = useSearchParams();
+  const { isPending } = useSearchParamsTransition();
+
+  const rows = data ?? NO_ROWS;
+  const showPreviousRows = !showSkeletonWhilePending && data !== undefined;
+  const isLoading = data === undefined || (isPending && !showPreviousRows);
+  const isRefreshing = isPending && showPreviousRows;
 
   const page = parseInt(searchParams.get(pageParam) || "1");
   const resolvedPerPageDefault =
@@ -85,14 +98,14 @@ export function usePaginatedTable<TData extends MRT_RowData>({
   }, [sorting, router, searchParams]);
   */
 
-  const firstRowId = getRowId(data?.[0]);
+  const firstRowId = getRowId(rows[0]);
   const expanded = useMemo(() => {
     return firstRowId && expandFirstRow ? { [firstRowId]: true } : {};
   }, [firstRowId, expandFirstRow]);
 
   const table = useTable<TData>({
     columns,
-    data,
+    data: rows,
     rowCount,
     getRowId,
     enablePagination: true,
@@ -107,7 +120,13 @@ export function usePaginatedTable<TData extends MRT_RowData>({
     state: {
       pagination,
       sorting,
+      isLoading,
+      showLoadingOverlay: false,
       ...state,
+    },
+    muiTableBodyProps: {
+      "aria-busy": isLoading || isRefreshing,
+      sx: isRefreshing ? { opacity: PREVIOUS_ROWS_OPACITY } : undefined,
     },
     muiPaginationProps: {
       rowsPerPageOptions,

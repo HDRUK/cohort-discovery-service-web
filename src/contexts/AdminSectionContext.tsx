@@ -1,18 +1,18 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo } from "react";
+import { createContext, use, useContext, useEffect, useMemo } from "react";
 import { redirect } from "next/navigation";
 
 import useCustodianStore from "@/hooks/useCustodianStore";
 import useUserStore from "@/hooks/useUserStore";
 import { useAdminDataStore } from "@/store/adminDataStore";
 import { checkIsAdmin } from "@/utils/user";
-import { Collection, CollectionHost, User } from "@/types/api";
+import { ApiResponse, Collection, CollectionHost, User } from "@/types/api";
 
 type Props = {
-  collections: Collection[];
-  collectionHosts: CollectionHost[];
-  users: User[];
+  collections: Promise<ApiResponse<Collection[]>>;
+  collectionHosts: Promise<ApiResponse<CollectionHost[]>>;
+  users: Promise<ApiResponse<User[]>>;
   children: React.ReactNode;
 };
 
@@ -23,11 +23,14 @@ type AdminSectionValue = {
 const AdminSectionContext = createContext<AdminSectionValue | null>(null);
 
 export const AdminSectionProvider = ({
-  collections,
-  collectionHosts,
-  users,
+  collections: collectionsPromise,
+  collectionHosts: collectionHostsPromise,
+  users: usersPromise,
   children,
 }: Props) => {
+  const { data: collections } = use(collectionsPromise);
+  const { data: collectionHosts } = use(collectionHostsPromise);
+  const { data: users } = use(usersPromise);
   const user = useUserStore((s) => s.user);
 
   const setCurrentCustodian = useCustodianStore((s) => s.current.setCustodian);

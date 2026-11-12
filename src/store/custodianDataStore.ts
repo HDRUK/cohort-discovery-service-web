@@ -12,20 +12,15 @@ import {
   CreateCollectionConfigPost,
   UpdateCollectionHostPayload,
   CollectionHost,
-  Paginated,
   CollectionWithHosts,
   CollectionStatus,
 } from "@/types/api";
-import { emptyPaginated } from "@/utils/pagination";
 import transitionCollections from "@/actions/collection/transitionCollections";
 
 export interface CustodianDataStoreState {
   current: {
     custodian: Custodian | null;
     setCustodian: (custodian: Custodian | null) => void;
-
-    collections: Paginated<CollectionWithHosts>;
-    setCollections: (collections: Paginated<CollectionWithHosts>) => void;
 
     collectionHosts: CollectionHost[];
     setCollectionHosts: (collectionHosts: CollectionHost[]) => void;
@@ -58,16 +53,6 @@ export const useCustodianDataStore = create<CustodianDataStoreState>((set) => ({
       set((state) => ({
         ...state,
         current: { ...state.current, custodian },
-      })),
-
-    collections: emptyPaginated<CollectionWithHosts>([]),
-    setCollections: (collections) =>
-      set((state) => ({
-        ...state,
-        current: {
-          ...state.current,
-          collections,
-        },
       })),
 
     collectionHosts: [],

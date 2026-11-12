@@ -5,7 +5,6 @@ import { type MRT_ColumnDef } from "material-react-table";
 import { useMemo } from "react";
 import { TermDirectoryEntry, Paginated } from "@/types/api";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
-import { useSearchParamsTransition } from "@/contexts/SearchParamsTransitionContext";
 import CopyableTextButton from "@/components/CopyableTextButton";
 import Table from "@/components/Table";
 import { formatNumber } from "@/utils/numbers";
@@ -13,16 +12,11 @@ import { DEFAULT_PER_PAGE } from "@/config/defaults";
 import DomainFilterTabs from "./DomainFilterTabs";
 import AssociatedCollectionsChip from "./AssociatedCollectionsChip";
 
-const NO_ENTRIES: TermDirectoryEntry[] = [];
-
 interface TermDirectoryProps {
   entries?: Paginated<TermDirectoryEntry>;
 }
 
 const TermDirectory = ({ entries }: TermDirectoryProps) => {
-  const { isPending } = useSearchParamsTransition();
-  const isLoading = !entries || isPending;
-
   const columns = useMemo<MRT_ColumnDef<TermDirectoryEntry>[]>(
     () => [
       {
@@ -81,7 +75,7 @@ const TermDirectory = ({ entries }: TermDirectoryProps) => {
 
   const table = usePaginatedTable<TermDirectoryEntry>({
     columns,
-    data: entries?.data ?? NO_ENTRIES,
+    data: entries?.data,
     rowCount: entries?.total ?? 0,
     perPageDefault: DEFAULT_PER_PAGE,
     getRowId: (row, index?: number) => String(row?.concept_id ?? index),
@@ -89,8 +83,6 @@ const TermDirectory = ({ entries }: TermDirectoryProps) => {
     enableSorting: false,
     enableRowSelection: false,
     layoutMode: "grid",
-    state: { isLoading, showLoadingOverlay: false },
-    muiTableBodyProps: { "aria-busy": isLoading },
     renderEmptyRowsFallback: () => (
       <Typography
         variant="h5"

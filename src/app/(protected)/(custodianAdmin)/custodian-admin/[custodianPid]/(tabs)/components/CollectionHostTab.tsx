@@ -12,13 +12,17 @@ export const CollectionHostsSkeleton = () => (
 );
 
 const CollectionHostsTab = async ({
-  custodianPid,
+  custodianPid: custodianPidPromise,
   searchParams,
 }: {
-  custodianPid: string;
-  searchParams: ApiSearchParams;
+  custodianPid: Promise<string>;
+  searchParams: Promise<ApiSearchParams>;
 }) => {
-  const params = buildCollectionHostParams(searchParams);
+  const [custodianPid, resolvedSearchParams] = await Promise.all([
+    custodianPidPromise,
+    searchParams,
+  ]);
+  const params = buildCollectionHostParams(resolvedSearchParams);
   const { data: collectionHosts } = await getCustodianCollectionHosts(
     custodianPid,
     { params },

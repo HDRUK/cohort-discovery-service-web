@@ -7,7 +7,7 @@ import CollectionHostsTable from "./CollectionHostsTable";
 
 type CollectionHostListPanelProps = {
   noCollectionHosts: boolean;
-  collectionHosts: CollectionHost[];
+  collectionHosts?: CollectionHost[];
   rowSelection: MRT_RowSelectionState;
   setRowSelection: Dispatch<SetStateAction<MRT_RowSelectionState>>;
   onDeleteHost: () => void;
