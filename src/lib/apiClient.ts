@@ -1,4 +1,4 @@
-"use server";
+import "server-only";
 
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import { cookies } from "next/headers";
@@ -83,7 +83,9 @@ async function request<TResponse, TBody = undefined>(
   url: string,
   options: RequestOptions<TBody> = {},
 ): Promise<TResponse | never> {
-  const fullUrl = url.startsWith("http") ? url : `${baseURL}${url}`;
+  if (!url.startsWith("/"))
+    throw new Error(`API path must be relative: ${url}`);
+  const fullUrl = `${baseURL}${url}`;
   const {
     headers = {},
     body,
@@ -101,8 +103,8 @@ async function request<TResponse, TBody = undefined>(
       method,
       headers: {
         "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...headers,
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       body: body !== undefined ? JSON.stringify(body) : undefined,
       signal,
@@ -158,8 +160,8 @@ export async function apiGet<TResponse>(
 ) {
   const { finalUrl, init } = await buildCachedRequest(args);
   return request<TResponse>("GET", finalUrl, {
-    ...init,
     ...(args.options ?? {}),
+    ...init,
   });
 }
 

@@ -18,6 +18,7 @@ import { Custodian } from "@/types/api";
 import { updateTag } from "next/cache";
 
 export const revalidateAction = async (tagName: string) => {
+  await getTokenUser();
   updateTag(tagName);
 };
 

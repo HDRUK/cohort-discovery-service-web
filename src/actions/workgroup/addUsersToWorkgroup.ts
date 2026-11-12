@@ -11,7 +11,7 @@ const addUsersToWorkgroup = async (
   const results = await Promise.all(
     payload.ids.map(async (id) =>
       apiPost<ApiResponse<number>, AddUsersToWorkgroupPost>(
-        `${API_ROUTES.user(id)}/workgroup`,
+        API_ROUTES.userWorkgroups(id),
         payload,
       ),
     ),

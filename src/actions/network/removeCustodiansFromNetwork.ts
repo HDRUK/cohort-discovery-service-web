@@ -11,7 +11,7 @@ const removeCustodiansFromNetwork = async (
   const results = await Promise.all(
     payload.custodian_ids.map(async (custodian_id) =>
       apiDelete<ApiResponse<number>>(
-        `${API_ROUTES.custodian(custodian_id)}/networks/${payload.id}`,
+        API_ROUTES.custodianNetwork(custodian_id, payload.id),
       ),
     ),
   );

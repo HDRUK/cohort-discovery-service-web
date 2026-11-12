@@ -10,6 +10,7 @@ import { capVarChar } from "@/utils/string";
 import { SearchParams } from "@/types/api";
 import QueryHistoryPage from "./components/QueryHistoryPage";
 import { getQueryName } from "@/utils/query";
+import { isPathSegment } from "@/lib/apiRoutes";
 
 type Params = Promise<{ tabId: string }>;
 
@@ -23,6 +24,9 @@ const DashboardTabPage = async (props: {
   const { tabId } = await params;
   const { query, open_queries: openQueries } = await searchParams;
   const arrayOpenQueries = ((openQueries as string) ?? "").split(",");
+
+  if (query && !isPathSegment(query as string)) notFound();
+  if (openQueries && !arrayOpenQueries.every(isPathSegment)) notFound();
 
   const resultsTabs = openQueries
     ? await Promise.all(
