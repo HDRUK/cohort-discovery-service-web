@@ -32,8 +32,6 @@ const SessionGate = async ({
 
   return (
     <ProtectedPage
-      user={loaded.data.user}
-      collections={loaded.data.userCollections}
       featureFlags={loaded.flags}
       sessionMsRemaining={loaded.sessionMsRemaining}
     >
