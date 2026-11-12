@@ -5,9 +5,11 @@ import {
   QueryHistorySearchParams,
   SearchParams,
   SearchParamValue,
+  Workgroup,
 } from "@/types/api";
 import { CollectionHostFilter } from "@/types/collections";
 import { MAX_PER_PAGE } from "@/config/defaults";
+import { selectByIdOrFirst } from "@/utils/selection";
 
 export const buildSearchParams = <
   T extends Record<string, SearchParamValue> = SearchParams,
@@ -54,6 +56,22 @@ export const buildCollectionParams = (
   };
 
   return buildSearchParams(params);
+};
+
+export const buildWorkgroupCollectionParams = (
+  searchParams: CollectionsSearchParams,
+  workgroups: Workgroup[],
+): URLSearchParams => {
+  const { workgroup_filter } = searchParams;
+  const selected = selectByIdOrFirst(
+    workgroups,
+    workgroup_filter ? String(workgroup_filter) : null,
+  );
+
+  return buildCollectionParams({
+    ...searchParams,
+    workgroup_filter: selected?.id,
+  });
 };
 
 export const buildCollectionHostParams = (

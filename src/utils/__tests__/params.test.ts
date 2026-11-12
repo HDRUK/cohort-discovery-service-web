@@ -2,9 +2,13 @@ import {
   buildCollectionHostParams,
   buildCollectionParams,
   buildQueryHistoryParams,
+  buildWorkgroupCollectionParams,
   clampPerPage,
 } from "../params";
 import { CollectionHostFilter } from "@/types/collections";
+import { Workgroup } from "@/types/api";
+
+const workgroup = (id: number): Workgroup => ({ id, name: `WG${id}` }) as Workgroup;
 
 describe("buildCollectionHostParams", () => {
   it("asks for only trashed hosts on the deleted filter", () => {
@@ -72,6 +76,40 @@ describe("buildQueryHistoryParams", () => {
     const params = buildQueryHistoryParams({ per_page: 100000 });
 
     expect(params.get("per_page")).toBe("200");
+  });
+});
+
+describe("buildWorkgroupCollectionParams", () => {
+  const workgroups = [workgroup(3), workgroup(7)];
+
+  it("filters by the first workgroup when none is in the URL", () => {
+    const params = buildWorkgroupCollectionParams({}, workgroups);
+
+    expect(params.get("workgroup_id")).toBe("3");
+  });
+
+  it("filters by the workgroup in the URL", () => {
+    const params = buildWorkgroupCollectionParams(
+      { workgroup_filter: 7 },
+      workgroups,
+    );
+
+    expect(params.get("workgroup_id")).toBe("7");
+  });
+
+  it("falls back to the first workgroup when the URL names an unknown one", () => {
+    const params = buildWorkgroupCollectionParams(
+      { workgroup_filter: 99 },
+      workgroups,
+    );
+
+    expect(params.get("workgroup_id")).toBe("3");
+  });
+
+  it("omits the workgroup filter when there are no workgroups", () => {
+    const params = buildWorkgroupCollectionParams({}, []);
+
+    expect(params.has("workgroup_id")).toBe(false);
   });
 });
 

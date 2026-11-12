@@ -1,4 +1,5 @@
-import { refresh } from "next/cache";
+import { updateTag } from "next/cache";
+import { CACHE_TAGS } from "@/config/tags";
 import { apiPost } from "@/server/api";
 import { ApiError } from "@/lib/https";
 import {
@@ -42,15 +43,15 @@ const CONFIG: Omit<CreateCollectionConfigPost, "collection_id"> = {
 beforeEach(() => jest.clearAllMocks());
 
 describe("createCollectionWithConfig", () => {
-  it("refreshes once both writes succeed", async () => {
+  it("expires the cached collection lists once both writes succeed", async () => {
     mockedApiPost.mockResolvedValue({ data: { id: 42 } });
 
     await createCollectionWithConfig(collection(), CONFIG);
 
-    expect(refresh).toHaveBeenCalledTimes(1);
+    expect(updateTag).toHaveBeenCalledWith(CACHE_TAGS.collections);
   });
 
-  it("skips the refresh when the config step fails", async () => {
+  it("leaves the caches when the config step fails", async () => {
     mockedApiPost
       .mockResolvedValueOnce({ data: { id: 42 } })
       .mockRejectedValueOnce(new ApiError(422, "Invalid config"));
@@ -59,6 +60,6 @@ describe("createCollectionWithConfig", () => {
       createCollectionWithConfig(collection(), CONFIG),
     ).rejects.toThrow("Invalid config");
 
-    expect(refresh).not.toHaveBeenCalled();
+    expect(updateTag).not.toHaveBeenCalled();
   });
 });

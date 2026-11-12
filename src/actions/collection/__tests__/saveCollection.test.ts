@@ -1,4 +1,5 @@
-import { refresh } from "next/cache";
+import { updateTag } from "next/cache";
+import { CACHE_TAGS } from "@/config/tags";
 import {
   addCollectionToWorkgroupIds,
   removeCollectionFromWorkgroupIds,
@@ -64,7 +65,7 @@ describe("saveCollection", () => {
       workgroupsRemoved: 1,
       statusChanged: true,
     });
-    expect(refresh).toHaveBeenCalledTimes(1);
+    expect(updateTag).toHaveBeenCalledWith(CACHE_TAGS.collections);
   });
 
   it("skips the status step when the status is unchanged", async () => {
@@ -74,7 +75,7 @@ describe("saveCollection", () => {
     expect(result).toMatchObject({ ok: true, statusChanged: false });
   });
 
-  it("stops at the failing step, names it and still refreshes", async () => {
+  it("stops at the failing step, names it and still expires the caches", async () => {
     (addCollectionToWorkgroupIds as jest.Mock).mockRejectedValueOnce(
       new ApiError(404, "Workgroup not found"),
     );
@@ -90,6 +91,6 @@ describe("saveCollection", () => {
       message: "Workgroup not found",
     });
     expect(transitionCollectionIds).not.toHaveBeenCalled();
-    expect(refresh).toHaveBeenCalledTimes(1);
+    expect(updateTag).toHaveBeenCalledWith(CACHE_TAGS.collections);
   });
 });

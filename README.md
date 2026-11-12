@@ -38,7 +38,7 @@ Use `.env.example` as the base:
 
 | Variable | Required | Description |
 | --- | --- | --- |
-| `API_BASE_URL` | Yes | Backend API base URL used by server actions. |
+| `API_BASE_URL` | Yes | Backend API base URL, used only by server code (`src/server/api.ts`). |
 | `NEXT_PUBLIC_LOGIN_URL` | Yes | Integrated mode: the full Gateway sign-in URL, used as is by the sign-in button and by logout, including the return param, e.g. `https://gateway.example.org?redirect_cohort_discovery_upon_signin=https://cds.example.org`. Its origin is the base for outbound organisation links; falls back to `links.organisation` in the branding config. |
 | `APPLICATION_MODE` | Yes | `integrated` or `standalone`. Controls auth/access behaviour. |
 | `NEXT_PUBLIC_TASK_URL` | Yes | API URL used for the task endpoints and the API docs footer link. |
@@ -107,6 +107,47 @@ Setting the `hdruk-uk-theme` feature flag to false in the API forces the neutral
 
 In standalone mode `/terms-and-conditions` and `/about/privacy-policy` are served from `branding/legal/*.mdx`. In integrated mode those links point at the Gateway instead. The page title, last-updated date, and optional source banner for each come from the `legal` section of `branding.config.ts`.
 
+## How the app talks to the API
+
+The browser never calls Laravel. Every call goes through `src/server/api.ts` on the server, so the token and the API URL never reach the browser.
+
+Two questions decide where API code goes: **can the browser call it?** and **does it read or write?**
+
+|  | Read | Write |
+| --- | --- | --- |
+| **Browser can call it** (public endpoint) | [`src/app/api/**/route.ts`](src/app/api/README.md) | [`src/actions/<domain>/<intent>.ts`](src/actions/README.md) |
+| **Server only** (`import "server-only"`) | [`src/server/data/<domain>.ts`](src/server/README.md#data--reads) | [`src/server/mutations/<domain>.ts`](src/server/README.md#mutations--shared-write-steps) |
+
+```
+Server Component ──────────────────────────────► server/data ──────┐
+Browser ── routeGet / routePost ──► app/api ───► server/data ──────┤
+Browser ── await the action ──────► actions ───► server/mutations ─┼─► server/api.ts ─► Laravel
+                                       └───────────────────────────┘
+```
+
+| Situation | Use |
+| --- | --- |
+| Data a page needs to render | A Server Component that imports a reader from `src/server/data/` |
+| Data the browser needs later (polling, typeahead, expand-on-click) | A Route Handler in `src/app/api/`, fetched with `routeGet` / `routePost` from a TanStack `queryFn` |
+| The user changes something | A server action in `src/actions/`, which calls `updateTag` for each cached read it changes (`refresh()` when it changes only uncached data) |
+
+Why they are separate:
+
+- **`"use server"` makes every export a public POST endpoint.** So `src/actions/` holds only actions that check the session themselves, and shared helpers live in `src/server/`, where they can't be called from the browser.
+- **Server actions run one at a time per client and can't be cached**, so they are for mutations only. Reads the browser makes go through Route Handlers, which run in parallel and answer 401 instead of redirecting.
+- **A reader is needed by both pages and Route Handlers**, so it lives in `src/server/data/` rather than inside either.
+
+### Getting server data to client components
+
+| Data | How it reaches the component |
+| --- | --- |
+| Read by the page for one part of it (a paginated, URL-driven admin table) | Props from the Server Component that read it |
+| Shared by many components (the user, the collections they can query, their custodians and workgroups) | `useSessionData()` / `useSessionUser()` |
+| Shared across a section (admin users, collections, hosts; the custodian's section) | The section's context, which `use()`s a promise its layout passes in |
+| Client state (query builder, UI state, selected ids) | Zustand. Store an id, never a server object |
+
+Signing out is a full page load to `/api/auth/logout` (`useSignOut`), not a client navigation, so every store is dropped and the response's `Clear-Site-Data` applies.
+
 ## Available Scripts
 
 - `npm run dev`: Start Next.js dev server (Turbopack) on port 3000.
@@ -125,11 +166,12 @@ In standalone mode `/terms-and-conditions` and `/about/privacy-policy` are serve
 Key directories:
 
 - `src/app`: App Router pages/layouts.
-- `src/actions`: Server actions for API access.
+- `src/actions`: Server actions, one per user change. See [How the app talks to the API](#how-the-app-talks-to-the-api).
+- `src/server`: Server-only code: the API client, session helpers, reads (`data/`) and shared write steps (`mutations/`).
 - `src/modules`: Feature-level UI modules.
 - `src/components`: Reusable UI components.
 - `src/hooks`: Shared React hooks.
-- `src/lib`: API client/auth/runtime utilities.
+- `src/lib`: Auth, route fetch and runtime utilities.
 - `src/config`: App constants, route builders, tags, defaults.
 - `src/types`: Shared TypeScript types.
 

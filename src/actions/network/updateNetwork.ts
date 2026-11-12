@@ -1,6 +1,7 @@
 "use server";
 
-import { refresh } from "next/cache";
+import { updateTag } from "next/cache";
+import { CACHE_TAGS } from "@/config/tags";
 import { apiPut } from "@/server/api";
 import { requireSession } from "@/server/session";
 import { API_ROUTES } from "@/lib/apiRoutes";
@@ -16,7 +17,8 @@ const updateNetwork = async (
     API_ROUTES.network(id),
     payload,
   );
-  refresh();
+  updateTag(CACHE_TAGS.custodians);
+  updateTag(CACHE_TAGS.collections);
 };
 
 export default updateNetwork;

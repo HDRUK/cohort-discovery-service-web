@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom";
 import { render, screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import getCollections from "@/actions/collection/__mocks__/getCollections";
+import { getMockCollectionsResponse } from "@/test/fixtures/collections";
 import SelectDatasets from "./SelectDatasets";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 
@@ -15,7 +15,7 @@ describe("SelectDatasets", () => {
   });
 
   it("displays datasets", async () => {
-    const collections = await getCollections();
+    const collections = await getMockCollectionsResponse();
 
     render(
       <MockCohortDiscoveryServiceStore
@@ -38,7 +38,7 @@ describe("SelectDatasets", () => {
   });
 
   it("can select datasets on click", async () => {
-    const collections = await getCollections();
+    const collections = await getMockCollectionsResponse();
     const user = userEvent.setup();
 
     render(
@@ -69,7 +69,7 @@ describe("SelectDatasets", () => {
   });
 
   it("shows selected dataset count", async () => {
-    const collections = await getCollections();
+    const collections = await getMockCollectionsResponse();
     const selected = collections.data.slice(0, 2).map((c) => c.pid);
 
     render(
@@ -96,7 +96,7 @@ describe("SelectDatasets", () => {
   });
 
   it("renders the collection type filters", async () => {
-    const collections = await getCollections();
+    const collections = await getMockCollectionsResponse();
 
     render(
       <MockCohortDiscoveryServiceStore
@@ -121,7 +121,7 @@ describe("SelectDatasets", () => {
   });
 
   it("restores previous selection and closes on cancel", async () => {
-    const collections = await getCollections();
+    const collections = await getMockCollectionsResponse();
     const user = userEvent.setup();
     const previous = collections.data.slice(0, 1).map((c) => c.pid);
 
@@ -151,7 +151,7 @@ describe("SelectDatasets", () => {
   });
 
   it("saves current selection and closes on save", async () => {
-    const collections = await getCollections();
+    const collections = await getMockCollectionsResponse();
     const user = userEvent.setup();
     const selected = collections.data.slice(0, 2).map((c) => c.pid);
 
@@ -180,7 +180,7 @@ describe("SelectDatasets", () => {
   });
 
   it("disables save and close when no datasets are selected", async () => {
-    const collections = await getCollections();
+    const collections = await getMockCollectionsResponse();
 
     render(
       <MockCohortDiscoveryServiceStore
@@ -204,7 +204,7 @@ describe("SelectDatasets", () => {
   });
 
   it("enables save and close when datasets are selected", async () => {
-    const collections = await getCollections();
+    const collections = await getMockCollectionsResponse();
 
     render(
       <MockCohortDiscoveryServiceStore
@@ -228,7 +228,7 @@ describe("SelectDatasets", () => {
   });
 
   it("filters datasets by search term", async () => {
-    const collections = await getCollections();
+    const collections = await getMockCollectionsResponse();
     const user = userEvent.setup();
 
     const visibleCollection = collections.data[0];

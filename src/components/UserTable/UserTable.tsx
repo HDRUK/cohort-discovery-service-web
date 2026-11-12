@@ -13,8 +13,6 @@ import Table from "@/components/Table";
 import useSearchParams from "@/hooks/useSearchParams";
 import { capitaliseFirstLetter } from "@/utils/string";
 
-import useAdminStore from "@/hooks/useAdminStore";
-
 import dayjs from "dayjs";
 import { TableProps } from "../Table/Table";
 import { trueKeys } from "@/utils/numbers";
@@ -29,6 +27,7 @@ import { getLastName } from "@/utils/user";
 import { formatWorkgroupName } from "@/utils/workgroups";
 import { filterUsers } from "./userFilters";
 import { useSessionData } from "@/contexts/SessionDataContext";
+import { useSelectionStore } from "@/store/selectionStore";
 
 const NO_USERS: User[] = [];
 
@@ -68,7 +67,7 @@ const UserTableView = ({
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
 
   const loadedUsers = users ?? NO_USERS;
-  const setSelectedUser = useAdminStore((s) => s.setSelectedUser);
+  const setSelectedUserId = useSelectionStore((s) => s.setSelectedUserId);
   const [sorting, setSorting] = useState<MRT_SortingState>([]);
 
   const selectedUserIds = useMemo(
@@ -78,14 +77,10 @@ const UserTableView = ({
 
   useEffect(() => {
     const [firstId] = selectedUserIds;
-    setSelectedUser(
-      firstId
-        ? (loadedUsers.find((u) => String(u.id) === firstId) ?? null)
-        : null,
-    );
+    setSelectedUserId(firstId ?? null);
 
-    return () => setSelectedUser(null);
-  }, [selectedUserIds, loadedUsers, setSelectedUser]);
+    return () => setSelectedUserId(null);
+  }, [selectedUserIds, setSelectedUserId]);
 
   const workgroups = useSessionData().workgroups;
   const activeWorkgroup = workgroups.find((wg) => String(wg.id) === wgFilter);

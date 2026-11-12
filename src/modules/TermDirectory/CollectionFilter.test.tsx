@@ -9,7 +9,7 @@ import {
 import userEvent from "@testing-library/user-event";
 import CollectionFilter from "./CollectionFilter";
 import { DefaultProvider } from "@/providers/DefaultProvider";
-import { getMockCollection } from "@/actions/collection/__mocks__/getCollections";
+import { getMockCollection } from "@/test/fixtures/collections";
 import {
   SessionData,
   SessionDataProvider,

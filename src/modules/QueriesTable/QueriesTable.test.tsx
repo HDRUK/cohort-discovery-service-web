@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom";
 import { render, screen, fireEvent } from "@testing-library/react";
 import QueriesTable from "./QueriesTable";
-import { getMockQuery } from "@/actions/query/__mocks__/getQueries";
+import { getMockQuery } from "@/test/fixtures/queries";
 import { paginateData } from "@/utils/mock";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 

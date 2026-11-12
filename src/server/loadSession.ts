@@ -1,9 +1,9 @@
 import "server-only";
 
-import {
-  decideAccess,
-  SessionAccess,
-} from "@/app/(protected)/components/sessionAccess";
+import { headers } from "next/headers";
+import { decideAccess } from "@/lib/sessionAccess";
+import { toClientTokenUser } from "@/lib/tokenUser";
+import { SessionAccess } from "@/types/session";
 import type { SessionData } from "@/contexts/SessionDataContext";
 import { getUserCollections } from "@/server/data/collections";
 import { getCustodians } from "@/server/data/custodians";
@@ -11,11 +11,17 @@ import { getFeatureFlags } from "@/server/data/features";
 import { getCurrentUser } from "@/server/data/user";
 import { getWorkgroups } from "@/server/data/workgroups";
 import { getSession, hasLiveSession } from "@/server/session";
+import { msUntilSessionEnds } from "@/server/sessionExpiry";
 import { CombinedUser } from "@/types/api";
 import { FeatureFlag } from "@/types/features";
 
 export type LoadedSession =
-  | { access: SessionAccess.Ok; data: SessionData; flags: FeatureFlag }
+  | {
+      access: SessionAccess.Ok;
+      data: SessionData;
+      flags: FeatureFlag;
+      sessionMsRemaining: number | null;
+    }
   | {
       access: Exclude<SessionAccess, SessionAccess.Ok>;
       errorText?: string;
@@ -33,9 +39,10 @@ export const loadSession = async (): Promise<LoadedSession> => {
   ]);
   sessionReads.catch(ignoreRejection);
 
-  const [session, currentUser] = await Promise.all([
+  const [session, currentUser, requestHeaders] = await Promise.all([
     getSession(),
     getCurrentUser(),
+    headers(),
   ]);
 
   const access = decideAccess(currentUser);
@@ -53,10 +60,14 @@ export const loadSession = async (): Promise<LoadedSession> => {
   return {
     access,
     flags,
+    sessionMsRemaining: msUntilSessionEnds(
+      session?.exp,
+      Number(requestHeaders.get("x-request-now")),
+    ),
     data: {
       user: {
         ...currentUser.data,
-        token_user: session?.user ?? null,
+        token_user: session ? toClientTokenUser(session.user) : null,
       } as CombinedUser,
       userCollections,
       custodians,

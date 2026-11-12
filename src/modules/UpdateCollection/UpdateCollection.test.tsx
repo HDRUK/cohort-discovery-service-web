@@ -1,10 +1,10 @@
 import { render, screen, within } from "@testing-library/react";
 import UpdateCollection from ".";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
-import { getMockCollection } from "@/actions/collection/__mocks__/getCollections";
+import { getMockCollection } from "@/test/fixtures/collections";
 import { ThreePaneProvider } from "@/providers/ThreePaneProvider";
-import getCollectionHost from "@/actions/collectionHost/__mocks__/getCollectionHost";
-import getCustodian from "@/actions/custodian/__mocks__/getCustodian";
+import { getMockCollectionHost } from "@/test/fixtures/collectionHosts";
+import { getMockCustodian } from "@/test/fixtures/custodians";
 import { CloseGuardProvider } from "@/providers/CloseGuardProvider";
 import userEvent from "@testing-library/user-event";
 import SwimLane from "@/components/SwimLane";
@@ -29,9 +29,9 @@ describe("UpdateCollection", () => {
   const renderComponent = (
     collectionOverride?: Partial<CollectionWithHosts>,
   ) => {
-    const host1 = getCollectionHost();
-    const host2 = getCollectionHost();
-    const custodian = getCustodian();
+    const host1 = getMockCollectionHost();
+    const host2 = getMockCollectionHost();
+    const custodian = getMockCustodian();
 
     const collection = getMockCollection({
       id: 1,
@@ -254,7 +254,7 @@ describe("UpdateCollection", () => {
         }),
       });
 
-      renderComponent({ host: getCollectionHost({ id: 11 }) });
+      renderComponent({ host: getMockCollectionHost({ id: 11 }) });
 
       expect(
         await screen.findByDisplayValue("client-id-11"),
@@ -269,7 +269,7 @@ describe("UpdateCollection", () => {
     it("explains when the credentials can't be loaded", async () => {
       fetchMock.mockResolvedValue({ ok: false, status: 403 });
 
-      renderComponent({ host: getCollectionHost({ id: 12 }) });
+      renderComponent({ host: getMockCollectionHost({ id: 12 }) });
 
       expect(
         await screen.findByText(/couldn.t load this host.s credentials/i),

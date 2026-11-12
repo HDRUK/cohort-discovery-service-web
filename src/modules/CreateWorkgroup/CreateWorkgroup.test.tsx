@@ -10,10 +10,24 @@ import userEvent from "@testing-library/user-event";
 import CreateWorkgroup from "./CreateWorkgroup";
 import { Collection } from "@/types/api";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
-import { getMockCollections } from "@/actions/collection/__mocks__/getCollections";
+import { getMockCollections } from "@/test/fixtures/collections";
 
-const createWorkgroup = jest.fn();
-const addCollectionsToWorkgroup = jest.fn();
+const mockCreateWorkgroup = jest.fn();
+
+jest.mock("@/actions/workgroup/createWorkgroup", () => ({
+  __esModule: true,
+  default: (...args: unknown[]) => mockCreateWorkgroup(...args),
+}));
+
+const createWorkgroup = mockCreateWorkgroup;
+
+const mockAddCollectionsToWorkgroup = jest.fn();
+
+jest.mock("@/actions/workgroup/addCollectionsToWorkgroup", () => ({
+  __esModule: true,
+  default: (...args: unknown[]) => mockAddCollectionsToWorkgroup(...args),
+}));
+
 
 let collections: Collection[];
 
@@ -23,10 +37,6 @@ const renderCreateWorkgroup = (
   return render(
     <MockCohortDiscoveryServiceStore
       overrides={{
-        admin: {
-          createWorkgroup,
-          addCollectionsToWorkgroup,
-        },
         adminSection: {
           collections,
         },

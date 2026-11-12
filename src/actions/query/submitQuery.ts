@@ -1,6 +1,7 @@
 "use server";
 
-import { refresh } from "next/cache";
+import { updateTag } from "next/cache";
+import { CACHE_TAGS } from "@/config/tags";
 import { RuleGroupType } from "@/types/rules";
 import { apiPost, ErrorMode } from "@/server/api";
 import { requireSession } from "@/server/session";
@@ -12,6 +13,7 @@ import {
   TaskType,
 } from "@/types/api";
 import { capVarChar } from "@/utils/string";
+import { changesQueryQuota } from "@/utils/queryLimit";
 
 const submitQuery = async (
   query: RuleGroupType,
@@ -32,9 +34,7 @@ const submitQuery = async (
     { errorMode: ErrorMode.RESULT },
   );
 
-  if (res.error) return res;
-
-  refresh();
+  if (changesQueryQuota(res)) updateTag(CACHE_TAGS.currentUser);
   return res;
 };
 

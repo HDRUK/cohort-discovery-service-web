@@ -1,4 +1,3 @@
-import useUserStore from "@/hooks/useUserStore";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import useStateManagement from "@/hooks/useStateManagement";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -11,13 +10,13 @@ import {
 import { routes } from "@/config/routes";
 import { useEffect } from "react";
 import useIsQueryLimitReached from "@/hooks/useIsQueryLimitReached";
+import submitQuery from "@/actions/query/submitQuery";
 
 const useSubmitQuery = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const notify = useNotify();
 
-  const fetchResults = useUserStore((s) => s.fetchResults);
   const isQueryLimitReached = useIsQueryLimitReached();
   const { isLoading, setIsLoading } = useStateManagement((s) => ({
     isLoading: s.isLoading,
@@ -42,7 +41,11 @@ const useSubmitQuery = () => {
 
   const submit = async (): Promise<boolean> => {
     setIsLoading(true);
-    const res = await fetchResults(queryName);
+    const res = await submitQuery(
+      queryBuilderJson,
+      queryName ? queryName : null,
+      selectedDatasets,
+    );
 
     if (res.error) {
       setIsLoading(false);

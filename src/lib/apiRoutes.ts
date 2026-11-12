@@ -54,6 +54,8 @@ export const API_ROUTES = {
   signIn: `${API_AUTH_URL}/login`,
   authMethods: `${API_AUTH_URL}/methods`,
   ssoExchange: `${API_AUTH_URL}/sso/exchange`,
+  ssoLogout: (provider: string) =>
+    `${API_AUTH_URL}/sso/${segment(provider)}/logout`,
   getQuery: (pid: string) => `${API_URL}/query/${segment(pid)}`,
   getCodes: (domain: string) => `${API_URL}/codes/${segment(domain)}`,
   getTaskStatus: (taskId: string) =>

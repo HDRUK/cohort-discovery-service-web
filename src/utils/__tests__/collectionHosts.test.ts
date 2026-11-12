@@ -2,12 +2,12 @@ import {
   parseCollectionHostId,
   toCollectionHostCredentials,
 } from "../collectionHosts";
-import getCollectionHost from "@/actions/collectionHost/__mocks__/getCollectionHost";
+import { getMockCollectionHost } from "@/test/fixtures/collectionHosts";
 
 describe("toCollectionHostCredentials", () => {
   it("returns only the id and credentials", () => {
     const host = {
-      ...getCollectionHost({ id: 3 }),
+      ...getMockCollectionHost({ id: 3 }),
       client_id: "client-id",
       client_secret: "client-secret",
     };

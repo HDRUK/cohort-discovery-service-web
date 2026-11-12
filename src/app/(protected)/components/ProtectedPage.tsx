@@ -1,27 +1,28 @@
 "use client";
 
-import { Collection, CombinedUser } from "@/types/api";
 import { FeatureFlag } from "@/types/features";
 import { ReactNode, useEffect, useRef } from "react";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { useQueryBuilderStore } from "@/store/queryBuilderStore";
-import { shouldResetPreferences } from "@/store/queryBuilderPreferences";
 import { isOnlyInDefaultWorkgroup } from "@/utils/user";
+import useSessionExpiry from "@/hooks/useSessionExpiry";
+import { useSessionData } from "@/contexts/SessionDataContext";
 
 interface ProtectedPageProps {
-  user: CombinedUser;
-  collections: Collection[];
   featureFlags: FeatureFlag;
+  sessionMsRemaining: number | null;
   children: ReactNode;
 }
 
 const ProtectedPage = ({
-  user,
-  collections,
   featureFlags,
+  sessionMsRemaining,
   children,
 }: ProtectedPageProps) => {
+  useSessionExpiry(sessionMsRemaining);
+  const { user, userCollections: collections } = useSessionData();
+
   const setFlags = useFeatureFlagsStore((s) => s.setFlags);
 
   const initialiseSelectedDatasets = useQueryBuilder(
@@ -43,7 +44,7 @@ const ProtectedPage = ({
   useEffect(() => {
     if (!hasRendered.current) {
       const { ownerId } = useQueryBuilderStore.getState();
-      if (shouldResetPreferences(ownerId, user.id)) {
+      if (ownerId !== user.id) {
         resetSelectedDatasetsFor(user.id);
       }
       initialiseSelectedDatasets(collections, isOnlyInDefaultWorkgroup(user));

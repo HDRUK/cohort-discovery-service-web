@@ -1,15 +1,13 @@
 "use client";
 
 import { Box, Stack, Typography } from "@mui/material";
-import useAdminStore from "@/hooks/useAdminStore";
 import { useNotify } from "@/providers/NotifyProvider";
 import CustodianTable from "@/components/CustodianTable";
+import removeCustodiansFromNetwork from "@/actions/network/removeCustodiansFromNetwork";
+import useSelectedNetwork from "@/hooks/useSelectedNetwork";
 
 const NetworksMiddlePanel = () => {
-  const selectedNetwork = useAdminStore((s) => s.selectedNetwork);
-  const removeCustodiansFromNetwork = useAdminStore(
-    (s) => s.removeCustodiansFromNetwork,
-  );
+  const selectedNetwork = useSelectedNetwork();
 
   const notify = useNotify();
 

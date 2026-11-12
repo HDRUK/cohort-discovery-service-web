@@ -10,26 +10,32 @@ import {
 import userEvent from "@testing-library/user-event";
 import CreateCollection from "./CreateCollection";
 import { Custodian, CollectionHost } from "@/types/api";
-import getCustodian from "@/actions/custodian/__mocks__/getCustodian";
+import { getMockCustodian } from "@/test/fixtures/custodians";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
-import { getMockCollection } from "@/actions/collection/__mocks__/getCollections";
-import getCollectionHost from "@/actions/collectionHost/__mocks__/getCollectionHost";
+import { getMockCollection } from "@/test/fixtures/collections";
+import { getMockCollectionHost } from "@/test/fixtures/collectionHosts";
 
-const createCollection = jest.fn();
-const mockCustodian = getCustodian();
+const mockCreateCollection = jest.fn();
+
+jest.mock("@/actions/collection/createCustodianCollectionWithConfig", () => ({
+  __esModule: true,
+  default: (...args: unknown[]) => mockCreateCollection(...args),
+}));
+
+const createCollection = mockCreateCollection;
+const mockCustodian = getMockCustodian();
 const mockCollectionHosts = [
-  getCollectionHost({
+  getMockCollectionHost({
     id: 10,
     name: "Alpha Host",
     custodian: mockCustodian,
   }),
-  getCollectionHost({
+  getMockCollectionHost({
     id: 20,
     name: "Beta Host",
     custodian: mockCustodian,
   }),
 ];
-const createCollectionAdmin = jest.fn();
 
 let custodians: Custodian[];
 let collectionHosts: CollectionHost[];
@@ -43,16 +49,10 @@ const renderCreateCollection = (
   render(
     <MockCohortDiscoveryServiceStore
       overrides={{
-        custodian: {
-          createCollection,
-        },
         custodianSection: {
           custodian: custodians[0],
           collectionHosts,
           ...sectionOverrides,
-        },
-        admin: {
-          createCollection: createCollectionAdmin,
         },
         adminSection: {
           collectionHosts,

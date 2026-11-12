@@ -2,6 +2,17 @@ import type { QueryKey } from "@tanstack/react-query";
 
 type TimeRangeKey = { from: string; to: string };
 
+export const CACHE_TAGS = {
+  collections: "collections",
+  collectionHosts: "collection-hosts",
+  conceptSets: "concept-sets",
+  currentUser: "current-user",
+  custodians: "custodians",
+  features: "features",
+  users: "users",
+  workgroups: "workgroups",
+} as const;
+
 const queryKey = (...parts: unknown[]): QueryKey =>
   parts.filter((part) => part !== undefined);
 

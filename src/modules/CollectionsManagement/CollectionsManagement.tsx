@@ -45,7 +45,7 @@ const CollectionsManagement = ({ isAdmin, collections }: Props) => {
           rightDisabled={false}
           left={<CollectionsLeftPanel />}
           middle={<CollectionsTable collections={collections} />}
-          right={<CollectionsRightPanel />}
+          right={<CollectionsRightPanel collections={collections?.data} />}
         />
       </ThreePaneProvider>
     </Box>

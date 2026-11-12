@@ -1,6 +1,7 @@
 import "server-only";
 
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
+import { CACHE_TAGS } from "@/config/tags";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { apiGet, ErrorMode, ReadOptions } from "@/server/api";
 import { LIST_CACHE_LIFE, USER_DATA_CACHE_LIFE } from "@/server/cacheProfiles";
@@ -29,6 +30,7 @@ export const getUserCollections = async (): Promise<
 > => {
   "use cache: private";
   cacheLife(USER_DATA_CACHE_LIFE);
+  cacheTag(CACHE_TAGS.collections);
 
   const { token } = await requireSession();
   return apiGet<ApiResponse<Collection[]>>(token, API_ROUTES.userCollections);
@@ -37,6 +39,7 @@ export const getUserCollections = async (): Promise<
 export const getCollections = async (): Promise<ApiResponse<Collection[]>> => {
   "use cache: private";
   cacheLife(LIST_CACHE_LIFE);
+  cacheTag(CACHE_TAGS.collections);
 
   const { token } = await requireSession();
   return apiGet<ApiResponse<Collection[]>>(token, API_ROUTES.collections);
@@ -69,6 +72,7 @@ const fetchCachedAdminCollectionList = async (
 ): Promise<ApiResponse<Paginated<CollectionWithHosts>>> => {
   "use cache: private";
   cacheLife(LIST_CACHE_LIFE);
+  cacheTag(CACHE_TAGS.collections);
 
   return fetchAdminCollectionList(queryString);
 };
@@ -100,6 +104,7 @@ const fetchCachedCustodianCollections = async (
 ): Promise<ApiResponse<Paginated<CollectionWithHosts>>> => {
   "use cache: private";
   cacheLife(LIST_CACHE_LIFE);
+  cacheTag(CACHE_TAGS.collections);
 
   return fetchCustodianCollections(custodianPid, queryString);
 };

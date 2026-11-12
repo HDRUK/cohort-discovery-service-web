@@ -3,11 +3,13 @@
 import CollectionsTable from "@/components/CollectionsTable";
 import { Box, Stack, Typography } from "@mui/material";
 import { formatWorkgroupName } from "@/utils/workgroups";
-import useAdminStore from "@/hooks/useAdminStore";
 import { useNotify } from "@/providers/NotifyProvider";
 import UserTable from "@/components/UserTable";
 import useFeatures from "@/hooks/useFeatures";
 import { CollectionWithHosts, Paginated } from "@/types/api";
+import removeCollectionsFromWorkgroup from "@/actions/workgroup/removeCollectionsFromWorkgroup";
+import removeUsersFromWorkgroup from "@/actions/workgroup/removeUsersFromWorkgroup";
+import useSelectedWorkgroup from "@/hooks/useSelectedWorkgroup";
 
 const WorkgroupsMiddlePanel = ({
   collections,
@@ -16,14 +18,7 @@ const WorkgroupsMiddlePanel = ({
 }) => {
   const { manageWorkgroupsInternal } = useFeatures();
 
-  const selectedWorkgroup = useAdminStore((s) => s.selectedWorkgroup);
-  const removeCollectionsFromWorkgroup = useAdminStore(
-    (s) => s.removeCollectionsFromWorkgroup,
-  );
-
-  const removeUsersFromWorkgroup = useAdminStore(
-    (s) => s.removeUsersFromWorkgroup,
-  );
+  const selectedWorkgroup = useSelectedWorkgroup();
 
   const notify = useNotify();
 

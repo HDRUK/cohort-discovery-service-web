@@ -6,22 +6,22 @@ import { useNotify } from "@/providers/NotifyProvider";
 
 import FormMultiSelect from "@/components/FormMultiSelect";
 import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
-import useAdminStore from "@/hooks/useAdminStore";
 import { useCallback, useEffect } from "react";
 import UpdatePanel from "@/components/UpdatePanel";
 import { useThreePane } from "@/providers/ThreePaneProvider";
 import { useSaveChanges } from "@/hooks/useSaveChanges";
 import { useSessionData } from "@/contexts/SessionDataContext";
 import { useNetworks } from "@/contexts/NetworksContext";
+import updateNetwork from "@/actions/network/updateNetwork";
+import addCustodiansToNetwork from "@/actions/network/addCustodiansToNetwork";
+import useSelectedNetwork from "@/hooks/useSelectedNetwork";
 
 const UpdateNetwork = () => {
   const { expandedRight, toggleRight: onClose } = useThreePane();
 
-  const updateNetwork = useAdminStore((s) => s.updateNetwork);
   const networks = useNetworks();
   const custodians = useSessionData().custodians;
-  const addCustodiansToNetwork = useAdminStore((s) => s.addCustodiansToNetwork);
-  const selectedNetwork = useAdminStore((s) => s.selectedNetwork);
+  const selectedNetwork = useSelectedNetwork();
 
   const notify = useNotify();
 
@@ -82,8 +82,6 @@ const UpdateNetwork = () => {
       isDirty,
       notify,
       onClose,
-      addCustodiansToNetwork,
-      updateNetwork,
       selectedNetwork,
     ],
   );

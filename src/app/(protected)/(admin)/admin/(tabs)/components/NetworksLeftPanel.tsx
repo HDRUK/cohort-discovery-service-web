@@ -3,30 +3,23 @@ import { Box } from "@mui/material";
 import List from "@/components/List";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import AddButton from "@/components/AddButton";
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import useSearchParams from "@/hooks/useSearchParams";
-import useAdminStore from "@/hooks/useAdminStore";
 import CreateNetwork from "@/modules/CreateNetwork";
 import { useConfirm } from "@/hooks/useConfirm";
 import { useThreePane } from "@/providers/ThreePaneProvider";
 import { useNetworks } from "@/contexts/NetworksContext";
+import deleteNetwork from "@/actions/network/deleteNetwork";
+import useSelectedNetwork from "@/hooks/useSelectedNetwork";
 
 const NetworksLeftPanel = () => {
   const { expandedLeft, toggleLeft } = useThreePane();
 
-  const selectedNetwork = useAdminStore((s) => s.selectedNetwork);
-  const setSelectedNetwork = useAdminStore((s) => s.setSelectedNetwork);
+  const selectedNetwork = useSelectedNetwork();
   const networks = useNetworks();
-  const deleteNetwork = useAdminStore((s) => s.deleteNetwork);
 
-  const { getSearchParam, setSearchParam } = useSearchParams("network_filter");
+  const { setSearchParam } = useSearchParams("network_filter");
 
-  const workgroupId = getSearchParam();
-
-  useEffect(() => {
-    const network = networks.find((w) => String(w.id) === workgroupId);
-    setSelectedNetwork(network ?? (networks.length >= 1 ? networks[0] : null));
-  }, [networks, workgroupId, setSelectedNetwork]);
 
   const onSelectNetwork = useCallback(
     (id?: number) => {

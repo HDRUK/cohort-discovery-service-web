@@ -20,10 +20,8 @@ import useSearchParams from "@/hooks/useSearchParams";
 import { capitaliseFirstLetter } from "@/utils/string";
 import { getDatetime } from "@/utils/date";
 import { trueKeys } from "@/utils/numbers";
-import { useLogDependencyChanges } from "@/utils/deps";
 import deleteCollections from "@/actions/collection/deleteCollections";
 import restoreCollection from "@/actions/collection/restoreCollection";
-import useUserStore from "@/hooks/useUserStore";
 import { useConfirm } from "@/hooks/useConfirm";
 import { useNotify } from "@/providers/NotifyProvider";
 import { QUERY_KEYS } from "@/config/tags";
@@ -35,6 +33,8 @@ import useFeatures from "@/hooks/useFeatures";
 import { useQueryClient } from "@tanstack/react-query";
 import { CollectionFilterStatus } from "@/types/collections";
 import { useCustodianSection } from "@/contexts/CustodianSectionContext";
+import { useSelectionStore } from "@/store/selectionStore";
+import { selectAllById } from "@/utils/selection";
 
 export interface CollectionsTableProps extends TableProps {
   collections?: Paginated<CollectionWithHosts>;
@@ -55,7 +55,7 @@ const CollectionsTable = ({
   ...rest
 }: CollectionsTableProps) => {
   const { adminMoreCollectionDetails } = useFeatures();
-  const { searchParams, getSearchParam } = useSearchParams("collection_filter");
+  const { getSearchParam } = useSearchParams("collection_filter");
   const filter_name = getSearchParam() || "all";
   const isDeletedView = filter_name === CollectionFilterStatus.DELETED;
 
@@ -63,8 +63,9 @@ const CollectionsTable = ({
 
   const currentCustodian = useCustodianSection()?.custodian;
   const isAdmin = useMemo(() => !currentCustodian, [currentCustodian]);
-  const selectedCollections = useUserStore((s) => s.selectedCollections);
-  const setSelectedCollections = useUserStore((s) => s.setSelectedCollections);
+  const setSelectedCollectionIds = useSelectionStore(
+    (s) => s.setSelectedCollectionIds,
+  );
 
   const rows = collections?.data;
 
@@ -75,20 +76,21 @@ const CollectionsTable = ({
     [rowSelection],
   );
 
+  const selectedCollections = useMemo(
+    () => selectAllById(rows ?? [], selectedCollectionIds),
+    [rows, selectedCollectionIds],
+  );
+
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    const newSelectedCollections = selectedCollectionIds
-      .map((id) => rows?.find((c) => String(c.id) === id) || null)
-      .filter((c) => c !== null);
+    setSelectedCollectionIds(selectedCollectionIds);
+  }, [selectedCollectionIds, setSelectedCollectionIds]);
 
-    setSelectedCollections(newSelectedCollections);
-  }, [
-    rows,
-    selectedCollections,
-    selectedCollectionIds,
-    setSelectedCollections,
-  ]);
+  useEffect(
+    () => () => setSelectedCollectionIds([]),
+    [setSelectedCollectionIds],
+  );
 
   const columns = useMemo<MRT_ColumnDef<Collection>[]>(
     () => [
@@ -112,25 +114,22 @@ const CollectionsTable = ({
         id: "name",
         header: "Name",
         accessorFn: (row) => row.name,
-        size: 150,
-        minSize: 100,
-        maxSize: 200,
+        size: 200,
+        minSize: 120,
       },
       {
         id: "custodian",
         header: "Custodian",
         accessorFn: (row) => row.custodian.name,
-        size: 100,
-        minSize: 100,
-        maxSize: 200,
+        size: 160,
+        minSize: 120,
       },
       {
         id: "network",
         header: "Network",
         accessorFn: (row) => row.custodian.network?.name ?? " - ",
-        size: 100,
+        size: 140,
         minSize: 100,
-        maxSize: 200,
       },
       {
         id: "last_ping",
@@ -139,9 +138,8 @@ const CollectionsTable = ({
           row.last_ping?.a?.updated_at
             ? getDatetime(row.last_ping.a.updated_at)
             : "—",
-        size: 50,
-        minSize: 50,
-        maxSize: 50,
+        size: 120,
+        minSize: 110,
       },
       {
         id: "last_query",
@@ -150,9 +148,8 @@ const CollectionsTable = ({
           row.last_successful_query?.completed_at
             ? getDatetime(row.last_successful_query.created_at)
             : "—",
-        size: 50,
-        minSize: 50,
-        maxSize: 50,
+        size: 120,
+        minSize: 110,
       },
       {
         id: "last_demographic",
@@ -163,9 +160,8 @@ const CollectionsTable = ({
                 row.latest_successful_demographic_result_file.updated_at,
               )
             : "—",
-        size: 50,
-        minSize: 50,
-        maxSize: 50,
+        size: 120,
+        minSize: 110,
         Cell: ({ cell }) => {
           const date = cell.getValue<string>();
           return <Typography>{date}</Typography>;
@@ -178,9 +174,8 @@ const CollectionsTable = ({
           row.latest_successful_concept_result_file?.updated_at
             ? getDatetime(row.latest_successful_concept_result_file.updated_at)
             : "—",
-        size: 50,
-        minSize: 50,
-        maxSize: 50,
+        size: 120,
+        minSize: 110,
         Cell: ({ cell }) => {
           const date = cell.getValue<string>();
           return <Typography>{date}</Typography>;
@@ -203,15 +198,15 @@ const CollectionsTable = ({
             </Stack>
           );
         },
-        size: 20,
-        minSize: 20,
-        maxSize: 20,
+        size: 160,
+        minSize: 140,
       },
     ],
     [showPid],
   );
 
   const table = usePaginatedTable<Collection>({
+    layoutMode: "grid",
     columns,
     data: rows,
     rowCount: collections?.total ?? 0,
@@ -322,18 +317,6 @@ const CollectionsTable = ({
       ),
     );
   };
-
-  useLogDependencyChanges("collectionsTable", {
-    table,
-    filter_name,
-    handleDeleteCollections,
-    collections,
-    searchParams,
-    getSearchParam,
-    rowSelection,
-    setRowSelection,
-    setSelectedCollections,
-  });
 
   const confirm = useConfirm();
 

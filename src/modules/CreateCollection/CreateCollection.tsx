@@ -10,12 +10,12 @@ import { useNotify } from "@/providers/NotifyProvider";
 import CollectionConfig from "@/components/CollectionConfig";
 import { REGEX_URL_NO_WWW } from "@/config/regex";
 import FormDropdown from "@/components/FormDropdown";
-import useCustodianStore from "@/hooks/useCustodianStore";
 import { useEffect, useMemo } from "react";
 import ErrorHeader from "@/components/ErrorHeader";
 import { useSessionData } from "@/contexts/SessionDataContext";
 import { useCustodianSection } from "@/contexts/CustodianSectionContext";
 import { useAdminCollectionHosts } from "@/contexts/AdminSectionContext";
+import createCustodianCollectionWithConfig from "@/actions/collection/createCustodianCollectionWithConfig";
 
 const NO_HOSTS: CollectionHost[] = [];
 
@@ -24,7 +24,6 @@ interface CreateCollectionProps {
 }
 
 const CreateCollection = ({ onCancel }: CreateCollectionProps) => {
-  const createCollection = useCustodianStore((s) => s.createCollection);
   const custodianSection = useCustodianSection();
   const currentCustodian = custodianSection?.custodian;
   const currentCollectionHosts = custodianSection?.collectionHosts ?? NO_HOSTS;
@@ -84,7 +83,7 @@ const CreateCollection = ({ onCancel }: CreateCollectionProps) => {
   }, [allowedCollectionHosts, resetField]);
 
   const onSubmit = async (data: CreateCollectionFormValues) => {
-    const createdCollection = await createCollection(
+    const createdCollection = await createCustodianCollectionWithConfig(
       data.custodian_pid,
       data.collection,
       data.config,

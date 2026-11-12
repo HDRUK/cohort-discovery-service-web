@@ -46,8 +46,8 @@ export const useTable = <TData extends MRT_RowData>({
                   onChange={row.getToggleSelectedHandler()}
                 />
               ),
-              size: 10,
-              maxSize: 10,
+              size: SELECT_COL_SIZE,
+              grow: false,
             } as MRT_ColumnDef<TData>,
           ]
         : []),

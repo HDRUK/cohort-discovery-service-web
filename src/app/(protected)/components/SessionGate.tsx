@@ -5,7 +5,7 @@ import { LoadedSession } from "@/server/loadSession";
 import { isStandalone } from "@/utils/modes";
 import ProtectedPage from "./ProtectedPage";
 import SessionEnded from "./SessionEnded";
-import { SessionAccess } from "./sessionAccess";
+import { SessionAccess } from "@/types/session";
 
 const applicationMode = process.env.APPLICATION_MODE;
 
@@ -32,9 +32,8 @@ const SessionGate = async ({
 
   return (
     <ProtectedPage
-      user={loaded.data.user}
-      collections={loaded.data.userCollections}
       featureFlags={loaded.flags}
+      sessionMsRemaining={loaded.sessionMsRemaining}
     >
       {children}
     </ProtectedPage>

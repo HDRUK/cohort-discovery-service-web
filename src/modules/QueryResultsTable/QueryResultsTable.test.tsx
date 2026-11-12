@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import QueryResultsTable from "./QueryResultsTable";
-import { getMockQuery } from "@/actions/query/__mocks__/getQueries";
+import { getMockQuery } from "@/test/fixtures/queries";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 import { EXAMPLE_1 } from "@/config/queryExamples";
 import { Demographics, GeoRadiusLocation } from "@/types/rules";

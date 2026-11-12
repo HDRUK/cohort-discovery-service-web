@@ -1,7 +1,8 @@
 /**
  * @jest-environment node
  */
-import { SessionAccess } from "@/app/(protected)/components/sessionAccess";
+import { headers } from "next/headers";
+import { SessionAccess } from "@/types/session";
 import { getUserCollections } from "@/server/data/collections";
 import { getCustodians } from "@/server/data/custodians";
 import { getFeatureFlags } from "@/server/data/features";
@@ -10,6 +11,7 @@ import { getWorkgroups } from "@/server/data/workgroups";
 import { getSession, hasLiveSession } from "@/server/session";
 import { loadSession, loadSessionDataOrSignedOut } from "../loadSession";
 
+jest.mock("next/headers", () => ({ headers: jest.fn() }));
 jest.mock("@/server/session", () => ({
   getSession: jest.fn(),
   hasLiveSession: jest.fn(),
@@ -28,7 +30,15 @@ const mocked = <T extends (...args: never[]) => unknown>(fn: T) =>
 const ok = <T>(data: T) => ({ message: "", data });
 
 const USER = { id: 1, roles: [{ name: "user" }], custodians: [] };
-const TOKEN_USER = { id: 1, name: "Jane Doe" };
+const TOKEN_USER = {
+  id: 1,
+  name: "Jane Doe",
+  email: "jane.doe@example.com",
+  sso_logout_ticket: "a-logout-ticket",
+  is_admin: false,
+};
+const CLIENT_TOKEN_USER = { is_admin: false };
+const REQUEST_NOW = 1_700_000_000;
 
 const resolveSessionReads = () => {
   mocked(getFeatureFlags).mockResolvedValue(ok({ flag: true }));
@@ -40,6 +50,9 @@ const resolveSessionReads = () => {
 describe("loadSession", () => {
   beforeEach(() => {
     mocked(getSession).mockResolvedValue({ token: "t", user: TOKEN_USER });
+    mocked(headers).mockResolvedValue(
+      new Headers({ "x-request-now": String(REQUEST_NOW) }),
+    );
   });
 
   it("starts the session reads before the user has loaded", async () => {
@@ -71,13 +84,28 @@ describe("loadSession", () => {
     expect(loaded).toEqual({
       access: SessionAccess.Ok,
       flags: { flag: true },
+      sessionMsRemaining: null,
       data: {
-        user: { ...USER, token_user: TOKEN_USER },
+        user: { ...USER, token_user: CLIENT_TOKEN_USER },
         userCollections: [{ pid: "c1" }],
         custodians: [],
         workgroups: [],
       },
     });
+  });
+
+  it("measures the time left on the token from the request time", async () => {
+    mocked(getSession).mockResolvedValue({
+      token: "t",
+      user: TOKEN_USER,
+      exp: REQUEST_NOW + 90,
+    });
+    mocked(getCurrentUser).mockResolvedValue(ok(USER));
+    resolveSessionReads();
+
+    const loaded = await loadSession();
+
+    expect(loaded).toMatchObject({ sessionMsRemaining: 60_000 });
   });
 
   it("reports an ended session without waiting for or leaking the session reads", async () => {
@@ -116,7 +144,7 @@ describe("loadSessionDataOrSignedOut", () => {
     resolveSessionReads();
 
     await expect(loadSessionDataOrSignedOut()).resolves.toMatchObject({
-      user: { ...USER, token_user: TOKEN_USER },
+      user: { ...USER, token_user: CLIENT_TOKEN_USER },
     });
   });
 

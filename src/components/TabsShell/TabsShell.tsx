@@ -159,7 +159,9 @@ export default function TabsShell({
         </Box>
 
         {children && (
-          <Box sx={mergeSx(defaultTabContentSx, tabContentSx)}>{children}</Box>
+          <Box sx={mergeSx(defaultTabContentSx, tabContentSx)}>
+            <Box sx={tabPanelSx}>{children}</Box>
+          </Box>
         )}
 
         {kids.length > 0 && (

@@ -4,31 +4,22 @@ import List from "@/components/List";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import AddButton from "@/components/AddButton";
 import CreateWorkgroup from "@/modules/CreateWorkgroup";
-import { useCallback, useEffect, Suspense } from "react";
+import { useCallback, Suspense } from "react";
 import useSearchParams from "@/hooks/useSearchParams";
-import useAdminStore from "@/hooks/useAdminStore";
 import { useThreePane } from "@/providers/ThreePaneProvider";
 import { formatWorkgroupName } from "@/utils/workgroups";
 import { useSessionData } from "@/contexts/SessionDataContext";
+import useSelectedWorkgroup from "@/hooks/useSelectedWorkgroup";
 
 const WorkgroupsLeftPanel = () => {
   const { expandedLeft, toggleLeft } = useThreePane();
 
-  const selectedWorkgroup = useAdminStore((s) => s.selectedWorkgroup);
-  const setSelectedWorkgroup = useAdminStore((s) => s.setSelectedWorkgroup);
+  const selectedWorkgroup = useSelectedWorkgroup();
   const workgroups = useSessionData().workgroups;
 
-  const { getSearchParam, setSearchParam } =
+  const { setSearchParam } =
     useSearchParams("workgroup_filter");
 
-  const workgroupId = getSearchParam();
-
-  useEffect(() => {
-    const workgroup = workgroups.find((w) => String(w.id) === workgroupId);
-    setSelectedWorkgroup(
-      workgroup ?? (workgroups.length >= 1 ? workgroups[0] : null),
-    );
-  }, [workgroups, workgroupId, setSelectedWorkgroup]);
 
   const onSelectWorkgroup = useCallback(
     (id?: number) => {

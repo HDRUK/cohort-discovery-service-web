@@ -26,11 +26,9 @@ const CollectionsTab = async ({
 
   const isAdmin = !custodianPid;
 
-  const [{ data: collections }] = await Promise.all([
-    isAdmin
-      ? getAdminCollectionList({ params })
-      : getCustodianCollections(custodianPid, { params }),
-  ]);
+  const { data: collections } = isAdmin
+    ? await getAdminCollectionList({ params })
+    : await getCustodianCollections(custodianPid, { params });
 
   return <CollectionsManagement isAdmin={isAdmin} collections={collections} />;
 };

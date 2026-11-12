@@ -21,7 +21,6 @@ import {
 } from "@mui/material";
 import SquareCheckbox from "@/components/SquareCheckbox";
 import { ConceptItem, ConceptItemProps } from "./ConceptItem";
-import useUserStore from "@/hooks/useUserStore";
 import {
   DEFAULT_CODES_PER_PAGE,
   DEFAULT_SEARCH_RESULTS_MAX_HEIGHT,
@@ -29,6 +28,7 @@ import {
 import useFeatures from "@/hooks/useFeatures";
 import { mergeSx } from "@/utils/helpers";
 import useHasSelectedSyntheticDatasets from "@/hooks/useHasSelectedSyntheticDatasets";
+import useSearchForConcepts from "@/hooks/useSearchForConcepts";
 
 interface SlotProps {
   conceptItem: ConceptItemProps;
@@ -73,7 +73,7 @@ const SearchConcepts = ({
   hideSelectAll = false,
 }: SearchConceptsProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const searchForConcepts = useUserStore((s) => s.searchForConcepts);
+  const searchForConcepts = useSearchForConcepts();
   const includeSynthetic = useHasSelectedSyntheticDatasets();
 
   const [activeResult, setActiveResult] = useState<Paginated<

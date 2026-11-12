@@ -3,12 +3,19 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import CreateCollectionHost from "./CreateCollectionHost";
 import { Custodian } from "@/types/api";
-import getCustodian from "@/actions/custodian/__mocks__/getCustodian";
+import { getMockCustodian } from "@/test/fixtures/custodians";
 import { NotifyProvider } from "@/providers/NotifyProvider";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 
 // --- Mock CohortDiscoveryService store ---
-const createCollectionHost = jest.fn();
+const mockCreateCollectionHost = jest.fn();
+
+jest.mock("@/actions/collectionHost/createCollectionHost", () => ({
+  __esModule: true,
+  default: (...args: unknown[]) => mockCreateCollectionHost(...args),
+}));
+
+const createCollectionHost = mockCreateCollectionHost;
 const onCancel = jest.fn();
 
 let custodian: Custodian;
@@ -18,13 +25,7 @@ const renderCreateColllectionHost = (
 ) =>
   render(
     <NotifyProvider>
-      <MockCohortDiscoveryServiceStore
-        overrides={{
-          custodian: {
-            createCollectionHost,
-          },
-        }}
-      >
+      <MockCohortDiscoveryServiceStore>
         <CreateCollectionHost
           custodianId={custodian.id}
           onCancel={onCancel}
@@ -37,7 +38,7 @@ const renderCreateColllectionHost = (
 describe("CreateCollectionHost", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    custodian = getCustodian();
+    custodian = getMockCustodian();
   });
 
   it("renders the form ", async () => {

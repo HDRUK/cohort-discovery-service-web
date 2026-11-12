@@ -10,12 +10,28 @@ export interface FeatureFlagsStoreState {
   updateFlag: (name: string, enabled: boolean) => Promise<void>;
 }
 
-export const useFeatureFlagsStore = create<FeatureFlagsStoreState>((set) => ({
-  flags: null,
+export const useFeatureFlagsStore = create<FeatureFlagsStoreState>(
+  (set, get) => {
+    const setFlag = (name: string, enabled: boolean) => {
+      const { flags } = get();
+      if (flags) set({ flags: { ...flags, [name]: enabled } });
+    };
 
-  setFlags: (flags) => set({ flags }),
+    return {
+      flags: null,
 
-  updateFlag: async (name, enabled) => {
-    await updateFeatureFlag(name, { enabled });
+      setFlags: (flags) => set({ flags }),
+
+      updateFlag: async (name, enabled) => {
+        const previous = get().flags?.[name as keyof FeatureFlag];
+        setFlag(name, enabled);
+        try {
+          await updateFeatureFlag(name, { enabled });
+        } catch (error) {
+          if (previous !== undefined) setFlag(name, previous);
+          throw error;
+        }
+      },
+    };
   },
-}));
+);
