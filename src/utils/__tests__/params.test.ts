@@ -85,7 +85,7 @@ describe("buildWorkgroupCollectionParams", () => {
   it("filters by the first workgroup when none is in the URL", () => {
     const params = buildWorkgroupCollectionParams({}, workgroups);
 
-    expect(params?.get("workgroup_id")).toBe("3");
+    expect(params.get("workgroup_id")).toBe("3");
   });
 
   it("filters by the workgroup in the URL", () => {
@@ -94,7 +94,7 @@ describe("buildWorkgroupCollectionParams", () => {
       workgroups,
     );
 
-    expect(params?.get("workgroup_id")).toBe("7");
+    expect(params.get("workgroup_id")).toBe("7");
   });
 
   it("falls back to the first workgroup when the URL names an unknown one", () => {
@@ -103,11 +103,13 @@ describe("buildWorkgroupCollectionParams", () => {
       workgroups,
     );
 
-    expect(params?.get("workgroup_id")).toBe("3");
+    expect(params.get("workgroup_id")).toBe("3");
   });
 
-  it("returns null when the user has no workgroups", () => {
-    expect(buildWorkgroupCollectionParams({}, [])).toBeNull();
+  it("omits the workgroup filter when there are no workgroups", () => {
+    const params = buildWorkgroupCollectionParams({}, []);
+
+    expect(params.has("workgroup_id")).toBe(false);
   });
 });
 

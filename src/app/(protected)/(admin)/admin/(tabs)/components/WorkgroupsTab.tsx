@@ -28,8 +28,6 @@ const WorkgroupsTab = async ({
     { page, per_page, ...rest },
     workgroups ?? [],
   );
-  if (!params) return <WorkgroupsAdmin />;
-
   const { data: collections } = await getAdminCollectionList({ params });
 
   return (

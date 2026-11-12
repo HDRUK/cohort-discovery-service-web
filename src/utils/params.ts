@@ -61,17 +61,16 @@ export const buildCollectionParams = (
 export const buildWorkgroupCollectionParams = (
   searchParams: CollectionsSearchParams,
   workgroups: Workgroup[],
-): URLSearchParams | null => {
-  const { workgroup_filter } = searchParams ?? {};
+): URLSearchParams => {
+  const { workgroup_filter } = searchParams;
   const selected = selectByIdOrFirst(
     workgroups,
     workgroup_filter ? String(workgroup_filter) : null,
   );
-  if (!selected) return null;
 
   return buildCollectionParams({
     ...searchParams,
-    workgroup_filter: selected.id,
+    workgroup_filter: selected?.id,
   });
 };
 
