@@ -6,6 +6,7 @@ import { CollectionsSearchParams } from "@/types/api";
 import { buildCollectionParams } from "@/utils/params";
 import { Box, Skeleton } from "@mui/material";
 import CollectionsManagement from "../CollectionsManagement";
+import { CollectionListProvider } from "@/contexts/CollectionListContext";
 
 export const CollectionsSkeleton = () => (
   <Box sx={{ height: "100%", p: 2 }}>
@@ -26,11 +27,17 @@ const CollectionsTab = async ({
 
   const isAdmin = !custodianPid;
 
-  const { data: collections } = isAdmin
-    ? await getAdminCollectionList({ params })
-    : await getCustodianCollections(custodianPid, { params });
+  const collections = (
+    isAdmin
+      ? getAdminCollectionList({ params })
+      : getCustodianCollections(custodianPid, { params })
+  ).then(({ data }) => data);
 
-  return <CollectionsManagement isAdmin={isAdmin} collections={collections} />;
+  return (
+    <CollectionListProvider collections={collections}>
+      <CollectionsManagement isAdmin={isAdmin} />
+    </CollectionListProvider>
+  );
 };
 
 export default CollectionsTab;

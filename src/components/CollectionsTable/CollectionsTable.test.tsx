@@ -1,6 +1,7 @@
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import CollectionsTable, { CollectionsTableProps } from "./CollectionsTable";
+import { CollectionListProvider } from "@/contexts/CollectionListContext";
 import { getMockCustodianCollections } from "@/test/fixtures/collections";
 import { getMockCustodian } from "@/test/fixtures/custodians";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
@@ -28,7 +29,9 @@ describe("CollectionsTable", () => {
   ) =>
     render(
       <MockCohortDiscoveryServiceStore>
-        <CollectionsTable collections={collections} {...props} />
+        <CollectionListProvider collections={collections}>
+          <CollectionsTable {...props} />
+        </CollectionListProvider>
       </MockCohortDiscoveryServiceStore>,
     );
 
@@ -44,7 +47,9 @@ describe("CollectionsTable", () => {
           },
         }}
       >
-        <CollectionsTable collections={collections} {...props} />
+        <CollectionListProvider collections={collections}>
+          <CollectionsTable {...props} />
+        </CollectionListProvider>
       </MockCohortDiscoveryServiceStore>,
     );
 
