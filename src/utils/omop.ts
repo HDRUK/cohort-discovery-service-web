@@ -1,5 +1,4 @@
-import { Code, Concept } from "@/types/api";
-import { Option } from "@/types/common";
+import { Concept } from "@/types/api";
 import {
   DEFAULT_DOMAIN_PHRASE,
   DOMAIN_PHRASES,
@@ -9,15 +8,6 @@ import {
 import { capitaliseFirstLetter } from "./string";
 import { DOMAIN_MAP } from "@/config/domains";
 import { VALUE_AS_NUMBER_DOMAINS } from "@/config/rules";
-
-const codesToOption = (codes: Code[]): Option[] =>
-  codes
-    ?.filter((code) => code.name !== "0")
-    .sort((a, b) => a.name.localeCompare(b.name))
-    .map((code) => ({
-      name: code.name,
-      label: `${code.name} (${code.name}) `,
-    }));
 
 const getDomainPhrase = (category?: string): DomainPhrase => {
   if (!category) return DEFAULT_DOMAIN_PHRASE;
@@ -79,4 +69,4 @@ const NO_SELECTOR_DOMAINS = new Set<OmopTableName>([
 const categoryHasSelectors = (category: string): boolean =>
   !NO_SELECTOR_DOMAINS.has(category.toLowerCase() as OmopTableName);
 
-export { codesToOption, getDomainPhrase, getDomainPastPhrase, getDomain, getUniqueDomains, isValueAsNumberDomain, categoryHasSelectors };
+export { getDomainPhrase, getDomainPastPhrase, getDomain, getUniqueDomains, isValueAsNumberDomain, categoryHasSelectors };
