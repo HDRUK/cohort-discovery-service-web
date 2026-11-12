@@ -1,10 +1,7 @@
 "use client";
 
-import {
-  CollectionsSearchParams,
-  CollectionWithHosts,
-  Paginated,
-} from "@/types/api";
+import { ReactNode } from "react";
+import { CollectionsSearchParams } from "@/types/api";
 import { Box, Skeleton } from "@mui/material";
 import Title from "@/components/Title";
 import ThreePaneSwimLaneLayout from "@/modules/ThreePaneSwimLaneLayout";
@@ -17,10 +14,15 @@ import { useCustodianSection } from "@/contexts/CustodianSectionContext";
 
 type Props = {
   isAdmin: boolean;
-  collections?: Paginated<CollectionWithHosts>;
+  table?: ReactNode;
+  rightPanel?: ReactNode;
 };
 
-const CollectionsManagement = ({ isAdmin, collections }: Props) => {
+const CollectionsManagement = ({
+  isAdmin,
+  table = <CollectionsTable />,
+  rightPanel = <CollectionsRightPanel />,
+}: Props) => {
   const custodian = useCustodianSection()?.custodian;
 
   if (!isAdmin && !custodian) return <Skeleton height={"100%"} />;
@@ -44,8 +46,8 @@ const CollectionsManagement = ({ isAdmin, collections }: Props) => {
         <ThreePaneSwimLaneLayout
           rightDisabled={false}
           left={<CollectionsLeftPanel />}
-          middle={<CollectionsTable collections={collections} />}
-          right={<CollectionsRightPanel collections={collections?.data} />}
+          middle={table}
+          right={rightPanel}
         />
       </ThreePaneProvider>
     </Box>

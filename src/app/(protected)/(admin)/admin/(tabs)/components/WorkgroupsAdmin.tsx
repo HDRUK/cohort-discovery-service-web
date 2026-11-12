@@ -1,9 +1,6 @@
 "use client";
-import {
-  CollectionsSearchParams,
-  CollectionWithHosts,
-  Paginated,
-} from "@/types/api";
+import { ReactNode } from "react";
+import { CollectionsSearchParams } from "@/types/api";
 import { Box } from "@mui/material";
 import Title from "@/components/Title";
 import ThreePaneSwimLaneLayout from "@/modules/ThreePaneSwimLaneLayout";
@@ -14,9 +11,9 @@ import WorkgroupsRightPanel from "./WorkgroupsRightPanel";
 import { ThreePaneProvider } from "@/providers/ThreePaneProvider";
 
 const WorkgroupsAdmin = ({
-  collections,
+  middle = <WorkgroupsMiddlePanel />,
 }: {
-  collections?: Paginated<CollectionWithHosts>;
+  middle?: ReactNode;
 }) => {
   return (
     <Box
@@ -32,7 +29,7 @@ const WorkgroupsAdmin = ({
         <ThreePaneSwimLaneLayout
           rightDisabled={false}
           left={<WorkgroupsLeftPanel />}
-          middle={<WorkgroupsMiddlePanel collections={collections} />}
+          middle={middle}
           right={<WorkgroupsRightPanel />}
         />
       </ThreePaneProvider>

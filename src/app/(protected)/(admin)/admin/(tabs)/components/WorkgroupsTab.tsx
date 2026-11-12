@@ -1,4 +1,5 @@
 import WorkgroupsAdmin from "./WorkgroupsAdmin";
+import WorkgroupsMiddlePanel from "./WorkgroupsMiddlePanel";
 import { CollectionsSearchParams } from "@/types/api";
 import { buildWorkgroupCollectionParams } from "@/utils/params";
 import { Box, Skeleton } from "@mui/material";
@@ -31,7 +32,11 @@ const WorkgroupsTab = async ({
 
   const { data: collections } = await getAdminCollectionList({ params });
 
-  return <WorkgroupsAdmin collections={collections} />;
+  return (
+    <WorkgroupsAdmin
+      middle={<WorkgroupsMiddlePanel collections={collections} />}
+    />
+  );
 };
 
 export default WorkgroupsTab;
