@@ -114,25 +114,22 @@ const CollectionsTable = ({
         id: "name",
         header: "Name",
         accessorFn: (row) => row.name,
-        size: 150,
-        minSize: 100,
-        maxSize: 200,
+        size: 200,
+        minSize: 120,
       },
       {
         id: "custodian",
         header: "Custodian",
         accessorFn: (row) => row.custodian.name,
-        size: 100,
-        minSize: 100,
-        maxSize: 200,
+        size: 160,
+        minSize: 120,
       },
       {
         id: "network",
         header: "Network",
         accessorFn: (row) => row.custodian.network?.name ?? " - ",
-        size: 100,
+        size: 140,
         minSize: 100,
-        maxSize: 200,
       },
       {
         id: "last_ping",
@@ -141,9 +138,8 @@ const CollectionsTable = ({
           row.last_ping?.a?.updated_at
             ? getDatetime(row.last_ping.a.updated_at)
             : "—",
-        size: 50,
-        minSize: 50,
-        maxSize: 50,
+        size: 120,
+        minSize: 110,
       },
       {
         id: "last_query",
@@ -152,9 +148,8 @@ const CollectionsTable = ({
           row.last_successful_query?.completed_at
             ? getDatetime(row.last_successful_query.created_at)
             : "—",
-        size: 50,
-        minSize: 50,
-        maxSize: 50,
+        size: 120,
+        minSize: 110,
       },
       {
         id: "last_demographic",
@@ -165,9 +160,8 @@ const CollectionsTable = ({
                 row.latest_successful_demographic_result_file.updated_at,
               )
             : "—",
-        size: 50,
-        minSize: 50,
-        maxSize: 50,
+        size: 120,
+        minSize: 110,
         Cell: ({ cell }) => {
           const date = cell.getValue<string>();
           return <Typography>{date}</Typography>;
@@ -180,9 +174,8 @@ const CollectionsTable = ({
           row.latest_successful_concept_result_file?.updated_at
             ? getDatetime(row.latest_successful_concept_result_file.updated_at)
             : "—",
-        size: 50,
-        minSize: 50,
-        maxSize: 50,
+        size: 120,
+        minSize: 110,
         Cell: ({ cell }) => {
           const date = cell.getValue<string>();
           return <Typography>{date}</Typography>;
@@ -205,15 +198,15 @@ const CollectionsTable = ({
             </Stack>
           );
         },
-        size: 20,
-        minSize: 20,
-        maxSize: 20,
+        size: 160,
+        minSize: 140,
       },
     ],
     [showPid],
   );
 
   const table = usePaginatedTable<Collection>({
+    layoutMode: "grid",
     columns,
     data: rows,
     rowCount: collections?.total ?? 0,
