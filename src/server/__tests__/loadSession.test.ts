@@ -30,7 +30,14 @@ const mocked = <T extends (...args: never[]) => unknown>(fn: T) =>
 const ok = <T>(data: T) => ({ message: "", data });
 
 const USER = { id: 1, roles: [{ name: "user" }], custodians: [] };
-const TOKEN_USER = { id: 1, name: "Jane Doe" };
+const TOKEN_USER = {
+  id: 1,
+  name: "Jane Doe",
+  email: "jane.doe@example.com",
+  sso_logout_ticket: "a-logout-ticket",
+  is_admin: false,
+};
+const CLIENT_TOKEN_USER = { is_admin: false };
 const REQUEST_NOW = 1_700_000_000;
 
 const resolveSessionReads = () => {
@@ -79,7 +86,7 @@ describe("loadSession", () => {
       flags: { flag: true },
       sessionMsRemaining: null,
       data: {
-        user: { ...USER, token_user: TOKEN_USER },
+        user: { ...USER, token_user: CLIENT_TOKEN_USER },
         userCollections: [{ pid: "c1" }],
         custodians: [],
         workgroups: [],
@@ -137,7 +144,7 @@ describe("loadSessionDataOrSignedOut", () => {
     resolveSessionReads();
 
     await expect(loadSessionDataOrSignedOut()).resolves.toMatchObject({
-      user: { ...USER, token_user: TOKEN_USER },
+      user: { ...USER, token_user: CLIENT_TOKEN_USER },
     });
   });
 

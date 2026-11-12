@@ -2,6 +2,7 @@ import "server-only";
 
 import { headers } from "next/headers";
 import { decideAccess } from "@/lib/sessionAccess";
+import { toClientTokenUser } from "@/lib/tokenUser";
 import { SessionAccess } from "@/types/session";
 import type { SessionData } from "@/contexts/SessionDataContext";
 import { getUserCollections } from "@/server/data/collections";
@@ -66,7 +67,7 @@ export const loadSession = async (): Promise<LoadedSession> => {
     data: {
       user: {
         ...currentUser.data,
-        token_user: session?.user ?? null,
+        token_user: session ? toClientTokenUser(session.user) : null,
       } as CombinedUser,
       userCollections,
       custodians,

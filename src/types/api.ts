@@ -552,6 +552,11 @@ export interface TokenUser {
   cohort_admin_teams: ExternalCustodian[];
 }
 
+export type ClientTokenUser = Pick<
+  TokenUser,
+  "sso_provider" | "orcid" | "is_admin" | "cohort_admin_teams"
+>;
+
 export interface Network {
   name: string;
   pid: string;
@@ -568,7 +573,7 @@ export interface Custodian extends WithTimestamps {
 }
 
 export interface CombinedUser extends User {
-  token_user: TokenUser | null;
+  token_user: ClientTokenUser | null;
 }
 
 export interface CreateCollectionHostPost {
