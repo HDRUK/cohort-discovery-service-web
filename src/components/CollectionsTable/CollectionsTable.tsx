@@ -20,7 +20,6 @@ import useSearchParams from "@/hooks/useSearchParams";
 import { capitaliseFirstLetter } from "@/utils/string";
 import { getDatetime } from "@/utils/date";
 import { trueKeys } from "@/utils/numbers";
-import { useLogDependencyChanges } from "@/utils/deps";
 import deleteCollections from "@/actions/collection/deleteCollections";
 import restoreCollection from "@/actions/collection/restoreCollection";
 import { useConfirm } from "@/hooks/useConfirm";
@@ -56,7 +55,7 @@ const CollectionsTable = ({
   ...rest
 }: CollectionsTableProps) => {
   const { adminMoreCollectionDetails } = useFeatures();
-  const { searchParams, getSearchParam } = useSearchParams("collection_filter");
+  const { getSearchParam } = useSearchParams("collection_filter");
   const filter_name = getSearchParam() || "all";
   const isDeletedView = filter_name === CollectionFilterStatus.DELETED;
 
@@ -325,18 +324,6 @@ const CollectionsTable = ({
       ),
     );
   };
-
-  useLogDependencyChanges("collectionsTable", {
-    table,
-    filter_name,
-    handleDeleteCollections,
-    collections,
-    searchParams,
-    getSearchParam,
-    rowSelection,
-    setRowSelection,
-    setSelectedCollectionIds,
-  });
 
   const confirm = useConfirm();
 

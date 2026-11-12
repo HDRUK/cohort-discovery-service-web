@@ -20,7 +20,6 @@ const WorkgroupsMiddlePanel = ({
 
   const selectedWorkgroup = useSelectedWorkgroup();
 
-
   const notify = useNotify();
 
   return (
