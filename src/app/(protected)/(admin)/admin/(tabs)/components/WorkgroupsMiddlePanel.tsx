@@ -6,11 +6,16 @@ import { formatWorkgroupName } from "@/utils/workgroups";
 import { useNotify } from "@/providers/NotifyProvider";
 import UserTable from "@/components/UserTable";
 import useFeatures from "@/hooks/useFeatures";
+import { CollectionWithHosts, Paginated } from "@/types/api";
 import removeCollectionsFromWorkgroup from "@/actions/workgroup/removeCollectionsFromWorkgroup";
 import removeUsersFromWorkgroup from "@/actions/workgroup/removeUsersFromWorkgroup";
 import useSelectedWorkgroup from "@/hooks/useSelectedWorkgroup";
 
-const WorkgroupsMiddlePanel = () => {
+const WorkgroupsMiddlePanel = ({
+  collections,
+}: {
+  collections?: Paginated<CollectionWithHosts>;
+}) => {
   const { manageWorkgroupsInternal } = useFeatures();
 
   const selectedWorkgroup = useSelectedWorkgroup();
@@ -30,6 +35,7 @@ const WorkgroupsMiddlePanel = () => {
         <Stack gap={2}>
           <Box>
             <CollectionsTable
+              collections={collections}
               tableTitle={`${formatWorkgroupName(selectedWorkgroup?.name)} Workgroup`}
               tableSubTitle="Collections"
               deleteOverride={async (ids: string[]) => {

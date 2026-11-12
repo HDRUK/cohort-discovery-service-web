@@ -4,7 +4,6 @@ import { buildWorkgroupCollectionParams } from "@/utils/params";
 import { Box, Skeleton } from "@mui/material";
 import { getAdminCollectionList } from "@/server/data/collections";
 import { getWorkgroups } from "@/server/data/workgroups";
-import { CollectionListProvider } from "@/contexts/CollectionListContext";
 import { DEFAULT_PER_PAGE } from "@/config/defaults";
 
 export const WorkgroupsSkeleton = () => (
@@ -30,15 +29,9 @@ const WorkgroupsTab = async ({
   );
   if (!params) return <WorkgroupsAdmin />;
 
-  const collections = getAdminCollectionList({ params }).then(
-    ({ data }) => data,
-  );
+  const { data: collections } = await getAdminCollectionList({ params });
 
-  return (
-    <CollectionListProvider collections={collections}>
-      <WorkgroupsAdmin />
-    </CollectionListProvider>
-  );
+  return <WorkgroupsAdmin collections={collections} />;
 };
 
 export default WorkgroupsTab;

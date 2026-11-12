@@ -8,18 +8,22 @@ import { maskClientTest } from "@/lib/maskClientTest";
 import { CollectionGuidanceProps } from "./CollectionsGuidance";
 import { useSelectionStore } from "@/store/selectionStore";
 import { selectAllById } from "@/utils/selection";
-import { useCollectionList } from "@/contexts/CollectionListContext";
+import { CollectionWithHosts } from "@/types/api";
 import { useThreePane } from "@/providers/ThreePaneProvider";
 
 const CollectionGuidance = maskClientTest<CollectionGuidanceProps>(
   () => import("./CollectionsGuidance"),
 );
 
-type CollectionsRightPanelProps = Omit<UpdateCollectionProps, "collection">;
+type CollectionsRightPanelProps = Omit<UpdateCollectionProps, "collection"> & {
+  collections?: CollectionWithHosts[];
+};
 
-const CollectionsRightPanel = (props: CollectionsRightPanelProps) => {
+const CollectionsRightPanel = ({
+  collections,
+  ...props
+}: CollectionsRightPanelProps) => {
   const { expandedLeft } = useThreePane();
-  const collections = useCollectionList()?.data;
 
   const selectedCollections = selectAllById(
     collections ?? [],

@@ -1,6 +1,11 @@
 "use client";
 
-import { Collection, CollectionStatus } from "@/types/api";
+import {
+  Collection,
+  CollectionStatus,
+  CollectionWithHosts,
+  Paginated,
+} from "@/types/api";
 import { DEFAULT_PER_PAGE } from "@/config/defaults";
 import {
   MRT_RowSelectionState,
@@ -30,9 +35,9 @@ import { CollectionFilterStatus } from "@/types/collections";
 import { useCustodianSection } from "@/contexts/CustodianSectionContext";
 import { useSelectionStore } from "@/store/selectionStore";
 import { selectAllById } from "@/utils/selection";
-import { useCollectionList } from "@/contexts/CollectionListContext";
 
 export interface CollectionsTableProps extends TableProps {
+  collections?: Paginated<CollectionWithHosts>;
   showPid?: boolean;
   tableTitle?: string;
   tableSubTitle?: string;
@@ -41,6 +46,7 @@ export interface CollectionsTableProps extends TableProps {
 }
 
 const CollectionsTable = ({
+  collections,
   showPid = false,
   tableTitle,
   tableSubTitle,
@@ -48,7 +54,6 @@ const CollectionsTable = ({
   emptyMessageOverride,
   ...rest
 }: CollectionsTableProps) => {
-  const collections = useCollectionList();
   const { adminMoreCollectionDetails } = useFeatures();
   const { getSearchParam } = useSearchParams("collection_filter");
   const filter_name = getSearchParam() || "all";
