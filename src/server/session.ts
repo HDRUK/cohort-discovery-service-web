@@ -1,10 +1,11 @@
 import "server-only";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
 import { routes } from "@/config/routes";
+import { isSessionExpired, signedOutRedirect } from "@/lib/sessionRedirect";
 import { TokenUser } from "@/types/api";
 import { isStandalone } from "@/utils/modes";
 
@@ -30,13 +31,22 @@ export const getSession = async (): Promise<Session | null> => {
 };
 
 export const requireSession = async (): Promise<Session> => {
-  const session = await getSession();
+  const [session, requestHeaders] = await Promise.all([
+    getSession(),
+    headers(),
+  ]);
   if (!session) {
     redirect(
-      isStandalone(process.env.APPLICATION_MODE)
-        ? routes.login
-        : "/user-not-found",
+      signedOutRedirect(
+        isStandalone(process.env.APPLICATION_MODE),
+        requestHeaders.get("x-pathname"),
+      ),
     );
+  }
+  if (
+    isSessionExpired(session.exp, Number(requestHeaders.get("x-request-now")))
+  ) {
+    redirect(routes.logout);
   }
   return session;
 };

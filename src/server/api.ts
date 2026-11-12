@@ -69,7 +69,7 @@ export async function request<TResponse, TBody = undefined>(
     if (error instanceof ApiError) {
       if (token && isSessionEnded(error.status)) redirect(routes.logout);
       if (error.status === 404) notFound();
-      if (error.status === 403) redirect("/403");
+      if (error.status === 403) redirect(routes.forbidden);
       throw error;
     }
     throw await handleApiError(error);

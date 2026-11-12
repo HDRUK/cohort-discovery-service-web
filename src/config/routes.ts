@@ -22,6 +22,7 @@ export const routes = {
   loginWithReturn: (returnTo: string) =>
     `/login?return_to=${encodeURIComponent(returnTo)}`,
   logout: "/api/auth/logout",
+  forbidden: "/403",
   ssoCallback: "/api/auth/sso/callback",
   api: {
     collectionHostCredentials: (hostId: number) =>
