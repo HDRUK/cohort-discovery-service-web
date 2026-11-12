@@ -26,7 +26,7 @@ describe("toResponse", () => {
     expect(await response.json()).toEqual(ok);
   });
 
-  it.each([403, 404, 422])("passes an API %i through", async (code) => {
+  it.each([401, 403, 404, 422])("passes an API %i through", async (code) => {
     const response = toResponse({
       message: "",
       data: null,

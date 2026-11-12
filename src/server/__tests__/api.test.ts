@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { apiGet, apiPost, ErrorMode } from "../api";
+import { apiGet, apiPost, ErrorMode, isSessionEnded } from "../api";
 
 jest.mock("next/navigation", () => ({
   notFound: jest.fn(() => {
@@ -78,6 +78,24 @@ describe("request", () => {
     expect(redirect).toHaveBeenCalledWith("/403");
   });
 
+  it("redirects to logout on a 401", async () => {
+    global.fetch = respondWith(401, { message: "Unauthenticated" });
+
+    await expect(apiGet("a-token", "/api/v1/user")).rejects.toThrow(
+      "NEXT_REDIRECT",
+    );
+    expect(redirect).toHaveBeenCalledWith("/api/auth/logout");
+  });
+
+  it("throws a token-less 401 so a failed sign-in can handle it", async () => {
+    global.fetch = respondWith(401, { message: "Invalid credentials" });
+
+    await expect(
+      apiPost(null, "/api/auth/login", { email: "user@example.com" }),
+    ).rejects.toMatchObject({ status: 401 });
+    expect(redirect).not.toHaveBeenCalled();
+  });
+
   it("returns the error as a result in RESULT mode", async () => {
     global.fetch = respondWith(401, { message: "Unauthenticated" });
 
@@ -87,5 +105,15 @@ describe("request", () => {
       data: null,
       error: { text: "Unauthenticated", code: 401 },
     });
+  });
+});
+
+describe("isSessionEnded", () => {
+  it("treats 401 as ended", () => {
+    expect(isSessionEnded(401)).toBe(true);
+  });
+
+  it.each([403, 404])("treats %i as not ended", (status) => {
+    expect(isSessionEnded(status)).toBe(false);
   });
 });

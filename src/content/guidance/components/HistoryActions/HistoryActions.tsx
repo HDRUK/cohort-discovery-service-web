@@ -16,6 +16,8 @@ import {
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { ApiError } from "@/lib/https";
+import { useSessionStore } from "@/store/sessionStore";
 import { routeGet } from "@/lib/routeFetch";
 import { ApiResponse, Query } from "@/types/api";
 import rerunQuery from "@/actions/query/rerunQuery";
@@ -148,10 +150,14 @@ const HistoryActions = ({
               result = await routeGet<ApiResponse<Query>>(
                 routes.api.query(selectedIds[0]),
               );
-            } catch {
-              notify.error(
-                "We couldn't open that query for editing. Try again.",
-              );
+            } catch (error) {
+              if (error instanceof ApiError && error.status === 401) {
+                useSessionStore.getState().endSession();
+              } else {
+                notify.error(
+                  "We couldn't open that query for editing. Try again.",
+                );
+              }
               return;
             }
             const ranCollectionPids = result.data.tasks.map(

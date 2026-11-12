@@ -1,6 +1,7 @@
 import "server-only";
 
 import { notFound, redirect } from "next/navigation";
+import { routes } from "@/config/routes";
 import { ApiError } from "@/lib/https";
 import { ReadArgs } from "@/types/api";
 import { canonicaliseQueryString } from "@/utils/string";
@@ -23,6 +24,8 @@ export interface RequestOptions<B = undefined> {
   body?: B;
   errorMode?: ErrorMode;
 }
+
+export const isSessionEnded = (status: number): boolean => status === 401;
 
 const buildUrl = (path: string, params?: URLSearchParams | string) => {
   if (!path.startsWith("/"))
@@ -64,6 +67,7 @@ export async function request<TResponse, TBody = undefined>(
     return (await response.json()) as TResponse;
   } catch (error) {
     if (error instanceof ApiError) {
+      if (token && isSessionEnded(error.status)) redirect(routes.logout);
       if (error.status === 404) notFound();
       if (error.status === 403) redirect("/403");
       throw error;
