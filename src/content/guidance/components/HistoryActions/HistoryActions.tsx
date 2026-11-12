@@ -16,7 +16,8 @@ import {
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import getQuery from "@/actions/query/getQuery";
+import { routeGet } from "@/lib/routeGet";
+import { ApiResponse, Query } from "@/types/api";
 import rerunQuery from "@/actions/query/rerunQuery";
 import {
   handleQuerySubmissionError,
@@ -142,7 +143,17 @@ const HistoryActions = ({
         <EditButton
           label="Edit"
           onClick={async () => {
-            const result = await getQuery(selectedIds[0]);
+            let result: ApiResponse<Query>;
+            try {
+              result = await routeGet<ApiResponse<Query>>(
+                routes.api.query(selectedIds[0]),
+              );
+            } catch {
+              notify.error(
+                "We couldn't open that query for editing. Try again.",
+              );
+              return;
+            }
             const ranCollectionPids = result.data.tasks.map(
               (t) => t.collection.pid,
             );

@@ -3,7 +3,7 @@
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Query, Paginated } from "@/types/api";
+import { ApiResponse, Query, Paginated } from "@/types/api";
 import {
   MRT_ExpandedState,
   MRT_RowSelectionState,
@@ -24,7 +24,7 @@ import QueryResultsTable from "@/modules/QueryResultsTable";
 import QueryHistoryGuidance from "@/modules/QueryHistory/QueryHistoryGuidance";
 import { queryToText } from "@/utils/queryBuilder";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import getQueries from "@/actions/query/getQueries";
+import { routeGet } from "@/lib/routeGet";
 import { getQueryName, getQueryStatus } from "@/utils/query";
 import useSearchParams from "@/hooks/useSearchParams";
 import { buildQueryHistoryParams } from "@/utils/params";
@@ -35,6 +35,7 @@ import EditableText from "@/components/EditableText";
 import updateQuery from "@/actions/query/updateQuery";
 import { useNotify } from "@/providers/NotifyProvider";
 import { QUERY_KEYS } from "@/config/tags";
+import { receivedAt, setQueryDataIfNewer } from "@/utils/queryCache";
 
 interface QueriesTableProps {
   initialData: Paginated<Query>;
@@ -75,12 +76,13 @@ const QueriesTable = ({
         search_term: searchParams.get("search_term") ?? undefined,
       });
 
-      const res = await getQueries({
-        params: searchParamsObject.toString(),
-      });
+      const res = await routeGet<ApiResponse<Paginated<Query>>>(
+        routes.api.queries(searchParamsObject),
+      );
       return res.data;
     },
     initialData,
+    initialDataUpdatedAt: receivedAt(initialData),
     staleTime: 2 * defaults.tableRefresh,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
@@ -94,7 +96,7 @@ const QueriesTable = ({
     },
   });
   useEffect(() => {
-    qc.setQueryData(queryKey, initialData);
+    setQueryDataIfNewer(qc, queryKey, initialData);
   }, [qc, queryKey, initialData]);
 
   const columns: MRT_ColumnDef<Query>[] = [

@@ -2,6 +2,7 @@ import "server-only";
 
 import { notFound, redirect } from "next/navigation";
 import { ApiError } from "@/lib/https";
+import { ReadArgs } from "@/types/api";
 import { canonicaliseQueryString } from "@/utils/string";
 
 const baseURL = process.env.API_BASE_URL ?? "http://localhost:8100";
@@ -11,6 +12,10 @@ type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 export enum ErrorMode {
   THROW = "throw",
   RESULT = "result",
+}
+
+export interface ReadOptions extends ReadArgs {
+  errorMode?: ErrorMode;
 }
 
 export interface RequestOptions<B = undefined> {

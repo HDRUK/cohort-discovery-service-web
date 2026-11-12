@@ -2,19 +2,24 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import getAdminCollections from "@/actions/collection/getAdminCollections";
 import createRegressionTest from "@/actions/regressionTest/createRegressionTest";
-import getRegressionTests from "@/actions/regressionTest/getRegressionTests";
 import runRegressionTest from "@/actions/regressionTest/runRegressionTest";
 import updateRegressionTest from "@/actions/regressionTest/updateRegressionTest";
+import { routes } from "@/config/routes";
 import { QUERY_KEYS } from "@/config/tags";
 import useTaskPolling from "@/hooks/useTaskPolling";
 import { useDefaults } from "@/providers/DefaultProvider";
+import { routeGet } from "@/lib/routeGet";
 import { useNotify } from "@/providers/NotifyProvider";
-import { CollectionWithHosts, Paginated, RegressionTest } from "@/types/api";
+import {
+  ApiResponse,
+  CollectionWithHosts,
+  Paginated,
+  RegressionTest,
+} from "@/types/api";
+import { receivedAt } from "@/utils/queryCache";
 import { buildHealthRows, HealthThresholds } from "./health";
 
-export const COLLECTIONS_PER_PAGE = "500";
 export const REFRESH_INTERVAL = 10_000;
 
 const REFRESH_OPTIONS = {
@@ -23,16 +28,11 @@ const REFRESH_OPTIONS = {
   refetchOnReconnect: false,
 } as const;
 
-const collectionsParams = (pid?: string) =>
-  new URLSearchParams(pid ? { pid } : { per_page: COLLECTIONS_PER_PAGE });
-
 const useCollectionHealth = ({
   initialCollections,
-  fetchedAt,
   pid,
 }: {
   initialCollections: CollectionWithHosts[];
-  fetchedAt: number;
   pid?: string;
 }) => {
   const queryClient = useQueryClient();
@@ -54,14 +54,14 @@ const useCollectionHealth = ({
   } = useQuery({
     queryKey: queryKeyCollections,
     queryFn: () =>
-      getAdminCollections({
-        params: collectionsParams(pid),
-      }),
+      routeGet<ApiResponse<Paginated<CollectionWithHosts>>>(
+        routes.api.adminCollectionHealth(pid),
+      ),
     initialData: {
       message: "",
       data: { data: initialCollections } as Paginated<CollectionWithHosts>,
     },
-    initialDataUpdatedAt: fetchedAt,
+    initialDataUpdatedAt: receivedAt(initialCollections),
     ...REFRESH_OPTIONS,
   });
 
@@ -72,15 +72,16 @@ const useCollectionHealth = ({
     dataUpdatedAt: regressionUpdatedAt,
   } = useQuery({
     queryKey: QUERY_KEYS.regressionTests(),
-    queryFn: () => getRegressionTests(),
+    queryFn: () =>
+      routeGet<ApiResponse<RegressionTest[]>>(routes.api.regressionTests),
     ...REFRESH_OPTIONS,
   });
 
   const now = useMemo(
     () =>
       Math.max(collectionsUpdatedAt || 0, regressionUpdatedAt || 0) ||
-      fetchedAt,
-    [collectionsUpdatedAt, regressionUpdatedAt, fetchedAt],
+      receivedAt(initialCollections),
+    [collectionsUpdatedAt, regressionUpdatedAt, initialCollections],
   );
 
   const collections = useMemo(

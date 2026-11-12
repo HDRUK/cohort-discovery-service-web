@@ -5,9 +5,15 @@ import { Alert, Box, Skeleton, Stack, Typography } from "@mui/material";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { LineItemIdentifier } from "@mui/x-charts/models";
 import { useQuery } from "@tanstack/react-query";
-import getCollectionTaskHistory from "@/actions/collection/getCollectionTaskHistory";
+import { routes } from "@/config/routes";
 import { QUERY_KEYS } from "@/config/tags";
-import { TaskHistoryTask, TaskHistorySummary } from "@/types/api";
+import { routeGet } from "@/lib/routeGet";
+import {
+  ApiResponse,
+  CollectionTaskHistory,
+  TaskHistoryTask,
+  TaskHistorySummary,
+} from "@/types/api";
 import { formatDuration, MS_PER_SECOND } from "@/utils/date";
 import {
   buildTaskSeries,
@@ -95,7 +101,13 @@ const TaskHistoryChart = ({
 
   const { data, isLoading, isError } = useQuery({
     queryKey: QUERY_KEYS.collectionTaskHistory(collectionPid, range),
-    queryFn: () => getCollectionTaskHistory(collectionPid, range),
+    queryFn: () =>
+      routeGet<ApiResponse<CollectionTaskHistory>>(
+        routes.api.collectionTaskHistory(
+          collectionPid,
+          new URLSearchParams({ ...range }),
+        ),
+      ),
     enabled,
     refetchOnWindowFocus: false,
     staleTime: STALE_TIME_TELEMETRY,

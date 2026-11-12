@@ -2,7 +2,7 @@ import "server-only";
 
 import { cacheLife } from "next/cache";
 import { API_ROUTES } from "@/lib/apiRoutes";
-import { apiGet, ErrorMode } from "@/server/api";
+import { apiGet, ErrorMode, ReadOptions } from "@/server/api";
 import { LIST_CACHE_LIFE, USER_DATA_CACHE_LIFE } from "@/server/cacheProfiles";
 import { isSearchQuery, toListQuery } from "@/server/listQuery";
 import { requireSession } from "@/server/session";
@@ -43,13 +43,13 @@ export const getCollections = async (): Promise<ApiResponse<Collection[]>> => {
 };
 
 export const getAdminCollections = async (
-  args?: ReadArgs,
+  args?: ReadOptions,
 ): Promise<ApiResponse<Paginated<CollectionWithHosts>>> => {
   const { token } = await requireSession();
   return apiGet<ApiResponse<Paginated<CollectionWithHosts>>>(
     token,
     API_ROUTES.adminCollections,
-    { params: args?.params },
+    { params: args?.params, errorMode: args?.errorMode },
   );
 };
 
@@ -116,13 +116,13 @@ export const getCustodianCollections = (
 
 export const getCollectionDetails = async (
   pid: string,
-): Promise<CollectionDetails> => {
+): Promise<ApiResponse<CollectionDetails>> => {
   const { token } = await requireSession();
-  const { data } = await apiGet<ApiResponse<CollectionDetails>>(
+  return apiGet<ApiResponse<CollectionDetails>>(
     token,
     API_ROUTES.collectionDetails(pid),
+    { errorMode: ErrorMode.RESULT },
   );
-  return data;
 };
 
 export const getCollectionHealth = async (

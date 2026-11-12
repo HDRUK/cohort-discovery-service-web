@@ -6,8 +6,6 @@ import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceS
 import { EXAMPLE_1 } from "@/config/queryExamples";
 import { Demographics, GeoRadiusLocation } from "@/types/rules";
 
-jest.mock("@/actions/query/getQuery");
-
 // The real map pulls in leaflet (touches `window` at import) — replace it with a
 // light stub and make next/dynamic return it synchronously.
 jest.mock("@/components/GeoMap/GeoMapReadOnly", () => ({

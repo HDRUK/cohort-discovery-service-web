@@ -14,14 +14,21 @@ import {
 import { SxProps, Theme } from "@mui/material/styles";
 import { useQuery } from "@tanstack/react-query";
 import { MRT_ColumnDef } from "material-react-table";
-import getCollectionTaskHistory from "@/actions/collection/getCollectionTaskHistory";
 import SearchBox from "@/components/SearchBox";
 import SectionCard from "@/components/SectionCard";
 import Table from "@/components/Table";
+import { routes } from "@/config/routes";
 import { QUERY_KEYS } from "@/config/tags";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useTable } from "@/hooks/useTable";
-import { TaskHistoryTask, TaskType, TimeRange } from "@/types/api";
+import { routeGet } from "@/lib/routeGet";
+import {
+  ApiResponse,
+  CollectionTaskHistory,
+  TaskHistoryTask,
+  TaskType,
+  TimeRange,
+} from "@/types/api";
 import { formatDuration, getDatetime, getTimestamp } from "@/utils/date";
 import { queryToText } from "@/utils/queryBuilder";
 import TaskDetailModal from "./TaskDetailModal";
@@ -55,7 +62,13 @@ const CollectionTasksPanel = ({
 
   const { data, isLoading, isError } = useQuery({
     queryKey: QUERY_KEYS.collectionTaskHistory(collectionPid, range),
-    queryFn: () => getCollectionTaskHistory(collectionPid, range),
+    queryFn: () =>
+      routeGet<ApiResponse<CollectionTaskHistory>>(
+        routes.api.collectionTaskHistory(
+          collectionPid,
+          new URLSearchParams({ ...range }),
+        ),
+      ),
     enabled: isActive,
     refetchOnWindowFocus: false,
     refetchOnMount: false,

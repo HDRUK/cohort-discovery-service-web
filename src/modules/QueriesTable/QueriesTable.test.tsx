@@ -4,7 +4,6 @@ import QueriesTable from "./QueriesTable";
 import { getMockQuery } from "@/actions/query/__mocks__/getQueries";
 import { paginateData } from "@/utils/mock";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
-jest.mock("@/actions/query/getQueries");
 
 describe("QueriesTable", () => {
   /* it("renders a query row with task stats", async () => {

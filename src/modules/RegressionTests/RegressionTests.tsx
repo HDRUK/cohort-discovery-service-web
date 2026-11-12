@@ -20,6 +20,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { RuleGroupType } from "@/types/rules";
 import { MRT_ColumnDef } from "material-react-table";
 import {
+  ApiResponse,
   CollectionWithHosts,
   RegressionTest,
   RegressionTestCollection,
@@ -29,7 +30,6 @@ import { useTable } from "@/hooks/useTable";
 import ExpectedValue from "@/components/ExpectedValue";
 import Table from "@/components/Table";
 import { getDatetime, getDurationSeconds } from "@/utils/date";
-import getRegressionTests from "@/actions/regressionTest/getRegressionTests";
 import createRegressionTest from "@/actions/regressionTest/createRegressionTest";
 import updateRegressionTest from "@/actions/regressionTest/updateRegressionTest";
 import deleteRegressionTest from "@/actions/regressionTest/deleteRegressionTest";
@@ -37,7 +37,9 @@ import runRegressionTest from "@/actions/regressionTest/runRegressionTest";
 import PassFailChip from "./PassFailChip";
 import AddRegressionTestDialog from "./AddRegressionTestDialog";
 import useTaskPolling from "@/hooks/useTaskPolling";
+import { routes } from "@/config/routes";
 import { QUERY_KEYS } from "@/config/tags";
+import { routeGet } from "@/lib/routeGet";
 import { useConfirmBool } from "@/hooks/useConfirm";
 
 type RunStates = Record<string, Set<string>>;
@@ -56,7 +58,8 @@ const RegressionTests = ({ collections }: RegressionTestsProps) => {
 
   const { data, isLoading } = useQuery({
     queryKey: QUERY_KEYS.regressionTests(),
-    queryFn: () => getRegressionTests(),
+    queryFn: () =>
+      routeGet<ApiResponse<RegressionTest[]>>(routes.api.regressionTests),
     staleTime: 30_000,
   });
 

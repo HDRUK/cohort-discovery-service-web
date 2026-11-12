@@ -12,11 +12,9 @@ interface PageProps {
 }
 
 const QueryHistoryPageContent = async ({ searchParams }: PageProps) => {
-  const params = await searchParams;
-
-  const searchParamsObject = buildQueryHistoryParams(params);
-
-  const queries = await getQueries({ params: searchParamsObject });
+  const queries = await getQueries({
+    params: buildQueryHistoryParams(await searchParams),
+  });
 
   return (
     <Box
