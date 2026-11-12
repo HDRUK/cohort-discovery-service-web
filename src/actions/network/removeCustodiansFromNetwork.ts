@@ -21,6 +21,7 @@ const removeCustodiansFromNetwork = async (
   );
   updateTag(CACHE_TAGS.custodians);
   updateTag(CACHE_TAGS.collections);
+  updateTag(CACHE_TAGS.networks);
   return results.map((r) => r.data);
 };
 
