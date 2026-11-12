@@ -12,6 +12,7 @@ const deleteNetwork = async (id: number): Promise<void> => {
   await apiDelete<ApiResponse<Network>>(token, API_ROUTES.network(id));
   updateTag(CACHE_TAGS.custodians);
   updateTag(CACHE_TAGS.collections);
+  updateTag(CACHE_TAGS.networks);
 };
 
 export default deleteNetwork;

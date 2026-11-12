@@ -10,6 +10,7 @@ export const CACHE_TAGS = {
   currentUser: "current-user",
   custodians: "custodians",
   features: "features",
+  networks: "networks",
   users: "users",
   workgroups: "workgroups",
 } as const;

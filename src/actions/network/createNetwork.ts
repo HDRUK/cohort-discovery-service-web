@@ -16,6 +16,7 @@ const createNetwork = async (payload: CreateNetworkPost): Promise<Network> => {
   );
   updateTag(CACHE_TAGS.custodians);
   updateTag(CACHE_TAGS.collections);
+  updateTag(CACHE_TAGS.networks);
   return data;
 };
 
