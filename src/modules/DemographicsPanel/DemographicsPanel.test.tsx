@@ -10,7 +10,10 @@ import {
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import { FeatureFlag, FeatureName } from "@/types/features";
 import { MAX_AGE_FILTER } from "@/config/rules";
-import { useUserDataStore } from "@/hooks/userDataStore";
+import {
+  SessionData,
+  SessionDataProvider,
+} from "@/contexts/SessionDataContext";
 import { Collection } from "@/types/api";
 import { getMockCollection } from "@/actions/collection/__mocks__/getCollections";
 import DemographicsPanel from "./DemographicsPanel";
@@ -35,12 +38,23 @@ const demographics = () => store().queryBuilderJson.demographics;
 
 const female = { concept_id: 8532, name: "Female", category: "Gender" };
 
+let sessionCollections: Collection[] = [];
+
 const renderPanel = (initialExpand?: boolean) =>
   render(
     <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
       <QueryClientProvider client={new QueryClient()}>
         <ApplicationModeProvider>
-          <DemographicsPanel initialExpand={initialExpand} />
+          <SessionDataProvider
+            value={
+              {
+                user: { id: 1 },
+                userCollections: sessionCollections,
+              } as unknown as SessionData
+            }
+          >
+            <DemographicsPanel initialExpand={initialExpand} />
+          </SessionDataProvider>
         </ApplicationModeProvider>
       </QueryClientProvider>
     </HdrukUiProvider>,
@@ -56,7 +70,7 @@ const setAgeMin = async (value: string) => {
 describe("DemographicsPanel", () => {
   beforeEach(() => {
     useFeatureFlagsStore.setState({ flags: null });
-    useUserDataStore.setState({ userCollections: [] });
+    sessionCollections = [];
   });
 
   describe("first open (freshly added, nothing saved yet)", () => {
@@ -266,7 +280,7 @@ describe("DemographicsPanel", () => {
       userCollections: Collection[],
       selectedDatasets: string[],
     ) => {
-      useUserDataStore.setState({ userCollections });
+      sessionCollections = userCollections;
       store().setQueryBuilderJson(DEFAULT_QUERY);
       store().setDemographics({ ...EMPTY_DEMOGRAPHICS, sex: [female] });
       store().setSelectedDatasets(selectedDatasets);
@@ -354,7 +368,7 @@ describe("DemographicsPanel", () => {
     });
 
     beforeEach(() => {
-      useUserDataStore.setState({ userCollections: [withDeath] });
+      sessionCollections = [withDeath];
       store().setQueryBuilderJson(DEFAULT_QUERY);
       store().addDemographics();
       store().setSelectedDatasets([withDeath.pid]);

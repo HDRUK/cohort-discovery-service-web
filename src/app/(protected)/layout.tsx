@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import AppShell from "@/components/AppShell";
 import SkeletonFull from "@/components/SkeletonFull";
+import { SessionDataProvider } from "@/contexts/SessionDataContext";
+import { loadSession } from "@/server/loadSession";
 import SessionGate from "./components/SessionGate";
 
 export default function ProtectedLayout({
@@ -8,11 +10,15 @@ export default function ProtectedLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const session = loadSession();
+
   return (
-    <AppShell>
-      <Suspense fallback={<SkeletonFull />}>
-        <SessionGate>{children}</SessionGate>
-      </Suspense>
-    </AppShell>
+    <SessionDataProvider value={session.then(({ data }) => data)}>
+      <AppShell>
+        <Suspense fallback={<SkeletonFull />}>
+          <SessionGate session={session}>{children}</SessionGate>
+        </Suspense>
+      </AppShell>
+    </SessionDataProvider>
   );
 }

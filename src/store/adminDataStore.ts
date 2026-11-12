@@ -11,7 +11,6 @@ import {
   CreateWorkgroupPost,
   AddCollectionsToWorkgroupPost,
   RemoveCollectionsFromWorkgroupPost,
-  CollectionHost,
   User,
   RemoveUsersFromWorkgroupPost,
   Network,
@@ -28,19 +27,6 @@ import removeCustodiansFromNetwork from "@/actions/network/removeCustodiansFromN
 import updateNetwork from "@/actions/network/updateNetwork";
 
 export interface AdminDataStoreState {
-  users: User[];
-  setUsers: (users: User[]) => void;
-
-  // for all collections needed when assigning workgroups
-  allAprovedCollections: Collection[];
-  setAllAprovedCollections: (allAprovedCollections: Collection[]) => void;
-
-  collectionHosts: CollectionHost[];
-  setCollectionHosts: (collectionHosts: CollectionHost[]) => void;
-
-  networks: Network[];
-  setNetworks: (networks: Network[]) => void;
-
   createCollection: (
     payload: CreateCollectionPost,
     payloadConfig: Omit<CreateCollectionConfigPost, "collection_id">,
@@ -80,30 +66,6 @@ export interface AdminDataStoreState {
 }
 
 export const useAdminDataStore = create<AdminDataStoreState>((set) => ({
-  users: [],
-  setUsers: (users) => set((state) => ({ ...state, users })),
-
-  allAprovedCollections: [],
-  setAllAprovedCollections: (allAprovedCollections) =>
-    set((state) => ({
-      ...state,
-      allAprovedCollections,
-    })),
-
-  collectionHosts: [],
-  setCollectionHosts: (collectionHosts) =>
-    set((state) => ({
-      ...state,
-      collectionHosts,
-    })),
-
-  networks: [],
-  setNetworks: (networks) =>
-    set((state) => ({
-      ...state,
-      networks,
-    })),
-
   createCollection: async (payload, payloadConfig) => {
     return await createCollectionWithConfig(payload, payloadConfig);
   },

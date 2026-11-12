@@ -1,15 +1,23 @@
 import { PropsWithChildren, useState } from "react";
+import {
+  SessionData,
+  SessionDataProvider,
+} from "@/contexts/SessionDataContext";
+import {
+  AdminSectionData,
+  AdminSectionDataProvider,
+} from "@/contexts/AdminSectionContext";
+import { CustodianSectionDataProvider } from "@/contexts/CustodianSectionContext";
 
 import type {
   ApiResponse,
   Collection,
   CollectionHost,
   CombinedUser,
+  Custodian,
   CreateQuery,
   Query,
-  Custodian,
   CreateCollectionPost,
-  ConceptSet,
   Concept,
   Workgroup,
   Paginated,
@@ -70,6 +78,12 @@ type SliceOverrides = {
   stateManagement?: Partial<StateManagementState>;
   queryBuilder?: Partial<QueryBuilderState>;
   user?: Partial<UserStoreState>;
+  session?: Partial<SessionData>;
+  adminSection?: Partial<AdminSectionData>;
+  custodianSection?: {
+    custodian?: Custodian | null;
+    collectionHosts?: CollectionHost[];
+  };
   custodian?: Partial<CustodianStoreState>;
   admin?: Partial<AdminStoreState>;
   featureFlags?: Partial<FeatureFlagsStoreState>;
@@ -137,11 +151,7 @@ const seedStores = (overrides?: SliceOverrides) => {
 
   useUserDataStore.setState(
     {
-      user: null as CombinedUser | undefined | null,
-      queries: [] as Query[],
-      custodians: [] as Custodian[],
       selectedCollections: [] as CollectionWithHosts[],
-      conceptSets: [] as ConceptSet[],
       fetchResults: (_queryName?: string, _reset?: boolean) =>
         RESOLVE<ApiResponse<CreateQuery>>({
           data: { query_pid: "mock-pid" } as unknown as CreateQuery,
@@ -197,11 +207,6 @@ const seedStores = (overrides?: SliceOverrides) => {
         _payloadConfig: Omit<CreateCollectionConfigPost, "collection_id">,
       ) => RESOLVE<Collection>(getMockCollection()),
       ...(overrides?.custodian ?? {}),
-      current: {
-        custodian: null,
-        workgroups: [] as Workgroup[],
-        ...(overrides?.custodian?.current ?? {}),
-      },
     } as CustodianStoreState,
     true,
   );
@@ -237,11 +242,59 @@ const seedStores = (overrides?: SliceOverrides) => {
   );
 };
 
+const MockSections = ({
+  overrides,
+  children,
+}: PropsWithChildren<{ overrides?: SliceOverrides }>) => {
+  const { adminSection, custodianSection } = overrides ?? {};
+  const custodian = custodianSection?.custodian;
+
+  const withCustodian = custodian ? (
+    <CustodianSectionDataProvider
+      value={{
+        custodian,
+        collectionHosts: custodianSection?.collectionHosts ?? [],
+      }}
+    >
+      {children}
+    </CustodianSectionDataProvider>
+  ) : (
+    children
+  );
+
+  return adminSection ? (
+    <AdminSectionDataProvider
+      value={{
+        users: [],
+        collections: [],
+        collectionHosts: [],
+        ...adminSection,
+      }}
+    >
+      {withCustodian}
+    </AdminSectionDataProvider>
+  ) : (
+    withCustodian
+  );
+};
+
 const MockCohortDiscoveryServiceStore = ({
   overrides,
   children,
 }: PropsWithChildren<{ overrides?: SliceOverrides }>) => {
   useState(() => seedStores(overrides));
+  const [sessionData] = useState<SessionData>(() => ({
+    user: {
+      id: 1,
+      roles: [],
+      custodians: [],
+      workgroups: [],
+    } as unknown as CombinedUser,
+    userCollections: [],
+    custodians: [],
+    workgroups: [],
+    ...overrides?.session,
+  }));
 
   return (
     <ApplicationModeProvider>
@@ -251,7 +304,13 @@ const MockCohortDiscoveryServiceStore = ({
             <CohortBuilderProvider>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <ConfirmProvider>
-                  <NotifyProvider>{children}</NotifyProvider>
+                  <NotifyProvider>
+                    <SessionDataProvider value={sessionData}>
+                      <MockSections overrides={overrides}>
+                        {children}
+                      </MockSections>
+                    </SessionDataProvider>
+                  </NotifyProvider>
                 </ConfirmProvider>
               </LocalizationProvider>
             </CohortBuilderProvider>

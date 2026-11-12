@@ -1,4 +1,7 @@
 import { ReactNode } from "react";
+import { forbidden } from "next/navigation";
+import { getCurrentUser } from "@/server/data/user";
+import { isCustodianMember } from "@/utils/user";
 import { getCustodian } from "@/server/data/custodians";
 import { getCustodianCollectionHosts } from "@/server/data/collectionHosts";
 import { CustodianSectionProvider } from "@/contexts/CustodianSectionContext";
@@ -10,7 +13,11 @@ const CustodianSection = async ({
   params: Promise<{ custodianPid: string }>;
   children: ReactNode;
 }) => {
-  const { custodianPid } = await params;
+  const [{ custodianPid }, { data: me }] = await Promise.all([
+    params,
+    getCurrentUser(),
+  ]);
+  if (!isCustodianMember(me, custodianPid)) forbidden();
 
   return (
     <CustodianSectionProvider

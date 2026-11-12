@@ -12,8 +12,8 @@ import CollectionsTable from "@/components/CollectionsTable";
 import ControlledSearchBox from "@/modules/ControlledSearchBox";
 import CollectionsLeftPanel from "@/modules/CollectionsLeftPanel";
 import CollectionsRightPanel from "@/modules/CollectionsRightPanel";
-import useCustodianStore from "@/hooks/useCustodianStore";
 import { ThreePaneProvider } from "@/providers/ThreePaneProvider";
+import { useCustodianSection } from "@/contexts/CustodianSectionContext";
 
 type Props = {
   isAdmin: boolean;
@@ -21,9 +21,7 @@ type Props = {
 };
 
 const CollectionsManagement = ({ isAdmin, collections }: Props) => {
-  const custodian = useCustodianStore(
-    (custodianData) => custodianData.current.custodian,
-  );
+  const custodian = useCustodianSection()?.custodian;
 
   if (!isAdmin && !custodian) return <Skeleton height={"100%"} />;
 

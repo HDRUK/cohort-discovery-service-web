@@ -9,7 +9,6 @@ import {
 } from "react-hook-form";
 import { useCallback, useEffect, useState } from "react";
 import { useNotify } from "@/providers/NotifyProvider";
-import useCustodianStore from "@/hooks/useCustodianStore";
 import { useLogDependencyChanges } from "@/utils/deps";
 import SquareCheckbox from "@/components/SquareCheckbox";
 import updateCollections from "@/actions/collection/updateCollections";
@@ -19,8 +18,9 @@ import ManageMultipleCollectionsStatus from "@/modules/ManageMultipleCollections
 import UpdateMultipleCollectionsGuidance from "./UpdateMultipleCollectionsGuidance";
 import { UpdateCollectionFormValues } from "@/types/forms";
 import UpdatePanel from "@/components/UpdatePanel";
-import { useUserDataStore } from "@/hooks/userDataStore";
 import { useThreePane } from "@/providers/ThreePaneProvider";
+import { useSessionData } from "@/contexts/SessionDataContext";
+import { useCustodianSection } from "@/contexts/CustodianSectionContext";
 
 export type UpdateMultipleCollectionProps = {
   collections: CollectionWithHosts[];
@@ -50,9 +50,9 @@ const UpdateMultipleCollections = ({
   collections,
 }: UpdateMultipleCollectionProps) => {
   const { expandedRight, toggleRight: onClose } = useThreePane();
-  const currentCustodian = useCustodianStore((s) => s.current.custodian);
+  const currentCustodian = useCustodianSection()?.custodian;
 
-  const workgroups = useUserDataStore((s) => s.workgroups);
+  const workgroups = useSessionData().workgroups;
 
   const notify = useNotify();
 

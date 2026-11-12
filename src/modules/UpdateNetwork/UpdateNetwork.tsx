@@ -7,18 +7,19 @@ import { useNotify } from "@/providers/NotifyProvider";
 import FormMultiSelect from "@/components/FormMultiSelect";
 import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
 import useAdminStore from "@/hooks/useAdminStore";
-import useUserStore from "@/hooks/useUserStore";
 import { useCallback, useEffect } from "react";
 import UpdatePanel from "@/components/UpdatePanel";
 import { useThreePane } from "@/providers/ThreePaneProvider";
 import { useSaveChanges } from "@/hooks/useSaveChanges";
+import { useSessionData } from "@/contexts/SessionDataContext";
+import { useNetworks } from "@/contexts/NetworksContext";
 
 const UpdateNetwork = () => {
   const { expandedRight, toggleRight: onClose } = useThreePane();
 
   const updateNetwork = useAdminStore((s) => s.updateNetwork);
-  const networks = useAdminStore((s) => s.networks);
-  const custodians = useUserStore((s) => s.custodians);
+  const networks = useNetworks();
+  const custodians = useSessionData().custodians;
   const addCustodiansToNetwork = useAdminStore((s) => s.addCustodiansToNetwork);
   const selectedNetwork = useAdminStore((s) => s.selectedNetwork);
 

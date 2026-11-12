@@ -23,7 +23,7 @@ describe("SelectDatasets", () => {
           queryBuilder: {
             openSelectDatasetsPanel: true,
           },
-          user: {
+          session: {
             userCollections: collections.data,
           },
         }}
@@ -49,7 +49,7 @@ describe("SelectDatasets", () => {
             selectedDatasets: [],
             setSelectedDatasets,
           },
-          user: {
+          session: {
             userCollections: collections.data,
           },
         }}
@@ -79,7 +79,7 @@ describe("SelectDatasets", () => {
             openSelectDatasetsPanel: true,
             selectedDatasets: selected,
           },
-          user: {
+          session: {
             userCollections: collections.data,
           },
         }}
@@ -105,7 +105,7 @@ describe("SelectDatasets", () => {
             openSelectDatasetsPanel: true,
             selectedDatasets: [],
           },
-          user: {
+          session: {
             userCollections: collections.data,
           },
         }}
@@ -135,7 +135,7 @@ describe("SelectDatasets", () => {
             setSelectedDatasets,
             setOpenSelectDatasetsPanel,
           },
-          user: {
+          session: {
             userCollections: collections.data,
           },
         }}
@@ -164,7 +164,7 @@ describe("SelectDatasets", () => {
             setPreviouslySelectedDatasets,
             setOpenSelectDatasetsPanel,
           },
-          user: {
+          session: {
             userCollections: collections.data,
           },
         }}
@@ -189,7 +189,7 @@ describe("SelectDatasets", () => {
             openSelectDatasetsPanel: true,
             selectedDatasets: [],
           },
-          user: {
+          session: {
             userCollections: collections.data,
           },
         }}
@@ -213,7 +213,7 @@ describe("SelectDatasets", () => {
             openSelectDatasetsPanel: true,
             selectedDatasets: [collections.data[0].pid],
           },
-          user: {
+          session: {
             userCollections: collections.data,
           },
         }}
@@ -242,7 +242,7 @@ describe("SelectDatasets", () => {
           queryBuilder: {
             openSelectDatasetsPanel: true,
           },
-          user: {
+          session: {
             userCollections: collections.data,
           },
         }}

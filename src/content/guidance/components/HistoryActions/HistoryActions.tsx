@@ -38,9 +38,9 @@ import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/config/tags";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import useUserStore from "@/hooks/useUserStore";
 import deleteQueries from "@/actions/query/deleteQueries";
 import RenameButton from "@/components/RenameButton";
+import useIsQueryLimitReached from "@/hooks/useIsQueryLimitReached";
 
 const HistoryActions = ({
   multiple = false,
@@ -59,7 +59,7 @@ const HistoryActions = ({
   const router = useRouter();
   const notify = useNotify();
   const queryClient = useQueryClient();
-  const isQueryLimitReached = useUserStore((s) => s.isQueryLimitReached);
+  const isQueryLimitReached = useIsQueryLimitReached();
   const { setQueryBuilderJson, setSelectedDatasets, setQueryName } =
     useQueryBuilder((qb) => ({
       setSelectedDatasets: qb.setSelectedDatasets,

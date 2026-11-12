@@ -17,15 +17,15 @@ import SelectNetworkDatasets, {
   NetworkGroupedCollections,
 } from "../SelectNetworkDatasets";
 import RefreshButton from "../RefreshButton";
-import { useUserDataStore } from "@/hooks/userDataStore";
 import SquareCheckbox from "../SquareCheckbox";
 import CollectionTypeFilters from "../CollectionTypeFilters";
 import { addPids, removePids } from "@/utils/collections";
 import SearchBox from "../SearchBox";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useSessionData } from "@/contexts/SessionDataContext";
 
 const SelectDatasets = () => {
-  const collections = useUserDataStore((s) => s.userCollections);
+  const collections = useSessionData().userCollections;
   const selectedDatasets = useQueryBuilder((qb) => qb.selectedDatasets);
   const setSelectedDatasets = useQueryBuilder((qb) => qb.setSelectedDatasets);
 

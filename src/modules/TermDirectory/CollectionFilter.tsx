@@ -8,23 +8,25 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useState } from "react";
 import { filterDatasetChipSx } from "@/components/FilterDatasets/FilterDatasets";
 import SearchBox from "@/components/SearchBox";
 import SquareCheckbox from "@/components/SquareCheckbox";
 import Title from "@/components/Title";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useUserDataStore } from "@/hooks/userDataStore";
 import useSearchParams from "@/hooks/useSearchParams";
 import { GroupedCollection } from "@/types/api";
+import { useSessionData } from "@/contexts/SessionDataContext";
 
 const COLLECTIONS_PARAM = "collections";
 
 const CollectionFilter = () => {
   const { searchParams, setSearchParams } = useSearchParams();
-  const userCollections = useUserDataStore((state) => state.userCollections);
+  const userCollections = useSessionData().userCollections;
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+
+  useLayoutEffect(() => () => setAnchorEl(null), []);
   const [searchTerm, setSearchTerm] = useState<string>();
   const { debounced: debouncedSearchTerm } = useDebounce(searchTerm, {});
 

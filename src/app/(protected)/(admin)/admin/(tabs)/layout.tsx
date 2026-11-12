@@ -1,7 +1,13 @@
-import { ReactNode } from "react";
+// Admin routes with the tab bar. The bar sits outside Suspense so it is in
+// the static shell; the admin gate and the users, collections and hosts
+// reads sit inside it.
+import { ReactNode, Suspense } from "react";
 import SegmentTabsShell from "@/components/SegmentTabsShell";
 import { routes } from "@/config/routes";
 import { isStandalone } from "@/utils/modes";
+import { CollectionsSkeleton } from "@/modules/CollectionsTab/CollectionsTab";
+import AdminGate from "../components/AdminGate";
+import AdminSection from "../components/AdminSection";
 
 const applicationMode = process.env.APPLICATION_MODE;
 
@@ -15,7 +21,13 @@ const ADMIN_TABS = [
 ];
 
 const AdminTabsLayout = ({ children }: { children: ReactNode }) => (
-  <SegmentTabsShell tabs={ADMIN_TABS}>{children}</SegmentTabsShell>
+  <SegmentTabsShell tabs={ADMIN_TABS}>
+    <Suspense fallback={<CollectionsSkeleton />}>
+      <AdminGate>
+        <AdminSection>{children}</AdminSection>
+      </AdminGate>
+    </Suspense>
+  </SegmentTabsShell>
 );
 
 export default AdminTabsLayout;

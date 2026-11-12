@@ -9,12 +9,12 @@ import { useMemo, useState } from "react";
 import Table from "@/components/Table";
 import useSearchParams from "@/hooks/useSearchParams";
 import { capitaliseFirstLetter } from "@/utils/string";
-import useAdminStore from "@/hooks/useAdminStore";
 import { useTable } from "@/hooks/useTable";
 import dayjs from "dayjs";
 import { TableProps } from "../Table/Table";
 import { trueKeys } from "@/utils/numbers";
-import { useUserDataStore } from "@/hooks/userDataStore";
+import { useSessionData } from "@/contexts/SessionDataContext";
+import { useNetworks } from "@/contexts/NetworksContext";
 
 export interface CustodianTableProps extends TableProps {
   showPid?: boolean;
@@ -37,14 +37,14 @@ const CustodianTable = ({
 
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
 
-  const custodians = useUserDataStore((s) => s.custodians);
+  const custodians = useSessionData().custodians;
 
   const selectedCustodianIds = useMemo(
     () => trueKeys(rowSelection ?? {}),
     [rowSelection],
   );
 
-  const networks = useAdminStore((s) => s.networks);
+  const networks = useNetworks();
   const activeNetwork = useMemo(
     () => networks.find((nw) => String(nw.id) === nw_filter),
     [networks, nw_filter],

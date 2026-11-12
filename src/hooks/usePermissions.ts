@@ -1,9 +1,9 @@
 import { RoleName } from "@/types/roles";
-import useUserStore from "./useUserStore";
 import { Custodian } from "@/types/api";
+import { useSessionData } from "@/contexts/SessionDataContext";
 
 const usePermissions = () => {
-  const user = useUserStore((s) => s.user);
+  const user = useSessionData().user;
   const isAdmin = user?.roles.map((r) => r.name).includes(RoleName.ADMIN);
 
   const isCustodianAdmin = (custodian: Custodian) =>

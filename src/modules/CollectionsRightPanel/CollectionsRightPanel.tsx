@@ -1,3 +1,5 @@
+import { Skeleton } from "@mui/material";
+import { Suspense } from "react";
 import UpdateCollection, {
   UpdateCollectionProps,
 } from "@/modules/UpdateCollection";
@@ -26,11 +28,13 @@ const CollectionsRightPanel = ({ ...props }: CollectionsRightPanelProps) => {
   if (count === 1) {
     const [collection] = selectedCollections!;
     return (
-      <UpdateCollection
-        collection={collection}
-        key={`update-coll-${collection.id}`}
-        {...props}
-      />
+      <Suspense fallback={<Skeleton variant="rectangular" height={300} />}>
+        <UpdateCollection
+          collection={collection}
+          key={`update-coll-${collection.id}`}
+          {...props}
+        />
+      </Suspense>
     );
   }
 

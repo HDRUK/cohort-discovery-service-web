@@ -25,6 +25,7 @@ import InlineChoiceButton from "./InlineChoiceButton";
 import { CombinatorType } from "@/types/rules";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { QUERY_KEYS } from "@/config/tags";
+import useHasSelectedSyntheticDatasets from "@/hooks/useHasSelectedSyntheticDatasets";
 
 type FormValues = {
   cohortQueryInput: string;
@@ -60,9 +61,7 @@ const CohortQueryInput = ({
   const resetQueryBuilderJson = useQueryBuilder(
     (qb) => qb.resetQueryBuilderJson,
   );
-  const includeSynthetic = useQueryBuilder(
-    (qb) => qb.hasSelectedSyntheticDatasets,
-  );
+  const includeSynthetic = useHasSelectedSyntheticDatasets();
   const selectedDatasets = useQueryBuilder((qb) => qb.selectedDatasets);
   const appendError = useQueryBuilder((qb) => qb.appendError);
   const select = useQueryBuilder((qb) => qb.select);

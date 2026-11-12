@@ -1,30 +1,38 @@
-import { cookies } from "next/headers";
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
-import { ACCESS_TOKEN_NAME } from "@/config/internals";
-import { getAuthMethods } from "@/server/data/auth";
 import { routes } from "@/config/routes";
+import { hasLiveSession } from "@/server/session";
+import { getAuthMethods } from "@/server/data/auth";
 import { safeReturnTo } from "@/utils/returnTo";
+import { getCopyrightYear } from "@/utils/getCopyrightText";
 import Login from "@/modules/Login";
 
 interface LoginPageProps {
   searchParams: Promise<{ return_to?: string }>;
 }
 
-export const instant = false;
-
-export default async function LoginPage({ searchParams }: LoginPageProps) {
-  if ((await cookies()).get(ACCESS_TOKEN_NAME)) {
-    redirect(routes.home);
-  }
+const LoginContent = async ({ searchParams }: LoginPageProps) => {
+  if (await hasLiveSession()) redirect(routes.home);
 
   const { return_to: returnToParam } = await searchParams;
-  const { data: methods } = await getAuthMethods();
+  const [{ data: methods }, copyrightYear] = await Promise.all([
+    getAuthMethods(),
+    getCopyrightYear(),
+  ]);
 
   return (
     <Login
       methods={methods}
       returnTo={safeReturnTo(returnToParam)}
-      copyrightYear={new Date().getFullYear()}
+      copyrightYear={copyrightYear}
     />
+  );
+};
+
+export default function LoginPage({ searchParams }: LoginPageProps) {
+  return (
+    <Suspense>
+      <LoginContent searchParams={searchParams} />
+    </Suspense>
   );
 }
