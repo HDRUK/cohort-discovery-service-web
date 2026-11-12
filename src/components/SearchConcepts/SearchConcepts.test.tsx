@@ -10,9 +10,9 @@ import {
 } from "@/contexts/SessionDataContext";
 
 jest.mock("@/lib/routeFetch", () => {
-  const mockSearchConcepts = jest.requireActual(
-    "@/actions/concept/__mocks__/searchConcepts",
-  ).default;
+  const { searchMockConcepts: mockSearchConcepts } = jest.requireActual(
+    "@/test/fixtures/concepts",
+  );
   return {
     routePost: jest.fn((_path: string, body: unknown) =>
       mockSearchConcepts(body),

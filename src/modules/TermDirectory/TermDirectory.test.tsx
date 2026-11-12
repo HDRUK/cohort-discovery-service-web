@@ -5,7 +5,7 @@ import TermDirectory from "./TermDirectory";
 import { SearchParamsTransitionProvider } from "@/contexts/SearchParamsTransitionContext";
 import { DefaultProvider } from "@/providers/DefaultProvider";
 import { NotifyProvider } from "@/providers/NotifyProvider";
-import { mockTermDirectoryEntries } from "@/actions/termDirectory/__mocks__/getTermDirectory";
+import { mockTermDirectoryEntries } from "@/test/fixtures/termDirectory";
 import { paginateData } from "@/utils/mock";
 import { createPendingNavigation } from "@/utils/pendingNavigation";
 import { TermDirectoryEntry, Paginated } from "@/types/api";

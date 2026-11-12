@@ -10,7 +10,7 @@ interface SearchConceptsBody {
   include_ancestors?: boolean;
 }
 
-const searchConcepts = async (
+export const searchMockConcepts = async (
   body: SearchConceptsBody = {},
 ): Promise<ApiResponse<Paginated<Partial<Concept>>>> => {
   const searchTerms = [...(body.concept_name ?? []), ...(body.concept_id ?? [])]
@@ -254,5 +254,3 @@ const searchConcepts = async (
     },
   };
 };
-
-export default searchConcepts;

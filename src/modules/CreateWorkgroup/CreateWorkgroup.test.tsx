@@ -10,7 +10,7 @@ import userEvent from "@testing-library/user-event";
 import CreateWorkgroup from "./CreateWorkgroup";
 import { Collection } from "@/types/api";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
-import { getMockCollections } from "@/actions/collection/__mocks__/getCollections";
+import { getMockCollections } from "@/test/fixtures/collections";
 
 const mockCreateWorkgroup = jest.fn();
 

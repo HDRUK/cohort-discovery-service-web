@@ -10,10 +10,10 @@ import {
 import userEvent from "@testing-library/user-event";
 import CreateCollection from "./CreateCollection";
 import { Custodian, CollectionHost } from "@/types/api";
-import getCustodian from "@/actions/custodian/__mocks__/getCustodian";
+import { getMockCustodian } from "@/test/fixtures/custodians";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
-import { getMockCollection } from "@/actions/collection/__mocks__/getCollections";
-import getCollectionHost from "@/actions/collectionHost/__mocks__/getCollectionHost";
+import { getMockCollection } from "@/test/fixtures/collections";
+import { getMockCollectionHost } from "@/test/fixtures/collectionHosts";
 
 const mockCreateCollection = jest.fn();
 
@@ -23,14 +23,14 @@ jest.mock("@/actions/collection/createCustodianCollectionWithConfig", () => ({
 }));
 
 const createCollection = mockCreateCollection;
-const mockCustodian = getCustodian();
+const mockCustodian = getMockCustodian();
 const mockCollectionHosts = [
-  getCollectionHost({
+  getMockCollectionHost({
     id: 10,
     name: "Alpha Host",
     custodian: mockCustodian,
   }),
-  getCollectionHost({
+  getMockCollectionHost({
     id: 20,
     name: "Beta Host",
     custodian: mockCustodian,

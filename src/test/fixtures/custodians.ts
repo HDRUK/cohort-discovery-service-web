@@ -1,7 +1,7 @@
 import { Custodian } from "@/types/api";
 import { randNumber, randUuid, randCompanyName } from "@ngneat/falso";
 
-const getCustodian = (): Custodian => ({
+export const getMockCustodian = (): Custodian => ({
   id: randNumber({ min: 1, max: 1000 }),
   pid: randUuid(),
   name: randCompanyName(),
@@ -10,5 +10,3 @@ const getCustodian = (): Custodian => ({
   created_at: "2025-01-01 00:00:00",
   updated_at: "2025-01-01 00:00:00",
 });
-
-export default getCustodian;

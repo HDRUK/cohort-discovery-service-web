@@ -3,7 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import CreateCollectionHost from "./CreateCollectionHost";
 import { Custodian } from "@/types/api";
-import getCustodian from "@/actions/custodian/__mocks__/getCustodian";
+import { getMockCustodian } from "@/test/fixtures/custodians";
 import { NotifyProvider } from "@/providers/NotifyProvider";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 
@@ -38,7 +38,7 @@ const renderCreateColllectionHost = (
 describe("CreateCollectionHost", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    custodian = getCustodian();
+    custodian = getMockCustodian();
   });
 
   it("renders the form ", async () => {

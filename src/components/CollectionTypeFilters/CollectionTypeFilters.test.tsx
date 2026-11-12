@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import {
   getMockCollection,
   getMockCollections,
-} from "@/actions/collection/__mocks__/getCollections";
+} from "@/test/fixtures/collections";
 import CollectionTypeFilters from "./CollectionTypeFilters";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 

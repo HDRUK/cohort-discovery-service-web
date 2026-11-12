@@ -1,16 +1,14 @@
 import { CollectionHost } from "@/types/api";
 import { QueryContext } from "@/types/context";
-import getCustodian from "../../custodian/__mocks__/getCustodian";
+import { getMockCustodian } from "./custodians";
 
-export const getCollectionHost = (
+export const getMockCollectionHost = (
   rest?: Partial<CollectionHost>,
 ): CollectionHost => ({
   id: 1,
   name: "Test Custodian Host",
   query_context_type: QueryContext.BUNNY,
-  custodian: getCustodian(),
+  custodian: getMockCustodian(),
   collections: [],
   ...rest,
 });
-
-export default getCollectionHost;

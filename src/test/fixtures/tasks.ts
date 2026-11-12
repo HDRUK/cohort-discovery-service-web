@@ -1,5 +1,5 @@
-import { ApiResponse, Task, Result } from "@/types/api";
-import { getMockCollections } from "../../collection/__mocks__/getCollections";
+import { Task, Result } from "@/types/api";
+import { getMockCollections } from "./collections";
 
 const [mockCollection1, mockCollection2] = getMockCollections(2);
 
@@ -65,12 +65,3 @@ export const mockTasks: Task[] = [
     }),
   },
 ];
-
-const getTasks = async (): Promise<ApiResponse<Task[]>> => {
-  return {
-    data: mockTasks,
-    message: "success",
-  };
-};
-
-export default getTasks;

@@ -1,5 +1,4 @@
-import { TermDirectoryEntry, ApiResponse, Paginated } from "@/types/api";
-import { paginateData } from "@/utils/mock";
+import { TermDirectoryEntry } from "@/types/api";
 
 export const getMockTermDirectoryEntry = (
   rest?: Partial<TermDirectoryEntry>,
@@ -22,14 +21,3 @@ export const mockTermDirectoryEntries: TermDirectoryEntry[] = [
     ncollections: 1,
   }),
 ];
-
-const getTermDirectory = async (): Promise<
-  ApiResponse<Paginated<TermDirectoryEntry>>
-> => {
-  return {
-    message: "success",
-    data: paginateData({ data: mockTermDirectoryEntries }),
-  };
-};
-
-export default getTermDirectory;

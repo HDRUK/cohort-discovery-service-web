@@ -3,12 +3,15 @@ import {
   ApiResponse,
   Collection,
   CollectionWithHosts,
+  Paginated,
   Distribution,
   DistributionJobType,
   ModelState,
 } from "@/types/api";
 import { v4 as uuidv4 } from "uuid";
-import getCustodian from "../../custodian/__mocks__/getCustodian";
+import { getMockCustodian } from "./custodians";
+import { getMockCollectionHost } from "./collectionHosts";
+import { paginateData } from "@/utils/mock";
 
 const getMockDistribution = (rest?: Partial<Distribution>): Distribution => ({
   id: 1,
@@ -74,7 +77,7 @@ export const getMockCollection = (
   created_at: "2025-01-01 00:00:00",
   updated_at: "2025-01-01 00:00:00",
   demographics: getMockDemographics({ collection_id: 1, n: count }),
-  custodian: getCustodian(),
+  custodian: getMockCustodian(),
   is_synthetic: false,
   host: null,
   config: {
@@ -107,11 +110,25 @@ export const getMockCollections = (
     }),
   );
 
-const getCollections = async (): Promise<ApiResponse<Collection[]>> => {
+export const getMockCollectionsResponse = async (): Promise<
+  ApiResponse<Collection[]>
+> => {
   return {
     data: getMockCollections(),
     message: "success",
   };
 };
 
-export default getCollections;
+export const getMockCustodianCollections = async (): Promise<
+  ApiResponse<Paginated<CollectionWithHosts>>
+> => {
+  const collectionWithHost = getMockCollections().map((c) => ({
+    ...c,
+    host: getMockCollectionHost(),
+  })) as CollectionWithHosts[];
+
+  return {
+    data: paginateData({ data: collectionWithHost }),
+    message: "success",
+  };
+};

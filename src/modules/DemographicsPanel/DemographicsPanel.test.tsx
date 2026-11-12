@@ -15,7 +15,7 @@ import {
   SessionDataProvider,
 } from "@/contexts/SessionDataContext";
 import { Collection } from "@/types/api";
-import { getMockCollection } from "@/actions/collection/__mocks__/getCollections";
+import { getMockCollection } from "@/test/fixtures/collections";
 import DemographicsPanel from "./DemographicsPanel";
 import { HdrukUiProvider } from "@hdruk/ui";
 import { themeOptions } from "@/config/theme";
