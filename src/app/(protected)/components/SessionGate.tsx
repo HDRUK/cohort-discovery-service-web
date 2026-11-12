@@ -5,7 +5,7 @@ import { LoadedSession } from "@/server/loadSession";
 import { isStandalone } from "@/utils/modes";
 import ProtectedPage from "./ProtectedPage";
 import SessionEnded from "./SessionEnded";
-import { SessionAccess } from "./sessionAccess";
+import { SessionAccess } from "@/lib/sessionAccess";
 
 const applicationMode = process.env.APPLICATION_MODE;
 

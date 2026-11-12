@@ -1,6 +1,6 @@
 import { ApiResponse, User } from "@/types/api";
 import { RoleName } from "@/types/roles";
-import { decideAccess, SessionAccess } from "./sessionAccess";
+import { decideAccess, SessionAccess } from "@/lib/sessionAccess";
 
 const userWith = ({
   roles = [],

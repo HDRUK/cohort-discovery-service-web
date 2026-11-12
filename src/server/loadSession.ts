@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import {
   decideAccess,
   SessionAccess,
-} from "@/app/(protected)/components/sessionAccess";
+} from "@/lib/sessionAccess";
 import type { SessionData } from "@/contexts/SessionDataContext";
 import { getUserCollections } from "@/server/data/collections";
 import { getCustodians } from "@/server/data/custodians";
