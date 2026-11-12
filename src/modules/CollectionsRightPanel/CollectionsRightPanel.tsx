@@ -1,5 +1,3 @@
-"use client";
-
 import { Skeleton } from "@mui/material";
 import { Suspense } from "react";
 import UpdateCollection, {

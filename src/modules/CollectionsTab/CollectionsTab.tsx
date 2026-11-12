@@ -6,8 +6,6 @@ import { CollectionsSearchParams } from "@/types/api";
 import { buildCollectionParams } from "@/utils/params";
 import { Box, Skeleton } from "@mui/material";
 import CollectionsManagement from "../CollectionsManagement";
-import CollectionsTable from "@/components/CollectionsTable";
-import CollectionsRightPanel from "../CollectionsRightPanel";
 
 export const CollectionsSkeleton = () => (
   <Box sx={{ height: "100%", p: 2 }}>
@@ -32,13 +30,7 @@ const CollectionsTab = async ({
     ? await getAdminCollectionList({ params })
     : await getCustodianCollections(custodianPid, { params });
 
-  return (
-    <CollectionsManagement
-      isAdmin={isAdmin}
-      table={<CollectionsTable collections={collections} />}
-      rightPanel={<CollectionsRightPanel collections={collections?.data} />}
-    />
-  );
+  return <CollectionsManagement isAdmin={isAdmin} collections={collections} />;
 };
 
 export default CollectionsTab;
