@@ -23,6 +23,7 @@ const NetworksMiddlePanel = () => {
       {!!selectedNetwork && (
         <Stack gap={2}>
           <CustodianTable
+            custodians={selectedNetwork.custodians}
             tableTitle={`${selectedNetwork?.name} Network`}
             tableSubTitle="Collections"
             handleDelete={async (ids: string[]) => {

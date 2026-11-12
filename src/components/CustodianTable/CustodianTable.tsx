@@ -7,16 +7,13 @@ import {
 } from "material-react-table";
 import { useMemo, useState } from "react";
 import Table from "@/components/Table";
-import useSearchParams from "@/hooks/useSearchParams";
-import { capitaliseFirstLetter } from "@/utils/string";
 import { useTable } from "@/hooks/useTable";
 import dayjs from "dayjs";
 import { TableProps } from "../Table/Table";
 import { trueKeys } from "@/utils/numbers";
-import { useSessionData } from "@/contexts/SessionDataContext";
-import { useNetworks } from "@/contexts/NetworksContext";
 
 export interface CustodianTableProps extends TableProps {
+  custodians: Custodian[];
   showPid?: boolean;
   refreshRate?: number;
   tableTitle?: string;
@@ -26,33 +23,18 @@ export interface CustodianTableProps extends TableProps {
 }
 
 const CustodianTable = ({
+  custodians,
   tableTitle,
   tableSubTitle,
   handleDelete,
   emptyMessageOverride,
   ...rest
 }: CustodianTableProps) => {
-  const { getSearchParam } = useSearchParams("network_filter");
-  const nw_filter = getSearchParam();
-
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
-
-  const custodians = useSessionData().custodians;
 
   const selectedCustodianIds = useMemo(
     () => trueKeys(rowSelection ?? {}),
     [rowSelection],
-  );
-
-  const networks = useNetworks();
-  const activeNetwork = useMemo(
-    () => networks.find((nw) => String(nw.id) === nw_filter),
-    [networks, nw_filter],
-  );
-
-  const hydratedCustodians = useMemo(
-    () => custodians.filter((c) => c.network?.id === activeNetwork?.id),
-    [custodians, activeNetwork],
   );
 
   const columns: MRT_ColumnDef<Custodian>[] = [
@@ -84,7 +66,7 @@ const CustodianTable = ({
 
   const table = useTable({
     columns,
-    data: hydratedCustodians,
+    data: custodians,
     enableSorting: false,
     ...(setRowSelection && { onRowSelectionChange: setRowSelection }),
     ...(rowSelection && { state: { rowSelection } }),
@@ -102,8 +84,7 @@ const CustodianTable = ({
       leftAction={{
         titleProps: {
           title: tableTitle || "Custodians",
-          subTitle:
-            tableSubTitle || capitaliseFirstLetter(activeNetwork?.name ?? ""),
+          subTitle: tableSubTitle,
         },
       }}
       rightAction={{
