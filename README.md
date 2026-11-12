@@ -129,7 +129,7 @@ Browser ── await the action ──────► actions ───► serve
 | --- | --- |
 | Data a page needs to render | A Server Component that imports a reader from `src/server/data/` |
 | Data the browser needs later (polling, typeahead, expand-on-click) | A Route Handler in `src/app/api/`, fetched with `routeGet` / `routePost` from a TanStack `queryFn` |
-| The user changes something | A server action in `src/actions/`, which calls `refresh()` itself |
+| The user changes something | A server action in `src/actions/`, which calls `updateTag` for each cached read it changes (`refresh()` when it changes only uncached data) |
 
 Why they are separate:
 

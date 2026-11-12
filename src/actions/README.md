@@ -10,7 +10,7 @@ One file per user intent (`src/actions/<domain>/<intent>.ts`), named after the f
 
 1. Calls `requireSession()` (`src/server/session.ts`) to get the token.
 2. Makes its API calls through `src/server/api.ts`, with paths from `API_ROUTES` (`src/lib/apiRoutes.ts`). Write steps that another action also needs live in `src/server/mutations/`.
-3. Calls `refresh()` from `next/cache` once, at the end.
+3. Calls `updateTag(CACHE_TAGS.x)` from `next/cache` for each cached read its write changes (tags in `src/config/tags.ts`). An action that changes only uncached data calls `refresh()` instead: `refresh()` does not clear cached reads in the browser, so a list would stay stale for its whole `stale` time.
 
 ```ts
 "use server";
@@ -25,7 +25,8 @@ const restoreCollection = async (
     undefined,
     { errorMode: ErrorMode.RESULT },
   );
-  refresh();
+  updateTag(CACHE_TAGS.collections);
+  updateTag(CACHE_TAGS.collectionHosts);
   return res;
 };
 
@@ -38,4 +39,4 @@ One user change is one awaited action. If it has several steps, it runs them all
 
 - **Reads.** Next runs server actions one at a time per client, so a polling read would queue behind a save, and an action can't be cached. Reads the browser needs go through a Route Handler in `src/app/api/`.
 - **Shared helpers.** Any exported helper in a `"use server"` file becomes its own endpoint, with no session check from the action that was meant to wrap it. Put shared write steps in `src/server/mutations/`.
-- **Revalidating from the client.** The action refreshes itself; components just `await` it.
+- **Revalidating from the client.** The action expires its own tags; components just `await` it.
