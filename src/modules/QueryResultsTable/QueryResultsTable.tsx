@@ -26,7 +26,7 @@ import { receivedAt, setQueryDataIfNewer } from "@/utils/queryCache";
 
 interface QueryResultsTableProps {
   initialData: Query;
-  initialSearchParams?: URLSearchParams;
+  initialSearchParams?: string;
   tableProps?: TableProps;
   useTableProps?: Omit<MRT_TableOptions<Task>, "data" | "columns">;
   showGuidance?: boolean;
@@ -34,7 +34,7 @@ interface QueryResultsTableProps {
 
 const QueryResultsTable = ({
   initialData,
-  initialSearchParams = new URLSearchParams(),
+  initialSearchParams = "",
   tableProps,
   useTableProps,
   showGuidance = false,
@@ -43,7 +43,7 @@ const QueryResultsTable = ({
   const track = useTrackClick();
 
   const queryKey = useMemo(
-    () => QUERY_KEYS.query(initialData.pid, initialSearchParams.toString()),
+    () => QUERY_KEYS.query(initialData.pid, initialSearchParams),
     [initialSearchParams, initialData.pid],
   );
   const qc = useQueryClient();
@@ -51,7 +51,10 @@ const QueryResultsTable = ({
     queryKey,
     queryFn: async () => {
       const res = await routeGet<ApiResponse<Query>>(
-        routes.api.query(initialData.pid, initialSearchParams),
+        routes.api.query(
+          initialData.pid,
+          new URLSearchParams(initialSearchParams),
+        ),
       );
       return res.data;
     },
