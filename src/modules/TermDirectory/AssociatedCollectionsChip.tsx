@@ -13,7 +13,7 @@ const AssociatedCollectionsChip = ({
   <HelpTooltip
     placement="left"
     title={
-      names.length > 0 && (
+      names?.length > 0 && (
         <Box component="ul" sx={{ listStyle: "none", m: 0, p: 0 }}>
           {names.map((name) => (
             <Typography key={name} component="li" fontWeight={700}>
