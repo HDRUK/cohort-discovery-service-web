@@ -32,8 +32,8 @@ const AssociatedCollectionsChip = ({
       sx={{
         bgcolor: "tooltip.main",
         color: "white",
-        borderRadius: "3px",
-        fontSize: "14.2px",
+        borderRadius: 0.75,
+        fontSize: "0.875rem",
       }}
     />
   </HelpTooltip>
