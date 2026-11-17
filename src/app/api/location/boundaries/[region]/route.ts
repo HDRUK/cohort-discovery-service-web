@@ -23,9 +23,8 @@ export async function GET(
 
   const filePath = path.join(process.cwd(), "boundaries", fileName);
 
-  let size: number;
   try {
-    size = (await stat(filePath)).size;
+    await stat(filePath);
   } catch {
     return new Response("Boundary data not found", { status: 404 });
   }
@@ -38,7 +37,6 @@ export async function GET(
     status: 200,
     headers: {
       "Content-Type": "application/json",
-      "Content-Length": String(size),
       "Cache-Control": "public, max-age=31536000, immutable",
     },
   });
