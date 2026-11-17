@@ -13,6 +13,7 @@ const entry = (
   domain_id: DemographicDomain.Gender,
   count: 0,
   ncollections: 0,
+  collection_names: [],
   ...overrides,
 });
 

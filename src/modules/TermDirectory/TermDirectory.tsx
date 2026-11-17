@@ -58,8 +58,11 @@ const TermDirectory = ({ entries }: TermDirectoryProps) => {
         id: "ncollections",
         header: "Associated Collections",
         accessorFn: (row) => row.ncollections,
-        Cell: ({ cell }) => (
-          <AssociatedCollectionsChip count={cell.getValue<number>()} />
+        Cell: ({ cell, row }) => (
+          <AssociatedCollectionsChip
+            count={cell.getValue<number>()}
+            names={row.original.collection_names}
+          />
         ),
         muiTableBodyCellProps: {
           align: "center",

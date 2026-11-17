@@ -378,6 +378,7 @@ export interface TermDirectoryEntry {
   domain_id: string;
   count: number;
   ncollections: number;
+  collection_names: string[];
 }
 
 export interface TaskRun {
