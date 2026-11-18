@@ -12,6 +12,8 @@ import {
   Collection,
   CollectionDetails,
   CollectionHealthSeries,
+  CollectionMetadataRecord,
+  CollectionSchema,
   CollectionTaskHistory,
   CollectionWithHosts,
   Paginated,
@@ -128,6 +130,48 @@ export const getCollectionDetails = async (
     API_ROUTES.collectionDetails(pid),
     { errorMode: ErrorMode.RESULT },
   );
+};
+
+export const getCollectionSchema = async (
+  args?: ReadOptions,
+): Promise<ApiResponse<CollectionSchema>> => {
+  const { token } = await requireSession();
+  return apiGet<ApiResponse<CollectionSchema>>(
+    token,
+    API_ROUTES.collectionSchema,
+    { errorMode: args?.errorMode },
+  );
+};
+
+export const getCachedCollectionSchema = async (): Promise<
+  ApiResponse<CollectionSchema>
+> => {
+  "use cache: private";
+  cacheLife(USER_DATA_CACHE_LIFE);
+
+  return getCollectionSchema();
+};
+
+export const getCollectionMetadata = async (
+  pid: string,
+  args?: ReadOptions,
+): Promise<ApiResponse<CollectionMetadataRecord>> => {
+  const { token } = await requireSession();
+  return apiGet<ApiResponse<CollectionMetadataRecord>>(
+    token,
+    API_ROUTES.collectionMetadata(pid),
+    { errorMode: args?.errorMode },
+  );
+};
+
+export const getCachedCollectionMetadata = async (
+  pid: string,
+): Promise<ApiResponse<CollectionMetadataRecord>> => {
+  "use cache: private";
+  cacheLife(USER_DATA_CACHE_LIFE);
+  cacheTag(CACHE_TAGS.collections);
+
+  return getCollectionMetadata(pid);
 };
 
 export const getCollectionHealth = async (

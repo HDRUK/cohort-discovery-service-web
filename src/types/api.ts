@@ -1,3 +1,4 @@
+import type { JSONSchemaDocument } from "@hdruk/gwdm-view";
 import { DomainTab } from "@/config/domainFilters";
 import { QueryContext } from "./context";
 import { Role, RoleName } from "./roles";
@@ -316,6 +317,24 @@ export interface Collection extends WithTimestamps {
   location_enabled?: boolean;
   death_enabled?: boolean;
   deleted_at?: string | null;
+  metadata_schema?: string | null;
+}
+
+export type CollectionMetadataDocument = Record<string, unknown>;
+
+export interface CollectionMetadataRecord {
+  id: number;
+  pid: string;
+  name: string;
+  description: string;
+  url: UrlString | null;
+  metadata: CollectionMetadataDocument | null;
+  metadata_schema: string | null;
+}
+
+export interface CollectionSchema {
+  id: string;
+  schema: JSONSchemaDocument;
 }
 
 export interface CollectionConfig {

@@ -8,18 +8,21 @@ import GlobalStyles from "@mui/material/GlobalStyles";
 import { themeOptions } from "../../config/theme";
 import { NotifyProvider } from "../../providers/NotifyProvider";
 import { HdrukUiProvider } from "@hdruk/ui";
+import { createHdrukTheme } from "@hdruk/ui/theme";
 import { ThemeOptions } from "@mui/material";
 import { QueryClientProvider } from "@tanstack/react-query";
 import ConfirmProvider from "../ConfirmProvider";
 import { getQueryClient } from "@/lib/queryClient";
 import SessionEndedHandler from "@/components/SessionEndedHandler";
 
+const THEME = createHdrukTheme(themeOptions as ThemeOptions);
+
 export default function ThemeRegistry({ children }: { children: ReactNode }) {
   const queryClient = getQueryClient();
 
   return (
     <AppRouterCacheProvider>
-      <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
+      <HdrukUiProvider theme={THEME}>
         <ConfirmProvider>
           <QueryClientProvider client={queryClient}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>

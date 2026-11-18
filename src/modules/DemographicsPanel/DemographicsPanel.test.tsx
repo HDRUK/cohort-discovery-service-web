@@ -18,6 +18,7 @@ import { Collection } from "@/types/api";
 import { getMockCollection } from "@/test/fixtures/collections";
 import DemographicsPanel from "./DemographicsPanel";
 import { HdrukUiProvider } from "@hdruk/ui";
+import { createHdrukTheme } from "@hdruk/ui/theme";
 import { themeOptions } from "@/config/theme";
 import { ThemeOptions } from "@mui/material";
 
@@ -42,7 +43,7 @@ let sessionCollections: Collection[] = [];
 
 const renderPanel = (initialExpand?: boolean) =>
   render(
-    <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
+    <HdrukUiProvider theme={createHdrukTheme(themeOptions as ThemeOptions)}>
       <QueryClientProvider client={new QueryClient()}>
         <ApplicationModeProvider>
           <SessionDataProvider

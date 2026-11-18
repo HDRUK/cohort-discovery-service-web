@@ -7,7 +7,12 @@ import LaunchIcon from "@mui/icons-material/Launch";
 import { useEffect, useMemo } from "react";
 import { useTable } from "../../hooks/useTable";
 import { formatNumber } from "@/utils/numbers";
-import { addQueryParam } from "@/utils/string";
+import NextLink from "next/link";
+import { useApplicationMode } from "@/providers/ApplicationModeProvider";
+import {
+  CollectionLink,
+  getCollectionLink,
+} from "@/modules/CollectionMetadata/collectionMetadata";
 import useTrackClick from "@/hooks/useTrackClick";
 import useSearchParams from "@/hooks/useSearchParams";
 import { DEFAULT_STATUS_LABELS } from "@/config/defaults";
@@ -41,6 +46,7 @@ const QueryResultsTable = ({
 }: QueryResultsTableProps) => {
   const defaults = useDefaults();
   const track = useTrackClick();
+  const { isStandalone } = useApplicationMode();
 
   const queryKey = useMemo(
     () => QUERY_KEYS.query(initialData.pid, initialSearchParams),
@@ -82,24 +88,33 @@ const QueryResultsTable = ({
       accessorKey: "collection_name",
       accessorFn: (row) => ({
         name: row.collection.name,
-        url: row.collection.url,
+        link: getCollectionLink({
+          pid: row.collection.pid,
+          url: row.collection.url,
+          queryPid: query.pid,
+          standalone: isStandalone,
+        }),
         taskPid: row.pid,
       }),
       Cell: ({ cell }) => {
-        const { name, url, taskPid } = cell.getValue<{
+        const { name, link, taskPid } = cell.getValue<{
           name: string;
-          url: string;
+          link: CollectionLink | null;
           taskPid: string;
         }>();
-        if (!url) {
+        if (!link) {
           return <span> {name} </span>;
         }
         return (
           <Link
-            component="a"
-            rel="noopener noreferrer"
-            target="_blank"
-            href={addQueryParam(url, "ref", query.pid)}
+            {...(link.external
+              ? {
+                  component: "a",
+                  rel: "noopener noreferrer",
+                  target: "_blank",
+                }
+              : { component: NextLink })}
+            href={link.href}
             onClick={() => {
               track({
                 subjectType: "task",
@@ -108,7 +123,7 @@ const QueryResultsTable = ({
                 description:
                   "User followed the collection link on the results page",
                 properties: {
-                  collection_url: url,
+                  collection_url: link.href,
                   query_pid: query.pid,
                 },
               });
@@ -121,10 +136,12 @@ const QueryResultsTable = ({
             })}
           >
             {name}
-            <LaunchIcon
-              fontSize="small"
-              sx={{ ml: 0.25, verticalAlign: "middle" }}
-            />
+            {link.external && (
+              <LaunchIcon
+                fontSize="small"
+                sx={{ ml: 0.25, verticalAlign: "middle" }}
+              />
+            )}
           </Link>
         );
       },

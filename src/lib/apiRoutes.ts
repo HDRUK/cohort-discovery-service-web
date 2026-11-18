@@ -25,6 +25,9 @@ export const API_ROUTES = {
   collection: (id: number | string) => `${API_URL}/collections/${segment(id)}`,
   collectionDetails: (pid: string) =>
     `${API_URL}/collections/${segment(pid)}/details`,
+  collectionMetadata: (key: number | string) =>
+    `${API_URL}/collections/${segment(key)}/metadata`,
+  collectionSchema: `${API_URL}/collection-schema`,
   transitionCollection: (id: number | string) =>
     `${API_URL}/collections/${segment(id)}/transition_to`,
   collectionConfigItem: (id: number | string) =>

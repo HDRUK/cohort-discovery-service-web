@@ -43,6 +43,7 @@ import {
 } from "@/contexts/AdminSectionContext";
 import { clampRunTimeFrequency, getFrequencyModeKey } from "@/utils/frequency";
 import CollectionHostCredentials from "@/modules/CollectionHostCredentials";
+import CollectionMetadataForm from "@/modules/CollectionMetadata";
 import { useSessionData } from "@/contexts/SessionDataContext";
 import { useCustodianSection } from "@/contexts/CustodianSectionContext";
 
@@ -576,6 +577,23 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
           />
         </ActionMenuSection>
       </FormProvider>
+
+      {expandedRight && (
+        <ActionMenuSection
+          gap={2}
+          title="Collection Metadata"
+          fixedExpanded
+          defaultExpanded
+          accordionSummarySx={{
+            mt: 2,
+          }}
+        >
+          <CollectionMetadataForm
+            collectionId={collection.id}
+            pid={collection.pid}
+          />
+        </ActionMenuSection>
+      )}
     </UpdatePanel>
   );
 };

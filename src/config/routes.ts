@@ -28,6 +28,8 @@ export const routes = {
     collectionHostCredentials: (hostId: number) =>
       `/api/collection-hosts/${hostId}`,
     collectionDetails: (pid: string) => `/api/collections/${pid}/details`,
+    collectionMetadata: (pid: string) => `/api/collections/${pid}/metadata`,
+    collectionSchema: "/api/collection-schema",
     collectionHealth: (pid: string, params: URLSearchParams) =>
       withQuery(`/api/collections/${pid}/health`, params),
     collectionTaskHistory: (pid: string, params: URLSearchParams) =>
@@ -73,6 +75,7 @@ export const routes = {
     }${queryParams ? `&${queryParams}` : ""}`,
   dashboardCollections: dashboardPath("collections"),
   dashboardCodes: dashboardPath("codes"),
+  collection: (pid: string) => `/collections/${pid}`,
   profile: "/profile",
   definitions: "/my-definitions",
   help: (sectionId?: string, tutorialId?: string) =>

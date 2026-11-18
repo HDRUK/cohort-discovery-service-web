@@ -15,6 +15,7 @@ import {
   SessionDataProvider,
 } from "@/contexts/SessionDataContext";
 import { HdrukUiProvider } from "@hdruk/ui";
+import { createHdrukTheme } from "@hdruk/ui/theme";
 import { themeOptions } from "@/config/theme";
 import { ThemeOptions } from "@mui/material";
 import { createPendingNavigation } from "@/utils/pendingNavigation";
@@ -39,7 +40,7 @@ const collections = [
 const renderComponent = () =>
   render(
     <DefaultProvider>
-      <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
+      <HdrukUiProvider theme={createHdrukTheme(themeOptions as ThemeOptions)}>
         <SessionDataProvider
           value={{ userCollections: collections } as unknown as SessionData}
         >
@@ -74,7 +75,7 @@ describe("CollectionFilter", () => {
     mockReplace.mockImplementationOnce(() => navigation.start());
     render(
       <DefaultProvider>
-        <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
+        <HdrukUiProvider theme={createHdrukTheme(themeOptions as ThemeOptions)}>
           <SessionDataProvider
             value={{ userCollections: collections } as unknown as SessionData}
           >

@@ -9,6 +9,7 @@ import {
 import { Demographics } from "@/types/rules";
 import DemographicLocationSection from "./DemographicLocationSection";
 import { HdrukUiProvider } from "@hdruk/ui";
+import { createHdrukTheme } from "@hdruk/ui/theme";
 import { themeOptions } from "@/config/theme";
 import { ThemeOptions } from "@mui/material";
 
@@ -53,7 +54,7 @@ const Harness = ({
   });
 
   return (
-    <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
+    <HdrukUiProvider theme={createHdrukTheme(themeOptions as ThemeOptions)}>
       <FormProvider {...form}>
         <DemographicLocationSection
           editing={editing}

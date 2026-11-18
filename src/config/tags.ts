@@ -21,6 +21,8 @@ export const QUERY_KEYS = {
   query: (pid?: string, params?: string) => queryKey("query", pid, params),
   task: (pid: string) => queryKey("task", pid),
   collectionDetails: (pid?: string) => queryKey("collection-details", pid),
+  collectionMetadata: (pid?: string) => queryKey("collection-metadata", pid),
+  collectionSchema: () => queryKey("collection-schema"),
   collectionHealthRows: (pid?: string) =>
     queryKey("collection-health", "rows", pid),
   collectionHealthSeries: (pid: string, bin: string, range: TimeRangeKey) =>

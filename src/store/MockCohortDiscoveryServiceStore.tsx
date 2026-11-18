@@ -40,6 +40,7 @@ import ConfirmProvider from "@/components/ConfirmProvider";
 import { DefaultProvider } from "@/providers/DefaultProvider";
 import { themeOptions } from "@/config/theme";
 import { HdrukUiProvider } from "@hdruk/ui";
+import { createHdrukTheme } from "@hdruk/ui/theme";
 import { ThemeOptions } from "@mui/material";
 import { CohortBuilderProvider } from "@/providers/CohortBuilderProvider";
 import ApplicationModeProvider from "@/providers/ApplicationModeProvider";
@@ -195,7 +196,7 @@ const MockCohortDiscoveryServiceStore = ({
   return (
     <ApplicationModeProvider>
       <DefaultProvider>
-        <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
+        <HdrukUiProvider theme={createHdrukTheme(themeOptions as ThemeOptions)}>
           <QueryClientProvider client={queryClient}>
             <CohortBuilderProvider>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
