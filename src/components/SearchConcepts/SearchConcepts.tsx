@@ -1,7 +1,6 @@
 "use client";
 
 import { Concept, Paginated } from "@/types/api";
-import { SearchBar } from "@hdruk/ui";
 import {
   Dispatch,
   SetStateAction,
@@ -20,6 +19,7 @@ import {
   Stack,
 } from "@mui/material";
 import SquareCheckbox from "@/components/SquareCheckbox";
+import SearchBox from "@/components/SearchBox";
 import { ConceptItem, ConceptItemProps } from "./ConceptItem";
 import {
   DEFAULT_CODES_PER_PAGE,
@@ -29,6 +29,9 @@ import useFeatures from "@/hooks/useFeatures";
 import { mergeSx } from "@/utils/helpers";
 import useHasSelectedSyntheticDatasets from "@/hooks/useHasSelectedSyntheticDatasets";
 import useSearchForConcepts from "@/hooks/useSearchForConcepts";
+import { useDebounce } from "@/hooks/useDebounce";
+
+const SEARCH_DEBOUNCE_MS = 400;
 
 interface SlotProps {
   conceptItem: ConceptItemProps;
@@ -73,6 +76,7 @@ const SearchConcepts = ({
   hideSelectAll = false,
 }: SearchConceptsProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const searchForConcepts = useSearchForConcepts();
   const includeSynthetic = useHasSelectedSyntheticDatasets();
 
@@ -180,6 +184,12 @@ const SearchConcepts = ({
     [domain, searchForConcepts, setSelected, includeSynthetic, onHasOptions],
   );
 
+  useDebounce(searchTerm, {
+    delay: SEARCH_DEBOUNCE_MS,
+    shouldApplyImmediately: (value) => value.trim() === "",
+    onValueChange: onSearch,
+  });
+
   const handleToggle = useCallback(
     (id: number) => {
       setSelected?.((prev) => ({
@@ -237,19 +247,23 @@ const SearchConcepts = ({
 
   return (
     <Box>
-      <SearchBar
+      <SearchBox
         placeholder="Term search..."
+        collapsible={false}
         loading={isLoading}
-        onSearch={onSearch}
-        filters={
-          noOptionsFound ? (
-            <Box sx={{ fontSize: 14, color: "text.secondary" }}>
-              No options found
-            </Box>
-          ) : null
-        }
-        debounceMs={400}
+        value={searchTerm}
+        onChange={(event) => setSearchTerm(event.target.value)}
+        onClear={() => setSearchTerm("")}
+        onClick={(event) => event.stopPropagation()}
+        onKeyDown={(event) => {
+          if (event.key === "Enter") onSearch(searchTerm);
+        }}
       />
+      {noOptionsFound && (
+        <Box sx={{ mt: 1, fontSize: 14, color: "text.secondary" }}>
+          No options found
+        </Box>
+      )}
       {headerSlot}
       <FormGroup
         ref={resultsContainerRef}

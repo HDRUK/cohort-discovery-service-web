@@ -4,6 +4,7 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import SearchConcepts from "./SearchConcepts";
 import ApplicationModeProvider from "@/providers/ApplicationModeProvider";
+import { DefaultProvider } from "@/providers/DefaultProvider";
 import {
   SessionData,
   SessionDataProvider,
@@ -24,15 +25,17 @@ function Wrapper(props: React.ComponentProps<typeof SearchConcepts>) {
   const [selected, setSelected] = useState<Record<number, boolean>>({});
   return (
     <ApplicationModeProvider>
-      <SessionDataProvider
-        value={{ userCollections: [] } as unknown as SessionData}
-      >
-        <SearchConcepts
-          {...props}
-          selected={selected}
-          setSelected={setSelected}
-        />
-      </SessionDataProvider>
+      <DefaultProvider>
+        <SessionDataProvider
+          value={{ userCollections: [] } as unknown as SessionData}
+        >
+          <SearchConcepts
+            {...props}
+            selected={selected}
+            setSelected={setSelected}
+          />
+        </SessionDataProvider>
+      </DefaultProvider>
     </ApplicationModeProvider>
   );
 }
@@ -47,7 +50,7 @@ describe("SearchConcepts", () => {
   it("displays results upon search", async () => {
     renderComponent();
 
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("searchbox");
     await userEvent.type(input, "Chronic Kidney{enter}");
 
     const items = await screen.findAllByTestId("concept-item");
@@ -59,7 +62,7 @@ describe("SearchConcepts", () => {
   it("does not display results upon search if the domain is wrong", async () => {
     renderComponent({ domain: "Measurement" });
 
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("searchbox");
     await userEvent.type(input, "Chronic Kidney{enter}");
 
     const items = screen.queryAllByTestId("concept-item");
@@ -69,7 +72,7 @@ describe("SearchConcepts", () => {
   it("when multiple=true, shows 'Select All' and toggles it on click", async () => {
     renderComponent({ multiple: true });
 
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("searchbox");
     await userEvent.type(input, "Chronic Kidney{enter}");
 
     const items = await screen.findAllByTestId("concept-item");
@@ -89,7 +92,7 @@ describe("SearchConcepts", () => {
     const onClick = jest.fn();
     renderComponent({ multiple: false, onClick });
 
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("searchbox");
     await userEvent.type(input, "Chronic Kidney{enter}");
 
     const items = await screen.findAllByTestId("concept-item");
@@ -110,7 +113,7 @@ describe("SearchConcepts", () => {
   it("loads more results after clicking Show more", async () => {
     renderComponent();
 
-    const input = screen.getByRole("textbox");
+    const input = screen.getByRole("searchbox");
     await userEvent.type(input, "Chronic{enter}");
 
     const initialItems = await screen.findAllByTestId("concept-item");

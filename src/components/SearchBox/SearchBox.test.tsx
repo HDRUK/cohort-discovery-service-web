@@ -20,15 +20,13 @@ describe("SearchBox clear button", () => {
     renderComponent({ onClear: jest.fn() });
 
     expect(clearButton()).not.toBeInTheDocument();
-    expect(submitButton()).toBeInTheDocument();
 
     await userEvent.type(screen.getByRole("searchbox"), "asthma");
 
     expect(clearButton()).toBeInTheDocument();
-    expect(submitButton()).not.toBeInTheDocument();
   });
 
-  it("empties the input, tells the parent, and brings the search icon back", async () => {
+  it("empties the input, tells the parent, and removes the clear button", async () => {
     const onClear = jest.fn();
     renderComponent({ onClear });
     const input = screen.getByRole("searchbox");
@@ -38,7 +36,7 @@ describe("SearchBox clear button", () => {
 
     expect(input).toHaveValue("");
     expect(onClear).toHaveBeenCalledTimes(1);
-    expect(submitButton()).toBeInTheDocument();
+    expect(clearButton()).not.toBeInTheDocument();
   });
 
   it("moves focus back to the input after clearing, so keyboard users don't lose their place", async () => {
@@ -83,5 +81,38 @@ describe("SearchBox clear button", () => {
 
     expect(onClear).not.toHaveBeenCalled();
     expect(screen.getByRole("searchbox")).toHaveValue("asthma");
+  });
+});
+
+describe("SearchBox icons", () => {
+  const searchIcon = () => screen.queryByTestId("SearchIcon");
+
+  it("leads with a search icon by default", () => {
+    renderComponent();
+
+    expect(searchIcon()).toBeInTheDocument();
+  });
+
+  it("lets the caller replace the leading icon", () => {
+    renderComponent({ startIcon: <span data-testid="custom-icon" /> });
+
+    expect(screen.getByTestId("custom-icon")).toBeInTheDocument();
+    expect(searchIcon()).not.toBeInTheDocument();
+  });
+
+  it("has no trailing button when there is nothing for it to do", () => {
+    renderComponent();
+
+    expect(submitButton()).not.toBeInTheDocument();
+    expect(clearButton()).not.toBeInTheDocument();
+  });
+
+  it("keeps the trailing submit button, even when empty, for callers that submit with it", async () => {
+    const onClickEndAdornment = jest.fn();
+    renderComponent({ onClickEndAdornment });
+
+    await userEvent.click(submitButton()!);
+
+    expect(onClickEndAdornment).toHaveBeenCalledTimes(1);
   });
 });

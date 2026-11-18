@@ -62,6 +62,8 @@ export type SearchBoxProps = Omit<TextFieldProps, "errors"> & {
   readOnly?: boolean;
 };
 
+const DEFAULT_START_ICON = <SearchIcon fontSize="small" sx={{ ml: 1.5 }} />;
+
 const SearchBox = ({
   loading = false,
   warning = false,
@@ -76,7 +78,7 @@ const SearchBox = ({
   onClickEndAdornment,
   onClear,
   endIcon,
-  startIcon,
+  startIcon = DEFAULT_START_ICON,
   showEndIcon = true,
   placeholders,
   placeholderOverride,
@@ -112,6 +114,7 @@ const SearchBox = ({
   }, [collapsible]);
 
   const searchActionDisabled = disabled || readOnly;
+  const hasEndAction = collapsible || !!onClickEndAdornment || !!endIcon;
 
   const handleIconClick = useCallback(
     (e: React.MouseEvent<HTMLElement>) => {
@@ -291,7 +294,7 @@ const SearchBox = ({
                       >
                         <DeleteIcon fontSize="small" />
                       </IconButton>
-                    ) : showEndIcon ? (
+                    ) : showEndIcon && hasEndAction ? (
                       <IconButton
                         type="button"
                         disabled={searchActionDisabled}

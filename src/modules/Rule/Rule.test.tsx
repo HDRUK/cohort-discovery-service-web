@@ -70,7 +70,7 @@ describe("Rule", () => {
     expect(conceptChipOmop).toBeInTheDocument();
 
     expect(screen.getByText("Include")).toBeInTheDocument();
-    expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
+    expect(screen.queryByRole("searchbox")).not.toBeInTheDocument();
     expect(screen.queryByTestId("ErrorIcon")).not.toBeInTheDocument();
   });
 
@@ -99,7 +99,7 @@ describe("Rule", () => {
   it("renders the Rule card correctly when concept is blank", async () => {
     renderComponent({ rule: { concept: null } });
 
-    const searchInput = screen.queryByRole("textbox") as HTMLInputElement;
+    const searchInput = screen.queryByRole("searchbox") as HTMLInputElement;
     expect(searchInput).toBeInTheDocument();
 
     await userEvent.type(searchInput, "diabetes");
