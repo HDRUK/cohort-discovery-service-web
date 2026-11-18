@@ -1,4 +1,5 @@
 import { DomainTab } from "@/config/domainFilters";
+import { MembershipSources } from "./accessPolicy";
 import { QueryContext } from "./context";
 import { Role, RoleName } from "./roles";
 import { RuleGroupType } from "./rules";
@@ -530,6 +531,7 @@ export interface User extends WithTimestamps {
   workgroups?: Workgroup[];
   identities?: UserIdentity[];
   query_quota: QueryQuota;
+  membership_sources?: MembershipSources;
 }
 
 export interface ExternalCustodian {

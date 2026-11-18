@@ -100,6 +100,7 @@ export const API_ROUTES = {
   users: `${API_URL}/users`,
   user: (id: number) => `${API_URL}/users/${segment(id)}`,
   featureFlags: `${API_URL}/features`,
+  accessPolicy: `${API_URL}/access_policy`,
   feature: (name: string) => `${API_URL}/features/${segment(name)}`,
   termDirectory: `${API_URL}/term-directory`,
   clicks: `${API_URL}/clicks`,

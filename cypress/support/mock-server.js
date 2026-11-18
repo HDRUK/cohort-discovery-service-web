@@ -219,6 +219,22 @@ async function handle(req, res) {
     return ok(res, { name: pathname.split("/").pop(), ...body });
   }
 
+  if (method === "GET" && pathname === "/api/v1/access_policy") {
+    const internal = {
+      mode: "internal",
+      authoritative: false,
+      editable: true,
+      restored_on_sync: [],
+    };
+    return ok(res, {
+      operation_mode: "standalone",
+      providers: {},
+      workgroups: internal,
+      roles: internal,
+      custodians: internal,
+    });
+  }
+
   // -------------------------------------------------------------------------
   // Queries
   // -------------------------------------------------------------------------
