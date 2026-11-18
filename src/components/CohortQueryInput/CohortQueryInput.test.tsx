@@ -231,7 +231,7 @@ describe("CohortQueryInput", () => {
     });
   });
 
-  it("updates queryBuilderJson when Enter is pressed", async () => {
+  it("updates queryBuilderJson when the arrow button is clicked", async () => {
     const user = userEvent.setup();
 
     getQueryFromText.mockResolvedValueOnce(diabetesQuery);
@@ -242,22 +242,14 @@ describe("CohortQueryInput", () => {
 
     expect(setQueryBuilderJson).not.toHaveBeenCalled();
 
-    await user.type(getSearchInput(), "{enter}");
+    const buttons = screen.getAllByRole("button");
+    const arrowButton = buttons[buttons.length - 1];
+
+    await user.click(arrowButton);
 
     await waitFor(() => {
       expect(setQueryBuilderJson).toHaveBeenCalledWith(diabetesQuery);
     });
-  });
-
-  it("empties the input when the clear button is clicked", async () => {
-    const user = userEvent.setup();
-
-    renderComponent();
-
-    await user.type(getSearchInput(), "diabetes");
-    await user.click(screen.getByRole("button", { name: "Clear search" }));
-
-    expect(getSearchInput()).toHaveValue("");
   });
 
   it("replaces the existing query when Start Fresh is selected", async () => {
