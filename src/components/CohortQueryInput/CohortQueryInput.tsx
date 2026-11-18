@@ -20,10 +20,8 @@ import useFeatures from "@/hooks/useFeatures";
 import { Query } from "@/types/api";
 import SearchOverlay from "./SearchOverlay";
 import { useDefaults } from "@/providers/DefaultProvider";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import InlineChoiceButton from "./InlineChoiceButton";
 import { CombinatorType } from "@/types/rules";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { QUERY_KEYS } from "@/config/tags";
 import useHasSelectedSyntheticDatasets from "@/hooks/useHasSelectedSyntheticDatasets";
 
@@ -400,12 +398,6 @@ const CohortQueryInput = ({
 
           const searchDisabled = showChoicePrompt || !!error || !hasInput;
 
-          const EndIcon = isAppendMode ? AddCircleIcon : ArrowForwardIcon;
-
-          const endIconSx = {
-            color: isAppendMode ? "success.main" : "inherit",
-          };
-
           const showSearchOverlay =
             !showChoicePrompt &&
             !isAppendMode &&
@@ -458,9 +450,10 @@ const CohortQueryInput = ({
                   warning={warnings.length > 0}
                   readOnly={showChoicePrompt}
                   disabled={searchDisabled}
-                  showEndIcon
-                  endIcon={<EndIcon sx={endIconSx} />}
-                  onClickEndAdornment={onSubmit}
+                  onClear={() => {
+                    programmaticValueRef.current = null;
+                    field.onChange("");
+                  }}
                   onFocus={() => {
                     if (blurTimeoutRef.current) {
                       clearTimeout(blurTimeoutRef.current);
