@@ -1,9 +1,10 @@
 "use client";
 import UpdatePanel from "@/components/UpdatePanel";
 import ActionMenuSection from "@/components/ActionMenuSection";
-import { Controller, FormProvider, useForm } from "react-hook-form";
+import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
 import { UpdateWorkgroupFormValues } from "@/types/forms";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
+import { Alert, Typography } from "@mui/material";
 import updateWorkgroupMembers from "@/actions/workgroup/updateWorkgroupMembers";
 import { useNotify } from "@/providers/NotifyProvider";
 import FormMultiSelect from "@/components/FormMultiSelect";
@@ -11,10 +12,17 @@ import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
 import { useThreePane } from "@/providers/ThreePaneProvider";
 import { useSaveChanges } from "@/hooks/useSaveChanges";
 import {
+  useAdminAccessPolicy,
   useAdminCollections,
   useAdminUsers,
 } from "@/contexts/AdminSectionContext";
+import {
+  describeMembershipFailures,
+  firstLoginReplacementNotices,
+  workgroupUserOptions,
+} from "@/lib/membershipEditability";
 import useSelectedWorkgroup from "@/hooks/useSelectedWorkgroup";
+import useSelectedManagedUsers from "@/hooks/useSelectedManagedUsers";
 import { Collection, User } from "@/types/api";
 
 const NO_COLLECTIONS: Collection[] = [];
@@ -25,6 +33,7 @@ const UpdateWorkgroup = () => {
 
   const collections = useAdminCollections() ?? NO_COLLECTIONS;
   const users = useAdminUsers() ?? NO_USERS;
+  const policy = useAdminAccessPolicy();
 
   const selectedWorkgroup = useSelectedWorkgroup();
 
@@ -43,6 +52,27 @@ const UpdateWorkgroup = () => {
     reset,
     formState: { defaultValues },
   } = formMethods;
+
+  const userOptions = useMemo(
+    () => workgroupUserOptions(users, policy),
+    [users, policy],
+  );
+
+  const { warning: managedWarning } = useSelectedManagedUsers();
+
+  const selectedUsers = useWatch({ control, name: "users" });
+
+  const firstLoginNotices = useMemo(
+    () =>
+      policy
+        ? firstLoginReplacementNotices(
+            users,
+            policy,
+            selectedUsers.map((option) => +option.value),
+          )
+        : [],
+    [users, policy, selectedUsers],
+  );
 
   useEffect(() => {
     if (!selectedWorkgroup) return;
@@ -68,7 +98,31 @@ const UpdateWorkgroup = () => {
       const collectionIds = data.collections.map((c) => +c.value);
 
       if (userIds.length > 0 || collectionIds.length > 0) {
-        await updateWorkgroupMembers(id, { userIds, collectionIds });
+        const { failed, failedCollections = [] } = await updateWorkgroupMembers(
+          id,
+          { userIds, collectionIds },
+        );
+
+        if (failed.length || failedCollections.length) {
+          notify.error(
+            [
+              describeMembershipFailures(failed, users),
+              describeMembershipFailures(failedCollections, collections),
+            ]
+              .filter(Boolean)
+              .join(" "),
+          );
+          reset({
+            users: data.users.filter((option) =>
+              failed.some((failure) => failure.id === +option.value),
+            ),
+            collections: data.collections.filter((option) =>
+              failedCollections.some((failure) => failure.id === +option.value),
+            ),
+          });
+          return;
+        }
+
         notify.success(`Updated workgroup ${selectedWorkgroup.name}`);
       }
 
@@ -77,7 +131,7 @@ const UpdateWorkgroup = () => {
         onClose?.();
       }
     },
-    [notify, selectedWorkgroup, onClose, reset],
+    [notify, selectedWorkgroup, onClose, reset, users, collections],
   );
 
   const onSave = (closeAfter = false) =>
@@ -106,7 +160,13 @@ const UpdateWorkgroup = () => {
         expandedRight={expandedRight}
         onLockClick={() => onSave(true)}
         onUnlockClick={handleUnlockClick}
+        editDisabled={!!managedWarning}
       >
+        {managedWarning && (
+          <Alert severity="warning" sx={{ mx: 2, mb: 1 }}>
+            {managedWarning}
+          </Alert>
+        )}
         <ActionMenuSection
           title={"Add Collections"}
           fixedExpanded
@@ -160,10 +220,7 @@ const UpdateWorkgroup = () => {
                   placeholder="Search and add users..."
                   disabled={!expandedRight}
                   multiple
-                  options={users.map((c) => ({
-                    label: `${c.name} (${c.email})`,
-                    value: c.id as ValueType,
-                  }))}
+                  options={userOptions}
                   getChipLabel={(options, value) =>
                     options.find((option) => option.value === value.value)
                       ?.label || ""
@@ -178,6 +235,16 @@ const UpdateWorkgroup = () => {
               );
             }}
           />
+          {firstLoginNotices.map((notice) => (
+            <Typography
+              key={notice}
+              variant="body2"
+              color="text.secondary"
+              sx={{ pt: 1 }}
+            >
+              {notice}
+            </Typography>
+          ))}
         </ActionMenuSection>
       </UpdatePanel>
     </FormProvider>

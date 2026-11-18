@@ -8,6 +8,7 @@ import {
   type MRT_Row,
 } from "material-react-table";
 import { Suspense, useEffect, useMemo, useState } from "react";
+import { Chip, Tooltip } from "@mui/material";
 import ChipList from "@/components/ChipList";
 import Table from "@/components/Table";
 import useSearchParams from "@/hooks/useSearchParams";
@@ -28,6 +29,7 @@ import { formatWorkgroupName } from "@/utils/workgroups";
 import { filterUsers } from "./userFilters";
 import { useSessionData } from "@/contexts/SessionDataContext";
 import { useSelectionStore } from "@/store/selectionStore";
+import { MembershipStatus } from "@/lib/membershipEditability";
 
 const NO_USERS: User[] = [];
 
@@ -42,6 +44,8 @@ export interface CollectionsTableProps extends TableProps {
   handleDelete?: (ids: string[]) => Promise<void>;
   showRolesAndWorkgroupColumns?: boolean;
   showCheckboxes?: boolean;
+  deleteDisabled?: boolean;
+  getMembershipStatus?: (user: User) => MembershipStatus | null;
 }
 
 interface UserTableViewProps extends CollectionsTableProps {
@@ -55,6 +59,8 @@ const UserTableView = ({
   handleDelete,
   showRolesAndWorkgroupColumns = false,
   showCheckboxes = true,
+  deleteDisabled = false,
+  getMembershipStatus,
   ...rest
 }: UserTableViewProps) => {
   const { getSearchParam, searchParams } = useSearchParams("workgroup_filter");
@@ -68,6 +74,7 @@ const UserTableView = ({
 
   const loadedUsers = users ?? NO_USERS;
   const setSelectedUserId = useSelectionStore((s) => s.setSelectedUserId);
+  const setSelectedUserIds = useSelectionStore((s) => s.setSelectedUserIds);
   const [sorting, setSorting] = useState<MRT_SortingState>([]);
 
   const selectedUserIds = useMemo(
@@ -76,11 +83,17 @@ const UserTableView = ({
   );
 
   useEffect(() => {
+    if (!users) return;
+
     const [firstId] = selectedUserIds;
     setSelectedUserId(firstId ?? null);
+    setSelectedUserIds(selectedUserIds);
 
-    return () => setSelectedUserId(null);
-  }, [selectedUserIds, setSelectedUserId]);
+    return () => {
+      setSelectedUserId(null);
+      setSelectedUserIds([]);
+    };
+  }, [users, selectedUserIds, setSelectedUserId, setSelectedUserIds]);
 
   const workgroups = useSessionData().workgroups;
   const activeWorkgroup = workgroups.find((wg) => String(wg.id) === wgFilter);
@@ -220,8 +233,33 @@ const UserTableView = ({
             },
           ]
         : []),
+      ...(getMembershipStatus
+        ? [
+            {
+              id: "membership_status",
+              header: "Sign-in sync",
+              enableSorting: false,
+              accessorFn: (row: User) => getMembershipStatus(row)?.label ?? "",
+              Cell: ({ row }: { row: MRT_Row<User> }) => {
+                const status = getMembershipStatus(row.original);
+                if (!status) return null;
+
+                return (
+                  <Tooltip title={status.notice}>
+                    <Chip
+                      size="small"
+                      label={status.label}
+                      color={status.editable ? "default" : "warning"}
+                      variant="outlined"
+                    />
+                  </Tooltip>
+                );
+              },
+            } as MRT_ColumnDef<User>,
+          ]
+        : []),
     ],
-    [isAdmin, showRolesAndWorkgroupColumns],
+    [isAdmin, showRolesAndWorkgroupColumns, getMembershipStatus],
   );
 
   const table = usePaginatedTable<User>({
@@ -258,7 +296,7 @@ const UserTableView = ({
         ...(handleDelete && {
           deleteProps: {
             onClick: handleDelete,
-            disabled: selectedUserIds.length === 0,
+            disabled: selectedUserIds.length === 0 || deleteDisabled,
           },
         }),
         refreshProps: {

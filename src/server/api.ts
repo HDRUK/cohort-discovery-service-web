@@ -79,6 +79,13 @@ export async function request<TResponse, TBody = undefined>(
   }
 }
 
+export const endSessionIfEnded = (response: {
+  error?: { code: number };
+}): void => {
+  if (response.error && isSessionEnded(response.error.code))
+    redirect(routes.logout);
+};
+
 async function extractErrorMessage(response: Response): Promise<string> {
   try {
     const data = await response.json();

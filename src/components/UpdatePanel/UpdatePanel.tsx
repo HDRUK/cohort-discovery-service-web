@@ -18,6 +18,7 @@ type UpdatePanelProps = {
   onUnlockClick: () => void;
   children: ReactNode;
   rightExtras?: ReactNode;
+  editDisabled?: boolean;
 };
 
 export const UpdatePanel = ({
@@ -27,6 +28,7 @@ export const UpdatePanel = ({
   onUnlockClick,
   children,
   rightExtras,
+  editDisabled = false,
 }: UpdatePanelProps) => {
   const { setBlocked } = useSwimLaneBlocker();
   const { confirmCloseIfNeeded } = useCloseGuard();
@@ -129,6 +131,7 @@ export const UpdatePanel = ({
                     expandedRight ? "save-panel-toggle" : "edit-panel-toggle"
                   }
                   component="div"
+                  disabled={editDisabled && !expandedRight}
                   sx={{
                     borderRadius: 10,
                     p: 1,

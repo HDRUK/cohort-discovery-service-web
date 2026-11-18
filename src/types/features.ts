@@ -9,7 +9,6 @@ export enum FeatureName {
   FlattenNestedGroups = "flatten-nested-groups",
   QueryNlp = "query-nlp",
   InAppMessenger = "in-app-messenger",
-  ManageWorkgroupsInternally = "manage-workgroups-internally",
 
   IntegratedSyncWorkgroupsEveryRequest = "integrated-sync-workgroups-every-request",
   IntegratedSyncWorkgroupsFirstLogin = "integrated-sync-workgroups-first-login",
@@ -55,8 +54,6 @@ export const DEFAULT_FLAGS: FeatureFlag = {
   [FeatureName.IntegratedSyncCustodiansEveryRequest]: true,
 
   [FeatureName.HdrukTheme]: true,
-
-  [FeatureName.ManageWorkgroupsInternally]: true,
 
   [FeatureName.AdminMoreCollectionDetails]: false,
 
