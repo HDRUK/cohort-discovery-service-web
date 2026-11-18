@@ -59,6 +59,29 @@ describe("SearchConcepts", () => {
     expect(items[1]).toHaveTextContent("Chronic kidney disease stage 5");
   });
 
+  it("searches once typing pauses, without needing Enter", async () => {
+    renderComponent();
+
+    await userEvent.type(screen.getByRole("searchbox"), "Chronic Kidney");
+
+    expect(await screen.findAllByTestId("concept-item")).toHaveLength(16);
+  });
+
+  it("removes the results when the search is cleared", async () => {
+    renderComponent();
+
+    await userEvent.type(
+      screen.getByRole("searchbox"),
+      "Chronic Kidney{enter}",
+    );
+    await screen.findAllByTestId("concept-item");
+    await userEvent.click(screen.getByRole("button", { name: "Clear search" }));
+
+    await waitFor(() =>
+      expect(screen.queryAllByTestId("concept-item")).toHaveLength(0),
+    );
+  });
+
   it("does not display results upon search if the domain is wrong", async () => {
     renderComponent({ domain: "Measurement" });
 

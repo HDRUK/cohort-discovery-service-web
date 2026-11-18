@@ -24,14 +24,13 @@ import { ConceptItem, ConceptItemProps } from "./ConceptItem";
 import {
   DEFAULT_CODES_PER_PAGE,
   DEFAULT_SEARCH_RESULTS_MAX_HEIGHT,
+  DEFAULT_SEARCH_WAIT_TIME,
 } from "@/config/defaults";
 import useFeatures from "@/hooks/useFeatures";
 import { mergeSx } from "@/utils/helpers";
 import useHasSelectedSyntheticDatasets from "@/hooks/useHasSelectedSyntheticDatasets";
 import useSearchForConcepts from "@/hooks/useSearchForConcepts";
 import { useDebounce } from "@/hooks/useDebounce";
-
-const SEARCH_DEBOUNCE_MS = 400;
 
 interface SlotProps {
   conceptItem: ConceptItemProps;
@@ -184,8 +183,8 @@ const SearchConcepts = ({
     [domain, searchForConcepts, setSelected, includeSynthetic, onHasOptions],
   );
 
-  useDebounce(searchTerm, {
-    delay: SEARCH_DEBOUNCE_MS,
+  const { flush: flushSearchTerm } = useDebounce(searchTerm, {
+    delay: DEFAULT_SEARCH_WAIT_TIME,
     shouldApplyImmediately: (value) => value.trim() === "",
     onValueChange: onSearch,
   });
@@ -256,11 +255,16 @@ const SearchConcepts = ({
         onClear={() => setSearchTerm("")}
         onClick={(event) => event.stopPropagation()}
         onKeyDown={(event) => {
-          if (event.key === "Enter") onSearch(searchTerm);
+          if (event.key !== "Enter") return;
+          event.preventDefault();
+          flushSearchTerm();
         }}
       />
       {noOptionsFound && (
-        <Box sx={{ mt: 1, fontSize: 14, color: "text.secondary" }}>
+        <Box
+          role="status"
+          sx={{ mt: 1, fontSize: 14, color: "text.secondary" }}
+        >
           No options found
         </Box>
       )}

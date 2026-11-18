@@ -12,6 +12,7 @@ import {
   Grid,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import CloseIcon from "@mui/icons-material/Close";
 
 import {
   getContainerSx,
@@ -22,7 +23,6 @@ import {
 } from "./SearchBox.styles";
 import useRotatingPlaceholder from "@/hooks/useRotatingPlaceholder";
 import { useDefaults } from "@/providers/DefaultProvider";
-import { DeleteIcon } from "@/icons/DeleteIcon";
 
 export type SearchBoxProps = Omit<TextFieldProps, "errors"> & {
   loading?: boolean;
@@ -253,6 +253,10 @@ const SearchBox = ({
                     : {}),
                 },
                 id: STABLE_ID,
+                "aria-label":
+                  typeof rest.placeholder === "string"
+                    ? rest.placeholder
+                    : undefined,
                 autoComplete: "off",
                 name: "search-box",
                 readOnly,
@@ -292,7 +296,7 @@ const SearchBox = ({
                         aria-label="Clear search"
                         sx={iconButtonSx(searchActionDisabled)}
                       >
-                        <DeleteIcon fontSize="small" />
+                        <CloseIcon fontSize="small" />
                       </IconButton>
                     ) : showEndIcon && hasEndAction ? (
                       <IconButton

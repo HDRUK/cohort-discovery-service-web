@@ -5,6 +5,7 @@ import type { FieldPath, DefaultValues } from "react-hook-form";
 import { useCallback, useRef } from "react";
 
 import useSearchParams from "@/hooks/useSearchParams";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import SearchBox from "@/components/SearchBox";
 import type { SearchBoxProps } from "@/components/SearchBox/SearchBox";
 import type { ApiSearchParams } from "@/types/api";
@@ -89,6 +90,7 @@ const ControlledSearchBox = <
       control={control}
       render={({ field, fieldState: { error, isDirty } }) => (
         <SearchBox
+          endIcon={<ArrowForwardIcon fontSize="small" />}
           {...searchBoxProps}
           {...field}
           {...(useErrors

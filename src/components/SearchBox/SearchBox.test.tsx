@@ -11,7 +11,8 @@ const renderComponent = (props: Partial<SearchBoxProps> = {}) =>
     </DefaultProvider>,
   );
 
-const clearButton = () => screen.queryByRole("button", { name: "Clear search" });
+const clearButton = () =>
+  screen.queryByRole("button", { name: "Clear search" });
 const submitButton = () =>
   screen.queryByRole("button", { name: "Submit search" });
 
@@ -91,6 +92,12 @@ describe("SearchBox icons", () => {
     renderComponent();
 
     expect(searchIcon()).toBeInTheDocument();
+  });
+
+  it("clears with a close icon rather than a bin", () => {
+    renderComponent({ defaultValue: "asthma", onClear: jest.fn() });
+
+    expect(clearButton()).toContainElement(screen.getByTestId("CloseIcon"));
   });
 
   it("lets the caller replace the leading icon", () => {
