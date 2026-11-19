@@ -42,7 +42,7 @@ The per-user block wins whenever a user is in view; the deployment block is the 
 | `internal` | Normal editing | Nothing extra |
 | `first_login` | Editable. Removing asks for confirmation. Adding shows a note when the provider is authoritative, because the first sign-in will replace the edit | Notice |
 | `additive` | Editable. Removing asks for confirmation, because the provider adds back what it asserts | Notice |
-| `authoritative` | The user can be ticked. While any ticked user is authoritative, delete is disabled, the workgroup panel's edit toggle is disabled and a warning names them. They are disabled in the add picker, labelled "Managed by …" | Notice |
+| `authoritative` | The user can be ticked. While any ticked user is authoritative, delete is disabled and a warning names them at the top of the workgroup panel, which stays editable so collections can still be added. They are disabled in the add picker, labelled "Managed by …" | Notice |
 
 Entries in `restored_on_sync` (the `DEFAULT` workgroup, SDE workgroups in integrated mode) are warned about, not blocked, in the removal confirmation.
 

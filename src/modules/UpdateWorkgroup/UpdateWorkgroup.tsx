@@ -112,14 +112,19 @@ const UpdateWorkgroup = () => {
               .filter(Boolean)
               .join(" "),
           );
-          reset({
-            users: data.users.filter((option) =>
-              failed.some((failure) => failure.id === +option.value),
-            ),
-            collections: data.collections.filter((option) =>
-              failedCollections.some((failure) => failure.id === +option.value),
-            ),
-          });
+          reset(
+            {
+              users: data.users.filter((option) =>
+                failed.some((failure) => failure.id === +option.value),
+              ),
+              collections: data.collections.filter((option) =>
+                failedCollections.some(
+                  (failure) => failure.id === +option.value,
+                ),
+              ),
+            },
+            { keepDefaultValues: true },
+          );
           return;
         }
 
@@ -160,7 +165,6 @@ const UpdateWorkgroup = () => {
         expandedRight={expandedRight}
         onLockClick={() => onSave(true)}
         onUnlockClick={handleUnlockClick}
-        editDisabled={!!managedWarning}
       >
         {managedWarning && (
           <Alert severity="warning" sx={{ mx: 2, mb: 1 }}>
