@@ -14,14 +14,21 @@ import {
 import { SxProps, Theme } from "@mui/material/styles";
 import { useQuery } from "@tanstack/react-query";
 import { MRT_ColumnDef } from "material-react-table";
-import getCollectionTaskHistory from "@/actions/collection/getCollectionTaskHistory";
 import SearchBox from "@/components/SearchBox";
 import SectionCard from "@/components/SectionCard";
 import Table from "@/components/Table";
-import { getTagsCollectionTaskHistory } from "@/config/tags";
+import { routes } from "@/config/routes";
+import { QUERY_KEYS } from "@/config/tags";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useTable } from "@/hooks/useTable";
-import { TaskHistoryTask, TimeRange } from "@/types/api";
+import { routeGet } from "@/lib/routeFetch";
+import {
+  ApiResponse,
+  CollectionTaskHistory,
+  TaskHistoryTask,
+  TaskType,
+  TimeRange,
+} from "@/types/api";
 import { formatDuration, getDatetime, getTimestamp } from "@/utils/date";
 import { queryToText } from "@/utils/queryBuilder";
 import TaskDetailModal from "./TaskDetailModal";
@@ -54,8 +61,14 @@ const CollectionTasksPanel = ({
   const isActive = enabled;
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: getTagsCollectionTaskHistory(collectionPid, range),
-    queryFn: () => getCollectionTaskHistory(collectionPid, range),
+    queryKey: QUERY_KEYS.collectionTaskHistory(collectionPid, range),
+    queryFn: () =>
+      routeGet<ApiResponse<CollectionTaskHistory>>(
+        routes.api.collectionTaskHistory(
+          collectionPid,
+          new URLSearchParams({ ...range }),
+        ),
+      ),
     enabled: isActive,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
@@ -105,7 +118,7 @@ const CollectionTasksPanel = ({
         Cell: ({ row }) => (
           <Tooltip
             title={
-              row.original.task_type === "b"
+              row.original.task_type === TaskType.B
                 ? "B-type — a distribution job, which runs no cohort query"
                 : "A-type — a cohort query"
             }

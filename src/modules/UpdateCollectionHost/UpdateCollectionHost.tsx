@@ -1,7 +1,6 @@
 "use client";
 import { Stack } from "@mui/material";
 import { useRouter } from "next/navigation";
-import CopyableVariable from "@/components/CopyableVariable";
 import { CollectionHost } from "@/types/api";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useCallback, useEffect, useMemo } from "react";
@@ -10,11 +9,12 @@ import AddButton from "@/components/AddButton";
 import FormTextField from "@/components/FormTextField";
 import FormLabel from "@/components/FormLabel";
 import ErrorHeader from "@/components/ErrorHeader";
-import useCustodianStore from "@/hooks/useCustodianStore";
 import UpdatePanel from "@/components/UpdatePanel";
 import { useThreePane } from "@/providers/ThreePaneProvider";
 import { useSaveChanges } from "@/hooks/useSaveChanges";
 import { routes } from "@/config/routes";
+import CollectionHostCredentials from "@/modules/CollectionHostCredentials";
+import updateCollectionHost from "@/actions/collectionHost/updateCollectionHost";
 
 type CollectionHostFormValues = { hostName: string };
 
@@ -28,7 +28,6 @@ const UpdateCollectionHost = ({
   const { expandedRight, toggleRight: onClose } = useThreePane();
   const notify = useNotify();
   const router = useRouter();
-  const updateCollectionHost = useCustodianStore((s) => s.updateCollectionHost);
 
   const defaultValues = useMemo(
     () => ({
@@ -71,7 +70,7 @@ const UpdateCollectionHost = ({
 
       if (closeAfter) onClose?.();
     },
-    [notify, onClose, updateCollectionHost, selectedCollectionHost],
+    [notify, onClose, selectedCollectionHost],
   );
 
   const onDiscard = useCallback(() => {
@@ -135,13 +134,7 @@ const UpdateCollectionHost = ({
 
         <Stack sx={{ mt: 1 }}>
           <FormLabel underlined>Host Credentials</FormLabel>
-          Client ID
-          <CopyableVariable value={selectedCollectionHost.client_id} />
-          Client Secret
-          <CopyableVariable
-            hidden
-            value={selectedCollectionHost.client_secret}
-          />
+          <CollectionHostCredentials hostId={selectedCollectionHost.id} />
         </Stack>
       </UpdatePanel>
     </FormProvider>

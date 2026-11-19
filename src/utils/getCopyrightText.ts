@@ -9,3 +9,10 @@ export const getCopyrightText = async () => {
 
   return `${copyright}HDR UK ${currentYear}. All rights reserved.`;
 };
+
+export const getCopyrightYear = async (): Promise<number> => {
+  "use cache";
+  cacheLife("days");
+
+  return new Date().getFullYear();
+};

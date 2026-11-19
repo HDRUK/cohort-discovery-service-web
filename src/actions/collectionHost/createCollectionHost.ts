@@ -1,6 +1,9 @@
 "use server";
 
-import { apiPost } from "@/lib/apiClient";
+import { updateTag } from "next/cache";
+import { CACHE_TAGS } from "@/config/tags";
+import { apiPost } from "@/server/api";
+import { requireSession } from "@/server/session";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import {
   CollectionHost,
@@ -8,14 +11,14 @@ import {
   ApiResponse,
 } from "@/types/api";
 import { CollectionHostFormValues } from "@/types/forms";
-import { revalidateCollections } from "@/actions/revalidate";
 
 const createCollectionHost = async (
   custodian_id: number,
   { name, context }: CollectionHostFormValues,
-  custodianPid?: string,
 ): Promise<void> => {
+  const { token } = await requireSession();
   await apiPost<ApiResponse<CollectionHost>, CreateCollectionHostPost>(
+    token,
     API_ROUTES.collectionHosts,
     {
       name,
@@ -23,7 +26,8 @@ const createCollectionHost = async (
       custodian_id,
     },
   );
-  if (custodianPid) await revalidateCollections(custodianPid);
+  updateTag(CACHE_TAGS.collectionHosts);
+  updateTag(CACHE_TAGS.collections);
 };
 
 export default createCollectionHost;

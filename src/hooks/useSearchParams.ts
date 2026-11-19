@@ -11,20 +11,29 @@ import { useSearchParamsTransition } from "@/contexts/SearchParamsTransitionCont
 const useSearchParams = (paramName: string = "searchTerm") => {
   const router = useRouter();
   const pathname = usePathname();
-  const { startTransition } = useSearchParamsTransition();
+  const { startTransition, pendingSearchParams, setPendingSearchParams } =
+    useSearchParamsTransition();
+  const urlSearchParams = useNextSearchParams();
   const [searchParams, setOptimisticSearchParams] =
-    useOptimistic<URLSearchParams>(useNextSearchParams());
+    useOptimistic<URLSearchParams>(pendingSearchParams ?? urlSearchParams);
 
   const navigate = useCallback(
     (params: URLSearchParams) => {
       const queryString = params.toString();
 
       startTransition(() => {
+        setPendingSearchParams(params);
         setOptimisticSearchParams(params);
         router.replace(queryString ? `?${queryString}` : pathname);
       });
     },
-    [startTransition, setOptimisticSearchParams, router, pathname],
+    [
+      startTransition,
+      setPendingSearchParams,
+      setOptimisticSearchParams,
+      router,
+      pathname,
+    ],
   );
 
   const setSearchParams = useCallback(

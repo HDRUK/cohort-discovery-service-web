@@ -32,11 +32,9 @@ const OVERALL_COLOURS = {
 const CollectionHealthDetailView = ({
   pid,
   initialCollections,
-  fetchedAt,
 }: {
   pid: string;
   initialCollections: CollectionWithHosts[];
-  fetchedAt: number;
 }) => {
   const hasMounted = useHasMounted();
 
@@ -49,7 +47,7 @@ const CollectionHealthDetailView = ({
     invalidate,
     updateExpected,
     runTest,
-  } = useCollectionHealth({ initialCollections, fetchedAt, pid });
+  } = useCollectionHealth({ initialCollections, pid });
 
   const row = rows.find((candidate) => candidate.pid === pid);
 

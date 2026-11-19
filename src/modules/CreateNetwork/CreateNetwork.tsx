@@ -8,8 +8,10 @@ import { useNotify } from "@/providers/NotifyProvider";
 
 import FormMultiSelect from "@/components/FormMultiSelect";
 import { ValueType } from "@/components/FormMultiSelect/FormMultiSelect";
-import useAdminStore from "@/hooks/useAdminStore";
-import useUserStore from "@/hooks/useUserStore";
+import { useSessionData } from "@/contexts/SessionDataContext";
+import { useNetworks } from "@/contexts/NetworksContext";
+import createNetwork from "@/actions/network/createNetwork";
+import addCustodiansToNetwork from "@/actions/network/addCustodiansToNetwork";
 
 interface CreateCollectionProps {
   onCreate?: (id: number) => void;
@@ -17,10 +19,8 @@ interface CreateCollectionProps {
 }
 
 const CreateNetwork = ({ onCreate, onCancel }: CreateCollectionProps) => {
-  const createNetwork = useAdminStore((s) => s.createNetwork);
-  const networks = useAdminStore((s) => s.networks);
-  const custodians = useUserStore((s) => s.custodians);
-  const addCustodiansToNetwork = useAdminStore((s) => s.addCustodiansToNetwork);
+  const networks = useNetworks();
+  const custodians = useSessionData().custodians;
 
   const notify = useNotify();
 

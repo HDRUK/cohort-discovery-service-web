@@ -1,5 +1,7 @@
 import { cookies } from "next/headers";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
+import { API_ROUTES, isPathSegment } from "@/lib/apiRoutes";
+import { parseDownloadParams } from "@/utils/download";
 const baseURL = process.env.API_BASE_URL!;
 
 export async function GET(
@@ -7,20 +9,23 @@ export async function GET(
   { params }: { params: Promise<{ pid: string }> },
 ) {
   const { pid } = await params;
-  const urlObj = new URL(req.url);
-  const format = urlObj.searchParams.get("format") ?? "csv";
-  const entity = urlObj.searchParams.get("entity") ?? "queries";
+  const downloadParams = parseDownloadParams(new URL(req.url).searchParams);
+  if (!downloadParams || !isPathSegment(pid)) {
+    return new Response("Unsupported download", { status: 400 });
+  }
+  const { entity, format } = downloadParams;
 
   const cookieStore = await cookies();
   const token = cookieStore.get(ACCESS_TOKEN_NAME)?.value;
+  if (!token) {
+    return new Response("Not signed in", { status: 401 });
+  }
 
-  const backendUrl = `${baseURL}/api/v1/${entity}/${pid}/download/${format}`;
+  const backendUrl = `${baseURL}${API_ROUTES.download(entity, pid, format)}`;
 
   const backendRes = await fetch(backendUrl, {
     method: "GET",
-    headers: {
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
+    headers: { Authorization: `Bearer ${token}` },
   });
 
   if (!backendRes.ok) {

@@ -1,25 +1,27 @@
 "use server";
 
-import { apiPost } from "@/lib/apiClient";
+import { updateTag } from "next/cache";
+import { CACHE_TAGS } from "@/config/tags";
+import { apiPost } from "@/server/api";
+import { requireSession } from "@/server/session";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { ApiResponse, Concept } from "@/types/api";
-import { revalidateUserAction } from "@/actions/revalidate";
-import { TAG_CONCEPT_SETS } from "@/config/tags";
 
 const attachConcepts = async (
   conceptSetId: number,
   conceptIds: number[],
 ): Promise<void> => {
+  const { token } = await requireSession();
   await Promise.all(
     conceptIds.map((conceptId) =>
       apiPost<ApiResponse<Concept>, Record<string, never>>(
+        token,
         API_ROUTES.attachConcept(conceptSetId, conceptId),
         {},
-        { cache: "no-store" },
       ),
     ),
   );
-  await revalidateUserAction(TAG_CONCEPT_SETS);
+  updateTag(CACHE_TAGS.conceptSets);
 };
 
 export default attachConcepts;

@@ -1,7 +1,8 @@
 import { create, StateCreator } from "zustand";
 import { v4 as uuidv4 } from "uuid";
 import { persist, createJSONStorage } from "zustand/middleware";
-import parseQuery from "@/actions/query/parseQuery";
+import { routes } from "@/config/routes";
+import { routePost } from "@/lib/routeFetch";
 import { queryToText } from "@/utils/queryBuilder";
 import {
   SizeCache,
@@ -29,13 +30,12 @@ import { UniqueIdentifier } from "@dnd-kit/core";
 import { removeFalseKeys } from "@/utils/numbers";
 import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
 import { DatasetErrors } from "@/utils/datasets";
-import { Collection } from "@/types/api";
+import { ApiResponse, Collection, ParseQueryBody } from "@/types/api";
 import { FeatureName } from "@/types/features";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import { intersection } from "lodash";
 import { getAllowedDatasetIds } from "@/utils/collections";
 import { getDomain } from "@/utils/omop";
-import { useUserDataStore } from "@/hooks/userDataStore";
 
 export enum NodeKind {
   RULE = "RULE",
@@ -142,7 +142,8 @@ export interface QueryBuilderStoreState {
   selectedDatasets: string[];
   setSelectedDatasets: (pids: string[]) => void;
 
-  hasSelectedSyntheticDatasets: boolean;
+  ownerId: number | null;
+  resetSelectedDatasetsFor: (ownerId: number) => void;
 
   initialiseSelectedDatasets: (
     collections: Collection[],
@@ -498,25 +499,19 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
     }));
   },
 
-  hasSelectedSyntheticDatasets: false,
+  ownerId: null,
+  resetSelectedDatasetsFor: (ownerId) =>
+    set((state) => ({
+      ...state,
+      ownerId,
+      selectedDatasets: [],
+    })),
+
   selectedDatasets: [],
   setSelectedDatasets: (pids) => {
-    const { userCollections } = useUserDataStore.getState();
-
-    const syntheticPids = userCollections
-      .filter((collection) => collection.is_synthetic)
-      .map((collection) => collection.pid);
-
-    const selectedSet = new Set(pids);
-
-    const hasSelectedSyntheticDatasets = syntheticPids.some((pid) =>
-      selectedSet.has(pid),
-    );
-
     set((state) => ({
       ...state,
       selectedDatasets: pids,
-      hasSelectedSyntheticDatasets,
     }));
 
     get().setErrors(get().queryBuilderJson, pids);
@@ -576,8 +571,12 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
       }
       return query;
     };
-    const { data: newQueryString } = await parseQuery(input, {
-      ignoreSynthetic,
+    const { data: newQueryString } = await routePost<
+      ApiResponse<string>,
+      ParseQueryBody
+    >(routes.api.parseQuery, {
+      query: input,
+      ignore_synthetic: ignoreSynthetic,
       collections,
     });
 
@@ -612,7 +611,7 @@ export const useQueryBuilderStore = create<QueryBuilderStoreState>()(
     storage: createJSONStorage(() => localStorage),
     partialize: (state) => ({
       selectedDatasets: state.selectedDatasets,
-      hasSelectedSyntheticDatasets: state.hasSelectedSyntheticDatasets,
+      ownerId: state.ownerId,
     }),
   }),
 );

@@ -1,21 +1,26 @@
 "use server";
 
-import { apiDelete } from "@/lib/apiClient";
+import { updateTag } from "next/cache";
+import { CACHE_TAGS } from "@/config/tags";
+import { apiDelete } from "@/server/api";
+import { requireSession } from "@/server/session";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { RemoveCollectionsFromWorkgroupPost, ApiResponse } from "@/types/api";
-import { revalidateWorkgroupAndCollections } from "@/actions/revalidate";
 
 const removeCollectionsFromWorkgroup = async (
   payload: RemoveCollectionsFromWorkgroupPost,
 ): Promise<void> => {
+  const { token } = await requireSession();
   await Promise.all(
     payload.ids.map(async (id) =>
       apiDelete<ApiResponse<number>>(
-        `${API_ROUTES.collection(id)}/workgroup/${payload.workgroup_id}`,
+        token,
+        API_ROUTES.collectionWorkgroup(id, payload.workgroup_id),
       ),
     ),
   );
-  await revalidateWorkgroupAndCollections();
+  updateTag(CACHE_TAGS.workgroups);
+  updateTag(CACHE_TAGS.collections);
 };
 
 export default removeCollectionsFromWorkgroup;

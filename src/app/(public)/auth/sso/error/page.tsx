@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Button, Paper, Stack, Typography } from "@mui/material";
 import { routes } from "@/config/routes";
 
@@ -23,21 +24,23 @@ interface SsoErrorPageProps {
   searchParams: Promise<{ error?: string }>;
 }
 
-export const instant = false;
-
-export default async function SsoErrorPage({
-  searchParams,
-}: SsoErrorPageProps) {
+const SsoErrorMessage = async ({ searchParams }: SsoErrorPageProps) => {
   const { error } = await searchParams;
-  const message = (error && ERROR_MESSAGES[error]) || DEFAULT_MESSAGE;
+  return <>{(error && ERROR_MESSAGES[error]) || DEFAULT_MESSAGE}</>;
+};
 
+export default function SsoErrorPage({ searchParams }: SsoErrorPageProps) {
   return (
     <Paper sx={{ p: 4, maxWidth: 600, margin: "100px auto" }}>
       <Typography variant="h3" color="error.main" gutterBottom>
         Sign-in failed
       </Typography>
 
-      <Typography sx={{ mb: 3 }}>{message}</Typography>
+      <Typography sx={{ mb: 3 }}>
+        <Suspense>
+          <SsoErrorMessage searchParams={searchParams} />
+        </Suspense>
+      </Typography>
 
       <Stack>
         <Button variant="outlined" href={routes.login} sx={{ mx: "auto" }}>

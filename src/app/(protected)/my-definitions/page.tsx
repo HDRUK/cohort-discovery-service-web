@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { Paper, Typography } from "@mui/material";
 import TableSkeleton from "@/components/TableSkeleton";
 import MyDefinitions from "./components/MyDefinitions";
-import getConceptSets from "@/actions/conceptSet/getConceptSets";
+import { getConceptSets } from "@/server/data/conceptSets";
 
 const MyDefinitionsContent = async () => {
   const { data: conceptSets } = await getConceptSets();

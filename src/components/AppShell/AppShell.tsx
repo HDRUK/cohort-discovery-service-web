@@ -7,6 +7,7 @@ import SupportPopOut from "@/components/SupportPopOut/SupportPopOut";
 import { isStandalone } from "@/utils/modes";
 import { Suspense } from "react";
 import { getCopyrightText } from "@/utils/getCopyrightText";
+import { SessionDataProvider } from "@/contexts/SessionDataContext";
 
 const hideNav = process.env.HIDE_NAV === "1";
 const applicationMode = process.env.APPLICATION_MODE;
@@ -27,9 +28,23 @@ const AppShell = async ({ children }: { children: React.ReactNode }) => {
       >
         {!standalone && <SupportPopOut />}
 
-        {!hideNav && <HeaderBar />}
+        {!hideNav && (
+          <Suspense
+            fallback={
+              <SessionDataProvider value={null}>
+                <HeaderBar />
+              </SessionDataProvider>
+            }
+          >
+            <HeaderBar />
+          </Suspense>
+        )}
 
-        {!hideNav && <AccessBanner />}
+        {!hideNav && (
+          <Suspense>
+            <AccessBanner />
+          </Suspense>
+        )}
 
         <Box
           sx={{

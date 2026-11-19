@@ -4,7 +4,6 @@ import "./globals.css";
 import ThemeRegistry from "@/components/ThemeRegistry";
 import ServerDefaultProvider from "@/providers/ServerDefaultProvider";
 import ApplicationModeProvider from "@/providers/ApplicationModeProvider";
-import SignOutOverlay from "@/components/SignOutOverlay";
 import branding from "@branding/branding.config";
 
 const sourceSans = Source_Sans_3({
@@ -45,7 +44,6 @@ export default async function RootLayout({
           >
             <ServerDefaultProvider>
               {children}
-              <SignOutOverlay />
             </ServerDefaultProvider>
           </body>
         </html>

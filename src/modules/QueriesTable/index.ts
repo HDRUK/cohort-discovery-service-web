@@ -1,6 +1,6 @@
 import QueriesTable from "./QueriesTable";
-import QueriesTableSkeleton from "./QueriesTableSkeleton";
+import QueryHistoryTitle from "./QueryHistoryTitle";
 
-export { QueriesTableSkeleton };
+export { QueryHistoryTitle };
 
 export default QueriesTable;

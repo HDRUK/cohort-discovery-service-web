@@ -2,13 +2,14 @@
 
 import { ApiResponse, SignInPost, SignInResponse } from "@/types/api";
 import { API_ROUTES } from "@/lib/apiRoutes";
-import { apiPost } from "@/lib/apiClient";
+import { apiPost } from "@/server/api";
 import { ApiError } from "@/lib/https";
 import { setAccessTokenCookie } from "@/lib/authCookie";
 
 const standaloneSignIn = async (payload: SignInPost): Promise<boolean> => {
   try {
     const response = await apiPost<ApiResponse<SignInResponse>, SignInPost>(
+      null,
       API_ROUTES.signIn,
       payload,
     );

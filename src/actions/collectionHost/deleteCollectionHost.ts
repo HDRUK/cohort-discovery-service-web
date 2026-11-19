@@ -1,16 +1,20 @@
 "use server";
 
-import { apiDelete } from "@/lib/apiClient";
+import { updateTag } from "next/cache";
+import { CACHE_TAGS } from "@/config/tags";
+import { apiDelete } from "@/server/api";
+import { requireSession } from "@/server/session";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { CollectionHost, ApiResponse } from "@/types/api";
-import { revalidateCollections } from "@/actions/revalidate";
 
-const deleteCollectionHost = async (
-  hostId: number,
-  custodianPid?: string,
-): Promise<void> => {
-  await apiDelete<ApiResponse<CollectionHost>>(API_ROUTES.collectionHost(hostId));
-  await revalidateCollections(custodianPid);
+const deleteCollectionHost = async (hostId: number): Promise<void> => {
+  const { token } = await requireSession();
+  await apiDelete<ApiResponse<CollectionHost>>(
+    token,
+    API_ROUTES.collectionHost(hostId),
+  );
+  updateTag(CACHE_TAGS.collectionHosts);
+  updateTag(CACHE_TAGS.collections);
 };
 
 export default deleteCollectionHost;

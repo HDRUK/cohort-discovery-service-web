@@ -4,7 +4,7 @@ import { CollectionHostFormValues } from "@/types/forms";
 import { QueryContext } from "@/types/context";
 import FormTextField from "@/components/FormTextField";
 import FormDropdown from "@/components/FormDropdown";
-import useCustodianStore from "@/hooks/useCustodianStore";
+import createCollectionHost from "@/actions/collectionHost/createCollectionHost";
 
 interface CollectionHostFormProps {
   custodianId: number;
@@ -17,9 +17,6 @@ const CreateCollectionHost = ({
   onCancel,
   hideContext = true,
 }: CollectionHostFormProps) => {
-  const createCollectionHost = useCustodianStore(
-    (st) => st.createCollectionHost,
-  );
 
   const {
     handleSubmit,

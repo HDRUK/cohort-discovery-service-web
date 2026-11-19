@@ -1,8 +1,10 @@
-import getAdminCollections from "@/actions/collection/getAdminCollections";
+import {
+  getAdminCollectionList,
+  getCustodianCollections,
+} from "@/server/data/collections";
 import { CollectionsSearchParams } from "@/types/api";
 import { buildCollectionParams } from "@/utils/params";
 import { Box, Skeleton } from "@mui/material";
-import getCustodianCollections from "@/actions/collection/getCustodianCollections";
 import CollectionsManagement from "../CollectionsManagement";
 
 export const CollectionsSkeleton = () => (
@@ -14,20 +16,19 @@ export const CollectionsSkeleton = () => (
 
 const CollectionsTab = async ({
   searchParams,
-  custodianPid,
+  custodianPid: custodianPidPromise,
 }: {
-  searchParams: CollectionsSearchParams;
-  custodianPid?: string;
+  searchParams: Promise<CollectionsSearchParams>;
+  custodianPid?: Promise<string>;
 }) => {
-  const params = buildCollectionParams(searchParams);
+  const params = buildCollectionParams(await searchParams);
+  const custodianPid = await custodianPidPromise;
 
   const isAdmin = !custodianPid;
 
-  const [{ data: collections }] = await Promise.all([
-    isAdmin
-      ? getAdminCollections({ params })
-      : getCustodianCollections(custodianPid, { params }),
-  ]);
+  const { data: collections } = isAdmin
+    ? await getAdminCollectionList({ params })
+    : await getCustodianCollections(custodianPid, { params });
 
   return <CollectionsManagement isAdmin={isAdmin} collections={collections} />;
 };

@@ -1,23 +1,25 @@
 "use server";
 
-import { apiPost } from "@/lib/apiClient";
+import { refresh } from "next/cache";
+import { apiPost } from "@/server/api";
+import { requireSession } from "@/server/session";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { ApiResponse, Query } from "@/types/api";
-import { revalidateUserAction } from "../revalidate";
-import { TAG_QUERIES } from "@/config/tags";
 
 interface DeleteQueriesPost {
   keys: string[];
 }
 
 const deleteQueries = async (pids: string[]): Promise<ApiResponse<Query>> => {
+  const { token } = await requireSession();
   const res = await apiPost<ApiResponse<Query>, DeleteQueriesPost>(
+    token,
     API_ROUTES.deleteQueriesBulk,
     {
       keys: pids,
     },
   );
-  await revalidateUserAction(TAG_QUERIES);
+  refresh();
   return res;
 };
 

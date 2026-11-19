@@ -3,12 +3,12 @@
 import { FormControlLabel, Stack } from "@mui/material";
 import { useCallback, useMemo } from "react";
 import { Collection } from "@/types/api";
-import { useUserDataStore } from "@/hooks/userDataStore";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import useFeatures from "@/hooks/useFeatures";
 import { addPids, removePids } from "@/utils/collections";
 import SquareCheckbox from "../SquareCheckbox";
 import Title from "../Title";
+import { useSessionData } from "@/contexts/SessionDataContext";
 
 type CollectionTypeFilter = {
   key: string;
@@ -38,7 +38,7 @@ const COLLECTION_TYPE_FILTERS: CollectionTypeFilter[] = [
 ];
 
 const CollectionTypeFilters = () => {
-  const collections = useUserDataStore((s) => s.userCollections);
+  const collections = useSessionData().userCollections;
   const selectedDatasets = useQueryBuilder((qb) => qb.selectedDatasets);
   const setSelectedDatasets = useQueryBuilder((qb) => qb.setSelectedDatasets);
 

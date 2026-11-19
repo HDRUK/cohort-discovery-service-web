@@ -59,7 +59,7 @@ const Table = <TData extends MRT_RowData>({
   ...props
 }: DTableProps<TData>) => {
   const { table } = props;
-  const { rowSelection = {} } = table?.getState() || {};
+  const { rowSelection = {}, isLoading = false } = table?.getState() || {};
 
   const selectedRows = useMemo(() => trueKeys(rowSelection), [rowSelection]);
 
@@ -152,7 +152,7 @@ const Table = <TData extends MRT_RowData>({
 
       {details && <Box sx={{ pb: 1 }}>{details}</Box>}
 
-      {emptyMessage && nrows === 0 ? (
+      {emptyMessage && nrows === 0 && !isLoading ? (
         <Box
           sx={{
             mx: "auto",

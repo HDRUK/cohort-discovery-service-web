@@ -1,22 +1,27 @@
 "use server";
 
-import { apiPost } from "@/lib/apiClient";
+import { updateTag } from "next/cache";
+import { CACHE_TAGS } from "@/config/tags";
+import { apiPost } from "@/server/api";
+import { requireSession } from "@/server/session";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { AddCustodiansToNetworkPost, ApiResponse } from "@/types/api";
-import { revalidateNetworks } from "@/actions/revalidate";
 
 const addCustodiansToNetwork = async (
   payload: AddCustodiansToNetworkPost,
 ): Promise<number[]> => {
+  const { token } = await requireSession();
   const results = await Promise.all(
     payload.custodian_ids.map(async (custodian_id) =>
       apiPost<ApiResponse<number>, AddCustodiansToNetworkPost>(
-        `${API_ROUTES.custodian(custodian_id)}/networks/${payload.id}`,
+        token,
+        API_ROUTES.custodianNetwork(custodian_id, payload.id),
         payload,
       ),
     ),
   );
-  await revalidateNetworks();
+  updateTag(CACHE_TAGS.custodians);
+  updateTag(CACHE_TAGS.collections);
   return results.map((r) => r.data);
 };
 

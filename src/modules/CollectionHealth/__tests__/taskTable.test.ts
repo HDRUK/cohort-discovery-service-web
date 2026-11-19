@@ -1,4 +1,4 @@
-import { TaskHistoryTask } from "@/types/api";
+import { TaskHistoryTask, TaskType } from "@/types/api";
 import { filterTasks } from "../taskTable";
 
 const task = (
@@ -7,7 +7,7 @@ const task = (
 ): TaskHistoryTask =>
   ({
     pid,
-    task_type: query ? "a" : "b",
+    task_type: query ? TaskType.A : TaskType.B,
     status: "succeeded",
     attempts: 1,
     created_at: "2026-09-07T12:00:00Z",

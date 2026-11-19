@@ -1,14 +1,15 @@
 "use server";
 
-import { apiDelete } from "@/lib/apiClient";
+import { refresh } from "next/cache";
+import { apiDelete } from "@/server/api";
+import { requireSession } from "@/server/session";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { ApiResponse } from "@/types/api";
-import { revalidateUserAction } from "@/actions/revalidate";
-import { TAG_REGRESSION_TESTS } from "@/config/tags";
 
 const deleteRegressionTest = async (pid: string) => {
-  await apiDelete<ApiResponse<[]>>(API_ROUTES.regressionTest(pid));
-  await revalidateUserAction(TAG_REGRESSION_TESTS);
+  const { token } = await requireSession();
+  await apiDelete<ApiResponse<[]>>(token, API_ROUTES.regressionTest(pid));
+  refresh();
 };
 
 export default deleteRegressionTest;

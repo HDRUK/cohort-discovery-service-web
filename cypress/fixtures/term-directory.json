@@ -7,14 +7,16 @@
         "concept_name": "Type 2 diabetes mellitus",
         "domain_id": "Condition",
         "count": 420,
-        "ncollections": 2
+        "ncollections": 2,
+        "collection_names": ["Alpha Cohort", "Zebra Cohort"]
       },
       {
         "concept_id": 4329847,
         "concept_name": "Myocardial infarction",
         "domain_id": "Condition",
         "count": 50,
-        "ncollections": 1
+        "ncollections": 1,
+        "collection_names": ["Heart Study"]
       }
     ],
     "current_page": 1,

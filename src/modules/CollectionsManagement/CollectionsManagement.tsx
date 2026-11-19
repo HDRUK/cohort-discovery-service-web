@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import {
   CollectionsSearchParams,
   CollectionWithHosts,
@@ -13,29 +12,16 @@ import CollectionsTable from "@/components/CollectionsTable";
 import ControlledSearchBox from "@/modules/ControlledSearchBox";
 import CollectionsLeftPanel from "@/modules/CollectionsLeftPanel";
 import CollectionsRightPanel from "@/modules/CollectionsRightPanel";
-import useCustodianStore from "@/hooks/useCustodianStore";
-import useAdminStore from "@/hooks/useAdminStore";
 import { ThreePaneProvider } from "@/providers/ThreePaneProvider";
+import { useCustodianSection } from "@/contexts/CustodianSectionContext";
 
 type Props = {
   isAdmin: boolean;
-  collections: Paginated<CollectionWithHosts>;
+  collections?: Paginated<CollectionWithHosts>;
 };
 
 const CollectionsManagement = ({ isAdmin, collections }: Props) => {
-  const custodian = useCustodianStore(
-    (custodianData) => custodianData.current.custodian,
-  );
-
-  const setAdminCollections = useAdminStore((s) => s.setCollections);
-  const setCustodianCollections = useCustodianStore(
-    (s) => s.current.setCollections,
-  );
-
-  useEffect(() => {
-    if (isAdmin) setAdminCollections(collections);
-    else setCustodianCollections(collections);
-  }, [isAdmin, collections, setAdminCollections, setCustodianCollections]);
+  const custodian = useCustodianSection()?.custodian;
 
   if (!isAdmin && !custodian) return <Skeleton height={"100%"} />;
 
@@ -58,8 +44,8 @@ const CollectionsManagement = ({ isAdmin, collections }: Props) => {
         <ThreePaneSwimLaneLayout
           rightDisabled={false}
           left={<CollectionsLeftPanel />}
-          middle={<CollectionsTable />}
-          right={<CollectionsRightPanel />}
+          middle={<CollectionsTable collections={collections} />}
+          right={<CollectionsRightPanel collections={collections?.data} />}
         />
       </ThreePaneProvider>
     </Box>

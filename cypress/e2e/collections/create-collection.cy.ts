@@ -7,7 +7,7 @@ describe("Create collection", () => {
   beforeEach(() => {
     cy.login("admin", { isAdmin: true });
     cy.visit(routes.adminCollections);
-    cy.contains("Collections", { timeout: 10000 }).should("be.visible");
+    cy.contains("Test Dataset Alpha", { timeout: 15000 }).should("be.visible");
   });
 
   it("shows a button to create a new collection", () => {

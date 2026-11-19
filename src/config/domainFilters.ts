@@ -6,6 +6,7 @@ export const DOMAIN_TAB_FILTERS = {
   [OmopTableName.Measurement]: ["Measurement"],
   [OmopTableName.Drug]: ["Drug"],
   [OmopTableName.Procedure]: ["Procedure"],
+  [OmopTableName.Specimen]: ["Specimen"],
   [OmopTableName.Person]: ["Gender", "Race", "Ethnicity"],
 };
 

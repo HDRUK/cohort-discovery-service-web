@@ -7,7 +7,6 @@ import Table from "./Table";
 import { MRT_ColumnDef } from "material-react-table";
 import { AvailableFormats } from "../DownloadButton/DownloadButton";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
-jest.mock("@/actions/collection/getCustodianCollections");
 
 const handleDeleteRows = jest.fn();
 const handleRestoreRows = jest.fn();

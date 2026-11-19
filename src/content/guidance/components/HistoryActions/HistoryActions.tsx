@@ -16,7 +16,9 @@ import {
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import getQuery from "@/actions/query/getQuery";
+import { endSessionIfUnauthorised } from "@/lib/sessionEnd";
+import { routeGet } from "@/lib/routeFetch";
+import { ApiResponse, Query } from "@/types/api";
 import rerunQuery from "@/actions/query/rerunQuery";
 import {
   handleQuerySubmissionError,
@@ -32,10 +34,12 @@ import { routes } from "@/config/routes";
 import useSearchParams from "@/hooks/useSearchParams";
 import { useNotify } from "@/providers/NotifyProvider";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+import { QUERY_KEYS } from "@/config/tags";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import useUserStore from "@/hooks/useUserStore";
 import deleteQueries from "@/actions/query/deleteQueries";
 import RenameButton from "@/components/RenameButton";
+import useIsQueryLimitReached from "@/hooks/useIsQueryLimitReached";
 
 const HistoryActions = ({
   multiple = false,
@@ -53,7 +57,8 @@ const HistoryActions = ({
   const { searchParams } = useSearchParams();
   const router = useRouter();
   const notify = useNotify();
-  const isQueryLimitReached = useUserStore((s) => s.isQueryLimitReached);
+  const queryClient = useQueryClient();
+  const isQueryLimitReached = useIsQueryLimitReached();
   const { setQueryBuilderJson, setSelectedDatasets, setQueryName } =
     useQueryBuilder((qb) => ({
       setSelectedDatasets: qb.setSelectedDatasets,
@@ -105,6 +110,10 @@ const HistoryActions = ({
                   return;
                 }
 
+                await queryClient.invalidateQueries({
+                  queryKey: QUERY_KEYS.queries(),
+                });
+
                 const openQueries = (searchParams.get("open_queries") || "")
                   .split(",")
                   .filter((q) => q);
@@ -135,7 +144,19 @@ const HistoryActions = ({
         <EditButton
           label="Edit"
           onClick={async () => {
-            const result = await getQuery(selectedIds[0]);
+            let result: ApiResponse<Query>;
+            try {
+              result = await routeGet<ApiResponse<Query>>(
+                routes.api.query(selectedIds[0]),
+              );
+            } catch (error) {
+              if (!endSessionIfUnauthorised(error)) {
+                notify.error(
+                  "We couldn't open that query for editing. Try again.",
+                );
+              }
+              return;
+            }
             const ranCollectionPids = result.data.tasks.map(
               (t) => t.collection.pid,
             );

@@ -1,13 +1,10 @@
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import CollectionsTable, { CollectionsTableProps } from "./CollectionsTable";
-import getCustodianCollections from "@/actions/collection/getCustodianCollections";
-import getCustodian from "@/actions/custodian/getCustodian";
+import { getMockCustodianCollections } from "@/test/fixtures/collections";
+import { getMockCustodian } from "@/test/fixtures/custodians";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 import { CollectionWithHosts, Paginated } from "@/types/api";
-jest.mock("@/actions/collection/getCustodianCollections");
-jest.mock("@/actions/collection/getCollectionDetails");
-jest.mock("@/actions/custodian/getCustodian");
 
 let mockSearchParams = new URLSearchParams();
 
@@ -30,14 +27,8 @@ describe("CollectionsTable", () => {
     props?: CollectionsTableProps,
   ) =>
     render(
-      <MockCohortDiscoveryServiceStore
-        overrides={{
-          admin: {
-            collections,
-          },
-        }}
-      >
-        <CollectionsTable {...props} />
+      <MockCohortDiscoveryServiceStore>
+        <CollectionsTable collections={collections} {...props} />
       </MockCohortDiscoveryServiceStore>,
     );
 
@@ -48,20 +39,17 @@ describe("CollectionsTable", () => {
     render(
       <MockCohortDiscoveryServiceStore
         overrides={{
-          custodian: {
-            current: {
-              custodian: getCustodian(),
-              collections,
-            },
+          custodianSection: {
+            custodian: getMockCustodian(),
           },
         }}
       >
-        <CollectionsTable {...props} />
+        <CollectionsTable collections={collections} {...props} />
       </MockCohortDiscoveryServiceStore>,
     );
 
   it("renders the correct column headers for admin", async () => {
-    const collections = await getCustodianCollections("abc");
+    const collections = await getMockCustodianCollections();
 
     renderCollectionsTableAdmin(collections.data);
 
@@ -80,8 +68,19 @@ describe("CollectionsTable", () => {
     }
   });
 
+  it("marks the table busy until the collections have loaded", () => {
+    render(
+      <MockCohortDiscoveryServiceStore>
+        <CollectionsTable />
+      </MockCohortDiscoveryServiceStore>,
+    );
+
+    expect(document.querySelector('tbody[aria-busy="true"]')).not.toBeNull();
+    expect(screen.queryByText("Test Dataset #1")).not.toBeInTheDocument();
+  });
+
   it("displays data when collections exist for admin", async () => {
-    const collections = await getCustodianCollections("abc");
+    const collections = await getMockCustodianCollections();
 
     renderCollectionsTableAdmin(collections.data);
 
@@ -90,7 +89,7 @@ describe("CollectionsTable", () => {
   });
 
   it("displays data when collections exist for custodian", async () => {
-    const collections = await getCustodianCollections("abc");
+    const collections = await getMockCustodianCollections();
 
     renderCollectionsTable(collections.data);
 
@@ -99,7 +98,7 @@ describe("CollectionsTable", () => {
   });
 
   it("shows a deleted chip in place of the state for a deleted collection", async () => {
-    const collections = await getCustodianCollections("abc");
+    const collections = await getMockCustodianCollections();
     const [deleted, ...live] = collections.data.data;
 
     renderCollectionsTableAdmin({
@@ -111,7 +110,7 @@ describe("CollectionsTable", () => {
   });
 
   it("shows the delete button outside the deleted view", async () => {
-    const collections = await getCustodianCollections("abc");
+    const collections = await getMockCustodianCollections();
 
     renderCollectionsTableAdmin(collections.data);
 
@@ -120,7 +119,7 @@ describe("CollectionsTable", () => {
 
   it("swaps delete for restore on the deleted view", async () => {
     mockSearchParams = new URLSearchParams("collection_filter=deleted");
-    const collections = await getCustodianCollections("abc");
+    const collections = await getMockCustodianCollections();
 
     renderCollectionsTableAdmin(collections.data);
 
@@ -129,7 +128,7 @@ describe("CollectionsTable", () => {
   });
 
   it("shows no restore button outside the deleted view", async () => {
-    const collections = await getCustodianCollections("abc");
+    const collections = await getMockCustodianCollections();
 
     renderCollectionsTableAdmin(collections.data);
 

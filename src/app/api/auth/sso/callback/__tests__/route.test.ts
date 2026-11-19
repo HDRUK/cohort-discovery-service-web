@@ -3,9 +3,9 @@
  */
 import { NextRequest } from "next/server";
 import { GET } from "../route";
-import ssoExchange from "@/actions/standalone/ssoExchange";
+import ssoExchange from "@/server/ssoExchange";
 
-jest.mock("@/actions/standalone/ssoExchange", () => ({
+jest.mock("@/server/ssoExchange", () => ({
   __esModule: true,
   default: jest.fn(),
 }));

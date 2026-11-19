@@ -1,10 +1,19 @@
 import "@testing-library/jest-dom";
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import CollectionFilter from "./CollectionFilter";
 import { DefaultProvider } from "@/providers/DefaultProvider";
-import { getMockCollection } from "@/actions/collection/__mocks__/getCollections";
-import { useUserDataStore } from "@/hooks/userDataStore";
+import { getMockCollection } from "@/test/fixtures/collections";
+import {
+  SessionData,
+  SessionDataProvider,
+} from "@/contexts/SessionDataContext";
 import { HdrukUiProvider } from "@hdruk/ui";
 import { themeOptions } from "@/config/theme";
 import { ThemeOptions } from "@mui/material";
@@ -31,7 +40,11 @@ const renderComponent = () =>
   render(
     <DefaultProvider>
       <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
-        <CollectionFilter />
+        <SessionDataProvider
+          value={{ userCollections: collections } as unknown as SessionData}
+        >
+          <CollectionFilter />
+        </SessionDataProvider>
       </HdrukUiProvider>
     </DefaultProvider>,
   );
@@ -43,7 +56,6 @@ describe("CollectionFilter", () => {
   beforeEach(() => {
     mockReplace.mockClear();
     mockSearchParams = new URLSearchParams();
-    useUserDataStore.setState({ userCollections: collections });
   });
 
   it("writes a checked collection to the URL and restarts at page 1", async () => {
@@ -63,7 +75,11 @@ describe("CollectionFilter", () => {
     render(
       <DefaultProvider>
         <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
-          <CollectionFilter />
+          <SessionDataProvider
+            value={{ userCollections: collections } as unknown as SessionData}
+          >
+            <CollectionFilter />
+          </SessionDataProvider>
           <navigation.PendingRouter />
         </HdrukUiProvider>
       </DefaultProvider>,
@@ -79,6 +95,32 @@ describe("CollectionFilter", () => {
     expect(
       screen.getByRole("checkbox", { name: "Test Dataset Beta" }),
     ).toBeChecked();
+  });
+
+  it("shows every collection again after reopening, so a stale search doesn't hide what's available", async () => {
+    renderComponent();
+
+    await openPopover();
+    await userEvent.type(screen.getByRole("searchbox"), "Alpha");
+    await waitFor(() =>
+      expect(
+        screen.queryByRole("checkbox", { name: "Test Dataset Beta" }),
+      ).not.toBeInTheDocument(),
+    );
+
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() =>
+      expect(screen.queryByRole("searchbox")).not.toBeInTheDocument(),
+    );
+    await openPopover();
+
+    expect(screen.getByRole("searchbox")).toHaveValue("");
+    expect(
+      screen.getByRole("checkbox", { name: "Test Dataset Alpha" }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByRole("checkbox", { name: "Test Dataset Beta" }),
+    ).toBeInTheDocument();
   });
 
   it("removes the param when the last collection is unchecked", async () => {

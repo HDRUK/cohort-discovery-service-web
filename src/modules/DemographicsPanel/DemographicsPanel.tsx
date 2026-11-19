@@ -28,11 +28,17 @@ import {
   formatDeathSummary,
 } from "./summary";
 import { useQuery } from "@tanstack/react-query";
-import getTermDirectory from "@/actions/termDirectory/getTermDirectory";
+import { routes } from "@/config/routes";
+import { routeGet } from "@/lib/routeFetch";
+import { toTermDirectoryParams } from "@/utils/routeParams";
 import { OmopTableName } from "@/types/omop";
-import { useUserDataStore } from "@/hooks/userDataStore";
+import { ApiResponse, Paginated, TermDirectoryEntry } from "@/types/api";
 import useFeatures from "@/hooks/useFeatures";
 import { hasDemographicsContent } from "@/utils/rules";
+import { QUERY_KEYS } from "@/config/tags";
+import { useSessionData } from "@/contexts/SessionDataContext";
+
+const PERSON_CONCEPTS_PER_PAGE = 100;
 
 const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
   const { demographics, remove, selectedDatasets } = useQueryBuilder((qb) => ({
@@ -40,8 +46,8 @@ const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
     remove: qb.removeDemographics,
     selectedDatasets: qb.selectedDatasets,
   }));
-  const user = useUserDataStore((s) => s.user);
-  const userCollections = useUserDataStore((s) => s.userCollections);
+  const user = useSessionData().user;
+  const userCollections = useSessionData().userCollections;
   const { queryBuilderUseLocation, queryBuilderUseRace, queryBuilderUseDeath } =
     useFeatures();
 
@@ -71,9 +77,18 @@ const DemographicsPanel = ({ initialExpand }: { initialExpand?: boolean }) => {
 
   //this will be different for different users and what collectionPids are selected
   const { data: personConcepts } = useQuery({
-    queryKey: [`demographics-${user?.id}`, collectionPids],
-    queryFn: async () =>
-      await getTermDirectory(1, 100, "", OmopTableName.Person, collectionPids),
+    queryKey: QUERY_KEYS.demographics(user?.id, collectionPids),
+    queryFn: () =>
+      routeGet<ApiResponse<Paginated<TermDirectoryEntry>>>(
+        routes.api.termDirectory(
+          toTermDirectoryParams({
+            page: 1,
+            perPage: PERSON_CONCEPTS_PER_PAGE,
+            domain: OmopTableName.Person,
+            collections: collectionPids,
+          }),
+        ),
+      ),
     enabled: !!user?.id,
     staleTime: 10 * 60_000,
   });

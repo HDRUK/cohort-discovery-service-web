@@ -7,17 +7,17 @@ import TabsShell from "@/components/TabsShell";
 import { routes } from "../../config/routes";
 import { TabType } from "../TabsShell/TabsShell";
 import { checkIsAdmin } from "@/utils/user";
-import useUserStore from "@/hooks/useUserStore";
 import { HelpIcon } from "@/icons/HelpIcon";
 import HelpTooltip from "../HelpTooltip";
 import { useApplicationMode } from "@/providers/ApplicationModeProvider";
 import { TermDirectoryIcon } from "@/icons/TermDirectoryIcon";
 import { Stack, Typography } from "@mui/material";
 import { useUiPreferences } from "@/store/uiPreferencesStore";
+import { useSessionUser } from "@/contexts/SessionDataContext";
 
 export default function TopMenu() {
   const pathname = usePathname();
-  const user = useUserStore((s) => s.user);
+  const user = useSessionUser();
   const { isStandalone } = useApplicationMode();
 
   const dismissed = useUiPreferences((s) => s.dismissed.termDirectoryTooltip);

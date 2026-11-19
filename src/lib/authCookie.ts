@@ -1,8 +1,8 @@
 import { cookies, headers } from "next/headers";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { ACCESS_TOKEN_NAME } from "@/config/internals";
+import { SESSION_CLOCK_SKEW_SECONDS } from "@/server/sessionExpiry";
 
-const CLOCK_SKEW_SECONDS = 30;
 const FALLBACK_MAX_AGE_SECONDS = 60 * 60;
 
 export const getAccessTokenMaxAge = (
@@ -10,7 +10,7 @@ export const getAccessTokenMaxAge = (
   nowInSeconds: number,
 ): number =>
   exp
-    ? Math.max(0, exp - nowInSeconds - CLOCK_SKEW_SECONDS)
+    ? Math.max(0, exp - nowInSeconds - SESSION_CLOCK_SKEW_SECONDS)
     : FALLBACK_MAX_AGE_SECONDS;
 
 const getRequestNowInSeconds = async (): Promise<number> => {

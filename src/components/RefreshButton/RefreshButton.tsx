@@ -8,12 +8,11 @@ import {
   Tooltip,
 } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { revalidateAction } from "@/actions/revalidate";
+import { useRouter } from "next/navigation";
 
 const isProd = process.env.NODE_ENV === "production";
 
 export interface RefreshButtonProps extends Omit<IconButtonProps, "onClick"> {
-  tag: string | string[];
   showTooltip?: boolean;
   label?: string;
   text?: string;
@@ -21,16 +20,14 @@ export interface RefreshButtonProps extends Omit<IconButtonProps, "onClick"> {
 }
 
 const RefreshButton = ({
-  tag,
-  label,
+  label = "Refresh",
   text,
   showTooltip = false,
   onRefreshed,
   ...rest
 }: RefreshButtonProps) => {
-  const tags = Array.isArray(tag) ? tag : [tag];
-  const uniqueTags = [...new Set(tags)];
-  const title = !isProd || showTooltip ? (label ?? tag) : null;
+  const router = useRouter();
+  const title = !isProd || showTooltip ? label : null;
   return (
     <Tooltip title={title}>
       <Box display="flex" alignItems="center" gap={1}>
@@ -38,7 +35,7 @@ const RefreshButton = ({
           onClick={async (e) => {
             e.preventDefault();
             e.stopPropagation();
-            await Promise.all(uniqueTags.map((t) => revalidateAction(t)));
+            router.refresh();
             await onRefreshed?.();
           }}
           {...rest}

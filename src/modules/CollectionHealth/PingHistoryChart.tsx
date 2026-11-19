@@ -4,9 +4,15 @@ import { useCallback, useMemo } from "react";
 import { Alert, Box, Skeleton, Stack, Typography } from "@mui/material";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { useQuery } from "@tanstack/react-query";
-import getCollectionHealth from "@/actions/collection/getCollectionHealth";
-import { getTagsCollectionHealth } from "@/config/tags";
-import { PingBin, PingSummary } from "@/types/api";
+import { routes } from "@/config/routes";
+import { QUERY_KEYS } from "@/config/tags";
+import { routeGet } from "@/lib/routeFetch";
+import {
+  ApiResponse,
+  CollectionHealthSeries,
+  PingBin,
+  PingSummary,
+} from "@/types/api";
 import { getDatetime } from "@/utils/date";
 import DragRangeOverlay from "./DragRangeOverlay";
 import {
@@ -82,8 +88,14 @@ const PingHistoryChart = ({
   const [seriesAColour, seriesBColour] = useSeriesColours();
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: getTagsCollectionHealth(collectionPid, bin, range),
-    queryFn: () => getCollectionHealth(collectionPid, bin, range),
+    queryKey: QUERY_KEYS.collectionHealthSeries(collectionPid, bin, range),
+    queryFn: () =>
+      routeGet<ApiResponse<CollectionHealthSeries>>(
+        routes.api.collectionHealth(
+          collectionPid,
+          new URLSearchParams({ bin, from: range.from, to: range.to }),
+        ),
+      ),
     enabled,
     refetchOnWindowFocus: false,
     staleTime: STALE_TIME_TELEMETRY,

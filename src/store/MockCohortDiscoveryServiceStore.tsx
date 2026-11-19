@@ -1,27 +1,18 @@
 import { PropsWithChildren, useState } from "react";
+import {
+  SessionData,
+  SessionDataProvider,
+} from "@/contexts/SessionDataContext";
+import {
+  AdminSectionData,
+  AdminSectionDataProvider,
+} from "@/contexts/AdminSectionContext";
+import { CustodianSectionDataProvider } from "@/contexts/CustodianSectionContext";
 
 import type {
-  ApiResponse,
-  Collection,
   CollectionHost,
   CombinedUser,
-  CreateQuery,
-  Query,
   Custodian,
-  CreateCollectionPost,
-  ConceptSet,
-  Concept,
-  Workgroup,
-  Paginated,
-  CreateConceptSetPost,
-  UpdateCollectionHostPayload,
-  CreateCollectionConfigPost,
-  CollectionWithHosts,
-  DistributionType,
-  AddCollectionsToWorkgroupPost,
-  RemoveCollectionsFromWorkgroupPost,
-  AddCollectionToWorkgroupsPost,
-  RemoveCollectionFromWorkgroupsPost,
 } from "@/types/api";
 
 import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
@@ -33,23 +24,17 @@ import type {
 } from "@/types/rules";
 import type { UniqueIdentifier } from "@dnd-kit/core";
 
-import searchConcepts from "@/actions/concept/__mocks__/searchConcepts";
 import { validateRuleTree } from "@/utils/rules";
 import { queryToText } from "@/utils/queryBuilder";
 
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { NotifyProvider } from "@/providers/NotifyProvider";
-import { getMockCollection } from "@/actions/collection/__mocks__/getCollections";
-import { getMockWorkgroup } from "@/actions/workgroup/__mocks__/getWorkgroups";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { getMockQuery } from "@/actions/query/__mocks__/getQueries";
 
 import { useQueryBuilderStore } from "./queryBuilderStore";
 import { useStateManagementStore } from "@/store/stateManagementStore";
-import { useUserDataStore } from "@/hooks/userDataStore";
-import { useCustodianDataStore } from "@/store/custodianDataStore";
-import { useAdminDataStore } from "@/store/adminDataStore";
+import { useSelectionStore } from "@/store/selectionStore";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import ConfirmProvider from "@/components/ConfirmProvider";
 import { DefaultProvider } from "@/providers/DefaultProvider";
@@ -63,17 +48,17 @@ const queryClient = new QueryClient();
 
 type StateManagementState = ReturnType<typeof useStateManagementStore.getState>;
 type QueryBuilderState = ReturnType<typeof useQueryBuilderStore.getState>;
-type UserStoreState = ReturnType<typeof useUserDataStore.getState>;
-type CustodianStoreState = ReturnType<typeof useCustodianDataStore.getState>;
-type AdminStoreState = ReturnType<typeof useAdminDataStore.getState>;
 type FeatureFlagsStoreState = ReturnType<typeof useFeatureFlagsStore.getState>;
 
 type SliceOverrides = {
   stateManagement?: Partial<StateManagementState>;
   queryBuilder?: Partial<QueryBuilderState>;
-  user?: Partial<UserStoreState>;
-  custodian?: Partial<CustodianStoreState>;
-  admin?: Partial<AdminStoreState>;
+  session?: Partial<SessionData>;
+  adminSection?: Partial<AdminSectionData>;
+  custodianSection?: {
+    custodian?: Custodian | null;
+    collectionHosts?: CollectionHost[];
+  };
   featureFlags?: Partial<FeatureFlagsStoreState>;
 };
 
@@ -137,127 +122,10 @@ const seedStores = (overrides?: SliceOverrides) => {
     true,
   );
 
-  useUserDataStore.setState(
-    {
-      user: null as CombinedUser | undefined | null,
-      queries: [] as Query[],
-      custodians: [] as Custodian[],
-      selectedCollections: [] as CollectionWithHosts[],
-      conceptSets: [] as ConceptSet[],
-      fetchResults: (_queryName?: string, _reset?: boolean) =>
-        RESOLVE<ApiResponse<CreateQuery>>({
-          data: { query_pid: "mock-pid" } as unknown as CreateQuery,
-          message: "ok",
-        }),
-      rerunTask: NOOP,
-      setSelectedCollections: NOOP,
-      runDistributions: (
-        _collection: CollectionWithHosts,
-        _query_type: DistributionType,
-      ) => RESOLVE<Query>(getMockQuery()),
-      createConceptSet: (_payload: CreateConceptSetPost) =>
-        RESOLVE<void>(undefined),
-      searchForConcepts: async ({ searchTerm, perPage, page = 1, domain }) => {
-        const { data } = await searchConcepts({
-          concept_name: [searchTerm],
-          concept_id: [searchTerm],
-          per_page: perPage,
-          page,
-          domain,
-        });
-
-        return data as Paginated<Partial<Concept>>;
-      },
-      addConceptsToSet: (_conceptSetId: number, _conceptIds: number[]) =>
-        RESOLVE<void>(undefined),
-      removeConceptsFromSet: (_conceptSetId: number, _conceptIds: number[]) =>
-        RESOLVE<void>(undefined),
-      removeConceptSet: (_conceptSetId: number) => RESOLVE<void>(undefined),
-      deleteQueries: (_pids: string[]) => RESOLVE<void>(undefined),
-      ...(overrides?.user ?? {}),
-    } as UserStoreState,
-    true,
-  );
-
-  useCustodianDataStore.setState(
-    {
-      createCollectionHost: (
-        _custodianId: number,
-        _payload: { name: string; context: string },
-      ) => RESOLVE<void>(undefined),
-      updateCollectionHost: (
-        _id: number,
-        _payload: UpdateCollectionHostPayload,
-      ) => RESOLVE<void>(undefined),
-      deleteCollectionHost: (_id: number) => RESOLVE<void>(undefined),
-      restoreCollectionHost: (_id: number) =>
-        RESOLVE<ApiResponse<CollectionHost>>({
-          message: "success",
-          data: {} as CollectionHost,
-        }),
-      createCollection: (
-        _custodianPid: string,
-        _payload: CreateCollectionPost,
-        _payloadConfig: Omit<CreateCollectionConfigPost, "collection_id">,
-      ) => RESOLVE<Collection>(getMockCollection()),
-      updateCollection: (
-        _id: number,
-        _payload: Partial<CreateCollectionPost>,
-        _payloadConfig: Partial<CreateCollectionConfigPost>,
-      ) => RESOLVE<Collection>(getMockCollection()),
-      deleteCollection: (_id: number | string, _custodianPid: string) =>
-        RESOLVE<void>(undefined),
-      restoreCollection: (_id: number | string, _custodianPid: string) =>
-        RESOLVE<ApiResponse<Collection>>({
-          message: "success",
-          data: getMockCollection(),
-        }),
-      ...(overrides?.custodian ?? {}),
-      current: {
-        custodian: null,
-        collections: [] as Collection[],
-        workgroups: [] as Workgroup[],
-        ...(overrides?.custodian?.current ?? {}),
-      },
-    } as CustodianStoreState,
-    true,
-  );
-
-  useAdminDataStore.setState(
-    {
-      collections: [] as Collection[],
-      selectedWorkgroup: null,
-      createCollection: (_payload: CreateCollectionPost) =>
-        RESOLVE<Collection>(getMockCollection()),
-      updateCollection: (
-        _id: number,
-        _payload: Partial<CreateCollectionPost>,
-      ) => RESOLVE<Collection>(getMockCollection()),
-      deleteCollection: (_id: number | string) => RESOLVE<void>(undefined),
-      restoreCollection: (_id: number | string) =>
-        RESOLVE<ApiResponse<Collection>>({
-          message: "success",
-          data: getMockCollection(),
-        }),
-      createWorkgroup: (_payload: {
-        name: string;
-        collections?: number[];
-        active: boolean;
-      }) => RESOLVE<Workgroup>(getMockWorkgroup()),
-      addCollectionsToWorkgroup: (_payload: AddCollectionsToWorkgroupPost) =>
-        RESOLVE<number[]>([1]),
-      removeCollectionsFromWorkgroup: (
-        _payload: RemoveCollectionsFromWorkgroupPost,
-      ) => RESOLVE<void>(undefined),
-      addCollectionToWorkgroups: (_payload: AddCollectionToWorkgroupsPost) =>
-        RESOLVE<number[]>([1]),
-      removeCollectionFromWorkgroups: (
-        _payload: RemoveCollectionFromWorkgroupsPost,
-      ) => RESOLVE<void>(undefined),
-      ...(overrides?.admin ?? {}),
-    } as AdminStoreState,
-    true,
-  );
+  useSelectionStore.setState({
+    selectedUserId: null,
+    selectedCollectionIds: [],
+  });
 
   useFeatureFlagsStore.setState(
     {
@@ -270,11 +138,59 @@ const seedStores = (overrides?: SliceOverrides) => {
   );
 };
 
+const MockSections = ({
+  overrides,
+  children,
+}: PropsWithChildren<{ overrides?: SliceOverrides }>) => {
+  const { adminSection, custodianSection } = overrides ?? {};
+  const custodian = custodianSection?.custodian;
+
+  const withCustodian = custodian ? (
+    <CustodianSectionDataProvider
+      value={{
+        custodian,
+        collectionHosts: custodianSection?.collectionHosts ?? [],
+      }}
+    >
+      {children}
+    </CustodianSectionDataProvider>
+  ) : (
+    children
+  );
+
+  return adminSection ? (
+    <AdminSectionDataProvider
+      value={{
+        users: [],
+        collections: [],
+        collectionHosts: [],
+        ...adminSection,
+      }}
+    >
+      {withCustodian}
+    </AdminSectionDataProvider>
+  ) : (
+    withCustodian
+  );
+};
+
 const MockCohortDiscoveryServiceStore = ({
   overrides,
   children,
 }: PropsWithChildren<{ overrides?: SliceOverrides }>) => {
   useState(() => seedStores(overrides));
+  const [sessionData] = useState<SessionData>(() => ({
+    user: {
+      id: 1,
+      roles: [],
+      custodians: [],
+      workgroups: [],
+    } as unknown as CombinedUser,
+    userCollections: [],
+    custodians: [],
+    workgroups: [],
+    ...overrides?.session,
+  }));
 
   return (
     <ApplicationModeProvider>
@@ -284,7 +200,13 @@ const MockCohortDiscoveryServiceStore = ({
             <CohortBuilderProvider>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <ConfirmProvider>
-                  <NotifyProvider>{children}</NotifyProvider>
+                  <NotifyProvider>
+                    <SessionDataProvider value={sessionData}>
+                      <MockSections overrides={overrides}>
+                        {children}
+                      </MockSections>
+                    </SessionDataProvider>
+                  </NotifyProvider>
                 </ConfirmProvider>
               </LocalizationProvider>
             </CohortBuilderProvider>

@@ -1,36 +1,44 @@
 import { render, screen, within } from "@testing-library/react";
 import UpdateCollection from ".";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
-import { getMockCollection } from "@/actions/collection/__mocks__/getCollections";
+import { getMockCollection } from "@/test/fixtures/collections";
 import { ThreePaneProvider } from "@/providers/ThreePaneProvider";
-import getCollectionHost from "@/actions/collectionHost/__mocks__/getCollectionHost";
-import getCustodian from "@/actions/custodian/__mocks__/getCustodian";
+import { getMockCollectionHost } from "@/test/fixtures/collectionHosts";
+import { getMockCustodian } from "@/test/fixtures/custodians";
 import { CloseGuardProvider } from "@/providers/CloseGuardProvider";
 import userEvent from "@testing-library/user-event";
 import SwimLane from "@/components/SwimLane";
-import { revalidateCollections } from "@/actions/revalidate";
+import saveCollection from "@/actions/collection/saveCollection";
 import { CollectionWithHosts } from "@/types/api";
-jest.mock("@/actions/revalidate", () => ({
-  revalidateCollections: jest.fn(),
+
+jest.mock("@/actions/collection/saveCollection", () => ({
+  __esModule: true,
+  default: jest.fn().mockResolvedValue({
+    ok: true,
+    workgroupsAdded: 0,
+    workgroupsRemoved: 0,
+    statusChanged: false,
+  }),
 }));
 
-describe("UpdateCollection", () => {
-  const updateCollectionMock = jest.fn();
-  const updateCollectionStatusMock = jest.fn();
+const saveCollectionMock = saveCollection as jest.MockedFunction<
+  typeof saveCollection
+>;
 
+describe("UpdateCollection", () => {
   const renderComponent = (
     collectionOverride?: Partial<CollectionWithHosts>,
   ) => {
-    const host1 = getCollectionHost();
-    const host2 = getCollectionHost();
-    const custodian = getCustodian();
+    const host1 = getMockCollectionHost();
+    const host2 = getMockCollectionHost();
+    const custodian = getMockCustodian();
 
     const collection = getMockCollection({
       id: 1,
       name: "Mock Collection #1",
       description: "This is the description of the mock collection #1",
       url: "https://example.com/dataset",
-      host: [host1],
+      host: host1,
       config: {
         id: 1,
         enabled: true,
@@ -51,18 +59,11 @@ describe("UpdateCollection", () => {
     return render(
       <MockCohortDiscoveryServiceStore
         overrides={{
-          custodian: {
-            current: {
-              custodian,
-              collectionHosts,
-            },
-            updateCollection: updateCollectionMock,
-          },
-          admin: {
-            updateCollectionStatus: updateCollectionStatusMock,
+          custodianSection: {
+            custodian,
             collectionHosts,
           },
-          user: {
+          session: {
             workgroups,
           },
         }}
@@ -123,21 +124,20 @@ describe("UpdateCollection", () => {
 
     await user.click(screen.getByTestId("save-panel-toggle"));
 
-    expect(updateCollectionMock).toHaveBeenCalledWith(
+    expect(saveCollectionMock).toHaveBeenCalledWith(
       1,
       expect.objectContaining({
-        name: "Updated Collection Name",
+        collection: expect.objectContaining({
+          name: "Updated Collection Name",
+        }),
+        config: expect.objectContaining({
+          frequency_mode: 1,
+          run_time_frequency: 1,
+          run_time_hour: 1,
+          run_time_minute: 1,
+        }),
       }),
-      expect.objectContaining({
-        frequency_mode: 1,
-        run_time_frequency: 1,
-        run_time_hour: 1,
-        run_time_minute: 1,
-      }),
-      false,
     );
-
-    expect(revalidateCollections).toHaveBeenCalled();
   });
 
   it("can change frequency from Weekly to Monthly", async () => {
@@ -149,16 +149,17 @@ describe("UpdateCollection", () => {
     expect(screen.getByLabelText("Monthly")).toBeChecked();
 
     await user.click(screen.getByTestId("save-panel-toggle"));
-    expect(updateCollectionMock).toHaveBeenCalledWith(
+    expect(saveCollectionMock).toHaveBeenCalledWith(
       1,
-      expect.any(Object),
       expect.objectContaining({
-        frequency_mode: 2,
-        run_time_frequency: 1,
-        run_time_hour: 1,
-        run_time_minute: 1,
+        collection: expect.any(Object),
+        config: expect.objectContaining({
+          frequency_mode: 2,
+          run_time_frequency: 1,
+          run_time_hour: 1,
+          run_time_minute: 1,
+        }),
       }),
-      false,
     );
   });
 
@@ -180,16 +181,17 @@ describe("UpdateCollection", () => {
     expect(screen.getByLabelText("Biannually")).toBeChecked();
 
     await user.click(screen.getByTestId("save-panel-toggle"));
-    expect(updateCollectionMock).toHaveBeenCalledWith(
+    expect(saveCollectionMock).toHaveBeenCalledWith(
       1,
-      expect.any(Object),
       expect.objectContaining({
-        frequency_mode: 4,
-        run_time_frequency: 0, // gets reset as this mode has no value of 6
-        run_time_hour: 1,
-        run_time_minute: 1,
+        collection: expect.any(Object),
+        config: expect.objectContaining({
+          frequency_mode: 4,
+          run_time_frequency: 0, // gets reset as this mode has no value of 6
+          run_time_hour: 1,
+          run_time_minute: 1,
+        }),
       }),
-      false,
     );
   });
 
@@ -232,5 +234,53 @@ describe("UpdateCollection", () => {
 
     expect(screen.getByText("Biannually")).toBeInTheDocument();
     expect(screen.getByText("H1")).toBeInTheDocument();
+  });
+
+  describe("host credentials", () => {
+    const fetchMock = jest.fn();
+
+    beforeEach(() => {
+      fetchMock.mockReset();
+      global.fetch = fetchMock;
+    });
+
+    it("shows the credentials fetched for the collection's host", async () => {
+      fetchMock.mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          id: 11,
+          client_id: "client-id-11",
+          client_secret: "client-secret-11",
+        }),
+      });
+
+      renderComponent({ host: getMockCollectionHost({ id: 11 }) });
+
+      expect(
+        await screen.findByDisplayValue("client-id-11"),
+      ).toBeInTheDocument();
+      expect(screen.getByDisplayValue("client-secret-11")).toBeInTheDocument();
+      expect(fetchMock).toHaveBeenCalledWith(
+        "/api/collection-hosts/11",
+        expect.objectContaining({ cache: "no-store" }),
+      );
+    });
+
+    it("explains when the credentials can't be loaded", async () => {
+      fetchMock.mockResolvedValue({ ok: false, status: 403 });
+
+      renderComponent({ host: getMockCollectionHost({ id: 12 }) });
+
+      expect(
+        await screen.findByText(/couldn.t load this host.s credentials/i),
+      ).toBeInTheDocument();
+    });
+
+    it("explains when the collection has no host", () => {
+      renderComponent({ host: null });
+
+      expect(screen.getByText(/has no host yet/i)).toBeInTheDocument();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
   });
 });

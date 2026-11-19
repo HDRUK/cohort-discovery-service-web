@@ -7,26 +7,29 @@ import {
   type MRT_ColumnDef,
   type MRT_Row,
 } from "material-react-table";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import ChipList from "@/components/ChipList";
 import Table from "@/components/Table";
 import useSearchParams from "@/hooks/useSearchParams";
 import { capitaliseFirstLetter } from "@/utils/string";
 
-import useAdminStore from "@/hooks/useAdminStore";
-
 import dayjs from "dayjs";
 import { TableProps } from "../Table/Table";
 import { trueKeys } from "@/utils/numbers";
-import { useUserDataStore } from "@/hooks/userDataStore";
-import { useIsAdminSection } from "@/contexts/AdminSectionContext";
+import {
+  useAdminUsers,
+  useIsAdminSection,
+} from "@/contexts/AdminSectionContext";
 import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import { DEFAULT_PER_PAGE, DEFAULT_USERS_PER_PAGE } from "@/config/defaults";
-import { TAG_ADMIN_USERS } from "@/config/tags";
 import { getTimestamp } from "@/utils/date";
 import { getLastName } from "@/utils/user";
 import { formatWorkgroupName } from "@/utils/workgroups";
 import { filterUsers } from "./userFilters";
+import { useSessionData } from "@/contexts/SessionDataContext";
+import { useSelectionStore } from "@/store/selectionStore";
+
+const NO_USERS: User[] = [];
 
 const PAGE_PARAM = "users_page";
 const PER_PAGE_PARAM = "users_per_page";
@@ -41,14 +44,19 @@ export interface CollectionsTableProps extends TableProps {
   showCheckboxes?: boolean;
 }
 
-const UserTable = ({
+interface UserTableViewProps extends CollectionsTableProps {
+  users?: User[];
+}
+
+const UserTableView = ({
+  users,
   tableTitle,
   tableSubTitle,
   handleDelete,
   showRolesAndWorkgroupColumns = false,
   showCheckboxes = true,
   ...rest
-}: CollectionsTableProps) => {
+}: UserTableViewProps) => {
   const { getSearchParam, searchParams } = useSearchParams("workgroup_filter");
   const wgFilter = getSearchParam();
   const searchTerm = (searchParams.get("search_term") || "")
@@ -58,8 +66,8 @@ const UserTable = ({
 
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
 
-  const users = useAdminStore((s) => s.users);
-  const setSelectedUser = useAdminStore((s) => s.setSelectedUser);
+  const loadedUsers = users ?? NO_USERS;
+  const setSelectedUserId = useSelectionStore((s) => s.setSelectedUserId);
   const [sorting, setSorting] = useState<MRT_SortingState>([]);
 
   const selectedUserIds = useMemo(
@@ -69,18 +77,16 @@ const UserTable = ({
 
   useEffect(() => {
     const [firstId] = selectedUserIds;
-    setSelectedUser(
-      firstId ? (users.find((u) => String(u.id) === firstId) ?? null) : null,
-    );
+    setSelectedUserId(firstId ?? null);
 
-    return () => setSelectedUser(null);
-  }, [selectedUserIds, users, setSelectedUser]);
+    return () => setSelectedUserId(null);
+  }, [selectedUserIds, setSelectedUserId]);
 
-  const workgroups = useUserDataStore((s) => s.workgroups);
+  const workgroups = useSessionData().workgroups;
   const activeWorkgroup = workgroups.find((wg) => String(wg.id) === wgFilter);
 
   const hydratedUsers = useMemo(() => {
-    const filtered = filterUsers(users, {
+    const filtered = filterUsers(loadedUsers, {
       workgroupId: wgFilter,
       searchTerm,
     });
@@ -124,7 +130,7 @@ const UserTable = ({
           return 0;
       }
     });
-  }, [users, wgFilter, sorting, searchTerm]);
+  }, [loadedUsers, wgFilter, sorting, searchTerm]);
 
   const page = Math.max(1, parseInt(searchParams.get(PAGE_PARAM) || "1", 10));
 
@@ -220,7 +226,8 @@ const UserTable = ({
 
   const table = usePaginatedTable<User>({
     columns,
-    data: paginatedHydratedUsers,
+    data: users && paginatedHydratedUsers,
+    showSkeletonWhilePending: false,
     rowCount: hydratedUsers.length,
     perPageDefault: DEFAULT_USERS_PER_PAGE,
     pageParam: PAGE_PARAM,
@@ -255,7 +262,6 @@ const UserTable = ({
           },
         }),
         refreshProps: {
-          tag: TAG_ADMIN_USERS,
           label: "Refresh Users",
         },
       }}
@@ -263,5 +269,16 @@ const UserTable = ({
     />
   );
 };
+
+const AdminUsersTable = (props: CollectionsTableProps) => {
+  const users = useAdminUsers() ?? NO_USERS;
+  return <UserTableView {...props} users={users} />;
+};
+
+const UserTable = (props: CollectionsTableProps) => (
+  <Suspense fallback={<UserTableView {...props} />}>
+    <AdminUsersTable {...props} />
+  </Suspense>
+);
 
 export default UserTable;

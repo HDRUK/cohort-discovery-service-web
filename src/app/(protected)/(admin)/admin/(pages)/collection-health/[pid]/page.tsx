@@ -1,0 +1,53 @@
+import { Suspense } from "react";
+import { Box, Divider } from "@mui/material";
+import { getAdminCollections } from "@/server/data/collections";
+import SkeletonFull from "@/components/SkeletonFull";
+import Title from "@/components/Title";
+import CollectionHealthDetailView from "@/modules/CollectionHealth/CollectionHealthDetailView";
+
+const loadCollection = async (pid: string) => {
+  const result = await getAdminCollections({
+    params: new URLSearchParams({ pid }),
+  });
+
+  return result.data?.data ?? [];
+};
+
+const CollectionHealthLoader = async ({
+  params,
+}: {
+  params: Promise<{ pid: string }>;
+}) => {
+  const { pid } = await params;
+  const collections = await loadCollection(pid);
+
+  return (
+    <CollectionHealthDetailView pid={pid} initialCollections={collections} />
+  );
+};
+
+const AdminCollectionHealthDetailPage = ({
+  params,
+}: {
+  params: Promise<{ pid: string }>;
+}) => {
+  return (
+    <Box
+      sx={{
+        minHeight: "100%",
+        display: "flex",
+        flexDirection: "column",
+        p: 2,
+        bgcolor: "background.default",
+      }}
+    >
+      <Title title="Admin" subTitle="Collection Health" />
+      <Divider sx={{ mb: 2 }} />
+      <Suspense fallback={<SkeletonFull sx={{ minHeight: 400 }} />}>
+        <CollectionHealthLoader params={params} />
+      </Suspense>
+    </Box>
+  );
+};
+
+export default AdminCollectionHealthDetailPage;

@@ -57,4 +57,19 @@ describe("getOrganisationUrl", () => {
 
     expect(getOrganisationUrl()).toBe("https://example.org");
   });
+
+  it("drops the sign-in path and query so organisation links stay clean", async () => {
+    process.env.NEXT_PUBLIC_LOGIN_URL =
+      "https://gateway.example.org/en?redirect_cohort_discovery_upon_signin=https://cds.example.org";
+    const getOrganisationUrl = await loadResolver();
+
+    expect(getOrganisationUrl()).toBe("https://gateway.example.org");
+  });
+
+  it("falls back when the env var is not a url", async () => {
+    process.env.NEXT_PUBLIC_LOGIN_URL = "not a url";
+    const getOrganisationUrl = await loadResolver();
+
+    expect(getOrganisationUrl()).toBe(branding.links.organisation);
+  });
 });

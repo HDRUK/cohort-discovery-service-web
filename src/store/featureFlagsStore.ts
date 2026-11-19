@@ -2,30 +2,36 @@
 
 import { create } from "zustand";
 import { FeatureFlag } from "@/types/features";
-import getFeatureFlags from "@/actions/getFeatureFlags";
 import updateFeatureFlag from "@/actions/admin/updateFeatureFlag";
 
 export interface FeatureFlagsStoreState {
   flags: FeatureFlag | null;
   setFlags: (flags: FeatureFlag) => void;
-  refreshFlags: () => Promise<void>;
   updateFlag: (name: string, enabled: boolean) => Promise<void>;
 }
 
 export const useFeatureFlagsStore = create<FeatureFlagsStoreState>(
-  (set, get) => ({
-    flags: null,
+  (set, get) => {
+    const setFlag = (name: string, enabled: boolean) => {
+      const { flags } = get();
+      if (flags) set({ flags: { ...flags, [name]: enabled } });
+    };
 
-    setFlags: (flags) => set({ flags }),
+    return {
+      flags: null,
 
-    refreshFlags: async () => {
-      const response = await getFeatureFlags();
-      set({ flags: response.data });
-    },
+      setFlags: (flags) => set({ flags }),
 
-    updateFlag: async (name, enabled) => {
-      await updateFeatureFlag(name, { enabled });
-      await get().refreshFlags();
-    },
-  }),
+      updateFlag: async (name, enabled) => {
+        const previous = get().flags?.[name as keyof FeatureFlag];
+        setFlag(name, enabled);
+        try {
+          await updateFeatureFlag(name, { enabled });
+        } catch (error) {
+          if (previous !== undefined) setFlag(name, previous);
+          throw error;
+        }
+      },
+    };
+  },
 );

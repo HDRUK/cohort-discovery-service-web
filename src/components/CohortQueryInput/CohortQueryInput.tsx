@@ -24,6 +24,8 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import InlineChoiceButton from "./InlineChoiceButton";
 import { CombinatorType } from "@/types/rules";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import { QUERY_KEYS } from "@/config/tags";
+import useHasSelectedSyntheticDatasets from "@/hooks/useHasSelectedSyntheticDatasets";
 
 type FormValues = {
   cohortQueryInput: string;
@@ -59,9 +61,7 @@ const CohortQueryInput = ({
   const resetQueryBuilderJson = useQueryBuilder(
     (qb) => qb.resetQueryBuilderJson,
   );
-  const includeSynthetic = useQueryBuilder(
-    (qb) => qb.hasSelectedSyntheticDatasets,
-  );
+  const includeSynthetic = useHasSelectedSyntheticDatasets();
   const selectedDatasets = useQueryBuilder((qb) => qb.selectedDatasets);
   const appendError = useQueryBuilder((qb) => qb.appendError);
   const select = useQueryBuilder((qb) => qb.select);
@@ -161,7 +161,7 @@ const CohortQueryInput = ({
       if (v === programmaticValueRef.current) return;
 
       queryClient.prefetchQuery({
-        queryKey: ["cohortRules", v, includeSynthetic, selectedDatasets],
+        queryKey: QUERY_KEYS.cohortRules(v, includeSynthetic, selectedDatasets),
         queryFn: () =>
           getQueryFromText(v, {
             ignoreSynthetic: !includeSynthetic,
@@ -218,7 +218,7 @@ const CohortQueryInput = ({
       }
 
       const queryJson = await queryClient.fetchQuery({
-        queryKey: ["cohortRules", q, includeSynthetic, selectedDatasets],
+        queryKey: QUERY_KEYS.cohortRules(q, includeSynthetic, selectedDatasets),
         queryFn: () =>
           getQueryFromText(q, {
             ignoreSynthetic: !includeSynthetic,
@@ -305,7 +305,7 @@ const CohortQueryInput = ({
     },
   );
 
-  const showLoader = useIsFetching({ queryKey: ["cohortRules"] }) > 0;
+  const showLoader = useIsFetching({ queryKey: QUERY_KEYS.cohortRules() }) > 0;
 
   useEffect(() => {
     if (!syncFromQueryAsText) return;

@@ -71,7 +71,6 @@ const renderComponent = (
           resetQueryBuilderJson,
           appendError,
           errors: [],
-          hasSelectedSyntheticDatasets: false,
           ...extraOverrides,
         },
       }}

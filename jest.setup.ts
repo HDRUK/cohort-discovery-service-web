@@ -1,6 +1,10 @@
 import "@testing-library/jest-dom";
 jest.mock("next/cache", () => ({
   revalidateTag: jest.fn(),
+  updateTag: jest.fn(),
+  refresh: jest.fn(),
+  cacheLife: jest.fn(),
+  cacheTag: jest.fn(),
 }));
 
 const mockSearchParams = new URLSearchParams("page=1&per_page=5");
@@ -12,6 +16,7 @@ jest.mock("next/navigation", () => ({
   useRouter: () => ({
     push: jest.fn(),
     replace: jest.fn(),
+    refresh: jest.fn(),
   }),
 }));
 

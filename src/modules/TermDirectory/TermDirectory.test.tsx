@@ -5,7 +5,7 @@ import TermDirectory from "./TermDirectory";
 import { SearchParamsTransitionProvider } from "@/contexts/SearchParamsTransitionContext";
 import { DefaultProvider } from "@/providers/DefaultProvider";
 import { NotifyProvider } from "@/providers/NotifyProvider";
-import { mockTermDirectoryEntries } from "@/actions/termDirectory/__mocks__/getTermDirectory";
+import { mockTermDirectoryEntries } from "@/test/fixtures/termDirectory";
 import { paginateData } from "@/utils/mock";
 import { createPendingNavigation } from "@/utils/pendingNavigation";
 import { TermDirectoryEntry, Paginated } from "@/types/api";
@@ -84,6 +84,40 @@ describe("TermDirectory", () => {
     });
     expect(within(secondRow).getByText("4329847")).toBeInTheDocument();
     expect(within(secondRow).getByText("1 Collection")).toBeInTheDocument();
+  });
+
+  it("names the collections behind a count when its chip is hovered, so users can see where a term is available", async () => {
+    const user = userEvent.setup();
+    renderComponent(paginateData({ data: mockTermDirectoryEntries }));
+
+    expect(screen.queryByText("Alpha Cohort")).not.toBeInTheDocument();
+
+    await user.hover(screen.getByText("2 Collections"));
+
+    const tooltip = await screen.findByRole("tooltip");
+    expect(
+      within(tooltip)
+        .getAllByRole("listitem")
+        .map((item) => item.textContent),
+    ).toEqual(["Alpha Cohort", "Zebra Cohort"]);
+    // only this row's collections, not the other row's
+    expect(within(tooltip).queryByText("Heart Study")).not.toBeInTheDocument();
+  });
+
+  it("names the collections when the chip is reached with the keyboard, so the list is not mouse-only", async () => {
+    renderComponent(paginateData({ data: mockTermDirectoryEntries }));
+
+    // the chip itself must be a tab stop, otherwise keyboard users can never reach it
+    const chip = screen
+      .getByText("1 Collection")
+      .closest<HTMLElement>('[tabindex="0"]');
+    expect(chip).toHaveClass("MuiChip-root");
+
+    act(() => chip?.focus());
+
+    expect(
+      within(await screen.findByRole("tooltip")).getByText("Heart Study"),
+    ).toBeInTheDocument();
   });
 
   it("renders the count, formatted with thousands separators for readability", () => {

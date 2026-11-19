@@ -1,10 +1,10 @@
 "use client";
 
 import UserProfileDetails from "./UserProfileDetails";
-import useUserStore from "@/hooks/useUserStore";
+import { useSessionData } from "@/contexts/SessionDataContext";
 
 const UserProfile = () => {
-  const user = useUserStore((s) => s.user);
+  const user = useSessionData().user;
 
   return <>{user && <UserProfileDetails user={user} />}</>;
 };

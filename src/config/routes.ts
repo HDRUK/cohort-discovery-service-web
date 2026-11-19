@@ -8,6 +8,11 @@ const teamPath = (pid: string, subpath?: string) =>
 
 const adminPath = (subpath?: string) => `/admin${subpath ? `/${subpath}` : ""}`;
 
+const withQuery = (path: string, params?: URLSearchParams) => {
+  const query = params?.toString();
+  return query ? `${path}?${query}` : path;
+};
+
 const helpPath = (sectionId?: string, tutorialId?: string) =>
   `/help${sectionId ? `/${sectionId}${tutorialId ? `/${tutorialId}` : ""}` : ""}`;
 
@@ -17,7 +22,31 @@ export const routes = {
   loginWithReturn: (returnTo: string) =>
     `/login?return_to=${encodeURIComponent(returnTo)}`,
   logout: "/api/auth/logout",
+  forbidden: "/403",
   ssoCallback: "/api/auth/sso/callback",
+  api: {
+    collectionHostCredentials: (hostId: number) =>
+      `/api/collection-hosts/${hostId}`,
+    collectionDetails: (pid: string) => `/api/collections/${pid}/details`,
+    collectionHealth: (pid: string, params: URLSearchParams) =>
+      withQuery(`/api/collections/${pid}/health`, params),
+    collectionTaskHistory: (pid: string, params: URLSearchParams) =>
+      withQuery(`/api/collections/${pid}/task-history`, params),
+    adminCollectionHealth: (pid?: string) =>
+      withQuery(
+        "/api/admin/collection-health",
+        pid ? new URLSearchParams({ pid }) : undefined,
+      ),
+    queries: (params: URLSearchParams) => withQuery("/api/queries", params),
+    query: (pid: string, params?: URLSearchParams) =>
+      withQuery(`/api/queries/${pid}`, params),
+    task: (pid: string) => `/api/tasks/${pid}`,
+    regressionTests: "/api/regression-tests",
+    termDirectory: (params: URLSearchParams) =>
+      withQuery("/api/term-directory", params),
+    conceptSearch: "/api/concepts/search",
+    parseQuery: "/api/parse-query",
+  },
   ssoError: (error: string) =>
     `/auth/sso/error?error=${encodeURIComponent(error)}`,
   dashboard: dashboardPath(),

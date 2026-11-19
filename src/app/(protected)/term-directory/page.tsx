@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import Title from "@/components/Title";
 import TermDirectory from "@/modules/TermDirectory";
 import CollectionFilter from "@/modules/TermDirectory/CollectionFilter";
-import getTermDirectory from "@/actions/termDirectory/getTermDirectory";
+import { getTermDirectory } from "@/server/data/termDirectory";
 import { SearchParamsTransitionProvider } from "@/contexts/SearchParamsTransitionContext";
 import { TermDirectorySearchParams } from "@/types/api";
 import { getDomainPhrase } from "@/utils/omop";

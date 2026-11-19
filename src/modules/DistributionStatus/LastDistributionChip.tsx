@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useLayoutEffect, useState } from "react";
 import {
   Box,
   Chip,
@@ -20,6 +20,8 @@ export default function LastDistributionChip({
   file?: ResultFile | null;
 }) {
   const [open, setOpen] = useState(false);
+
+  useLayoutEffect(() => () => setOpen(false), []);
 
   const extraData = [
     { label: "Created At", value: getDatetime(file?.created_at) },

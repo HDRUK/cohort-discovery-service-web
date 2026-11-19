@@ -86,6 +86,35 @@ describe("while a navigation is pending", () => {
     expect(result.current.getSearchParam()).toBe("committed");
   });
 
+  it("shares the new value with every hook under the provider", async () => {
+    mockSearchParams = new URLSearchParams("search_term=old");
+    mockReplace.mockImplementationOnce(() => navigation.start());
+    const { result } = renderHook(
+      () => ({
+        writer: useSearchParams("search_term"),
+        reader: useSearchParams("search_term"),
+      }),
+      {
+        wrapper: ({ children }) =>
+          createElement(
+            SearchParamsTransitionProvider,
+            null,
+            children,
+            createElement(navigation.PendingRouter),
+          ),
+      },
+    );
+
+    await act(async () => result.current.writer.setSearchParam("new"));
+
+    expect(result.current.reader.getSearchParam()).toBe("new");
+
+    mockSearchParams = new URLSearchParams("search_term=committed");
+    await act(async () => navigation.finish());
+
+    expect(result.current.reader.getSearchParam()).toBe("committed");
+  });
+
   it("reports pending through the provider until the navigation finishes", async () => {
     const { result } = renderWithRouter(
       "search_term=old",

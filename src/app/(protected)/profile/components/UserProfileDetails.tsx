@@ -6,10 +6,8 @@ import PendingIcon from "@mui/icons-material/Pending";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import BlockIcon from "@mui/icons-material/Block";
 import dayjs from "dayjs";
-import { useRouter } from "next/navigation";
 import { CombinedUser } from "@/types/api";
 import { checkHasNhsSdeAccess, checkIsAdmin } from "@/utils/user";
-import { getTagUserProfile } from "@/config/tags";
 import RefreshButton from "@/components/RefreshButton";
 import Field from "./Field";
 import Section from "./Section";
@@ -17,7 +15,6 @@ import QueryQuotaSummary from "./QueryQuotaSummary";
 import UserInitials from "@/components/UserInitials";
 
 const UserProfileDetails = ({ user }: { user: CombinedUser }) => {
-  const router = useRouter();
   const isAdmin = checkIsAdmin(user);
   const hasNhsSdeAccess = checkHasNhsSdeAccess(user);
 
@@ -113,12 +110,7 @@ const UserProfileDetails = ({ user }: { user: CombinedUser }) => {
             <Field label="Monthly query limit">
               <QueryQuotaSummary quota={user.query_quota} />
             </Field>
-            <RefreshButton
-              tag={getTagUserProfile(user.id)}
-              label="Refresh"
-              showTooltip
-              onRefreshed={() => router.refresh()}
-            />
+            <RefreshButton showTooltip />
           </Box>
         </Grid>
       </Section>

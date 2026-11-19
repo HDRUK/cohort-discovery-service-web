@@ -1,10 +1,10 @@
 "use client";
-import { Box } from "@mui/material";
+import { Box, Skeleton } from "@mui/material";
 import List from "@/components/List";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import AddButton from "@/components/AddButton";
 import CreateCollection from "@/modules/CreateCollection";
-import { useCallback } from "react";
+import { useCallback, Suspense } from "react";
 import useSearchParams from "@/hooks/useSearchParams";
 import { CollectionFilterStatus } from "@/types/collections";
 import { ThreePaneProvider, useThreePane } from "@/providers/ThreePaneProvider";
@@ -50,7 +50,13 @@ const CollectionsLeftPanel = () => {
             disabled={expandedLeft}
           />
 
-          {expandedLeft && <CreateCollection onCancel={toggleLeft} />}
+          {expandedLeft && (
+            <Suspense
+              fallback={<Skeleton variant="rectangular" height={300} />}
+            >
+              <CreateCollection onCancel={toggleLeft} />
+            </Suspense>
+          )}
         </ActionMenuSection>
 
         <ActionMenuSection

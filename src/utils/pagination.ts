@@ -1,4 +1,5 @@
 import { Paginated } from "@/types/api";
+import { MAX_PER_PAGE } from "@/config/defaults";
 
 const NICE_STEPS = [1, 2, 5, 10, 25, 50, 100, 200, 500, 1000];
 const MULTIPLIERS = [0.25, 0.5, 1, 2, 4];
@@ -33,7 +34,7 @@ const roundToNice = (n: number) => {
 const buildRowsPerPageOptions = (
   perPageDefault: number,
   min = 5,
-  max = 200,
+  max = MAX_PER_PAGE,
 ) => {
   const effectiveMin =
     perPageDefault >= 50 ? 10 : perPageDefault >= 25 ? 5 : min;

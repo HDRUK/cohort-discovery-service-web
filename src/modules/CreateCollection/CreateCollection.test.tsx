@@ -10,64 +10,54 @@ import {
 import userEvent from "@testing-library/user-event";
 import CreateCollection from "./CreateCollection";
 import { Custodian, CollectionHost } from "@/types/api";
-import getCustodian from "@/actions/custodian/__mocks__/getCustodian";
+import { getMockCustodian } from "@/test/fixtures/custodians";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
-import { getMockCollection } from "@/actions/collection/__mocks__/getCollections";
-import getCollectionHost from "@/actions/collectionHost/__mocks__/getCollectionHost";
-import { useCustodianDataStore } from "@/store/custodianDataStore";
-jest.mock("@/actions/custodian/getCustodian");
+import { getMockCollection } from "@/test/fixtures/collections";
+import { getMockCollectionHost } from "@/test/fixtures/collectionHosts";
 
-const createCollection = jest.fn();
-const mockCustodian = getCustodian();
+const mockCreateCollection = jest.fn();
+
+jest.mock("@/actions/collection/createCustodianCollectionWithConfig", () => ({
+  __esModule: true,
+  default: (...args: unknown[]) => mockCreateCollection(...args),
+}));
+
+const createCollection = mockCreateCollection;
+const mockCustodian = getMockCustodian();
 const mockCollectionHosts = [
-  getCollectionHost({
+  getMockCollectionHost({
     id: 10,
     name: "Alpha Host",
     custodian: mockCustodian,
   }),
-  getCollectionHost({
+  getMockCollectionHost({
     id: 20,
     name: "Beta Host",
     custodian: mockCustodian,
   }),
 ];
-const createCollectionAdmin = jest.fn();
 
 let custodians: Custodian[];
 let collectionHosts: CollectionHost[];
 
-type CustodianStoreState = ReturnType<typeof useCustodianDataStore.getState>;
-
-type CustodianStoreOverrides = Partial<Omit<CustodianStoreState, "current">> & {
-  current?: Partial<CustodianStoreState["current"]>;
-};
+type CustodianSectionOverrides = { custodian?: Custodian | null };
 
 const renderCreateCollection = (
   overrides: Partial<Parameters<typeof CreateCollection>[0]> = {},
-  custodianDataOverides: CustodianStoreOverrides = {},
-) => {
-  const currentOverrides: Partial<CustodianStoreState["current"]> =
-    custodianDataOverides.current ?? {};
-
-  return render(
+  sectionOverrides: CustodianSectionOverrides = {},
+) =>
+  render(
     <MockCohortDiscoveryServiceStore
       overrides={{
-        custodian: {
-          createCollection,
-          ...custodianDataOverides,
-          current: {
-            custodian: custodians[0],
-            setCustodian: jest.fn(),
-            collectionHosts: collectionHosts,
-            setCollectionHosts: jest.fn(),
-            ...currentOverrides,
-          },
+        custodianSection: {
+          custodian: custodians[0],
+          collectionHosts,
+          ...sectionOverrides,
         },
-        admin: {
-          createCollection: createCollectionAdmin,
-          collectionHosts: collectionHosts,
+        adminSection: {
+          collectionHosts,
         },
-        user: {
+        session: {
           custodians,
         },
       }}
@@ -75,7 +65,6 @@ const renderCreateCollection = (
       <CreateCollection {...overrides} />
     </MockCohortDiscoveryServiceStore>,
   );
-};
 
 describe("CreateCollection", () => {
   beforeEach(() => {
@@ -194,7 +183,7 @@ describe("CreateCollection", () => {
     const user = userEvent.setup();
     const onCancel = jest.fn();
 
-    renderCreateCollection({ onCancel }, { current: { custodian: null } });
+    renderCreateCollection({ onCancel }, { custodian: null });
 
     const custodianLabel = screen.getByText(/custodian/i);
     const custodianId = custodianLabel.getAttribute("for");

@@ -1,0 +1,89 @@
+"use client";
+
+import CollectionsTable from "@/components/CollectionsTable";
+import { Box, Stack, Typography } from "@mui/material";
+import { formatWorkgroupName } from "@/utils/workgroups";
+import { useNotify } from "@/providers/NotifyProvider";
+import UserTable from "@/components/UserTable";
+import useFeatures from "@/hooks/useFeatures";
+import { CollectionWithHosts, Paginated } from "@/types/api";
+import removeCollectionsFromWorkgroup from "@/actions/workgroup/removeCollectionsFromWorkgroup";
+import removeUsersFromWorkgroup from "@/actions/workgroup/removeUsersFromWorkgroup";
+import useSelectedWorkgroup from "@/hooks/useSelectedWorkgroup";
+
+const WorkgroupsMiddlePanel = ({
+  collections,
+}: {
+  collections?: Paginated<CollectionWithHosts>;
+}) => {
+  const { manageWorkgroupsInternal } = useFeatures();
+
+  const selectedWorkgroup = useSelectedWorkgroup();
+
+  const notify = useNotify();
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        flex: 1,
+        minHeight: 0,
+      }}
+    >
+      {!!selectedWorkgroup && (
+        <Stack gap={2}>
+          <Box>
+            <CollectionsTable
+              collections={collections}
+              tableTitle={`${formatWorkgroupName(selectedWorkgroup?.name)} Workgroup`}
+              tableSubTitle="Collections"
+              deleteOverride={async (ids: string[]) => {
+                await removeCollectionsFromWorkgroup({
+                  ids: ids.map((id) => +id),
+                  workgroup_id: selectedWorkgroup.id,
+                });
+                notify.success(
+                  `${ids.length} Collection${
+                    ids.length > 1 ? "s" : ""
+                  } removed from workgroup ${selectedWorkgroup.name}`,
+                );
+              }}
+              emptyMessageOverride="Workgroup collections will appear here when created or assigned"
+              boxSxProps={{ minHeight: 300 }}
+            />
+          </Box>
+          {manageWorkgroupsInternal && (
+            <Box>
+              <UserTable
+                tableTitle={`${formatWorkgroupName(selectedWorkgroup?.name)} Workgroup`}
+                tableSubTitle="Users"
+                handleDelete={async (ids: string[]) => {
+                  await removeUsersFromWorkgroup({
+                    ids: ids.map((id) => +id),
+                    workgroup_id: selectedWorkgroup.id,
+                  });
+                  notify.success(
+                    `${ids.length} Users${
+                      ids.length > 1 ? "s" : ""
+                    } removed from workgroup ${selectedWorkgroup.name}`,
+                  );
+                }}
+                boxSxProps={{ minHeight: 300 }}
+              />
+            </Box>
+          )}
+        </Stack>
+      )}
+      {!selectedWorkgroup && (
+        <Box sx={{ mx: "auto", my: "auto" }}>
+          <Typography variant="h5">
+            Workgroup collections will appear here when a workgroup is selected
+          </Typography>
+        </Box>
+      )}
+    </Box>
+  );
+};
+
+export default WorkgroupsMiddlePanel;

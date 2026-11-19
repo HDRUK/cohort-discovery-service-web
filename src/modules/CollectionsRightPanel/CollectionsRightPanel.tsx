@@ -1,22 +1,34 @@
+import { Skeleton } from "@mui/material";
+import { Suspense } from "react";
 import UpdateCollection, {
   UpdateCollectionProps,
 } from "@/modules/UpdateCollection";
 import UpdateMultipleCollections from "../UpdateMultipleCollections";
 import { maskClientTest } from "@/lib/maskClientTest";
 import { CollectionGuidanceProps } from "./CollectionsGuidance";
-import useUserStore from "@/hooks/useUserStore";
+import { useSelectionStore } from "@/store/selectionStore";
+import { selectAllById } from "@/utils/selection";
+import { CollectionWithHosts } from "@/types/api";
 import { useThreePane } from "@/providers/ThreePaneProvider";
 
 const CollectionGuidance = maskClientTest<CollectionGuidanceProps>(
   () => import("./CollectionsGuidance"),
 );
 
-type CollectionsRightPanelProps = Omit<UpdateCollectionProps, "collection">;
+type CollectionsRightPanelProps = Omit<UpdateCollectionProps, "collection"> & {
+  collections?: CollectionWithHosts[];
+};
 
-const CollectionsRightPanel = ({ ...props }: CollectionsRightPanelProps) => {
+const CollectionsRightPanel = ({
+  collections,
+  ...props
+}: CollectionsRightPanelProps) => {
   const { expandedLeft } = useThreePane();
 
-  const selectedCollections = useUserStore((u) => u.selectedCollections);
+  const selectedCollections = selectAllById(
+    collections ?? [],
+    useSelectionStore((s) => s.selectedCollectionIds),
+  );
   const count = selectedCollections?.length ?? 0;
 
   if (expandedLeft) {
@@ -26,11 +38,13 @@ const CollectionsRightPanel = ({ ...props }: CollectionsRightPanelProps) => {
   if (count === 1) {
     const [collection] = selectedCollections!;
     return (
-      <UpdateCollection
-        collection={collection}
-        key={`update-coll-${collection.id}`}
-        {...props}
-      />
+      <Suspense fallback={<Skeleton variant="rectangular" height={300} />}>
+        <UpdateCollection
+          collection={collection}
+          key={`update-coll-${collection.id}`}
+          {...props}
+        />
+      </Suspense>
     );
   }
 

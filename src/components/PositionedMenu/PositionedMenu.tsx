@@ -31,6 +31,8 @@ const PositionedMenu = ({
   ...rest
 }: PositionedMenuProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+  React.useLayoutEffect(() => () => setAnchorEl(null), []);
   const buttonRef = React.useRef<HTMLButtonElement | null>(null);
   const open = Boolean(anchorEl);
 

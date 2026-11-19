@@ -1,17 +1,22 @@
 "use server";
 
-import { apiPost } from "@/lib/apiClient";
+import { updateTag } from "next/cache";
+import { CACHE_TAGS } from "@/config/tags";
+import { apiPost } from "@/server/api";
+import { requireSession } from "@/server/session";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { Collection, CreateConceptSetPost, ApiResponse } from "@/types/api";
-import { revalidateUserAction } from "@/actions/revalidate";
-import { TAG_CONCEPT_SETS } from "@/config/tags";
 
-const createConceptSet = async (payload: CreateConceptSetPost): Promise<void> => {
+const createConceptSet = async (
+  payload: CreateConceptSetPost,
+): Promise<void> => {
+  const { token } = await requireSession();
   await apiPost<ApiResponse<Collection>, CreateConceptSetPost>(
+    token,
     API_ROUTES.conceptSets,
     payload,
   );
-  await revalidateUserAction(TAG_CONCEPT_SETS);
+  updateTag(CACHE_TAGS.conceptSets);
 };
 
 export default createConceptSet;

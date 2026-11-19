@@ -4,17 +4,35 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import SearchConcepts from "./SearchConcepts";
 import ApplicationModeProvider from "@/providers/ApplicationModeProvider";
-jest.mock("@/actions/concept/searchConcepts");
+import {
+  SessionData,
+  SessionDataProvider,
+} from "@/contexts/SessionDataContext";
+
+jest.mock("@/lib/routeFetch", () => {
+  const { searchMockConcepts: mockSearchConcepts } = jest.requireActual(
+    "@/test/fixtures/concepts",
+  );
+  return {
+    routePost: jest.fn((_path: string, body: unknown) =>
+      mockSearchConcepts(body),
+    ),
+  };
+});
 
 function Wrapper(props: React.ComponentProps<typeof SearchConcepts>) {
   const [selected, setSelected] = useState<Record<number, boolean>>({});
   return (
     <ApplicationModeProvider>
-      <SearchConcepts
-        {...props}
-        selected={selected}
-        setSelected={setSelected}
-      />
+      <SessionDataProvider
+        value={{ userCollections: [] } as unknown as SessionData}
+      >
+        <SearchConcepts
+          {...props}
+          selected={selected}
+          setSelected={setSelected}
+        />
+      </SessionDataProvider>
     </ApplicationModeProvider>
   );
 }
@@ -97,9 +115,9 @@ describe("SearchConcepts", () => {
 
     const initialItems = await screen.findAllByTestId("concept-item");
     expect(initialItems).toHaveLength(20);
-    expect(screen.getByRole("button", { name: /show more/i })).toHaveTextContent(
-      "Show more (20 / 22)",
-    );
+    expect(
+      screen.getByRole("button", { name: /show more/i }),
+    ).toHaveTextContent("Show more (20 / 22)");
 
     const showMore = await screen.findByRole("button", { name: /show more/i });
     await act(async () => {

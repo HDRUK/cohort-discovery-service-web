@@ -1,32 +1,34 @@
+import { CollectionHost } from "@/types/api";
 import { Box, Stack, Button, MenuItem } from "@mui/material";
 import { useForm, Controller, FormProvider, useWatch } from "react-hook-form";
 import { CreateCollectionFormValues } from "@/types/forms";
 import { QueryContext } from "@/types/context";
 import FormTextField from "@/components/FormTextField";
-import { TaskType, FrequencyMode } from "@/types/api";
+import { DistributionJobType, FrequencyMode } from "@/types/api";
 import ActionMenuSection from "@/components/ActionMenuSection";
 import { useNotify } from "@/providers/NotifyProvider";
 import CollectionConfig from "@/components/CollectionConfig";
 import { REGEX_URL_NO_WWW } from "@/config/regex";
 import FormDropdown from "@/components/FormDropdown";
-import useCustodianStore from "@/hooks/useCustodianStore";
 import { useEffect, useMemo } from "react";
 import ErrorHeader from "@/components/ErrorHeader";
-import { useUserDataStore } from "@/hooks/userDataStore";
-import { useAdminDataStore } from "@/store/adminDataStore";
+import { useSessionData } from "@/contexts/SessionDataContext";
+import { useCustodianSection } from "@/contexts/CustodianSectionContext";
+import { useAdminCollectionHosts } from "@/contexts/AdminSectionContext";
+import createCustodianCollectionWithConfig from "@/actions/collection/createCustodianCollectionWithConfig";
+
+const NO_HOSTS: CollectionHost[] = [];
 
 interface CreateCollectionProps {
   onCancel?: () => void;
 }
 
 const CreateCollection = ({ onCancel }: CreateCollectionProps) => {
-  const createCollection = useCustodianStore((s) => s.createCollection);
-  const currentCustodian = useCustodianStore((s) => s.current.custodian);
-  const currentCollectionHosts = useCustodianStore(
-    (s) => s.current.collectionHosts,
-  );
-  const collectionHosts = useAdminDataStore((s) => s.collectionHosts);
-  const custodians = useUserDataStore((s) => s.custodians);
+  const custodianSection = useCustodianSection();
+  const currentCustodian = custodianSection?.custodian;
+  const currentCollectionHosts = custodianSection?.collectionHosts ?? NO_HOSTS;
+  const collectionHosts = useAdminCollectionHosts() ?? NO_HOSTS;
+  const custodians = useSessionData().custodians;
 
   const isAdmin = !currentCustodian;
 
@@ -51,7 +53,7 @@ const CreateCollection = ({ onCancel }: CreateCollectionProps) => {
         frequency_mode: Number(FrequencyMode.WEEKLY),
         run_time_frequency: 0,
         enabled: 1,
-        type: TaskType.B,
+        type: DistributionJobType.DEMOGRAPHICS,
       },
     },
   });
@@ -81,7 +83,7 @@ const CreateCollection = ({ onCancel }: CreateCollectionProps) => {
   }, [allowedCollectionHosts, resetField]);
 
   const onSubmit = async (data: CreateCollectionFormValues) => {
-    const createdCollection = await createCollection(
+    const createdCollection = await createCustodianCollectionWithConfig(
       data.custodian_pid,
       data.collection,
       data.config,

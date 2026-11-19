@@ -1,38 +1,28 @@
 "use client";
 
-import { Collection, CombinedUser, Custodian, Workgroup } from "@/types/api";
 import { FeatureFlag } from "@/types/features";
-import { redirect } from "next/navigation";
 import { ReactNode, useEffect, useRef } from "react";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
-import useUserStore from "@/hooks/useUserStore";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
+import { useQueryBuilderStore } from "@/store/queryBuilderStore";
+import { isOnlyInDefaultWorkgroup } from "@/utils/user";
+import useSessionExpiry from "@/hooks/useSessionExpiry";
+import { useSessionData } from "@/contexts/SessionDataContext";
 
 interface ProtectedPageProps {
-  user: CombinedUser;
-  collections: Collection[];
-  custodians: Custodian[];
   featureFlags: FeatureFlag;
-  workgroups: Workgroup[];
+  sessionMsRemaining: number | null;
   children: ReactNode;
 }
 
 const ProtectedPage = ({
-  user,
-  collections,
-  custodians,
   featureFlags,
-  workgroups,
+  sessionMsRemaining,
   children,
 }: ProtectedPageProps) => {
-  const currentUser = useUserStore((s) => s.user);
-  const setUser = useUserStore((s) => s.setUser);
-  const isOnlyInDefaultWorkgroup = useUserStore(
-    (s) => s.isOnlyInDefaultWorkgroup,
-  );
-  const setCollections = useUserStore((s) => s.setUserCollections);
-  const setCustodians = useUserStore((s) => s.setCustodians);
-  const setWorkgroups = useUserStore((s) => s.setWorkgroups);
+  useSessionExpiry(sessionMsRemaining);
+  const { user, userCollections: collections } = useSessionData();
+
   const setFlags = useFeatureFlagsStore((s) => s.setFlags);
 
   const initialiseSelectedDatasets = useQueryBuilder(
@@ -41,24 +31,11 @@ const ProtectedPage = ({
   const checkSelectedDatasets = useQueryBuilder(
     (qb) => qb.checkSelectedDatasets,
   );
+  const resetSelectedDatasetsFor = useQueryBuilder(
+    (qb) => qb.resetSelectedDatasetsFor,
+  );
 
   const hasRendered = useRef(false);
-
-  useEffect(() => {
-    setUser(user);
-  }, [user, setUser]);
-
-  useEffect(() => {
-    setCollections(collections);
-  }, [collections, setCollections]);
-
-  useEffect(() => {
-    setCustodians(custodians);
-  }, [custodians, setCustodians]);
-
-  useEffect(() => {
-    setWorkgroups(workgroups);
-  }, [workgroups, setWorkgroups]);
 
   useEffect(() => {
     setFlags(featureFlags);
@@ -66,17 +43,18 @@ const ProtectedPage = ({
 
   useEffect(() => {
     if (!hasRendered.current) {
-      initialiseSelectedDatasets(collections, isOnlyInDefaultWorkgroup);
+      const { ownerId } = useQueryBuilderStore.getState();
+      if (ownerId !== user.id) {
+        resetSelectedDatasetsFor(user.id);
+      }
+      initialiseSelectedDatasets(collections, isOnlyInDefaultWorkgroup(user));
     }
     hasRendered.current = true;
-  }, [collections, initialiseSelectedDatasets, isOnlyInDefaultWorkgroup]);
+  }, [collections, initialiseSelectedDatasets, resetSelectedDatasetsFor, user]);
 
   useEffect(() => {
-    if (!currentUser) return;
     checkSelectedDatasets(collections);
-  }, [collections, currentUser, checkSelectedDatasets]);
-
-  if (!user) redirect("/403?reason=no-token");
+  }, [collections, checkSelectedDatasets]);
 
   return <>{children}</>;
 };

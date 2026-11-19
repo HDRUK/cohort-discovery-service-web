@@ -1,0 +1,118 @@
+import { CollectionHost } from "@/types/api";
+import { useRouter } from "next/navigation";
+import { useTable } from "@/hooks/useTable";
+import { MRT_ColumnDef, MRT_RowSelectionState } from "material-react-table";
+import { Box, Chip } from "@mui/material";
+import { Dispatch, SetStateAction, useMemo } from "react";
+import { useSearchParamsTransition } from "@/contexts/SearchParamsTransitionContext";
+import Table from "@/components/Table";
+import { routes } from "@/config/routes";
+import SortButton from "@/components/SortButton";
+
+const NO_HOSTS: CollectionHost[] = [];
+
+interface CollectionHostsTableProps {
+  collectionHosts?: CollectionHost[];
+  rowSelection: MRT_RowSelectionState;
+  setRowSelection: Dispatch<SetStateAction<MRT_RowSelectionState>>;
+  onDelete: (ids: string[]) => void;
+  onRestore: (ids: string[]) => void;
+  isDeletedView: boolean;
+}
+
+const CollectionHostsTable = ({
+  collectionHosts,
+  rowSelection,
+  setRowSelection,
+  onDelete,
+  onRestore,
+  isDeletedView,
+}: CollectionHostsTableProps) => {
+  const router = useRouter();
+  const { isPending } = useSearchParamsTransition();
+  const isLoading = !collectionHosts || isPending;
+
+  const columns = useMemo<MRT_ColumnDef<CollectionHost>[]>(
+    () => [
+      {
+        accessorKey: "name",
+        header: "Name",
+        Cell: ({ row }) => (
+          <Box display="flex" alignItems="center" gap={1}>
+            {row.original.name}
+            {row.original.deleted_at && <Chip label="Deleted" color="error" />}
+          </Box>
+        ),
+      },
+      {
+        accessorFn: (row) => row.collections,
+        header: "Associated Collections",
+        Cell: ({ row }) => {
+          return (
+            <Box display="flex" gap={1}>
+              {row.original.collections.map((c) => {
+                return (
+                  <Chip
+                    color="secondary"
+                    label={c.name}
+                    key={`${c.name}-${row.original.id}`}
+                    onClick={() => {
+                      router.push(
+                        routes.teamCollections(row.original.custodian.pid),
+                      );
+                    }}
+                  />
+                );
+              })}
+            </Box>
+          );
+        },
+      },
+    ],
+    [router],
+  );
+
+  const table = useTable<CollectionHost>({
+    columns,
+    data: collectionHosts ?? NO_HOSTS,
+    getRowId: (row) => String(row.id),
+    onRowSelectionChange: setRowSelection,
+    state: { rowSelection, isLoading, showLoadingOverlay: false },
+    muiTableBodyProps: { "aria-busy": isLoading },
+  });
+
+  return (
+    <Box>
+      <Table
+        table={table}
+        leftAction={{
+          titleProps: {
+            title: "Collection Hosts",
+            subTitle: isDeletedView ? "Deleted" : "All",
+            children: (
+              <SortButton
+                fields={[
+                  { field: "name", displayName: "Name", numeric: false },
+                ]}
+              />
+            ),
+            wrapperSx: {
+              sx: {
+                display: "flex",
+                alignItems: "center",
+                flexWrap: "nowrap",
+              },
+            },
+          },
+        }}
+        rightAction={{
+          ...(isDeletedView
+            ? { restoreProps: { onClick: onRestore } }
+            : { deleteProps: { onClick: onDelete } }),
+        }}
+      />
+    </Box>
+  );
+};
+
+export default CollectionHostsTable;

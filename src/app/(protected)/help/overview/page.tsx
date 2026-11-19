@@ -1,7 +1,7 @@
 "use client";
 
 import { Box } from "@mui/material";
-import QueryBuilderGuidance from "@/app/(protected)/dashboard/[tabId]/components/QueryBuilderGuidance";
+import QueryBuilderGuidance from "@/app/(protected)/dashboard/(tabs)/components/QueryBuilderGuidance";
 import { baseComponents } from "@/modules/Guidance/Guidance";
 import Video from "../components/Video";
 import OverviewMdx from "./overview.mdx";

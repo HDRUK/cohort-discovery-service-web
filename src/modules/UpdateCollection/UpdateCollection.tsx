@@ -1,4 +1,6 @@
 "use client";
+
+import { CollectionHost } from "@/types/api";
 import {
   Chip,
   Box,
@@ -22,26 +24,29 @@ import FormTextField from "@/components/FormTextField";
 import CollectionConfig from "@/components/CollectionConfig";
 import { UpdateCollectionFormValues } from "@/types/forms";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { revalidateCollections } from "@/actions/revalidate";
 import { useNotify } from "@/providers/NotifyProvider";
 import FormDropdown from "@/components/FormDropdown";
 import DistributionStatus from "../DistributionStatus";
-import useCustodianStore from "@/hooks/useCustodianStore";
 import FormLabel from "@/components/FormLabel";
-import useAdminStore from "@/hooks/useAdminStore";
-import removeCollectionFromWorkgroups from "@/actions/workgroup/removeCollectionFromWorkgroups";
-import addCollectionToWorkgroups from "@/actions/workgroup/addCollectionToWorkgroups";
+import saveCollection from "@/actions/collection/saveCollection";
+import { describeCollectionSave } from "@/utils/collectionSave";
 import SquareCheckbox from "@/components/SquareCheckbox";
 import ManageCollectionStatus from "@/modules/ManageCollectionStatus";
 import CopyableVariable from "@/components/CopyableVariable";
 import ErrorHeader from "@/components/ErrorHeader";
-import { useAdminDataStore } from "@/store/adminDataStore";
 import UpdatePanel from "@/components/UpdatePanel";
 import { useThreePane } from "@/providers/ThreePaneProvider";
 import { FieldConfigMap, useSaveChanges } from "@/hooks/useSaveChanges";
-import { useUserDataStore } from "@/hooks/userDataStore";
-import { useIsAdminSection } from "@/contexts/AdminSectionContext";
+import {
+  useAdminCollectionHosts,
+  useIsAdminSection,
+} from "@/contexts/AdminSectionContext";
 import { clampRunTimeFrequency, getFrequencyModeKey } from "@/utils/frequency";
+import CollectionHostCredentials from "@/modules/CollectionHostCredentials";
+import { useSessionData } from "@/contexts/SessionDataContext";
+import { useCustodianSection } from "@/contexts/CustodianSectionContext";
+
+const NO_HOSTS: CollectionHost[] = [];
 
 export type UpdateCollectionProps = {
   collection: CollectionWithHosts;
@@ -74,7 +79,7 @@ const getDefaultValues = (collection: CollectionWithHosts | null) => {
     name,
     description,
     url,
-    host: hosts,
+    host,
     config,
     model_state,
     workgroups,
@@ -82,13 +87,12 @@ const getDefaultValues = (collection: CollectionWithHosts | null) => {
     location_enabled,
     death_enabled,
   } = collection;
-  const [host] = hosts;
   return {
     collection: {
       name,
       description: description || "",
       url: url || ("" as UrlString),
-      host_id: host?.id ?? "",
+      host_id: host?.id ?? 0,
       model_state: model_state,
       workgroups: workgroups,
       is_synthetic: is_synthetic,
@@ -111,16 +115,13 @@ const getDefaultValues = (collection: CollectionWithHosts | null) => {
 const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
   const { expandedRight, toggleRight: onClose } = useThreePane();
 
-  const currentCustodian = useCustodianStore((s) => s.current.custodian);
   const isAdmin = useIsAdminSection();
+  const hostId = collection.host?.id;
 
-  const currentCollectionHosts = useCustodianStore(
-    (s) => s.current.collectionHosts,
-  );
-  const updateCollection = useCustodianStore((s) => s.updateCollection);
-  const updateCollectionStatus = useAdminStore((s) => s.updateCollectionStatus);
-  const collectionHosts = useAdminDataStore((s) => s.collectionHosts);
-  const workgroups = useUserDataStore((s) => s.workgroups);
+  const currentCollectionHosts =
+    useCustodianSection()?.collectionHosts ?? NO_HOSTS;
+  const collectionHosts = useAdminCollectionHosts() ?? NO_HOSTS;
+  const workgroups = useSessionData().workgroups;
 
   const notify = useNotify();
 
@@ -189,8 +190,6 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
       const { id, name } = collection;
       if (isDirty) {
         lastCollectionIdRef.current = null;
-        await updateCollection(id, data.collection, data.config, false);
-        notify.success(`Updated collection ${data.collection.name}`);
 
         const currentNames = new Set(
           (collection.workgroups ?? []).map((w) => w.name),
@@ -206,58 +205,36 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
           (wg) => !selectedNames.has(wg.name) && currentNames.has(wg.name),
         );
 
-        if (toAdd.length > 0) {
-          await addCollectionToWorkgroups({
-            id,
-            workgroup_ids: toAdd.map((wg) => wg.id),
-          });
-
-          notify.success(
-            `Add collection "${name}" to workgroup${
-              toAdd.length > 1 ? "s" : ""
-            } ${toAdd.map((wg) => wg.name).join(", ")}`,
-          );
-        }
-
-        if (toRemove.length > 0) {
-          await removeCollectionFromWorkgroups({
-            id,
-            workgroup_ids: toRemove.map((wg) => wg.id),
-          });
-
-          notify.success(
-            `Removed collection "${name}" from workgroup${
-              toRemove.length > 1 ? "s" : ""
-            } ${toRemove.map((wg) => wg.name).join(", ")}`,
-          );
-        }
-
         const nextStateId = data.collection.model_state?.state?.id;
-        if (nextStateId && collection.model_state?.state_id !== nextStateId) {
-          await updateCollectionStatus(id, nextStateId);
+        const status =
+          nextStateId && collection.model_state?.state_id !== nextStateId
+            ? (nextStateId as CollectionStatus)
+            : undefined;
 
-          notify.success(
-            `Changed collection "${name}" to status ${
-              CollectionStatus[nextStateId as CollectionStatus]
-            }`,
-          );
+        const result = await saveCollection(id, {
+          collection: data.collection,
+          config: data.config,
+          addWorkgroupIds: toAdd.map((wg) => wg.id),
+          removeWorkgroupIds: toRemove.map((wg) => wg.id),
+          status,
+        });
+
+        const { ok, message } = describeCollectionSave(
+          `collection "${data.collection.name ?? name}"`,
+          result,
+          status !== undefined ? CollectionStatus[status] : undefined,
+        );
+        if (!ok) {
+          lastCollectionIdRef.current = id;
+          notify.error(message);
+          return;
         }
-
-        revalidateCollections(currentCustodian?.pid ?? undefined);
+        notify.success(message);
       }
 
       if (closeAfter) onClose?.();
     },
-    [
-      collection,
-      currentCustodian,
-      isDirty,
-      notify,
-      updateCollection,
-      updateCollectionStatus,
-      onClose,
-      workgroups,
-    ],
+    [collection, isDirty, notify, onClose, workgroups],
   );
 
   const onSave = useCallback(
@@ -448,17 +425,13 @@ const UpdateCollection = ({ collection }: UpdateCollectionProps) => {
             {!isAdmin && (
               <Stack>
                 <FormLabel underlined>Host Credentials</FormLabel>
-                Client ID
-                <CopyableVariable
-                  value={collection.host?.[0]?.client_id}
-                  sx={{ mb: 2 }}
-                />
-                Client Secret
-                <CopyableVariable
-                  hidden
-                  value={collection.host?.[0]?.client_secret}
-                  sx={{ mb: 2 }}
-                />
+                {!hostId && (
+                  <Typography sx={{ mb: 2 }}>
+                    This collection has no host yet, so there are no credentials
+                    to copy. Choose one under Collection Connection.
+                  </Typography>
+                )}
+                {hostId && <CollectionHostCredentials hostId={hostId} />}
               </Stack>
             )}
           </Box>

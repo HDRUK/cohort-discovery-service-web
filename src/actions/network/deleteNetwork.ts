@@ -1,13 +1,17 @@
 "use server";
 
-import { apiDelete } from "@/lib/apiClient";
+import { updateTag } from "next/cache";
+import { CACHE_TAGS } from "@/config/tags";
+import { apiDelete } from "@/server/api";
+import { requireSession } from "@/server/session";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { ApiResponse, Network } from "@/types/api";
-import { revalidateNetworks } from "@/actions/revalidate";
 
 const deleteNetwork = async (id: number): Promise<void> => {
-  await apiDelete<ApiResponse<Network>>(API_ROUTES.network(id));
-  await revalidateNetworks();
+  const { token } = await requireSession();
+  await apiDelete<ApiResponse<Network>>(token, API_ROUTES.network(id));
+  updateTag(CACHE_TAGS.custodians);
+  updateTag(CACHE_TAGS.collections);
 };
 
 export default deleteNetwork;

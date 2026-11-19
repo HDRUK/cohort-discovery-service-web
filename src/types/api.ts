@@ -44,8 +44,25 @@ export interface TermDirectorySearchParams extends ApiSearchParams {
   collections?: string;
 }
 
-export interface CacheOptions {
-  useCache?: boolean;
+export interface ReadArgs {
+  params?: URLSearchParams | string;
+}
+
+export interface SearchConceptsBody {
+  concept_name?: string[];
+  concept_id?: string[];
+  domain?: string;
+  collections?: string[];
+  page?: number;
+  per_page?: number;
+  include_ancestors?: boolean;
+}
+
+export interface ParseQueryBody {
+  query: string;
+  ignore_synthetic?: boolean;
+  prefer_non_synthetic?: boolean;
+  collections?: string[];
 }
 
 export interface ApiResponse<T> {
@@ -89,8 +106,6 @@ export interface CreateQuery {
   task_count: number;
   task_pids: string[];
 }
-export type Tasks = string[];
-
 export interface Distribution extends WithTimestamps {
   id: number;
   collection_id: number;
@@ -310,10 +325,11 @@ export interface CollectionConfig {
   run_time_frequency: number;
   run_time_hour: number;
   run_time_minute: number;
+  type: DistributionJobType;
 }
 
 export interface CollectionWithHosts extends Collection {
-  host: CollectionHost[];
+  host: CollectionHost | null;
   config: CollectionConfig;
   workgroups?: Workgroup[];
 }
@@ -362,6 +378,7 @@ export interface TermDirectoryEntry {
   domain_id: string;
   count: number;
   ncollections: number;
+  collection_names: string[];
 }
 
 export interface TaskRun {
@@ -482,6 +499,11 @@ export enum TaskType {
   B = "b",
 }
 
+export enum DistributionJobType {
+  GENERIC = "GENERIC",
+  DEMOGRAPHICS = "DEMOGRAPHICS",
+}
+
 export interface UserIdentity extends WithTimestamps {
   id: number;
   provider: string;
@@ -531,6 +553,11 @@ export interface TokenUser {
   cohort_admin_teams: ExternalCustodian[];
 }
 
+export type ClientTokenUser = Pick<
+  TokenUser,
+  "sso_provider" | "orcid" | "is_admin" | "cohort_admin_teams"
+>;
+
 export interface Network {
   name: string;
   pid: string;
@@ -547,7 +574,7 @@ export interface Custodian extends WithTimestamps {
 }
 
 export interface CombinedUser extends User {
-  token_user: TokenUser | null;
+  token_user: ClientTokenUser | null;
 }
 
 export interface CreateCollectionHostPost {
@@ -565,12 +592,20 @@ export interface CollectionHost {
   id: number;
   name: string;
   query_context_type: string;
-  client_id: string;
-  client_secret: string;
   custodian: Custodian;
   collections: Collection[];
   deleted_at?: string | null;
 }
+
+export interface CollectionHostWithCredentials extends CollectionHost {
+  client_id: string;
+  client_secret: string;
+}
+
+export type CollectionHostCredentials = Pick<
+  CollectionHostWithCredentials,
+  "id" | "client_id" | "client_secret"
+>;
 
 export type UrlString = `http${"s" | ""}://${string}`;
 
@@ -598,6 +633,39 @@ export interface TransitionCollectionPut {
   state: string;
 }
 
+export type CollectionSaveStep = "details" | "workgroups" | "status";
+
+export type CollectionSaveResult =
+  | {
+      ok: true;
+      workgroupsAdded: number;
+      workgroupsRemoved: number;
+      statusChanged: boolean;
+    }
+  | {
+      ok: false;
+      failedStep: CollectionSaveStep;
+      failedCollection?: SaveStepCollection;
+      message: string;
+    };
+
+export interface SaveStepCollection {
+  id: number;
+  name?: string;
+}
+
+export interface CollectionWorkgroupChanges {
+  id: number;
+  name: string;
+  addWorkgroupIds: number[];
+  removeWorkgroupIds: number[];
+}
+
+export interface DeleteCollectionsResult {
+  deleted: number[];
+  failed: number[];
+}
+
 export interface CreateCollectionConfigPost {
   collection_id: number;
   run_time_hour: number;
@@ -605,7 +673,7 @@ export interface CreateCollectionConfigPost {
   frequency_mode: number;
   run_time_frequency: number;
   enabled: number;
-  type: string;
+  type: DistributionJobType;
 }
 
 export interface Workgroup {
@@ -631,11 +699,6 @@ export interface AddUsersToWorkgroupPost {
   workgroup_id: number;
 }
 
-export interface AddCollectionToWorkgroupsPost {
-  id: number;
-  workgroup_ids: number[];
-}
-
 export interface RemoveCollectionsFromWorkgroupPost {
   ids: number[];
   workgroup_id: number;
@@ -644,11 +707,6 @@ export interface RemoveCollectionsFromWorkgroupPost {
 export interface RemoveUsersFromWorkgroupPost {
   ids: number[];
   workgroup_id: number;
-}
-
-export interface RemoveCollectionFromWorkgroupsPost {
-  id: number;
-  workgroup_ids: number[];
 }
 
 export interface CreateNetworkPost {
