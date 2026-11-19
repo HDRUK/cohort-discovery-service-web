@@ -166,11 +166,6 @@ const UpdateWorkgroup = () => {
         onLockClick={() => onSave(true)}
         onUnlockClick={handleUnlockClick}
       >
-        {managedWarning && (
-          <Alert severity="warning" sx={{ mx: 2, mb: 1 }}>
-            {managedWarning}
-          </Alert>
-        )}
         <ActionMenuSection
           title={"Add Collections"}
           fixedExpanded
@@ -249,6 +244,11 @@ const UpdateWorkgroup = () => {
               {notice}
             </Typography>
           ))}
+          {managedWarning && (
+            <Alert severity="warning" sx={{ my: 1 }}>
+              {managedWarning}
+            </Alert>
+          )}
         </ActionMenuSection>
       </UpdatePanel>
     </FormProvider>
