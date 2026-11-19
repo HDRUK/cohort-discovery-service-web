@@ -27,7 +27,7 @@ const socialLinks = [
     icon: <XIcon fontSize="small" />,
   },
   {
-    href: "https://www.linkedin.com/company/hdruk/mycompany/",
+    href: "https://www.linkedin.com/company/hdruk/",
     label: "LinkedIn",
     icon: <LinkedInIcon fontSize="small" />,
   },
