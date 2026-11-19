@@ -3,7 +3,7 @@ import {
   operationModeLabel,
   providersSummary,
 } from "@/lib/accessPolicySummary";
-import { MembershipMode } from "@/types/accessPolicy";
+import { MembershipMode, RestoredWhen } from "@/types/accessPolicy";
 import {
   DEFAULT_WORKGROUP,
   SDE_WORKGROUP,
@@ -72,6 +72,31 @@ describe("accessPolicyRows", () => {
       sync: "First sign-in, adds",
       adminEdits: "Kept; the provider adds to them at the user's first sign-in",
     });
+  });
+
+  it("shows an unknown mode as it is instead of throwing", () => {
+    const policy = getMockAccessPolicy({
+      workgroups: getMockSubjectPolicy({
+        mode: "hybrid" as MembershipMode,
+      }),
+    });
+
+    expect(accessPolicyRows(policy)[0]).toMatchObject({
+      sync: "hybrid, adds",
+      adminEdits: "hybrid",
+    });
+  });
+
+  it("leaves out the suffix for an unknown restored when", () => {
+    const policy = getMockAccessPolicy({
+      workgroups: getMockSubjectPolicy({
+        restored_on_sync: [
+          { ...DEFAULT_WORKGROUP, when: "sometimes" as RestoredWhen },
+        ],
+      }),
+    });
+
+    expect(accessPolicyRows(policy)[0].restored).toBe("DEFAULT");
   });
 });
 
