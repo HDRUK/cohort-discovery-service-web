@@ -44,3 +44,13 @@ export interface UserMembershipSource {
 }
 
 export type MembershipSources = Record<MembershipSubject, UserMembershipSource>;
+
+export interface MembershipEditFailure {
+  id: number;
+  message: string;
+}
+
+export interface MembershipEditResult {
+  failed: MembershipEditFailure[];
+  failedCollections?: MembershipEditFailure[];
+}

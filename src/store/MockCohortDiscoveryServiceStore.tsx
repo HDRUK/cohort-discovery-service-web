@@ -123,6 +123,7 @@ const seedStores = (overrides?: SliceOverrides) => {
 
   useSelectionStore.setState({
     selectedUserId: null,
+    selectedUserIds: [],
     selectedCollectionIds: [],
   });
 

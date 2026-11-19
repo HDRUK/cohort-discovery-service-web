@@ -697,7 +697,6 @@ export interface AddCollectionsToWorkgroupPost {
 }
 
 export interface AddUsersToWorkgroupPost {
-  ids: number[];
   workgroup_id: number;
 }
 

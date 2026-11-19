@@ -18,6 +18,7 @@ export type ValueType = number | string;
 export type OptionsType = {
   value: ValueType;
   label: string;
+  disabled?: boolean;
 };
 
 interface FormMultiSelectProps extends Omit<
@@ -113,6 +114,7 @@ const FormMultiSelect = ({
           );
         }}
         isOptionEqualToValue={(option, value) => option.value === value?.value}
+        getOptionDisabled={(option) => !!option.disabled}
         options={options}
         getOptionKey={(option) => option.value}
         disabled={disabled}

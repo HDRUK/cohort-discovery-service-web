@@ -1,23 +1,21 @@
 "use client";
 
+import { Suspense } from "react";
 import CollectionsTable from "@/components/CollectionsTable";
 import { Box, Stack, Typography } from "@mui/material";
 import { formatWorkgroupName } from "@/utils/workgroups";
 import { useNotify } from "@/providers/NotifyProvider";
 import UserTable from "@/components/UserTable";
-import useFeatures from "@/hooks/useFeatures";
 import { CollectionWithHosts, Paginated } from "@/types/api";
 import removeCollectionsFromWorkgroup from "@/actions/workgroup/removeCollectionsFromWorkgroup";
-import removeUsersFromWorkgroup from "@/actions/workgroup/removeUsersFromWorkgroup";
 import useSelectedWorkgroup from "@/hooks/useSelectedWorkgroup";
+import WorkgroupUsers from "./WorkgroupUsers";
 
 const WorkgroupsMiddlePanel = ({
   collections,
 }: {
   collections?: Paginated<CollectionWithHosts>;
 }) => {
-  const { manageWorkgroupsInternal } = useFeatures();
-
   const selectedWorkgroup = useSelectedWorkgroup();
 
   const notify = useNotify();
@@ -53,26 +51,22 @@ const WorkgroupsMiddlePanel = ({
               boxSxProps={{ minHeight: 300 }}
             />
           </Box>
-          {manageWorkgroupsInternal && (
-            <Box>
-              <UserTable
-                tableTitle={`${formatWorkgroupName(selectedWorkgroup?.name)} Workgroup`}
-                tableSubTitle="Users"
-                handleDelete={async (ids: string[]) => {
-                  await removeUsersFromWorkgroup({
-                    ids: ids.map((id) => +id),
-                    workgroup_id: selectedWorkgroup.id,
-                  });
-                  notify.success(
-                    `${ids.length} Users${
-                      ids.length > 1 ? "s" : ""
-                    } removed from workgroup ${selectedWorkgroup.name}`,
-                  );
-                }}
-                boxSxProps={{ minHeight: 300 }}
+          <Box>
+            <Suspense
+              fallback={
+                <UserTable
+                  tableTitle={`${formatWorkgroupName(selectedWorkgroup.name)} Workgroup`}
+                  tableSubTitle="Users"
+                  boxSxProps={{ minHeight: 300 }}
+                />
+              }
+            >
+              <WorkgroupUsers
+                key={selectedWorkgroup.id}
+                workgroup={selectedWorkgroup}
               />
-            </Box>
-          )}
+            </Suspense>
+          </Box>
         </Stack>
       )}
       {!selectedWorkgroup && (

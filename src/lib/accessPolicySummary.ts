@@ -44,20 +44,25 @@ export const accessPolicyRows = (policy: AccessPolicy): AccessPolicyRow[] =>
       policy,
     );
     const restored = policy[subject].restored_on_sync;
+    const syncTiming = SYNC_TIMING_LABELS[mode] ?? mode;
 
     return {
       subject: capitaliseFirstLetter(MEMBERSHIP_SUBJECT_LABELS[subject]),
       sync:
         mode === MembershipMode.Internal
-          ? SYNC_TIMING_LABELS[mode]
-          : `${SYNC_TIMING_LABELS[mode]}, ${authoritative ? "replaces" : "adds"}`,
-      adminEdits: ADMIN_EDITS[mode]({
-        authoritative,
-        providers: joinLabels(providerLabels),
-      }),
+          ? syncTiming
+          : `${syncTiming}, ${authoritative ? "replaces" : "adds"}`,
+      adminEdits:
+        ADMIN_EDITS[mode]?.({
+          authoritative,
+          providers: joinLabels(providerLabels),
+        }) ?? mode,
       restored: restored.length
         ? restored
-            .map(({ name, when }) => `${name}${RESTORED_WHEN_SUFFIXES[when]}`)
+            .map(
+              ({ name, when }) =>
+                `${name}${RESTORED_WHEN_SUFFIXES[when] ?? ""}`,
+            )
             .join("; ")
         : null,
     };
