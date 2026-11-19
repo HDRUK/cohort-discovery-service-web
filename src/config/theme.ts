@@ -543,7 +543,7 @@ const baseThemeOptions: ThemeOptions = {
           }),
         },
         ...(["primary", "success", "warning", "error"] as const).map(
-          color => ({
+          (color) => ({
             props: { variant: "outlined" as const, color },
             style: ({ theme }: { theme: Theme }) => ({
               borderColor: alpha(theme.palette[color].main, 0.7),

@@ -14,7 +14,8 @@ import { getDomain } from "@/utils/omop";
 import SquareCheckbox from "@/components/SquareCheckbox";
 
 type ConceptSelectEvent =
-  ChangeEvent<HTMLInputElement> | MouseEvent<HTMLDivElement>;
+  | ChangeEvent<HTMLInputElement>
+  | MouseEvent<HTMLDivElement>;
 
 export interface ConceptItemProps {
   concept: Concept;
