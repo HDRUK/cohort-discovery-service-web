@@ -9,8 +9,7 @@ import {
 import { Demographics } from "@/types/rules";
 import DemographicLocationSection from "./DemographicLocationSection";
 import { HdrukUiProvider } from "@hdruk/ui";
-import { themeOptions } from "@/config/theme";
-import { ThemeOptions } from "@mui/material";
+import { siteTheme } from "@/config/theme";
 
 // The real picker pulls in leaflet (touches `window` at import) — replace it
 // with a light stub and make next/dynamic return it synchronously.
@@ -53,7 +52,7 @@ const Harness = ({
   });
 
   return (
-    <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
+    <HdrukUiProvider theme={siteTheme}>
       <FormProvider {...form}>
         <DemographicLocationSection
           editing={editing}

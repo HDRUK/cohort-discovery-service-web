@@ -2,6 +2,8 @@
 
 import { Footer as HdrFooter } from "@hdruk/ui";
 import { Box, Link as MuiLink, Typography } from "@mui/material";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import XIcon from "@mui/icons-material/X";
 import Link from "next/link";
 import branding from "@branding/branding.config";
 import useHdrukChrome from "@/hooks/useHdrukChrome";
@@ -17,6 +19,19 @@ interface FooterLink {
   href: string;
   label: string;
 }
+
+const socialLinks = [
+  {
+    href: "https://x.com/HDR_UK",
+    label: "X",
+    icon: <XIcon fontSize="small" />,
+  },
+  {
+    href: "https://www.linkedin.com/company/hdruk/",
+    label: "LinkedIn",
+    icon: <LinkedInIcon fontSize="small" />,
+  },
+];
 
 interface FooterProps {
   copyright?: string;
@@ -68,6 +83,7 @@ const Footer = ({ copyright }: FooterProps) => {
           { title: "links2", items: secondaryLinks },
         ]}
         copyrightText={copyright}
+        socialLinks={socialLinks}
       />
     );
   }

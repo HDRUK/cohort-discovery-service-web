@@ -12,6 +12,7 @@ import {
   Grid,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import CloseIcon from "@mui/icons-material/Close";
 
 import {
   getContainerSx,
@@ -22,7 +23,6 @@ import {
 } from "./SearchBox.styles";
 import useRotatingPlaceholder from "@/hooks/useRotatingPlaceholder";
 import { useDefaults } from "@/providers/DefaultProvider";
-import { DeleteIcon } from "@/icons/DeleteIcon";
 
 export type SearchBoxProps = Omit<TextFieldProps, "errors"> & {
   loading?: boolean;
@@ -62,6 +62,8 @@ export type SearchBoxProps = Omit<TextFieldProps, "errors"> & {
   readOnly?: boolean;
 };
 
+const DEFAULT_START_ICON = <SearchIcon fontSize="small" sx={{ ml: 1.5 }} />;
+
 const SearchBox = ({
   loading = false,
   warning = false,
@@ -76,7 +78,7 @@ const SearchBox = ({
   onClickEndAdornment,
   onClear,
   endIcon,
-  startIcon,
+  startIcon = DEFAULT_START_ICON,
   showEndIcon = true,
   placeholders,
   placeholderOverride,
@@ -112,6 +114,7 @@ const SearchBox = ({
   }, [collapsible]);
 
   const searchActionDisabled = disabled || readOnly;
+  const hasEndAction = collapsible || !!onClickEndAdornment || !!endIcon;
 
   const handleIconClick = useCallback(
     (e: React.MouseEvent<HTMLElement>) => {
@@ -250,6 +253,10 @@ const SearchBox = ({
                     : {}),
                 },
                 id: STABLE_ID,
+                "aria-label":
+                  typeof rest.placeholder === "string"
+                    ? rest.placeholder
+                    : undefined,
                 autoComplete: "off",
                 name: "search-box",
                 readOnly,
@@ -289,9 +296,9 @@ const SearchBox = ({
                         aria-label="Clear search"
                         sx={iconButtonSx(searchActionDisabled)}
                       >
-                        <DeleteIcon fontSize="small" />
+                        <CloseIcon fontSize="small" />
                       </IconButton>
-                    ) : showEndIcon ? (
+                    ) : showEndIcon && hasEndAction ? (
                       <IconButton
                         type="button"
                         disabled={searchActionDisabled}
