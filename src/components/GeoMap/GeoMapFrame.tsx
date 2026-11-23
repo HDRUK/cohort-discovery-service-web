@@ -2,7 +2,7 @@
 
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import {
   AttributionControl,
   MapContainer,
@@ -46,28 +46,38 @@ const GeoMapFrame = ({
   fitBounds,
   children,
   ...mapProps
-}: GeoMapFrameProps) => (
-  <Box
-    sx={{
-      height,
-      width: "100%",
-      "& .leaflet-container": { borderRadius: 1 },
-    }}
-  >
-    <MapContainer
-      bounds={fitBounds}
-      boundsOptions={{ padding: BOUNDS_PADDING }}
-      maxZoom={MAX_MAP_ZOOM}
-      style={{ height: "100%", width: "100%" }}
-      attributionControl={false}
-      {...mapProps}
+}: GeoMapFrameProps) => {
+  // react-leaflet can't survive React <Activity> (used by Cache Components):
+  // hiding destroys the Leaflet map but keeps the reference. A new key gives
+  // us a fresh map when shown again. See "Limitations" in
+  // https://react-leaflet.js.org/docs/start-introduction/
+  const [mapKey, setMapKey] = useState(0);
+  useEffect(() => () => setMapKey((k) => k + 1), []);
+
+  return (
+    <Box
+      sx={{
+        height,
+        width: "100%",
+        "& .leaflet-container": { borderRadius: 1 },
+      }}
     >
-      <AttributionControl prefix={LEAFLET_ATTRIBUTION_PREFIX} />
-      <TileLayer attribution={TILE_ATTRIBUTION} url={TILE_URL} />
-      <SettleOnMount fitBounds={fitBounds} />
-      {children}
-    </MapContainer>
-  </Box>
-);
+      <MapContainer
+        key={mapKey}
+        bounds={fitBounds}
+        boundsOptions={{ padding: BOUNDS_PADDING }}
+        maxZoom={MAX_MAP_ZOOM}
+        style={{ height: "100%", width: "100%" }}
+        attributionControl={false}
+        {...mapProps}
+      >
+        <AttributionControl prefix={LEAFLET_ATTRIBUTION_PREFIX} />
+        <TileLayer attribution={TILE_ATTRIBUTION} url={TILE_URL} />
+        <SettleOnMount fitBounds={fitBounds} />
+        {children}
+      </MapContainer>
+    </Box>
+  );
+};
 
 export default GeoMapFrame;
