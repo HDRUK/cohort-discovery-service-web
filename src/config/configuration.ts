@@ -9,6 +9,7 @@ export const CONFIGURATION_SECTION_LABELS: Record<
   string
 > = {
   [ConfigurationSection.Flags]: "Feature flags",
+  [ConfigurationSection.FlagOverrides]: "Flag overrides",
   [ConfigurationSection.Defaults]: "Defaults",
   [ConfigurationSection.AccessControl]: "Access control",
 };

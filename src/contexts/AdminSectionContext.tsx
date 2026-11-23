@@ -3,7 +3,14 @@
 import { createContext, ReactNode, use, useContext, useMemo } from "react";
 
 import { AccessPolicy } from "@/types/accessPolicy";
-import { ApiResponse, Collection, CollectionHost, User } from "@/types/api";
+import {
+  ApiResponse,
+  Collection,
+  CollectionHost,
+  User,
+  Workgroup,
+} from "@/types/api";
+import { FeatureFlag, FeatureOverrides } from "@/types/features";
 
 type Source<T> = Promise<ApiResponse<T>> | T;
 
@@ -12,6 +19,9 @@ export interface AdminSectionData {
   collections: Collection[];
   collectionHosts: CollectionHost[];
   accessPolicy?: AccessPolicy | null;
+  workgroups?: Workgroup[];
+  globalFeatureFlags?: FeatureFlag;
+  featureOverrides?: FeatureOverrides[];
 }
 
 interface AdminSectionSources {
@@ -19,6 +29,9 @@ interface AdminSectionSources {
   collections: Source<Collection[]>;
   collectionHosts: Source<CollectionHost[]>;
   accessPolicy?: Promise<AccessPolicy | null> | AccessPolicy | null;
+  workgroups?: Source<Workgroup[]>;
+  globalFeatureFlags?: Source<FeatureFlag>;
+  featureOverrides?: Source<FeatureOverrides[]>;
 }
 
 const AdminSectionContext = createContext<AdminSectionSources | null>(null);
@@ -40,17 +53,39 @@ export const AdminSectionProvider = ({
   collections,
   collectionHosts,
   accessPolicy,
+  workgroups,
+  globalFeatureFlags,
+  featureOverrides,
   children,
 }: {
   users: Promise<ApiResponse<User[]>>;
   collections: Promise<ApiResponse<Collection[]>>;
   collectionHosts: Promise<ApiResponse<CollectionHost[]>>;
   accessPolicy: Promise<AccessPolicy | null>;
+  workgroups: Promise<ApiResponse<Workgroup[]>>;
+  globalFeatureFlags: Promise<ApiResponse<FeatureFlag>>;
+  featureOverrides: Promise<ApiResponse<FeatureOverrides[]>>;
   children: ReactNode;
 }) => {
   const value = useMemo<AdminSectionSources>(
-    () => ({ users, collections, collectionHosts, accessPolicy }),
-    [users, collections, collectionHosts, accessPolicy],
+    () => ({
+      users,
+      collections,
+      collectionHosts,
+      accessPolicy,
+      workgroups,
+      globalFeatureFlags,
+      featureOverrides,
+    }),
+    [
+      users,
+      collections,
+      collectionHosts,
+      accessPolicy,
+      workgroups,
+      globalFeatureFlags,
+      featureOverrides,
+    ],
   );
 
   return (
@@ -73,6 +108,15 @@ export const useAdminCollections = (): Collection[] | null =>
 
 export const useAdminCollectionHosts = (): CollectionHost[] | null =>
   useSourceValue(useContext(AdminSectionContext)?.collectionHosts);
+
+export const useAdminWorkgroups = (): Workgroup[] | null =>
+  useSourceValue(useContext(AdminSectionContext)?.workgroups);
+
+export const useAdminGlobalFeatureFlags = (): FeatureFlag | null =>
+  useSourceValue(useContext(AdminSectionContext)?.globalFeatureFlags);
+
+export const useAdminFeatureOverrides = (): FeatureOverrides[] | null =>
+  useSourceValue(useContext(AdminSectionContext)?.featureOverrides);
 
 export const useAdminAccessPolicy = (): AccessPolicy | null => {
   const source = useContext(AdminSectionContext)?.accessPolicy;

@@ -7,7 +7,7 @@ import { apiGet } from "@/server/api";
 import { USER_DATA_CACHE_LIFE } from "@/server/cacheProfiles";
 import { requireSession } from "@/server/session";
 import { ApiResponse } from "@/types/api";
-import { FeatureFlag } from "@/types/features";
+import { FeatureFlag, FeatureOverrides } from "@/types/features";
 
 export const getFeatureFlags = async (): Promise<ApiResponse<FeatureFlag>> => {
   "use cache: private";
@@ -16,4 +16,29 @@ export const getFeatureFlags = async (): Promise<ApiResponse<FeatureFlag>> => {
 
   const { token } = await requireSession();
   return apiGet<ApiResponse<FeatureFlag>>(token, API_ROUTES.featureFlags);
+};
+
+export const getGlobalFeatureFlags = async (): Promise<
+  ApiResponse<FeatureFlag>
+> => {
+  "use cache: private";
+  cacheLife(USER_DATA_CACHE_LIFE);
+  cacheTag(CACHE_TAGS.features);
+
+  const { token } = await requireSession();
+  return apiGet<ApiResponse<FeatureFlag>>(token, API_ROUTES.featureFlagsGlobal);
+};
+
+export const getFeatureOverrides = async (): Promise<
+  ApiResponse<FeatureOverrides[]>
+> => {
+  "use cache: private";
+  cacheLife(USER_DATA_CACHE_LIFE);
+  cacheTag(CACHE_TAGS.features);
+
+  const { token } = await requireSession();
+  return apiGet<ApiResponse<FeatureOverrides[]>>(
+    token,
+    API_ROUTES.featureOverrides,
+  );
 };

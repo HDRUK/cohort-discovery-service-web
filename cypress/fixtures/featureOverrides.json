@@ -1,0 +1,17 @@
+{
+  "message": "success",
+  "data": [
+    {
+      "feature": "query-builder-use-location",
+      "global": false,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "query-builder-use-death",
+      "global": false,
+      "users": [],
+      "workgroups": []
+    }
+  ]
+}

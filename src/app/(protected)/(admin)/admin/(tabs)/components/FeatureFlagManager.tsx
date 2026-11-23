@@ -3,21 +3,29 @@
 import { useState } from "react";
 import Table from "@/components/Table";
 import { useTransposedTable } from "@/hooks/useTransposedTable";
-import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
+import { useAdminGlobalFeatureFlags } from "@/contexts/AdminSectionContext";
+import updateFeatureFlag from "@/actions/admin/updateFeatureFlag";
 import { useNotify } from "@/providers/NotifyProvider";
+import { FeatureFlag, FeatureName } from "@/types/features";
 import { Box, CircularProgress, Switch } from "@mui/material";
 
 export const FeatureFlagManager = () => {
-  const flags = useFeatureFlagsStore((s) => s.flags);
-  const updateFlag = useFeatureFlagsStore((s) => s.updateFlag);
+  const globalFlags = useAdminGlobalFeatureFlags();
+  const [flags, setFlags] = useState<FeatureFlag | null>(globalFlags);
   const [savingKeys, setSavingKeys] = useState<string[]>([]);
   const notify = useNotify();
 
+  const setFlag = (key: string, enabled: boolean) =>
+    setFlags((current) => current && { ...current, [key]: enabled });
+
   const handleToggleFeature = async (key: string, newValue: boolean) => {
+    const previous = flags?.[key as FeatureName];
+    setFlag(key, newValue);
     setSavingKeys((keys) => [...keys, key]);
     try {
-      await updateFlag(key, newValue);
+      await updateFeatureFlag(key, { enabled: newValue });
     } catch {
+      if (previous !== undefined) setFlag(key, previous);
       notify.error(
         `Could not save the "${key}" flag, so it has been switched back. Try again, or refresh the page if it keeps failing.`,
       );
