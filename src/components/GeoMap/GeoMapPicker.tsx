@@ -24,11 +24,20 @@ import {
 } from "@/config/map";
 import { useDefaults } from "@/providers/DefaultProvider";
 
-function FlyTo({ target }: { target: L.LatLngTuple | null }) {
+function FlyTo({
+  target,
+  onDone,
+}: {
+  target: L.LatLngTuple | null;
+  onDone: () => void;
+}) {
   const map = useMap();
   useEffect(() => {
-    if (target) map.flyTo(target, FLY_TO_ZOOM);
-  }, [target, map]);
+    if (target) {
+      map.flyTo(target, FLY_TO_ZOOM);
+      onDone();
+    }
+  }, [target, map, onDone]);
   return null;
 }
 
@@ -74,7 +83,9 @@ export default function GeoMapPicker({
   // Frame the saved radius on first render — a fixed zoom would otherwise
   // ignore how wide an existing location's radius actually is.
   const [initialBounds] = useState(() =>
-    value ? L.latLng(value.lat, value.lon).toBounds(value.radius * 2) : undefined,
+    value
+      ? L.latLng(value.lat, value.lon).toBounds(value.radius * 2)
+      : undefined,
   );
 
   const handlePinDrop = (pos: L.LatLngTuple) => {
@@ -107,7 +118,7 @@ export default function GeoMapPicker({
         zoomControl={false}
       >
         <ZoomControl position="bottomright" />
-        <FlyTo target={flyTarget} />
+        <FlyTo target={flyTarget} onDone={() => setFlyTarget(null)} />
         <LSOABoundaries
           pinPosition={position}
           radius={radius}
