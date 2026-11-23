@@ -9,7 +9,6 @@ import AccessPolicyPanel from "./AccessPolicyPanel";
 import SkeletonFull from "@/components/SkeletonFull";
 import { DefaultsManager } from "./DefaultsManager";
 import { FeatureFlagManager } from "./FeatureFlagManager";
-import { FeatureOverridesManager } from "./FeatureOverridesManager";
 
 const AdminAccessPolicyPanel = () => {
   const policy = useAdminAccessPolicy();
@@ -20,11 +19,6 @@ const SECTION_PANELS: Record<ConfigurationSection, ReactNode> = {
   [ConfigurationSection.Flags]: (
     <Suspense fallback={<SkeletonFull />}>
       <FeatureFlagManager />
-    </Suspense>
-  ),
-  [ConfigurationSection.FlagOverrides]: (
-    <Suspense fallback={<SkeletonFull />}>
-      <FeatureOverridesManager />
     </Suspense>
   ),
   [ConfigurationSection.Defaults]: <DefaultsManager />,

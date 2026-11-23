@@ -18,17 +18,6 @@ export const getFeatureFlags = async (): Promise<ApiResponse<FeatureFlag>> => {
   return apiGet<ApiResponse<FeatureFlag>>(token, API_ROUTES.featureFlags);
 };
 
-export const getGlobalFeatureFlags = async (): Promise<
-  ApiResponse<FeatureFlag>
-> => {
-  "use cache: private";
-  cacheLife(USER_DATA_CACHE_LIFE);
-  cacheTag(CACHE_TAGS.features);
-
-  const { token } = await requireSession();
-  return apiGet<ApiResponse<FeatureFlag>>(token, API_ROUTES.featureFlagsGlobal);
-};
-
 export const getFeatureOverrides = async (): Promise<
   ApiResponse<FeatureOverrides[]>
 > => {

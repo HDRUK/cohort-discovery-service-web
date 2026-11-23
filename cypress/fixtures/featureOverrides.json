@@ -2,13 +2,115 @@
   "message": "success",
   "data": [
     {
-      "feature": "query-builder-use-location",
+      "feature": "constrain-for-bunny-v1",
+      "global": true,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "flatten-nested-groups",
+      "global": true,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "hdruk-uk-theme",
+      "global": true,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "in-app-messenger",
+      "global": false,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "integrated-ensure-default-wgs",
+      "global": true,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "integrated-sync-custodians-every-request",
+      "global": true,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "integrated-sync-roles-every-request",
+      "global": true,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "integrated-sync-sde-wgs-from-claim",
+      "global": true,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "integrated-sync-workgroups-every-request",
+      "global": false,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "integrated-sync-workgroups-first-login",
+      "global": true,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "query-builder",
+      "global": true,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "query-builder-allow-nested-groups",
+      "global": true,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "query-builder-show-concept-stats",
       "global": false,
       "users": [],
       "workgroups": []
     },
     {
       "feature": "query-builder-use-death",
+      "global": true,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "query-builder-use-leave-confirmation",
+      "global": true,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "query-builder-use-location",
+      "global": true,
+      "users": [],
+      "workgroups": [
+        {
+          "id": 1,
+          "name": "UK-RESEARCH",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "feature": "query-builder-use-stats-in-ordering",
+      "global": true,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "query-nlp",
       "global": false,
       "users": [],
       "workgroups": []

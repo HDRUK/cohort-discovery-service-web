@@ -6,25 +6,19 @@ import { apiPut } from "@/server/api";
 import { requireSession } from "@/server/session";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { ApiResponse } from "@/types/api";
-import { FeatureOverrideSubject } from "@/types/features";
+import { FeatureOverridesUpdate } from "@/types/features";
 
-export interface SetFeatureOverridePayload {
-  enabled: boolean;
-}
-
-const setFeatureOverride = async (
+const replaceFeatureOverrides = async (
   name: string,
-  subject: FeatureOverrideSubject,
-  id: number,
-  payload: SetFeatureOverridePayload,
+  payload: FeatureOverridesUpdate,
 ): Promise<void> => {
   const { token } = await requireSession();
-  await apiPut<ApiResponse<unknown>, SetFeatureOverridePayload>(
+  await apiPut<ApiResponse<unknown>, FeatureOverridesUpdate>(
     token,
-    API_ROUTES.featureOverride(name, subject, id),
+    API_ROUTES.featureOverridesFor(name),
     payload,
   );
   updateTag(CACHE_TAGS.features);
 };
 
-export default setFeatureOverride;
+export default replaceFeatureOverrides;

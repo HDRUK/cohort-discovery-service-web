@@ -3,10 +3,7 @@ import { AdminSectionProvider } from "@/contexts/AdminSectionContext";
 import { getAccessPolicy } from "@/server/data/accessPolicy";
 import { getCollectionHosts } from "@/server/data/collectionHosts";
 import { getCollections } from "@/server/data/collections";
-import {
-  getFeatureOverrides,
-  getGlobalFeatureFlags,
-} from "@/server/data/features";
+import { getFeatureOverrides } from "@/server/data/features";
 import { getUsersList } from "@/server/data/users";
 import { getWorkgroups } from "@/server/data/workgroups";
 
@@ -17,7 +14,6 @@ const AdminSection = ({ children }: { children: ReactNode }) => (
     collectionHosts={getCollectionHosts()}
     accessPolicy={getAccessPolicy()}
     workgroups={getWorkgroups()}
-    globalFeatureFlags={getGlobalFeatureFlags()}
     featureOverrides={getFeatureOverrides()}
   >
     {children}

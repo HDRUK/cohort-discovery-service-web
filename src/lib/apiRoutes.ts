@@ -1,4 +1,3 @@
-import { FeatureOverrideSubject } from "@/types/features";
 import { DownloadEntity, DownloadFormat } from "@/utils/download";
 
 const API_URL = "/api/v1";
@@ -101,14 +100,9 @@ export const API_ROUTES = {
   users: `${API_URL}/users`,
   user: (id: number) => `${API_URL}/users/${segment(id)}`,
   featureFlags: `${API_URL}/features`,
-  featureFlagsGlobal: `${API_URL}/features/global`,
   featureOverrides: `${API_URL}/features/overrides`,
-  featureOverride: (
-    name: string,
-    subject: FeatureOverrideSubject,
-    id: number,
-  ) =>
-    `${API_URL}/features/${segment(name)}/overrides/${segment(subject)}/${segment(id)}`,
+  featureOverridesFor: (name: string) =>
+    `${API_URL}/features/${segment(name)}/overrides`,
   accessPolicy: `${API_URL}/access_policy`,
   feature: (name: string) => `${API_URL}/features/${segment(name)}`,
   termDirectory: `${API_URL}/term-directory`,

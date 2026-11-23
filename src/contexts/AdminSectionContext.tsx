@@ -10,7 +10,7 @@ import {
   User,
   Workgroup,
 } from "@/types/api";
-import { FeatureFlag, FeatureOverrides } from "@/types/features";
+import { FeatureOverrides } from "@/types/features";
 
 type Source<T> = Promise<ApiResponse<T>> | T;
 
@@ -20,7 +20,6 @@ export interface AdminSectionData {
   collectionHosts: CollectionHost[];
   accessPolicy?: AccessPolicy | null;
   workgroups?: Workgroup[];
-  globalFeatureFlags?: FeatureFlag;
   featureOverrides?: FeatureOverrides[];
 }
 
@@ -30,7 +29,6 @@ interface AdminSectionSources {
   collectionHosts: Source<CollectionHost[]>;
   accessPolicy?: Promise<AccessPolicy | null> | AccessPolicy | null;
   workgroups?: Source<Workgroup[]>;
-  globalFeatureFlags?: Source<FeatureFlag>;
   featureOverrides?: Source<FeatureOverrides[]>;
 }
 
@@ -54,7 +52,6 @@ export const AdminSectionProvider = ({
   collectionHosts,
   accessPolicy,
   workgroups,
-  globalFeatureFlags,
   featureOverrides,
   children,
 }: {
@@ -63,7 +60,6 @@ export const AdminSectionProvider = ({
   collectionHosts: Promise<ApiResponse<CollectionHost[]>>;
   accessPolicy: Promise<AccessPolicy | null>;
   workgroups: Promise<ApiResponse<Workgroup[]>>;
-  globalFeatureFlags: Promise<ApiResponse<FeatureFlag>>;
   featureOverrides: Promise<ApiResponse<FeatureOverrides[]>>;
   children: ReactNode;
 }) => {
@@ -74,7 +70,6 @@ export const AdminSectionProvider = ({
       collectionHosts,
       accessPolicy,
       workgroups,
-      globalFeatureFlags,
       featureOverrides,
     }),
     [
@@ -83,7 +78,6 @@ export const AdminSectionProvider = ({
       collectionHosts,
       accessPolicy,
       workgroups,
-      globalFeatureFlags,
       featureOverrides,
     ],
   );
@@ -111,9 +105,6 @@ export const useAdminCollectionHosts = (): CollectionHost[] | null =>
 
 export const useAdminWorkgroups = (): Workgroup[] | null =>
   useSourceValue(useContext(AdminSectionContext)?.workgroups);
-
-export const useAdminGlobalFeatureFlags = (): FeatureFlag | null =>
-  useSourceValue(useContext(AdminSectionContext)?.globalFeatureFlags);
 
 export const useAdminFeatureOverrides = (): FeatureOverrides[] | null =>
   useSourceValue(useContext(AdminSectionContext)?.featureOverrides);

@@ -214,17 +214,13 @@ async function handle(req, res) {
     return json(res, 200, fixture("features"));
   }
 
-  if (method === "GET" && pathname === "/api/v1/features/global") {
-    return json(res, 200, fixture("features"));
-  }
-
   if (method === "GET" && pathname === "/api/v1/features/overrides") {
     return json(res, 200, fixture("featureOverrides"));
   }
 
   if (
-    (method === "PUT" || method === "DELETE") &&
-    matchRoute("/api/v1/features/:name/overrides/:subject/:id", pathname)
+    method === "PUT" &&
+    matchRoute("/api/v1/features/:name/overrides", pathname)
   ) {
     return ok(res, []);
   }

@@ -67,11 +67,6 @@ export const DEFAULT_FLAGS: FeatureFlag = {
   [FeatureName.AccessBanner]: false,
 };
 
-export enum FeatureOverrideSubject {
-  User = "users",
-  Workgroup = "workgroups",
-}
-
 export interface FeatureOverride {
   id: number;
   name: string;
@@ -84,4 +79,14 @@ export interface FeatureOverrides {
   global: boolean;
   users: FeatureOverride[];
   workgroups: FeatureOverride[];
+}
+
+export interface FeatureOverrideUpdate {
+  id: number;
+  enabled: boolean;
+}
+
+export interface FeatureOverridesUpdate {
+  users: FeatureOverrideUpdate[];
+  workgroups: FeatureOverrideUpdate[];
 }
