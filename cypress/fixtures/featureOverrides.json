@@ -4,7 +4,7 @@
     {
       "feature": "constrain-for-bunny-v1",
       "global": true,
-      "overridable": true,
+      "overridable": false,
       "users": [],
       "workgroups": []
     },
