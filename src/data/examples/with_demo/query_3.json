@@ -1,0 +1,26 @@
+{
+  "id": "6763cec1-9f97-47d9-97b4-f9108ae5c3ba",
+  "rules": [
+    {
+      "id": "e57f4069-a269-4f06-a8e0-df82eaf3a2dd",
+      "exclude": false,
+      "rule": {
+        "concept": {
+          "concept_id": 4182210,
+          "name": "Dementia",
+          "category": "Condition",
+          "children": []
+        }
+      }
+    }
+  ],
+  "demographics": {
+    "age": [18, 120],
+    "sex": [],
+    "race": []
+  },
+  "constraints": {
+    "ageConstraint": [null, null],
+    "timeConstraint": [null, null]
+  }
+}

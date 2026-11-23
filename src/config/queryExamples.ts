@@ -1,4 +1,5 @@
 import { CombinatorType, RuleGroupType } from "@/types/rules";
+import dayjs from "dayjs";
 import { v4 as uuidv4 } from "uuid";
 
 import query1 from "@/data/examples/query_1.json";
@@ -6,25 +7,41 @@ import query2 from "@/data/examples/query_2.json";
 import query3 from "@/data/examples/query_3.json";
 import query1WithDemo from "@/data/examples/with_demo/query_1.json";
 import query2WithDemo from "@/data/examples/with_demo/query_2.json";
+import query3WithDemo from "@/data/examples/with_demo/query_3.json";
 
 const WOMEN_OVER_18 = "E.g. Women over 18 with Covid";
 const ADULTS_DIABETES =
   "E.g. Adults with diabetes on insulin (glargine or detemir)";
-const COVID_VACCINES = "E.g. Covid and moderna or pfizer";
+const DEMENTIA_LAST_10_YEARS =
+  "E.g. Adults with Dementia in the last ten years";
+
+const inLastTenYears = (query: RuleGroupType): RuleGroupType => ({
+  ...query,
+  rules: query.rules.map((node) =>
+    "rule" in node
+      ? {
+          ...node,
+          timeConstraint: [dayjs().subtract(10, "year").toISOString(), null],
+        }
+      : node,
+  ),
+});
 
 export const EXAMPLES: Record<string, RuleGroupType> = {
   [WOMEN_OVER_18]: query1 as RuleGroupType,
   [ADULTS_DIABETES]: query2 as RuleGroupType,
-  [COVID_VACCINES]: query3 as RuleGroupType,
+  [DEMENTIA_LAST_10_YEARS]: inLastTenYears(query3 as RuleGroupType),
 };
 
 // Variants used when the `query-builder-use-demographic-rule` flag is on: age
 // and sex live in a `demographics` block instead of standalone age-filter /
-// Gender-concept rule nodes. query_3 has no age/sex, so it is shared as-is.
+// Gender-concept rule nodes.
 export const DEMOGRAPHIC_EXAMPLES: Record<string, RuleGroupType> = {
   [WOMEN_OVER_18]: query1WithDemo as unknown as RuleGroupType,
   [ADULTS_DIABETES]: query2WithDemo as unknown as RuleGroupType,
-  [COVID_VACCINES]: query3 as RuleGroupType,
+  [DEMENTIA_LAST_10_YEARS]: inLastTenYears(
+    query3WithDemo as unknown as RuleGroupType,
+  ),
 };
 
 export const getExamples = (
