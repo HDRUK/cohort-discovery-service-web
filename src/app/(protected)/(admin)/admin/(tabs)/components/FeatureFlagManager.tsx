@@ -11,7 +11,12 @@ import { useNotify } from "@/providers/NotifyProvider";
 import { FeatureOverrides } from "@/types/features";
 import { FeatureOverrideRules } from "./FeatureOverrideRules";
 
-const overridesSummary = ({ users, workgroups }: FeatureOverrides) => {
+const overridesSummary = ({
+  overridable,
+  users,
+  workgroups,
+}: FeatureOverrides) => {
+  if (!overridable) return "Global only";
   const count = users.length + workgroups.length;
   if (count === 0) return "—";
   return count === 1 ? "1 override" : `${count} overrides`;
@@ -97,19 +102,20 @@ export const FeatureFlagManager = () => {
     enableRowSelection: false,
     enableExpanding: true,
     getRowId: ({ feature }) => feature,
-    renderDetailPanel: ({ row }) => (
-      <Paper
-        variant="outlined"
-        sx={{ p: 2 }}
-        onClick={(event) => event.stopPropagation()}
-        onMouseDown={(event) => event.stopPropagation()}
-      >
-        <FeatureOverrideRules
-          key={overridesKey(row.original)}
-          feature={row.original}
-        />
-      </Paper>
-    ),
+    renderDetailPanel: ({ row }) =>
+      row.original.overridable ? (
+        <Paper
+          variant="outlined"
+          sx={{ p: 2 }}
+          onClick={(event) => event.stopPropagation()}
+          onMouseDown={(event) => event.stopPropagation()}
+        >
+          <FeatureOverrideRules
+            key={overridesKey(row.original)}
+            feature={row.original}
+          />
+        </Paper>
+      ) : null,
   });
 
   return (

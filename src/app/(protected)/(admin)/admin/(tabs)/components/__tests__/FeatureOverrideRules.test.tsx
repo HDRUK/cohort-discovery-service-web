@@ -28,6 +28,7 @@ const workgroups = [
 const withOverrides: FeatureOverrides = {
   feature: FEATURE,
   global: false,
+  overridable: true,
   users: [
     { id: 1, name: "Jane Doe", email: "jane@example.com", enabled: false },
   ],
@@ -37,6 +38,7 @@ const withOverrides: FeatureOverrides = {
 const withoutOverrides: FeatureOverrides = {
   feature: FEATURE,
   global: false,
+  overridable: true,
   users: [],
   workgroups: [],
 };

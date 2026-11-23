@@ -1,6 +1,6 @@
 # Feature flag overrides
 
-Any feature flag can be switched on or off for a single workgroup or user, not just globally. The API decides how a user's value is worked out, and which API behaviour honours overrides. See `docs/ARCHITECTURE/scoped-feature-flags.md` in `project-daphne-api`. This page covers what the web app does with it.
+Any feature flag that isn't global-only can be switched on or off for a single workgroup or user, not just globally. The API decides how a user's value is worked out, and which API behaviour honours overrides. See `docs/ARCHITECTURE/scoped-feature-flags.md` in `project-daphne-api`. This page covers what the web app does with it.
 
 ## Two kinds of flag value
 
@@ -18,7 +18,7 @@ The admin table must show global values. Otherwise an admin who has an override 
 Configuration → **Feature flags** (`FeatureFlagManager`) lists every flag with three columns:
 - **Field:** the flag name.
 - **Value:** the global value. Switching it saves straight away through `updateFeatureFlag`, and switches back with an error notification if the save fails.
-- **Overrides:** how many workgroups and users have an override.
+- **Overrides:** how many workgroups and users have an override, or "Global only" for a flag the API marks `overridable: false`. Those rows don't expand, because `renderDetailPanel` returns nothing for them, and the API rejects overrides on them. The API's `config/features.php` lists them and says why.
 
 Each row expands into its override rules (`FeatureOverrideRules`):
 - There are at most two rules, **On** and **Off**. Each picks workgroups and users with a multi-select. The API stores one value per workgroup or user, so a workgroup or user can only be in one rule; the other rule's picker shows it as disabled.

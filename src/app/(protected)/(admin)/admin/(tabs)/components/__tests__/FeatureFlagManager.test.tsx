@@ -21,12 +21,21 @@ const featureOverrides: FeatureOverrides[] = [
   {
     feature: FeatureName.QueryBuilderUseLocation,
     global: false,
+    overridable: true,
     users: [],
     workgroups: [{ id: 10, name: "UK-RESEARCH", enabled: true }],
   },
   {
     feature: FeatureName.AccessBanner,
     global: true,
+    overridable: true,
+    users: [],
+    workgroups: [],
+  },
+  {
+    feature: FeatureName.FlattenNestedGroups,
+    global: true,
+    overridable: false,
     users: [],
     workgroups: [],
   },
@@ -99,5 +108,14 @@ describe("FeatureFlagManager", () => {
     await user.click(screen.getAllByRole("button", { name: "Expand" })[0]);
 
     expect(screen.getByRole("group", { name: "On rule" })).toBeInTheDocument();
+  });
+
+  it("does not offer override rules for a global-only flag", () => {
+    renderManager();
+
+    expect(screen.getByText("Global only")).toBeInTheDocument();
+    const expandButtons = screen.getAllByRole("button", { name: "Expand" });
+    expect(expandButtons[0]).toBeEnabled();
+    expect(expandButtons[2]).toBeDisabled();
   });
 });

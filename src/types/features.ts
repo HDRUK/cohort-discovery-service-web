@@ -77,6 +77,7 @@ export interface FeatureOverride {
 export interface FeatureOverrides {
   feature: string;
   global: boolean;
+  overridable: boolean;
   users: FeatureOverride[];
   workgroups: FeatureOverride[];
 }
