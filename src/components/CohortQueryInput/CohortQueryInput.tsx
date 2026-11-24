@@ -13,6 +13,7 @@ import {
   createRuleGroup,
   findRulesWithAlternatives,
   getFirstTopLevelCombinator,
+  hasDemographicsContent,
   RuleErrors,
 } from "@/utils/rules";
 import { getExamples } from "@/config/queryExamples";
@@ -248,7 +249,10 @@ const CohortQueryInput = ({
         setQueryBuilderJson(queryJson);
       }
 
-      if (queryJson.rules.length === 0) {
+      if (
+        queryJson.rules.length === 0 &&
+        !hasDemographicsContent(queryJson.demographics)
+      ) {
         appendError(RuleErrors.NO_QUERY_FOUND);
       }
 
