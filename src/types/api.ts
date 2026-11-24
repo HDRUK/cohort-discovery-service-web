@@ -155,6 +155,7 @@ export interface ModelState {
 export interface ResultFile extends WithTimestamps {
   id: number;
   status: string;
+  file_name?: string;
   file_description: string;
   rows_processed: number;
   task: Task;
@@ -340,6 +341,7 @@ export interface CollectionDetails extends WithTimestamps {
   nconcepts: number;
   demographics: Distribution[];
   result_files: ResultFile[];
+  latest_successful_concept_result_file?: ResultFile | null;
 }
 
 export interface Network extends WithTimestamps {
