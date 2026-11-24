@@ -6,6 +6,7 @@ import CohortQueryInput from ".";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 import {
   CombinatorType,
+  Demographics,
   OperatorType,
   RuleLeafType,
   RuleNodeType,
@@ -15,6 +16,7 @@ import {
   isOperator,
   isRuleGroup,
   isRuleLeaf,
+  RuleErrors,
 } from "@/utils/rules";
 
 const setQueryBuilderJson = jest.fn();
@@ -228,6 +230,59 @@ describe("CohortQueryInput", () => {
 
     await waitFor(() => {
       expect(setQueryBuilderJson).toHaveBeenCalledWith(diabetesQuery);
+    });
+  });
+
+  describe("no valid query error", () => {
+    // The API attaches a demographics block to every parse when the
+    // demographic-rule flag is on, so an empty rules array alone does not mean
+    // nothing was found. When the text has no demographics, the block is empty.
+    // Unmatched words (gibberish) never get here: the API returns them as a
+    // rule with no concept, which shows the unknown-rule error instead.
+    const nothingFoundDemographics: Demographics = {
+      age: null,
+      sex: [],
+      race: [],
+      location: null,
+      death: null,
+    };
+
+    it("does not show the error for a demographics-only search like 'adults'", async () => {
+      getQueryFromText.mockResolvedValueOnce({
+        ...createRuleGroup([]),
+        demographics: { ...nothingFoundDemographics, age: [18, 120] },
+      });
+
+      renderComponent();
+      await submitWithEnter("adults");
+
+      await waitFor(() => expect(setQueryBuilderJson).toHaveBeenCalled());
+      expect(appendError).not.toHaveBeenCalledWith(RuleErrors.NO_QUERY_FOUND);
+    });
+
+    it("still shows the error when the parse returns no rules and an empty demographics block", async () => {
+      getQueryFromText.mockResolvedValueOnce({
+        ...createRuleGroup([]),
+        demographics: nothingFoundDemographics,
+      });
+
+      renderComponent();
+      await submitWithEnter("search text");
+
+      await waitFor(() =>
+        expect(appendError).toHaveBeenCalledWith(RuleErrors.NO_QUERY_FOUND),
+      );
+    });
+
+    it("still shows the error when the parse returns no rules and no demographics block (flag off)", async () => {
+      getQueryFromText.mockResolvedValueOnce(createRuleGroup([]));
+
+      renderComponent();
+      await submitWithEnter("search text");
+
+      await waitFor(() =>
+        expect(appendError).toHaveBeenCalledWith(RuleErrors.NO_QUERY_FOUND),
+      );
     });
   });
 
