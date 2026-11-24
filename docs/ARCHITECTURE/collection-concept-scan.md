@@ -18,7 +18,7 @@ Types are in `src/types/collections.ts`. Labels, chip copy and the `code.distrib
 
 ## Concepts table
 
-Titled **Concepts / pid**, with a line saying it shows the most recent scan that returned concepts. It lists the task ID, result file ID, name, completed at, rows processed and number of concepts of that scan. The scan is `latest_successful_concept_result_file` from the details endpoint. The API only treats a `code.distribution` file as successful when it is `done` and produced concepts, so an empty newer scan never replaces it. See `docs/ARCHITECTURE/collection-concept-scan.md` in `project-daphne-api`.
+Titled **Concepts / pid**, with a line saying it shows the most recent scan that returned concepts. It lists the task ID, result file ID, name, completed at, rows processed and number of concepts of that scan. The scan is `latest_successful_concept_result_file` from the details endpoint. The API marks a `code.distribution` file with no concepts as `failed` when it is ingested, so only scans that returned concepts are `done` and an empty newer scan never replaces the last good one. See `docs/ARCHITECTURE/collection-concept-scan.md` in `project-daphne-api`.
 
 When the newest `code.distribution` file is a different file, a **Latest attempt** chip explains why it was not used (`Task 17800 failed: No concepts found in file`, `Task N failed`, `Task N returned 0 rows` for an old empty file the API has not yet marked failed, `Task N produced no concepts`, or its in-flight status).
 
@@ -30,7 +30,7 @@ With no successful scan the table says so and still shows the concept count.
 
 ## Result Files table
 
-The **Concept scan** column marks the file used for the concept count (`Used for concept count`), done files with 0 rows (`Empty (0 rows)`) and failed scans (`Failed`). Metadata files carry no chip.
+The **Concept scan** column marks the file used for the concept count (`Used for concept count`), failed scans (`Failed`, with the reason in the Latest attempt chip) and done files with 0 rows (`Empty (0 rows)`), which only exist for old files the API's backfill migration has not yet marked failed. Metadata files carry no chip.
 
 `Completed At` is the task's `completed_at`.
 
