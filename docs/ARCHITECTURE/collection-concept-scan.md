@@ -29,7 +29,7 @@ With no successful scan the table says so and still shows the concept count.
 
 ## Result Files table
 
-The **Concept scan** column marks the file used for the concept count (`Used for concept count`), failed scans (`Failed`, with the reason in the Latest attempt chip) and done files with 0 rows (`Empty (0 rows)`), which only exist for files ingested before the API started failing empty scans. The API does not backfill them, so such a file stays the last successful scan until a newer scan succeeds. Metadata files carry no chip.
+The **Concept scan** column marks the file used for the concept count (`Used for concept count`), failed scans (`Failed`, with the reason in the Latest attempt chip) and done files with 0 rows (`Empty (0 rows)`), which only exist for files ingested before the API started failing empty scans. A queued job the API starts on deploy marks those failed, so such a file can stay the last successful scan only until that job has finished. Metadata files carry no chip.
 
 `Completed At` is the task's `completed_at`.
 
