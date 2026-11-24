@@ -1,10 +1,11 @@
 import "@testing-library/jest-dom";
-import { render, screen, within } from "@testing-library/react";
+import { useState } from "react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 import { User, Workgroup } from "@/types/api";
 import { FeatureOverrides } from "@/types/features";
-import { FeatureOverrideRules } from "../FeatureOverrideRules";
+import { FeatureOverrideRules, OverrideRule } from "../FeatureOverrideRules";
 
 const mockReplaceFeatureOverrides = jest.fn();
 
@@ -43,14 +44,26 @@ const withoutOverrides: FeatureOverrides = {
   workgroups: [],
 };
 
-const renderRules = (feature: FeatureOverrides) =>
-  render(
-    <MockCohortDiscoveryServiceStore
-      overrides={{ adminSection: { users, workgroups } }}
-    >
-      <FeatureOverrideRules feature={feature} />
-    </MockCohortDiscoveryServiceStore>,
+const RulesWithDraft = ({ feature }: { feature: FeatureOverrides }) => {
+  const [draft, setDraft] = useState<OverrideRule[]>();
+  return (
+    <FeatureOverrideRules
+      feature={feature}
+      draft={draft}
+      onDraftChange={setDraft}
+    />
   );
+};
+
+const rulesFor = (feature: FeatureOverrides) => (
+  <MockCohortDiscoveryServiceStore
+    overrides={{ adminSection: { users, workgroups } }}
+  >
+    <RulesWithDraft feature={feature} />
+  </MockCohortDiscoveryServiceStore>
+);
+
+const renderRules = (feature: FeatureOverrides) => render(rulesFor(feature));
 
 const rule = (value: "On" | "Off") =>
   within(screen.getByRole("group", { name: `${value} rule` }));
@@ -149,6 +162,41 @@ describe("FeatureOverrideRules", () => {
     await user.click(screen.getByRole("button", { name: "Reset" }));
     expect(rule("Off").getByRole("switch")).not.toBeChecked();
     expect(screen.getByRole("button", { name: "Save" })).toBeDisabled();
+  });
+
+  it("shows the saved rules once a save has finished", async () => {
+    const user = userEvent.setup();
+    const { rerender } = renderRules(withOverrides);
+
+    await user.click(
+      screen.getByRole("button", { name: "Remove the off rule" }),
+    );
+    await user.click(screen.getByRole("button", { name: "Save" }));
+    rerender(rulesFor({ ...withOverrides, users: [] }));
+
+    expect(
+      screen.queryByRole("group", { name: "Off rule" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Save" })).toBeDisabled();
+  });
+
+  it("keeps the edits when the save fails", async () => {
+    mockReplaceFeatureOverrides.mockRejectedValue(new Error("save failed"));
+    const user = userEvent.setup();
+    renderRules(withOverrides);
+
+    await user.click(
+      screen.getByRole("button", { name: "Remove the off rule" }),
+    );
+    await user.click(screen.getByRole("button", { name: "Save" }));
+
+    await screen.findByText(/Could not save the overrides/);
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Save" })).toBeEnabled(),
+    );
+    expect(
+      screen.queryByRole("group", { name: "Off rule" }),
+    ).not.toBeInTheDocument();
   });
 
   it("shows an error when the save fails", async () => {

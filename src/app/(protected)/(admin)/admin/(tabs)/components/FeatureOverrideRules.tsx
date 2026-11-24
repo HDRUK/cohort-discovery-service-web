@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useTransition } from "react";
 import {
   Box,
   Button,
@@ -28,7 +28,7 @@ import {
   FeatureOverridesUpdate,
 } from "@/types/features";
 
-interface OverrideRule {
+export interface OverrideRule {
   enabled: boolean;
   workgroups: number[];
   users: number[];
@@ -37,7 +37,7 @@ interface OverrideRule {
 type RuleSubject = "workgroups" | "users";
 
 const PRECEDENCE_HELP =
-  "A user's own rule wins. Otherwise the flag is on if any of their workgroups is in the on rule, off if any is in the off rule, and the global value if neither.";
+  "A user's own rule always wins. Otherwise the flag is on if any of their workgroups is in the On rule, even if another of their workgroups is in the Off rule. To switch it off for someone in an On workgroup, add them to the Off rule as a user. Deactivated workgroups still count.";
 
 const valueLabel = (enabled: boolean) => (enabled ? "On" : "Off");
 
@@ -85,16 +85,23 @@ const userLabel = ({ name, email }: { name: string; email?: string }) =>
 
 interface FeatureOverrideRulesProps {
   feature: FeatureOverrides;
+  draft: OverrideRule[] | undefined;
+  onDraftChange: (draft: OverrideRule[] | undefined) => void;
 }
 
 export const FeatureOverrideRules = ({
   feature,
+  draft,
+  onDraftChange,
 }: FeatureOverrideRulesProps) => {
   const users = useAdminUsers();
   const workgroups = useAdminWorkgroups();
   const notify = useNotify();
   const [pending, startTransition] = useTransition();
-  const [rules, setRules] = useState<OverrideRule[]>(() => toRules(feature));
+  const savedRules = useMemo(() => toRules(feature), [feature]);
+  const rules = draft ?? savedRules;
+  const setRules = (update: (current: OverrideRule[]) => OverrideRule[]) =>
+    onDraftChange(update(rules));
 
   const options = useMemo<Record<RuleSubject, OptionsType[]>>(
     () => ({
@@ -116,7 +123,7 @@ export const FeatureOverrideRules = ({
   );
 
   const isDirty =
-    fingerprint(toUpdate(rules)) !== fingerprint(toUpdate(toRules(feature)));
+    fingerprint(toUpdate(rules)) !== fingerprint(toUpdate(savedRules));
 
   const updateRule = (index: number, change: Partial<OverrideRule>) =>
     setRules((current) =>
@@ -147,6 +154,7 @@ export const FeatureOverrideRules = ({
     startTransition(async () => {
       try {
         await replaceFeatureOverrides(feature.feature, toUpdate(rules));
+        onDraftChange(undefined);
       } catch {
         notify.error(
           `Could not save the overrides for "${feature.feature}". Try again, or refresh the page if it keeps failing.`,
@@ -240,7 +248,7 @@ export const FeatureOverrideRules = ({
         {pending && <CircularProgress size={16} />}
         <Button
           disabled={pending || !isDirty}
-          onClick={() => setRules(toRules(feature))}
+          onClick={() => onDraftChange(undefined)}
         >
           Reset
         </Button>

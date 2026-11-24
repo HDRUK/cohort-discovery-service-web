@@ -2,35 +2,53 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { MRT_ColumnDef } from "material-react-table";
-import { Box, CircularProgress, Paper, Switch } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Paper,
+  Stack,
+  Switch,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import Table from "@/components/Table";
 import { useTable } from "@/hooks/useTable";
 import { useAdminFeatureOverrides } from "@/contexts/AdminSectionContext";
 import updateFeatureFlag from "@/actions/admin/updateFeatureFlag";
 import { useNotify } from "@/providers/NotifyProvider";
+import {
+  FEATURE_FLAG_GROUPS,
+  FeatureFlagGroup,
+  featureFlagDetails,
+} from "@/config/featureFlags";
 import { FeatureOverrides } from "@/types/features";
-import { FeatureOverrideRules } from "./FeatureOverrideRules";
+import { FeatureOverrideRules, OverrideRule } from "./FeatureOverrideRules";
 
-const overridesSummary = ({
-  overridable,
-  users,
-  workgroups,
-}: FeatureOverrides) => {
-  if (!overridable) return "Global only";
-  const count = users.length + workgroups.length;
+const OVERRIDDEN_HELP =
+  "Some workgroups or users have their own value for this flag. Changing the global value doesn't change theirs.";
+
+const overrideCount = ({ users, workgroups }: FeatureOverrides) =>
+  users.length + workgroups.length;
+
+const overridesSummary = (feature: FeatureOverrides) => {
+  if (!feature.overridable) return "Global only";
+  const count = overrideCount(feature);
   if (count === 0) return "—";
   return count === 1 ? "1 override" : `${count} overrides`;
 };
 
-const overridesKey = ({ users, workgroups }: FeatureOverrides) =>
-  JSON.stringify([users, workgroups]);
+interface FeatureFlagTableProps {
+  group: FeatureFlagGroup;
+  features: FeatureOverrides[];
+}
 
-export const FeatureFlagManager = () => {
-  const features = useAdminFeatureOverrides();
+const FeatureFlagTable = ({ group, features }: FeatureFlagTableProps) => {
   const [optimisticGlobals, setOptimisticGlobals] = useState<
     Record<string, boolean>
   >({});
   const [savingKeys, setSavingKeys] = useState<string[]>([]);
+  const [drafts, setDrafts] = useState<Record<string, OverrideRule[]>>({});
   const notify = useNotify();
 
   const handleToggleFeature = useCallback(
@@ -40,30 +58,49 @@ export const FeatureFlagManager = () => {
       try {
         await updateFeatureFlag(key, { enabled: newValue });
       } catch {
-        setOptimisticGlobals((current) => {
-          const reverted = { ...current };
-          delete reverted[key];
-          return reverted;
-        });
         notify.error(
           `Could not save the "${key}" flag, so it has been switched back. Try again, or refresh the page if it keeps failing.`,
         );
       } finally {
+        setOptimisticGlobals((current) => {
+          const settled = { ...current };
+          delete settled[key];
+          return settled;
+        });
         setSavingKeys((keys) => keys.filter((k) => k !== key));
       }
     },
     [notify],
   );
 
+  const setDraft = useCallback(
+    (feature: string, draft: OverrideRule[] | undefined) =>
+      setDrafts((current) => {
+        const next = { ...current };
+        if (draft) next[feature] = draft;
+        else delete next[feature];
+        return next;
+      }),
+    [],
+  );
+
   const columns = useMemo<MRT_ColumnDef<FeatureOverrides>[]>(
     () => [
       {
         accessorKey: "feature",
-        header: "Field",
+        header: "Flag",
+        Cell: ({ row }) => (
+          <Stack>
+            <Typography variant="body2">{row.original.feature}</Typography>
+            <Typography variant="caption" color="text.secondary">
+              {featureFlagDetails(row.original.feature).description}
+            </Typography>
+          </Stack>
+        ),
       },
       {
         id: "global",
-        header: "Value",
+        header: "Global value",
         Cell: ({ row }) => {
           const { feature, global } = row.original;
           const isSaving = savingKeys.includes(feature);
@@ -79,6 +116,15 @@ export const FeatureFlagManager = () => {
                   handleToggleFeature(feature, event.target.checked)
                 }
               />
+              {overrideCount(row.original) > 0 && (
+                <Tooltip title={OVERRIDDEN_HELP} describeChild>
+                  <WarningAmberIcon
+                    color="warning"
+                    fontSize="small"
+                    titleAccess={`${feature} has overrides`}
+                  />
+                </Tooltip>
+              )}
               <CircularProgress
                 size={16}
                 sx={{ visibility: isSaving ? "visible" : "hidden" }}
@@ -98,7 +144,7 @@ export const FeatureFlagManager = () => {
 
   const table = useTable<FeatureOverrides>({
     columns,
-    data: features ?? [],
+    data: features,
     enableRowSelection: false,
     enableExpanding: true,
     getRowId: ({ feature }) => feature,
@@ -111,8 +157,9 @@ export const FeatureFlagManager = () => {
           onMouseDown={(event) => event.stopPropagation()}
         >
           <FeatureOverrideRules
-            key={overridesKey(row.original)}
             feature={row.original}
+            draft={drafts[row.original.feature]}
+            onDraftChange={(draft) => setDraft(row.original.feature, draft)}
           />
         </Paper>
       ) : null,
@@ -123,10 +170,33 @@ export const FeatureFlagManager = () => {
       table={table}
       leftAction={{
         titleProps: {
-          title: "Features",
-          subTitle: "Flags",
+          title: group,
+          subTitle: "Feature flags",
         },
       }}
     />
+  );
+};
+
+export const FeatureFlagManager = () => {
+  const features = useAdminFeatureOverrides();
+
+  const groups = useMemo(
+    () =>
+      FEATURE_FLAG_GROUPS.map((group) => ({
+        group,
+        features: (features ?? []).filter(
+          ({ feature }) => featureFlagDetails(feature).group === group,
+        ),
+      })).filter(({ features }) => features.length > 0),
+    [features],
+  );
+
+  return (
+    <Stack gap={3}>
+      {groups.map(({ group, features }) => (
+        <FeatureFlagTable key={group} group={group} features={features} />
+      ))}
+    </Stack>
   );
 };

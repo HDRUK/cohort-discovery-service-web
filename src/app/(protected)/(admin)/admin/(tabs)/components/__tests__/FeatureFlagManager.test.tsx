@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 import { FeatureName, FeatureOverrides } from "@/types/features";
@@ -41,13 +41,26 @@ const featureOverrides: FeatureOverrides[] = [
   },
 ];
 
-const renderManager = () =>
-  render(
-    <MockCohortDiscoveryServiceStore
-      overrides={{ adminSection: { featureOverrides } }}
-    >
-      <FeatureFlagManager />
-    </MockCohortDiscoveryServiceStore>,
+const managerWith = (overrides: FeatureOverrides[]) => (
+  <MockCohortDiscoveryServiceStore
+    overrides={{ adminSection: { featureOverrides: overrides } }}
+  >
+    <FeatureFlagManager />
+  </MockCohortDiscoveryServiceStore>
+);
+
+const renderManager = () => render(managerWith(featureOverrides));
+
+const withGlobal = (feature: string, global: boolean) =>
+  featureOverrides.map((flag) =>
+    flag.feature === feature ? { ...flag, global } : flag,
+  );
+
+const rowOf = (feature: string) =>
+  within(
+    screen
+      .getAllByRole("row")
+      .find((row) => within(row).queryByText(feature)) as HTMLElement,
   );
 
 const locationSwitch = () =>
@@ -75,7 +88,7 @@ describe("FeatureFlagManager", () => {
   it("saves the new global value", async () => {
     mockUpdateFeatureFlag.mockResolvedValue(undefined);
     const user = userEvent.setup();
-    renderManager();
+    const { rerender } = renderManager();
 
     await user.click(locationSwitch());
 
@@ -83,7 +96,86 @@ describe("FeatureFlagManager", () => {
       FeatureName.QueryBuilderUseLocation,
       { enabled: true },
     );
+    rerender(
+      managerWith(withGlobal(FeatureName.QueryBuilderUseLocation, true)),
+    );
     await waitFor(() => expect(locationSwitch()).toBeChecked());
+  });
+
+  it("shows the saved global value once a save has finished", async () => {
+    mockUpdateFeatureFlag.mockResolvedValue(undefined);
+    const user = userEvent.setup();
+    const { rerender } = renderManager();
+
+    await user.click(locationSwitch());
+    await waitFor(() => expect(locationSwitch()).toBeEnabled());
+    rerender(
+      managerWith(withGlobal(FeatureName.QueryBuilderUseLocation, false)),
+    );
+
+    expect(locationSwitch()).not.toBeChecked();
+  });
+
+  it("marks a global value that some workgroups or users override", () => {
+    renderManager();
+
+    expect(
+      screen.getByRole("img", {
+        name: `${FeatureName.QueryBuilderUseLocation} has overrides`,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("img", {
+        name: `${FeatureName.AccessBanner} has overrides`,
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("groups the flags and describes each one", () => {
+    renderManager();
+
+    expect(screen.getByText(/Rule types/)).toBeInTheDocument();
+    expect(screen.getByText(/Users and access/)).toBeInTheDocument();
+    expect(screen.queryByText(/Query builder/)).not.toBeInTheDocument();
+    expect(
+      rowOf(FeatureName.QueryBuilderUseLocation).getByText(
+        /Lets users query by location/,
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("keeps unsaved rule edits when a flag is collapsed", async () => {
+    const user = userEvent.setup();
+    renderManager();
+
+    await user.click(
+      rowOf(FeatureName.QueryBuilderUseLocation).getByRole("button", {
+        name: "Expand",
+      }),
+    );
+    await user.click(
+      screen.getByRole("button", { name: "Remove the on rule" }),
+    );
+    await user.click(
+      rowOf(FeatureName.QueryBuilderUseLocation).getByRole("button", {
+        name: "Expand",
+      }),
+    );
+    await waitFor(() =>
+      expect(
+        screen.queryByRole("button", { name: "Save" }),
+      ).not.toBeInTheDocument(),
+    );
+    await user.click(
+      rowOf(FeatureName.QueryBuilderUseLocation).getByRole("button", {
+        name: "Expand",
+      }),
+    );
+
+    expect(
+      screen.queryByRole("group", { name: "On rule" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Save" })).toBeEnabled();
   });
 
   it("switches back when the save fails", async () => {
@@ -105,7 +197,11 @@ describe("FeatureFlagManager", () => {
       screen.queryByRole("group", { name: "On rule" }),
     ).not.toBeInTheDocument();
 
-    await user.click(screen.getAllByRole("button", { name: "Expand" })[0]);
+    await user.click(
+      rowOf(FeatureName.QueryBuilderUseLocation).getByRole("button", {
+        name: "Expand",
+      }),
+    );
 
     expect(screen.getByRole("group", { name: "On rule" })).toBeInTheDocument();
   });
@@ -113,9 +209,18 @@ describe("FeatureFlagManager", () => {
   it("does not offer override rules for a global-only flag", () => {
     renderManager();
 
-    expect(screen.getByText("Global only")).toBeInTheDocument();
-    const expandButtons = screen.getAllByRole("button", { name: "Expand" });
-    expect(expandButtons[0]).toBeEnabled();
-    expect(expandButtons[2]).toBeDisabled();
+    expect(
+      rowOf(FeatureName.FlattenNestedGroups).getByText("Global only"),
+    ).toBeInTheDocument();
+    expect(
+      rowOf(FeatureName.FlattenNestedGroups).getByRole("button", {
+        name: "Expand",
+      }),
+    ).toBeDisabled();
+    expect(
+      rowOf(FeatureName.QueryBuilderUseLocation).getByRole("button", {
+        name: "Expand",
+      }),
+    ).toBeEnabled();
   });
 });
