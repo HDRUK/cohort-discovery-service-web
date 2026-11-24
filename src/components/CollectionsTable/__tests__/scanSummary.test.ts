@@ -1,4 +1,3 @@
-import { NO_SUCCESSFUL_SCAN_MESSAGE } from "@/config/conceptScan";
 import { getMockResultFile, getMockTask } from "@/test/fixtures/tasks";
 import { CollectionDetails } from "@/types/api";
 import {
@@ -8,6 +7,7 @@ import {
   getScanSummary,
   isConceptFile,
   isEmptyConceptFile,
+  NO_SUCCESSFUL_SCAN_MESSAGE,
 } from "../scanSummary";
 
 const getMockDetails = (rest?: Partial<CollectionDetails>): CollectionDetails =>

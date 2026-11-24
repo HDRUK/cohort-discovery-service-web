@@ -11,10 +11,9 @@
 | `CollectionMetadataTable.tsx` | The "Details / pid" table of collection metadata, currently created and updated |
 | `ConceptScanDetails.tsx` | The "Concepts / pid" table, via `useTransposedTable` and `<Table>` |
 | `ResultFilesTable.tsx` | The "Result Files / pid" table |
-| `ConceptScanChip.tsx` | The outlined chip both tables use |
 | `scanSummary.ts` | Pure logic, tested in `__tests__/scanSummary.test.ts` |
 
-Types are in `src/types/collections.ts`. Labels, chip copy and the `code.distribution` file name are in `src/config/conceptScan.ts`.
+Types are in `src/types/collections.ts`. Labels and chip copy sit beside the component that uses them, and the `code.distribution` file name is in `scanSummary.ts`.
 
 ## Concepts table
 

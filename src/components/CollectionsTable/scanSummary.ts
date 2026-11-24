@@ -1,7 +1,3 @@
-import {
-  CONCEPT_FILE_NAME,
-  NO_SUCCESSFUL_SCAN_MESSAGE,
-} from "@/config/conceptScan";
 import { CollectionDetails, ResultFile } from "@/types/api";
 import {
   ConceptScanChipConfig,
@@ -10,6 +6,11 @@ import {
   ConceptScanSummary,
 } from "@/types/collections";
 import { getTimestamp } from "@/utils/date";
+
+const CONCEPT_FILE_NAME = "code.distribution";
+
+export const NO_SUCCESSFUL_SCAN_MESSAGE =
+  "None yet: no concept scan has returned concepts";
 
 export const isConceptFile = (file: ResultFile): boolean =>
   file.file_name === CONCEPT_FILE_NAME;

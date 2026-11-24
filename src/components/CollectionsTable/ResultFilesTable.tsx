@@ -1,12 +1,22 @@
-import { CONCEPT_SCAN_CHIPS } from "@/config/conceptScan";
 import { useTable } from "@/hooks/useTable";
 import { ResultFile } from "@/types/api";
+import {
+  ConceptScanChipConfig,
+  ConceptScanChipState,
+} from "@/types/collections";
 import { getDatetime } from "@/utils/date";
+import { Chip } from "@mui/material";
 import { MRT_ColumnDef } from "material-react-table";
 import { useMemo } from "react";
 import Table from "../Table";
-import ConceptScanChip from "./ConceptScanChip";
 import { getConceptScanChipState } from "./scanSummary";
+
+const CONCEPT_SCAN_CHIPS: Record<ConceptScanChipState, ConceptScanChipConfig> =
+  {
+    used: { label: "Used for concept count", color: "success" },
+    empty: { label: "Empty (0 rows)", color: "warning" },
+    failed: { label: "Failed", color: "error" },
+  };
 
 interface ResultFilesTableProps {
   pid: string;
@@ -52,8 +62,13 @@ const ResultFilesTable = ({
         header: "Concept scan",
         Cell: ({ row }) => {
           const state = getConceptScanChipState(row.original, successfulFileId);
+          if (!state) return null;
 
-          return state && <ConceptScanChip {...CONCEPT_SCAN_CHIPS[state]} />;
+          const { label, color } = CONCEPT_SCAN_CHIPS[state];
+
+          return (
+            <Chip size="small" variant="outlined" color={color} label={label} />
+          );
         },
       },
     ],
