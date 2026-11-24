@@ -46,8 +46,7 @@ const renderDetails = (rest: Partial<CollectionDetailsType>) => {
   render(<CollectionDetails pid={PID} />);
 };
 
-const valueFor = (label: string) =>
-  screen.getByText(label, { selector: "td, th, span, p" }).closest("tr")!;
+const rowFor = (label: RegExp) => screen.getByRole("row", { name: label });
 
 describe("CollectionDetails", () => {
   it("titles the panel Concepts and says what it shows", () => {
@@ -59,13 +58,28 @@ describe("CollectionDetails", () => {
     ).toBeInTheDocument();
   });
 
+  it("keeps the collection dates in their own Details table", () => {
+    renderDetails({
+      created_at: "2026-05-19T12:00:00Z",
+      updated_at: "2026-06-20T12:00:00Z",
+    });
+
+    expect(screen.getByText(/^Details\s*\//)).toBeInTheDocument();
+    expect(
+      within(rowFor(/Collection created/)).getByText(/19\/05\/2026/),
+    ).toBeVisible();
+    expect(
+      within(rowFor(/Collection updated/)).getByText(/20\/06\/2026/),
+    ).toBeVisible();
+  });
+
   it("shows the scan the concept count comes from and warns about the newer empty one", () => {
     renderDetails({
       result_files: [emptyLatestScan, metadataFile, lastGoodScan],
       latest_successful_concept_result_file: lastGoodScan,
     });
 
-    expect(within(valueFor("Result file ID")).getByText("1180")).toBeVisible();
+    expect(within(rowFor(/Result file ID/)).getByText("1180")).toBeVisible();
     expect(screen.getByText("Task 17800 returned 0 rows")).toBeInTheDocument();
   });
 

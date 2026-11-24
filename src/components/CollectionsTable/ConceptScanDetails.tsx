@@ -26,8 +26,6 @@ const ConceptScanDetails = ({ pid, data }: ConceptScanDetailsProps) => {
       nconcepts: (value) => formatNumber(value),
       latest_attempt: (file) =>
         file && <ConceptScanChip {...getLatestAttempt(file)} />,
-      created_at: (value) => getDatetime(value),
-      updated_at: (value) => getDatetime(value),
     },
   });
 

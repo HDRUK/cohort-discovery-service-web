@@ -33,6 +33,9 @@ export const CONCEPT_SCAN_DETAIL_LABELS: Record<
   rows_processed: "Rows processed",
   nconcepts: "Number of concepts",
   latest_attempt: "Latest attempt",
+};
+
+export const COLLECTION_DATE_LABELS = {
   created_at: "Collection created",
   updated_at: "Collection updated",
 };

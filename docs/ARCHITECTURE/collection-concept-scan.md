@@ -8,6 +8,7 @@
 
 | File | Holds |
 |------|-------|
+| `CollectionDates.tsx` | The "Details / pid" table: collection created and updated |
 | `ConceptScanDetails.tsx` | The "Concepts / pid" table, via `useTransposedTable` and `<Table>` |
 | `ResultFilesTable.tsx` | The "Result Files / pid" table |
 | `ConceptScanChip.tsx` | The outlined chip both tables use |
@@ -21,9 +22,11 @@ Titled **Concepts / pid**, with a line saying it shows the most recent scan that
 
 When the newest `code.distribution` file is a different file, a **Latest attempt** chip explains why it was not used (`Task 17800 returned 0 rows`, `Task N failed`, `Task N produced no concepts`, or its in-flight status).
 
-With no successful scan the table says so instead of showing 0 concepts.
+With no successful scan the table says so and still shows the concept count.
 
-`Collection created` and `Collection updated` are the collection row's own timestamps. They do not move when a scan runs.
+## Details table
+
+`Collection created` and `Collection updated` are the collection row's own timestamps. They sit in their own table because they do not move when a scan runs, and were being read as scan dates.
 
 ## Result Files table
 
@@ -33,6 +36,6 @@ The **Concept scan** column marks the file used for the concept count (`Used for
 
 ## Derivation
 
-`getScanSummary` takes the successful scan from the API and derives the latest attempt as the newest `code.distribution` entry in `result_files`. The FE does not re-decide what is successful, so it cannot drift from the API's `nconcepts`.
+`getScanSummary` takes the successful scan from the API and derives the latest attempt as the newest `code.distribution` entry in `result_files`, ordered by `updated_at` then `id` exactly as the API orders its choice, so the two cannot disagree about which file is newest. The FE does not re-decide what is successful, so it cannot drift from the API's `nconcepts`.
 
 The API change must be deployed first. Without `latest_successful_concept_result_file` the table shows the empty state.

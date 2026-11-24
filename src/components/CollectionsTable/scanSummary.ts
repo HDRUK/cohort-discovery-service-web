@@ -11,9 +11,6 @@ import {
 } from "@/types/collections";
 import { getTimestamp } from "@/utils/date";
 
-const finishedAt = (file: ResultFile): string =>
-  file.task?.completed_at ?? file.created_at;
-
 export const isConceptFile = (file: ResultFile): boolean =>
   file.file_name === CONCEPT_FILE_NAME;
 
@@ -27,8 +24,7 @@ export const getScanSummary = (
     .filter(isConceptFile)
     .sort(
       (a, b) =>
-        getTimestamp(finishedAt(b)) - getTimestamp(finishedAt(a)) ||
-        b.id - a.id,
+        getTimestamp(b.updated_at) - getTimestamp(a.updated_at) || b.id - a.id,
     );
 
   return {
@@ -48,7 +44,7 @@ export const getConceptScanChipState = (
 };
 
 export const getLatestAttempt = (file: ResultFile): ConceptScanChipConfig => {
-  const task = `Task ${file.task?.id}`;
+  const task = `Task ${file.task.id}`;
 
   if (file.status === "failed") {
     return { label: `${task} failed`, color: "error" };
@@ -63,20 +59,18 @@ export const getLatestAttempt = (file: ResultFile): ConceptScanChipConfig => {
 };
 
 export const getConceptScanDetailsData = (
-  details: CollectionDetails | undefined,
+  details: CollectionDetails,
   { successful, latest }: ConceptScanSummary,
 ): ConceptScanDetailsData => ({
   ...(successful
     ? {
-        task_id: successful.task?.id,
+        task_id: successful.task.id,
         result_file_id: successful.id,
         name: successful.file_description,
-        completed_at: finishedAt(successful),
+        completed_at: successful.task.completed_at ?? successful.created_at,
         rows_processed: successful.rows_processed,
-        nconcepts: details?.nconcepts,
       }
     : { last_successful_scan: NO_SUCCESSFUL_SCAN_MESSAGE }),
+  nconcepts: details.nconcepts,
   ...(latest && latest.id !== successful?.id ? { latest_attempt: latest } : {}),
-  created_at: details?.created_at,
-  updated_at: details?.updated_at,
 });

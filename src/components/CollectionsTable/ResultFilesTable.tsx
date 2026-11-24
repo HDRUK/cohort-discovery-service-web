@@ -33,7 +33,7 @@ const ResultFilesTable = ({
       {
         accessorKey: "task.completed_at",
         header: "Completed At",
-        accessorFn: (row) => getDatetime(row.task?.completed_at ?? undefined),
+        accessorFn: (row) => getDatetime(row.task.completed_at ?? undefined),
       },
       {
         accessorKey: "file_description",

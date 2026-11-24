@@ -36,6 +36,4 @@ export interface ConceptScanDetailsData {
   rows_processed?: number;
   nconcepts?: number;
   latest_attempt?: ResultFile;
-  created_at?: string;
-  updated_at?: string;
 }
