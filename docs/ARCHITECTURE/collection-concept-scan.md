@@ -20,7 +20,7 @@ Types are in `src/types/collections.ts`. Labels, chip copy and the `code.distrib
 
 Titled **Concepts / pid**, with a line saying it shows the most recent scan that returned concepts. It lists the task ID, result file ID, name, completed at, rows processed and number of concepts of that scan. The scan is `latest_successful_concept_result_file` from the details endpoint. The API only treats a `code.distribution` file as successful when it is `done` and produced concepts, so an empty newer scan never replaces it. See `docs/ARCHITECTURE/collection-concept-scan.md` in `project-daphne-api`.
 
-When the newest `code.distribution` file is a different file, a **Latest attempt** chip explains why it was not used (`Task 17800 returned 0 rows`, `Task N failed`, `Task N produced no concepts`, or its in-flight status).
+When the newest `code.distribution` file is a different file, a **Latest attempt** chip explains why it was not used (`Task 17800 failed: No concepts found in file`, `Task N failed`, `Task N returned 0 rows` for an old empty file the API has not yet marked failed, `Task N produced no concepts`, or its in-flight status).
 
 With no successful scan the table says so and still shows the concept count.
 

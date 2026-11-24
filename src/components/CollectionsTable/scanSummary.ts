@@ -47,7 +47,10 @@ export const getLatestAttempt = (file: ResultFile): ConceptScanChipConfig => {
   const task = `Task ${file.task.id}`;
 
   if (file.status === "failed") {
-    return { label: `${task} failed`, color: "error" };
+    return {
+      label: file.error ? `${task} failed: ${file.error}` : `${task} failed`,
+      color: "error",
+    };
   }
   if (file.status !== "done") {
     return { label: `${task} ${file.status}`, color: "default" };

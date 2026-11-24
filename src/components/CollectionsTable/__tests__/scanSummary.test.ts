@@ -173,6 +173,19 @@ describe("getLatestAttempt", () => {
     });
   });
 
+  it("includes the reason a scan failed when the API gives one", () => {
+    expect(
+      getLatestAttempt({
+        ...emptyLatestScan,
+        status: "failed",
+        error: "No concepts found in file",
+      }),
+    ).toEqual({
+      label: "Task 17800 failed: No concepts found in file",
+      color: "error",
+    });
+  });
+
   it("names the status of a scan that is still running", () => {
     expect(
       getLatestAttempt({ ...emptyLatestScan, status: "processing" }),
