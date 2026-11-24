@@ -1,69 +1,29 @@
 {
-  "id": "6f6b6461-4434-403c-8038-4ab8d48618ad",
+  "id": "6763cec1-9f97-47d9-97b4-f9108ae5c3ba",
   "rules": [
     {
-      "id": "4343ce5d-0aa8-457a-8411-3e935f808099",
+      "id": "588c4d2c-635d-472c-984f-c9fdf7e60c1b",
+      "value": [18, 120]
+    },
+    {
+      "id": "8495bdf0-fdc5-4c48-af76-168d0949dc82",
+      "combinator": "and"
+    },
+    {
+      "id": "e57f4069-a269-4f06-a8e0-df82eaf3a2dd",
       "exclude": false,
       "rule": {
         "concept": {
-          "concept_id": 37311061,
-          "name": "COVID-19",
+          "concept_id": 4182210,
+          "name": "Dementia",
           "category": "Condition",
-          "children": [],
-          "match_score": 99.7,
-          "tokens": ["19", "covid"],
-          "phrase_tokens": ["covid 19"],
-          "alternatives": []
+          "children": []
         }
-      },
-      "valid": true
-    },
-    {
-      "id": "6997b36e-f743-4b11-b3b4-4aaf70235c33",
-      "combinator": "and",
-      "exclude": false,
-      "valid": true
-    },
-    {
-      "id": "4f191ef6-9123-443b-8cb2-d28af8a9dfd3",
-      "rules": [
-        {
-          "id": "9dd349ba-a14c-4673-815a-87936f296145",
-          "exclude": false,
-          "rule": {
-            "concept": {
-              "concept_id": 37003518,
-              "name": "SARS-CoV-2 (COVID-19) vaccine, mRNA-1273 0.2 MG/ML Injectable Suspension",
-              "category": "Drug",
-              "children": []
-            }
-          }
-        },
-        {
-          "id": "2ca9902c-4538-49ce-915f-caee496ed330",
-          "combinator": "or",
-          "valid": true
-        },
-        {
-          "id": "07e7f8bf-a357-4914-8dd8-f1a2b383fce0",
-          "exclude": false,
-          "rule": {
-            "concept": {
-              "concept_id": 37003436,
-              "name": "SARS-CoV-2 (COVID-19) vaccine, mRNA-BNT162b2 0.1 MG/ML Injectable Suspension",
-              "category": "Drug",
-              "children": []
-            }
-          }
-        }
-      ],
-      "valid": true
+      }
     }
   ],
   "constraints": {
     "ageConstraint": [null, null],
     "timeConstraint": [null, null]
-  },
-  "warnings": [],
-  "valid": true
+  }
 }
