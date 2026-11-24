@@ -22,7 +22,7 @@ import SearchOverlay from "./SearchOverlay";
 import { useDefaults } from "@/providers/DefaultProvider";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import InlineChoiceButton from "./InlineChoiceButton";
-import { CombinatorType } from "@/types/rules";
+import { CombinatorType, Demographics } from "@/types/rules";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { QUERY_KEYS } from "@/config/tags";
 import useHasSelectedSyntheticDatasets from "@/hooks/useHasSelectedSyntheticDatasets";
@@ -173,6 +173,24 @@ const CohortQueryInput = ({
     [getQueryFromText, queryClient, includeSynthetic, selectedDatasets],
   );
 
+  const { queryBuilderUseDemographicRule } = useFeatures();
+
+  const usesDemographics = useCallback(
+    (demographics: Demographics | undefined) => {
+      const defaultDemographics = {
+        age: [0, 120],
+        sex: [],
+        race: [],
+        death: null,
+      };
+
+      return (
+        JSON.stringify(defaultDemographics) !== JSON.stringify(demographics)
+      );
+    },
+    [],
+  );
+
   const handleSearch = useCallback(
     async (raw: string) => {
       const parseQueryInput = (raw: string) => {
@@ -248,7 +266,13 @@ const CohortQueryInput = ({
         setQueryBuilderJson(queryJson);
       }
 
-      if (queryJson.rules.length === 0) {
+      if (
+        queryJson.rules.length === 0 &&
+        !(
+          queryBuilderUseDemographicRule &&
+          usesDemographics(queryJson.demographics)
+        )
+      ) {
         appendError(RuleErrors.NO_QUERY_FOUND);
       }
 
@@ -279,6 +303,8 @@ const CohortQueryInput = ({
       queryMode,
       queryBuilderJson,
       select,
+      queryBuilderUseDemographicRule,
+      usesDemographics,
     ],
   );
 
@@ -343,8 +369,6 @@ const CohortQueryInput = ({
     setFormError,
     clearFormErrors,
   ]);
-
-  const { queryBuilderUseDemographicRule } = useFeatures();
 
   const examples = useMemo(
     () => getExamples(queryBuilderUseDemographicRule),
