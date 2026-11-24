@@ -8,7 +8,7 @@
 
 | File | Holds |
 |------|-------|
-| `CollectionDates.tsx` | The "Details / pid" table: collection created and updated |
+| `CollectionMetadataTable.tsx` | The "Details / pid" table of collection metadata, currently created and updated |
 | `ConceptScanDetails.tsx` | The "Concepts / pid" table, via `useTransposedTable` and `<Table>` |
 | `ResultFilesTable.tsx` | The "Result Files / pid" table |
 | `ConceptScanChip.tsx` | The outlined chip both tables use |

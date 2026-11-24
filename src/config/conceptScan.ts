@@ -35,7 +35,7 @@ export const CONCEPT_SCAN_DETAIL_LABELS: Record<
   latest_attempt: "Latest attempt",
 };
 
-export const COLLECTION_DATE_LABELS = {
+export const COLLECTION_METADATA_LABELS = {
   created_at: "Collection created",
   updated_at: "Collection updated",
 };

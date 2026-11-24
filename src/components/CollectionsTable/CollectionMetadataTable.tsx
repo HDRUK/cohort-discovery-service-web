@@ -1,19 +1,19 @@
-import { COLLECTION_DATE_LABELS } from "@/config/conceptScan";
+import { COLLECTION_METADATA_LABELS } from "@/config/conceptScan";
 import { useTransposedTable } from "@/hooks/useTransposedTable";
 import { CollectionDetails } from "@/types/api";
 import { getDatetime } from "@/utils/date";
 import Table from "../Table";
 
-interface CollectionDatesProps {
+interface CollectionMetadataTableProps {
   pid: string;
   details: CollectionDetails;
 }
 
-const CollectionDates = ({ pid, details }: CollectionDatesProps) => {
+const CollectionMetadataTable = ({ pid, details }: CollectionMetadataTableProps) => {
   const table = useTransposedTable<CollectionDetails>({
     data: details,
     include: ["created_at", "updated_at"],
-    labels: COLLECTION_DATE_LABELS,
+    labels: COLLECTION_METADATA_LABELS,
     formatters: {
       created_at: (value) => getDatetime(value),
       updated_at: (value) => getDatetime(value),
@@ -33,4 +33,4 @@ const CollectionDates = ({ pid, details }: CollectionDatesProps) => {
   );
 };
 
-export default CollectionDates;
+export default CollectionMetadataTable;
