@@ -1,4 +1,4 @@
-import { Task, Result } from "@/types/api";
+import { Task, Result, ResultFile } from "@/types/api";
 import { getMockCollections } from "./collections";
 
 const [mockCollection1, mockCollection2] = getMockCollections(2);
@@ -28,6 +28,18 @@ export const getMockTask = (rest?: Partial<Task>) => ({
   attempts: 1,
   collection: mockCollection1,
   result: getMockResult(),
+  ...rest,
+});
+
+export const getMockResultFile = (rest?: Partial<ResultFile>): ResultFile => ({
+  id: 1,
+  status: "done",
+  file_name: "code.distribution",
+  file_description: "Result of code.distribution analysis",
+  rows_processed: 2,
+  task: getMockTask(),
+  created_at: "2025-01-01T12:00:00Z",
+  updated_at: "2025-01-01T12:00:00Z",
   ...rest,
 });
 
