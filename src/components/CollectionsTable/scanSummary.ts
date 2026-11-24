@@ -1,18 +1,28 @@
+import {
+  CONCEPT_FILE_NAME,
+  NO_SUCCESSFUL_SCAN_MESSAGE,
+} from "@/config/conceptScan";
 import { CollectionDetails, ResultFile } from "@/types/api";
+import {
+  ConceptScanChipConfig,
+  ConceptScanChipState,
+  ConceptScanDetailsData,
+  ConceptScanSummary,
+} from "@/types/collections";
 import { getTimestamp } from "@/utils/date";
 
-const CONCEPT_FILE_NAME = "code.distribution";
-
-const finishedAt = (file: ResultFile) =>
+const finishedAt = (file: ResultFile): string =>
   file.task?.completed_at ?? file.created_at;
 
-const isConceptFile = (file: ResultFile) =>
+export const isConceptFile = (file: ResultFile): boolean =>
   file.file_name === CONCEPT_FILE_NAME;
 
-const isEmptyConceptFile = (file: ResultFile) =>
+export const isEmptyConceptFile = (file: ResultFile): boolean =>
   isConceptFile(file) && file.status === "done" && file.rows_processed === 0;
 
-const getScanSummary = (details?: CollectionDetails) => {
+export const getScanSummary = (
+  details?: CollectionDetails,
+): ConceptScanSummary => {
   const [latest = null] = (details?.result_files ?? [])
     .filter(isConceptFile)
     .sort(
@@ -27,18 +37,46 @@ const getScanSummary = (details?: CollectionDetails) => {
   };
 };
 
-const getLatestAttemptLabel = (file: ResultFile) => {
+export const getConceptScanChipState = (
+  file: ResultFile,
+  successfulFileId?: number,
+): ConceptScanChipState | null => {
+  if (file.id === successfulFileId) return "used";
+  if (isEmptyConceptFile(file)) return "empty";
+  if (isConceptFile(file) && file.status === "failed") return "failed";
+  return null;
+};
+
+export const getLatestAttempt = (file: ResultFile): ConceptScanChipConfig => {
   const task = `Task ${file.task?.id}`;
 
-  if (file.status === "failed") return `${task} failed`;
-  if (file.status !== "done") return `${task} ${file.status}`;
-  if (file.rows_processed === 0) return `${task} returned 0 rows`;
-  return `${task} produced no concepts`;
+  if (file.status === "failed") {
+    return { label: `${task} failed`, color: "error" };
+  }
+  if (file.status !== "done") {
+    return { label: `${task} ${file.status}`, color: "default" };
+  }
+  if (file.rows_processed === 0) {
+    return { label: `${task} returned 0 rows`, color: "warning" };
+  }
+  return { label: `${task} produced no concepts`, color: "warning" };
 };
 
-export {
-  getLatestAttemptLabel,
-  getScanSummary,
-  isConceptFile,
-  isEmptyConceptFile,
-};
+export const getConceptScanDetailsData = (
+  details: CollectionDetails | undefined,
+  { successful, latest }: ConceptScanSummary,
+): ConceptScanDetailsData => ({
+  ...(successful
+    ? {
+        task_id: successful.task?.id,
+        result_file_id: successful.id,
+        name: successful.file_description,
+        completed_at: finishedAt(successful),
+        rows_processed: successful.rows_processed,
+        nconcepts: details?.nconcepts,
+      }
+    : { last_successful_scan: NO_SUCCESSFUL_SCAN_MESSAGE }),
+  ...(latest && latest.id !== successful?.id ? { latest_attempt: latest } : {}),
+  created_at: details?.created_at,
+  updated_at: details?.updated_at,
+});

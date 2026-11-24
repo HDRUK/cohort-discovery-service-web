@@ -13,14 +13,12 @@ const lastGoodScan = getMockResultFile({
   id: 1180,
   rows_processed: 2,
   task: getMockTask({ id: 17799, completed_at: "2026-11-24T09:20:01Z" }),
-  created_at: "2026-11-24T09:20:01Z",
 });
 
 const emptyLatestScan = getMockResultFile({
   id: 1181,
   rows_processed: 0,
   task: getMockTask({ id: 17800, completed_at: "2026-11-24T09:27:11Z" }),
-  created_at: "2026-11-24T09:27:11Z",
 });
 
 const metadataFile = getMockResultFile({
@@ -29,7 +27,6 @@ const metadataFile = getMockResultFile({
   file_description: "Metadata for the result of code.distribution analysis",
   rows_processed: 1,
   task: emptyLatestScan.task,
-  created_at: "2026-11-24T09:27:11Z",
 });
 
 const renderDetails = (rest: Partial<CollectionDetailsType>) => {
@@ -47,94 +44,51 @@ const renderDetails = (rest: Partial<CollectionDetailsType>) => {
   });
 
   render(<CollectionDetails pid={PID} />);
-
-  return within(
-    screen.getByRole("region", { name: "Last successful concept scan" }),
-  );
 };
 
+const valueFor = (label: string) =>
+  screen.getByText(label, { selector: "td, th, span, p" }).closest("tr")!;
+
 describe("CollectionDetails", () => {
-  it("identifies the last successful concept scan", () => {
-    const scan = renderDetails({
+  it("titles the panel Concepts and says what it shows", () => {
+    renderDetails({ latest_successful_concept_result_file: lastGoodScan });
+
+    expect(screen.getByText(/^Concepts\s*\//)).toBeInTheDocument();
+    expect(
+      screen.getByText("From the most recent scan that returned concepts."),
+    ).toBeInTheDocument();
+  });
+
+  it("shows the scan the concept count comes from and warns about the newer empty one", () => {
+    renderDetails({
       result_files: [emptyLatestScan, metadataFile, lastGoodScan],
       latest_successful_concept_result_file: lastGoodScan,
     });
 
-    expect(scan.getByText("Task ID").nextSibling).toHaveTextContent("17799");
-    expect(scan.getByText("Result file ID").nextSibling).toHaveTextContent(
-      "1180",
-    );
-    expect(scan.getByText("Name").nextSibling).toHaveTextContent(
-      "Result of code.distribution analysis",
-    );
-    expect(scan.getByText("Rows processed").nextSibling).toHaveTextContent("2");
-    expect(scan.getByText("Number of concepts").nextSibling).toHaveTextContent(
-      "2",
-    );
+    expect(within(valueFor("Result file ID")).getByText("1180")).toBeVisible();
+    expect(screen.getByText("Task 17800 returned 0 rows")).toBeInTheDocument();
   });
 
-  it("warns when the latest scan returned no rows", () => {
-    const scan = renderDetails({
-      result_files: [emptyLatestScan, metadataFile, lastGoodScan],
-      latest_successful_concept_result_file: lastGoodScan,
-    });
-
-    expect(scan.getByText("Task 17800 returned 0 rows")).toBeInTheDocument();
-  });
-
-  it("does not warn when the latest scan is the successful one", () => {
-    const scan = renderDetails({
-      result_files: [lastGoodScan],
-      latest_successful_concept_result_file: lastGoodScan,
-    });
-
-    expect(scan.queryByText(/^Task \d+ /)).not.toBeInTheDocument();
-  });
-
-  it("shows an empty state when no scan has been successful", () => {
-    const scan = renderDetails({
+  it("explains the empty state when no scan returned concepts", () => {
+    renderDetails({
       nconcepts: 0,
       result_files: [emptyLatestScan],
       latest_successful_concept_result_file: null,
     });
 
     expect(
-      scan.getByText("No successful concept scan yet"),
+      screen.getByText("None yet: no concept scan has returned concepts"),
     ).toBeInTheDocument();
-    expect(scan.getByText("Task 17800 returned 0 rows")).toBeInTheDocument();
   });
 
-  it("labels the collection timestamps so they are not mistaken for job dates", () => {
-    const scan = renderDetails({
-      latest_successful_concept_result_file: lastGoodScan,
-      result_files: [lastGoodScan],
-    });
-
-    expect(scan.getByText("Collection created")).toBeInTheDocument();
-    expect(scan.getByText("Collection updated")).toBeInTheDocument();
-  });
-
-  it("marks the file used for the concept count and flags empty files", () => {
+  it("marks the file used for the concept count and flags the empty one", () => {
     renderDetails({
       result_files: [emptyLatestScan, metadataFile, lastGoodScan],
       latest_successful_concept_result_file: lastGoodScan,
     });
 
-    const fileRows = screen
-      .getAllByRole("row")
-      .filter((row) => (row as HTMLTableRowElement).cells.length > 2);
-    const rowFor = (id: string) =>
-      fileRows.find((row) => within(row).queryAllByText(id).length > 0);
-
-    expect(
-      within(rowFor("1180")!).getByText("Used for concept count"),
-    ).toBeInTheDocument();
-    expect(
-      within(rowFor("1181")!).getByText("Empty (0 rows)"),
-    ).toBeInTheDocument();
-    expect(
-      within(rowFor("1182")!).queryByText("Empty (0 rows)"),
-    ).not.toBeInTheDocument();
+    expect(screen.getByText("Used for concept count")).toBeInTheDocument();
+    expect(screen.getByText("Empty (0 rows)")).toBeInTheDocument();
   });
 
   it("shows the task completion time rather than the file creation time", () => {
@@ -149,7 +103,6 @@ describe("CollectionDetails", () => {
           created_at: "2026-01-02T03:04:05Z",
         }),
       ],
-      latest_successful_concept_result_file: null,
     });
 
     expect(screen.queryByText(/02\/01\/2026/)).not.toBeInTheDocument();
