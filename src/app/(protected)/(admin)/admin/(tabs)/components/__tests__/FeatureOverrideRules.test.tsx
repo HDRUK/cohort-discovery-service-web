@@ -168,9 +168,7 @@ describe("FeatureOverrideRules", () => {
     const user = userEvent.setup();
     renderRules(withOverrides);
 
-    await user.click(
-      screen.getByRole("button", { name: "Edit the off rule" }),
-    );
+    await user.click(screen.getByRole("button", { name: "Edit the off rule" }));
     expect(dialog().getByRole("switch")).toBeEnabled();
     await user.click(dialog().getByRole("switch"));
     await user.click(dialog().getByRole("button", { name: "Save" }));

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Box, Button, Stack, Switch, Typography } from "@mui/material";
+import { Button, Stack, Switch, Typography } from "@mui/material";
 import FormMultiSelect, {
   OptionsType,
 } from "@/components/FormMultiSelect/FormMultiSelect";
@@ -8,10 +8,8 @@ import {
   useAdminUsers,
   useAdminWorkgroups,
 } from "@/contexts/AdminSectionContext";
-import { FeatureOverrides } from "@/types/features";
+import { FeatureOverrides, OverrideRule, RuleSubject } from "@/types/features";
 import {
-  OverrideRule,
-  RuleSubject,
   excludedIds,
   userLabel,
   valueLabel,
@@ -127,26 +125,25 @@ const FeatureOverrideModal = ({
         {(["workgroups", "users"] as const).map((subject) => {
           const subjectOptions = optionsFor(subject, enabled);
           return (
-            <Box key={subject}>
-              <FormMultiSelect
-                id={`${feature.feature}-${subject}`}
-                label={SUBJECT_LABELS[subject]}
-                multiple
-                disabled={pending}
-                options={subjectOptions}
-                value={subjectOptions.filter(({ value }) =>
-                  selected[subject].includes(Number(value)),
-                )}
-                onChange={(value) =>
-                  setSelected((current) => ({
-                    ...current,
-                    [subject]: (Array.isArray(value) ? value : [value]).map(
-                      (option) => Number(option.value),
-                    ),
-                  }))
-                }
-              />
-            </Box>
+            <FormMultiSelect
+              key={subject}
+              id={`${feature.feature}-${subject}`}
+              label={SUBJECT_LABELS[subject]}
+              multiple
+              disabled={pending}
+              options={subjectOptions}
+              value={subjectOptions.filter(({ value }) =>
+                selected[subject].includes(Number(value)),
+              )}
+              onChange={(value) =>
+                setSelected((current) => ({
+                  ...current,
+                  [subject]: (Array.isArray(value) ? value : [value]).map(
+                    (option) => Number(option.value),
+                  ),
+                }))
+              }
+            />
           );
         })}
       </Stack>

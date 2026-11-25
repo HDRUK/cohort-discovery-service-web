@@ -8,7 +8,7 @@ import {
   useQueryBuilderStore,
 } from "@/store/queryBuilderStore";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
-import { FeatureFlag, FeatureName } from "@/types/features";
+import { FeatureFlag } from "@/types/features";
 import { MAX_AGE_FILTER } from "@/config/rules";
 import {
   SessionData,
@@ -255,7 +255,7 @@ describe("DemographicsPanel", () => {
 
     it("hides the Race row when the flag is disabled", () => {
       useFeatureFlagsStore.setState({
-        flags: { [FeatureName.QueryBuilderUseRace]: false } as FeatureFlag,
+        flags: { "query-builder-use-race": false } as FeatureFlag,
       });
       renderPanel(true);
 
@@ -287,7 +287,7 @@ describe("DemographicsPanel", () => {
 
     beforeEach(() => {
       useFeatureFlagsStore.setState({
-        flags: { [FeatureName.QueryBuilderUseLocation]: true } as FeatureFlag,
+        flags: { "query-builder-use-location": true } as FeatureFlag,
       });
     });
 
@@ -350,7 +350,7 @@ describe("DemographicsPanel", () => {
 
     it("shows the Death row when the flag is enabled", () => {
       useFeatureFlagsStore.setState({
-        flags: { [FeatureName.QueryBuilderUseDeath]: true } as FeatureFlag,
+        flags: { "query-builder-use-death": true } as FeatureFlag,
       });
       renderPanel(true);
 
@@ -372,7 +372,7 @@ describe("DemographicsPanel", () => {
       store().addDemographics();
       store().setSelectedDatasets([withDeath.pid]);
       useFeatureFlagsStore.setState({
-        flags: { [FeatureName.QueryBuilderUseDeath]: true } as FeatureFlag,
+        flags: { "query-builder-use-death": true } as FeatureFlag,
       });
     });
 

@@ -2,7 +2,7 @@ import "@testing-library/jest-dom";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
-import { FeatureName, FeatureOverrides } from "@/types/features";
+import { FeatureOverrides } from "@/types/features";
 import { FeatureFlagManager } from "../FeatureFlagManager";
 
 const mockUpdateFeatureFlag = jest.fn();
@@ -19,21 +19,21 @@ jest.mock("@/actions/admin/replaceFeatureOverrides", () => ({
 
 const featureOverrides: FeatureOverrides[] = [
   {
-    feature: FeatureName.QueryBuilderUseLocation,
+    feature: "query-builder-use-location",
     global: false,
     overridable: true,
     users: [],
     workgroups: [{ id: 10, name: "UK-RESEARCH", enabled: true }],
   },
   {
-    feature: FeatureName.AccessBanner,
+    feature: "access-banner",
     global: true,
     overridable: true,
     users: [],
     workgroups: [],
   },
   {
-    feature: FeatureName.FlattenNestedGroups,
+    feature: "flatten-nested-groups",
     global: true,
     overridable: false,
     users: [],
@@ -65,7 +65,7 @@ const rowOf = (feature: string) =>
 
 const locationSwitch = () =>
   screen.getByRole("switch", {
-    name: `${FeatureName.QueryBuilderUseLocation} global value`,
+    name: `query-builder-use-location global value`,
   });
 
 describe("FeatureFlagManager", () => {
@@ -79,7 +79,7 @@ describe("FeatureFlagManager", () => {
     expect(locationSwitch()).not.toBeChecked();
     expect(
       screen.getByRole("switch", {
-        name: `${FeatureName.AccessBanner} global value`,
+        name: `access-banner global value`,
       }),
     ).toBeChecked();
     expect(screen.queryByText("Overrides")).not.toBeInTheDocument();
@@ -93,25 +93,30 @@ describe("FeatureFlagManager", () => {
     await user.click(locationSwitch());
 
     expect(mockUpdateFeatureFlag).toHaveBeenCalledWith(
-      FeatureName.QueryBuilderUseLocation,
+      "query-builder-use-location",
       { enabled: true },
     );
   });
 
-  it("keeps the new global value while the refreshed data is on its way", async () => {
-    mockUpdateFeatureFlag.mockResolvedValue(undefined);
+  it("shows the new global value while the save is running and once it has refreshed", async () => {
+    let finishSave: () => void = () => {};
+    mockUpdateFeatureFlag.mockReturnValue(
+      new Promise<void>((resolve) => {
+        finishSave = resolve;
+      }),
+    );
     const user = userEvent.setup();
     const { rerender } = renderManager();
 
     await user.click(locationSwitch());
-    await waitFor(() => expect(locationSwitch()).toBeEnabled());
 
     expect(locationSwitch()).toBeChecked();
+    expect(locationSwitch()).toBeDisabled();
 
-    rerender(
-      managerWith(withGlobal(FeatureName.QueryBuilderUseLocation, true)),
-    );
+    rerender(managerWith(withGlobal("query-builder-use-location", true)));
+    finishSave();
 
+    await waitFor(() => expect(locationSwitch()).toBeEnabled());
     expect(locationSwitch()).toBeChecked();
   });
 
@@ -120,12 +125,12 @@ describe("FeatureFlagManager", () => {
 
     expect(
       screen.getByRole("img", {
-        name: `${FeatureName.QueryBuilderUseLocation} has overrides`,
+        name: `query-builder-use-location has overrides`,
       }),
     ).toBeInTheDocument();
     expect(
       screen.queryByRole("img", {
-        name: `${FeatureName.AccessBanner} has overrides`,
+        name: `access-banner has overrides`,
       }),
     ).not.toBeInTheDocument();
   });
@@ -134,13 +139,13 @@ describe("FeatureFlagManager", () => {
     renderManager();
 
     expect(
-      rowOf(FeatureName.FlattenNestedGroups).getByRole("img", {
-        name: `${FeatureName.FlattenNestedGroups} is global only`,
+      rowOf("flatten-nested-groups").getByRole("img", {
+        name: `flatten-nested-groups is global only`,
       }),
     ).toBeInTheDocument();
     expect(
       screen.queryByRole("img", {
-        name: `${FeatureName.AccessBanner} is global only`,
+        name: `access-banner is global only`,
       }),
     ).not.toBeInTheDocument();
   });
@@ -152,7 +157,7 @@ describe("FeatureFlagManager", () => {
     expect(screen.getByText(/Users and access/)).toBeInTheDocument();
     expect(screen.queryByText(/Query builder/)).not.toBeInTheDocument();
     expect(
-      rowOf(FeatureName.QueryBuilderUseLocation).getByText(
+      rowOf("query-builder-use-location").getByText(
         /Lets users query by location/,
       ),
     ).toBeInTheDocument();
@@ -178,7 +183,7 @@ describe("FeatureFlagManager", () => {
     ).not.toBeInTheDocument();
 
     await user.click(
-      rowOf(FeatureName.QueryBuilderUseLocation).getByRole("button", {
+      rowOf("query-builder-use-location").getByRole("button", {
         name: "Expand",
       }),
     );
@@ -190,12 +195,12 @@ describe("FeatureFlagManager", () => {
     renderManager();
 
     expect(
-      rowOf(FeatureName.FlattenNestedGroups).getByRole("button", {
+      rowOf("flatten-nested-groups").getByRole("button", {
         name: "Expand",
       }),
     ).toBeDisabled();
     expect(
-      rowOf(FeatureName.QueryBuilderUseLocation).getByRole("button", {
+      rowOf("query-builder-use-location").getByRole("button", {
         name: "Expand",
       }),
     ).toBeEnabled();
@@ -205,7 +210,7 @@ describe("FeatureFlagManager", () => {
     render(
       managerWith([
         {
-          feature: FeatureName.AccessBanner,
+          feature: "access-banner",
           global: true,
           users: [],
           workgroups: [],
@@ -214,12 +219,12 @@ describe("FeatureFlagManager", () => {
     );
 
     expect(
-      rowOf(FeatureName.AccessBanner).getByRole("img", {
-        name: `${FeatureName.AccessBanner} is global only`,
+      rowOf("access-banner").getByRole("img", {
+        name: `access-banner is global only`,
       }),
     ).toBeInTheDocument();
     expect(
-      rowOf(FeatureName.AccessBanner).getByRole("button", { name: "Expand" }),
+      rowOf("access-banner").getByRole("button", { name: "Expand" }),
     ).toBeDisabled();
   });
 });

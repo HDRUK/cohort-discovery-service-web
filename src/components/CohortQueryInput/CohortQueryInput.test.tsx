@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 
 import CohortQueryInput from ".";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
-import { DEFAULT_FLAGS, FeatureName } from "@/types/features";
+import { DEFAULT_FLAGS } from "@/config/featureFlags";
 import {
   CombinatorType,
   OperatorType,
@@ -475,7 +475,7 @@ describe("CohortQueryInput", () => {
         <MockCohortDiscoveryServiceStore
           overrides={{
             featureFlags: {
-              flags: { ...DEFAULT_FLAGS, [FeatureName.QueryNlp]: enabled },
+              flags: { ...DEFAULT_FLAGS, "query-nlp": enabled },
             },
           }}
         >

@@ -7,7 +7,7 @@ import { getQueryJson } from "./__mocks__/getQueryJson";
 
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 import { Query } from "@/types/api";
-import { DEFAULT_FLAGS, FeatureName } from "@/types/features";
+import { DEFAULT_FLAGS } from "@/config/featureFlags";
 
 let mockUrlQueryPid: string | null = null;
 jest.mock("@/hooks/useSearchParams", () => ({
@@ -208,7 +208,7 @@ describe("QueryBuilder query-builder flag", () => {
       <MockCohortDiscoveryServiceStore
         overrides={{
           featureFlags: {
-            flags: { ...DEFAULT_FLAGS, [FeatureName.QueryBuilder]: enabled },
+            flags: { ...DEFAULT_FLAGS, "query-builder": enabled },
           },
         }}
       >

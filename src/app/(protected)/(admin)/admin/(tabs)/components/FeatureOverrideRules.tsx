@@ -16,10 +16,9 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import replaceFeatureOverrides from "@/actions/admin/replaceFeatureOverrides";
 import Modal from "@/components/Modal";
 import { useNotify } from "@/providers/NotifyProvider";
-import { FeatureOverrides } from "@/types/features";
+import { FeatureOverrides, OverrideRule } from "@/types/features";
 import FeatureOverrideModal from "./FeatureOverrideModal";
 import {
-  OverrideRule,
   addToRules,
   removeRule,
   toRules,

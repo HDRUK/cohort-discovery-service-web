@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, ReactNode, use, useContext, useMemo } from "react";
+import { createContext, ReactNode, use, useContext } from "react";
 
 import { AccessPolicy } from "@/types/accessPolicy";
 import {
@@ -63,24 +63,14 @@ export const AdminSectionProvider = ({
   featureOverrides: Promise<ApiResponse<FeatureOverrides[]>>;
   children: ReactNode;
 }) => {
-  const value = useMemo<AdminSectionSources>(
-    () => ({
-      users,
-      collections,
-      collectionHosts,
-      accessPolicy,
-      workgroups,
-      featureOverrides,
-    }),
-    [
-      users,
-      collections,
-      collectionHosts,
-      accessPolicy,
-      workgroups,
-      featureOverrides,
-    ],
-  );
+  const value: AdminSectionSources = {
+    users,
+    collections,
+    collectionHosts,
+    accessPolicy,
+    workgroups,
+    featureOverrides,
+  };
 
   return (
     <AdminSectionContext.Provider value={value}>

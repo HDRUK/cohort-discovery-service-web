@@ -31,7 +31,6 @@ import { removeFalseKeys } from "@/utils/numbers";
 import { EXAMPLE_1, NO_QUERY } from "@/config/queryExamples";
 import { DatasetErrors } from "@/utils/datasets";
 import { ApiResponse, Collection, ParseQueryBody } from "@/types/api";
-import { FeatureName } from "@/types/features";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import { intersection } from "lodash";
 import { getAllowedDatasetIds } from "@/utils/collections";
@@ -589,11 +588,11 @@ const state: StateCreator<QueryBuilderStoreState> = (set, get) => ({
 
     return validateRuleTree(root, {
       constrainForBunnyV1:
-        featureFlags?.[FeatureName.ConstrainForBunnyV1] || false,
+        featureFlags?.["constrain-for-bunny-v1"] || false,
       allowNestedGroups:
-        featureFlags?.[FeatureName.QueryBuilderAllowNestedGroups] || false,
+        featureFlags?.["query-builder-allow-nested-groups"] || false,
       allowDemographicsOnly:
-        featureFlags?.[FeatureName.QueryBuilderUseDemographicRule] || false,
+        featureFlags?.["query-builder-use-demographic-rule"] || false,
     });
   },
 

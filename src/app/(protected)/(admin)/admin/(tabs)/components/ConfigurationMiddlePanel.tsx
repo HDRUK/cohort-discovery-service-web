@@ -1,12 +1,12 @@
 "use client";
 import { ReactNode, Suspense } from "react";
+import SkeletonFull from "@/components/SkeletonFull";
 import { CONFIGURATION_SECTION_PARAM } from "@/config/configuration";
 import { useAdminAccessPolicy } from "@/contexts/AdminSectionContext";
 import useSearchParams from "@/hooks/useSearchParams";
 import { toConfigurationSection } from "@/lib/configurationSection";
 import { ConfigurationSection } from "@/types/configuration";
 import AccessPolicyPanel from "./AccessPolicyPanel";
-import SkeletonFull from "@/components/SkeletonFull";
 import { DefaultsManager } from "./DefaultsManager";
 import { FeatureFlagManager } from "./FeatureFlagManager";
 

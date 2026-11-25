@@ -1,6 +1,5 @@
-import { FeatureOverrides } from "@/types/features";
+import { FeatureOverrides, OverrideRule } from "@/types/features";
 import {
-  OverrideRule,
   addToRules,
   excludedIds,
   removeRule,

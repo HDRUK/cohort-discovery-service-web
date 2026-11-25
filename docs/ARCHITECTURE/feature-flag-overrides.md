@@ -15,10 +15,10 @@ The admin table must show global values. Otherwise an admin who has an override 
 
 ## Admin UI
 
-Configuration → **Feature flags** (`FeatureFlagManager`) shows one paper per group of flags, with the page background between them. `src/config/featureFlags.ts` gives each flag its group and a one-line description. The description says whether the API enforces the flag, or whether it only changes what the web app shows. A flag missing from that file goes under **Other** with no description, so add an entry whenever the API gains a flag.
+Configuration → **Feature flags** (`FeatureFlagManager`) shows one paper per group of flags, with the page background between them. `src/config/featureFlags.ts` gives each flag its group and a one-line description. The description says whether the API enforces the flag, or whether it only changes what the web app shows. A flag missing from `FEATURE_FLAGS` goes under **Other** with no description, so add one entry there whenever the API gains a flag. The entry holds the name, group, description and, for a flag the web reads, its default. `FeatureName`, `DEFAULT_FLAGS` and the table groups are all derived from it.
 
 Each table has three columns, in this order:
-- **Global value:** a switch for the global value. Switching it saves straight away through `updateFeatureFlag`. The switch shows the new value while the save runs, then the value from the API. If the save fails, it shows an error notification.
+- **Global value:** a switch for the global value. Switching it saves straight away through `updateFeatureFlag`. The switch (`GlobalValueSwitch`) shows the new value while the save runs, using `useOptimistic`, then the value from the API. If the save fails, it shows an error notification.
 - **Status** (narrow, no heading): a warning sign when any workgroup or user has an override; its tooltip gives the count and says that changing the global value doesn't change theirs. A lock instead for a flag the API marks `overridable: false` or sends without the field ("global only"). Those rows don't expand, because `renderDetailPanel` returns nothing for them, and the API rejects overrides on them. The API's `config/features.php` lists them and says why.
 - **Flag:** the flag name and its description.
 
@@ -35,7 +35,7 @@ Each other row expands into a tinted panel listing its override rules (`FeatureO
 
 `getFeatureFlags` and `getFeatureOverrides` use `"use cache: private"` with `FEATURE_FLAGS_CACHE_LIFE`, which has a `stale` time of 30 seconds. In production, a private cache isn't stored on the server, so every request reads the API. The delay comes only from each browser's router cache, which reuses a page for its `stale` time while the user moves around the app.
 
-- The admin who makes a change sees it straight away, because `updateTag` clears their router cache. The global switch also keeps its new value on screen until the refreshed data differs from the value it had when toggled, so it doesn't flicker back to the old value while the refresh arrives.
+- The admin who makes a change sees it straight away, because `updateTag` clears their router cache. The global switch holds its new value until the refreshed data arrives, so it doesn't flicker back to the old value.
 - Other users and admins see it the next time they load a page, or within 30 seconds if they are moving around the app.
 - Where the API honours overrides, such as query submission, it checks the user's effective value on every request, so the delay only affects what the UI shows.
 

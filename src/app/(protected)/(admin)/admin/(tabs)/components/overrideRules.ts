@@ -3,15 +3,9 @@ import {
   FeatureOverride,
   FeatureOverrides,
   FeatureOverridesUpdate,
+  OverrideRule,
+  RuleSubject,
 } from "@/types/features";
-
-export interface OverrideRule {
-  enabled: boolean;
-  workgroups: number[];
-  users: number[];
-}
-
-export type RuleSubject = "workgroups" | "users";
 
 type RuleSubjects = Pick<OverrideRule, RuleSubject>;
 
@@ -107,3 +101,11 @@ export const withOverriddenSubjects = (
 
 export const valueLabel = (enabled: boolean): string =>
   enabled ? "On" : "Off";
+
+export const overrideCount = ({
+  users,
+  workgroups,
+}: FeatureOverrides): number => users.length + workgroups.length;
+
+export const overriddenHelp = (count: number): string =>
+  `${count === 1 ? "1 override" : `${count} overrides`}: some workgroups or users have their own value for this flag. Changing the global value doesn't change theirs.`;

@@ -1,46 +1,23 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { MRT_ColumnDef } from "material-react-table";
-import {
-  Box,
-  CircularProgress,
-  Paper,
-  Stack,
-  Switch,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import { Box, Paper, Stack, Tooltip, Typography } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import Table from "@/components/Table";
 import { useTable } from "@/hooks/useTable";
 import { useAdminFeatureOverrides } from "@/contexts/AdminSectionContext";
-import updateFeatureFlag from "@/actions/admin/updateFeatureFlag";
-import { useNotify } from "@/providers/NotifyProvider";
 import {
   FEATURE_FLAG_GROUPS,
   FeatureFlagGroup,
+  GLOBAL_ONLY_HELP,
   featureFlagDetails,
 } from "@/config/featureFlags";
 import { FeatureOverrides } from "@/types/features";
 import { FeatureOverrideRules } from "./FeatureOverrideRules";
-
-const GLOBAL_ONLY_HELP = "Global only: this flag can't be overridden.";
-
-const overrideCount = ({ users, workgroups }: FeatureOverrides) =>
-  users.length + workgroups.length;
-
-const overriddenHelp = (count: number) =>
-  `${count === 1 ? "1 override" : `${count} overrides`}: some workgroups or users have their own value for this flag. Changing the global value doesn't change theirs.`;
-
-interface OptimisticGlobal {
-  value: boolean;
-  serverValue: boolean;
-}
-
-const shownGlobal = (global: boolean, optimistic?: OptimisticGlobal) =>
-  optimistic && optimistic.serverValue === global ? optimistic.value : global;
+import GlobalValueSwitch from "./GlobalValueSwitch";
+import { overrideCount, overriddenHelp } from "./overrideRules";
 
 interface FeatureFlagTableProps {
   group: FeatureFlagGroup;
@@ -48,43 +25,6 @@ interface FeatureFlagTableProps {
 }
 
 const FeatureFlagTable = ({ group, features }: FeatureFlagTableProps) => {
-  const [optimisticGlobals, setOptimisticGlobals] = useState<
-    Record<string, OptimisticGlobal>
-  >({});
-  const [savingKeys, setSavingKeys] = useState<string[]>([]);
-  const notify = useNotify();
-
-  const discardOptimisticGlobal = useCallback(
-    (key: string) =>
-      setOptimisticGlobals((current) => {
-        const remaining = { ...current };
-        delete remaining[key];
-        return remaining;
-      }),
-    [],
-  );
-
-  const handleToggleFeature = useCallback(
-    async (key: string, newValue: boolean, serverValue: boolean) => {
-      setOptimisticGlobals((current) => ({
-        ...current,
-        [key]: { value: newValue, serverValue },
-      }));
-      setSavingKeys((keys) => [...keys, key]);
-      try {
-        await updateFeatureFlag(key, { enabled: newValue });
-      } catch {
-        discardOptimisticGlobal(key);
-        notify.error(
-          `Could not save the "${key}" flag, so it has been switched back. Try again, or refresh the page if it keeps failing.`,
-        );
-      } finally {
-        setSavingKeys((keys) => keys.filter((k) => k !== key));
-      }
-    },
-    [notify, discardOptimisticGlobal],
-  );
-
   const columns = useMemo<MRT_ColumnDef<FeatureOverrides>[]>(
     () => [
       {
@@ -92,28 +32,12 @@ const FeatureFlagTable = ({ group, features }: FeatureFlagTableProps) => {
         header: "Global value",
         size: 130,
         grow: false,
-        Cell: ({ row }) => {
-          const { feature, global } = row.original;
-          const isSaving = savingKeys.includes(feature);
-          return (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Switch
-                checked={shownGlobal(global, optimisticGlobals[feature])}
-                disabled={isSaving}
-                slotProps={{
-                  input: { "aria-label": `${feature} global value` },
-                }}
-                onChange={(event) =>
-                  handleToggleFeature(feature, event.target.checked, global)
-                }
-              />
-              <CircularProgress
-                size={16}
-                sx={{ visibility: isSaving ? "visible" : "hidden" }}
-              />
-            </Box>
-          );
-        },
+        Cell: ({ row }) => (
+          <GlobalValueSwitch
+            feature={row.original.feature}
+            global={row.original.global}
+          />
+        ),
       },
       {
         id: "status",
@@ -160,7 +84,7 @@ const FeatureFlagTable = ({ group, features }: FeatureFlagTableProps) => {
         ),
       },
     ],
-    [optimisticGlobals, savingKeys, handleToggleFeature],
+    [],
   );
 
   const table = useTable<FeatureOverrides>({
