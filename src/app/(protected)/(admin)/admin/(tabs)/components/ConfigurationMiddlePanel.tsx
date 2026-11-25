@@ -1,5 +1,6 @@
 "use client";
 import { ReactNode, Suspense } from "react";
+import SkeletonFull from "@/components/SkeletonFull";
 import { CONFIGURATION_SECTION_PARAM } from "@/config/configuration";
 import { useAdminAccessPolicy } from "@/contexts/AdminSectionContext";
 import useSearchParams from "@/hooks/useSearchParams";
@@ -15,7 +16,11 @@ const AdminAccessPolicyPanel = () => {
 };
 
 const SECTION_PANELS: Record<ConfigurationSection, ReactNode> = {
-  [ConfigurationSection.Flags]: <FeatureFlagManager />,
+  [ConfigurationSection.Flags]: (
+    <Suspense fallback={<SkeletonFull />}>
+      <FeatureFlagManager />
+    </Suspense>
+  ),
   [ConfigurationSection.Defaults]: <DefaultsManager />,
   [ConfigurationSection.AccessControl]: (
     <Suspense fallback={<AccessPolicyPanel />}>

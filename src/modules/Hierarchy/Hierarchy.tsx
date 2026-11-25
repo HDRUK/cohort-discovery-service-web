@@ -25,7 +25,6 @@ import useHasMounted from "@/hooks/useHasMounted";
 import SkeletonFull from "@/components/SkeletonFull";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
-import { FeatureName } from "@/types/features";
 
 export const Hierarchy = () => {
   const { queryBuilderJson, setQueryBuilderJson, boardIndex } = useQueryBuilder(
@@ -73,7 +72,7 @@ export const Hierarchy = () => {
 
       const featureFlags = useFeatureFlagsStore.getState().flags;
 
-      if (!featureFlags?.[FeatureName.QueryBuilderAllowNestedGroups]) {
+      if (!featureFlags?.["query-builder-allow-nested-groups"]) {
         if (isRuleGroup(activeNode) && overGroupId !== activeGroupId) return;
       }
 

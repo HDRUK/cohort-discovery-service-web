@@ -1,0 +1,137 @@
+{
+  "message": "success",
+  "data": [
+    {
+      "feature": "constrain-for-bunny-v1",
+      "global": true,
+      "overridable": false,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "flatten-nested-groups",
+      "global": true,
+      "overridable": false,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "hdruk-uk-theme",
+      "global": true,
+      "overridable": true,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "in-app-messenger",
+      "global": false,
+      "overridable": true,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "integrated-ensure-default-wgs",
+      "global": true,
+      "overridable": true,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "integrated-sync-custodians-every-request",
+      "global": true,
+      "overridable": true,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "integrated-sync-roles-every-request",
+      "global": true,
+      "overridable": true,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "integrated-sync-sde-wgs-from-claim",
+      "global": true,
+      "overridable": true,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "integrated-sync-workgroups-every-request",
+      "global": false,
+      "overridable": true,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "integrated-sync-workgroups-first-login",
+      "global": true,
+      "overridable": true,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "query-builder",
+      "global": true,
+      "overridable": true,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "query-builder-allow-nested-groups",
+      "global": true,
+      "overridable": true,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "query-builder-show-concept-stats",
+      "global": false,
+      "overridable": true,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "query-builder-use-death",
+      "global": true,
+      "overridable": true,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "query-builder-use-leave-confirmation",
+      "global": true,
+      "overridable": true,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "query-builder-use-location",
+      "global": true,
+      "overridable": true,
+      "users": [],
+      "workgroups": [
+        {
+          "id": 1,
+          "name": "UK-RESEARCH",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "feature": "query-builder-use-stats-in-ordering",
+      "global": true,
+      "overridable": true,
+      "users": [],
+      "workgroups": []
+    },
+    {
+      "feature": "query-nlp",
+      "global": false,
+      "overridable": true,
+      "users": [],
+      "workgroups": []
+    }
+  ]
+}

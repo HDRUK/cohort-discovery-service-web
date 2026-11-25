@@ -211,7 +211,21 @@ async function handle(req, res) {
   // Feature flags
   // -------------------------------------------------------------------------
   if (method === "GET" && pathname === "/api/v1/features") {
-    return json(res, 200, fixture("features"));
+    const disabled = decodeAuthToken(req)?.user?.disabled_features ?? [];
+    const flags = fixture("features");
+    for (const name of disabled) flags.data[name] = false;
+    return json(res, 200, flags);
+  }
+
+  if (method === "GET" && pathname === "/api/v1/features/overrides") {
+    return json(res, 200, fixture("featureOverrides"));
+  }
+
+  if (
+    method === "PUT" &&
+    matchRoute("/api/v1/features/:name/overrides", pathname)
+  ) {
+    return ok(res, []);
   }
 
   if (method === "PUT" && matchRoute("/api/v1/features/:name", pathname)) {

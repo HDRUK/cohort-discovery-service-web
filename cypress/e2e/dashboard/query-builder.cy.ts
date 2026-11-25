@@ -48,4 +48,23 @@ describe("Query Builder", () => {
     cy.contains(/run query/i).click({ force: true });
     cy.url().should("include", "/dashboard/new-query");
   });
+
+  it("shows the search bar and the builder when their flags are on", () => {
+    cy.get("input[type='search']").should("exist");
+    cy.contains(/add.*group/i).should("be.visible");
+    cy.contains(/the query builder is switched off/i).should("not.exist");
+  });
+});
+
+describe("Query Builder with its flags turned off", () => {
+  beforeEach(() => {
+    cy.login("user", { disabledFeatures: ["query-builder", "query-nlp"] });
+    cy.setCookie("queryBuilderGuidanceRead", "true");
+    cy.visit(routes.dashboardNewQuery());
+  });
+
+  it("explains that the query builder is switched off", () => {
+    cy.contains(/the query builder is switched off/i).should("be.visible");
+    cy.contains(/add.*group/i).should("not.exist");
+  });
 });

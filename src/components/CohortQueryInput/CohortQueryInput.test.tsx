@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 
 import CohortQueryInput from ".";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
+import { DEFAULT_FLAGS } from "@/config/featureFlags";
 import {
   CombinatorType,
   Demographics,
@@ -482,7 +483,9 @@ describe("CohortQueryInput", () => {
           concept_id: 100,
           name: "COVID-19",
           category: "Condition",
-          alternatives: [{ concept_id: 200, name: "Acute COVID-19", category: "Condition" }],
+          alternatives: [
+            { concept_id: 200, name: "Acute COVID-19", category: "Condition" },
+          ],
         },
       },
     } as unknown as RuleLeafType;
@@ -519,5 +522,32 @@ describe("CohortQueryInput", () => {
       andRule,
       createRuleGroup([covidRule, orRule, cancerRule]),
     ]);
+  });
+
+  describe("query-nlp flag", () => {
+    const renderWithFlag = (enabled: boolean) =>
+      render(
+        <MockCohortDiscoveryServiceStore
+          overrides={{
+            featureFlags: {
+              flags: { ...DEFAULT_FLAGS, "query-nlp": enabled },
+            },
+          }}
+        >
+          <CohortQueryInput queries={[]} />
+        </MockCohortDiscoveryServiceStore>,
+      );
+
+    it("hides the search bar when the flag is off", () => {
+      renderWithFlag(false);
+
+      expect(screen.queryByRole("searchbox")).not.toBeInTheDocument();
+    });
+
+    it("shows the search bar when the flag is on", () => {
+      renderWithFlag(true);
+
+      expect(getSearchInput()).toBeInTheDocument();
+    });
   });
 });

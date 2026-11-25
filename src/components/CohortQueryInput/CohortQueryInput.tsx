@@ -47,7 +47,7 @@ type CohortQueryInputProps = {
   autoFocus?: boolean;
 };
 
-const CohortQueryInput = ({
+const CohortQueryInputField = ({
   queries,
   syncFromQueryAsText = false,
   resetOnSearch = true,
@@ -513,6 +513,12 @@ const CohortQueryInput = ({
       />
     </Box>
   );
+};
+
+const CohortQueryInput = (props: CohortQueryInputProps) => {
+  const { queryNlp } = useFeatures();
+
+  return queryNlp ? <CohortQueryInputField {...props} /> : null;
 };
 
 export default CohortQueryInput;
