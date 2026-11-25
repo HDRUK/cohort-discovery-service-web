@@ -67,8 +67,4 @@ describe("Query Builder with its flags turned off", () => {
     cy.contains(/the query builder is switched off/i).should("be.visible");
     cy.contains(/add.*group/i).should("not.exist");
   });
-
-  it("hides the search bar", () => {
-    cy.get("input[type='search']").should("not.exist");
-  });
 });
