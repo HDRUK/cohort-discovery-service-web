@@ -14,7 +14,7 @@ import {
   userLabel,
   valueLabel,
   withOverriddenSubjects,
-} from "./overrideRules";
+} from "@/utils/overrideRules";
 
 const SUBJECT_LABELS: Record<RuleSubject, string> = {
   workgroups: "Workgroups",

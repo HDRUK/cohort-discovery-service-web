@@ -25,7 +25,7 @@ import {
   toUpdate,
   userLabel,
   valueLabel,
-} from "./overrideRules";
+} from "@/utils/overrideRules";
 
 const PRECEDENCE_HELP =
   "A user's own rule always wins. Otherwise the flag is on if any of their workgroups is in the On rule, even if another of their workgroups is in the Off rule. To switch it off for someone in an On workgroup, add them to the Off rule as a user. Deactivated workgroups still count.";

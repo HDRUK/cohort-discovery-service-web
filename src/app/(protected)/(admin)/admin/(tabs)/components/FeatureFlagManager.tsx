@@ -17,7 +17,7 @@ import {
 import { FeatureOverrides } from "@/types/features";
 import { FeatureOverrideRules } from "./FeatureOverrideRules";
 import GlobalValueSwitch from "./GlobalValueSwitch";
-import { overrideCount, overriddenHelp } from "./overrideRules";
+import { overrideCount, overriddenHelp } from "@/utils/overrideRules";
 
 interface FeatureFlagTableProps {
   group: FeatureFlagGroup;
