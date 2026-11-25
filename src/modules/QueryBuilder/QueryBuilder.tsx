@@ -1,6 +1,7 @@
 "use client";
 import useQueryBuilder from "@/hooks/useQueryBuilder";
 
+import { Typography } from "@mui/material";
 import { useCallback, useRef, useEffect } from "react";
 import ActionMenu from "../ActionMenu";
 import RuleMenu from "../RuleMenu";
@@ -17,13 +18,15 @@ import { CohortBuilderProvider } from "@/providers/CohortBuilderProvider";
 import useFeatures from "@/hooks/useFeatures";
 import useSearchParams from "@/hooks/useSearchParams";
 
-const QueryBuilder = ({
-  query,
-  errorOnDrag = false,
-}: {
+interface QueryBuilderProps {
   query?: Query;
   errorOnDrag?: boolean;
-}) => {
+}
+
+const QueryBuilderBoard = ({
+  query,
+  errorOnDrag = false,
+}: QueryBuilderProps) => {
   const { queryBuilderLeaveConfirm, queryBuilderUseDemographicRule } =
     useFeatures();
   const { queryBuilderJson, setQueryBuilderJson, select, deselect } =
@@ -95,6 +98,20 @@ const QueryBuilder = ({
       </ThreePaneProvider>
     </CohortBuilderProvider>
   );
+};
+
+const QueryBuilder = (props: QueryBuilderProps) => {
+  const { queryBuilder } = useFeatures();
+
+  if (!queryBuilder) {
+    return (
+      <Typography variant="body2" color="text.secondary" sx={{ p: 2 }}>
+        The query builder is switched off. Ask an administrator to turn it on.
+      </Typography>
+    );
+  }
+
+  return <QueryBuilderBoard {...props} />;
 };
 
 export default QueryBuilder;

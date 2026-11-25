@@ -7,6 +7,7 @@ import { getQueryJson } from "./__mocks__/getQueryJson";
 
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 import { Query } from "@/types/api";
+import { DEFAULT_FLAGS, FeatureName } from "@/types/features";
 
 let mockUrlQueryPid: string | null = null;
 jest.mock("@/hooks/useSearchParams", () => ({
@@ -198,5 +199,36 @@ describe("QueryBuilder", () => {
         exact: false,
       }),
     ).toBeInTheDocument();
+  });
+});
+
+describe("QueryBuilder query-builder flag", () => {
+  const renderWithFlag = (enabled: boolean) =>
+    render(
+      <MockCohortDiscoveryServiceStore
+        overrides={{
+          featureFlags: {
+            flags: { ...DEFAULT_FLAGS, [FeatureName.QueryBuilder]: enabled },
+          },
+        }}
+      >
+        <QueryBuilder />
+      </MockCohortDiscoveryServiceStore>,
+    );
+
+  it("explains that the builder is switched off when the flag is off", () => {
+    renderWithFlag(false);
+
+    expect(
+      screen.getByText(/The query builder is switched off/),
+    ).toBeInTheDocument();
+  });
+
+  it("shows the builder when the flag is on", () => {
+    renderWithFlag(true);
+
+    expect(
+      screen.queryByText(/The query builder is switched off/),
+    ).not.toBeInTheDocument();
   });
 });

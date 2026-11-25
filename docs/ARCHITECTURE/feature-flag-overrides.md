@@ -15,28 +15,27 @@ The admin table must show global values. Otherwise an admin who has an override 
 
 ## Admin UI
 
-Configuration → **Feature flags** (`FeatureFlagManager`) shows one table per group of flags. `src/config/featureFlags.ts` gives each flag its group and a one-line description. The description says whether the API enforces the flag, or whether it only changes what the web app shows. A flag missing from that file goes under **Other** with no description, so add an entry whenever the API gains a flag.
+Configuration → **Feature flags** (`FeatureFlagManager`) shows one paper per group of flags, with the page background between them. `src/config/featureFlags.ts` gives each flag its group and a one-line description. The description says whether the API enforces the flag, or whether it only changes what the web app shows. A flag missing from that file goes under **Other** with no description, so add an entry whenever the API gains a flag.
 
-Each table has three columns:
+Each table has three columns, in this order:
+- **Global value:** a switch for the global value. Switching it saves straight away through `updateFeatureFlag`. The switch shows the new value while the save runs, then the value from the API. If the save fails, it shows an error notification.
+- **Status** (narrow, no heading): a warning sign when any workgroup or user has an override; its tooltip gives the count and says that changing the global value doesn't change theirs. A lock instead for a flag the API marks `overridable: false` or sends without the field ("global only"). Those rows don't expand, because `renderDetailPanel` returns nothing for them, and the API rejects overrides on them. The API's `config/features.php` lists them and says why.
 - **Flag:** the flag name and its description.
-- **Global value:** a switch for the global value. Switching it saves straight away through `updateFeatureFlag`. The switch shows the new value while the save runs, then the value from the API. If the save fails, it shows an error notification. A warning sign appears next to the switch when any workgroup or user has an override, because changing the global value doesn't change theirs.
-- **Overrides:** how many workgroups and users have an override, or "Global only" for a flag the API marks `overridable: false`. Those rows don't expand, because `renderDetailPanel` returns nothing for them, and the API rejects overrides on them. The API's `config/features.php` lists them and says why.
 
-Each row expands into its override rules (`FeatureOverrideRules`):
-- There are at most two rules, **On** and **Off**. Each picks workgroups and users with a multi-select. The API stores one value per workgroup or user, so a workgroup or user can only be in one rule; the other rule's picker shows it as disabled.
-- **Add rule** adds the missing rule. A flag's first rule takes the opposite of the global value, since a rule that matches the global value only matters when it outranks another rule.
-- A rule's value can be switched only while it is the only rule.
+Each other row expands into a tinted panel listing its override rules (`FeatureOverrideRules`):
+- There are at most two rules, **On** and **Off**. Each lists its workgroups and users as chips, with edit and remove buttons. The API stores one value per workgroup or user, so a workgroup or user can only be in one rule; the other rule's picker shows it as disabled.
+- **Add override** and the edit button open a modal (`FeatureOverrideModal`) with the value switch and the Workgroups and Users pickers. Adding merges into the rule with the chosen value, creating it if needed. A flag's first rule defaults to the opposite of the global value, since a rule that matches the global value only matters when it outranks another rule. Editing replaces that rule's workgroups and users, and its value is fixed. Remove asks for confirmation first.
 - The help text above the rules explains the precedence. An On workgroup beats an Off workgroup, so switching the flag off for one person in an On workgroup needs a user rule. Deactivated workgroups still count.
-- Edits stay local until **Save**, which sends the whole set to `PUT /api/v1/features/{name}/overrides` through the `replaceFeatureOverrides` server action. Anything not in the rules is cleared. **Reset** discards the edits. Both buttons are disabled until something changes.
+- Every change saves immediately: the modal's Save or the confirmed remove sends the whole set to `PUT /api/v1/features/{name}/overrides` through the `replaceFeatureOverrides` server action. Anything not in the rules is cleared. A failed save shows an error notification and keeps the modal open. The pure rule logic is in `overrideRules.ts`.
 - The pickers use the admin section's users and workgroups lists. A workgroup or user with an override that isn't in those lists still shows, using the name from the overrides response.
 
-Unsaved edits are held by the group's table, not by the rules panel. The table library unmounts a detail panel when its row collapses, so edits kept in the panel would be lost. `replaceFeatureOverrides` calls `updateTag(CACHE_TAGS.features)`, which refreshes the admin section data. A successful save drops the edits, so the panel shows the saved rules. A failed save shows an error notification and keeps the edits.
+`replaceFeatureOverrides` calls `updateTag(CACHE_TAGS.features)`, which refreshes the admin section data, so the list updates once the save finishes.
 
 ## Cache lag
 
 `getFeatureFlags` and `getFeatureOverrides` use `"use cache: private"` with `FEATURE_FLAGS_CACHE_LIFE`, which has a `stale` time of 30 seconds. In production, a private cache isn't stored on the server, so every request reads the API. The delay comes only from each browser's router cache, which reuses a page for its `stale` time while the user moves around the app.
 
-- The admin who makes a change sees it straight away, because `updateTag` clears their router cache.
+- The admin who makes a change sees it straight away, because `updateTag` clears their router cache. The global switch also keeps its new value on screen until the refreshed data differs from the value it had when toggled, so it doesn't flicker back to the old value while the refresh arrives.
 - Other users and admins see it the next time they load a page, or within 30 seconds if they are moving around the app.
 - Where the API honours overrides, such as query submission, it checks the user's effective value on every request, so the delay only affects what the UI shows.
 

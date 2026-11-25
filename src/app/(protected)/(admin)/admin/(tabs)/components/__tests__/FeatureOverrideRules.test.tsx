@@ -1,11 +1,10 @@
 import "@testing-library/jest-dom";
-import { useState } from "react";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 import { User, Workgroup } from "@/types/api";
 import { FeatureOverrides } from "@/types/features";
-import { FeatureOverrideRules, OverrideRule } from "../FeatureOverrideRules";
+import { FeatureOverrideRules } from "../FeatureOverrideRules";
 
 const mockReplaceFeatureOverrides = jest.fn();
 
@@ -44,22 +43,11 @@ const withoutOverrides: FeatureOverrides = {
   workgroups: [],
 };
 
-const RulesWithDraft = ({ feature }: { feature: FeatureOverrides }) => {
-  const [draft, setDraft] = useState<OverrideRule[]>();
-  return (
-    <FeatureOverrideRules
-      feature={feature}
-      draft={draft}
-      onDraftChange={setDraft}
-    />
-  );
-};
-
 const rulesFor = (feature: FeatureOverrides) => (
   <MockCohortDiscoveryServiceStore
     overrides={{ adminSection: { users, workgroups } }}
   >
-    <RulesWithDraft feature={feature} />
+    <FeatureOverrideRules feature={feature} />
   </MockCohortDiscoveryServiceStore>
 );
 
@@ -68,54 +56,124 @@ const renderRules = (feature: FeatureOverrides) => render(rulesFor(feature));
 const rule = (value: "On" | "Off") =>
   within(screen.getByRole("group", { name: `${value} rule` }));
 
+const dialog = () => within(screen.getByRole("dialog"));
+
 describe("FeatureOverrideRules", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockReplaceFeatureOverrides.mockResolvedValue(undefined);
   });
 
-  it("groups overrides into an on rule and an off rule", () => {
+  it("lists the on rule and the off rule with who is in them", () => {
     renderRules(withOverrides);
 
     expect(rule("On").getByText("UK-RESEARCH")).toBeInTheDocument();
     expect(
       rule("Off").getByText("Jane Doe (jane@example.com)"),
     ).toBeInTheDocument();
-    expect(rule("On").getByRole("switch")).toBeChecked();
-    expect(rule("On").getByRole("switch")).toBeDisabled();
-    expect(rule("Off").getByRole("switch")).not.toBeChecked();
-    expect(
-      screen.queryByRole("button", { name: "Add rule" }),
-    ).not.toBeInTheDocument();
   });
 
-  it("saves a new rule with the opposite of the global value", async () => {
+  it("explains an empty list", () => {
+    renderRules(withoutOverrides);
+
+    expect(screen.getByText(/No override rules/)).toBeInTheDocument();
+  });
+
+  it("adds an override with the opposite of the global value", async () => {
     const user = userEvent.setup();
     renderRules(withoutOverrides);
 
-    await user.click(screen.getByRole("button", { name: "Add rule" }));
-    await user.click(rule("On").getByRole("combobox", { name: "Workgroups" }));
+    await user.click(screen.getByRole("button", { name: "Add override" }));
+    expect(dialog().getByRole("switch")).toBeChecked();
+    await user.click(dialog().getByRole("combobox", { name: "Workgroups" }));
     await user.click(screen.getByRole("option", { name: "UK-INDUSTRY" }));
-    await user.click(rule("On").getByRole("combobox", { name: "Users" }));
+    await user.click(dialog().getByRole("combobox", { name: "Users" }));
     await user.click(
       screen.getByRole("option", { name: "John Smith (john@example.com)" }),
     );
-    await user.click(screen.getByRole("button", { name: "Save" }));
+    await user.click(dialog().getByRole("button", { name: "Save" }));
 
     expect(mockReplaceFeatureOverrides).toHaveBeenCalledWith(FEATURE, {
       users: [{ id: 2, enabled: true }],
       workgroups: [{ id: 11, enabled: true }],
     });
+    await waitFor(() =>
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument(),
+    );
   });
 
-  it("clears a removed rule's overrides on save", async () => {
+  it("adds to an existing rule without losing what is already in it", async () => {
+    const user = userEvent.setup();
+    renderRules(withOverrides);
+
+    await user.click(screen.getByRole("button", { name: "Add override" }));
+    expect(dialog().getByRole("switch")).not.toBeChecked();
+    await user.click(dialog().getByRole("combobox", { name: "Users" }));
+    await user.click(
+      screen.getByRole("option", { name: "John Smith (john@example.com)" }),
+    );
+    await user.click(dialog().getByRole("button", { name: "Save" }));
+
+    expect(mockReplaceFeatureOverrides).toHaveBeenCalledWith(FEATURE, {
+      users: [
+        { id: 1, enabled: false },
+        { id: 2, enabled: false },
+      ],
+      workgroups: [{ id: 10, enabled: true }],
+    });
+  });
+
+  it("only enables save once someone is chosen", async () => {
+    const user = userEvent.setup();
+    renderRules(withoutOverrides);
+
+    await user.click(screen.getByRole("button", { name: "Add override" }));
+
+    expect(dialog().getByRole("button", { name: "Save" })).toBeDisabled();
+  });
+
+  it("does not offer a subject that is already in the other rule", async () => {
+    const user = userEvent.setup();
+    renderRules(withOverrides);
+
+    await user.click(screen.getByRole("button", { name: "Add override" }));
+    await user.click(dialog().getByRole("switch"));
+    await user.click(dialog().getByRole("combobox", { name: "Users" }));
+
+    expect(
+      screen.getByRole("option", { name: "Jane Doe (jane@example.com)" }),
+    ).toHaveAttribute("aria-disabled", "true");
+  });
+
+  it("edits a rule with its subjects filled in and its value fixed", async () => {
+    const user = userEvent.setup();
+    renderRules(withOverrides);
+
+    await user.click(screen.getByRole("button", { name: "Edit the on rule" }));
+    expect(dialog().getByText("UK-RESEARCH")).toBeInTheDocument();
+    expect(dialog().getByRole("switch")).toBeDisabled();
+    await user.click(dialog().getByRole("combobox", { name: "Workgroups" }));
+    await user.click(screen.getByRole("option", { name: "UK-INDUSTRY" }));
+    await user.click(dialog().getByRole("button", { name: "Save" }));
+
+    expect(mockReplaceFeatureOverrides).toHaveBeenCalledWith(FEATURE, {
+      users: [{ id: 1, enabled: false }],
+      workgroups: [
+        { id: 10, enabled: true },
+        { id: 11, enabled: true },
+      ],
+    });
+  });
+
+  it("removes a rule once the removal is confirmed", async () => {
     const user = userEvent.setup();
     renderRules(withOverrides);
 
     await user.click(
       screen.getByRole("button", { name: "Remove the off rule" }),
     );
-    await user.click(screen.getByRole("button", { name: "Save" }));
+    expect(mockReplaceFeatureOverrides).not.toHaveBeenCalled();
+    await user.click(dialog().getByRole("button", { name: "Remove" }));
 
     expect(mockReplaceFeatureOverrides).toHaveBeenCalledWith(FEATURE, {
       users: [],
@@ -123,94 +181,19 @@ describe("FeatureOverrideRules", () => {
     });
   });
 
-  it("can switch a single rule's value", async () => {
-    const user = userEvent.setup();
-    renderRules({ ...withOverrides, users: [] });
-
-    await user.click(rule("On").getByRole("switch"));
-    await user.click(screen.getByRole("button", { name: "Save" }));
-
-    expect(mockReplaceFeatureOverrides).toHaveBeenCalledWith(FEATURE, {
-      users: [],
-      workgroups: [{ id: 10, enabled: false }],
-    });
-  });
-
-  it("does not offer a subject that is already in the other rule", async () => {
-    const user = userEvent.setup();
-    renderRules(withOverrides);
-
-    await user.click(rule("On").getByRole("combobox", { name: "Users" }));
-
-    expect(
-      screen.getByRole("option", { name: "Jane Doe (jane@example.com)" }),
-    ).toHaveAttribute("aria-disabled", "true");
-  });
-
-  it("only enables save and reset once something changes", async () => {
-    const user = userEvent.setup();
-    renderRules(withOverrides);
-
-    expect(screen.getByRole("button", { name: "Save" })).toBeDisabled();
-    expect(screen.getByRole("button", { name: "Reset" })).toBeDisabled();
-
-    await user.click(
-      screen.getByRole("button", { name: "Remove the off rule" }),
-    );
-    expect(screen.getByRole("button", { name: "Save" })).toBeEnabled();
-
-    await user.click(screen.getByRole("button", { name: "Reset" }));
-    expect(rule("Off").getByRole("switch")).not.toBeChecked();
-    expect(screen.getByRole("button", { name: "Save" })).toBeDisabled();
-  });
-
-  it("shows the saved rules once a save has finished", async () => {
-    const user = userEvent.setup();
-    const { rerender } = renderRules(withOverrides);
-
-    await user.click(
-      screen.getByRole("button", { name: "Remove the off rule" }),
-    );
-    await user.click(screen.getByRole("button", { name: "Save" }));
-    rerender(rulesFor({ ...withOverrides, users: [] }));
-
-    expect(
-      screen.queryByRole("group", { name: "Off rule" }),
-    ).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Save" })).toBeDisabled();
-  });
-
-  it("keeps the edits when the save fails", async () => {
+  it("keeps the modal open and shows an error when the save fails", async () => {
     mockReplaceFeatureOverrides.mockRejectedValue(new Error("save failed"));
     const user = userEvent.setup();
-    renderRules(withOverrides);
+    renderRules(withoutOverrides);
 
-    await user.click(
-      screen.getByRole("button", { name: "Remove the off rule" }),
-    );
-    await user.click(screen.getByRole("button", { name: "Save" }));
-
-    await screen.findByText(/Could not save the overrides/);
-    await waitFor(() =>
-      expect(screen.getByRole("button", { name: "Save" })).toBeEnabled(),
-    );
-    expect(
-      screen.queryByRole("group", { name: "Off rule" }),
-    ).not.toBeInTheDocument();
-  });
-
-  it("shows an error when the save fails", async () => {
-    mockReplaceFeatureOverrides.mockRejectedValue(new Error("save failed"));
-    const user = userEvent.setup();
-    renderRules(withOverrides);
-
-    await user.click(
-      screen.getByRole("button", { name: "Remove the off rule" }),
-    );
-    await user.click(screen.getByRole("button", { name: "Save" }));
+    await user.click(screen.getByRole("button", { name: "Add override" }));
+    await user.click(dialog().getByRole("combobox", { name: "Workgroups" }));
+    await user.click(screen.getByRole("option", { name: "UK-INDUSTRY" }));
+    await user.click(dialog().getByRole("button", { name: "Save" }));
 
     expect(
       await screen.findByText(/Could not save the overrides/),
     ).toBeInTheDocument();
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
 });

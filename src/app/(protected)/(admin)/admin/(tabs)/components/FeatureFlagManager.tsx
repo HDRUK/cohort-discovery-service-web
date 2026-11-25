@@ -11,6 +11,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import Table from "@/components/Table";
 import { useTable } from "@/hooks/useTable";
@@ -23,20 +24,23 @@ import {
   featureFlagDetails,
 } from "@/config/featureFlags";
 import { FeatureOverrides } from "@/types/features";
-import { FeatureOverrideRules, OverrideRule } from "./FeatureOverrideRules";
+import { FeatureOverrideRules } from "./FeatureOverrideRules";
 
-const OVERRIDDEN_HELP =
-  "Some workgroups or users have their own value for this flag. Changing the global value doesn't change theirs.";
+const GLOBAL_ONLY_HELP = "Global only: this flag can't be overridden.";
 
 const overrideCount = ({ users, workgroups }: FeatureOverrides) =>
   users.length + workgroups.length;
 
-const overridesSummary = (feature: FeatureOverrides) => {
-  if (!feature.overridable) return "Global only";
-  const count = overrideCount(feature);
-  if (count === 0) return "—";
-  return count === 1 ? "1 override" : `${count} overrides`;
-};
+const overriddenHelp = (count: number) =>
+  `${count === 1 ? "1 override" : `${count} overrides`}: some workgroups or users have their own value for this flag. Changing the global value doesn't change theirs.`;
+
+interface OptimisticGlobal {
+  value: boolean;
+  serverValue: boolean;
+}
+
+const shownGlobal = (global: boolean, optimistic?: OptimisticGlobal) =>
+  optimistic && optimistic.serverValue === global ? optimistic.value : global;
 
 interface FeatureFlagTableProps {
   group: FeatureFlagGroup;
@@ -45,86 +49,64 @@ interface FeatureFlagTableProps {
 
 const FeatureFlagTable = ({ group, features }: FeatureFlagTableProps) => {
   const [optimisticGlobals, setOptimisticGlobals] = useState<
-    Record<string, boolean>
+    Record<string, OptimisticGlobal>
   >({});
   const [savingKeys, setSavingKeys] = useState<string[]>([]);
-  const [drafts, setDrafts] = useState<Record<string, OverrideRule[]>>({});
   const notify = useNotify();
 
+  const discardOptimisticGlobal = useCallback(
+    (key: string) =>
+      setOptimisticGlobals((current) => {
+        const remaining = { ...current };
+        delete remaining[key];
+        return remaining;
+      }),
+    [],
+  );
+
   const handleToggleFeature = useCallback(
-    async (key: string, newValue: boolean) => {
-      setOptimisticGlobals((current) => ({ ...current, [key]: newValue }));
+    async (key: string, newValue: boolean, serverValue: boolean) => {
+      setOptimisticGlobals((current) => ({
+        ...current,
+        [key]: { value: newValue, serverValue },
+      }));
       setSavingKeys((keys) => [...keys, key]);
       try {
         await updateFeatureFlag(key, { enabled: newValue });
       } catch {
+        discardOptimisticGlobal(key);
         notify.error(
           `Could not save the "${key}" flag, so it has been switched back. Try again, or refresh the page if it keeps failing.`,
         );
       } finally {
-        setOptimisticGlobals((current) => {
-          const settled = { ...current };
-          delete settled[key];
-          return settled;
-        });
         setSavingKeys((keys) => keys.filter((k) => k !== key));
       }
     },
-    [notify],
-  );
-
-  const setDraft = useCallback(
-    (feature: string, draft: OverrideRule[] | undefined) =>
-      setDrafts((current) => {
-        const next = { ...current };
-        if (draft) next[feature] = draft;
-        else delete next[feature];
-        return next;
-      }),
-    [],
+    [notify, discardOptimisticGlobal],
   );
 
   const columns = useMemo<MRT_ColumnDef<FeatureOverrides>[]>(
     () => [
       {
-        accessorKey: "feature",
-        header: "Flag",
-        Cell: ({ row }) => (
-          <Stack>
-            <Typography variant="body2">{row.original.feature}</Typography>
-            <Typography variant="caption" color="text.secondary">
-              {featureFlagDetails(row.original.feature).description}
-            </Typography>
-          </Stack>
-        ),
-      },
-      {
         id: "global",
         header: "Global value",
+        size: 130,
+        grow: false,
         Cell: ({ row }) => {
           const { feature, global } = row.original;
           const isSaving = savingKeys.includes(feature);
           return (
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <Switch
-                checked={optimisticGlobals[feature] ?? global}
+                checked={shownGlobal(global, optimisticGlobals[feature])}
                 disabled={isSaving}
                 slotProps={{
                   input: { "aria-label": `${feature} global value` },
                 }}
                 onChange={(event) =>
-                  handleToggleFeature(feature, event.target.checked)
+                  handleToggleFeature(feature, event.target.checked, global)
                 }
               />
-              {overrideCount(row.original) > 0 && (
-                <Tooltip title={OVERRIDDEN_HELP} describeChild>
-                  <WarningAmberIcon
-                    color="warning"
-                    fontSize="small"
-                    titleAccess={`${feature} has overrides`}
-                  />
-                </Tooltip>
-              )}
               <CircularProgress
                 size={16}
                 sx={{ visibility: isSaving ? "visible" : "hidden" }}
@@ -134,9 +116,48 @@ const FeatureFlagTable = ({ group, features }: FeatureFlagTableProps) => {
         },
       },
       {
-        id: "overrides",
-        header: "Overrides",
-        Cell: ({ row }) => overridesSummary(row.original),
+        id: "status",
+        header: "",
+        size: 48,
+        grow: false,
+        Cell: ({ row }) => {
+          const { feature } = row.original;
+          if (!row.original.overridable) {
+            return (
+              <Tooltip title={GLOBAL_ONLY_HELP} describeChild>
+                <LockOutlinedIcon
+                  color="action"
+                  fontSize="small"
+                  titleAccess={`${feature} is global only`}
+                />
+              </Tooltip>
+            );
+          }
+          const count = overrideCount(row.original);
+          if (count === 0) return null;
+          return (
+            <Tooltip title={overriddenHelp(count)} describeChild>
+              <WarningAmberIcon
+                color="warning"
+                fontSize="small"
+                titleAccess={`${feature} has overrides`}
+              />
+            </Tooltip>
+          );
+        },
+      },
+      {
+        accessorKey: "feature",
+        header: "Flag",
+        grow: true,
+        Cell: ({ row }) => (
+          <Stack>
+            <Typography variant="body2">{row.original.feature}</Typography>
+            <Typography variant="caption" color="text.secondary">
+              {featureFlagDetails(row.original.feature).description}
+            </Typography>
+          </Stack>
+        ),
       },
     ],
     [optimisticGlobals, savingKeys, handleToggleFeature],
@@ -147,21 +168,27 @@ const FeatureFlagTable = ({ group, features }: FeatureFlagTableProps) => {
     data: features,
     enableRowSelection: false,
     enableExpanding: true,
+    layoutMode: "grid",
+    displayColumnDefOptions: {
+      "mrt-row-actions": { visibleInShowHideMenu: false },
+      "mrt-row-expand": { size: 48, grow: false },
+    },
     getRowId: ({ feature }) => feature,
     renderDetailPanel: ({ row }) =>
       row.original.overridable ? (
-        <Paper
-          variant="outlined"
-          sx={{ p: 2 }}
+        <Box
+          sx={{
+            p: 2,
+            backgroundColor: "background.default",
+            borderLeft: 4,
+            borderColor: "divider",
+            borderRadius: 1,
+          }}
           onClick={(event) => event.stopPropagation()}
           onMouseDown={(event) => event.stopPropagation()}
         >
-          <FeatureOverrideRules
-            feature={row.original}
-            draft={drafts[row.original.feature]}
-            onDraftChange={(draft) => setDraft(row.original.feature, draft)}
-          />
-        </Paper>
+          <FeatureOverrideRules feature={row.original} />
+        </Box>
       ) : null,
   });
 
@@ -195,7 +222,9 @@ export const FeatureFlagManager = () => {
   return (
     <Stack gap={3}>
       {groups.map(({ group, features }) => (
-        <FeatureFlagTable key={group} group={group} features={features} />
+        <Paper key={group} sx={{ p: 2 }}>
+          <FeatureFlagTable group={group} features={features} />
+        </Paper>
       ))}
     </Stack>
   );

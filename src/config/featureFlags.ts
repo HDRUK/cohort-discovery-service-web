@@ -16,7 +16,8 @@ interface FeatureFlagDetails {
 export const FEATURE_FLAG_DETAILS: Record<string, FeatureFlagDetails> = {
   "query-builder": {
     group: "Query builder",
-    description: "Not used at the moment.",
+    description:
+      "Shows the rule builder on the New query page. When off, users see a message instead and can only use the free-text query input.",
   },
   "query-builder-use-leave-confirmation": {
     group: "Query builder",
@@ -43,7 +44,8 @@ export const FEATURE_FLAG_DETAILS: Record<string, FeatureFlagDetails> = {
   },
   "query-nlp": {
     group: "Query builder",
-    description: "Not used at the moment.",
+    description:
+      "Shows the free-text search bar on the New query page. When off, users build queries from the rule builder only.",
   },
   "query-builder-use-value-as-number": {
     group: "Rule types",

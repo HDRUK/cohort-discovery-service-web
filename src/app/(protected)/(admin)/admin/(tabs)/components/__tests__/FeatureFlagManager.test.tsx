@@ -73,7 +73,7 @@ describe("FeatureFlagManager", () => {
     jest.clearAllMocks();
   });
 
-  it("shows the global value and override count of each flag", () => {
+  it("shows the global value of each flag", () => {
     renderManager();
 
     expect(locationSwitch()).not.toBeChecked();
@@ -82,13 +82,13 @@ describe("FeatureFlagManager", () => {
         name: `${FeatureName.AccessBanner} global value`,
       }),
     ).toBeChecked();
-    expect(screen.getByText("1 override")).toBeInTheDocument();
+    expect(screen.queryByText("Overrides")).not.toBeInTheDocument();
   });
 
   it("saves the new global value", async () => {
     mockUpdateFeatureFlag.mockResolvedValue(undefined);
     const user = userEvent.setup();
-    const { rerender } = renderManager();
+    renderManager();
 
     await user.click(locationSwitch());
 
@@ -96,24 +96,23 @@ describe("FeatureFlagManager", () => {
       FeatureName.QueryBuilderUseLocation,
       { enabled: true },
     );
-    rerender(
-      managerWith(withGlobal(FeatureName.QueryBuilderUseLocation, true)),
-    );
-    await waitFor(() => expect(locationSwitch()).toBeChecked());
   });
 
-  it("shows the saved global value once a save has finished", async () => {
+  it("keeps the new global value while the refreshed data is on its way", async () => {
     mockUpdateFeatureFlag.mockResolvedValue(undefined);
     const user = userEvent.setup();
     const { rerender } = renderManager();
 
     await user.click(locationSwitch());
     await waitFor(() => expect(locationSwitch()).toBeEnabled());
+
+    expect(locationSwitch()).toBeChecked();
+
     rerender(
-      managerWith(withGlobal(FeatureName.QueryBuilderUseLocation, false)),
+      managerWith(withGlobal(FeatureName.QueryBuilderUseLocation, true)),
     );
 
-    expect(locationSwitch()).not.toBeChecked();
+    expect(locationSwitch()).toBeChecked();
   });
 
   it("marks a global value that some workgroups or users override", () => {
@@ -131,6 +130,21 @@ describe("FeatureFlagManager", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("marks a global-only flag with a lock instead of an overrides column", () => {
+    renderManager();
+
+    expect(
+      rowOf(FeatureName.FlattenNestedGroups).getByRole("img", {
+        name: `${FeatureName.FlattenNestedGroups} is global only`,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("img", {
+        name: `${FeatureName.AccessBanner} is global only`,
+      }),
+    ).not.toBeInTheDocument();
+  });
+
   it("groups the flags and describes each one", () => {
     renderManager();
 
@@ -142,40 +156,6 @@ describe("FeatureFlagManager", () => {
         /Lets users query by location/,
       ),
     ).toBeInTheDocument();
-  });
-
-  it("keeps unsaved rule edits when a flag is collapsed", async () => {
-    const user = userEvent.setup();
-    renderManager();
-
-    await user.click(
-      rowOf(FeatureName.QueryBuilderUseLocation).getByRole("button", {
-        name: "Expand",
-      }),
-    );
-    await user.click(
-      screen.getByRole("button", { name: "Remove the on rule" }),
-    );
-    await user.click(
-      rowOf(FeatureName.QueryBuilderUseLocation).getByRole("button", {
-        name: "Expand",
-      }),
-    );
-    await waitFor(() =>
-      expect(
-        screen.queryByRole("button", { name: "Save" }),
-      ).not.toBeInTheDocument(),
-    );
-    await user.click(
-      rowOf(FeatureName.QueryBuilderUseLocation).getByRole("button", {
-        name: "Expand",
-      }),
-    );
-
-    expect(
-      screen.queryByRole("group", { name: "On rule" }),
-    ).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Save" })).toBeEnabled();
   });
 
   it("switches back when the save fails", async () => {
@@ -210,9 +190,6 @@ describe("FeatureFlagManager", () => {
     renderManager();
 
     expect(
-      rowOf(FeatureName.FlattenNestedGroups).getByText("Global only"),
-    ).toBeInTheDocument();
-    expect(
       rowOf(FeatureName.FlattenNestedGroups).getByRole("button", {
         name: "Expand",
       }),
@@ -222,5 +199,27 @@ describe("FeatureFlagManager", () => {
         name: "Expand",
       }),
     ).toBeEnabled();
+  });
+
+  it("treats a flag the API sends without overridable as global only", () => {
+    render(
+      managerWith([
+        {
+          feature: FeatureName.AccessBanner,
+          global: true,
+          users: [],
+          workgroups: [],
+        },
+      ]),
+    );
+
+    expect(
+      rowOf(FeatureName.AccessBanner).getByRole("img", {
+        name: `${FeatureName.AccessBanner} is global only`,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      rowOf(FeatureName.AccessBanner).getByRole("button", { name: "Expand" }),
+    ).toBeDisabled();
   });
 });
