@@ -30,10 +30,12 @@ export default defineConfig({
           role = "user",
           isAdmin = false,
           custodianPid,
+          disabledFeatures = [],
         }: {
           role?: string;
           isAdmin?: boolean;
           custodianPid?: string;
+          disabledFeatures?: string[];
         } = {}) {
           const payload = {
             user: {
@@ -51,6 +53,7 @@ export default defineConfig({
               cohort_admin_teams: custodianPid
                 ? [{ id: 1, name: "Test Custodian" }]
                 : [],
+              disabled_features: disabledFeatures,
             },
           };
           return jwt.sign(payload, CYPRESS_JWT_SECRET, { expiresIn: "1h" });

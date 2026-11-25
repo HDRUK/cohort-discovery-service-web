@@ -11,7 +11,11 @@ declare global {
        */
       login(
         role?: "user" | "admin",
-        opts?: { isAdmin?: boolean; custodianPid?: string }
+        opts?: {
+          isAdmin?: boolean;
+          custodianPid?: string;
+          disabledFeatures?: string[];
+        }
       ): Chainable<void>;
 
       /** Remove the auth cookie, simulating a logged-out state. */
@@ -22,11 +26,19 @@ declare global {
 
 Cypress.Commands.add(
   "login",
-  (role = "user", opts: { isAdmin?: boolean; custodianPid?: string } = {}) => {
+  (
+    role = "user",
+    opts: {
+      isAdmin?: boolean;
+      custodianPid?: string;
+      disabledFeatures?: string[];
+    } = {},
+  ) => {
     cy.task("generateToken", {
       role,
       isAdmin: opts.isAdmin ?? role === "admin",
       custodianPid: opts.custodianPid,
+      disabledFeatures: opts.disabledFeatures,
     }).then((token) => {
       // Cookie name matches ACCESS_TOKEN_NAME default ("token").
       // domain must be explicit so the cookie is sent on the very first
