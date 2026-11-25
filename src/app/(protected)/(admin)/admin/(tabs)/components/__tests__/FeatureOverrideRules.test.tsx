@@ -145,13 +145,12 @@ describe("FeatureOverrideRules", () => {
     ).toHaveAttribute("aria-disabled", "true");
   });
 
-  it("edits a rule with its subjects filled in and its value fixed", async () => {
+  it("edits a rule with its subjects filled in", async () => {
     const user = userEvent.setup();
     renderRules(withOverrides);
 
     await user.click(screen.getByRole("button", { name: "Edit the on rule" }));
     expect(dialog().getByText("UK-RESEARCH")).toBeInTheDocument();
-    expect(dialog().getByRole("switch")).toBeDisabled();
     await user.click(dialog().getByRole("combobox", { name: "Workgroups" }));
     await user.click(screen.getByRole("option", { name: "UK-INDUSTRY" }));
     await user.click(dialog().getByRole("button", { name: "Save" }));
@@ -162,6 +161,23 @@ describe("FeatureOverrideRules", () => {
         { id: 10, enabled: true },
         { id: 11, enabled: true },
       ],
+    });
+  });
+
+  it("moves a rule to the other value when its switch is flipped", async () => {
+    const user = userEvent.setup();
+    renderRules(withOverrides);
+
+    await user.click(
+      screen.getByRole("button", { name: "Edit the off rule" }),
+    );
+    expect(dialog().getByRole("switch")).toBeEnabled();
+    await user.click(dialog().getByRole("switch"));
+    await user.click(dialog().getByRole("button", { name: "Save" }));
+
+    expect(mockReplaceFeatureOverrides).toHaveBeenCalledWith(FEATURE, {
+      users: [{ id: 1, enabled: true }],
+      workgroups: [{ id: 10, enabled: true }],
     });
   });
 

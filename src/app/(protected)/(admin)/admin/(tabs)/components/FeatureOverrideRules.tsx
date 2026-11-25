@@ -22,7 +22,6 @@ import {
   OverrideRule,
   addToRules,
   removeRule,
-  replaceRule,
   toRules,
   toUpdate,
   userLabel,
@@ -157,7 +156,7 @@ export const FeatureOverrideRules = ({
             save(
               modal.enabled === null
                 ? addToRules(rules, rule)
-                : replaceRule(rules, modal.enabled, rule),
+                : addToRules(removeRule(rules, modal.enabled), rule),
             )
           }
         />

@@ -44,6 +44,7 @@ const FeatureOverrideModal = ({
   const workgroups = useAdminWorkgroups();
   const isEditing = editing !== null;
   const editedRule = rules.find((rule) => rule.enabled === editing);
+  const otherRules = rules.filter((rule) => rule.enabled !== editing);
   const [enabled, setEnabled] = useState(
     editing ?? (rules[0] ? !rules[0].enabled : !feature.global),
   );
@@ -72,7 +73,7 @@ const FeatureOverrideModal = ({
   );
 
   const optionsFor = (subject: RuleSubject, value: boolean) => {
-    const excluded = excludedIds(rules, value, subject);
+    const excluded = excludedIds(otherRules, value, subject);
     return options[subject].map((option) => ({
       ...option,
       disabled: excluded.includes(Number(option.value)),
@@ -83,10 +84,10 @@ const FeatureOverrideModal = ({
     setEnabled(value);
     setSelected((current) => ({
       workgroups: current.workgroups.filter(
-        (id) => !excludedIds(rules, value, "workgroups").includes(id),
+        (id) => !excludedIds(otherRules, value, "workgroups").includes(id),
       ),
       users: current.users.filter(
-        (id) => !excludedIds(rules, value, "users").includes(id),
+        (id) => !excludedIds(otherRules, value, "users").includes(id),
       ),
     }));
   };
@@ -117,7 +118,7 @@ const FeatureOverrideModal = ({
         <Stack direction="row" alignItems="center">
           <Switch
             checked={enabled}
-            disabled={pending || isEditing}
+            disabled={pending}
             slotProps={{ input: { "aria-label": "Override value" } }}
             onChange={(event) => changeValue(event.target.checked)}
           />
