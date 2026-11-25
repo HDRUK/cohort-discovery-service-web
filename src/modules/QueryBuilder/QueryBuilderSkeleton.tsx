@@ -1,20 +1,25 @@
 import { Paper, Typography } from "@mui/material";
+import useFeatures from "@/hooks/useFeatures";
 
-export const QueryBuilderSkeleton = () => (
-  <Paper
-    sx={{
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      alignSelf: "center",
-      flexGrow: 1,
-      maxWidth: "700px",
-    }}
-  >
-    <Typography textAlign="center" px={3} fontSize="large">
-      Start by typing your query keywords in the Natural Language search box, or
-      build your query step-by-step using the buttons under &apos;Insert&apos;
-      in the left-hand menu.
-    </Typography>
-  </Paper>
-);
+export const QueryBuilderSkeleton = () => {
+  const { queryNlp } = useFeatures();
+
+  return (
+    <Paper
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        alignSelf: "center",
+        flexGrow: 1,
+        maxWidth: "700px",
+      }}
+    >
+      <Typography textAlign="center" px={3} fontSize="large">
+        {queryNlp
+          ? "Start by typing your query keywords in the Natural Language search box, or build your query step-by-step using the buttons under 'Insert' in the left-hand menu."
+          : "Build your query step-by-step using the buttons under 'Insert' in the left-hand menu."}
+      </Typography>
+    </Paper>
+  );
+};
