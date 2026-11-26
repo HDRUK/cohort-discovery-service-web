@@ -1,13 +1,10 @@
 import { ReactNode } from "react";
-import { forbidden, notFound } from "next/navigation";
+import Custom403 from "@/app/(error)/403/components/Custom403";
 import UserNotFound from "@/components/UserNotFound";
 import { LoadedSession } from "@/server/loadSession";
-import { isStandalone } from "@/utils/modes";
 import ProtectedPage from "./ProtectedPage";
 import SessionEnded from "./SessionEnded";
 import { SessionAccess } from "@/types/session";
-
-const applicationMode = process.env.APPLICATION_MODE;
 
 const SessionGate = async ({
   session,
@@ -22,10 +19,9 @@ const SessionGate = async ({
     case SessionAccess.SessionEnded:
       return <SessionEnded />;
     case SessionAccess.UserNotFound:
-      if (isStandalone(applicationMode)) notFound();
       return <UserNotFound />;
     case SessionAccess.Forbidden:
-      forbidden();
+      return <Custom403 reason="missing-role" />;
     case SessionAccess.Failed:
       throw new Error(loaded.errorText);
   }

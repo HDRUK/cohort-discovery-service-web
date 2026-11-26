@@ -1,6 +1,6 @@
 # Root layouts and sign-out
 
-Why `src/app/` has no top-level `layout.tsx`, and three route groups that each render their own root layout. Ticket DP-1294 (stack ticket W6).
+Why `src/app/` has no top-level `layout.tsx`, and each route group renders its own root layout. Ticket DP-1294 (stack ticket W6).
 
 ## The problem
 
@@ -20,7 +20,7 @@ Next does a full page load whenever a navigation crosses root layouts (`route-gr
 
 | Group | Root layout | Contains |
 |---|---|---|
-| `(signed-in)` | `(signed-in)/layout.tsx` | `/` (redirects to the dashboard), `forbidden.tsx`, and `(protected)/` with everything behind a session |
+| `(protected)` | `(protected)/layout.tsx` | `/` (redirects to the dashboard) and everything behind a session |
 | `(public)` | `(public)/layout.tsx` | `/login`, `/auth/*`, `/about`, `/terms-and-conditions` |
 | `(error)` | `(error)/layout.tsx` | `/403`, `/user-not-found` |
 
@@ -28,14 +28,20 @@ The shared `<html>`/`<body>`, fonts, theme and providers live in `src/components
 
 Any route from a signed-in page to `/login` or `/403` is now a full page load, whatever starts it: a server `redirect()`, `router.push` or a `<Link>`. Nothing in the header, the menus or `requireSession` needed to change.
 
-`(protected)` sits one level below `(signed-in)` rather than being the root itself, so `forbidden()` and `notFound()` thrown by `SessionGate` in the `(protected)` layout are still caught by the boundary above it (`(signed-in)/forbidden.tsx`).
+### Why `SessionGate` renders its outcomes in place
+
+A segment's `forbidden.tsx` and `not-found.tsx` catch what its children throw, not what its own layout throws. `SessionGate` runs inside the `(protected)` layout, and that layout is now a root, so a `forbidden()` or `notFound()` from it would have no boundary to land in. It renders `<Custom403 reason="missing-role" />` and `<UserNotFound />` directly instead (decision Q8 allowed either). Standalone mode used to call `notFound()` for a user the API doesn't know and showed Next's generic 404; it now shows the user-not-found message, as integrated mode already did.
+
+`forbidden()` and `notFound()` from pages and nested layouts (`AdminGate`, `CustodianSection`, tab pages) are unaffected: they sit below the root and keep their boundaries.
+
+The session reads in `loadSession` (flags, custodians, workgroups, collections) use `ErrorMode.THROW`, so a 404 from one of them would call `notFound()` inside the root layout with no boundary. That needs one of those endpoints to 404 for a signed-in user, which isn't expected.
 
 Unmatched URLs render Next's default 404 (`/_not-found`); no `global-not-found.tsx` is needed.
 
 ## Consequences
 
 - Every move between groups is a full page load: standalone sign-in, the footer's terms and about links, an API 403 redirecting to `/403`, and the HDR UK header links. In-memory state that isn't saved (the query builder) does not survive those moves.
-- Navigation inside `(signed-in)` is unchanged, so the caching measurements in `docs/cache-components/` still hold.
+- Navigation inside `(protected)` is unchanged, so the caching measurements in `docs/cache-components/` still hold.
 - A tab whose session ended elsewhere still shows the old user on pages that make no request, such as `/profile`, until something reaches the server. That is a separate problem.
 
 ## Tests
