@@ -20,6 +20,8 @@ declare global {
 
       /** Remove the auth cookie, simulating a logged-out state. */
       logout(): Chainable<void>;
+
+      hydrated(): Chainable<JQuery<HTMLElement>>;
     }
   }
 }
@@ -57,5 +59,21 @@ Cypress.Commands.add(
 Cypress.Commands.add("logout", () => {
   cy.clearCookie("token");
 });
+
+const REACT_PROPS_KEY_PREFIX = "__reactProps$";
+
+Cypress.Commands.add(
+  "hydrated",
+  { prevSubject: "element" },
+  (subject: JQuery<HTMLElement>) =>
+    cy.wrap(subject).should(($el) => {
+      expect(
+        Object.keys($el[0]).some((key) =>
+          key.startsWith(REACT_PROPS_KEY_PREFIX),
+        ),
+        "element hydrated by React",
+      ).to.equal(true);
+    }),
+);
 
 export {};

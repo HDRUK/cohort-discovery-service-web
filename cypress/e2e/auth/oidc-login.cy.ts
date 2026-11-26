@@ -1,7 +1,7 @@
 describe("SSO sign-in options", () => {
   beforeEach(() => {
     cy.visit("/login");
-    cy.contains("button:visible", "Log in").click();
+    cy.contains("button:visible", "Log in").hydrated().click();
     cy.get('input[type="email"]').should("be.visible");
   });
 

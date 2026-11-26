@@ -6,7 +6,7 @@ const email = () => Cypress.env("CYPRESS_USER_EMAIL") || "test@example.com";
 const password = () => Cypress.env("CYPRESS_USER_PASSWORD") || "password123";
 
 const openAuthScreen = () => {
-  cy.contains("button:visible", "Log in").click();
+  cy.contains("button:visible", "Log in").hydrated().click();
   cy.get('input[type="email"]').should("be.visible");
 };
 
@@ -105,7 +105,7 @@ describe("Logged-out redirects", () => {
     cy.visit("/term-directory");
     cy.url({ timeout: 10000 }).should("include", "/login");
 
-    cy.contains("button:visible", "Log in").click();
+    cy.contains("button:visible", "Log in").hydrated().click();
     cy.get('input[type="email"]').type(email());
     cy.get('input[type="password"]').type(password());
     cy.get('button[type="submit"]').click();
