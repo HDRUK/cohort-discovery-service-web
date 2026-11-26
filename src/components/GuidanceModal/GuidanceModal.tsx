@@ -5,12 +5,12 @@ import { Box } from "@mui/material";
 
 const QueryBuilderGuidance = maskClientTest(
   () =>
-    import("@/app/(protected)/dashboard/(tabs)/components/QueryBuilderGuidance"),
+    import("@/app/(signed-in)/(protected)/dashboard/(tabs)/components/QueryBuilderGuidance"),
 );
 
 const QueryBuilderWelcome = maskClientTest(
   () =>
-    import("@/app/(protected)/dashboard/(tabs)/components/QueryBuilderWelcome"),
+    import("@/app/(signed-in)/(protected)/dashboard/(tabs)/components/QueryBuilderWelcome"),
 );
 
 const GuidanceModal = ({
