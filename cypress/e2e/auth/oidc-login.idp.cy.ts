@@ -2,7 +2,7 @@ const IDP_ORIGIN = "http://localhost:4011";
 
 const signInAtIdp = (username: string, password: string) => {
   cy.visit("/login");
-  cy.contains("button:visible", "Log in").click();
+  cy.contains("button:visible", "Log in").hydrated().click();
   cy.get('input[type="email"]').should("be.visible");
   cy.contains("a", "Single Sign-On").click();
 

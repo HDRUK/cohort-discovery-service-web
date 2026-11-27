@@ -1,63 +1,55 @@
-import { DEFAULT_FLAGS, FeatureName } from "@/types/features";
+import { DEFAULT_FLAGS } from "@/config/featureFlags";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import { useShallow } from "zustand/react/shallow";
-import { useApplicationMode } from "@/providers/ApplicationModeProvider";
 
 const useFeatures = () => {
-  const { isStandalone } = useApplicationMode();
   return useFeatureFlagsStore(
     useShallow((st) => {
       const flags = { ...DEFAULT_FLAGS, ...(st.flags ?? {}) };
 
       return {
-        queryBuilder: flags[FeatureName.QueryBuilder],
-        queryBuilderLeaveConfirm: flags[FeatureName.QueryBuilderLeaveConfirm],
-        queryBuilderShowConceptStats:
-          flags[FeatureName.QueryBuilderShowConceptStats],
+        queryBuilder: flags["query-builder"],
+        queryBuilderLeaveConfirm: flags["query-builder-use-leave-confirmation"],
+        queryBuilderShowConceptStats: flags["query-builder-show-concept-stats"],
         queryBuilderStatsInOrdering:
-          flags[FeatureName.QueryBuilderStatsInOrdering],
+          flags["query-builder-use-stats-in-ordering"],
 
-        constrainForBunnyV1: flags[FeatureName.ConstrainForBunnyV1],
+        constrainForBunnyV1: flags["constrain-for-bunny-v1"],
         queryBuilderAllowNestedGroups:
-          flags[FeatureName.QueryBuilderAllowNestedGroups],
-        flattenNestedGroups: flags[FeatureName.FlattenNestedGroups],
-        queryNlp: flags[FeatureName.QueryNlp],
-        inAppMessenger: flags[FeatureName.InAppMessenger],
+          flags["query-builder-allow-nested-groups"],
+        flattenNestedGroups: flags["flatten-nested-groups"],
+        queryNlp: flags["query-nlp"],
+        inAppMessenger: flags["in-app-messenger"],
 
         syncWorkgroupsEveryRequest:
-          flags[FeatureName.IntegratedSyncWorkgroupsEveryRequest],
+          flags["integrated-sync-workgroups-every-request"],
 
         syncWorkgroupsFirstLogin:
-          flags[FeatureName.IntegratedSyncWorkgroupsFirstLogin],
+          flags["integrated-sync-workgroups-first-login"],
 
-        ensureDefaultWorkgroups: flags[FeatureName.IntegratedEnsureDefaultWgs],
+        ensureDefaultWorkgroups: flags["integrated-ensure-default-wgs"],
 
-        syncSdeWorkgroupsFromClaim:
-          flags[FeatureName.IntegratedSyncSdeWgsFromClaim],
+        syncSdeWorkgroupsFromClaim: flags["integrated-sync-sde-wgs-from-claim"],
 
-        syncRolesEveryRequest:
-          flags[FeatureName.IntegratedSyncRolesEveryRequest],
+        syncRolesEveryRequest: flags["integrated-sync-roles-every-request"],
 
         syncCustodiansEveryRequest:
-          flags[FeatureName.IntegratedSyncCustodiansEveryRequest],
+          flags["integrated-sync-custodians-every-request"],
 
-        hdrukTheme: flags[FeatureName.HdrukTheme],
-        manageWorkgroupsInternal:
-          isStandalone || flags[FeatureName.ManageWorkgroupsInternally],
+        hdrukTheme: flags["hdruk-uk-theme"],
 
-        adminMoreCollectionDetails:
-          flags[FeatureName.AdminMoreCollectionDetails],
+        adminMoreCollectionDetails: flags["admin-more-collection-details"],
 
         queryBuilderUseValueAsNumber:
-          flags[FeatureName.QueryBuilderUseValueAsNumber],
-        queryBuilderUseLocation: flags[FeatureName.QueryBuilderUseLocation],
-        queryBuilderUseDeath: flags[FeatureName.QueryBuilderUseDeath],
-        queryBuilderUseRace: flags[FeatureName.QueryBuilderUseRace],
+          flags["query-builder-use-value-as-number"],
+        queryBuilderUseLocation: flags["query-builder-use-location"],
+        queryBuilderUseDeath: flags["query-builder-use-death"],
+        queryBuilderUseRace: flags["query-builder-use-race"],
 
         queryBuilderUseDemographicRule:
-          flags[FeatureName.QueryBuilderUseDemographicRule],
+          flags["query-builder-use-demographic-rule"],
 
-        accessBanner: flags[FeatureName.AccessBanner],
+        accessBanner: flags["access-banner"],
       };
     }),
   );

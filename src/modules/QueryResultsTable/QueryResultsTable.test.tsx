@@ -1,10 +1,12 @@
 import "@testing-library/jest-dom";
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import QueryResultsTable from "./QueryResultsTable";
 import { getMockQuery } from "@/test/fixtures/queries";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
 import { EXAMPLE_1 } from "@/config/queryExamples";
 import { Demographics, GeoRadiusLocation } from "@/types/rules";
+import { routeGet } from "@/lib/routeFetch";
+import { DEFAULT_REFRESH_TABLE } from "@/config/defaults";
 
 // The real map pulls in leaflet (touches `window` at import) — replace it with a
 // light stub and make next/dynamic return it synchronously.
@@ -18,6 +20,10 @@ jest.mock("@/components/GeoMap/GeoMapReadOnly", () => ({
 jest.mock("next/dynamic", () => ({
   __esModule: true,
   default: () => jest.requireMock("@/components/GeoMap/GeoMapReadOnly").default,
+}));
+
+jest.mock("@/lib/routeFetch", () => ({
+  routeGet: jest.fn(),
 }));
 
 const LONDON: GeoRadiusLocation = {
@@ -91,5 +97,24 @@ describe("QueryResultsTable", () => {
 
     expect(screen.getByTestId("query-results-location")).toBeInTheDocument();
     expect(screen.getByText("Test Dataset #1")).toBeInTheDocument();
+  });
+
+  it("keeps the search term when polling for pending tasks", async () => {
+    jest.useFakeTimers();
+    const polledQuery = getMockQuery({ pid: "query-polled-search" });
+    jest.mocked(routeGet).mockResolvedValue({ data: polledQuery });
+
+    renderTable({
+      initialData: polledQuery,
+      initialSearchParams: "name%5B%5D=test",
+    });
+    await act(async () => {
+      await jest.advanceTimersByTimeAsync(DEFAULT_REFRESH_TABLE);
+    });
+
+    expect(routeGet).toHaveBeenCalledWith(
+      "/api/queries/query-polled-search?name%5B%5D=test",
+    );
+    jest.useRealTimers();
   });
 });

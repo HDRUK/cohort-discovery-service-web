@@ -3,6 +3,7 @@ import type { QueryKey } from "@tanstack/react-query";
 type TimeRangeKey = { from: string; to: string };
 
 export const CACHE_TAGS = {
+  accessPolicy: "access-policy",
   collections: "collections",
   collectionHosts: "collection-hosts",
   conceptSets: "concept-sets",

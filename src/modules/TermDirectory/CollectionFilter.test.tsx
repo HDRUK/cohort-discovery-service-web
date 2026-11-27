@@ -15,8 +15,7 @@ import {
   SessionDataProvider,
 } from "@/contexts/SessionDataContext";
 import { HdrukUiProvider } from "@hdruk/ui";
-import { themeOptions } from "@/config/theme";
-import { ThemeOptions } from "@mui/material";
+import { siteTheme } from "@/config/theme";
 import { createPendingNavigation } from "@/utils/pendingNavigation";
 
 const mockReplace = jest.fn();
@@ -39,7 +38,7 @@ const collections = [
 const renderComponent = () =>
   render(
     <DefaultProvider>
-      <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
+      <HdrukUiProvider theme={siteTheme}>
         <SessionDataProvider
           value={{ userCollections: collections } as unknown as SessionData}
         >
@@ -74,7 +73,7 @@ describe("CollectionFilter", () => {
     mockReplace.mockImplementationOnce(() => navigation.start());
     render(
       <DefaultProvider>
-        <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
+        <HdrukUiProvider theme={siteTheme}>
           <SessionDataProvider
             value={{ userCollections: collections } as unknown as SessionData}
           >

@@ -18,6 +18,7 @@ const ADMIN_TABS = [
   { id: "workgroups", label: "Workgroups", href: routes.adminWorkgroups },
   { id: "collections", label: "Collections", href: routes.adminCollections },
   { id: "networks", label: "Networks", href: routes.adminNetworks },
+  { id: "configuration", label: "Configuration", href: routes.config },
 ];
 
 const AdminTabsLayout = ({ children }: { children: ReactNode }) => (

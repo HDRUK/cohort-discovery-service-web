@@ -1,94 +1,29 @@
-import { useTable } from "@/hooks/useTable";
-import {
-  CollectionDetails as CollectionDetailsType,
-  ResultFile,
-} from "@/types/api";
 import { Skeleton, Stack } from "@mui/material";
-import { MRT_ColumnDef } from "material-react-table";
-import { useMemo } from "react";
-import Table from "../Table";
-import { formatNumber } from "@/utils/numbers";
-import { getDatetime } from "@/utils/date";
-import { useTransposedTable } from "@/hooks/useTransposedTable";
+import CollectionMetadataTable from "./CollectionMetadataTable";
+import ConceptScanDetails from "./ConceptScanDetails";
+import ResultFilesTable from "./ResultFilesTable";
+import { getConceptScanDetailsData, getScanSummary } from "./scanSummary";
 import useCollectionDetails from "./useCollectionDetails";
 
 const CollectionDetails = ({ pid }: { pid: string }) => {
   const { data: details, isLoading } = useCollectionDetails(pid);
 
-  const detailsTable = useTransposedTable<CollectionDetailsType>({
-    data: details,
-    include: ["created_at", "updated_at", "nconcepts"],
-    labels: {
-      created_at: "Created At",
-      updated_at: "Updated At",
-      nconcepts: "Number of Concepts",
-    },
-    formatters: {
-      created_at: (value) => getDatetime(value),
-      updated_at: (value) => getDatetime(value),
-      nconcepts: (value) => formatNumber(value),
-    },
-  });
-
-  const filesColumns = useMemo<MRT_ColumnDef<ResultFile>[]>(
-    () => [
-      {
-        accessorKey: "id",
-        header: "ID",
-      },
-      {
-        accessorKey: "task.id",
-        header: "Task ID",
-        accessorFn: (row) => row.task.id,
-      },
-      {
-        accessorKey: "task.completed_at",
-        header: "Completed At",
-        accessorFn: (row) => getDatetime(row.created_at),
-      },
-      {
-        accessorKey: "file_description",
-        header: "Name",
-      },
-      {
-        accessorKey: "rows_processed",
-        header: "Rows Processed",
-      },
-      {
-        accessorKey: "status",
-        header: "Status",
-      },
-    ],
-    [],
-  );
-
-  const filesTable = useTable<ResultFile>({
-    enableRowSelection: false,
-    columns: filesColumns,
-    data: details?.result_files ?? [],
-  });
-
   if (isLoading) return <Skeleton />;
+  if (!details) return null;
+
+  const summary = getScanSummary(details);
 
   return (
     <Stack direction={"column"} gap={2}>
-      <Table
-        table={detailsTable}
-        leftAction={{
-          titleProps: {
-            title: "Details",
-            subTitle: pid,
-          },
-        }}
+      <CollectionMetadataTable pid={pid} details={details} />
+      <ConceptScanDetails
+        pid={pid}
+        data={getConceptScanDetailsData(details, summary)}
       />
-      <Table
-        table={filesTable}
-        leftAction={{
-          titleProps: {
-            title: "Result Files",
-            subTitle: pid,
-          },
-        }}
+      <ResultFilesTable
+        pid={pid}
+        files={details.result_files}
+        successfulFileId={summary.successful?.id}
       />
     </Stack>
   );

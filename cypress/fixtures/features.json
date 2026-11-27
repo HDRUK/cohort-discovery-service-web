@@ -10,7 +10,7 @@
     "flatten-nested-groups": true,
     "query-builder-use-location": true,
     "query-builder-use-death": true,
-    "query-nlp": false,
+    "query-nlp": true,
     "in-app-messenger": false,
     "integrated-sync-workgroups-every-request": false,
     "integrated-sync-workgroups-first-login": true,

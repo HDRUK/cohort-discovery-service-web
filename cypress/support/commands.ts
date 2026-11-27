@@ -11,22 +11,36 @@ declare global {
        */
       login(
         role?: "user" | "admin",
-        opts?: { isAdmin?: boolean; custodianPid?: string }
+        opts?: {
+          isAdmin?: boolean;
+          custodianPid?: string;
+          disabledFeatures?: string[];
+        }
       ): Chainable<void>;
 
       /** Remove the auth cookie, simulating a logged-out state. */
       logout(): Chainable<void>;
+
+      hydrated(): Chainable<JQuery<HTMLElement>>;
     }
   }
 }
 
 Cypress.Commands.add(
   "login",
-  (role = "user", opts: { isAdmin?: boolean; custodianPid?: string } = {}) => {
+  (
+    role = "user",
+    opts: {
+      isAdmin?: boolean;
+      custodianPid?: string;
+      disabledFeatures?: string[];
+    } = {},
+  ) => {
     cy.task("generateToken", {
       role,
       isAdmin: opts.isAdmin ?? role === "admin",
       custodianPid: opts.custodianPid,
+      disabledFeatures: opts.disabledFeatures,
     }).then((token) => {
       // Cookie name matches ACCESS_TOKEN_NAME default ("token").
       // domain must be explicit so the cookie is sent on the very first
@@ -45,5 +59,21 @@ Cypress.Commands.add(
 Cypress.Commands.add("logout", () => {
   cy.clearCookie("token");
 });
+
+const REACT_PROPS_KEY_PREFIX = "__reactProps$";
+
+Cypress.Commands.add(
+  "hydrated",
+  { prevSubject: "element" },
+  (subject: JQuery<HTMLElement>) =>
+    cy.wrap(subject).should(($el) => {
+      expect(
+        Object.keys($el[0]).some((key) =>
+          key.startsWith(REACT_PROPS_KEY_PREFIX),
+        ),
+        "element hydrated by React",
+      ).to.equal(true);
+    }),
+);
 
 export {};

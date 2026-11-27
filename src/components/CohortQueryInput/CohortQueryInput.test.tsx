@@ -4,8 +4,10 @@ import userEvent from "@testing-library/user-event";
 
 import CohortQueryInput from ".";
 import MockCohortDiscoveryServiceStore from "@/store/MockCohortDiscoveryServiceStore";
+import { DEFAULT_FLAGS } from "@/config/featureFlags";
 import {
   CombinatorType,
+  Demographics,
   OperatorType,
   RuleLeafType,
   RuleNodeType,
@@ -15,6 +17,7 @@ import {
   isOperator,
   isRuleGroup,
   isRuleLeaf,
+  RuleErrors,
 } from "@/utils/rules";
 
 const setQueryBuilderJson = jest.fn();
@@ -231,6 +234,59 @@ describe("CohortQueryInput", () => {
     });
   });
 
+  describe("no valid query error", () => {
+    // The API attaches a demographics block to every parse when the
+    // demographic-rule flag is on, so an empty rules array alone does not mean
+    // nothing was found. When the text has no demographics, the block is empty.
+    // Unmatched words (gibberish) never get here: the API returns them as a
+    // rule with no concept, which shows the unknown-rule error instead.
+    const nothingFoundDemographics: Demographics = {
+      age: null,
+      sex: [],
+      race: [],
+      location: null,
+      death: null,
+    };
+
+    it("does not show the error for a demographics-only search like 'adults'", async () => {
+      getQueryFromText.mockResolvedValueOnce({
+        ...createRuleGroup([]),
+        demographics: { ...nothingFoundDemographics, age: [18, 120] },
+      });
+
+      renderComponent();
+      await submitWithEnter("adults");
+
+      await waitFor(() => expect(setQueryBuilderJson).toHaveBeenCalled());
+      expect(appendError).not.toHaveBeenCalledWith(RuleErrors.NO_QUERY_FOUND);
+    });
+
+    it("still shows the error when the parse returns no rules and an empty demographics block", async () => {
+      getQueryFromText.mockResolvedValueOnce({
+        ...createRuleGroup([]),
+        demographics: nothingFoundDemographics,
+      });
+
+      renderComponent();
+      await submitWithEnter("search text");
+
+      await waitFor(() =>
+        expect(appendError).toHaveBeenCalledWith(RuleErrors.NO_QUERY_FOUND),
+      );
+    });
+
+    it("still shows the error when the parse returns no rules and no demographics block (flag off)", async () => {
+      getQueryFromText.mockResolvedValueOnce(createRuleGroup([]));
+
+      renderComponent();
+      await submitWithEnter("search text");
+
+      await waitFor(() =>
+        expect(appendError).toHaveBeenCalledWith(RuleErrors.NO_QUERY_FOUND),
+      );
+    });
+  });
+
   it("updates queryBuilderJson when the arrow button is clicked", async () => {
     const user = userEvent.setup();
 
@@ -427,7 +483,9 @@ describe("CohortQueryInput", () => {
           concept_id: 100,
           name: "COVID-19",
           category: "Condition",
-          alternatives: [{ concept_id: 200, name: "Acute COVID-19", category: "Condition" }],
+          alternatives: [
+            { concept_id: 200, name: "Acute COVID-19", category: "Condition" },
+          ],
         },
       },
     } as unknown as RuleLeafType;
@@ -464,5 +522,32 @@ describe("CohortQueryInput", () => {
       andRule,
       createRuleGroup([covidRule, orRule, cancerRule]),
     ]);
+  });
+
+  describe("query-nlp flag", () => {
+    const renderWithFlag = (enabled: boolean) =>
+      render(
+        <MockCohortDiscoveryServiceStore
+          overrides={{
+            featureFlags: {
+              flags: { ...DEFAULT_FLAGS, "query-nlp": enabled },
+            },
+          }}
+        >
+          <CohortQueryInput queries={[]} />
+        </MockCohortDiscoveryServiceStore>,
+      );
+
+    it("hides the search bar when the flag is off", () => {
+      renderWithFlag(false);
+
+      expect(screen.queryByRole("searchbox")).not.toBeInTheDocument();
+    });
+
+    it("shows the search bar when the flag is on", () => {
+      renderWithFlag(true);
+
+      expect(getSearchInput()).toBeInTheDocument();
+    });
   });
 });

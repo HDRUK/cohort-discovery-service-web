@@ -38,6 +38,11 @@ export const getTextFieldSx = (
     py: 0.5,
   },
 
+  "& .MuiOutlinedInput-root.Mui-focused:not(.Mui-error) .MuiOutlinedInput-notchedOutline":
+    {
+      borderColor: (t: Theme) => t.palette.primary.main,
+    },
+
   "& .MuiOutlinedInput-notchedOutline": {
     zIndex: 0,
     border: 0,

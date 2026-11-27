@@ -8,6 +8,7 @@ export const getMockTermDirectoryEntry = (
   domain_id: "Condition",
   count: 1234,
   ncollections: 2,
+  collection_names: ["Alpha Cohort", "Zebra Cohort"],
   ...rest,
 });
 
@@ -19,5 +20,6 @@ export const mockTermDirectoryEntries: TermDirectoryEntry[] = [
     domain_id: "Observation",
     count: 50,
     ncollections: 1,
+    collection_names: ["Heart Study"],
   }),
 ];

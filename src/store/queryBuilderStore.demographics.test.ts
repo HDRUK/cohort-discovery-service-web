@@ -5,7 +5,7 @@ import {
   useQueryBuilderStore,
 } from "@/store/queryBuilderStore";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
-import { FeatureFlag, FeatureName } from "@/types/features";
+import { FeatureFlag } from "@/types/features";
 import { DemographicDomain } from "@/config/demographics";
 
 const concept = (
@@ -26,7 +26,7 @@ const isValid = () => store().queryBuilderJson.valid;
 const setDemographicRuleFlag = (enabled: boolean) =>
   useFeatureFlagsStore.setState({
     flags: {
-      [FeatureName.QueryBuilderUseDemographicRule]: enabled,
+      "query-builder-use-demographic-rule": enabled,
     } as FeatureFlag,
   });
 

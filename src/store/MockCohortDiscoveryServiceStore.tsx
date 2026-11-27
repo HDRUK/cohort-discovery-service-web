@@ -38,9 +38,8 @@ import { useSelectionStore } from "@/store/selectionStore";
 import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 import ConfirmProvider from "@/components/ConfirmProvider";
 import { DefaultProvider } from "@/providers/DefaultProvider";
-import { themeOptions } from "@/config/theme";
+import { siteTheme } from "@/config/theme";
 import { HdrukUiProvider } from "@hdruk/ui";
-import { ThemeOptions } from "@mui/material";
 import { CohortBuilderProvider } from "@/providers/CohortBuilderProvider";
 import ApplicationModeProvider from "@/providers/ApplicationModeProvider";
 
@@ -124,6 +123,7 @@ const seedStores = (overrides?: SliceOverrides) => {
 
   useSelectionStore.setState({
     selectedUserId: null,
+    selectedUserIds: [],
     selectedCollectionIds: [],
   });
 
@@ -195,7 +195,7 @@ const MockCohortDiscoveryServiceStore = ({
   return (
     <ApplicationModeProvider>
       <DefaultProvider>
-        <HdrukUiProvider themeOptions={themeOptions as ThemeOptions}>
+        <HdrukUiProvider theme={siteTheme}>
           <QueryClientProvider client={queryClient}>
             <CohortBuilderProvider>
               <LocalizationProvider dateAdapter={AdapterDayjs}>

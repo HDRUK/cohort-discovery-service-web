@@ -1,4 +1,5 @@
 import { DomainTab } from "@/config/domainFilters";
+import { MembershipSources } from "./accessPolicy";
 import { QueryContext } from "./context";
 import { Role, RoleName } from "./roles";
 import { RuleGroupType } from "./rules";
@@ -154,6 +155,8 @@ export interface ModelState {
 export interface ResultFile extends WithTimestamps {
   id: number;
   status: string;
+  file_name?: string;
+  error?: string | null;
   file_description: string;
   rows_processed: number;
   task: Task;
@@ -339,6 +342,7 @@ export interface CollectionDetails extends WithTimestamps {
   nconcepts: number;
   demographics: Distribution[];
   result_files: ResultFile[];
+  latest_successful_concept_result_file?: ResultFile | null;
 }
 
 export interface Network extends WithTimestamps {
@@ -378,6 +382,7 @@ export interface TermDirectoryEntry {
   domain_id: string;
   count: number;
   ncollections: number;
+  collection_names: string[];
 }
 
 export interface TaskRun {
@@ -529,6 +534,7 @@ export interface User extends WithTimestamps {
   workgroups?: Workgroup[];
   identities?: UserIdentity[];
   query_quota: QueryQuota;
+  membership_sources?: MembershipSources;
 }
 
 export interface ExternalCustodian {
@@ -694,7 +700,6 @@ export interface AddCollectionsToWorkgroupPost {
 }
 
 export interface AddUsersToWorkgroupPost {
-  ids: number[];
   workgroup_id: number;
 }
 

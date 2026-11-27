@@ -1,3 +1,27 @@
+## [1.13.0](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.12.0...v1.13.0) (2026-11-19)
+
+### ✨ Features
+
+* **DP-1042:** show collection names in term directory tooltip (#624) ([6b03779](https://github.com/HDRUK/cohort-discovery-service-web/commit/6b03779cdfc0e375e3f55cf9ad446e64293f5316)), closes [DP-1042](undefinedDP-1042)
+* **DP-1052:** caching model and server-only data access layer (#609) ([3aab751](https://github.com/HDRUK/cohort-discovery-service-web/commit/3aab751094593b94af83f67341c5e02ebbb3f56d)), closes [DP-1052](undefinedDP-1052)
+* **DP-1179:** move auth redirects out of the protected layout (#618) ([e58c127](https://github.com/HDRUK/cohort-discovery-service-web/commit/e58c12739c81bd6f90ab844f005aa562f6b1dd91)), closes [DP-1179](undefinedDP-1179)
+* **DP-1203:** client reads through Route Handlers (part 2) (#614) ([35f670f](https://github.com/HDRUK/cohort-discovery-service-web/commit/35f670fe9306dbe14bdacf903e704c4989257c2e)), closes [DP-1203](undefinedDP-1203)
+* **DP-1203:** client reads through Route Handlers, polling at 3 s (part 1) (#613) ([3097cc1](https://github.com/HDRUK/cohort-discovery-service-web/commit/3097cc1820aabcd391442808e23d93bb80afa92f)), closes [DP-1203](undefinedDP-1203)
+* **DP-1204:** instant admin and custodian tab navigation (#612) ([037919c](https://github.com/HDRUK/cohort-discovery-service-web/commit/037919cb0d921c200560a7b64c26db0d7372a41c)), closes [DP-1204](undefinedDP-1204) [navigation](undefinedgation)
+* **DP-1204:** instant navigation for the remaining routes (#619) ([fe28ad9](https://github.com/HDRUK/cohort-discovery-service-web/commit/fe28ad9461a78feb3b2a09d7916fb4a828c59fcf)), closes [DP-1204](undefinedDP-1204) [navigation](undefinedgation)
+* **DP-1215:** improve collection filter UX in Term Directory (#621) ([a641426](https://github.com/HDRUK/cohort-discovery-service-web/commit/a6414267035d166218ca08bd713476c9cfd53f33)), closes [DP-1215](undefinedDP-1215)
+* **DP-1219:** add specimen tab to term directory (#604) ([a28eca5](https://github.com/HDRUK/cohort-discovery-service-web/commit/a28eca5d728da9581eedce65f9536c37f6760537)), closes [DP-1219](undefinedDP-1219)
+
+### 🐛 Bug Fixes
+
+* **DP-1078:** send collection config type as a distribution job name (#602) ([908a4f4](https://github.com/HDRUK/cohort-discovery-service-web/commit/908a4f42fe88f2c54001491013806391a95fe922)), closes [DP-1078](undefinedDP-1078)
+* **DP-1196:** keep collection host credentials out of shared payloads (#606) ([3ac7db0](https://github.com/HDRUK/cohort-discovery-service-web/commit/3ac7db0e118597c3e394dc474ef6f35f42406e49)), closes [DP-1196](undefinedDP-1196)
+* **DP-1199:** handle token expiry and logout properly (#617) ([5a256a7](https://github.com/HDRUK/cohort-discovery-service-web/commit/5a256a7cc6ff8ffa7faeb26846ff7c81177f3c7e)), closes [DP-1199](undefinedDP-1199)
+* **DP-1202:** lock down server actions and the API client (#607) ([51812c8](https://github.com/HDRUK/cohort-discovery-service-web/commit/51812c899690f79287fb3a7394e7354fa13d0359)), closes [DP-1202](undefinedDP-1202)
+* **DP-1207:** create a TanStack query client per server request (#605) ([0ec919b](https://github.com/HDRUK/cohort-discovery-service-web/commit/0ec919b793b0b44f8212d50dd3bdb57ab6bdf829)), closes [DP-1207](undefinedDP-1207)
+* **DP-1251:** keep the search term when polling query results (#623) ([8d9bf48](https://github.com/HDRUK/cohort-discovery-service-web/commit/8d9bf480ef36facf0c0e21ce188d002021053a09)), closes [DP-1251](undefinedDP-1251)
+* **DP-775:** one action per user change, refreshed inside (#611) ([5f4308b](https://github.com/HDRUK/cohort-discovery-service-web/commit/5f4308ba6dda103db8b927cbfaf3c7a1f3f7a8ab)), closes [DP-775](undefinedDP-775)
+
 ## [1.12.0](https://github.com/HDRUK/cohort-discovery-service-web/compare/v1.11.2...v1.12.0) (2026-11-03)
 
 ### ✨ Features
