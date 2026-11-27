@@ -7,6 +7,9 @@ import { EXAMPLE_1 } from "@/config/queryExamples";
 import { Demographics, GeoRadiusLocation } from "@/types/rules";
 import { routeGet } from "@/lib/routeFetch";
 import { DEFAULT_REFRESH_TABLE } from "@/config/defaults";
+import { DEFAULT_FLAGS } from "@/config/featureFlags";
+import { getMockResult, getMockTask } from "@/test/fixtures/tasks";
+import { useFeatureFlagsStore } from "@/store/featureFlagsStore";
 
 // The real map pulls in leaflet (touches `window` at import) — replace it with a
 // light stub and make next/dynamic return it synchronously.
@@ -36,11 +39,31 @@ const LONDON: GeoRadiusLocation = {
 const withDemographics = (demographics: Demographics) =>
   getMockQuery({ definition: { ...EXAMPLE_1, demographics } });
 
+const RECORD_COUNTING_ON = {
+  featureFlags: { flags: { ...DEFAULT_FLAGS, "query-record-counting": true } },
+};
+
+const withSpecimenCount = (pid: string) =>
+  getMockQuery({
+    pid,
+    tasks: [
+      getMockTask({
+        result: getMockResult({
+          count: 40,
+          metadata: { record_counts: { specimen: 1500 } },
+        }),
+      }),
+    ],
+  });
+
 const renderTable = (
   props: Partial<React.ComponentProps<typeof QueryResultsTable>> = {},
+  overrides?: React.ComponentProps<
+    typeof MockCohortDiscoveryServiceStore
+  >["overrides"],
 ) =>
   render(
-    <MockCohortDiscoveryServiceStore>
+    <MockCohortDiscoveryServiceStore overrides={overrides}>
       <QueryResultsTable initialData={getMockQuery()} {...props} />
     </MockCohortDiscoveryServiceStore>,
   );
@@ -97,6 +120,48 @@ describe("QueryResultsTable", () => {
 
     expect(screen.getByTestId("query-results-location")).toBeInTheDocument();
     expect(screen.getByText("Test Dataset #1")).toBeInTheDocument();
+  });
+
+  it("hides specimen counts when record counting is off", () => {
+    renderTable({ initialData: withSpecimenCount("query-counting-off") });
+
+    expect(screen.getByText("Total records")).toBeInTheDocument();
+    expect(screen.queryByText("Specimens")).not.toBeInTheDocument();
+  });
+
+  it("hides the specimen column when no dataset counted specimens", () => {
+    renderTable(
+      { initialData: getMockQuery({ pid: "query-no-specimens" }) },
+      RECORD_COUNTING_ON,
+    );
+
+    expect(screen.getByText("Total records")).toBeInTheDocument();
+    expect(screen.queryByText("Specimens")).not.toBeInTheDocument();
+  });
+
+  it("shows people and specimen counts when record counting is on", () => {
+    renderTable(
+      { initialData: withSpecimenCount("query-counting-on") },
+      RECORD_COUNTING_ON,
+    );
+
+    expect(screen.getByText("People")).toBeInTheDocument();
+    expect(screen.getByText("Specimens")).toBeInTheDocument();
+    expect(screen.getByText("40")).toBeInTheDocument();
+    expect(screen.getByText("1,500")).toBeInTheDocument();
+  });
+
+  it("puts specimens next to people when the flags load after the table", () => {
+    renderTable({ initialData: withSpecimenCount("query-flags-late") });
+
+    act(() => {
+      useFeatureFlagsStore.setState(RECORD_COUNTING_ON.featureFlags);
+    });
+
+    const headers = screen
+      .getAllByRole("columnheader")
+      .map((header) => header.textContent);
+    expect(headers.indexOf("Specimens")).toBe(headers.indexOf("People") + 1);
   });
 
   it("keeps the search term when polling for pending tasks", async () => {

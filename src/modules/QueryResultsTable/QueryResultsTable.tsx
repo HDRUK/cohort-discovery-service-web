@@ -23,6 +23,8 @@ import TwoPaneSwimLaneLayout from "@/modules/TwoPaneSwimLaneLayout";
 import QueryResultsLocation from "./QueryResultsLocation";
 import { QUERY_KEYS } from "@/config/tags";
 import { receivedAt, setQueryDataIfNewer } from "@/utils/queryCache";
+import useFeatures from "@/hooks/useFeatures";
+import { getSpecimenCount, hasSpecimenCounts } from "./recordCounts";
 
 interface QueryResultsTableProps {
   initialData: Query;
@@ -41,6 +43,7 @@ const QueryResultsTable = ({
 }: QueryResultsTableProps) => {
   const defaults = useDefaults();
   const track = useTrackClick();
+  const { queryRecordCounting } = useFeatures();
 
   const queryKey = useMemo(
     () => QUERY_KEYS.query(initialData.pid, initialSearchParams),
@@ -76,6 +79,7 @@ const QueryResultsTable = ({
 
   const { tasks, definition } = query;
   const location = definition.demographics?.location ?? null;
+  const showSpecimens = queryRecordCounting && hasSpecimenCounts(tasks);
 
   const columns: MRT_ColumnDef<Task>[] = [
     {
@@ -136,7 +140,7 @@ const QueryResultsTable = ({
     {
       accessorKey: "total",
       accessorFn: (row) => row.result,
-      header: "Total records",
+      header: showSpecimens ? "People" : "Total records",
       Cell: ({ cell, row: { original } }) => {
         const result = cell.getValue<Result>();
         const { count, status } = result || {};
@@ -149,6 +153,22 @@ const QueryResultsTable = ({
         ) : (
           formatNumber(count)
         );
+      },
+      size: 100,
+      minSize: 100,
+      maxSize: 100,
+    },
+    {
+      accessorKey: "specimens",
+      accessorFn: (row) => getSpecimenCount(row),
+      header: "Specimens",
+      Cell: ({ cell, row: { original } }) => {
+        const count = original.result?.count;
+        if (!original.failed_at && (count === undefined || count === null)) {
+          return <CircularProgress size={12} />;
+        }
+
+        return formatNumber(cell.getValue<number | null>());
       },
       size: 100,
       minSize: 100,
@@ -216,6 +236,10 @@ const QueryResultsTable = ({
     columns,
     data: sortedTasks,
     ...useTableProps,
+    state: {
+      ...useTableProps?.state,
+      columnVisibility: { specimens: showSpecimens },
+    },
   });
 
   const tableContent = <Table table={table} {...tableProps} />;

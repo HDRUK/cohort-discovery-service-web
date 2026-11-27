@@ -102,6 +102,12 @@ export const FEATURE_FLAGS = {
     group: "Collections and BUNNY",
     description: "Limits how many tasks can queue up for one collection.",
   },
+  "query-record-counting": {
+    default: false,
+    group: "Collections and BUNNY",
+    description:
+      "Asks BUNNY to count specimen records as well as people for queries with at least one specimen rule, and shows the specimen count in the results.",
+  },
   "distribution-use-central-domain": {
     group: "Collections and BUNNY",
     description:

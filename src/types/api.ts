@@ -353,6 +353,8 @@ export interface Network extends WithTimestamps {
   custodians: Custodian[];
 }
 
+export type RecordCounts = Partial<Record<"specimen", number>>;
+
 export interface Result extends WithTimestamps {
   id: number;
   pid: string;

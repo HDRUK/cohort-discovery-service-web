@@ -40,6 +40,8 @@ const useFeatures = () => {
 
         adminMoreCollectionDetails: flags["admin-more-collection-details"],
 
+        queryRecordCounting: flags["query-record-counting"],
+
         queryBuilderUseValueAsNumber:
           flags["query-builder-use-value-as-number"],
         queryBuilderUseLocation: flags["query-builder-use-location"],
