@@ -9,6 +9,7 @@ import { Box } from "@mui/material";
 import Title from "@/components/Title";
 import ThreePaneSwimLaneLayout from "@/modules/ThreePaneSwimLaneLayout";
 import ControlledSearchBox from "@/modules/ControlledSearchBox";
+import useSearchParams from "@/hooks/useSearchParams";
 import { NetworksProvider } from "@/contexts/NetworksContext";
 import NetworksLeftPanel from "./NetworksLeftPanel";
 import NetworksMiddlePanel from "./NetworksMiddlePanel";
@@ -24,12 +25,16 @@ const NetworksAdmin = ({
   networks?: Network[];
   custodians?: Paginated<Custodian>;
 }) => {
+  const { getSearchParam: getNetworkFilter } =
+    useSearchParams("network_filter");
+
   return (
     <Box
       sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}
     >
       <Title title="Networks" subTitle="Management" />
       <ControlledSearchBox<NetworkCustodiansSearchParams>
+        key={getNetworkFilter() ?? ""}
         paramName="search_term"
         placeholder="Search custodians by name..."
         submitOnChange
