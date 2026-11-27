@@ -1,6 +1,7 @@
-import { NetworkCustodiansSearchParams } from "@/types/api";
+import { Custodian, NetworkCustodiansSearchParams } from "@/types/api";
 import { buildNetworkCustodianParams } from "@/utils/params";
 import { selectByIdOrFirst } from "@/utils/selection";
+import { emptyPaginated } from "@/utils/pagination";
 import NetworksAdmin from "./NetworksAdmin";
 import { getNetworkCustodians, getNetworks } from "@/server/data/networks";
 
@@ -26,7 +27,7 @@ const NetworksTab = async ({
           buildNetworkCustodianParams(params),
         )
       ).data
-    : undefined;
+    : emptyPaginated<Custodian>([]);
 
   return <NetworksAdmin networks={networks ?? []} custodians={custodians} />;
 };

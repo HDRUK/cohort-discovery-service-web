@@ -44,12 +44,7 @@ const NetworksAdmin = ({
           <ThreePaneSwimLaneLayout
             rightDisabled={false}
             left={<NetworksLeftPanel />}
-            middle={
-              <NetworksMiddlePanel
-                custodians={custodians}
-                isLoading={networks === undefined}
-              />
-            }
+            middle={<NetworksMiddlePanel custodians={custodians} />}
             right={<NetworksRightPanel />}
           />
         </ThreePaneProvider>

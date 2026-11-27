@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import { Custodian, Paginated } from "@/types/api";
 import { useNotify } from "@/providers/NotifyProvider";
 import { useConfirm } from "@/hooks/useConfirm";
@@ -10,10 +10,8 @@ import useSelectedNetwork from "@/hooks/useSelectedNetwork";
 
 const NetworksMiddlePanel = ({
   custodians,
-  isLoading,
 }: {
   custodians?: Paginated<Custodian>;
-  isLoading: boolean;
 }) => {
   const selectedNetwork = useSelectedNetwork();
 
@@ -52,27 +50,22 @@ const NetworksMiddlePanel = ({
         minHeight: 0,
       }}
     >
-      {(isLoading || !!selectedNetwork) && (
-        <Stack gap={2}>
-          <CustodianTable
-            custodians={custodians}
-            tableTitle={
-              selectedNetwork ? `${selectedNetwork.name} network` : "Network"
-            }
-            tableSubTitle="Custodians"
-            onDelete={removeCustodians}
-            emptyMessage="Custodians will appear here when they are added to this network, or when one matches your search"
-            boxSxProps={{ minHeight: 300 }}
-          />
-        </Stack>
-      )}
-      {!isLoading && !selectedNetwork && (
-        <Box sx={{ mx: "auto", my: "auto" }}>
-          <Typography variant="h5">
-            Create a network to see its custodians here
-          </Typography>
-        </Box>
-      )}
+      <Stack gap={2}>
+        <CustodianTable
+          custodians={custodians}
+          tableTitle={
+            selectedNetwork ? `${selectedNetwork.name} network` : "Network"
+          }
+          tableSubTitle="Custodians"
+          onDelete={removeCustodians}
+          emptyMessage={
+            selectedNetwork
+              ? "Custodians will appear here when they are added to this network, or when one matches your search"
+              : "Network custodians will appear here when a network is created"
+          }
+          boxSxProps={{ minHeight: 300 }}
+        />
+      </Stack>
     </Box>
   );
 };
