@@ -5,7 +5,7 @@ import { CACHE_TAGS } from "@/config/tags";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { apiGet, ErrorMode, ReadOptions } from "@/server/api";
 import { LIST_CACHE_LIFE, USER_DATA_CACHE_LIFE } from "@/server/cacheProfiles";
-import { isSearchQuery, toListQuery } from "@/server/listQuery";
+import { toListQuery } from "@/server/listQuery";
 import { requireSession } from "@/server/session";
 import {
   ApiResponse,
@@ -59,6 +59,10 @@ export const getAdminCollections = async (
 const fetchAdminCollectionList = async (
   queryString: string,
 ): Promise<ApiResponse<Paginated<CollectionWithHosts>>> => {
+  "use cache: private";
+  cacheLife(LIST_CACHE_LIFE);
+  cacheTag(CACHE_TAGS.collections);
+
   const { token } = await requireSession();
   return apiGet<ApiResponse<Paginated<CollectionWithHosts>>>(
     token,
@@ -67,29 +71,19 @@ const fetchAdminCollectionList = async (
   );
 };
 
-const fetchCachedAdminCollectionList = async (
+export const getAdminCollectionList = (
+  args?: ReadArgs,
+): Promise<ApiResponse<Paginated<CollectionWithHosts>>> =>
+  fetchAdminCollectionList(toListQuery(args?.params));
+
+const fetchCustodianCollections = async (
+  custodianPid: string,
   queryString: string,
 ): Promise<ApiResponse<Paginated<CollectionWithHosts>>> => {
   "use cache: private";
   cacheLife(LIST_CACHE_LIFE);
   cacheTag(CACHE_TAGS.collections);
 
-  return fetchAdminCollectionList(queryString);
-};
-
-export const getAdminCollectionList = (
-  args?: ReadArgs,
-): Promise<ApiResponse<Paginated<CollectionWithHosts>>> => {
-  const queryString = toListQuery(args?.params);
-  return isSearchQuery(queryString)
-    ? fetchAdminCollectionList(queryString)
-    : fetchCachedAdminCollectionList(queryString);
-};
-
-const fetchCustodianCollections = async (
-  custodianPid: string,
-  queryString: string,
-): Promise<ApiResponse<Paginated<CollectionWithHosts>>> => {
   const { token } = await requireSession();
   return apiGet<ApiResponse<Paginated<CollectionWithHosts>>>(
     token,
@@ -98,26 +92,11 @@ const fetchCustodianCollections = async (
   );
 };
 
-const fetchCachedCustodianCollections = async (
-  custodianPid: string,
-  queryString: string,
-): Promise<ApiResponse<Paginated<CollectionWithHosts>>> => {
-  "use cache: private";
-  cacheLife(LIST_CACHE_LIFE);
-  cacheTag(CACHE_TAGS.collections);
-
-  return fetchCustodianCollections(custodianPid, queryString);
-};
-
 export const getCustodianCollections = (
   custodianPid: string,
   args?: ReadArgs,
-): Promise<ApiResponse<Paginated<CollectionWithHosts>>> => {
-  const queryString = toListQuery(args?.params);
-  return isSearchQuery(queryString)
-    ? fetchCustodianCollections(custodianPid, queryString)
-    : fetchCachedCustodianCollections(custodianPid, queryString);
-};
+): Promise<ApiResponse<Paginated<CollectionWithHosts>>> =>
+  fetchCustodianCollections(custodianPid, toListQuery(args?.params));
 
 export const getCollectionDetails = async (
   pid: string,
