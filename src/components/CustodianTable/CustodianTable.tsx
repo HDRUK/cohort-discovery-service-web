@@ -57,6 +57,12 @@ const CustodianTable = ({
   ...rest
 }: CustodianTableProps) => {
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
+  const [selectionCustodians, setSelectionCustodians] = useState(custodians);
+
+  if (custodians !== selectionCustodians) {
+    setSelectionCustodians(custodians);
+    setRowSelection({});
+  }
 
   const selectedCustodianIds = useMemo(
     () => trueKeys(rowSelection),
