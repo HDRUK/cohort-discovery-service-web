@@ -54,6 +54,7 @@ describe("Concept sets", () => {
       .not('[aria-label="delete concept"]')
       .not('[aria-label="Toggle Row Expanded"]')
       .first()
+      .hydrated()
       .click({ force: true });
     // The search modal should open with a SearchBar input (placeholder "Search…")
     cy.get('input[placeholder*="Search" i]', { timeout: 5000 })

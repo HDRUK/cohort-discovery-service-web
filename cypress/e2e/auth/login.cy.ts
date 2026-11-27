@@ -2,8 +2,21 @@
  * Standalone login flow.
  * Requires APPLICATION_MODE=standalone and the mock API server.
  */
-const email = () => Cypress.env("CYPRESS_USER_EMAIL") || "test@example.com";
-const password = () => Cypress.env("CYPRESS_USER_PASSWORD") || "password123";
+const credentials = () =>
+  cy
+    .env(["USER_EMAIL", "USER_PASSWORD"])
+    .then(
+      ({ USER_EMAIL = "test@example.com", USER_PASSWORD = "password123" }) => ({
+        email: USER_EMAIL,
+        password: USER_PASSWORD,
+      }),
+    );
+
+const typeCredentials = () =>
+  credentials().then(({ email, password }) => {
+    cy.get('input[type="email"]').type(email);
+    cy.get('input[type="password"]').type(password);
+  });
 
 const openAuthScreen = () => {
   cy.contains("button:visible", "Log in").hydrated().click();
@@ -33,7 +46,9 @@ describe("Login", () => {
   it("toggles password visibility", () => {
     openAuthScreen();
 
-    cy.get('input[type="password"]').type(password());
+    credentials().then(({ password }) =>
+      cy.get('input[type="password"]').type(password),
+    );
     cy.get('button[aria-label="Show password"]').click();
     cy.get('input[name="password"]').should("have.attr", "type", "text");
     cy.get('button[aria-label="Hide password"]').click();
@@ -43,8 +58,7 @@ describe("Login", () => {
   it("logs in with valid credentials and lands on the dashboard", () => {
     openAuthScreen();
 
-    cy.get('input[type="email"]').type(email());
-    cy.get('input[type="password"]').type(password());
+    typeCredentials();
     cy.get('button[type="submit"]').click();
 
     cy.url({ timeout: 15000 }).should("include", "/dashboard");
@@ -106,8 +120,7 @@ describe("Logged-out redirects", () => {
     cy.url({ timeout: 10000 }).should("include", "/login");
 
     cy.contains("button:visible", "Log in").hydrated().click();
-    cy.get('input[type="email"]').type(email());
-    cy.get('input[type="password"]').type(password());
+    typeCredentials();
     cy.get('button[type="submit"]').click();
 
     cy.url({ timeout: 15000 }).should("include", "/term-directory");
