@@ -18,18 +18,18 @@ const NetworksLeftPanel = () => {
   const selectedNetwork = useSelectedNetwork();
   const networks = useNetworks();
 
-  const { setSearchParam } = useSearchParams("network_filter");
+  const { setSearchParams } = useSearchParams();
 
 
   const onSelectNetwork = useCallback(
     (id?: number) => {
-      if (!id) {
-        setSearchParam(null);
-        return;
-      }
-      setSearchParam(String(id));
+      setSearchParams({
+        network_filter: id ? String(id) : null,
+        page: null,
+        search_term: null,
+      });
     },
-    [setSearchParam],
+    [setSearchParams],
   );
 
   const confirm = useConfirm();

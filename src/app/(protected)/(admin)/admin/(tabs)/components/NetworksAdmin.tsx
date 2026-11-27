@@ -1,28 +1,50 @@
 "use client";
-import { Network } from "@/types/api";
-import { Box, Skeleton } from "@mui/material";
+import {
+  Custodian,
+  Network,
+  NetworkCustodiansSearchParams,
+  Paginated,
+} from "@/types/api";
+import { Box } from "@mui/material";
 import Title from "@/components/Title";
 import ThreePaneSwimLaneLayout from "@/modules/ThreePaneSwimLaneLayout";
+import ControlledSearchBox from "@/modules/ControlledSearchBox";
+import useSearchParams from "@/hooks/useSearchParams";
 import { NetworksProvider } from "@/contexts/NetworksContext";
 import NetworksLeftPanel from "./NetworksLeftPanel";
 import NetworksMiddlePanel from "./NetworksMiddlePanel";
 import NetworksRightPanel from "./NetworksRightPanel";
 import { ThreePaneProvider } from "@/providers/ThreePaneProvider";
 
-const NetworksAdmin = ({ networks }: { networks: Network[] }) => {
-  if (!networks) return <Skeleton height={"100%"} />;
+const NO_NETWORKS: Network[] = [];
+
+const NetworksAdmin = ({
+  networks,
+  custodians,
+}: {
+  networks?: Network[];
+  custodians?: Paginated<Custodian>;
+}) => {
+  const { getSearchParam: getNetworkFilter } =
+    useSearchParams("network_filter");
 
   return (
     <Box
       sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}
     >
       <Title title="Networks" subTitle="Management" />
-      <NetworksProvider networks={networks}>
+      <ControlledSearchBox<NetworkCustodiansSearchParams>
+        key={getNetworkFilter() ?? ""}
+        paramName="search_term"
+        placeholder="Search custodians by name..."
+        submitOnChange
+      />
+      <NetworksProvider networks={networks ?? NO_NETWORKS}>
         <ThreePaneProvider>
           <ThreePaneSwimLaneLayout
             rightDisabled={false}
             left={<NetworksLeftPanel />}
-            middle={<NetworksMiddlePanel />}
+            middle={<NetworksMiddlePanel custodians={custodians} />}
             right={<NetworksRightPanel />}
           />
         </ThreePaneProvider>

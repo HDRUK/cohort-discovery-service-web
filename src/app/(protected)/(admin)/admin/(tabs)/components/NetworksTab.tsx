@@ -1,37 +1,35 @@
-import { CollectionsSearchParams } from "@/types/api";
-import { buildCollectionParams } from "@/utils/params";
-import { Box, Skeleton } from "@mui/material";
-import { DEFAULT_PER_PAGE } from "@/config/defaults";
+import { Custodian, NetworkCustodiansSearchParams } from "@/types/api";
+import { buildNetworkCustodianParams } from "@/utils/params";
+import { selectByIdOrFirst } from "@/utils/selection";
+import { emptyPaginated } from "@/utils/pagination";
 import NetworksAdmin from "./NetworksAdmin";
-import { getNetworks } from "@/server/data/networks";
-
-export const WorkgroupsSkeleton = () => (
-  <Box sx={{ height: "100%", p: 2 }}>
-    <Skeleton variant="text" width={200} />
-    <Skeleton variant="rectangular" height={300} sx={{ mt: 2 }} />
-  </Box>
-);
+import { getNetworkCustodians, getNetworks } from "@/server/data/networks";
 
 const NetworksTab = async ({
   searchParams,
 }: {
-  searchParams: Promise<CollectionsSearchParams>;
+  searchParams: Promise<NetworkCustodiansSearchParams>;
 }) => {
-  const {
-    page = 1,
-    per_page = DEFAULT_PER_PAGE,
-    ...rest
-  } = (await searchParams) ?? {};
+  const [params, { data: networks }] = await Promise.all([
+    searchParams,
+    getNetworks(),
+  ]);
 
-  const params = buildCollectionParams({
-    page,
-    per_page,
-    ...rest,
-  });
+  const selectedNetwork = selectByIdOrFirst(
+    networks ?? [],
+    params.network_filter ?? null,
+  );
 
-  const { data: networks } = await getNetworks(params);
+  const custodians = selectedNetwork
+    ? (
+        await getNetworkCustodians(
+          selectedNetwork.id,
+          buildNetworkCustodianParams(params),
+        )
+      ).data
+    : emptyPaginated<Custodian>([]);
 
-  return <NetworksAdmin networks={networks} />;
+  return <NetworksAdmin networks={networks ?? []} custodians={custodians} />;
 };
 
 export default NetworksTab;

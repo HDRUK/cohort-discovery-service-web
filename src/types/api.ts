@@ -26,6 +26,10 @@ export interface CollectionsSearchParams extends ApiSearchParams {
   collection_filter?: string; // collection status
 }
 
+export interface NetworkCustodiansSearchParams extends ApiSearchParams {
+  network_filter?: string;
+}
+
 export interface CollectionHostsSearchParams extends ApiSearchParams {
   collection_host_filter?: string;
 }
@@ -346,12 +350,15 @@ export interface CollectionDetails extends WithTimestamps {
 }
 
 export interface Network extends WithTimestamps {
+  id: number;
   name: string;
   url: string | null;
   pid: string;
   enabled: boolean;
   custodians: Custodian[];
 }
+
+export type NetworkSummary = Omit<Network, "custodians">;
 
 export interface Result extends WithTimestamps {
   id: number;
@@ -563,19 +570,13 @@ export type ClientTokenUser = Pick<
   "sso_provider" | "orcid" | "is_admin" | "cohort_admin_teams"
 >;
 
-export interface Network {
-  name: string;
-  pid: string;
-  id: number;
-}
-
 export interface Custodian extends WithTimestamps {
   id: number;
   pid: string;
   name: string;
   external_custodian_id: number | string;
   external_custodian_name: string;
-  network?: Network;
+  network?: NetworkSummary;
 }
 
 export interface CombinedUser extends User {

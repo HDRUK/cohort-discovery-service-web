@@ -1,7 +1,7 @@
 "use client";
 
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import { GroupedCollection, Network } from "@/types/api";
+import { GroupedCollection, NetworkSummary } from "@/types/api";
 import {
   AccordionSummary,
   AccordionDetails,
@@ -73,7 +73,7 @@ const SelectDatasets = () => {
     return Object.values(
       custodianGroups.reduce<Record<string, NetworkGroupedCollections>>(
         (acc, gc) => {
-          const network: Network | null = gc.custodian.network ?? null;
+          const network: NetworkSummary | null = gc.custodian.network ?? null;
           const key = network ? String(network.id) : "no-network";
 
           if (!acc[key]) {

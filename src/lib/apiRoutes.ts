@@ -50,6 +50,8 @@ export const API_ROUTES = {
   networks: `${API_URL}/custodian_networks`,
   network: (id: number | string) =>
     `${API_URL}/custodian_networks/${segment(id)}`,
+  networkCustodians: (id: number | string) =>
+    `${API_URL}/custodian_networks/${segment(id)}/custodians`,
   getMe: `${API_URL}/user`,
   signIn: `${API_AUTH_URL}/login`,
   authMethods: `${API_AUTH_URL}/methods`,
