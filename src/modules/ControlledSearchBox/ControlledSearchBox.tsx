@@ -42,7 +42,7 @@ const ControlledSearchBox = <
 }: ControlledSearchBoxProps<TParams, K>) => {
   const key = (paramName ?? ("search_term" as StringParamKey<TParams>)) as K;
 
-  const { getSearchParam, setSearchParam } = useSearchParams(key);
+  const { getSearchParam, setSearchParams } = useSearchParams(key);
 
   type FV = FormValues<K>;
 
@@ -61,9 +61,9 @@ const ControlledSearchBox = <
       if (nextValue === lastSubmittedValueRef.current) return;
 
       lastSubmittedValueRef.current = nextValue;
-      setSearchParam(nextValue);
+      setSearchParams({ [key]: nextValue, page: null });
     },
-    [setSearchParam],
+    [setSearchParams, key],
   );
 
   const watchedValues = useWatch({ control });
