@@ -24,8 +24,4 @@ Both reads are `'use cache: private'` with `LIST_CACHE_LIFE`. `getNetworks` is t
 
 ## `CustodianTable`
 
-`src/components/CustodianTable/` knows nothing about networks. It takes `custodians?: Paginated<Custodian>` (`undefined` while loading), a title, subtitle and empty message, and an optional `onDelete(ids) => Promise<boolean>`. The table shows row selection and a delete button only when `onDelete` is given, and clears the selection when `onDelete` returns `true`. The networks panel's `onDelete` asks for confirmation, then removes the custodians from the network.
-
-## Editing membership
-
-The edit form compares the selected custodians with the network's current members (`diffMembership`, `src/utils/membership.ts`). It adds only the new ones and removes the ones that were deselected, instead of re-adding every selected custodian and ignoring removals.
+`src/components/CustodianTable/` knows nothing about networks. It takes `custodians?: Paginated<Custodian>` (`undefined` while loading), a title, subtitle and empty message, and an optional `onDelete(ids) => Promise<boolean>`. The table shows row selection and a delete button only when `onDelete` is given, and clears the selection when `onDelete` returns `true` or when the `custodians` prop changes (network, page or search), so a delete never acts on rows that aren't on screen. The networks panel's `onDelete` asks for confirmation, then removes the custodians from the network.
