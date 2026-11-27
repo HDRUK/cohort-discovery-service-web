@@ -12,6 +12,7 @@ const nextConfig: NextConfig = {
     },
   },
   experimental: {
+    agentUpgrade: "security",
     authInterrupts: true,
     useTypeScriptCli: false,
   },
