@@ -416,6 +416,24 @@ async function handle(req, res) {
   }
 
   {
+    const params = matchRoute("/api/v1/custodian_networks/:id/custodians", pathname);
+    if (method === "GET" && params) {
+      const custodians = fixture("custodians").data;
+      return ok(res, {
+        data: custodians,
+        current_page: 1,
+        per_page: 25,
+        total: custodians.length,
+        from: 1,
+        to: custodians.length,
+        last_page: 1,
+        next_page_url: null,
+        prev_page_url: null,
+      });
+    }
+  }
+
+  {
     const params = matchRoute("/api/v1/custodian_networks/:id", pathname);
     if (params) {
       if (method === "PUT") {

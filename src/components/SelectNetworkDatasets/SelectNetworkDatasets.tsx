@@ -1,7 +1,7 @@
 "use client";
 
 import useQueryBuilder from "@/hooks/useQueryBuilder";
-import { GroupedCollection, Network } from "../../types/api";
+import { GroupedCollection, NetworkSummary } from "../../types/api";
 import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Title from "../Title";
@@ -9,7 +9,7 @@ import SelectCustodianDatasets from "../SelectCustodianDatasets";
 import SquareCheckbox from "../SquareCheckbox";
 
 export type NetworkGroupedCollections = {
-  network: Network | null;
+  network: NetworkSummary | null;
   custodians: GroupedCollection[];
 };
 

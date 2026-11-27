@@ -1,6 +1,7 @@
 import {
   CollectionHostsSearchParams,
   CollectionsSearchParams,
+  NetworkCustodiansSearchParams,
   ConceptSearchParams,
   QueryHistorySearchParams,
   SearchParams,
@@ -57,6 +58,17 @@ export const buildCollectionParams = (
 
   return buildSearchParams(params);
 };
+
+export const buildNetworkCustodianParams = ({
+  page,
+  per_page,
+  search_term,
+}: NetworkCustodiansSearchParams): URLSearchParams =>
+  buildSearchParams({
+    page,
+    per_page: clampPerPage(per_page),
+    ...(search_term ? { ["name[]"]: search_term } : {}),
+  });
 
 export const buildWorkgroupCollectionParams = (
   searchParams: CollectionsSearchParams,

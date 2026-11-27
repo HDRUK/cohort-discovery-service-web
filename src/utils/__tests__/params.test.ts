@@ -1,6 +1,7 @@
 import {
   buildCollectionHostParams,
   buildCollectionParams,
+  buildNetworkCustodianParams,
   buildQueryHistoryParams,
   buildWorkgroupCollectionParams,
   clampPerPage,
@@ -118,5 +119,26 @@ describe("buildCollectionParams", () => {
     const params = buildCollectionParams({ per_page: 100000 });
 
     expect(params.get("per_page")).toBe("200");
+  });
+});
+
+describe("buildNetworkCustodianParams", () => {
+  it("sends the search term as name[]", () => {
+    const params = buildNetworkCustodianParams({ search_term: "north" });
+
+    expect(params.get("name[]")).toBe("north");
+  });
+
+  it("sends the page and a clamped page size", () => {
+    const params = buildNetworkCustodianParams({ page: 2, per_page: 100000 });
+
+    expect(params.get("page")).toBe("2");
+    expect(params.get("per_page")).toBe("200");
+  });
+
+  it("leaves out the network selection", () => {
+    const params = buildNetworkCustodianParams({ network_filter: "3" });
+
+    expect(params.toString()).toBe("");
   });
 });

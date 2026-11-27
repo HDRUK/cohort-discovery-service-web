@@ -1,118 +1,105 @@
 "use client";
 
-import { Custodian } from "@/types/api";
+import { Custodian, Paginated } from "@/types/api";
 import {
   MRT_RowSelectionState,
   type MRT_ColumnDef,
 } from "material-react-table";
 import { useMemo, useState } from "react";
 import Table from "@/components/Table";
-import useSearchParams from "@/hooks/useSearchParams";
-import { capitaliseFirstLetter } from "@/utils/string";
-import { useTable } from "@/hooks/useTable";
+import { usePaginatedTable } from "@/hooks/usePaginatedTable";
 import dayjs from "dayjs";
 import { TableProps } from "../Table/Table";
 import { trueKeys } from "@/utils/numbers";
-import { useSessionData } from "@/contexts/SessionDataContext";
-import { useNetworks } from "@/contexts/NetworksContext";
+import { DEFAULT_PER_PAGE } from "@/config/defaults";
 
-export interface CustodianTableProps extends TableProps {
-  showPid?: boolean;
-  refreshRate?: number;
+const formatTimestamp = (value?: string) =>
+  value ? dayjs(value).format("MMM D, YYYY HH:mm") : "—";
+
+const COLUMNS: MRT_ColumnDef<Custodian>[] = [
+  {
+    id: "name",
+    header: "Name",
+    accessorFn: (row) => row.name,
+    size: 200,
+    minSize: 200,
+    maxSize: 200,
+  },
+  {
+    id: "created_at",
+    header: "Created",
+    accessorFn: (row) => formatTimestamp(row.created_at),
+  },
+  {
+    id: "updated_at",
+    header: "Last updated",
+    accessorFn: (row) => formatTimestamp(row.updated_at),
+  },
+];
+
+export interface CustodianTableProps extends Omit<
+  TableProps,
+  "leftAction" | "rightAction" | "emptyMessage"
+> {
+  custodians?: Paginated<Custodian>;
   tableTitle?: string;
   tableSubTitle?: string;
-  handleDelete?: (ids: string[]) => Promise<void>;
-  emptyMessageOverride?: string;
+  emptyMessage?: string;
+  onDelete?: (ids: string[]) => Promise<boolean>;
 }
 
 const CustodianTable = ({
+  custodians,
   tableTitle,
   tableSubTitle,
-  handleDelete,
-  emptyMessageOverride,
+  emptyMessage = "Custodians will appear here when they are added",
+  onDelete,
   ...rest
 }: CustodianTableProps) => {
-  const { getSearchParam } = useSearchParams("network_filter");
-  const nw_filter = getSearchParam();
-
   const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
 
-  const custodians = useSessionData().custodians;
-
   const selectedCustodianIds = useMemo(
-    () => trueKeys(rowSelection ?? {}),
+    () => trueKeys(rowSelection),
     [rowSelection],
   );
 
-  const networks = useNetworks();
-  const activeNetwork = useMemo(
-    () => networks.find((nw) => String(nw.id) === nw_filter),
-    [networks, nw_filter],
-  );
-
-  const hydratedCustodians = useMemo(
-    () => custodians.filter((c) => c.network?.id === activeNetwork?.id),
-    [custodians, activeNetwork],
-  );
-
-  const columns: MRT_ColumnDef<Custodian>[] = [
-    {
-      id: "name",
-      header: "Name",
-      accessorFn: (row) => row.name,
-      size: 200,
-      minSize: 200,
-      maxSize: 200,
-    },
-    {
-      id: "created_at",
-      header: "Created",
-      accessorFn: (row) =>
-        row.created_at
-          ? dayjs(row.created_at).format("MMM D, YYYY HH:mm")
-          : "—",
-    },
-    {
-      id: "updated_at",
-      header: "Last Updated",
-      accessorFn: (row) =>
-        row.updated_at
-          ? dayjs(row.updated_at).format("MMM D, YYYY HH:mm")
-          : "—",
-    },
-  ];
-
-  const table = useTable({
-    columns,
-    data: hydratedCustodians,
+  const table = usePaginatedTable<Custodian>({
+    columns: COLUMNS,
+    data: custodians?.data,
+    rowCount: custodians?.total ?? 0,
+    perPageDefault: custodians?.per_page ?? DEFAULT_PER_PAGE,
     enableSorting: false,
-    ...(setRowSelection && { onRowSelectionChange: setRowSelection }),
-    ...(rowSelection && { state: { rowSelection } }),
+    enableRowSelection: !!onDelete,
+    onRowSelectionChange: setRowSelection,
+    state: { rowSelection },
     getRowId: (row) => String(row?.id),
   });
 
+  const handleDelete = async () => {
+    if (!onDelete) return;
+    const deleted = await onDelete(selectedCustodianIds);
+    if (deleted) setRowSelection({});
+  };
+
   return (
     <Table
-      key="admin-custodian-table"
-      emptyMessage={
-        emptyMessageOverride ??
-        "Custodians will appear here when they are added to this network"
-      }
+      {...rest}
       table={table}
+      emptyMessage={emptyMessage}
       leftAction={{
         titleProps: {
           title: tableTitle || "Custodians",
-          subTitle:
-            tableSubTitle || capitaliseFirstLetter(activeNetwork?.name ?? ""),
+          subTitle: tableSubTitle,
         },
       }}
-      rightAction={{
-        deleteProps: {
-          onClick: handleDelete,
-          disabled: selectedCustodianIds.length === 0,
-        },
-      }}
-      {...rest}
+      rightAction={
+        onDelete && {
+          deleteProps: {
+            onClick: handleDelete,
+            disabled: selectedCustodianIds.length === 0,
+          },
+        }
+      }
     />
   );
 };

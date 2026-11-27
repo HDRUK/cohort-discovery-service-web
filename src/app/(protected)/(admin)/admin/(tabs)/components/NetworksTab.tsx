@@ -1,18 +1,34 @@
-import { Box, Skeleton } from "@mui/material";
+import { NetworkCustodiansSearchParams } from "@/types/api";
+import { buildNetworkCustodianParams } from "@/utils/params";
+import { selectByIdOrFirst } from "@/utils/selection";
 import NetworksAdmin from "./NetworksAdmin";
-import { getNetworks } from "@/server/data/networks";
+import { getNetworkCustodians, getNetworks } from "@/server/data/networks";
 
-export const WorkgroupsSkeleton = () => (
-  <Box sx={{ height: "100%", p: 2 }}>
-    <Skeleton variant="text" width={200} />
-    <Skeleton variant="rectangular" height={300} sx={{ mt: 2 }} />
-  </Box>
-);
+const NetworksTab = async ({
+  searchParams,
+}: {
+  searchParams: Promise<NetworkCustodiansSearchParams>;
+}) => {
+  const [params, { data: networks }] = await Promise.all([
+    searchParams,
+    getNetworks(),
+  ]);
 
-const NetworksTab = async () => {
-  const { data: networks } = await getNetworks();
+  const selectedNetwork = selectByIdOrFirst(
+    networks ?? [],
+    params.network_filter ?? null,
+  );
 
-  return <NetworksAdmin networks={networks} />;
+  const custodians = selectedNetwork
+    ? (
+        await getNetworkCustodians(
+          selectedNetwork.id,
+          buildNetworkCustodianParams(params),
+        )
+      ).data
+    : undefined;
+
+  return <NetworksAdmin networks={networks ?? []} custodians={custodians} />;
 };
 
 export default NetworksTab;

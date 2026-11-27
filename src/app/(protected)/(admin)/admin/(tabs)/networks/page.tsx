@@ -1,12 +1,17 @@
 import { Suspense } from "react";
 import { SearchParamsTransitionProvider } from "@/contexts/SearchParamsTransitionContext";
-import { CollectionsSkeleton } from "@/modules/CollectionsTab/CollectionsTab";
+import { NetworkCustodiansSearchParams } from "@/types/api";
 import NetworksTab from "../components/NetworksTab";
+import NetworksAdmin from "../components/NetworksAdmin";
 
-const AdminNetworksPage = () => (
+const AdminNetworksPage = ({
+  searchParams,
+}: {
+  searchParams: Promise<NetworkCustodiansSearchParams>;
+}) => (
   <SearchParamsTransitionProvider>
-    <Suspense fallback={<CollectionsSkeleton />}>
-      <NetworksTab />
+    <Suspense fallback={<NetworksAdmin />}>
+      <NetworksTab searchParams={searchParams} />
     </Suspense>
   </SearchParamsTransitionProvider>
 );
