@@ -16,7 +16,7 @@ const HELP_TABS = [
   { slug: "results-tutorials", label: "Results Tutorials" },
   { slug: "history-tutorials", label: "History Tutorials" },
   { slug: "collection-admin-tutorials", label: "Collection Admin Tutorials" },
-  { slug: "documentation", label: "Documentation" },
+  { slug: "documentation", label: "Onboarding documentation" },
 ];
 
 const HelpLayout = ({ children }: { children: ReactNode }) => {
