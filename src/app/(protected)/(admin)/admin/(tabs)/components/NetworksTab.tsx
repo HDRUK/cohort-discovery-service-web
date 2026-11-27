@@ -1,3 +1,5 @@
+import { ApiSearchParams } from "@/types/api";
+import { buildNetworkParams } from "@/utils/params";
 import { Box, Skeleton } from "@mui/material";
 import NetworksAdmin from "./NetworksAdmin";
 import { getNetworks } from "@/server/data/networks";
@@ -9,8 +11,14 @@ export const NetworksSkeleton = () => (
   </Box>
 );
 
-const NetworksTab = async () => {
-  const { data: networks } = await getNetworks();
+const NetworksTab = async ({
+  searchParams,
+}: {
+  searchParams: Promise<ApiSearchParams>;
+}) => {
+  const { data: networks } = await getNetworks(
+    buildNetworkParams((await searchParams) ?? {}),
+  );
 
   return <NetworksAdmin networks={networks} />;
 };

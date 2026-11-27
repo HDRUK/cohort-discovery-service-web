@@ -5,14 +5,34 @@ import { CACHE_TAGS } from "@/config/tags";
 import { API_ROUTES } from "@/lib/apiRoutes";
 import { apiGet } from "@/server/api";
 import { LIST_CACHE_LIFE } from "@/server/cacheProfiles";
+import { isSearchQuery, toListQuery } from "@/server/listQuery";
 import { requireSession } from "@/server/session";
 import { ApiResponse, Network } from "@/types/api";
 
-export const getNetworks = async (): Promise<ApiResponse<Network[]>> => {
+const fetchNetworks = async (
+  queryString: string,
+): Promise<ApiResponse<Network[]>> => {
+  const { token } = await requireSession();
+  return apiGet<ApiResponse<Network[]>>(token, API_ROUTES.networks, {
+    params: queryString,
+  });
+};
+
+const fetchCachedNetworks = async (
+  queryString: string,
+): Promise<ApiResponse<Network[]>> => {
   "use cache: private";
   cacheLife(LIST_CACHE_LIFE);
   cacheTag(CACHE_TAGS.networks);
 
-  const { token } = await requireSession();
-  return apiGet<ApiResponse<Network[]>>(token, API_ROUTES.networks);
+  return fetchNetworks(queryString);
+};
+
+export const getNetworks = (
+  params?: URLSearchParams | string,
+): Promise<ApiResponse<Network[]>> => {
+  const queryString = toListQuery(params);
+  return isSearchQuery(queryString)
+    ? fetchNetworks(queryString)
+    : fetchCachedNetworks(queryString);
 };

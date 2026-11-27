@@ -1,6 +1,7 @@
 import {
   buildCollectionHostParams,
   buildCollectionParams,
+  buildNetworkParams,
   buildQueryHistoryParams,
   buildWorkgroupCollectionParams,
   clampPerPage,
@@ -118,5 +119,24 @@ describe("buildCollectionParams", () => {
     const params = buildCollectionParams({ per_page: 100000 });
 
     expect(params.get("per_page")).toBe("200");
+  });
+});
+
+describe("buildNetworkParams", () => {
+  it("sends the search term as name[]", () => {
+    const params = buildNetworkParams({ search_term: "north" });
+
+    expect(params.get("name[]")).toBe("north");
+  });
+
+  it("leaves out page and per_page even when the URL has them", () => {
+    const params = buildNetworkParams({ page: 2, per_page: 5 });
+
+    expect(params.has("page")).toBe(false);
+    expect(params.has("per_page")).toBe(false);
+  });
+
+  it("sends nothing when there is no search term", () => {
+    expect(buildNetworkParams({}).toString()).toBe("");
   });
 });

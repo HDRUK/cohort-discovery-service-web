@@ -1,11 +1,16 @@
 import { Suspense } from "react";
 import { SearchParamsTransitionProvider } from "@/contexts/SearchParamsTransitionContext";
+import { ApiSearchParams } from "@/types/api";
 import NetworksTab, { NetworksSkeleton } from "../components/NetworksTab";
 
-const AdminNetworksPage = () => (
+const AdminNetworksPage = ({
+  searchParams,
+}: {
+  searchParams: Promise<ApiSearchParams>;
+}) => (
   <SearchParamsTransitionProvider>
     <Suspense fallback={<NetworksSkeleton />}>
-      <NetworksTab />
+      <NetworksTab searchParams={searchParams} />
     </Suspense>
   </SearchParamsTransitionProvider>
 );

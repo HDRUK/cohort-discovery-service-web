@@ -1,4 +1,5 @@
 import {
+  ApiSearchParams,
   CollectionHostsSearchParams,
   CollectionsSearchParams,
   ConceptSearchParams,
@@ -57,6 +58,11 @@ export const buildCollectionParams = (
 
   return buildSearchParams(params);
 };
+
+export const buildNetworkParams = ({
+  search_term,
+}: ApiSearchParams): URLSearchParams =>
+  buildSearchParams(search_term ? { ["name[]"]: search_term } : {});
 
 export const buildWorkgroupCollectionParams = (
   searchParams: CollectionsSearchParams,
