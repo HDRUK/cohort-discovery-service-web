@@ -14,6 +14,8 @@ import { useSessionData } from "@/contexts/SessionDataContext";
 import { useNetworks } from "@/contexts/NetworksContext";
 import updateNetwork from "@/actions/network/updateNetwork";
 import addCustodiansToNetwork from "@/actions/network/addCustodiansToNetwork";
+import removeCustodiansFromNetwork from "@/actions/network/removeCustodiansFromNetwork";
+import { diffMembership } from "@/utils/membership";
 import useSelectedNetwork from "@/hooks/useSelectedNetwork";
 
 const UpdateNetwork = () => {
@@ -67,9 +69,21 @@ const UpdateNetwork = () => {
           url: data.url,
         });
 
-        if (data.custodians.length > 0) {
+        const { added, removed } = diffMembership(
+          selectedNetwork.custodians.map((c) => c.id),
+          data.custodians.map((c) => +c.value),
+        );
+
+        if (added.length > 0) {
           await addCustodiansToNetwork({
-            custodian_ids: data.custodians.map((c) => +c.value),
+            custodian_ids: added,
+            id: selectedNetwork.id,
+          });
+        }
+
+        if (removed.length > 0) {
+          await removeCustodiansFromNetwork({
+            custodian_ids: removed,
             id: selectedNetwork.id,
           });
         }
